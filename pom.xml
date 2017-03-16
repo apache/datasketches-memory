@@ -163,7 +163,7 @@
                   <!--
                     <show>private</show>
                   -->
-                  <stylesheetfile>sketches/src/main/javadoc/stylesheet.css</stylesheetfile>
+                  <stylesheetfile>src/main/javadoc/stylesheet.css</stylesheetfile>
                   <docfilessubdirs>true</docfilessubdirs>
                 </configuration>
                 <executions>
@@ -171,7 +171,7 @@
                         <id>attach-javadocs</id>
                         <goals>
                             <goal>jar</goal>
-                          </goals>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

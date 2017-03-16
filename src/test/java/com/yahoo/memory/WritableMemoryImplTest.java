@@ -15,12 +15,6 @@ import java.nio.ByteOrder;
 
 import org.testng.annotations.Test;
 
-import com.yahoo.memory.Memory;
-import com.yahoo.memory.ReadOnlyMemoryException;
-import com.yahoo.memory.UnsafeUtil;
-import com.yahoo.memory.WritableMemory;
-import com.yahoo.memory.WritableResourceHandler;
-
 public class WritableMemoryImplTest {
 
   //Simple Native direct
@@ -28,6 +22,7 @@ public class WritableMemoryImplTest {
   @Test
   public void checkNativeCapacityAndClose() {
     int memCapacity = 64;
+    @SuppressWarnings("resource") //intentionally not using try-with-resouces here
     WritableResourceHandler wmh = WritableMemory.allocateDirect(memCapacity);
     WritableMemory mem = wmh.get();
     assertEquals(memCapacity, mem.getCapacity());
@@ -307,121 +302,125 @@ public class WritableMemoryImplTest {
   @Test
   public void checkCopyCrossNativeSmall() {
     int memCapacity = 64;
-    WritableResourceHandler wrh1 = WritableMemory.allocateDirect(memCapacity);
-    WritableMemory mem1 = wrh1.get();
-    WritableResourceHandler wrh2 = WritableMemory.allocateDirect(memCapacity);
-    WritableMemory mem2 = wrh2.get();
 
-    for (int i=0; i < memCapacity; i++) {
-      mem1.putByte(i, (byte) i);
-    }
-    mem2.clear();
-    mem1.copyTo(0, mem2, 0, memCapacity);
+    try (WritableResourceHandler wrh1 = WritableMemory.allocateDirect(memCapacity);
+        WritableResourceHandler wrh2 = WritableMemory.allocateDirect(memCapacity))
+    {
+      WritableMemory mem1 = wrh1.get();
+      WritableMemory mem2 = wrh2.get();
 
-    for (int i=0; i<memCapacity; i++) {
-      assertEquals(mem2.getByte(i), (byte) i);
+      for (int i=0; i < memCapacity; i++) {
+        mem1.putByte(i, (byte) i);
+      }
+      mem2.clear();
+      mem1.copyTo(0, mem2, 0, memCapacity);
+
+      for (int i=0; i<memCapacity; i++) {
+        assertEquals(mem2.getByte(i), (byte) i);
+      }
+      wrh1.close();
+      wrh2.close();
     }
-    wrh1.close();
-    wrh2.close();
   }
 
   @Test
   public void checkCopyCrossNativeLarge() {
     int memCapacity = (2<<20) + 64;
     int memCapLongs = memCapacity / 8;
-    WritableResourceHandler wrh1 = WritableMemory.allocateDirect(memCapacity);
-    WritableMemory mem1 = wrh1.get();
-    WritableResourceHandler wrh2 = WritableMemory.allocateDirect(memCapacity);
-    WritableMemory mem2 = wrh2.get();
 
-    for (int i=0; i < memCapLongs; i++) {
-      mem1.putLong(i*8, i);
+    try (WritableResourceHandler wrh1 = WritableMemory.allocateDirect(memCapacity);
+        WritableResourceHandler wrh2 = WritableMemory.allocateDirect(memCapacity))
+    {
+      WritableMemory mem1 = wrh1.get();
+      WritableMemory mem2 = wrh2.get();
+
+      for (int i=0; i < memCapLongs; i++) {
+        mem1.putLong(i*8, i);
+      }
+      mem2.clear();
+
+      mem1.copyTo(0, mem2, 0, memCapacity);
+
+      for (int i=0; i<memCapLongs; i++) {
+        assertEquals(mem2.getLong(i*8), i);
+      }
     }
-    mem2.clear();
-
-    mem1.copyTo(0, mem2, 0, memCapacity);
-
-    for (int i=0; i<memCapLongs; i++) {
-      assertEquals(mem2.getLong(i*8), i);
-    }
-    wrh1.close();
-    wrh2.close();
   }
 
   @Test
   public void checkCopyCrossNativeAndByteArray() {
     int memCapacity = 64;
-    WritableResourceHandler wrh1 = WritableMemory.allocateDirect(memCapacity);
-    WritableMemory mem1 = wrh1.get();
+    try (WritableResourceHandler wrh1 = WritableMemory.allocateDirect(memCapacity)) {
+      WritableMemory mem1 = wrh1.get();
 
-    for (int i= 0; i < mem1.getCapacity(); i++) {
-      mem1.putByte(i, (byte) i);
+      for (int i= 0; i < mem1.getCapacity(); i++) {
+        mem1.putByte(i, (byte) i);
+      }
+
+      WritableMemory mem2 = WritableMemory.allocate(memCapacity);
+      mem1.copyTo(8, mem2, 16, 16);
+
+      for (int i=0; i<16; i++) {
+        assertEquals(mem1.getByte(8+i), mem2.getByte(16+i));
+      }
+      //println(mem2.toHexString("Mem2", 0, (int)mem2.getCapacity()));
     }
-
-    WritableMemory mem2 = WritableMemory.allocate(memCapacity);
-    mem1.copyTo(8, mem2, 16, 16);
-
-    for (int i=0; i<16; i++) {
-      assertEquals(mem1.getByte(8+i), mem2.getByte(16+i));
-    }
-    //println(mem2.toHexString("Mem2", 0, (int)mem2.getCapacity()));
-    wrh1.close();
   }
 
   @Test
   public void checkCopyCrossRegionsSameNative() {
     int memCapacity = 128;
-    WritableResourceHandler wrh1 = WritableMemory.allocateDirect(memCapacity);
-    WritableMemory mem1 = wrh1.get();
 
-    for (int i= 0; i < mem1.getCapacity(); i++) {
-      mem1.putByte(i, (byte) i);
+    try (WritableResourceHandler wrh1 = WritableMemory.allocateDirect(memCapacity)) {
+      WritableMemory mem1 = wrh1.get();
+
+      for (int i= 0; i < mem1.getCapacity(); i++) {
+        mem1.putByte(i, (byte) i);
+      }
+      //println(mem1.toHexString("Mem1", 0, (int)mem1.getCapacity()));
+
+      Memory reg1 = mem1.region(8, 16);
+      //println(reg1.toHexString("Reg1", 0, (int)reg1.getCapacity()));
+
+      WritableMemory reg2 = mem1.writableRegion(24, 16);
+      //println(reg2.toHexString("Reg2", 0, (int)reg2.getCapacity()));
+      reg1.copyTo(0, reg2, 0, 16);
+
+      for (int i=0; i<16; i++) {
+        assertEquals(reg1.getByte(i), reg2.getByte(i));
+        assertEquals(mem1.getByte(8+i), mem1.getByte(24+i));
+      }
+      //println(mem1.toHexString("Mem1", 0, (int)mem1.getCapacity()));
     }
-    //println(mem1.toHexString("Mem1", 0, (int)mem1.getCapacity()));
-
-    Memory reg1 = mem1.region(8, 16);
-    //println(reg1.toHexString("Reg1", 0, (int)reg1.getCapacity()));
-
-    WritableMemory reg2 = mem1.writableRegion(24, 16);
-    //println(reg2.toHexString("Reg2", 0, (int)reg2.getCapacity()));
-    reg1.copyTo(0, reg2, 0, 16);
-
-    for (int i=0; i<16; i++) {
-      assertEquals(reg1.getByte(i), reg2.getByte(i));
-      assertEquals(mem1.getByte(8+i), mem1.getByte(24+i));
-    }
-
-    //println(mem1.toHexString("Mem1", 0, (int)mem1.getCapacity()));
-    wrh1.close();
   }
 
   @Test
   public void checkCopyCrossNativeArrayAndHierarchicalRegions() {
     int memCapacity = 64;
-    WritableResourceHandler wrh1 = WritableMemory.allocateDirect(memCapacity);
-    WritableMemory mem1 = wrh1.get();
+    try (WritableResourceHandler wrh1 = WritableMemory.allocateDirect(memCapacity)) {
+      WritableMemory mem1 = wrh1.get();
 
-    for (int i= 0; i < mem1.getCapacity(); i++) { //fill with numbers
-      mem1.putByte(i, (byte) i);
+      for (int i= 0; i < mem1.getCapacity(); i++) { //fill with numbers
+        mem1.putByte(i, (byte) i);
+      }
+      //println(mem1.toHexString("Mem1", 0, (int)mem1.getCapacity()));
+
+      WritableMemory mem2 = WritableMemory.allocate(memCapacity);
+
+      Memory reg1 = mem1.region(8, 32);
+      Memory reg1B = reg1.region(8, 16);
+      //println(reg1.toHexString("Reg1", 0, (int)reg1.getCapacity()));
+      //println(reg1B.toHexString("Reg1B", 0, (int)reg1B.getCapacity()));
+
+      WritableMemory reg2 = mem2.writableRegion(32, 16);
+      reg1B.copyTo(0, reg2, 0, 16);
+      //println(reg2.toHexString("Reg2", 0, (int)reg2.getCapacity()));
+
+      //println(mem2.toHexString("Mem2", 0, (int)mem2.getCapacity()));
+      for (int i = 32, j = 16; i < 40; i++, j++) {
+        assertEquals(mem2.getByte(i), j);
+      }
     }
-    //println(mem1.toHexString("Mem1", 0, (int)mem1.getCapacity()));
-
-    WritableMemory mem2 = WritableMemory.allocate(memCapacity);
-
-    Memory reg1 = mem1.region(8, 32);
-    Memory reg1B = reg1.region(8, 16);
-    //println(reg1.toHexString("Reg1", 0, (int)reg1.getCapacity()));
-    //println(reg1B.toHexString("Reg1B", 0, (int)reg1B.getCapacity()));
-
-    WritableMemory reg2 = mem2.writableRegion(32, 16);
-    reg1B.copyTo(0, reg2, 0, 16);
-    //println(reg2.toHexString("Reg2", 0, (int)reg2.getCapacity()));
-
-    //println(mem2.toHexString("Mem2", 0, (int)mem2.getCapacity()));
-    for (int i = 32, j = 16; i < 40; i++, j++) {
-      assertEquals(mem2.getByte(i), j);
-    }
-    wrh1.close();
 
   }
 
@@ -430,88 +429,80 @@ public class WritableMemoryImplTest {
   @Test
   public void checkToHexStringAllMem() {
     int memCapacity = 48; //must be 48
-    WritableResourceHandler wrh1 = WritableMemory.allocateDirect(memCapacity);
-    WritableMemory mem = wrh1.get();
+    try (WritableResourceHandler wrh1 = WritableMemory.allocateDirect(memCapacity)) {
+      WritableMemory mem = wrh1.get();
 
-    CommonTest.toHexStringAllMemTests(mem); //requires println enabled to visually check
-
-    wrh1.close();
+      CommonTest.toHexStringAllMemTests(mem); //requires println enabled to visually check
+    }
   }
 
   @Test
   public void checkSetClearMemoryRegions() {
     int memCapacity = 64; //must be 64
-    WritableResourceHandler wrh1 = WritableMemory.allocateDirect(memCapacity);
-    WritableMemory mem = wrh1.get();
+    try (WritableResourceHandler wrh1 = WritableMemory.allocateDirect(memCapacity)) {
+      WritableMemory mem = wrh1.get();
 
-    CommonTest.setClearMemoryRegionsTests(mem); //requires println enabled to visually check
-    for (int i = 0; i < memCapacity; i++) {
-      assertEquals(mem.getByte(i), 0);
+      CommonTest.setClearMemoryRegionsTests(mem); //requires println enabled to visually check
+      for (int i = 0; i < memCapacity; i++) {
+        assertEquals(mem.getByte(i), 0);
+      }
     }
-    wrh1.close();
   }
 
   @Test
   public void checkSetGet() {
     int memCapacity = 16; //must be 16
-    WritableResourceHandler wrh = WritableMemory.allocateDirect(memCapacity);
-    WritableMemory mem = wrh.get();
-    assertEquals(mem.getCapacity(), memCapacity);
+    try (WritableResourceHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
+      WritableMemory mem = wrh.get();
+      assertEquals(mem.getCapacity(), memCapacity);
 
-    CommonTest.setGetTests(mem);
-
-    wrh.close();
+      CommonTest.setGetTests(mem);
+    }
   }
 
   @Test
   public void checkSetGetArrays() {
     int memCapacity = 32;
-    WritableResourceHandler wrh = WritableMemory.allocateDirect(memCapacity);
-    WritableMemory mem = wrh.get();
-    assertEquals(memCapacity, mem.getCapacity());
+    try (WritableResourceHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
+      WritableMemory mem = wrh.get();
+      assertEquals(memCapacity, mem.getCapacity());
 
-    CommonTest.setGetArraysTests(mem);
-
-    wrh.close();
+      CommonTest.setGetArraysTests(mem);
+    }
   }
 
   @Test
   public void checkSetGetPartialArraysWithOffset() {
     int memCapacity = 32;
-    WritableResourceHandler wrh = WritableMemory.allocateDirect(memCapacity);
-    WritableMemory mem = wrh.get();
-    assertEquals(memCapacity, mem.getCapacity());
+    try (WritableResourceHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
+      WritableMemory mem = wrh.get();
+      assertEquals(memCapacity, mem.getCapacity());
 
-    CommonTest.setGetPartialArraysWithOffsetTests(mem);
-
-    wrh.close();
+      CommonTest.setGetPartialArraysWithOffsetTests(mem);
+    }
   }
 
   @Test
   public void checkSetClearIsBits() {
     int memCapacity = 8;
-    WritableResourceHandler wrh = WritableMemory.allocateDirect(memCapacity);
-    WritableMemory mem = wrh.get();
+    try (WritableResourceHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
+      WritableMemory mem = wrh.get();
 
-    assertEquals(memCapacity, mem.getCapacity());
-    mem.clear();
+      assertEquals(memCapacity, mem.getCapacity());
+      mem.clear();
 
-    CommonTest.setClearIsBitsTests(mem);
-
-    wrh.close();
+      CommonTest.setClearIsBitsTests(mem);
+    }
   }
 
   @Test
   public void checkAtomicMethods() {
     int memCapacity = 8;
-    WritableResourceHandler wrh = WritableMemory.allocateDirect(memCapacity);
-    WritableMemory mem = wrh.get();
-
-    assertEquals(mem.getCapacity(), memCapacity);
-
-    CommonTest.atomicMethodTests(mem);
-
-    wrh.close();
+    try (WritableResourceHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
+      WritableMemory mem = wrh.get();
+      assertEquals(mem.getCapacity(), memCapacity);
+      CommonTest.atomicMethodTests(mem);
+    }
   }
 
   @Test
@@ -624,10 +615,11 @@ public class WritableMemoryImplTest {
     int memCapacity = 64;
     WritableMemory mem = WritableMemory.allocate(memCapacity);
     assertFalse(mem.isDirect());
-    WritableResourceHandler wrh = WritableMemory.allocateDirect(memCapacity);
-    mem = wrh.get();
-    assertTrue(mem.isDirect());
-    wrh.close();
+    try (WritableResourceHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
+      mem = wrh.get();
+      assertTrue(mem.isDirect());
+      wrh.close();
+    }
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)
@@ -697,33 +689,31 @@ public class WritableMemoryImplTest {
     byte[] arr2 = new byte[] {0, 1, 2, 4};
     byte[] arr3 = new byte[] {0, 1, 2, 3, 4};
 
-    WritableResourceHandler h1 = WritableMemory.allocateDirect(4);
-    WritableMemory mem1 = h1.get();
-    mem1.putByteArray(0, arr1, 0, 4);
+    try (WritableResourceHandler h1 = WritableMemory.allocateDirect(4);
+        WritableResourceHandler h2 = WritableMemory.allocateDirect(4);
+        WritableResourceHandler h3 = WritableMemory.allocateDirect(5))
+    {
+      WritableMemory mem1 = h1.get();
+      mem1.putByteArray(0, arr1, 0, 4);
 
-    WritableResourceHandler h2 = WritableMemory.allocateDirect(4);
-    WritableMemory mem2 = h2.get();
-    mem2.putByteArray(0, arr2, 0, 4);
+      WritableMemory mem2 = h2.get();
+      mem2.putByteArray(0, arr2, 0, 4);
 
-    WritableResourceHandler h3 = WritableMemory.allocateDirect(5);
-    WritableMemory mem3 = h3.get();
-    mem3.putByteArray(0, arr3, 0, 5);
+      WritableMemory mem3 = h3.get();
+      mem3.putByteArray(0, arr3, 0, 5);
 
-    int comp = mem1.compareTo(0, 3, mem2, 0, 3);
-    assertEquals(comp, 0);
-    comp = mem1.compareTo(0, 4, mem2, 0, 4);
-    assertEquals(comp, -1);
-    comp = mem2.compareTo(0, 4, mem1, 0, 4);
-    assertEquals(comp, 1);
-    //different lengths
-    comp = mem1.compareTo(0, 4, mem3, 0, 5);
-    assertEquals(comp, -1);
-    comp = mem3.compareTo(0, 5, mem1, 0, 4);
-    assertEquals(comp, 1);
-
-    h1.close();
-    h2.close();
-    h3.close();
+      int comp = mem1.compareTo(0, 3, mem2, 0, 3);
+      assertEquals(comp, 0);
+      comp = mem1.compareTo(0, 4, mem2, 0, 4);
+      assertEquals(comp, -1);
+      comp = mem2.compareTo(0, 4, mem1, 0, 4);
+      assertEquals(comp, 1);
+      //different lengths
+      comp = mem1.compareTo(0, 4, mem3, 0, 5);
+      assertEquals(comp, -1);
+      comp = mem3.compareTo(0, 5, mem1, 0, 4);
+      assertEquals(comp, 1);
+    }
   }
 
   @Test

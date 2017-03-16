@@ -11,9 +11,6 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.yahoo.memory.MemoryRequest;
-import com.yahoo.memory.WritableMemory;
-import com.yahoo.memory.WritableResourceHandler;
 import com.yahoo.memory.ResourceHandler.ResourceType;
 
 public class AllocateDirectTest {
@@ -22,19 +19,19 @@ public class AllocateDirectTest {
   public void checkAllocateDirect() {
     int longs = 32;
     int bytes = longs << 3;
-    WritableResourceHandler wh = WritableMemory.allocateDirect(bytes);
-    WritableMemory wMem1 = wh.get();
-    for (int i = 0; i<longs; i++) {
-      wMem1.putLong(i << 3, i);
-      assertEquals(wMem1.getLong(i << 3), i);
+    try (WritableResourceHandler wh = WritableMemory.allocateDirect(bytes)) {
+      WritableMemory wMem1 = wh.get();
+      for (int i = 0; i<longs; i++) {
+        wMem1.putLong(i << 3, i);
+        assertEquals(wMem1.getLong(i << 3), i);
+      }
+      wMem1.toHexString("Test", 0, 32 * 8);
+      wh.load();
+      assertFalse(wh.isLoaded());
+      wh.force();
+      assertEquals(wh.getResourceType(), ResourceType.NATIVE_MEMORY);
+      assertTrue(wh.isResourceType(ResourceType.NATIVE_MEMORY));
     }
-    wMem1.toHexString("Test", 0, 32 * 8);
-    wh.load();
-    assertFalse(wh.isLoaded());
-    wh.force();
-    assertEquals(wh.getResourceType(), ResourceType.NATIVE_MEMORY);
-    assertTrue(wh.isResourceType(ResourceType.NATIVE_MEMORY));
-    wh.close();
   }
 
   private static class DummyMemReq implements MemoryRequest {
@@ -52,10 +49,10 @@ public class AllocateDirectTest {
   @Test
   public void checkAllocateWithMemReq() {
     MemoryRequest req = new DummyMemReq();
-    WritableResourceHandler wh = WritableMemory.allocateDirect(8, req);
-    WritableMemory wMem = wh.get();
-    assertTrue(req.equals(wMem.getMemoryRequest()));
-    wh.close();
+    try (WritableResourceHandler wh = WritableMemory.allocateDirect(8, req)) {
+      WritableMemory wMem = wh.get();
+      assertTrue(req.equals(wMem.getMemoryRequest()));
+    }
   }
 
   @Test

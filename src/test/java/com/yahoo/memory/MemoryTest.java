@@ -12,23 +12,19 @@ import java.nio.ByteOrder;
 
 import org.testng.annotations.Test;
 
-import com.yahoo.memory.Memory;
-import com.yahoo.memory.WritableMemory;
-import com.yahoo.memory.WritableResourceHandler;
-
 public class MemoryTest {
 
   @Test
   public void checkDirectRoundTrip() {
     int n = 1024; //longs
-    WritableResourceHandler wh = WritableMemory.allocateDirect(n * 8, null);
-    WritableMemory mem = wh.get();
-    for (int i = 0; i < n; i++) mem.putLong(i * 8, i);
-    for (int i = 0; i < n; i++) {
-      long v = mem.getLong(i * 8);
-      assertEquals(v, i);
+    try (WritableResourceHandler wh = WritableMemory.allocateDirect(n * 8, null)) {
+      WritableMemory mem = wh.get();
+      for (int i = 0; i < n; i++) mem.putLong(i * 8, i);
+      for (int i = 0; i < n; i++) {
+        long v = mem.getLong(i * 8);
+        assertEquals(v, i);
+      }
     }
-    wh.close();
   }
 
   @Test
@@ -194,6 +190,7 @@ public class MemoryTest {
   @Test(expectedExceptions = AssertionError.class)
   public void checkParentUseAfterFree() {
     int bytes = 64 * 8;
+    @SuppressWarnings("resource") //intentionally not using try-with-resouces here
     WritableResourceHandler wh = WritableMemory.allocateDirect(bytes);
     WritableMemory wmem = wh.get();
     wh.close();
@@ -205,6 +202,7 @@ public class MemoryTest {
   @Test(expectedExceptions = AssertionError.class)
   public void checkRegionUseAfterFree() {
     int bytes = 64;
+    @SuppressWarnings("resource") //intentionally not using try-with-resouces here
     WritableResourceHandler wh = WritableMemory.allocateDirect(bytes);
     Memory wmem = wh.get();
     Memory region = wmem.region(0L, bytes);

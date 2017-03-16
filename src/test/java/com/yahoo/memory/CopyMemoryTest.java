@@ -10,10 +10,6 @@ import static org.testng.Assert.assertEquals;
 
 import org.testng.annotations.Test;
 
-import com.yahoo.memory.Memory;
-import com.yahoo.memory.WritableMemory;
-import com.yahoo.memory.WritableResourceHandler;
-
 
 public class CopyMemoryTest {
 
@@ -43,24 +39,24 @@ public class CopyMemoryTest {
   public void directWSource() {
     int k1 = 1 << 20; //longs
     int k2 = 2 * k1;
-    WritableResourceHandler wrh = genWRH(k1, false);
-    WritableMemory srcMem = wrh.get();
-    WritableMemory dstMem = genMem(k2, true);
-    srcMem.copyTo(0, dstMem, k1 << 3, k1 << 3);
-    check(dstMem, k1, k1, 1);
-    wrh.close();
+    try (WritableResourceHandler wrh = genWRH(k1, false)) {
+      WritableMemory srcMem = wrh.get();
+      WritableMemory dstMem = genMem(k2, true);
+      srcMem.copyTo(0, dstMem, k1 << 3, k1 << 3);
+      check(dstMem, k1, k1, 1);
+    }
   }
 
   @Test
   public void directROSource() {
     int k1 = 1 << 20; //longs
     int k2 = 2 * k1;
-    WritableResourceHandler wrh = genWRH(k1, false);
-    Memory srcMem = wrh.get();
-    WritableMemory dstMem = genMem(k2, true);
-    srcMem.copyTo(0, dstMem, k1 << 3, k1 << 3);
-    check(dstMem, k1, k1, 1);
-    wrh.close();
+    try (WritableResourceHandler wrh = genWRH(k1, false)) {
+      Memory srcMem = wrh.get();
+      WritableMemory dstMem = genMem(k2, true);
+      srcMem.copyTo(0, dstMem, k1 << 3, k1 << 3);
+      check(dstMem, k1, k1, 1);
+    }
   }
 
   @Test
@@ -92,14 +88,14 @@ public class CopyMemoryTest {
   public void directROSrcRegion() {
     int k1 = 1 << 20; //longs
     //gen baseMem of k1 longs w data, direct
-    WritableResourceHandler wrh = genWRH(k1, false);
-    Memory baseMem = wrh.get();
-    //gen src region of k1/2 longs, off= k1/2
-    Memory srcReg = baseMem.region((k1/2) << 3, (k1/2) << 3);
-    WritableMemory dstMem = genMem(2 * k1, true); //empty
-    srcReg.copyTo(0, dstMem, k1 << 3, (k1/2) << 3);
-    check(dstMem, k1, k1/2, k1/2 + 1);
-    wrh.close();
+    try (WritableResourceHandler wrh = genWRH(k1, false)) {
+      Memory baseMem = wrh.get();
+      //gen src region of k1/2 longs, off= k1/2
+      Memory srcReg = baseMem.region((k1/2) << 3, (k1/2) << 3);
+      WritableMemory dstMem = genMem(2 * k1, true); //empty
+      srcReg.copyTo(0, dstMem, k1 << 3, (k1/2) << 3);
+      check(dstMem, k1, k1/2, k1/2 + 1);
+    }
   }
 
   private static void check(Memory mem, int offsetLongs, int lengthLongs, int startValue) {

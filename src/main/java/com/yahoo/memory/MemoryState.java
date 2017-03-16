@@ -3,7 +3,7 @@
  * Apache License 2.0. See LICENSE file at the project root for terms.
  */
 
-package com.yahoo.memory4;
+package com.yahoo.memory;
 
 import java.io.File;
 import java.nio.ByteBuffer;

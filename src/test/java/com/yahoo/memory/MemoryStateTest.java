@@ -3,7 +3,7 @@
  * Apache License 2.0. See LICENSE file at the project root for terms.
  */
 
-package com.yahoo.memory4;
+package com.yahoo.memory;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -13,6 +13,9 @@ import static org.testng.Assert.fail;
 import java.nio.ByteOrder;
 
 import org.testng.annotations.Test;
+
+import com.yahoo.memory.MemoryState;
+import com.yahoo.memory.StepBoolean;
 
 public class MemoryStateTest {
 

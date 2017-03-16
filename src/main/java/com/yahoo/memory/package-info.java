@@ -55,4 +55,4 @@ public abstract WritableBuffer { //Not implemented
 }
 
 */
-package com.yahoo.memory4;
+package com.yahoo.memory;

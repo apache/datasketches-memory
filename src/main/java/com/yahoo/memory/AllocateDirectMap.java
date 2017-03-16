@@ -3,10 +3,10 @@
  * Apache License 2.0. See LICENSE file at the project root for terms.
  */
 
-package com.yahoo.memory4;
+package com.yahoo.memory;
 
-import static com.yahoo.memory4.AllocateDirectWritableMap.isFileReadOnly;
-import static com.yahoo.memory4.UnsafeUtil.unsafe;
+import static com.yahoo.memory.AllocateDirectWritableMap.isFileReadOnly;
+import static com.yahoo.memory.UnsafeUtil.unsafe;
 
 import java.io.File;
 import java.io.FileDescriptor;

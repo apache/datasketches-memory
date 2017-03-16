@@ -3,37 +3,37 @@
  * Apache License 2.0. See LICENSE file at the project root for terms.
  */
 
-package com.yahoo.memory4;
+package com.yahoo.memory;
 
-import static com.yahoo.memory4.UnsafeUtil.ARRAY_BOOLEAN_BASE_OFFSET;
-import static com.yahoo.memory4.UnsafeUtil.ARRAY_BOOLEAN_INDEX_SCALE;
-import static com.yahoo.memory4.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
-import static com.yahoo.memory4.UnsafeUtil.ARRAY_BYTE_INDEX_SCALE;
-import static com.yahoo.memory4.UnsafeUtil.ARRAY_CHAR_BASE_OFFSET;
-import static com.yahoo.memory4.UnsafeUtil.ARRAY_CHAR_INDEX_SCALE;
-import static com.yahoo.memory4.UnsafeUtil.ARRAY_DOUBLE_BASE_OFFSET;
-import static com.yahoo.memory4.UnsafeUtil.ARRAY_DOUBLE_INDEX_SCALE;
-import static com.yahoo.memory4.UnsafeUtil.ARRAY_FLOAT_BASE_OFFSET;
-import static com.yahoo.memory4.UnsafeUtil.ARRAY_FLOAT_INDEX_SCALE;
-import static com.yahoo.memory4.UnsafeUtil.ARRAY_INT_BASE_OFFSET;
-import static com.yahoo.memory4.UnsafeUtil.ARRAY_INT_INDEX_SCALE;
-import static com.yahoo.memory4.UnsafeUtil.ARRAY_LONG_BASE_OFFSET;
-import static com.yahoo.memory4.UnsafeUtil.ARRAY_LONG_INDEX_SCALE;
-import static com.yahoo.memory4.UnsafeUtil.ARRAY_SHORT_BASE_OFFSET;
-import static com.yahoo.memory4.UnsafeUtil.ARRAY_SHORT_INDEX_SCALE;
-import static com.yahoo.memory4.UnsafeUtil.BOOLEAN_SHIFT;
-import static com.yahoo.memory4.UnsafeUtil.BYTE_SHIFT;
-import static com.yahoo.memory4.UnsafeUtil.CHAR_SHIFT;
-import static com.yahoo.memory4.UnsafeUtil.DOUBLE_SHIFT;
-import static com.yahoo.memory4.UnsafeUtil.FLOAT_SHIFT;
-import static com.yahoo.memory4.UnsafeUtil.INT_SHIFT;
-import static com.yahoo.memory4.UnsafeUtil.LONG_SHIFT;
-import static com.yahoo.memory4.UnsafeUtil.LS;
-import static com.yahoo.memory4.UnsafeUtil.SHORT_SHIFT;
-import static com.yahoo.memory4.UnsafeUtil.UNSAFE_COPY_THRESHOLD;
-import static com.yahoo.memory4.UnsafeUtil.assertBounds;
-import static com.yahoo.memory4.UnsafeUtil.checkOverlap;
-import static com.yahoo.memory4.UnsafeUtil.unsafe;
+import static com.yahoo.memory.UnsafeUtil.ARRAY_BOOLEAN_BASE_OFFSET;
+import static com.yahoo.memory.UnsafeUtil.ARRAY_BOOLEAN_INDEX_SCALE;
+import static com.yahoo.memory.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
+import static com.yahoo.memory.UnsafeUtil.ARRAY_BYTE_INDEX_SCALE;
+import static com.yahoo.memory.UnsafeUtil.ARRAY_CHAR_BASE_OFFSET;
+import static com.yahoo.memory.UnsafeUtil.ARRAY_CHAR_INDEX_SCALE;
+import static com.yahoo.memory.UnsafeUtil.ARRAY_DOUBLE_BASE_OFFSET;
+import static com.yahoo.memory.UnsafeUtil.ARRAY_DOUBLE_INDEX_SCALE;
+import static com.yahoo.memory.UnsafeUtil.ARRAY_FLOAT_BASE_OFFSET;
+import static com.yahoo.memory.UnsafeUtil.ARRAY_FLOAT_INDEX_SCALE;
+import static com.yahoo.memory.UnsafeUtil.ARRAY_INT_BASE_OFFSET;
+import static com.yahoo.memory.UnsafeUtil.ARRAY_INT_INDEX_SCALE;
+import static com.yahoo.memory.UnsafeUtil.ARRAY_LONG_BASE_OFFSET;
+import static com.yahoo.memory.UnsafeUtil.ARRAY_LONG_INDEX_SCALE;
+import static com.yahoo.memory.UnsafeUtil.ARRAY_SHORT_BASE_OFFSET;
+import static com.yahoo.memory.UnsafeUtil.ARRAY_SHORT_INDEX_SCALE;
+import static com.yahoo.memory.UnsafeUtil.BOOLEAN_SHIFT;
+import static com.yahoo.memory.UnsafeUtil.BYTE_SHIFT;
+import static com.yahoo.memory.UnsafeUtil.CHAR_SHIFT;
+import static com.yahoo.memory.UnsafeUtil.DOUBLE_SHIFT;
+import static com.yahoo.memory.UnsafeUtil.FLOAT_SHIFT;
+import static com.yahoo.memory.UnsafeUtil.INT_SHIFT;
+import static com.yahoo.memory.UnsafeUtil.LONG_SHIFT;
+import static com.yahoo.memory.UnsafeUtil.LS;
+import static com.yahoo.memory.UnsafeUtil.SHORT_SHIFT;
+import static com.yahoo.memory.UnsafeUtil.UNSAFE_COPY_THRESHOLD;
+import static com.yahoo.memory.UnsafeUtil.assertBounds;
+import static com.yahoo.memory.UnsafeUtil.checkOverlap;
+import static com.yahoo.memory.UnsafeUtil.unsafe;
 
 /**
  * @author Lee Rhodes

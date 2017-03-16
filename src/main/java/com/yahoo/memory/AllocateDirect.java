@@ -3,9 +3,9 @@
  * Apache License 2.0. See LICENSE file at the project root for terms.
  */
 
-package com.yahoo.memory4;
+package com.yahoo.memory;
 
-import static com.yahoo.memory4.UnsafeUtil.unsafe;
+import static com.yahoo.memory.UnsafeUtil.unsafe;
 
 import sun.misc.Cleaner;
 

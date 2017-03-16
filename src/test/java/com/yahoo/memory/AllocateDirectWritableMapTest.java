@@ -3,9 +3,9 @@
  * Apache License 2.0. See LICENSE file at the project root for terms.
  */
 
-package com.yahoo.memory4;
+package com.yahoo.memory;
 
-import static com.yahoo.memory4.AllocateDirectWritableMap.checkOffsetAndCapacity;
+import static com.yahoo.memory.AllocateDirectWritableMap.checkOffsetAndCapacity;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -18,7 +18,12 @@ import java.io.UnsupportedEncodingException;
 
 import org.testng.annotations.Test;
 
-import com.yahoo.memory4.ResourceHandler.ResourceType;
+import com.yahoo.memory.Memory;
+import com.yahoo.memory.ReadOnlyMemoryException;
+import com.yahoo.memory.ResourceHandler;
+import com.yahoo.memory.WritableMemory;
+import com.yahoo.memory.WritableResourceHandler;
+import com.yahoo.memory.ResourceHandler.ResourceType;
 
 public class AllocateDirectWritableMapTest {
 

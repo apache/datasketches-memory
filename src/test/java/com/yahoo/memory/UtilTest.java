@@ -3,15 +3,21 @@
  * Apache License 2.0. See LICENSE file at the project root for terms.
  */
 
-package com.yahoo.memory4;
+package com.yahoo.memory;
 
-import static com.yahoo.memory4.Util.characterPad;
-import static com.yahoo.memory4.Util.memoryRequestHandler;
-import static com.yahoo.memory4.Util.zeroPad;
+import static com.yahoo.memory.Util.characterPad;
+import static com.yahoo.memory.Util.memoryRequestHandler;
+import static com.yahoo.memory.Util.zeroPad;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
+
+import com.yahoo.memory.MemoryRequest;
+import com.yahoo.memory.UnsafeUtil;
+import com.yahoo.memory.Util;
+import com.yahoo.memory.WritableMemory;
+import com.yahoo.memory.WritableResourceHandler;
 
 public class UtilTest {
   @Test

@@ -3,11 +3,13 @@
  * Apache License 2.0. See LICENSE file at the project root for terms.
  */
 
-package com.yahoo.memory4;
+package com.yahoo.memory;
 
 import java.nio.ByteBuffer;
 
 import org.testng.annotations.Test;
+
+import com.yahoo.memory.WritableMemory;
 
 public class WritableMemoryTest {
 

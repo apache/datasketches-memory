@@ -3,7 +3,7 @@
  * Apache License 2.0. See LICENSE file at the project root for terms.
  */
 
-package com.yahoo.memory4;
+package com.yahoo.memory;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -13,7 +13,10 @@ import java.io.File;
 
 import org.testng.annotations.Test;
 
-import com.yahoo.memory4.ResourceHandler.ResourceType;
+import com.yahoo.memory.AllocateDirectMap;
+import com.yahoo.memory.Memory;
+import com.yahoo.memory.ResourceHandler;
+import com.yahoo.memory.ResourceHandler.ResourceType;
 
 public class AllocateDirectMapTest {
 

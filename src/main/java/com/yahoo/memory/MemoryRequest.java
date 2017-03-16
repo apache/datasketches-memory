@@ -3,7 +3,7 @@
  * Licensed under the terms of the Apache License 2.0. See LICENSE file at the project root for terms.
  */
 
-package com.yahoo.memory4;
+package com.yahoo.memory;
 
 /**
  * The MemoryRequest is a callback interface that is accessible from the WritableMemory interface and

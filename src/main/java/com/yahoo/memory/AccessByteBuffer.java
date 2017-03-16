@@ -3,10 +3,10 @@
  * Apache License 2.0. See LICENSE file at the project root for terms.
  */
 
-package com.yahoo.memory4;
+package com.yahoo.memory;
 
-import static com.yahoo.memory4.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
-import static com.yahoo.memory4.UnsafeUtil.ARRAY_BYTE_INDEX_SCALE;
+import static com.yahoo.memory.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
+import static com.yahoo.memory.UnsafeUtil.ARRAY_BYTE_INDEX_SCALE;
 
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;

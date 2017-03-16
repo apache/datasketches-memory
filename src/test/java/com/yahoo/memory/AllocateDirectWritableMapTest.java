@@ -18,11 +18,6 @@ import java.io.UnsupportedEncodingException;
 
 import org.testng.annotations.Test;
 
-import com.yahoo.memory.Memory;
-import com.yahoo.memory.ReadOnlyMemoryException;
-import com.yahoo.memory.ResourceHandler;
-import com.yahoo.memory.WritableMemory;
-import com.yahoo.memory.WritableResourceHandler;
 import com.yahoo.memory.ResourceHandler.ResourceType;
 
 public class AllocateDirectWritableMapTest {
@@ -45,7 +40,7 @@ public class AllocateDirectWritableMapTest {
   public void testForce() throws Exception {
     String origStr = "Corectng spellng mistks";
     File origFile = createFile("force_original.txt", origStr); //23
-    origFile.setWritable(true, false);
+    assertTrue(origFile.setWritable(true, false));
     long origBytes = origFile.length();
     String correctStr = "Correcting spelling mistakes"; //28
     byte[] correctByteArr = correctStr.getBytes(UTF_8);

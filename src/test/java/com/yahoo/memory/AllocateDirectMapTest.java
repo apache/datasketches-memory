@@ -13,9 +13,6 @@ import java.io.File;
 
 import org.testng.annotations.Test;
 
-import com.yahoo.memory.AllocateDirectMap;
-import com.yahoo.memory.Memory;
-import com.yahoo.memory.ResourceHandler;
 import com.yahoo.memory.ResourceHandler.ResourceType;
 
 public class AllocateDirectMapTest {
@@ -25,7 +22,7 @@ public class AllocateDirectMapTest {
     File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
     try (ResourceHandler rh = Memory.map(file)) {
       ResourceType type = rh.getResourceType();
-      rh.isResourceType(type);
+      assertTrue(rh.isResourceType(type));
       rh.close();
     }
   }

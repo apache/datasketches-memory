@@ -18,9 +18,6 @@ public interface WritableResourceHandler extends ResourceHandler {
   @Override
   WritableMemory get();
 
-  @Override
-  void close();
-
   /**
    * Applies only to writable mapped files. Otherwise is a no-op.
    * Forces any changes made to this content to be written to the storage device containing the

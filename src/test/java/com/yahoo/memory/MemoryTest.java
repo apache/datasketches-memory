@@ -136,7 +136,7 @@ public class MemoryTest {
     for (int i = 0; i < 64; i++) {
       assertEquals(mem.getByte(i), 64 + i);
     }
-    println(mem.toHexString("slice", 0, slice.capacity()));
+    //println(mem.toHexString("slice", 0, slice.capacity()));
   }
 
   @Test
@@ -218,11 +218,16 @@ public class MemoryTest {
     test.checkRegionUseAfterFree();
   }
 
+  @Test
+  public void printlnTest() {
+    println("PRINTING: "+this.getClass().getName());
+  }
+
   /**
    * @param s blah
    */
   static void println(final String s) {
-    System.out.println(s);
+    //System.out.println(s);
   }
 
 }

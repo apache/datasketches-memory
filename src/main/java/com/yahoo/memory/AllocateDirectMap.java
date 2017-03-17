@@ -47,10 +47,7 @@ final class AllocateDirectMap extends WritableMemoryImpl implements ResourceHand
    * <p>Memory maps a file directly in off heap leveraging native map0 method used in
    * FileChannelImpl.c. The owner will have read access to that address space.</p>
    *
-   * @param file File to be mapped
-   * @param offset Memory map starting from this offset in the file
-   * @param capacity Memory map at most capacity bytes &gt; 0 starting from {@code offset}
-   * @param readOnlyRequest true if requesting method requests read-only interface.
+   * @param state the MemoryState
    * @return A new MemoryMappedFile
    * @throws Exception file not found or RuntimeException, etc.
    */
@@ -177,6 +174,11 @@ final class AllocateDirectMap extends WritableMemoryImpl implements ResourceHand
    * Creates a mapping of the file on disk starting at position and of size length to pages in OS.
    * May throw OutOfMemory error if you have exhausted memory. Force garbage collection and
    * re-attempt.
+   * @param fileChannel the FileChannel
+   * @param position the offset in bytes
+   * @param len the length in bytes
+   * @return the direct memory address
+   * @throws RuntimeException Encountered an exception while mapping
    */
   private static final long map(final FileChannel fileChannel, final long position, final long len)
       throws RuntimeException {

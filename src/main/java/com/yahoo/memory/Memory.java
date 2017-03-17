@@ -444,6 +444,7 @@ public abstract class Memory {
    * @param preamble a descriptive header
    * @param offsetBytes offset bytes relative to the Memory start
    * @param lengthBytes number of bytes to convert to a hex string
+   * @param state the MemoryState
    * @return a formatted hex string in a human readable array
    */
   static String toHex(final String preamble, final long offsetBytes, final int lengthBytes,

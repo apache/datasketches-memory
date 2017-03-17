@@ -9,7 +9,7 @@
     <groupId>com.yahoo.datasketches</groupId>
     <artifactId>memory</artifactId>
     <version>0.10.0</version>
-    <packaging>pom</packaging>
+    <!-- <packaging>pom</packaging> -->
 
     <!-- Project Information -->
     <name>${project.groupId}:${project.artifactId}</name>
@@ -140,7 +140,7 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>6.11</version>
+            <version>6.10</version>
             <scope>test</scope>
         </dependency>
         <!-- run locally for now

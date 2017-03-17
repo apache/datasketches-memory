@@ -22,7 +22,7 @@ public interface WritableResourceHandler extends ResourceHandler {
   void close();
 
   /**
-   * Applies only to mapped files. Otherwise is a no-op.
+   * Applies only to writable mapped files. Otherwise is a no-op.
    * Forces any changes made to this content to be written to the storage device containing the
    * mapped file.
    *
@@ -41,9 +41,8 @@ public interface WritableResourceHandler extends ResourceHandler {
    * (java.nio.channels.FileChannel.MapMode.READ_WRITE) then invoking this method has no effect.
    * </p>
    *
-   * @see <a href=
-   * "https://docs.oracle.com/javase/8/docs/api/java/nio/MappedByteBuffer.html#force--"> java/
-   * nio/MappedByteBuffer.force</a>
+   * @see <a href="https://docs.oracle.com/javase/8/docs/api/java/nio/MappedByteBuffer.html#force--">
+   * java/nio/MappedByteBuffer.force</a>
    */
   void force();
 

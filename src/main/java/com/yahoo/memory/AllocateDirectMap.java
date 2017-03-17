@@ -134,6 +134,16 @@ final class AllocateDirectMap extends WritableMemoryImpl implements ResourceHand
     }
   }
 
+  @Override
+  public ResourceType getResourceType() {
+    return ResourceType.MEMORY_MAPPED_FILE;
+  }
+
+  @Override
+  public boolean isResourceType(final ResourceType resourceType) {
+    return resourceType == ResourceType.MEMORY_MAPPED_FILE;
+  }
+
   // Restricted methods
 
   static final int pageCount(final int ps, final long capacity) {
@@ -218,6 +228,15 @@ final class AllocateDirectMap extends WritableMemoryImpl implements ResourceHand
       this.parentStateRef = state;
     }
 
+    @Override
+    public void run() {
+      if (this.fc != null) {
+        unmap();
+      }
+      this.actualNativeBaseOffset = 0L;
+      this.parentStateRef.setInvalid(); //The only place valid is set invalid.
+    }
+
     /**
      * Removes existing mapping
      */
@@ -233,14 +252,6 @@ final class AllocateDirectMap extends WritableMemoryImpl implements ResourceHand
       }
     }
 
-    @Override
-    public void run() {
-      if (this.fc != null) {
-        unmap();
-      }
-      this.actualNativeBaseOffset = 0L;
-      this.parentStateRef.setInvalid(); //The only place valid is set invalid.
-    }
   } //End of class Deallocator
 
   private static final void checkOffsetAndCapacity(final long offset, final long capacity) {
@@ -251,13 +262,4 @@ final class AllocateDirectMap extends WritableMemoryImpl implements ResourceHand
     }
   }
 
-  @Override
-  public ResourceType getResourceType() {
-    return ResourceType.MEMORY_MAPPED_FILE;
-  }
-
-  @Override
-  public boolean isResourceType(final ResourceType resourceType) {
-    return resourceType == ResourceType.MEMORY_MAPPED_FILE;
-  }
 }

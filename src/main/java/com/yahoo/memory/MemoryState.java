@@ -13,23 +13,96 @@ import java.nio.ByteOrder;
  * @author Lee Rhodes
  */
 final class MemoryState {
-  private static final ByteOrder nativeOrder_ = ByteOrder.nativeOrder();
-  private ByteOrder myOrder_ = nativeOrder_;
-  private boolean swapBytes_ = false;
-  private long nativeBaseOffset_ = 0L; //Direct ByteBuffer includes the slice() offset here.
-  private Object unsafeObj_ = null; //##Array objects are held here.
-  private long unsafeObjHeader_ = 0L; //##Heap ByteBuffer includes the slice() offset here.
-  private ByteBuffer byteBuf_ = null; //Holding this until we are done with it.
-  private File file_ = null; //Holding this until we are done with it.
+
+  /**
+   * Only used to compute cumBaseOffset for off-heap resources.
+   * If this changes, cumBaseOffset is recomputed.
+   * A slice() of a Direct ByteBuffer includes the array_offset here.  It is originally computed
+   * either from the Unsafe.allocateMemory() call or from the mapping class.
+   */
+  private long nativeBaseOffset_ = 0L;
+
+  /**
+   * The object used in most Unsafe calls. This is effectively the array object if on-heap and
+   * null for direct memory and determines how cumBaseOffset is computed.
+   * This is effectively supplied by the user.
+   */
+  private Object unsafeObj_ = null;
+
+  /**
+   * If unsafeObj_ is non-null, this is the object header space for the specific array type,
+   * typically either 16 or 24 bytes.  However, a slice of a Heap ByteBuffer adds the array-offset
+   * to this value. This is computed based on the type of unsafeObj_ or extracted from a sliced
+   * heap ByteBuffer. This is used to compute cumBaseOffset for heap resources.
+   * If this changes, cumBaseOffset is recomputed.
+   */
+  private long unsafeObjHeader_ = 0L;
+
+  /**
+   * This holds a reference to a ByteBuffer until we are done with it.
+   * This is also a user supplied parameter passed to AccessByteBuffer.
+   */
+  private ByteBuffer byteBuf_ = null;
+
+  /**
+   * This is user supplied parameter that is passed to the mapping class..
+   */
+  private File file_ = null;
+
+  /**
+   * The position or offset of a file that defines the starting region for the memory map. This is
+   * a user supplied parameter that is passed to the mapping class.
+   */
   private long fileOffset_;
+
+  /**
+   * This is the offset that defines the start of a sub-region of the backing resource. It is
+   * used to compute cumBaseOffset. If this changes, cumBaseOffset is recomputed.
+   */
   private long regionOffset_ = 0L;
+
+  /**
+   * The size of the backing resource in bytes. Used by all methods when checking bounds.
+   */
   private long capacity_ = 0L;//##
+
+  /**
+   * This becomes the base offset used by all Unsafe calls.
+   */
   private long cumBaseOffset_ = 0L; //##Holds the cum offset to the start of data.
+
+  /**
+   * Only relevant when user allocated direct memory is the backing resource. It is a callback
+   * mechanism for the client of a resource to request more memory from the owner of the resource.
+   */
   private MemoryRequest memReq_ = null; //##
+
+  /**
+   * Only set true if the backing resource has an independen read-only state and is, in fact,
+   * read-only. This can only be changed from false (writable) to true (read-only) once. The
+   * initial state is false (writable).
+   */
+  private StepBoolean resourceIsReadOnly_ = new StepBoolean(false); //initial state is writable
+
+  /**
+   * Only the backing resources that use AutoCloseable can set this to false.  It can only be
+   * changed from true to false once. The initial state is valid.
+   */
+  private StepBoolean valid_ = new StepBoolean(true);
+
+  /**
+   * Place holder for future positional memory extension.
+   */
   private boolean positional_ = false;
 
-  private StepBoolean resourceIsReadOnly_ = new StepBoolean(false); //initial state is writable
-  private StepBoolean valid_ = new StepBoolean(true); //## initial state is valid
+  /** Place holder for some future endian extension. */
+  private static final ByteOrder nativeOrder_ = ByteOrder.nativeOrder();
+
+  /** Place holder for some future endian extension. */
+  private ByteOrder myOrder_ = nativeOrder_;
+
+  /** Place holder for some future endian extension. */
+  private boolean swapBytes_ = false; //true if myOrder != nativeOrder_
 
   MemoryState() {}
 

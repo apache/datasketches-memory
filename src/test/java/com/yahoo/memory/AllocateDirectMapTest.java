@@ -6,16 +6,20 @@
 package com.yahoo.memory;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 import java.io.File;
 
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 import com.yahoo.memory.ResourceHandler.ResourceType;
 
 public class AllocateDirectMapTest {
+  ResourceHandler hand = null;
+
 
   @Test
   public void simpleMap() throws Exception {
@@ -90,6 +94,39 @@ public class AllocateDirectMapTest {
   }
 
   @Test
+  public void testHandlerHandoffWithTWR() throws Exception {
+    File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
+    long memCapacity = file.length();
+    try (ResourceHandler rh = Memory.map(file, 0, memCapacity)) {
+      rh.load();
+      assertTrue(rh.isLoaded());
+      hand = rh;
+    }
+    Memory mem = hand.get();
+    assertFalse(mem.isValid());
+    println(""+mem.isValid());
+  }
+
+  @Test
+  public void testHandoffWithoutClose() throws Exception {
+    File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
+    long memCapacity = file.length();
+    ResourceHandler rh = Memory.map(file, 0, memCapacity);
+    rh.load();
+    assertTrue(rh.isLoaded());
+    hand = rh;
+    //The receiver of the handler must close the resource, in this case it is the class.
+  }
+
+  @AfterClass
+  public void afterAllTests() {
+    Memory mem = hand.get();
+    assertTrue(mem.isValid());
+    hand.close();
+    assertFalse(mem.isValid());
+  }
+
+  @Test
   public void printlnTest() {
     println("PRINTING: "+this.getClass().getName());
   }
@@ -98,6 +135,6 @@ public class AllocateDirectMapTest {
    * @param s value to print
    */
   static void println(String s) {
-    //System.out.println(s); //disable here
+    System.out.println(s); //disable here
   }
 }

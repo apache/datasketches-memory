@@ -287,7 +287,7 @@ final class AllocateDirectWritableMap extends WritableMemoryImpl implements Writ
       e.printStackTrace();
     }
     if (attributes != null) {
-      // A file is read-only in Linux only when it has 0444 permissions.
+      // A file is read-only in Linux-derived OSes only when it has 0444 permissions.
       // Here we are going to ignore the Owner W,E bits to allow root/owner testing.
       final Set<PosixFilePermission> permissions = attributes.permissions();
       int bits = 0;

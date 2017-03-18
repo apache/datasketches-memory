@@ -88,8 +88,13 @@ public abstract class WritableMemory extends Memory {
 
   /**
    * Allocates and provides access to capacityBytes directly in native (off-heap) memory
-   * leveraging the WritableMemory API.
-   * The allocated memory will be 8-byte aligned, but may not be page aligned.
+   * leveraging the WritableMemory API. The allocated memory will be 8-byte aligned, but may not
+   * be page aligned.
+   *
+   * <p><b>NOTE:</b> Native/Direct memory acquired using Unsafe may have garbage in it.
+   * It is the responsibility of the using class to clear this memory, if required,
+   * and to call <i>close()</i> when done.</p>
+   *
    * @param capacityBytes the size of the desired memory in bytes
    * @return WritableResourceHandler for managing this off-heap resource
    */

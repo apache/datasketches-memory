@@ -6,9 +6,10 @@
 package com.yahoo.memory;
 
 /**
- * The MemoryRequest is a callback interface that is accessible from the WritableMemory interface and
- * provides a means for a WritableMemory object to request more memory from the calling class and to
- * free memory that is no longer needed.
+ * The MemoryRequest is a callback interface provides a means for a WritableMemory object to
+ * request more memory from the parent class and to request that its original memory object be
+ * closed or reused, which is up to the parent class. This mechanism is only used with directly
+ * allocated native memory.
  *
  * @author Lee Rhodes
  */
@@ -24,8 +25,8 @@ public interface MemoryRequest {
   /**
    * Request for allocate and copy.
    *
-   * <p>Request to allocate new WritableMemory with the capacityBytes; copy the contents of origMem
-   * from zero to copyToBytes.</p>
+   * <p>Request to allocate new WritableMemory with the capacityBytes and copy the contents of
+   * origMem from zero to copyToBytes.</p>
    *
    * @param origMem The original WritableMemory, a portion, starting at zero, which will be copied
    * to the newly allocated WritableMemory. This reference must not be null.

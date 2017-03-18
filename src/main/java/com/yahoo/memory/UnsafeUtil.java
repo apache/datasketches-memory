@@ -19,10 +19,6 @@ import sun.misc.Unsafe;
  * and it must be done with both source and target versions of jdk7 specified in pom.xml.
  * The resultant jar will work on jdk7 and jdk8.</p>
  *
- * <p><b>NOTE:</b> Native/Direct memory acquired using Unsafe may have garbage in it.
- * It is the responsibility of the using class to clear this memory, if required,
- * and to call <i>freeMemory()</i> when done.</p>
- *
  * @author Lee Rhodes
  */
 //@SuppressWarnings("restriction")
@@ -71,8 +67,8 @@ public final class UnsafeUtil {
   //@formatter:on
 
   /**
-   * This number limits the number of bytes to copy per call to Unsafe's copyMemory method.
-   * A limit is imposed to allow for safepoint polling during a large copy.
+   * Large memory copies are broken into segments of bytes of this size to allow for safepoint
+   * polling by the JVM.
    */
   public static final long UNSAFE_COPY_THRESHOLD = 1L << 20; //2^20
 

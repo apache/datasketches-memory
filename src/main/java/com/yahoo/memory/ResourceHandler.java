@@ -49,9 +49,21 @@ public interface ResourceHandler extends AutoCloseable {
    */
   boolean isLoaded();
 
+  /**
+   * The type of resource
+   */
   enum ResourceType { MEMORY_MAPPED_FILE, NATIVE_MEMORY }
 
+  /**
+   * Gets the current resource type
+   * @return the current resource type
+   */
   ResourceType getResourceType();
 
+  /**
+   * Returns <i>true</i> if the given resourceType is the same as <i>this</i>.
+   * @param resourceType the given resource type.
+   * @return <i>true</i> if the given resourceType is the same as <i>this</i>.
+   */
   boolean isResourceType(ResourceType resourceType);
 }

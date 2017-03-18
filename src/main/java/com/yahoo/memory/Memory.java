@@ -338,6 +338,18 @@ public abstract class Memory {
 
   //OTHER PRIMITIVE READ METHODS: copy, isYYYY(), areYYYY() //XXX
 
+  /**
+   * Compares the bytes of this Memory to <i>that</i> Memory.
+   * Returns <i>(this &lt; that) ? -1 : (this &gt; that) ? 1 : 0;</i>.
+   * If all bytes are equal up to the shorter of the two lengths, the shorter length is considered
+   * to be less than the other.
+   * @param thisOffsetBytes the starting offset for <i>this Memory</i>
+   * @param thisLengthBytes the length of the region to compare from <i>this Memory</i>
+   * @param that the other Memory to compare with
+   * @param thatOffsetBytes the starting offset for <i>that Memory</i>
+   * @param thatLengthBytes the length of the region to compare from <i>that Memory</i>
+   * @return <i>(this &lt; that) ? -1 : (this &gt; that) ? 1 : 0;</i>
+   */
   public abstract int compareTo(long thisOffsetBytes, long thisLengthBytes, Memory that,
       long thatOffsetBytes, long thatLengthBytes);
 

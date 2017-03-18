@@ -25,12 +25,12 @@ public interface WritableResourceHandler extends ResourceHandler {
    *
    * <p>
    * If the file mapped into this buffer resides on a local storage device then when this method
-   * returns it is guaranteed that all changes made to the buffer since it was created, or since
+   * returns, it is guaranteed that all changes made to the buffer since it was created, or since
    * this method was last invoked, will have been written to that device.
    * </p>
    *
    * <p>
-   * If the file does not reside on a local device then no such guarantee is made.
+   * If the file does not reside on a local device then no such guarantee can be made.
    * </p>
    *
    * <p>

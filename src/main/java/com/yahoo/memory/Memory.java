@@ -30,6 +30,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
+ * Provides read-only primitive and primitive array methods to any of the four resources
+ * mentioned at the package level.
+ *
  * @author Lee Rhodes
  */
 public abstract class Memory {

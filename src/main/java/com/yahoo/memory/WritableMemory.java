@@ -27,6 +27,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
+ * Provides read and write primitive and primitive array access to any of the four resources
+ * mentioned at the package level.
+ *
  * @author Lee Rhodes
  */
 public abstract class WritableMemory extends Memory {

@@ -16,6 +16,10 @@ import java.nio.MappedByteBuffer;
  */
 final class MemoryState {
 
+  /** Place holder for some future endian extension. */
+  private static final ByteOrder nativeOrder_ = ByteOrder.nativeOrder();
+
+  //FOUNDATION PARAMETERS
   /**
    * Only used to compute cumBaseOffset for off-heap resources.
    * If this changes, cumBaseOffset is recomputed.
@@ -41,32 +45,6 @@ final class MemoryState {
   private long unsafeObjHeader_ = 0L;
 
   /**
-   * This holds a reference to a ByteBuffer until we are done with it.
-   * This is also a user supplied parameter passed to AccessByteBuffer.
-   */
-  private ByteBuffer byteBuf_ = null;
-
-  /**
-   * This is user supplied parameter that is passed to the mapping class..
-   */
-  private File file_ = null;
-
-  private RandomAccessFile raf_ = null;
-
-  private MappedByteBuffer mbb_ = null;
-  /**
-   * The position or offset of a file that defines the starting region for the memory map. This is
-   * a user supplied parameter that is passed to the mapping class.
-   */
-  private long fileOffset_;
-
-  /**
-   * This is the offset that defines the start of a sub-region of the backing resource. It is
-   * used to compute cumBaseOffset. If this changes, cumBaseOffset is recomputed.
-   */
-  private long regionOffset_ = 0L;
-
-  /**
    * The size of the backing resource in bytes. Used by all methods when checking bounds.
    */
   private long capacity_ = 0L;//##
@@ -82,6 +60,7 @@ final class MemoryState {
    */
   private MemoryRequest memReq_ = null; //##
 
+  //FLAGS
   /**
    * Only set true if the backing resource has an independen read-only state and is, in fact,
    * read-only. This can only be changed from false (writable) to true (read-only) once. The
@@ -95,13 +74,49 @@ final class MemoryState {
    */
   private StepBoolean valid_ = new StepBoolean(true);
 
+  //REGIONS
+  /**
+   * This is the offset that defines the start of a sub-region of the backing resource. It is
+   * used to compute cumBaseOffset. If this changes, cumBaseOffset is recomputed.
+   */
+  private long regionOffset_ = 0L;
+
+  //BYTE BUFFER
+  /**
+   * This holds a reference to a ByteBuffer until we are done with it.
+   * This is also a user supplied parameter passed to AccessByteBuffer.
+   */
+  private ByteBuffer byteBuf_ = null;
+
+  //MAPPED FILES
+  /**
+   * This is user supplied parameter that is passed to the mapping class..
+   */
+  private File file_ = null;
+
+  /**
+   * The position or offset of a file that defines the starting region for the memory map. This is
+   * a user supplied parameter that is passed to the mapping class.
+   */
+  private long fileOffset_;
+
+  /**
+   * This is used by the mapping class as a passing parameter.
+   */
+  private RandomAccessFile raf_ = null;
+
+  /**
+   * This is used by the mapping class as a passing parameter.
+   */
+  private MappedByteBuffer mbb_ = null;
+
+  //POSITIONAL
   /**
    * Place holder for future positional memory extension.
    */
   private boolean positional_ = false;
 
-  /** Place holder for some future endian extension. */
-  private static final ByteOrder nativeOrder_ = ByteOrder.nativeOrder();
+  //ENDIANNESS PLACE HOLDERS
 
   /** Place holder for some future endian extension. */
   private ByteOrder myOrder_ = nativeOrder_;
@@ -113,20 +128,37 @@ final class MemoryState {
 
   MemoryState copy() {
     final MemoryState out = new MemoryState();
-    out.myOrder_ = myOrder_;
-    out.swapBytes_ = swapBytes_;
+    //FOUNDATION PARAMETERS
     out.nativeBaseOffset_ = nativeBaseOffset_;
     out.unsafeObj_ = unsafeObj_;
     out.unsafeObjHeader_ = unsafeObjHeader_;
-    out.byteBuf_ = byteBuf_;
-    out.file_ = file_;
-    out.fileOffset_ = fileOffset_;
-    out.regionOffset_ = regionOffset_;
     out.capacity_ = capacity_;
+    //cumBaseOffset to compute
     out.memReq_ = memReq_;
-    out.positional_ = positional_;
+
+    //Flags
     out.resourceIsReadOnly_ = resourceIsReadOnly_;
     out.valid_ = valid_;
+
+    //REGIONS
+    out.regionOffset_ = regionOffset_;
+
+    //Byte Buffer
+    out.byteBuf_ = byteBuf_;
+
+    //Mapped files
+    out.file_ = file_;
+    out.fileOffset_ = fileOffset_;
+    out.raf_ = raf_;
+    out.mbb_ = mbb_;
+
+    //POSITIONAL
+    out.positional_ = positional_;
+
+    //ENDIANNESS PLACE HOLDERS
+    out.myOrder_ = myOrder_;
+    out.swapBytes_ = swapBytes_;
+    out.compute();
     return out;
   }
 

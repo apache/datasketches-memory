@@ -1,8 +1,9 @@
 /**
  * The goal of this package is to provide high performance access to native memory for primitives
- * and primitive arrays. It also provides compatible views into heap-based arrays and the
- * Java ByteBuffer class. This package is general purpose, has no external dependencies and can
- * be used in any application that needs to manage data structures outside the Java heap.
+ * and primitive arrays. It also provides consistent views into heap-based arrays,
+ * Java ByteBuffers and memory mapped files. This package is general purpose, has no external
+ * dependencies and can be used in any application that needs to manage data structures outside
+ * the Java heap.
  *
  * <p>More specifically, this package provides access to four different types of resources using
  * the same API:
@@ -18,11 +19,11 @@
  * <li>Converting a writable instance into a read-only instance is a simple up-cast.
  * For example: <pre>{@code
  *     WritableMemory wMem = ...
- *     Memory mem = (Memory)wMem;
+ *     Memory mem = (Memory)wMem; //or Memory mem = wMem.asReadOnly()
  * }</pre>
  * </li>
- * <li>The Native Memory and the Memory Mapped File resources implement {@code AutoCloseable} so
- * that these resources are automatically closed if wrapped in a try-with-resources block.
+ * <li>The native memory and the memory mapped file resources implement {@code AutoCloseable} so
+ * that these resources are automatically closed if wrapped in a try-with-resources (TRW) block.
  * These resources are acquired using simple handlers that implement the {@code close()}
  * method: <pre>{@code
  *     try (WritableResourceHandler handler = WritableResource.map(File file)) {
@@ -34,11 +35,11 @@
  * one can not use the TWR block. Instead:<pre>{@code
  *     WritableResourceHandler handler = WritableResource.map(File file);
  *     ...
- *     doWorkAndClose(handler); //passes the handler to downstream that closes the resource.
+ *     doWorkAndClose(handler); //passes the handler to downstream object that closes the resource.
  * }</pre>
  * </li>
  *
- * <li>With asserts enabled in the JVM, all methods are checked for bounds violations and
+ * <li>With asserts enabled in the JVM, all methods are checked for bounds and
  * use-after-close violations.</li>
  *
  * <li>Hierarchical memory regions can be easily created:<pre>{@code

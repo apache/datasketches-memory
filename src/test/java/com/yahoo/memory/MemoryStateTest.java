@@ -14,9 +14,6 @@ import java.nio.ByteOrder;
 
 import org.testng.annotations.Test;
 
-import com.yahoo.memory.MemoryState;
-import com.yahoo.memory.StepBoolean;
-
 public class MemoryStateTest {
 
   @Test
@@ -28,7 +25,7 @@ public class MemoryStateTest {
   }
 
   @Test
-  public void checkOrder() {
+  public void checkByteOrder() {
     MemoryState state = new MemoryState();
     assertEquals(state.order(), ByteOrder.nativeOrder());
     if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
@@ -65,11 +62,28 @@ public class MemoryStateTest {
     }
 
     try {
+      state.putRandomAccessFile(null);
+      fail();
+    } catch (IllegalArgumentException e) {
+      //ok
+    }
+
+    try {
+      state.putMappedByteBuffer(null);
+      fail();
+    } catch (IllegalArgumentException e) {
+      //ok
+    }
+
+    try {
       state.putRegionOffset( -16L);
       fail();
     } catch (IllegalArgumentException e) {
       //ok
     }
+
+
+
   }
 
   //StepBoolean checks

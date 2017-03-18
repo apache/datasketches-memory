@@ -6,8 +6,10 @@
 package com.yahoo.memory;
 
 import java.io.File;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.MappedByteBuffer;
 
 /**
  * @author Lee Rhodes
@@ -49,6 +51,9 @@ final class MemoryState {
    */
   private File file_ = null;
 
+  private RandomAccessFile raf_ = null;
+
+  private MappedByteBuffer mbb_ = null;
   /**
    * The position or offset of a file that defines the starting region for the memory map. This is
    * a user supplied parameter that is passed to the mapping class.
@@ -150,6 +155,14 @@ final class MemoryState {
     return file_;
   }
 
+  RandomAccessFile getRandomAccessFile() {
+    return raf_;
+  }
+
+  MappedByteBuffer getMappedByteBuffer() {
+    return mbb_;
+  }
+
   long getFileOffset() {
     return fileOffset_;
   }
@@ -219,6 +232,20 @@ final class MemoryState {
       throw new IllegalArgumentException("File may not be assigned null");
     }
     this.file_ = file;
+  }
+
+  void putRandomAccessFile(final RandomAccessFile raf) {
+    if (raf == null) {
+      throw new IllegalArgumentException("RandomAccessFile may not be assigned null");
+    }
+    this.raf_ = raf;
+  }
+
+  void putMappedByteBuffer(final MappedByteBuffer mbb) {
+    if (mbb == null) {
+      throw new IllegalArgumentException("MappedByteBuffer may not be assigned null");
+    }
+    this.mbb_ = mbb;
   }
 
   void putFileOffset(final long fileOffset) {

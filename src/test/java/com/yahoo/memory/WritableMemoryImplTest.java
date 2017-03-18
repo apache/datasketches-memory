@@ -424,6 +424,15 @@ public class WritableMemoryImplTest {
 
   }
 
+  @Test(expectedExceptions = AssertionError.class)
+  public void checkRegionBounds() {
+    int memCapacity = 64;
+    try (WritableResourceHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
+      WritableMemory mem = wrh.get();
+      mem.writableRegion(1, 64);
+    }
+  }
+
   //Tests using CommonTests
 
   @Test

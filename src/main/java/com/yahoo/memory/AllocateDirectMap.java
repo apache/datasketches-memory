@@ -34,18 +34,13 @@ import sun.nio.ch.FileChannelImpl;
  * @author Praveenkumar Venkatesan
  * @author Lee Rhodes
  */
-final class AllocateDirectMap extends WritableMemoryImpl implements ResourceHandler {
-  //private RandomAccessFile randomAccessFile = null; //only used in writable version
-  private MappedByteBuffer dummyMbbInstance = null;
-  private final Cleaner cleaner;
+class AllocateDirectMap extends WritableMemoryImpl implements ResourceHandler {
+  final Cleaner cleaner;
 
-  private AllocateDirectMap(final MemoryState state, final RandomAccessFile raf,
-      final MappedByteBuffer mbb) {
+  AllocateDirectMap(final MemoryState state) {
     super(state);
-    //this.randomAccessFile = raf; //only used in writable version
-    this.dummyMbbInstance = mbb;
     this.cleaner = Cleaner.create(this,
-        new Deallocator(raf, state));
+        new Deallocator(state));
   }
 
   /**
@@ -56,11 +51,16 @@ final class AllocateDirectMap extends WritableMemoryImpl implements ResourceHand
    * FileChannelImpl.c. The owner will have read access to that address space.</p>
    *
    * @param state the MemoryState
-   * @return A new MemoryMappedFile
+   * @return A new AllocateDirectMap
    * @throws Exception file not found or RuntimeException, etc.
    */
-  @SuppressWarnings("resource")
   static AllocateDirectMap map(final MemoryState state) throws Exception {
+    return new AllocateDirectMap(mapper(state));
+  }
+
+  //does the actual mapping work
+  @SuppressWarnings("resource")
+  static MemoryState mapper(final MemoryState state) throws Exception {
     final long fileOffset = state.getFileOffset();
     final long capacity = state.getCapacity();
     checkOffsetAndCapacity(fileOffset, capacity);
@@ -73,6 +73,7 @@ final class AllocateDirectMap extends WritableMemoryImpl implements ResourceHand
 
     final String mode = "rw"; //we can't map it unless we use rw mode
     final RandomAccessFile raf = new RandomAccessFile(file, mode);
+    state.putRandomAccessFile(raf);
     final FileChannel fc = raf.getChannel();
     final long nativeBaseOffset = map(fc, fileOffset, capacity);
     state.putNativeBaseOffset(nativeBaseOffset);
@@ -80,7 +81,8 @@ final class AllocateDirectMap extends WritableMemoryImpl implements ResourceHand
     // len can be more than the file.length
     raf.setLength(capacity);
     final MappedByteBuffer mbb = createDummyMbbInstance(nativeBaseOffset);
-    return new AllocateDirectMap(state, raf, mbb);
+    state.putMappedByteBuffer(mbb);
+    return state;
   }
 
   @Override
@@ -111,26 +113,13 @@ final class AllocateDirectMap extends WritableMemoryImpl implements ResourceHand
       final Method method =
           MappedByteBuffer.class.getDeclaredMethod("isLoaded0", long.class, long.class, int.class);
       method.setAccessible(true);
-      return (boolean) method.invoke(dummyMbbInstance, nativeBaseOffset, super.capacity,
+      return (boolean) method.invoke(super.state.getMappedByteBuffer(), nativeBaseOffset, super.capacity,
           pageCount);
     } catch (final Exception e) {
       throw new RuntimeException(
           String.format("Encountered %s exception while loading", e.getClass()));
     }
   }
-
-  //@Override //only used in writable version
-  //  public void force() {
-  //    try {
-  //      final Method method = MappedByteBuffer.class.getDeclaredMethod("force0",
-  //          FileDescriptor.class, long.class, long.class);
-  //      method.setAccessible(true);
-  //      method.invoke(this.dummyMbbInstance, this.randomAccessFile.getFD(),
-  //          super.state.getNativeBaseOffset(), super.capacity);
-  //    } catch (final Exception e) {
-  //      throw new RuntimeException(String.format("Encountered %s exception in force", e.getClass()));
-  //    }
-  //  }
 
   @Override
   public void close() {
@@ -158,7 +147,7 @@ final class AllocateDirectMap extends WritableMemoryImpl implements ResourceHand
     return (int) ( (capacity == 0) ? 0 : (capacity - 1L) / ps + 1L);
   }
 
-  private static final MappedByteBuffer createDummyMbbInstance(final long nativeBaseAddress)
+  static final MappedByteBuffer createDummyMbbInstance(final long nativeBaseAddress)
       throws RuntimeException {
     try {
       final Class<?> cl = Class.forName("java.nio.DirectByteBuffer");
@@ -177,11 +166,11 @@ final class AllocateDirectMap extends WritableMemoryImpl implements ResourceHand
   /**
    * madvise is a system call made by load0 native method
    */
-  private void madvise() throws RuntimeException {
+  void madvise() throws RuntimeException {
     try {
       final Method method = MappedByteBuffer.class.getDeclaredMethod("load0", long.class, long.class);
       method.setAccessible(true);
-      method.invoke(dummyMbbInstance, super.state.getNativeBaseOffset(), super.capacity);
+      method.invoke(super.state.getMappedByteBuffer(), super.state.getNativeBaseOffset(), super.capacity);
     } catch (final Exception e) {
       throw new RuntimeException(
           String.format("Encountered %s exception while loading", e.getClass()));
@@ -198,7 +187,7 @@ final class AllocateDirectMap extends WritableMemoryImpl implements ResourceHand
    * @return the direct memory address
    * @throws RuntimeException Encountered an exception while mapping
    */
-  private static final long map(final FileChannel fileChannel, final long position, final long len)
+  static final long map(final FileChannel fileChannel, final long position, final long len)
       throws RuntimeException {
     final int pagePosition = (int) (position % unsafe.pageSize());
     final long mapPosition = position - pagePosition;
@@ -217,28 +206,28 @@ final class AllocateDirectMap extends WritableMemoryImpl implements ResourceHand
   }
 
   private static final class Deallocator implements Runnable {
-    private RandomAccessFile raf;
-    private FileChannel fc;
+    private RandomAccessFile myRaf;
+    private FileChannel myFc;
     //This is the only place the actual native offset is kept for use by unsafe.freeMemory();
     //It can never be modified until it is deallocated.
     private long actualNativeBaseOffset;
     private final long myCapacity;
     private final MemoryState parentStateRef;
 
-    private Deallocator(final RandomAccessFile randomAccessFile, final MemoryState state) {
-      assert (randomAccessFile != null);
-      actualNativeBaseOffset = state.getNativeBaseOffset();
+    private Deallocator(final MemoryState state) {
+      this.myRaf = state.getRandomAccessFile();
+      assert (myRaf != null);
+      this.myFc = myRaf.getChannel();
+      this.actualNativeBaseOffset = state.getNativeBaseOffset();
       assert (actualNativeBaseOffset != 0);
       this.myCapacity = state.getCapacity();
       assert (myCapacity != 0);
-      this.raf = randomAccessFile;
-      this.fc = randomAccessFile.getChannel();
       this.parentStateRef = state;
     }
 
     @Override
     public void run() {
-      if (this.fc != null) {
+      if (this.myFc != null) {
         unmap();
       }
       this.actualNativeBaseOffset = 0L;
@@ -252,8 +241,8 @@ final class AllocateDirectMap extends WritableMemoryImpl implements ResourceHand
       try {
         final Method method = FileChannelImpl.class.getDeclaredMethod("unmap0", long.class, long.class);
         method.setAccessible(true);
-        method.invoke(this.fc, this.actualNativeBaseOffset, this.myCapacity);
-        this.raf.close();
+        method.invoke(this.myFc, this.actualNativeBaseOffset, this.myCapacity);
+        this.myRaf.close();
       } catch (final Exception e) {
         throw new RuntimeException(
             String.format("Encountered %s exception while freeing memory", e.getClass()));
@@ -262,7 +251,7 @@ final class AllocateDirectMap extends WritableMemoryImpl implements ResourceHand
 
   } //End of class Deallocator
 
-  private static final void checkOffsetAndCapacity(final long offset, final long capacity) {
+  static final void checkOffsetAndCapacity(final long offset, final long capacity) {
     if (((offset) | (capacity - 1L) | (offset + capacity)) < 0) {
       throw new IllegalArgumentException(
           "offset: " + offset + ", capacity: " + capacity

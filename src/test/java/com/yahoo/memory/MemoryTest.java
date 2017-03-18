@@ -136,7 +136,8 @@ public class MemoryTest {
     for (int i = 0; i < 64; i++) {
       assertEquals(mem.getByte(i), 64 + i);
     }
-    //println(mem.toHexString("slice", 0, slice.capacity()));
+    mem.toHexString("slice", 0, slice.capacity());
+    //println(s);
   }
 
   @Test
@@ -210,12 +211,6 @@ public class MemoryTest {
     //with -ea assert: Memory not valid.
     //with -da sometimes segfaults, sometimes passes!
     region.getByte(0);
-  }
-
-  public static void main(String[] args) {
-    MemoryTest test = new MemoryTest();
-    test.checkParentUseAfterFree();
-    test.checkRegionUseAfterFree();
   }
 
   @Test

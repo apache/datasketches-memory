@@ -8,7 +8,7 @@ package com.yahoo.memory;
 /**
  * Read only interface for a memory mapped file
  */
-public interface Map extends AutoCloseable {
+interface Map extends AutoCloseable {
 
   @Override
   void close();

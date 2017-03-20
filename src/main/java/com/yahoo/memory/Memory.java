@@ -34,7 +34,8 @@ public abstract class Memory {
     }
     final ResourceState state = new ResourceState();
     state.putByteBuffer(byteBuf);
-    return AccessByteBuffer.wrap(state);
+    AccessByteBuffer.wrap(state);
+    return new WritableMemoryImpl(state);
   }
 
   //MAP

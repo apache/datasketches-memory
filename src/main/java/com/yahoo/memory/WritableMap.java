@@ -8,7 +8,7 @@ package com.yahoo.memory;
 /**
  * Writable interface for a memory mapped file
  */
-public interface WritableMap extends Map {
+interface WritableMap extends Map {
 
   /**
    * Forces any changes made to this content to be written to the storage device containing the

@@ -14,14 +14,12 @@ import java.nio.ByteBuffer;
 /**
  * @author Lee Rhodes
  */
-final class AccessByteBuffer extends WritableMemoryImpl {
+final class AccessByteBuffer {
 
-  private AccessByteBuffer(final ResourceState state) {
-    super(state);
-  }
+  private AccessByteBuffer() { }
 
   //The provided ByteBuffer may be either readOnly or writable
-  static WritableMemoryImpl wrap(final ResourceState state) {
+  static ResourceState wrap(final ResourceState state) {
     final ByteBuffer byteBuf = state.getByteBuffer();
     state.putCapacity(byteBuf.capacity());
     final boolean readOnlyBB = byteBuf.isReadOnly();
@@ -35,7 +33,7 @@ final class AccessByteBuffer extends WritableMemoryImpl {
       if (direct) {
         //address() is already adjusted for direct slices, so regionOffset = 0
         state.putNativeBaseOffset(((sun.nio.ch.DirectBuffer) byteBuf).address());
-        return new AccessByteBuffer(state);
+        return state;
       }
 
       //READ-ONLY HEAP
@@ -59,7 +57,7 @@ final class AccessByteBuffer extends WritableMemoryImpl {
       state.putUnsafeObjectHeader(ARRAY_BYTE_BASE_OFFSET);
       state.putUnsafeObject(unsafeObj);
       state.putRegionOffset(regionOffset);
-      return new AccessByteBuffer(state);
+      return state;
     }
 
     else { //BB is WRITABLE.
@@ -68,14 +66,14 @@ final class AccessByteBuffer extends WritableMemoryImpl {
       if (direct) {
         //address() is already adjusted for direct slices, so regionOffset = 0
         state.putNativeBaseOffset(((sun.nio.ch.DirectBuffer) byteBuf).address());
-        return new AccessByteBuffer(state);
+        return state;
       }
 
       //WRITABLE-HEAP  //unsafeObj, unsafeObjHeader, bytBuf, regionOffset, capacity
       state.putUnsafeObject(byteBuf.array());
       state.putUnsafeObjectHeader(ARRAY_BYTE_BASE_OFFSET);
       state.putRegionOffset(byteBuf.arrayOffset() * ARRAY_BYTE_INDEX_SCALE);
-      return new AccessByteBuffer(state);
+      return state;
     }
   }
 

@@ -23,8 +23,7 @@ final class AllocateDirectWritableMap extends AllocateDirectMap implements Writa
   }
 
   /**
-   * Factory method for memory mapping a file. This should only be called if the file is indeed
-   * writable.
+   * Factory method for memory mapping a file for write access.
    *
    * <p>Memory maps a file directly in off heap leveraging native map0 method used in
    * FileChannelImpl.c. The owner will have read and write access to that address space.</p>

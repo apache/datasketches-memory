@@ -39,13 +39,11 @@ class AllocateDirectMap extends WritableMemoryImpl implements ResourceHandler {
 
   AllocateDirectMap(final ResourceState state) {
     super(state);
-    this.cleaner = Cleaner.create(this,
-        new Deallocator(state));
+    this.cleaner = Cleaner.create(this, new Deallocator(state));
   }
 
   /**
-   * Factory method for memory mapping a file. This should be called only if read access
-   * is desired.
+   * Factory method for memory mapping a file for read-only access.
    *
    * <p>Memory maps a file directly in off heap leveraging native map0 method used in
    * FileChannelImpl.c. The owner will have read access to that address space.</p>
@@ -56,33 +54,6 @@ class AllocateDirectMap extends WritableMemoryImpl implements ResourceHandler {
    */
   static AllocateDirectMap map(final ResourceState state) throws Exception {
     return new AllocateDirectMap(mapper(state));
-  }
-
-  //does the actual mapping work
-  @SuppressWarnings("resource")
-  static ResourceState mapper(final ResourceState state) throws Exception {
-    final long fileOffset = state.getFileOffset();
-    final long capacity = state.getCapacity();
-    checkOffsetAndCapacity(fileOffset, capacity);
-
-    final File file = state.getFile();
-
-    if (isFileReadOnly(file)) {
-      state.setResourceReadOnly(); //The file itself could be writable
-    }
-
-    final String mode = "rw"; //we can't map it unless we use rw mode
-    final RandomAccessFile raf = new RandomAccessFile(file, mode);
-    state.putRandomAccessFile(raf);
-    final FileChannel fc = raf.getChannel();
-    final long nativeBaseOffset = map(fc, fileOffset, capacity);
-    state.putNativeBaseOffset(nativeBaseOffset);
-
-    // len can be more than the file.length
-    raf.setLength(capacity);
-    final MappedByteBuffer mbb = createDummyMbbInstance(nativeBaseOffset);
-    state.putMappedByteBuffer(mbb);
-    return state;
   }
 
   @Override
@@ -142,6 +113,33 @@ class AllocateDirectMap extends WritableMemoryImpl implements ResourceHandler {
   }
 
   // Restricted methods
+
+  //does the actual mapping work
+  @SuppressWarnings("resource")
+  static ResourceState mapper(final ResourceState state) throws Exception {
+    final long fileOffset = state.getFileOffset();
+    final long capacity = state.getCapacity();
+    checkOffsetAndCapacity(fileOffset, capacity);
+
+    final File file = state.getFile();
+
+    if (isFileReadOnly(file)) {
+      state.setResourceReadOnly(); //The file itself could be writable
+    }
+
+    final String mode = "rw"; //we can't map it unless we use rw mode
+    final RandomAccessFile raf = new RandomAccessFile(file, mode);
+    state.putRandomAccessFile(raf);
+    final FileChannel fc = raf.getChannel();
+    final long nativeBaseOffset = map(fc, fileOffset, capacity);
+    state.putNativeBaseOffset(nativeBaseOffset);
+
+    // len can be more than the file.length
+    raf.setLength(capacity);
+    final MappedByteBuffer mbb = createDummyMbbInstance(nativeBaseOffset);
+    state.putMappedByteBuffer(mbb);
+    return state;
+  }
 
   static final int pageCount(final int ps, final long capacity) {
     return (int) ( (capacity == 0) ? 0 : (capacity - 1L) / ps + 1L);

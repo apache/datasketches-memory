@@ -9,13 +9,49 @@ package com.yahoo.memory;
  * Gets a WritableMemory for a map resource
  * @author Lee Rhodes
  */
-//Defines combo of WritableMemory with WritableMap resource
-public interface WritableMemoryMapHandler extends WritableMap {
+//Implements combo of WritableMemory with WritableMap resource
+public class WritableMemoryMapHandler implements WritableMap {
+  AllocateDirectWritableMap dirWmap;
+  WritableMemoryImpl wMem;
+
+  WritableMemoryMapHandler(final AllocateDirectWritableMap dirWmap, final WritableMemoryImpl wMem) {
+    this.dirWmap = dirWmap;
+    this.wMem = wMem;
+  }
+
+  @SuppressWarnings("resource") //called from memory
+  static WritableMemoryMapHandler map(final ResourceState state) throws Exception {
+    final AllocateDirectWritableMap dirMap = AllocateDirectWritableMap.map(state);
+    final WritableMemoryImpl wMem = new WritableMemoryImpl(state);
+    return new WritableMemoryMapHandler(dirMap, wMem);
+  }
 
   /**
    * Gets a WritableMemory for a map resource
    * @return a WritableMemory for a map resource
    */
-  WritableMemory get();
+  public WritableMemory get() {
+    return wMem;
+  }
+
+  @Override
+  public void close() {
+    dirWmap.close();
+  }
+
+  @Override
+  public void load() {
+    dirWmap.load();
+  }
+
+  @Override
+  public boolean isLoaded() {
+    return dirWmap.isLoaded();
+  }
+
+  @Override
+  public void force() {
+    dirWmap.force();
+  }
 
 }

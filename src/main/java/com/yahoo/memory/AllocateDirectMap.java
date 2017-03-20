@@ -34,12 +34,13 @@ import sun.nio.ch.FileChannelImpl;
  * @author Praveenkumar Venkatesan
  * @author Lee Rhodes
  */
-//Called from Memory, implements combo of Memory with Map resource
-class AllocateDirectMap extends WritableMemoryImpl implements MemoryMapHandler {
+class AllocateDirectMap implements Map {
+  final ResourceState state;
   final Cleaner cleaner;
 
+
   AllocateDirectMap(final ResourceState state) {
-    super(state);
+    this.state = state;
     this.cleaner = Cleaner.create(this, new Deallocator(state));
   }
 
@@ -58,17 +59,12 @@ class AllocateDirectMap extends WritableMemoryImpl implements MemoryMapHandler {
   }
 
   @Override
-  public Memory get() {
-    return this;
-  }
-
-  @Override
   public void load() {
     madvise();
     // Read a byte from each page to bring it into memory.
     final int ps = unsafe.pageSize();
-    final int count = pageCount(ps, super.capacity);
-    long a = super.state.getNativeBaseOffset();
+    final int count = pageCount(ps, this.state.getCapacity());
+    long a = this.state.getNativeBaseOffset();
     for (int i = 0; i < count; i++) {
       unsafe.getByte(a);
       a += ps;
@@ -78,15 +74,15 @@ class AllocateDirectMap extends WritableMemoryImpl implements MemoryMapHandler {
   @Override
   public boolean isLoaded() {
     final int ps = unsafe.pageSize();
-    final long nativeBaseOffset = super.state.getNativeBaseOffset();
+    final long nativeBaseOffset = this.state.getNativeBaseOffset();
     try {
 
-      final int pageCount = pageCount(ps, super.capacity);
+      final int pageCount = pageCount(ps, this.state.getCapacity());
       final Method method =
           MappedByteBuffer.class.getDeclaredMethod("isLoaded0", long.class, long.class, int.class);
       method.setAccessible(true);
-      return (boolean) method.invoke(super.state.getMappedByteBuffer(), nativeBaseOffset, super.capacity,
-          pageCount);
+      return (boolean) method.invoke(this.state.getMappedByteBuffer(), nativeBaseOffset,
+          this.state.getCapacity(), pageCount);
     } catch (final Exception e) {
       throw new RuntimeException(
           String.format("Encountered %s exception while loading", e.getClass()));
@@ -159,7 +155,8 @@ class AllocateDirectMap extends WritableMemoryImpl implements MemoryMapHandler {
     try {
       final Method method = MappedByteBuffer.class.getDeclaredMethod("load0", long.class, long.class);
       method.setAccessible(true);
-      method.invoke(super.state.getMappedByteBuffer(), super.state.getNativeBaseOffset(), super.capacity);
+      method.invoke(this.state.getMappedByteBuffer(), this.state.getNativeBaseOffset(),
+          this.state.getCapacity());
     } catch (final Exception e) {
       throw new RuntimeException(
           String.format("Encountered %s exception while loading", e.getClass()));

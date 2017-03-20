@@ -17,7 +17,7 @@ import java.nio.MappedByteBuffer;
  * @author Lee Rhodes
  */
 //Called from WritableMemory, implements combo of WritableMemory with WritableMap resource
-final class AllocateDirectWritableMap extends AllocateDirectMap implements WritableMemoryMapHandler {
+final class AllocateDirectWritableMap extends AllocateDirectMap implements WritableMap {
 
   private AllocateDirectWritableMap(final ResourceState state) {
     super(state);
@@ -42,18 +42,13 @@ final class AllocateDirectWritableMap extends AllocateDirectMap implements Writa
   }
 
   @Override
-  public WritableMemory get() {
-    return this;
-  }
-
-  @Override
   public void force() {
     try {
       final Method method = MappedByteBuffer.class.getDeclaredMethod("force0",
           FileDescriptor.class, long.class, long.class);
       method.setAccessible(true);
       method.invoke(super.state.getMappedByteBuffer(), super.state.getRandomAccessFile().getFD(),
-          super.state.getNativeBaseOffset(), super.capacity);
+          super.state.getNativeBaseOffset(), super.state.getCapacity());
     } catch (final Exception e) {
       throw new RuntimeException(String.format("Encountered %s exception in force", e.getClass()));
     }

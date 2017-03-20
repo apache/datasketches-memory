@@ -64,7 +64,7 @@ public abstract class WritableMemory extends Memory {
     state.putFile(file);
     state.putFileOffset(fileOffset);
     state.putCapacity(capacity);
-    return AllocateDirectWritableMap.map(state);
+    return WritableMemoryMapHandler.map(state);
   }
 
   //ALLOCATE DIRECT
@@ -98,7 +98,7 @@ public abstract class WritableMemory extends Memory {
     final ResourceState state = new ResourceState();
     state.putCapacity(capacityBytes);
     state.putMemoryRequest(memReq);
-    return (WritableMemoryDirectHandler)AllocateDirect.allocDirect(state);
+    return WritableMemoryDirectHandler.allocDirect(state);
   }
 
   //REGIONS

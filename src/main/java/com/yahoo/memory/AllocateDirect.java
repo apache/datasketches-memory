@@ -12,7 +12,8 @@ import sun.misc.Cleaner;
 /**
  * @author Lee Rhodes
  */
-final class AllocateDirect extends WritableMemoryImpl implements WritableMemoryDirectHandler {
+final class AllocateDirect implements AutoCloseable {
+  final ResourceState state;
   private final Cleaner cleaner;
 
   /**
@@ -24,11 +25,11 @@ final class AllocateDirect extends WritableMemoryImpl implements WritableMemoryD
    * @param state contains the capacity and optionally the MemoryRequest
    */
   private AllocateDirect(final ResourceState state) {
-    super(state);
+    this.state = state;
     this.cleaner = Cleaner.create(this, new Deallocator(state));
   }
 
-  static WritableMemoryImpl allocDirect(final ResourceState state) {
+  static AllocateDirect allocDirect(final ResourceState state) {
     state.putNativeBaseOffset(unsafe.allocateMemory(state.getCapacity()));
     return new AllocateDirect(state);
   }
@@ -37,7 +38,7 @@ final class AllocateDirect extends WritableMemoryImpl implements WritableMemoryD
   public void close() {
     try {
       this.cleaner.clean();
-      super.state.setInvalid();
+      this.state.setInvalid();
     } catch (final Exception e) {
       throw e;
     }
@@ -65,11 +66,6 @@ final class AllocateDirect extends WritableMemoryImpl implements WritableMemoryD
       this.actualNativeBaseOffset = 0L;
       this.parentStateRef.setInvalid(); //The only place valid is set invalid.
     }
-  }
-
-  @Override
-  public WritableMemory get() {
-    return this;
   }
 
 }

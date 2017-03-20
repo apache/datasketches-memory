@@ -64,7 +64,7 @@ public abstract class Memory {
     state.putFile(file);
     state.putFileOffset(fileOffset);
     state.putCapacity(capacity);
-    return AllocateDirectMap.map(state);
+    return MemoryMapHandler.map(state);
   }
 
   //REGIONS

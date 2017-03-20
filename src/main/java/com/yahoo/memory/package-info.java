@@ -26,14 +26,14 @@
  * that these resources are automatically closed if wrapped in a try-with-resources (TRW) block.
  * These resources are acquired using simple handlers that implement the {@code close()}
  * method: <pre>{@code
- *     try (WritableResourceHandler handler = WritableResource.map(File file)) {
+ *     try (WritableMemoryMapHandler handler = WritableResource.map(File file)) {
  *       WritableMemory wMem = handler.get();
  *       // read and write to memory mapped file.
  *     }
  * }</pre>
  * Where it is desirable to pass ownership of the resource (and the {@code close()} responsibility)
  * one can not use the TWR block. Instead:<pre>{@code
- *     WritableResourceHandler handler = WritableResource.map(File file);
+ *     WritableMemoryMapHandler handler = WritableResource.map(File file);
  *     ...
  *     doWorkAndClose(handler); //passes the handler to downstream object that closes the resource.
  * }</pre>

@@ -6,22 +6,14 @@
 package com.yahoo.memory;
 
 /**
- * Wraps a resource for read operations
- * @author Lee Rhodes
+ * Read only interface for a memory mapped file
  */
-public interface ResourceHandler extends AutoCloseable {
-
-  /**
-   * Returns a Memory for read operations
-   * @return a Memory for read operations
-   */
-  Memory get();
+public interface Map extends AutoCloseable {
 
   @Override
   void close();
 
   /**
-   * Applies only to mapped files. Otherwise is a no-op.
    * Loads content into physical memory. This method makes a best effort to ensure that, when it
    * returns, this buffer's content is resident in physical memory. Invoking this method may cause
    * some number of page faults and I/O operations to occur.
@@ -32,7 +24,6 @@ public interface ResourceHandler extends AutoCloseable {
   void load();
 
   /**
-   * Applies only to mapped files. Otherwise always returns false.
    * Tells whether or not the content is resident in physical memory. A return value of true implies
    * that it is highly likely that all of the data in this buffer is resident in physical memory and
    * may therefore be accessed without incurring any virtual-memory page faults or I/O operations. A
@@ -49,21 +40,4 @@ public interface ResourceHandler extends AutoCloseable {
    */
   boolean isLoaded();
 
-  /**
-   * The type of resource
-   */
-  enum ResourceType { MEMORY_MAPPED_FILE, NATIVE_MEMORY }
-
-  /**
-   * Gets the current resource type
-   * @return the current resource type
-   */
-  ResourceType getResourceType();
-
-  /**
-   * Returns <i>true</i> if the given resourceType is the same as <i>this</i>.
-   * @param resourceType the given resource type.
-   * @return <i>true</i> if the given resourceType is the same as <i>this</i>.
-   */
-  boolean isResourceType(ResourceType resourceType);
 }

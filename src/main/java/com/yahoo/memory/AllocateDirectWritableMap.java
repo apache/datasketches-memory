@@ -16,7 +16,8 @@ import java.nio.MappedByteBuffer;
  * @author Praveenkumar Venkatesan
  * @author Lee Rhodes
  */
-final class AllocateDirectWritableMap extends AllocateDirectMap implements WritableResourceHandler {
+//Called from WritableMemory, implements combo of WritableMemory with WritableMap resource
+final class AllocateDirectWritableMap extends AllocateDirectMap implements WritableMemoryMapHandler {
 
   private AllocateDirectWritableMap(final ResourceState state) {
     super(state);
@@ -37,7 +38,7 @@ final class AllocateDirectWritableMap extends AllocateDirectMap implements Writa
     if (isFileReadOnly(state.getFile())) {
       throw new ReadOnlyMemoryException("File is read-only.");
     }
-    return new AllocateDirectWritableMap(mapper(state));
+    return new AllocateDirectWritableMap(AllocateDirectMap.mapper(state));
   }
 
   @Override

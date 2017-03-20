@@ -42,11 +42,11 @@ public abstract class WritableMemory extends Memory {
    * Allocates direct memory used to memory map files for write operations
    * (including those &gt; 2GB).
    * @param file the given file to map
-   * @return WritableResourceHandler for managing this map
+   * @return WritableMemoryMapHandler for managing this map
    * @throws Exception file not found or RuntimeException, etc.
    */
-  public static WritableResourceHandler map(final File file) throws Exception {
-    return map(file, 0, file.length());
+  public static WritableMemoryMapHandler writableMap(final File file) throws Exception {
+    return writableMap(file, 0, file.length());
   }
 
   /**
@@ -55,10 +55,10 @@ public abstract class WritableMemory extends Memory {
    * @param file the given file to map
    * @param fileOffset the position in the given file
    * @param capacity the size of the allocated direct memory
-   * @return WritableResourceHandler for managing this map
+   * @return WritableMemoryMapHandler for managing this map
    * @throws Exception file not found or RuntimeException, etc.
    */
-  public static WritableResourceHandler map(final File file, final long fileOffset,
+  public static WritableMemoryMapHandler writableMap(final File file, final long fileOffset,
       final long capacity) throws Exception {
     final ResourceState state = new ResourceState();
     state.putFile(file);
@@ -79,9 +79,9 @@ public abstract class WritableMemory extends Memory {
    * and to call <i>close()</i> when done.</p>
    *
    * @param capacityBytes the size of the desired memory in bytes
-   * @return WritableResourceHandler for managing this off-heap resource
+   * @return WritableMemoryMapHandler for managing this off-heap resource
    */
-  public static WritableResourceHandler allocateDirect(final long capacityBytes) {
+  public static WritableMemoryDirectHandler allocateDirect(final long capacityBytes) {
     return allocateDirect(capacityBytes, null);
   }
 
@@ -91,14 +91,14 @@ public abstract class WritableMemory extends Memory {
    * The allocated memory will be 8-byte aligned, but may not be page aligned.
    * @param capacityBytes the size of the desired memory in bytes
    * @param memReq optional callback
-   * @return WritableResourceHandler for managing this off-heap resource
+   * @return WritableMemoryMapHandler for managing this off-heap resource
    */
-  public static WritableResourceHandler allocateDirect(final long capacityBytes,
+  public static WritableMemoryDirectHandler allocateDirect(final long capacityBytes,
       final MemoryRequest memReq) {
     final ResourceState state = new ResourceState();
     state.putCapacity(capacityBytes);
     state.putMemoryRequest(memReq);
-    return (WritableResourceHandler) AllocateDirect.allocDirect(state);
+    return (WritableMemoryDirectHandler)AllocateDirect.allocDirect(state);
   }
 
   //REGIONS

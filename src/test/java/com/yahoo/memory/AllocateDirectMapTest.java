@@ -15,18 +15,14 @@ import java.io.File;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
-import com.yahoo.memory.ResourceHandler.ResourceType;
-
 public class AllocateDirectMapTest {
-  ResourceHandler hand = null;
+  MemoryMapHandler hand = null;
 
 
   @Test
   public void simpleMap() throws Exception {
     File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
-    try (ResourceHandler rh = Memory.map(file)) {
-      ResourceType type = rh.getResourceType();
-      assertTrue(rh.isResourceType(type));
+    try (MemoryMapHandler rh = Memory.map(file)) {
       rh.close();
     }
   }
@@ -34,19 +30,19 @@ public class AllocateDirectMapTest {
   @Test
   public void testIllegalArguments() throws Exception {
     File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
-    try (ResourceHandler rh = Memory.map(file, -1, Integer.MAX_VALUE)) {
+    try (MemoryMapHandler rh = Memory.map(file, -1, Integer.MAX_VALUE)) {
       fail("Failed: testIllegalArgumentException: Position was negative.");
     } catch (IllegalArgumentException e) {
       //ok
     }
 
-    try (ResourceHandler rh = Memory.map(file, 0, -1)) {
+    try (MemoryMapHandler rh = Memory.map(file, 0, -1)) {
       fail("Failed: testIllegalArgumentException: Size was negative.");
     } catch (IllegalArgumentException e) {
       //ok
     }
 
-    try (ResourceHandler rh = Memory.map(file, Long.MAX_VALUE, 2)) {
+    try (MemoryMapHandler rh = Memory.map(file, Long.MAX_VALUE, 2)) {
       fail("Failed: testIllegalArgumentException: Sum of position + size is negative.");
     } catch (IllegalArgumentException e) {
       //ok
@@ -57,7 +53,7 @@ public class AllocateDirectMapTest {
   public void testMapAndMultipleClose() throws Exception {
     File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
     long memCapacity = file.length();
-    try (ResourceHandler rh = Memory.map(file, 0, memCapacity)) {
+    try (MemoryMapHandler rh = Memory.map(file, 0, memCapacity)) {
       Memory map = rh.get();
       assertEquals(memCapacity, map.getCapacity());
       rh.close();
@@ -73,7 +69,7 @@ public class AllocateDirectMapTest {
   public void testReadFailAfterClose() throws Exception {
     File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
     long memCapacity = file.length();
-    try (ResourceHandler rh = Memory.map(file, 0, memCapacity)) {
+    try (MemoryMapHandler rh = Memory.map(file, 0, memCapacity)) {
       Memory mmf = rh.get();
       rh.close();
       mmf.getByte(0);
@@ -86,7 +82,7 @@ public class AllocateDirectMapTest {
   public void testLoad() throws Exception {
     File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
     long memCapacity = file.length();
-    try (ResourceHandler rh = Memory.map(file, 0, memCapacity)) {
+    try (MemoryMapHandler rh = Memory.map(file, 0, memCapacity)) {
       rh.load();
       assertTrue(rh.isLoaded());
       rh.close();
@@ -97,7 +93,7 @@ public class AllocateDirectMapTest {
   public void testHandlerHandoffWithTWR() throws Exception {
     File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
     long memCapacity = file.length();
-    try (ResourceHandler rh = Memory.map(file, 0, memCapacity)) {
+    try (MemoryMapHandler rh = Memory.map(file, 0, memCapacity)) {
       rh.load();
       assertTrue(rh.isLoaded());
       hand = rh;
@@ -111,7 +107,7 @@ public class AllocateDirectMapTest {
   public void testHandoffWithoutClose() throws Exception {
     File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
     long memCapacity = file.length();
-    ResourceHandler rh = Memory.map(file, 0, memCapacity);
+    MemoryMapHandler rh = Memory.map(file, 0, memCapacity);
     rh.load();
     assertTrue(rh.isLoaded());
     hand = rh;

@@ -6,20 +6,11 @@
 package com.yahoo.memory;
 
 /**
- * Wraps a resource for write operations
- * @author Lee Rhodes
+ * Writable interface for a memory mapped file
  */
-public interface WritableResourceHandler extends ResourceHandler {
+public interface WritableMap extends Map {
 
   /**
-   * Return a WritableMemory for write operations
-   * @return a WritableMemory for write operations
-   */
-  @Override
-  WritableMemory get();
-
-  /**
-   * Applies only to writable mapped files. Otherwise is a no-op.
    * Forces any changes made to this content to be written to the storage device containing the
    * mapped file.
    *

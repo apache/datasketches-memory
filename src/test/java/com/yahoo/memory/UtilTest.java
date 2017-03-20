@@ -13,12 +13,6 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.yahoo.memory.MemoryRequest;
-import com.yahoo.memory.UnsafeUtil;
-import com.yahoo.memory.Util;
-import com.yahoo.memory.WritableMemory;
-import com.yahoo.memory.WritableResourceHandler;
-
 public class UtilTest {
   @Test
   public void checkGoodCallback() {
@@ -41,7 +35,7 @@ public class UtilTest {
   public void checkNullMemoryReturned() {
     int k = 128;
     BadMemoryManager1 badMM1 = new BadMemoryManager1();
-    try (WritableResourceHandler wrh = WritableMemory.allocateDirect(k, badMM1)) {
+    try (WritableMemoryDirectHandler wrh = WritableMemory.allocateDirect(k, badMM1)) {
       WritableMemory origMem = wrh.get();
       memoryRequestHandler(origMem, 2 * k, true); //returns a null Memory
     } catch (IllegalArgumentException e) {
@@ -53,7 +47,7 @@ public class UtilTest {
   public void checkSmallReturnedMemory() {
     int k = 128;
     BadMemoryManager2 badMM2 = new BadMemoryManager2();
-    try (WritableResourceHandler wrh = WritableMemory.allocateDirect(k, badMM2)) {
+    try (WritableMemoryDirectHandler wrh = WritableMemory.allocateDirect(k, badMM2)) {
       WritableMemory origMem = wrh.get();
       memoryRequestHandler(origMem, 2 * k, true); //returns Memory too small
     } catch (IllegalArgumentException e) {
@@ -65,7 +59,7 @@ public class UtilTest {
   public void checkNullMemoryRequest() {
     int k = 128;
     BadMemoryManager3 badMM3 = new BadMemoryManager3();
-    try (WritableResourceHandler wrh = WritableMemory.allocateDirect(k, badMM3)) {
+    try (WritableMemoryDirectHandler wrh = WritableMemory.allocateDirect(k, badMM3)) {
       WritableMemory origMem = wrh.get();
       WritableMemory newMem = memoryRequestHandler(origMem, 2 * k, false);
       memoryRequestHandler(newMem, 4 * k, false); //returns null MemoryRequest
@@ -77,11 +71,11 @@ public class UtilTest {
   //////////////////////////////////////////////////////
   //////////////////////////////////////////////////////
   private static class GoodMemoryManager implements MemoryRequest { //Allocates what was requested
-    WritableResourceHandler last = null; //simple means of tracking the last Handler allocated
+    WritableMemoryDirectHandler last = null; //simple means of tracking the last Handler allocated
 
     @Override
     public WritableMemory request(long capacityBytes) {
-      WritableResourceHandler wrh = WritableMemory.allocateDirect(capacityBytes, this);
+      WritableMemoryDirectHandler wrh = WritableMemory.allocateDirect(capacityBytes, this);
       last = wrh;
       //println("\nReqCap: "+capacityBytes + ", Granted: "+last.get().getCapacity());
       return last.get();
@@ -135,11 +129,11 @@ public class UtilTest {
   //////////////////////////////////////////////////////
   //////////////////////////////////////////////////////
   private static class BadMemoryManager2 implements MemoryRequest { //Allocates too small
-    WritableResourceHandler last = null; //simple means of tracking the last Handler allocated
+    WritableMemoryDirectHandler last = null; //simple means of tracking the last Handler allocated
 
     @Override
     public WritableMemory request(long capacityBytes) {
-      WritableResourceHandler wrh = WritableMemory.allocateDirect(capacityBytes -1, this);
+      WritableMemoryDirectHandler wrh = WritableMemory.allocateDirect(capacityBytes -1, this);
       last = wrh;
       //println("\nReqCap: "+capacityBytes + ", Granted: "+last.get().getCapacity());
       return last.get();
@@ -163,11 +157,11 @@ public class UtilTest {
   //////////////////////////////////////////////////////
   //////////////////////////////////////////////////////
   private static class BadMemoryManager3 implements MemoryRequest { //returns a null MemoryRequest
-    WritableResourceHandler last = null; //simple means of tracking the last Handler allocated
+    WritableMemoryDirectHandler last = null; //simple means of tracking the last Handler allocated
 
     @Override
     public WritableMemory request(long capacityBytes) {
-      WritableResourceHandler wrh = WritableMemory.allocateDirect(capacityBytes, null); //bad!
+      WritableMemoryDirectHandler wrh = WritableMemory.allocateDirect(capacityBytes, null); //bad!
       last = wrh;
       //println("\nReqCap: "+capacityBytes + ", Granted: "+last.get().getCapacity());
       return last.get();

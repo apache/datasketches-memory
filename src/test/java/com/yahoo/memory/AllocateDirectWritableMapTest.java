@@ -5,7 +5,7 @@
 
 package com.yahoo.memory;
 
-import static com.yahoo.memory.AllocateDirectWritableMap.checkOffsetAndCapacity;
+import static com.yahoo.memory.AllocateDirectMap.checkOffsetAndCapacity;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -18,8 +18,6 @@ import java.io.UnsupportedEncodingException;
 
 import org.testng.annotations.Test;
 
-import com.yahoo.memory.ResourceHandler.ResourceType;
-
 public class AllocateDirectWritableMapTest {
 
   @Test(expectedExceptions = IllegalArgumentException.class)
@@ -31,7 +29,7 @@ public class AllocateDirectWritableMapTest {
   @Test(expectedExceptions = ReadOnlyMemoryException.class)
   public void simpleMap2() throws Exception {
     File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
-    try (WritableResourceHandler rh = WritableMemory.map(file)) {
+    try (WritableMemoryMapHandler rh = WritableMemory.writableMap(file)) {
       rh.close();
     }
   }
@@ -46,7 +44,7 @@ public class AllocateDirectWritableMapTest {
     byte[] correctByteArr = correctStr.getBytes(UTF_8);
     long corrBytes = correctByteArr.length;
 
-    try (ResourceHandler rh = Memory.map(origFile, 0, origBytes)) {
+    try (MemoryMapHandler rh = Memory.map(origFile, 0, origBytes)) {
       Memory map = rh.get();
       rh.load();
       assertTrue(rh.isLoaded());
@@ -57,10 +55,8 @@ public class AllocateDirectWritableMapTest {
       assertEquals(bufStr, origStr);
     }
 
-    try (WritableResourceHandler wrh = WritableMemory.map(origFile, 0, corrBytes)) { //longer
+    try (WritableMemoryMapHandler wrh = WritableMemory.writableMap(origFile, 0, corrBytes)) { //longer
       WritableMemory wMap = wrh.get();
-      ResourceType type = wrh.getResourceType();
-      wrh.isResourceType(type);
       wrh.load();
       assertTrue(wrh.isLoaded());
       // over write content

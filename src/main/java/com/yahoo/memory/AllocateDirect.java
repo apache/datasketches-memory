@@ -12,7 +12,7 @@ import sun.misc.Cleaner;
 /**
  * @author Lee Rhodes
  */
-final class AllocateDirect extends WritableMemoryImpl implements WritableResourceHandler {
+final class AllocateDirect extends WritableMemoryImpl implements WritableMemoryDirectHandler {
   private final Cleaner cleaner;
 
   /**
@@ -70,32 +70,6 @@ final class AllocateDirect extends WritableMemoryImpl implements WritableResourc
   @Override
   public WritableMemory get() {
     return this;
-  }
-
-  @Override
-  public void load() {
-    // No-op
-  }
-
-  @Override
-  public boolean isLoaded() {
-    // means nothing.
-    return false;
-  }
-
-  @Override
-  public void force() {
-    // No-op
-  }
-
-  @Override
-  public ResourceType getResourceType() {
-    return ResourceType.NATIVE_MEMORY;
-  }
-
-  @Override
-  public boolean isResourceType(final ResourceType resourceType) {
-    return resourceType == ResourceType.NATIVE_MEMORY;
   }
 
 }

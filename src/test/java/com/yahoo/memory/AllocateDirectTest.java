@@ -6,12 +6,9 @@
 package com.yahoo.memory;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
-
-import com.yahoo.memory.ResourceHandler.ResourceType;
 
 public class AllocateDirectTest {
 
@@ -19,18 +16,13 @@ public class AllocateDirectTest {
   public void checkAllocateDirect() {
     int longs = 32;
     int bytes = longs << 3;
-    try (WritableResourceHandler wh = WritableMemory.allocateDirect(bytes)) {
+    try (WritableMemoryDirectHandler wh = WritableMemory.allocateDirect(bytes)) {
       WritableMemory wMem1 = wh.get();
       for (int i = 0; i<longs; i++) {
         wMem1.putLong(i << 3, i);
         assertEquals(wMem1.getLong(i << 3), i);
       }
       wMem1.toHexString("Test", 0, 32 * 8);
-      wh.load();
-      assertFalse(wh.isLoaded());
-      wh.force();
-      assertEquals(wh.getResourceType(), ResourceType.NATIVE_MEMORY);
-      assertTrue(wh.isResourceType(ResourceType.NATIVE_MEMORY));
     }
   }
 
@@ -47,9 +39,9 @@ public class AllocateDirectTest {
   }
 
   @Test
-  public void checkAllocateWithMemReq() {
+  public void checkAllocateDirectWithMemReq() {
     MemoryRequest req = new DummyMemReq();
-    try (WritableResourceHandler wh = WritableMemory.allocateDirect(8, req)) {
+    try (WritableMemoryDirectHandler wh = WritableMemory.allocateDirect(8, req)) {
       WritableMemory wMem = wh.get();
       assertTrue(req.equals(wMem.getMemoryRequest()));
     }

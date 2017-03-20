@@ -17,7 +17,7 @@ public class MemoryTest {
   @Test
   public void checkDirectRoundTrip() {
     int n = 1024; //longs
-    try (WritableResourceHandler wh = WritableMemory.allocateDirect(n * 8, null)) {
+    try (WritableMemoryDirectHandler wh = WritableMemory.allocateDirect(n * 8, null)) {
       WritableMemory mem = wh.get();
       for (int i = 0; i < n; i++) mem.putLong(i * 8, i);
       for (int i = 0; i < n; i++) {
@@ -192,7 +192,7 @@ public class MemoryTest {
   public void checkParentUseAfterFree() {
     int bytes = 64 * 8;
     @SuppressWarnings("resource") //intentionally not using try-with-resouces here
-    WritableResourceHandler wh = WritableMemory.allocateDirect(bytes);
+    WritableMemoryDirectHandler wh = WritableMemory.allocateDirect(bytes);
     WritableMemory wmem = wh.get();
     wh.close();
     //with -ea assert: Memory not valid.
@@ -204,7 +204,7 @@ public class MemoryTest {
   public void checkRegionUseAfterFree() {
     int bytes = 64;
     @SuppressWarnings("resource") //intentionally not using try-with-resouces here
-    WritableResourceHandler wh = WritableMemory.allocateDirect(bytes);
+    WritableMemoryDirectHandler wh = WritableMemory.allocateDirect(bytes);
     Memory wmem = wh.get();
     Memory region = wmem.region(0L, bytes);
     wh.close();

@@ -28,13 +28,14 @@ import sun.misc.Cleaner;
 import sun.nio.ch.FileChannelImpl;
 
 /**
- * Allocates direct memory used to memory map files for read operations
+ * Allocates direct memory used to memory map files for read operations.
  * (including those &gt; 2GB).
  *
  * @author Praveenkumar Venkatesan
  * @author Lee Rhodes
  */
-class AllocateDirectMap extends WritableMemoryImpl implements ResourceHandler {
+//Called from Memory, implements combo of Memory with Map resource
+class AllocateDirectMap extends WritableMemoryImpl implements MemoryMapHandler {
   final Cleaner cleaner;
 
   AllocateDirectMap(final ResourceState state) {
@@ -102,21 +103,11 @@ class AllocateDirectMap extends WritableMemoryImpl implements ResourceHandler {
     }
   }
 
-  @Override
-  public ResourceType getResourceType() {
-    return ResourceType.MEMORY_MAPPED_FILE;
-  }
-
-  @Override
-  public boolean isResourceType(final ResourceType resourceType) {
-    return resourceType == ResourceType.MEMORY_MAPPED_FILE;
-  }
-
   // Restricted methods
 
   //does the actual mapping work
   @SuppressWarnings("resource")
-  static ResourceState mapper(final ResourceState state) throws Exception {
+  static final ResourceState mapper(final ResourceState state) throws Exception {
     final long fileOffset = state.getFileOffset();
     final long capacity = state.getCapacity();
     checkOffsetAndCapacity(fileOffset, capacity);

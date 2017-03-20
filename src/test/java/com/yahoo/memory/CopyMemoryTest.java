@@ -39,7 +39,7 @@ public class CopyMemoryTest {
   public void directWSource() {
     int k1 = 1 << 20; //longs
     int k2 = 2 * k1;
-    try (WritableResourceHandler wrh = genWRH(k1, false)) {
+    try (WritableMemoryDirectHandler wrh = genWRH(k1, false)) {
       WritableMemory srcMem = wrh.get();
       WritableMemory dstMem = genMem(k2, true);
       srcMem.copyTo(0, dstMem, k1 << 3, k1 << 3);
@@ -51,7 +51,7 @@ public class CopyMemoryTest {
   public void directROSource() {
     int k1 = 1 << 20; //longs
     int k2 = 2 * k1;
-    try (WritableResourceHandler wrh = genWRH(k1, false)) {
+    try (WritableMemoryDirectHandler wrh = genWRH(k1, false)) {
       Memory srcMem = wrh.get();
       WritableMemory dstMem = genMem(k2, true);
       srcMem.copyTo(0, dstMem, k1 << 3, k1 << 3);
@@ -88,7 +88,7 @@ public class CopyMemoryTest {
   public void directROSrcRegion() {
     int k1 = 1 << 20; //longs
     //gen baseMem of k1 longs w data, direct
-    try (WritableResourceHandler wrh = genWRH(k1, false)) {
+    try (WritableMemoryDirectHandler wrh = genWRH(k1, false)) {
       Memory baseMem = wrh.get();
       //gen src region of k1/2 longs, off= k1/2
       Memory srcReg = baseMem.region((k1/2) << 3, (k1/2) << 3);
@@ -105,8 +105,8 @@ public class CopyMemoryTest {
     }
   }
 
-  private static WritableResourceHandler genWRH(int longs, boolean empty) {
-    WritableResourceHandler wrh = WritableMemory.allocateDirect(longs << 3);
+  private static WritableMemoryDirectHandler genWRH(int longs, boolean empty) {
+    WritableMemoryDirectHandler wrh = WritableMemory.allocateDirect(longs << 3);
     WritableMemory mem = wrh.get();
     if (empty) {
       mem.clear();

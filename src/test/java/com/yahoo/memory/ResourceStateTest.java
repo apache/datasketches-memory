@@ -5,6 +5,7 @@
 
 package com.yahoo.memory;
 
+import static com.yahoo.memory.UnsafeUtil.ARRAY_DOUBLE_INDEX_SCALE;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -14,7 +15,7 @@ import java.nio.ByteOrder;
 
 import org.testng.annotations.Test;
 
-public class MemoryStateTest {
+public class ResourceStateTest {
 
   @Test
   public void checkPositional() {
@@ -40,6 +41,15 @@ public class MemoryStateTest {
   @Test
   public void checkExceptions() {
     ResourceState state = new ResourceState();
+
+    try {
+      state.putUnsafeObject(null);
+      fail();
+    } catch (IllegalArgumentException e) {
+      //ok
+    }
+
+
     try {
       state.putUnsafeObjectHeader( -16L);
       fail();
@@ -81,9 +91,6 @@ public class MemoryStateTest {
     } catch (IllegalArgumentException e) {
       //ok
     }
-
-
-
   }
 
   //StepBoolean checks
@@ -94,6 +101,9 @@ public class MemoryStateTest {
     assertTrue(step.hasChanged());
   }
 
-
+  @Test
+  public void checkPrim() {
+    assertEquals(Prim.DOUBLE.scale(), ARRAY_DOUBLE_INDEX_SCALE);
+  }
 
 }

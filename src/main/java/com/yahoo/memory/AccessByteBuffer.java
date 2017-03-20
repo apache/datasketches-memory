@@ -16,12 +16,12 @@ import java.nio.ByteBuffer;
  */
 final class AccessByteBuffer extends WritableMemoryImpl {
 
-  private AccessByteBuffer(final MemoryState state) {
+  private AccessByteBuffer(final ResourceState state) {
     super(state);
   }
 
   //The provided ByteBuffer may be either readOnly or writable
-  static WritableMemoryImpl wrap(final MemoryState state) {
+  static WritableMemoryImpl wrap(final ResourceState state) {
     final ByteBuffer byteBuf = state.getByteBuffer();
     state.putCapacity(byteBuf.capacity());
     final boolean readOnlyBB = byteBuf.isReadOnly();

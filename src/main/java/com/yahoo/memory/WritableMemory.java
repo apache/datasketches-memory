@@ -49,7 +49,7 @@ public abstract class WritableMemory extends Memory {
       throw new IllegalArgumentException(
           "Memory does not support " + (byteBuf.order().toString()));
     }
-    final MemoryState state = new MemoryState();
+    final ResourceState state = new ResourceState();
     state.putByteBuffer(byteBuf);
     return AccessByteBuffer.wrap(state);
   }
@@ -77,7 +77,7 @@ public abstract class WritableMemory extends Memory {
    */
   public static WritableResourceHandler map(final File file, final long fileOffset,
       final long capacity) throws Exception {
-    final MemoryState state = new MemoryState();
+    final ResourceState state = new ResourceState();
     state.putFile(file);
     state.putFileOffset(fileOffset);
     state.putCapacity(capacity);
@@ -112,7 +112,7 @@ public abstract class WritableMemory extends Memory {
    */
   public static WritableResourceHandler allocateDirect(final long capacityBytes,
       final MemoryRequest memReq) {
-    final MemoryState state = new MemoryState();
+    final ResourceState state = new ResourceState();
     state.putCapacity(capacityBytes);
     state.putMemoryRequest(memReq);
     return (WritableResourceHandler) AllocateDirect.allocDirect(state);
@@ -140,7 +140,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory allocate(final int capacityBytes) {
-    final MemoryState state = new MemoryState();
+    final ResourceState state = new ResourceState();
     state.putUnsafeObject(new byte[capacityBytes]);
     state.putUnsafeObjectHeader(ARRAY_BYTE_BASE_OFFSET);
     state.putCapacity(capacityBytes);
@@ -155,7 +155,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final boolean[] arr) {
-    final MemoryState state = new MemoryState();
+    final ResourceState state = new ResourceState();
     state.putUnsafeObject(arr);
     state.putUnsafeObjectHeader(ARRAY_BOOLEAN_BASE_OFFSET);
     state.putCapacity(arr.length << BOOLEAN_SHIFT);
@@ -168,7 +168,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final byte[] arr) {
-    final MemoryState state = new MemoryState();
+    final ResourceState state = new ResourceState();
     state.putUnsafeObject(arr);
     state.putUnsafeObjectHeader(ARRAY_BYTE_BASE_OFFSET);
     state.putCapacity(arr.length << BYTE_SHIFT);
@@ -181,7 +181,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final char[] arr) {
-    final MemoryState state = new MemoryState();
+    final ResourceState state = new ResourceState();
     state.putUnsafeObject(arr);
     state.putUnsafeObjectHeader(ARRAY_CHAR_BASE_OFFSET);
     state.putCapacity(arr.length << CHAR_SHIFT);
@@ -194,7 +194,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final short[] arr) {
-    final MemoryState state = new MemoryState();
+    final ResourceState state = new ResourceState();
     state.putUnsafeObject(arr);
     state.putUnsafeObjectHeader(ARRAY_SHORT_BASE_OFFSET);
     state.putCapacity(arr.length << SHORT_SHIFT);
@@ -207,7 +207,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final int[] arr) {
-    final MemoryState state = new MemoryState();
+    final ResourceState state = new ResourceState();
     state.putUnsafeObject(arr);
     state.putUnsafeObjectHeader(ARRAY_INT_BASE_OFFSET);
     state.putCapacity(arr.length << INT_SHIFT);
@@ -220,7 +220,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final long[] arr) {
-    final MemoryState state = new MemoryState();
+    final ResourceState state = new ResourceState();
     state.putUnsafeObject(arr);
     state.putUnsafeObjectHeader(ARRAY_LONG_BASE_OFFSET);
     state.putCapacity(arr.length << LONG_SHIFT);
@@ -233,7 +233,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final float[] arr) {
-    final MemoryState state = new MemoryState();
+    final ResourceState state = new ResourceState();
     state.putUnsafeObject(arr);
     state.putUnsafeObjectHeader(ARRAY_FLOAT_BASE_OFFSET);
     state.putCapacity(arr.length << FLOAT_SHIFT);
@@ -246,7 +246,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final double[] arr) {
-    final MemoryState state = new MemoryState();
+    final ResourceState state = new ResourceState();
     state.putUnsafeObject(arr);
     state.putUnsafeObjectHeader(ARRAY_DOUBLE_BASE_OFFSET);
     state.putCapacity(arr.length << DOUBLE_SHIFT);

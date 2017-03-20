@@ -23,12 +23,12 @@ final class AllocateDirect extends WritableMemoryImpl implements WritableResourc
    * The allocated memory will be 8-byte aligned, but may not be page aligned.
    * @param state contains the capacity and optionally the MemoryRequest
    */
-  private AllocateDirect(final MemoryState state) {
+  private AllocateDirect(final ResourceState state) {
     super(state);
     this.cleaner = Cleaner.create(this, new Deallocator(state));
   }
 
-  static WritableMemoryImpl allocDirect(final MemoryState state) {
+  static WritableMemoryImpl allocDirect(final ResourceState state) {
     state.putNativeBaseOffset(unsafe.allocateMemory(state.getCapacity()));
     return new AllocateDirect(state);
   }
@@ -47,9 +47,9 @@ final class AllocateDirect extends WritableMemoryImpl implements WritableResourc
     //This is the only place the actual native offset is kept for use by unsafe.freeMemory();
     //It can never be modified until it is deallocated.
     private long actualNativeBaseOffset; //
-    private final MemoryState parentStateRef;
+    private final ResourceState parentStateRef;
 
-    private Deallocator(final MemoryState state) {
+    private Deallocator(final ResourceState state) {
       this.actualNativeBaseOffset = state.getNativeBaseOffset();
       assert (actualNativeBaseOffset != 0);
       this.parentStateRef = state;

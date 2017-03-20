@@ -48,7 +48,7 @@ public abstract class Memory {
       throw new IllegalArgumentException(
           "Memory does not support " + (byteBuf.order().toString()));
     }
-    final MemoryState state = new MemoryState();
+    final ResourceState state = new ResourceState();
     state.putByteBuffer(byteBuf);
     return AccessByteBuffer.wrap(state);
   }
@@ -76,7 +76,7 @@ public abstract class Memory {
    */
   public static ResourceHandler map(final File file, final long fileOffset, final long capacity)
       throws Exception {
-    final MemoryState state = new MemoryState();
+    final ResourceState state = new ResourceState();
     state.putFile(file);
     state.putFileOffset(fileOffset);
     state.putCapacity(capacity);
@@ -101,7 +101,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final boolean[] arr) {
-    final MemoryState state = new MemoryState();
+    final ResourceState state = new ResourceState();
     state.putUnsafeObject(arr);
     state.putUnsafeObjectHeader(ARRAY_BOOLEAN_BASE_OFFSET);
     state.putCapacity(arr.length << BOOLEAN_SHIFT);
@@ -114,7 +114,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final byte[] arr) {
-    final MemoryState state = new MemoryState();
+    final ResourceState state = new ResourceState();
     state.putUnsafeObject(arr);
     state.putUnsafeObjectHeader(ARRAY_BYTE_BASE_OFFSET);
     state.putCapacity(arr.length << BYTE_SHIFT);
@@ -127,7 +127,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final char[] arr) {
-    final MemoryState state = new MemoryState();
+    final ResourceState state = new ResourceState();
     state.putUnsafeObject(arr);
     state.putUnsafeObjectHeader(ARRAY_CHAR_BASE_OFFSET);
     state.putCapacity(arr.length << CHAR_SHIFT);
@@ -140,7 +140,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final short[] arr) {
-    final MemoryState state = new MemoryState();
+    final ResourceState state = new ResourceState();
     state.putUnsafeObject(arr);
     state.putUnsafeObjectHeader(ARRAY_SHORT_BASE_OFFSET);
     state.putCapacity(arr.length << SHORT_SHIFT);
@@ -153,7 +153,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final int[] arr) {
-    final MemoryState state = new MemoryState();
+    final ResourceState state = new ResourceState();
     state.putUnsafeObject(arr);
     state.putUnsafeObjectHeader(ARRAY_INT_BASE_OFFSET);
     state.putCapacity(arr.length << INT_SHIFT);
@@ -166,7 +166,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final long[] arr) {
-    final MemoryState state = new MemoryState();
+    final ResourceState state = new ResourceState();
     state.putUnsafeObject(arr);
     state.putUnsafeObjectHeader(ARRAY_LONG_BASE_OFFSET);
     state.putCapacity(arr.length << LONG_SHIFT);
@@ -179,7 +179,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final float[] arr) {
-    final MemoryState state = new MemoryState();
+    final ResourceState state = new ResourceState();
     state.putUnsafeObject(arr);
     state.putUnsafeObjectHeader(ARRAY_FLOAT_BASE_OFFSET);
     state.putCapacity(arr.length << FLOAT_SHIFT);
@@ -192,7 +192,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final double[] arr) {
-    final MemoryState state = new MemoryState();
+    final ResourceState state = new ResourceState();
     state.putUnsafeObject(arr);
     state.putUnsafeObjectHeader(ARRAY_DOUBLE_BASE_OFFSET);
     state.putCapacity(arr.length << DOUBLE_SHIFT);
@@ -459,11 +459,11 @@ public abstract class Memory {
    * @param preamble a descriptive header
    * @param offsetBytes offset bytes relative to the Memory start
    * @param lengthBytes number of bytes to convert to a hex string
-   * @param state the MemoryState
+   * @param state the ResourceState
    * @return a formatted hex string in a human readable array
    */
   static String toHex(final String preamble, final long offsetBytes, final int lengthBytes,
-      final MemoryState state) {
+      final ResourceState state) {
     assertBounds(offsetBytes, lengthBytes, state.getCapacity());
     final StringBuilder sb = new StringBuilder();
     final Object uObj = state.getUnsafeObject();

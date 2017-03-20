@@ -18,7 +18,7 @@ public class MemoryStateTest {
 
   @Test
   public void checkPositional() {
-    MemoryState state = new MemoryState();
+    ResourceState state = new ResourceState();
     assertFalse(state.isPositional());
     state.setPositional(true);
     assertTrue(state.isPositional());
@@ -26,7 +26,7 @@ public class MemoryStateTest {
 
   @Test
   public void checkByteOrder() {
-    MemoryState state = new MemoryState();
+    ResourceState state = new ResourceState();
     assertEquals(state.order(), ByteOrder.nativeOrder());
     if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
       state.order(ByteOrder.BIG_ENDIAN);
@@ -39,7 +39,7 @@ public class MemoryStateTest {
 
   @Test
   public void checkExceptions() {
-    MemoryState state = new MemoryState();
+    ResourceState state = new ResourceState();
     try {
       state.putUnsafeObjectHeader( -16L);
       fail();

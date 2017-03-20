@@ -14,7 +14,7 @@ import java.nio.MappedByteBuffer;
 /**
  * @author Lee Rhodes
  */
-final class MemoryState {
+final class ResourceState {
 
   /** Place holder for some future endian extension. */
   private static final ByteOrder nativeOrder_ = ByteOrder.nativeOrder();
@@ -124,10 +124,10 @@ final class MemoryState {
   /** Place holder for some future endian extension. */
   private boolean swapBytes_ = false; //true if myOrder != nativeOrder_
 
-  MemoryState() {}
+  ResourceState() {}
 
-  MemoryState copy() {
-    final MemoryState out = new MemoryState();
+  ResourceState copy() {
+    final ResourceState out = new ResourceState();
     //FOUNDATION PARAMETERS
     out.nativeBaseOffset_ = nativeBaseOffset_;
     out.unsafeObj_ = unsafeObj_;

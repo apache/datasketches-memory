@@ -37,7 +37,7 @@ import sun.nio.ch.FileChannelImpl;
 class AllocateDirectMap extends WritableMemoryImpl implements ResourceHandler {
   final Cleaner cleaner;
 
-  AllocateDirectMap(final MemoryState state) {
+  AllocateDirectMap(final ResourceState state) {
     super(state);
     this.cleaner = Cleaner.create(this,
         new Deallocator(state));
@@ -50,17 +50,17 @@ class AllocateDirectMap extends WritableMemoryImpl implements ResourceHandler {
    * <p>Memory maps a file directly in off heap leveraging native map0 method used in
    * FileChannelImpl.c. The owner will have read access to that address space.</p>
    *
-   * @param state the MemoryState
+   * @param state the ResourceState
    * @return A new AllocateDirectMap
    * @throws Exception file not found or RuntimeException, etc.
    */
-  static AllocateDirectMap map(final MemoryState state) throws Exception {
+  static AllocateDirectMap map(final ResourceState state) throws Exception {
     return new AllocateDirectMap(mapper(state));
   }
 
   //does the actual mapping work
   @SuppressWarnings("resource")
-  static MemoryState mapper(final MemoryState state) throws Exception {
+  static ResourceState mapper(final ResourceState state) throws Exception {
     final long fileOffset = state.getFileOffset();
     final long capacity = state.getCapacity();
     checkOffsetAndCapacity(fileOffset, capacity);
@@ -212,9 +212,9 @@ class AllocateDirectMap extends WritableMemoryImpl implements ResourceHandler {
     //It can never be modified until it is deallocated.
     private long actualNativeBaseOffset;
     private final long myCapacity;
-    private final MemoryState parentStateRef;
+    private final ResourceState parentStateRef;
 
-    private Deallocator(final MemoryState state) {
+    private Deallocator(final ResourceState state) {
       this.myRaf = state.getRandomAccessFile();
       assert (myRaf != null);
       this.myFc = myRaf.getChannel();

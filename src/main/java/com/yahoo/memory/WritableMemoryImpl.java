@@ -39,13 +39,13 @@ import static com.yahoo.memory.UnsafeUtil.unsafe;
  * @author Lee Rhodes
  */
 class WritableMemoryImpl extends WritableMemory {
-  final MemoryState state;
+  final ResourceState state;
   final Object unsafeObj; //Array objects are held here.
   final long unsafeObjHeader; //Heap ByteBuffer includes the slice() offset here.
   final long capacity;
   final long cumBaseOffset; //Holds the cum offset to the start of data.
 
-  WritableMemoryImpl(final MemoryState state) {
+  WritableMemoryImpl(final ResourceState state) {
     this.state = state;
     this.unsafeObj = state.getUnsafeObject();
     this.unsafeObjHeader = state.getUnsafeObjectHeader();
@@ -66,7 +66,7 @@ class WritableMemoryImpl extends WritableMemory {
     checkValid();
     assert offsetBytes + capacityBytes <= this.capacity
         : "newOff + newCap: " + (offsetBytes + capacityBytes) + ", origCap: " + this.capacity;
-    final MemoryState newState = this.state.copy();
+    final ResourceState newState = this.state.copy();
     newState.putRegionOffset(newState.getRegionOffset() + offsetBytes);
     newState.putCapacity(capacityBytes);
     return new WritableMemoryImpl(newState);

@@ -18,7 +18,7 @@ import java.nio.MappedByteBuffer;
  */
 final class AllocateDirectWritableMap extends AllocateDirectMap implements WritableResourceHandler {
 
-  private AllocateDirectWritableMap(final MemoryState state) {
+  private AllocateDirectWritableMap(final ResourceState state) {
     super(state);
   }
 
@@ -29,12 +29,12 @@ final class AllocateDirectWritableMap extends AllocateDirectMap implements Writa
    * <p>Memory maps a file directly in off heap leveraging native map0 method used in
    * FileChannelImpl.c. The owner will have read and write access to that address space.</p>
    *
-   * @param state the MemoryState
+   * @param state the ResourceState
    * @return A new AllocateDirectWritableMap
    * @throws Exception file not found or RuntimeException, etc.
    */
   //@SuppressWarnings("resource")
-  static AllocateDirectWritableMap map(final MemoryState state) throws Exception {
+  static AllocateDirectWritableMap map(final ResourceState state) throws Exception {
     if (isFileReadOnly(state.getFile())) {
       throw new ReadOnlyMemoryException("File is read-only.");
     }

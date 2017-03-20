@@ -5,23 +5,6 @@
 
 package com.yahoo.memory;
 
-import static com.yahoo.memory.UnsafeUtil.ARRAY_BOOLEAN_BASE_OFFSET;
-import static com.yahoo.memory.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
-import static com.yahoo.memory.UnsafeUtil.ARRAY_CHAR_BASE_OFFSET;
-import static com.yahoo.memory.UnsafeUtil.ARRAY_DOUBLE_BASE_OFFSET;
-import static com.yahoo.memory.UnsafeUtil.ARRAY_FLOAT_BASE_OFFSET;
-import static com.yahoo.memory.UnsafeUtil.ARRAY_INT_BASE_OFFSET;
-import static com.yahoo.memory.UnsafeUtil.ARRAY_LONG_BASE_OFFSET;
-import static com.yahoo.memory.UnsafeUtil.ARRAY_SHORT_BASE_OFFSET;
-import static com.yahoo.memory.UnsafeUtil.BOOLEAN_SHIFT;
-import static com.yahoo.memory.UnsafeUtil.BYTE_SHIFT;
-import static com.yahoo.memory.UnsafeUtil.CHAR_SHIFT;
-import static com.yahoo.memory.UnsafeUtil.DOUBLE_SHIFT;
-import static com.yahoo.memory.UnsafeUtil.FLOAT_SHIFT;
-import static com.yahoo.memory.UnsafeUtil.INT_SHIFT;
-import static com.yahoo.memory.UnsafeUtil.LONG_SHIFT;
-import static com.yahoo.memory.UnsafeUtil.SHORT_SHIFT;
-
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -140,11 +123,8 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory allocate(final int capacityBytes) {
-    final ResourceState state = new ResourceState();
-    state.putUnsafeObject(new byte[capacityBytes]);
-    state.putUnsafeObjectHeader(ARRAY_BYTE_BASE_OFFSET);
-    state.putCapacity(capacityBytes);
-    return new WritableMemoryImpl(state);
+    final byte[] arr = new byte[capacityBytes];
+    return new WritableMemoryImpl(new ResourceState(arr, Prim.BYTE, arr.length));
   }
 
   //ACCESS PRIMITIVE HEAP ARRAYS for write
@@ -155,11 +135,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final boolean[] arr) {
-    final ResourceState state = new ResourceState();
-    state.putUnsafeObject(arr);
-    state.putUnsafeObjectHeader(ARRAY_BOOLEAN_BASE_OFFSET);
-    state.putCapacity(arr.length << BOOLEAN_SHIFT);
-    return new WritableMemoryImpl(state);
+    return new WritableMemoryImpl(new ResourceState(arr, Prim.BOOLEAN, arr.length));
   }
 
   /**
@@ -168,11 +144,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final byte[] arr) {
-    final ResourceState state = new ResourceState();
-    state.putUnsafeObject(arr);
-    state.putUnsafeObjectHeader(ARRAY_BYTE_BASE_OFFSET);
-    state.putCapacity(arr.length << BYTE_SHIFT);
-    return new WritableMemoryImpl(state);
+    return new WritableMemoryImpl(new ResourceState(arr, Prim.BYTE, arr.length));
   }
 
   /**
@@ -181,11 +153,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final char[] arr) {
-    final ResourceState state = new ResourceState();
-    state.putUnsafeObject(arr);
-    state.putUnsafeObjectHeader(ARRAY_CHAR_BASE_OFFSET);
-    state.putCapacity(arr.length << CHAR_SHIFT);
-    return new WritableMemoryImpl(state);
+    return new WritableMemoryImpl(new ResourceState(arr, Prim.CHAR, arr.length));
   }
 
   /**
@@ -194,11 +162,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final short[] arr) {
-    final ResourceState state = new ResourceState();
-    state.putUnsafeObject(arr);
-    state.putUnsafeObjectHeader(ARRAY_SHORT_BASE_OFFSET);
-    state.putCapacity(arr.length << SHORT_SHIFT);
-    return new WritableMemoryImpl(state);
+    return new WritableMemoryImpl(new ResourceState(arr, Prim.SHORT, arr.length));
   }
 
   /**
@@ -207,11 +171,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final int[] arr) {
-    final ResourceState state = new ResourceState();
-    state.putUnsafeObject(arr);
-    state.putUnsafeObjectHeader(ARRAY_INT_BASE_OFFSET);
-    state.putCapacity(arr.length << INT_SHIFT);
-    return new WritableMemoryImpl(state);
+    return new WritableMemoryImpl(new ResourceState(arr, Prim.INT, arr.length));
   }
 
   /**
@@ -220,11 +180,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final long[] arr) {
-    final ResourceState state = new ResourceState();
-    state.putUnsafeObject(arr);
-    state.putUnsafeObjectHeader(ARRAY_LONG_BASE_OFFSET);
-    state.putCapacity(arr.length << LONG_SHIFT);
-    return new WritableMemoryImpl(state);
+    return new WritableMemoryImpl(new ResourceState(arr, Prim.LONG, arr.length));
   }
 
   /**
@@ -233,11 +189,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final float[] arr) {
-    final ResourceState state = new ResourceState();
-    state.putUnsafeObject(arr);
-    state.putUnsafeObjectHeader(ARRAY_FLOAT_BASE_OFFSET);
-    state.putCapacity(arr.length << FLOAT_SHIFT);
-    return new WritableMemoryImpl(state);
+    return new WritableMemoryImpl(new ResourceState(arr, Prim.FLOAT, arr.length));
   }
 
   /**
@@ -246,14 +198,9 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final double[] arr) {
-    final ResourceState state = new ResourceState();
-    state.putUnsafeObject(arr);
-    state.putUnsafeObjectHeader(ARRAY_DOUBLE_BASE_OFFSET);
-    state.putCapacity(arr.length << DOUBLE_SHIFT);
-    return new WritableMemoryImpl(state);
+    return new WritableMemoryImpl(new ResourceState(arr, Prim.DOUBLE, arr.length));
   }
   //END OF CONSTRUCTOR-TYPE METHODS
-
 
   //PRIMITIVE putXXX() and putXXXArray() //XXX
 

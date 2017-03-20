@@ -126,6 +126,17 @@ final class ResourceState {
 
   ResourceState() {}
 
+  //Constructor for heap primitive arrays
+  ResourceState(final Object obj, final Prim prim, final long arrLen) {
+    this.unsafeObj_ = obj;
+    this.unsafeObjHeader_ = prim.off();
+    if (arrLen <= 0) {
+      throw new IllegalArgumentException("Array length cannot be <= 0");
+    }
+    this.capacity_ = arrLen << prim.shift();
+    compute();
+  }
+
   ResourceState copy() {
     final ResourceState out = new ResourceState();
     //FOUNDATION PARAMETERS

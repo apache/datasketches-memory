@@ -180,12 +180,6 @@ public class WritableMemoryImplTest {
     }
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
-  public void checkNullInput() {
-    byte[] arr = null;
-    Memory.wrap(arr);
-  }
-
   @Test
   public void checkNativeBaseBound() {
     int memCapacity = 64;
@@ -631,11 +625,6 @@ public class WritableMemoryImplTest {
     }
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
-  public void checkNullByteArray() {
-    byte[] byteArr = null;
-    Memory.wrap(byteArr);
-  }
 
   @Test
   public void checkIsReadOnly() {
@@ -650,12 +639,6 @@ public class WritableMemoryImplTest {
     for (int i = 0; i < mem.getCapacity(); i++) {
       assertEquals(mem.getByte(i), memRO.getByte(i));
     }
-  }
-
-  @Test(expectedExceptions = IllegalArgumentException.class)
-  public void checkNullIntArray() {
-    int[] intArr = null;
-    Memory.wrap(intArr);
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)

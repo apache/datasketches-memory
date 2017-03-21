@@ -380,15 +380,12 @@ class WritableMemoryImpl extends WritableMemory {
     final long hcode = this.hashCode() & 0XFFFFFFFFL;
     final String call = ".toHexString" + s1 + ", hashCode: " + hcode;
     final StringBuilder sb = new StringBuilder();
-    sb.append("### MEMORY SUMMARY ###").append(LS);
+    sb.append("### ").append(klass).append(" SUMMARY ###").append(LS);
     sb.append("Header Comment      : ").append(header).append(LS);
-    sb.append("Class               : ").append(klass).append(LS);
-    sb.append("Call                : ").append(call);
-
+    sb.append("Call Params         : ").append(call);
     return Memory.toHex(sb.toString(), offsetBytes, lengthBytes, this.state);
   }
 
-  //ALL METHODS BELOW ONLY APPLY TO WRITABLE
   //PRIMITIVE putXXX() and putXXXArray() implementations XXX
 
   @Override

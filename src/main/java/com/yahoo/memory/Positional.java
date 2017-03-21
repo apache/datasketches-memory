@@ -8,64 +8,70 @@ package com.yahoo.memory;
 public interface Positional {
 
   /**
-   * Sets the limit to the current position and then sets the position to zero
-   * @return WritableBuffer
+   * @return the current relOffset
    */
-  WritableBuffer flip();
+  long getRelOffset(); //get position
 
   /**
-   * Returns true if there are elements remaining between the position and the limit
-   * @return (limit - pos) > 0
+   * Sets the relOffset
+   * @param relOff the given relOffset
+   * @return Positional
    */
-  boolean hasRemaining();
+  Positional setRelOffset(long relOff); //set position
 
   /**
-   * @return limit
+   * @return upperBound
    */
-  long limit();
+  long getUpperBound(); //get limit
 
   /**
-   * Sets the limit
-   * @param lim the given limit
+   * Sets the upperBound
+   * @param ub the given upperBound
+   * @return Positional
    */
-  void limit(long lim);
+  Positional setUpperBound(long ub); //set limit
 
   /**
-   * Sets the mark to the current position
+   * Sets the tag = relOffset
+   * @return Positional
    */
-  void mark();
+  Positional setTagToRelOffset(); //set mark = position
 
   /**
-   * @return the current position
+   * Sets the relOffset = tag
+   * @return Positional
    */
-  long position();
+  Positional setRelOffsetToTag(); //reset
 
   /**
-   * Sets the postion
-   * @param pos the given position
-   */
-  void position(long pos);
-
-  /**
-   * The number of elements remaining between the position and the limit
-   * @return (limit - position)
-   */
-  long remaining();
-
-  /**
-   * Sets the position to the mark
-   */
-  void reset();
-
-  /**
-   * Sets the position to zero and the mark to invalid
-   */
-  void rewind();
-
-  /**
-   * Sets the position to zero, the limit to the capacity and the mark to invalid.
+   * Sets the relOffset to zero, the upperBound to the capacity and the tag to invalid.
    * This does not modify any data.
+   * @return Positional
    */
-  void clearPositions();
+  Positional reset(); //clear
+
+  /**
+   * Sets the upperBound to the current relOffset and then sets the relOffset to zero
+   * @return Positional
+   */
+  Positional exchange(); //flip
+
+  /**
+   * Sets the relOffset to zero and the tag to invalid
+   * @return Positional
+   */
+  Positional setRelOffsetToZero(); //rewind
+
+  /**
+   * The number of elements remaining between the relOffset and the upperBound
+   * @return (upperBound - relOffset)
+   */
+  long getRemaining(); //remaining
+
+  /**
+   * Returns true if there are elements remaining between the relOffset and the upperBound
+   * @return (upperBound - pos) > 0
+   */
+  boolean hasRemaining(); //hasRemaining
 
 }

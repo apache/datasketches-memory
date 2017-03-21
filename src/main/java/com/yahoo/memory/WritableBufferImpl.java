@@ -5,6 +5,13 @@
 
 package com.yahoo.memory;
 
+import static com.yahoo.memory.UnsafeUtil.ARRAY_BOOLEAN_BASE_OFFSET;
+import static com.yahoo.memory.UnsafeUtil.ARRAY_BOOLEAN_INDEX_SCALE;
+import static com.yahoo.memory.UnsafeUtil.BOOLEAN_SHIFT;
+import static com.yahoo.memory.UnsafeUtil.LS;
+import static com.yahoo.memory.UnsafeUtil.assertBounds;
+import static com.yahoo.memory.UnsafeUtil.unsafe;
+
 /**
  * @author Lee Rhodes
  */
@@ -14,9 +21,9 @@ class WritableBufferImpl extends WritableBuffer implements Positional {
   final long unsafeObjHeader; //Heap ByteBuffer includes the slice() offset here.
   final long capacity;
   final long cumBaseOffset; //Holds the cum offset to the start of data.
-  long position;
-  long limit;
-  long mark;
+  long relOffset;
+  long upperBound;
+  long tag;
 
   WritableBufferImpl(final ResourceState state) {
     this.state = state;
@@ -24,16 +31,16 @@ class WritableBufferImpl extends WritableBuffer implements Positional {
     this.unsafeObjHeader = state.getUnsafeObjectHeader();
     this.capacity = state.getCapacity();
     this.cumBaseOffset = state.getCumBaseOffset();
-    this.position = 0L;
-    this.limit = this.capacity;
-    this.mark = -1L;
+    this.relOffset = 0L;
+    this.upperBound = this.capacity;
+    this.tag = -1L;
   }
 
   //REGIONS XXX
   @Override
   public Buffer region() {
     checkValid();
-    return writableRegion(position(), limit() - position());
+    return writableRegion(getRelOffset(), getUpperBound() - getRelOffset());
   }
 
   @Override
@@ -50,14 +57,25 @@ class WritableBufferImpl extends WritableBuffer implements Positional {
   //PRIMITIVE getXXX() and getXXXArray() XXX
   @Override
   public boolean getBoolean() {
-    // TODO Auto-generated method stub
-    return false;
+    checkValid();
+    assertBounds(relOffset, ARRAY_BOOLEAN_INDEX_SCALE, this.capacity);
+    relOffset++;
+    return unsafe.getBoolean(this.unsafeObj, this.cumBaseOffset + relOffset);
   }
 
   @Override
   public void getBooleanArray(final boolean[] dstArray, final int dstOffset, final int length) {
-    // TODO Auto-generated method stub
-
+    checkValid();
+    final long copyBytes = length << BOOLEAN_SHIFT;
+    assertBounds(relOffset, copyBytes, this.capacity);
+    assertBounds(dstOffset, length, dstArray.length);
+    unsafe.copyMemory(
+      this.unsafeObj,
+      this.cumBaseOffset + relOffset,
+      dstArray,
+      ARRAY_BOOLEAN_BASE_OFFSET + (dstOffset << BOOLEAN_SHIFT),
+      copyBytes);
+    relOffset += copyBytes;
   }
 
   @Override
@@ -227,8 +245,16 @@ class WritableBufferImpl extends WritableBuffer implements Positional {
 
   @Override
   public String toHexString(final String header, final long offsetBytes, final int lengthBytes) {
-    // TODO Auto-generated method stub
-    return null;
+    checkValid();
+    final String klass = this.getClass().getSimpleName();
+    final String s1 = String.format("(..., %d, %d)", offsetBytes, lengthBytes);
+    final long hcode = this.hashCode() & 0XFFFFFFFFL;
+    final String call = ".toHexString" + s1 + ", hashCode: " + hcode;
+    final StringBuilder sb = new StringBuilder();
+    sb.append("### ").append(klass).append(" SUMMARY ###").append(LS);
+    sb.append("Header Comment      : ").append(header).append(LS);
+    sb.append("Call Params         : ").append(call);
+    return Memory.toHex(sb.toString(), offsetBytes, lengthBytes, this.state);
   }
 
   //PRIMITIVE putXXX() and putXXXArray() XXX
@@ -383,70 +409,78 @@ class WritableBufferImpl extends WritableBuffer implements Positional {
   }
 
   //POSITIONAL
+
   @Override
-  public WritableBuffer flip() {
-    this.limit = this.position;
-    this.position = 0L;
-    this.mark = -1L;
+  public long getRelOffset() { //get position
+    return this.relOffset;
+  }
+
+  @Override
+  public WritableBufferImpl setRelOffset(final long relOff) { //set position
+    assertBounds(0, relOff, this.upperBound);
+    this.relOffset = relOff;
+    if (this.tag > this.relOffset) { tag = -1; }
     return this;
   }
 
   @Override
+  public long getUpperBound() { //get limit
+    return this.upperBound;
+  }
+
+  @Override
+  public WritableBufferImpl setUpperBound(final long ub) { //set limit
+    assertBounds(0, ub, this.capacity);
+    this.upperBound = ub;
+    if (relOffset > upperBound) { relOffset = upperBound; }
+    if (tag > upperBound) { tag = -1; }
+    return this;
+  }
+
+  @Override
+  public WritableBufferImpl setTagToRelOffset() { //set mark
+    this.tag = this.relOffset;
+    return this;
+  }
+
+  @Override
+  public WritableBufferImpl setRelOffsetToTag() { //reset
+    assertBounds(0, tag, this.capacity);
+    this.relOffset = this.tag;
+    return this;
+  }
+
+  @Override
+  public WritableBufferImpl reset() { //clear
+    this.relOffset = 0;
+    this.upperBound = this.getCapacity();
+    this.tag = -1;
+    return this;
+  }
+
+  @Override
+  public WritableBufferImpl exchange() { //flip
+    this.upperBound = this.relOffset;
+    this.relOffset = 0;
+    this.tag = -1;
+    return this;
+  }
+
+  @Override
+  public WritableBufferImpl setRelOffsetToZero() {
+    this.relOffset = 0;
+    this.tag = -1;
+    return this;
+  }
+
+  @Override
+  public long getRemaining() {
+    return this.upperBound - this.relOffset;
+  }
+
+  @Override
   public boolean hasRemaining() {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
-  public long limit() {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
-  @Override
-  public void limit(final long lim) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void mark() {
-    this.mark = position();
-  }
-
-  @Override
-  public long position() {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
-  @Override
-  public void position(final long pos) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public long remaining() {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
-  @Override
-  public void reset() {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void rewind() {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void clearPositions() {
-    // TODO Auto-generated method stub
+    return (this.upperBound - this.relOffset) > 0;
   }
 
   //RESTRICTED READ AND WRITE

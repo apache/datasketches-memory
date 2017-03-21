@@ -5,10 +5,49 @@
 
 package com.yahoo.memory;
 
-public class WritableBufferImpl extends WritableBuffer implements Positional {
+/**
+ * @author Lee Rhodes
+ */
+class WritableBufferImpl extends WritableBuffer implements Positional {
+  final ResourceState state;
+  final Object unsafeObj; //Array objects are held here.
+  final long unsafeObjHeader; //Heap ByteBuffer includes the slice() offset here.
+  final long capacity;
+  final long cumBaseOffset; //Holds the cum offset to the start of data.
+  long position;
+  long limit;
+  long mark;
 
-  //PRIMITIVE getXXX() and getXXXArray() //XXX
+  WritableBufferImpl(final ResourceState state) {
+    this.state = state;
+    this.unsafeObj = state.getUnsafeObject();
+    this.unsafeObjHeader = state.getUnsafeObjectHeader();
+    this.capacity = state.getCapacity();
+    this.cumBaseOffset = state.getCumBaseOffset();
+    this.position = 0L;
+    this.limit = this.capacity;
+    this.mark = -1L;
+  }
 
+  //REGIONS XXX
+  @Override
+  public Buffer region() {
+    checkValid();
+    return writableRegion(position(), limit() - position());
+  }
+
+  @Override
+  public WritableBuffer writableRegion(final long offsetBytes, final long capacityBytes) {
+    checkValid();
+    assert offsetBytes + capacityBytes <= this.capacity
+        : "newOff + newCap: " + (offsetBytes + capacityBytes) + ", origCap: " + this.capacity;
+    final ResourceState newState = this.state.copy();
+    newState.putRegionOffset(newState.getRegionOffset() + offsetBytes);
+    newState.putCapacity(capacityBytes);
+    return new WritableBufferImpl(newState);
+  }
+
+  //PRIMITIVE getXXX() and getXXXArray() XXX
   @Override
   public boolean getBoolean() {
     // TODO Auto-generated method stub
@@ -105,8 +144,7 @@ public class WritableBufferImpl extends WritableBuffer implements Positional {
 
   }
 
-  //OTHER PRIMITIVE READ METHODS: copy, final isYYYY(), final areYYYY() //XXX
-
+  //OTHER PRIMITIVE READ METHODS: copy, final isYYYY(), final areYYYY() XXX
   @Override
   public int compareTo(final long thisLengthBytes, final Buffer that, final long thatLengthBytes) {
     // TODO Auto-generated method stub
@@ -143,7 +181,7 @@ public class WritableBufferImpl extends WritableBuffer implements Positional {
     return false;
   }
 
-  //OTHER READ METHODS //XXX
+  //OTHER READ METHODS XXX
 
   @Override
   public long getCapacity() {
@@ -193,8 +231,7 @@ public class WritableBufferImpl extends WritableBuffer implements Positional {
     return null;
   }
 
-  //PRIMITIVE putXXX() and putXXXArray() //XXX
-
+  //PRIMITIVE putXXX() and putXXXArray() XXX
   @Override
   public void putBoolean(final boolean value) {
     // TODO Auto-generated method stub
@@ -322,12 +359,6 @@ public class WritableBufferImpl extends WritableBuffer implements Positional {
   }
 
   @Override
-  public void clear(final long lengthBytes) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
   public void clearBits(final byte bitMask) {
     // TODO Auto-generated method stub
 
@@ -335,12 +366,6 @@ public class WritableBufferImpl extends WritableBuffer implements Positional {
 
   @Override
   public void fill(final byte value) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void fill(final long lengthBytes, final byte value) {
     // TODO Auto-generated method stub
 
   }
@@ -358,11 +383,12 @@ public class WritableBufferImpl extends WritableBuffer implements Positional {
   }
 
   //POSITIONAL
-
   @Override
-  public void flip() {
-    // TODO Auto-generated method stub
-
+  public WritableBuffer flip() {
+    this.limit = this.position;
+    this.position = 0L;
+    this.mark = -1L;
+    return this;
   }
 
   @Override
@@ -385,8 +411,7 @@ public class WritableBufferImpl extends WritableBuffer implements Positional {
 
   @Override
   public void mark() {
-    // TODO Auto-generated method stub
-
+    this.mark = position();
   }
 
   @Override
@@ -422,6 +447,10 @@ public class WritableBufferImpl extends WritableBuffer implements Positional {
   @Override
   public void clearPositions() {
     // TODO Auto-generated method stub
+  }
 
+  //RESTRICTED READ AND WRITE
+  private final void checkValid() { //applies to both readable and writable
+    assert this.state.isValid() : "Memory not valid.";
   }
 }

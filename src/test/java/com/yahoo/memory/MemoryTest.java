@@ -79,7 +79,7 @@ public class MemoryTest {
       assertEquals(v, i);
     }
     //convert to RO
-    Memory mem = wmem.asReadOnly();
+    Memory mem = wmem;
     for (int i = 0; i < n; i++) {
       long v = mem.getLong(i * 8);
       assertEquals(v, i);
@@ -109,7 +109,7 @@ public class MemoryTest {
       assertEquals(v, i);
     }
     //convert to RO
-    Memory mem = wmem.asReadOnly();
+    Memory mem = wmem;
     for (int i = 0; i < n; i++) {
       long v = mem.getLong(i * 8);
       assertEquals(v, i);

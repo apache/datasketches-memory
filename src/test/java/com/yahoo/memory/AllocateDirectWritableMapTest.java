@@ -26,7 +26,7 @@ public class AllocateDirectWritableMapTest {
     Memory.map(dummy, 0, dummy.length());
   }
 
-  @Test(expectedExceptions = ReadOnlyMemoryException.class)
+  @Test(expectedExceptions = ReadOnlyException.class)
   public void simpleMap2() throws Exception {
     File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
     try (WritableMemoryMapHandler rh = WritableMemory.writableMap(file)) {

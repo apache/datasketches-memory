@@ -69,7 +69,6 @@ public abstract class Memory {
   }
 
   //REGIONS
-
   /**
    * Returns a read only region of this Memory.
    * @param offsetBytes the starting offset with respect to this Memory
@@ -79,7 +78,6 @@ public abstract class Memory {
   public abstract Memory region(long offsetBytes, long capacityBytes);
 
   //ACCESS PRIMITIVE HEAP ARRAYS for readOnly
-
   /**
    * Wraps the given primitive array for read operations
    * @param arr the given primitive array
@@ -152,8 +150,7 @@ public abstract class Memory {
     return new WritableMemoryImpl(new ResourceState(arr, Prim.DOUBLE, arr.length));
   }
 
-  //PRIMITIVE getXXX() and getXXXArray() //XXX
-
+  //PRIMITIVE getXXX() and getXXXArray() XXX
   /**
    * Gets the boolean value at the given offset
    * @param offsetBytes offset bytes relative to this Memory start
@@ -289,8 +286,7 @@ public abstract class Memory {
   public abstract void getShortArray(long offsetBytes, short[] dstArray, int dstOffset,
       int length);
 
-  //OTHER PRIMITIVE READ METHODS: copy, isYYYY(), areYYYY() //XXX
-
+  //OTHER PRIMITIVE READ METHODS: copy, isYYYY(), areYYYY() XXX
   /**
    * Compares the bytes of this Memory to <i>that</i> Memory.
    * Returns <i>(this &lt; that) ? -1 : (this &gt; that) ? 1 : 0;</i>.
@@ -350,8 +346,7 @@ public abstract class Memory {
    */
   public abstract boolean isAnyBitsSet(long offsetBytes, byte bitMask);
 
-  //OTHER READ METHODS //XXX
-
+  //OTHER READ METHODS XXX
   /**
    * Gets the capacity of this Memory in bytes
    * @return the capacity of this Memory in bytes

@@ -19,7 +19,7 @@
  * <li>Converting a writable instance into a read-only instance is a simple up-cast.
  * For example: <pre>{@code
  *     WritableMemory wMem = ...
- *     Memory mem = (Memory)wMem; //or Memory mem = wMem.asReadOnly()
+ *     Memory mem = wMem;
  * }</pre>
  * </li>
  * <li>The native memory and the memory mapped file resources implement {@code AutoCloseable} so

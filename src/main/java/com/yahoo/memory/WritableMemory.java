@@ -17,8 +17,7 @@ import java.nio.ByteOrder;
  */
 public abstract class WritableMemory extends Memory {
 
-  //BYTE BUFFER
-
+  //BYTE BUFFER XXX
   /**
    * Accesses the given ByteBuffer for write operations.
    * @param byteBuf the given ByteBuffer
@@ -26,7 +25,7 @@ public abstract class WritableMemory extends Memory {
    */
   public static WritableMemory wrap(final ByteBuffer byteBuf) {
     if (byteBuf.isReadOnly()) {
-      throw new ReadOnlyMemoryException("ByteBuffer is read-only.");
+      throw new ReadOnlyException("ByteBuffer is read-only.");
     }
     if (byteBuf.order() != ByteOrder.nativeOrder()) {
       throw new IllegalArgumentException(
@@ -38,7 +37,7 @@ public abstract class WritableMemory extends Memory {
     return new WritableMemoryImpl(state);
   }
 
-  //MAP
+  //MAP XXX
   /**
    * Allocates direct memory used to memory map files for write operations
    * (including those &gt; 2GB).
@@ -68,8 +67,7 @@ public abstract class WritableMemory extends Memory {
     return WritableMemoryMapHandler.map(state);
   }
 
-  //ALLOCATE DIRECT
-
+  //ALLOCATE DIRECT XXX
   /**
    * Allocates and provides access to capacityBytes directly in native (off-heap) memory
    * leveraging the WritableMemory API. The allocated memory will be 8-byte aligned, but may not
@@ -102,7 +100,7 @@ public abstract class WritableMemory extends Memory {
     return WritableMemoryDirectHandler.allocDirect(state);
   }
 
-  //REGIONS
+  //REGIONS XXX
   /**
    * Returns a writable region of this WritableMemory
    * @param offsetBytes the starting offset with respect to this WritableMemory
@@ -111,13 +109,7 @@ public abstract class WritableMemory extends Memory {
    */
   public abstract WritableMemory writableRegion(long offsetBytes, long capacityBytes);
 
-  /**
-   * Returns a read-only version of this memory
-   * @return a read-only version of this memory
-   */
-  public abstract Memory asReadOnly();
-
-  //ALLOCATE HEAP VIA AUTOMATIC BYTE ARRAY
+  //ALLOCATE HEAP VIA AUTOMATIC BYTE ARRAY XXX
   /**
    * Creates on-heap WritableMemory with the given capacity
    * @param capacityBytes the given capacity in bytes
@@ -129,7 +121,6 @@ public abstract class WritableMemory extends Memory {
   }
 
   //ACCESS PRIMITIVE HEAP ARRAYS for write
-
   /**
    * Wraps the given primitive array for write operations
    * @param arr the given primitive array
@@ -203,7 +194,7 @@ public abstract class WritableMemory extends Memory {
   }
   //END OF CONSTRUCTOR-TYPE METHODS
 
-  //PRIMITIVE putXXX() and putXXXArray() //XXX
+  //PRIMITIVE putXXX() and putXXXArray() XXX
 
   /**
    * Puts the boolean value at the given offset
@@ -341,8 +332,7 @@ public abstract class WritableMemory extends Memory {
   public abstract void putShortArray(long offsetBytes, short[] srcArray,
       final int srcOffset, final int length);
 
-  //Atomic Methods //XXX
-
+  //Atomic Methods XXX
   /**
    * Atomically adds the given value to the long located at offsetBytes.
    * @param offsetBytes offset bytes relative to this Memory start
@@ -370,8 +360,7 @@ public abstract class WritableMemory extends Memory {
    */
   public abstract long getAndSetLong(long offsetBytes, long newValue);
 
-  //OTHER WRITE METHODS //XXX
-
+  //OTHER WRITE METHODS XXX
   /**
    * Returns the primitive backing array, otherwise null.
    * @return the primitive backing array, otherwise null.
@@ -419,8 +408,7 @@ public abstract class WritableMemory extends Memory {
   public abstract void setBits(long offsetBytes, byte bitMask);
 
 
-  //OTHER //XXX
-
+  //OTHER XXX
   /**
    * Returns a MemoryRequest or null
    * @return a MemoryRequest or null

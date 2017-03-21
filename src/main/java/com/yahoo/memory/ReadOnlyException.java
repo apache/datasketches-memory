@@ -6,14 +6,14 @@
 package com.yahoo.memory;
 
 /**
- * The exception thrown when attempting to write into a read-only Memory.
+ * The exception thrown when attempting to write into a read-only Resource.
  *
  * @author Praveenkumar Venkatesan
  */
-public class ReadOnlyMemoryException extends RuntimeException {
+public class ReadOnlyException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
-    public ReadOnlyMemoryException(final String message) {
+    public ReadOnlyException(final String message) {
       super(message);
     }
 }

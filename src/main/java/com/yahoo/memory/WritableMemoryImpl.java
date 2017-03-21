@@ -53,8 +53,7 @@ class WritableMemoryImpl extends WritableMemory {
     this.cumBaseOffset = state.getCumBaseOffset();
   }
 
-  //REGIONS
-
+  //REGIONS XXX
   @Override
   public Memory region(final long offsetBytes, final long capacityBytes) {
     checkValid();
@@ -72,16 +71,7 @@ class WritableMemoryImpl extends WritableMemory {
     return new WritableMemoryImpl(newState);
   }
 
-  //AS READ ONLY
-
-  @Override
-  public Memory asReadOnly() {
-    checkValid();
-    return this;
-  }
-
-  ///PRIMITIVE getXXX() and getXXXArray() //XXX
-
+  ///PRIMITIVE getXXX() and getXXXArray() XXX
   @Override
   public boolean getBoolean(final long offsetBytes) {
     checkValid();
@@ -258,7 +248,7 @@ class WritableMemoryImpl extends WritableMemory {
       copyBytes);
   }
 
-  //OTHER PRIMITIVE READ METHODS: copy, isYYYY(), areYYYY() //XXX
+  //OTHER PRIMITIVE READ METHODS: copy, isYYYY(), areYYYY() XXX
 
   @Override
   public int compareTo(final long thisOffsetBytes, final long thisLengthBytes, final Memory that,
@@ -399,7 +389,7 @@ class WritableMemoryImpl extends WritableMemory {
   }
 
   //ALL METHODS BELOW ONLY APPLY TO WRITABLE
-  //PRIMITIVE putXXX() and putXXXArray() implementations //XXX
+  //PRIMITIVE putXXX() and putXXXArray() implementations XXX
 
   @Override
   public void putBoolean(final long offsetBytes, final boolean value) {
@@ -585,7 +575,7 @@ class WritableMemoryImpl extends WritableMemory {
       );
   }
 
-  //Atomic Write Methods //XXX
+  //Atomic Write Methods XXX
 
   @Override
   public long getAndAddLong(final long offsetBytes, final long delta) { //JDK 8+
@@ -612,7 +602,7 @@ class WritableMemoryImpl extends WritableMemory {
     return unsafe.compareAndSwapLong(unsafeObj, cumBaseOffset + offsetBytes, expect, update);
   }
 
-  //OTHER WRITE METHODS //XXX
+  //OTHER WRITE METHODS XXX
 
   @Override
   public Object getArray() {
@@ -664,7 +654,7 @@ class WritableMemoryImpl extends WritableMemory {
     unsafe.putByte(this.unsafeObj, myOffset, (byte)(value | bitMask));
   }
 
-  //OTHER //XXX
+  //OTHER XXX
 
   @Override
   public MemoryRequest getMemoryRequest() { //only applicable to writable

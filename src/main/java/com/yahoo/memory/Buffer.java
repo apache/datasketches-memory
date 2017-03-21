@@ -5,11 +5,149 @@
 
 package com.yahoo.memory;
 
+import java.io.File;
+//import static com.yahoo.memory.UnsafeUtil.LS;
+//import static com.yahoo.memory.UnsafeUtil.assertBounds;
+//import static com.yahoo.memory.UnsafeUtil.unsafe;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
+/**
+ * Provides read-only, positional primitive and primitive array methods to any of the four resources
+ * mentioned at the package level.
+ *
+ * @author Lee Rhodes
+ */
 public abstract class Buffer {
 
+  //BYTE BUFFER XXX
+  /**
+   * Accesses the given ByteBuffer for read-only operations.
+   * @param byteBuf the given ByteBuffer
+   * @return the given ByteBuffer for read-only operations.
+   */
+  public static Buffer wrap(final ByteBuffer byteBuf) {
+    if (byteBuf.order() != ByteOrder.nativeOrder()) {
+      throw new IllegalArgumentException(
+          "Buffer does not support " + (byteBuf.order().toString()));
+    }
+    final ResourceState state = new ResourceState();
+    state.putByteBuffer(byteBuf);
+    AccessByteBuffer.wrap(state);
+    return new WritableBufferImpl(state);
+  }
+
+  //MAP XXX
+  /**
+   * Allocates direct memory used to memory map files for positional read operations
+   * (including those &gt; 2GB).
+   * @param file the given file to map
+   * @return BufferMapHandler for managing this map
+   * @throws Exception file not found or RuntimeException, etc.
+   */
+  public static BufferMapHandler map(final File file) throws Exception {
+    return map(file, 0, file.length());
+  }
+
+  /**
+   * Allocates direct memory used to memory map files for positional read operations
+   * (including those &gt; 2GB).
+   * @param file the given file to map
+   * @param fileOffset the position in the given file
+   * @param capacity the size of the allocated direct memory
+   * @return BufferMapHandler for managing this map
+   * @throws Exception file not found or RuntimeException, etc.
+   */
+  public static BufferMapHandler map(final File file, final long fileOffset, final long capacity)
+      throws Exception {
+    final ResourceState state = new ResourceState();
+    state.putFile(file);
+    state.putFileOffset(fileOffset);
+    state.putCapacity(capacity);
+    return BufferMapHandler.map(state);
+  }
+
+  //REGIONS XXX
+  /**
+   * Returns a read only region of this Buffer starting at position ending at limit.
+   * @return a read only region of this Buffer
+   */
+  public abstract Buffer region();
+
+  //ACCESS PRIMITIVE HEAP ARRAYS for readOnly XXX
+  /**
+   * Wraps the given primitive array for read operations
+   * @param arr the given primitive array
+   * @return Buffer for read operations
+   */
+  public static Buffer wrap(final boolean[] arr) {
+    return new WritableBufferImpl(new ResourceState(arr, Prim.BOOLEAN, arr.length));
+  }
+
+  /**
+   * Wraps the given primitive array for read operations
+   * @param arr the given primitive array
+   * @return Buffer for read operations
+   */
+  public static Buffer wrap(final byte[] arr) {
+    return new WritableBufferImpl(new ResourceState(arr, Prim.BYTE, arr.length));
+  }
+
+  /**
+   * Wraps the given primitive array for read operations
+   * @param arr the given primitive array
+   * @return Buffer for read operations
+   */
+  public static Buffer wrap(final char[] arr) {
+    return new WritableBufferImpl(new ResourceState(arr, Prim.CHAR, arr.length));
+  }
+
+  /**
+   * Wraps the given primitive array for read operations
+   * @param arr the given primitive array
+   * @return Buffer for read operations
+   */
+  public static Buffer wrap(final short[] arr) {
+    return new WritableBufferImpl(new ResourceState(arr, Prim.SHORT, arr.length));
+  }
+
+  /**
+   * Wraps the given primitive array for read operations
+   * @param arr the given primitive array
+   * @return Buffer for read operations
+   */
+  public static Buffer wrap(final int[] arr) {
+    return new WritableBufferImpl(new ResourceState(arr, Prim.INT, arr.length));
+  }
+
+  /**
+   * Wraps the given primitive array for read operations
+   * @param arr the given primitive array
+   * @return Buffer for read operations
+   */
+  public static Buffer wrap(final long[] arr) {
+    return new WritableBufferImpl(new ResourceState(arr, Prim.LONG, arr.length));
+  }
+
+  /**
+   * Wraps the given primitive array for read operations
+   * @param arr the given primitive array
+   * @return Buffer for read operations
+   */
+  public static Buffer wrap(final float[] arr) {
+    return new WritableBufferImpl(new ResourceState(arr, Prim.FLOAT, arr.length));
+  }
+
+  /**
+   * Wraps the given primitive array for read operations
+   * @param arr the given primitive array
+   * @return Buffer for read operations
+   */
+  public static Buffer wrap(final double[] arr) {
+    return new WritableBufferImpl(new ResourceState(arr, Prim.DOUBLE, arr.length));
+  }
 
   //PRIMITIVE getXXX() and getXXXArray() //XXX
-
   /**
    * Gets the boolean value at the current position
    * @return the boolean at the current position
@@ -122,7 +260,7 @@ public abstract class Buffer {
    */
   public abstract void getShortArray(short[] dstArray, int dstOffset, int length);
 
-  //OTHER PRIMITIVE READ METHODS: copy, isYYYY(), areYYYY() //XXX
+  //OTHER PRIMITIVE READ METHODS: copy, isYYYY(), areYYYY() XXX
 
   /**
    * Compares the bytes of this Buffer to <i>that</i> Buffer starting at their current positions.
@@ -173,7 +311,7 @@ public abstract class Buffer {
    */
   public abstract boolean isAnyBitsSet(byte bitMask);
 
-  //OTHER READ METHODS //XXX
+  //OTHER READ METHODS XXX
 
   /**
    * Gets the capacity of this Buffer in bytes

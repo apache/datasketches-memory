@@ -36,7 +36,7 @@ final class AllocateDirectWritableMap extends AllocateDirectMap implements Writa
   //@SuppressWarnings("resource")
   static AllocateDirectWritableMap map(final ResourceState state) throws Exception {
     if (isFileReadOnly(state.getFile())) {
-      throw new ReadOnlyMemoryException("File is read-only.");
+      throw new ReadOnlyException("File is read-only.");
     }
     return new AllocateDirectWritableMap(AllocateDirectMap.mapper(state));
   }

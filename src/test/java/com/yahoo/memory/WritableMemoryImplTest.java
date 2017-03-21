@@ -547,7 +547,7 @@ public class WritableMemoryImplTest {
     //println(mem.toHexString("HeapBB", 0, memCapacity));
   }
 
-  @Test(expectedExceptions = ReadOnlyMemoryException.class)
+  @Test(expectedExceptions = ReadOnlyException.class)
   public void checkWrapWithBBReadonly2() {
     int memCapacity = 64;
     ByteBuffer byteBuf = ByteBuffer.allocate(memCapacity);
@@ -578,7 +578,7 @@ public class WritableMemoryImplTest {
     //println(mem.toHexString("HeapBB", 0, memCapacity));
   }
 
-  @Test(expectedExceptions = ReadOnlyMemoryException.class)
+  @Test(expectedExceptions = ReadOnlyException.class)
   public void checkWrapWithDirectBBReadonlyPut() {
     int memCapacity = 64;
     ByteBuffer byteBuf = ByteBuffer.allocateDirect(memCapacity);
@@ -630,14 +630,14 @@ public class WritableMemoryImplTest {
   public void checkIsReadOnly() {
     long[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
 
-    WritableMemory mem = WritableMemory.wrap(srcArray);
-    assertFalse(mem.isResourceReadOnly());
+    WritableMemory wmem = WritableMemory.wrap(srcArray);
+    assertFalse(wmem.isResourceReadOnly());
 
-    Memory memRO = mem.asReadOnly();
+    Memory memRO = wmem;
     assertFalse(memRO.isResourceReadOnly());
 
-    for (int i = 0; i < mem.getCapacity(); i++) {
-      assertEquals(mem.getByte(i), memRO.getByte(i));
+    for (int i = 0; i < wmem.getCapacity(); i++) {
+      assertEquals(wmem.getByte(i), memRO.getByte(i));
     }
   }
 

@@ -9,8 +9,9 @@ public interface Positional {
 
   /**
    * Sets the limit to the current position and then sets the position to zero
+   * @return WritableBuffer
    */
-  void flip();
+  WritableBuffer flip();
 
   /**
    * Returns true if there are elements remaining between the position and the limit

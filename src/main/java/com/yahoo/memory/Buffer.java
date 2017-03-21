@@ -18,7 +18,11 @@ import java.nio.ByteOrder;
  *
  * @author Lee Rhodes
  */
-public abstract class Buffer {
+public abstract class Buffer extends BaseBuffer {
+
+  Buffer(final long capacity) {
+    super(capacity);
+  }
 
   //BYTE BUFFER XXX
   /**
@@ -261,27 +265,6 @@ public abstract class Buffer {
   public abstract void getShortArray(short[] dstArray, int dstOffset, int length);
 
   //OTHER PRIMITIVE READ METHODS: copy, isYYYY(), areYYYY() XXX
-
-  /**
-   * Compares the bytes of this Buffer to <i>that</i> Buffer starting at their current positions.
-   * Returns <i>(this &lt; that) ? -1 : (this &gt; that) ? 1 : 0;</i>.
-   * If all bytes are equal up to the shorter of the two lengths, the shorter length is considered
-   * to be less than the other.
-   * @param thisLengthBytes the length of the region to compare from <i>this Buffer</i>
-   * @param that the other Buffer to compare with
-   * @param thatLengthBytes the length of the region to compare from <i>that Buffer</i>
-   * @return <i>(this &lt; that) ? -1 : (this &gt; that) ? 1 : 0;</i>
-   */
-  public abstract int compareTo(long thisLengthBytes, Buffer that, long thatLengthBytes);
-
-  /**
-   * Copies bytes from a source range of this Buffer to a destination range of the given
-   * WritableBuffer relative to their respective positions using the same low-level system copy
-   * function as found in {@link java.lang.System#arraycopy(Object, int, Object, int, int)}.
-   * @param destination the destination Buffer, which may not be Read-Only.
-   * @param lengthBytes the number of bytes to copy
-   */
-  public abstract void copyTo(WritableBuffer destination, long lengthBytes);
 
   /**
    * Returns true if all bits defined by the bitMask are clear

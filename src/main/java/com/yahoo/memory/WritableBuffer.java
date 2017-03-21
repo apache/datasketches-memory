@@ -17,6 +17,11 @@ import java.nio.ByteOrder;
  */
 public abstract class WritableBuffer extends Buffer {
 
+  WritableBuffer(final long capacity) {
+    super(capacity);
+  }
+
+
   //BYTE BUFFER XXX
   /**
    * Accesses the given ByteBuffer for write operations.

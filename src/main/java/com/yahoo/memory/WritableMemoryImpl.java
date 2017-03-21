@@ -580,7 +580,6 @@ class WritableMemoryImpl extends WritableMemory {
     assertBounds(offsetBytes, ARRAY_LONG_INDEX_SCALE, capacity);
     final long add = cumBaseOffset + offsetBytes;
     return UnsafeUtil.compatibilityMethods.getAndAddLong(unsafeObj, add, delta) + delta;
-    //return unsafe.getAndAddLong(unsafeObj, add, delta) + delta;
   }
 
   @Override

@@ -5,6 +5,8 @@
 
 package com.yahoo.memory;
 
+import java.nio.ByteBuffer;
+
 /**
  * A new positional API. This is different from and simpler than Java Buffer positional approach.
  * <ul><li>All based on longs instead of ints.</li>
@@ -34,6 +36,11 @@ class BaseBuffer {
       this.pos = baseBuf.getPos();
       this.high = baseBuf.getHigh();
     } else {
+      final ByteBuffer byteBuf = state.getByteBuffer();
+      if (byteBuf != null) {
+        this.pos = byteBuf.position();
+        this.high = byteBuf.limit();
+      }
       this.low = 0;
       this.pos = 0;
       this.high = this.cap;

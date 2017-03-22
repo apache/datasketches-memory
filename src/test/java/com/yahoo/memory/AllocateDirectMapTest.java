@@ -18,7 +18,6 @@ import org.testng.annotations.Test;
 public class AllocateDirectMapTest {
   MemoryMapHandler hand = null;
 
-
   @Test
   public void simpleMap() throws Exception {
     File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
@@ -97,10 +96,10 @@ public class AllocateDirectMapTest {
       rh.load();
       assertTrue(rh.isLoaded());
       hand = rh;
-    }
+    } //TWR closes
     Memory mem = hand.get();
     assertFalse(mem.isValid());
-    println(""+mem.isValid());
+    //println(""+mem.isValid());
   }
 
   @Test

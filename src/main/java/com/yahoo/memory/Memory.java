@@ -21,7 +21,7 @@ import java.nio.ByteOrder;
  */
 public abstract class Memory {
 
-  //BYTE BUFFER
+  //BYTE BUFFER XXX
   /**
    * Accesses the given ByteBuffer for read-only operations.
    * @param byteBuf the given ByteBuffer
@@ -38,7 +38,7 @@ public abstract class Memory {
     return new WritableMemoryImpl(state);
   }
 
-  //MAP
+  //MAP XXX
   /**
    * Allocates direct memory used to memory map files for read operations
    * (including those &gt; 2GB).
@@ -68,7 +68,7 @@ public abstract class Memory {
     return MemoryMapHandler.map(state);
   }
 
-  //REGIONS
+  //REGIONS XXX
   /**
    * Returns a read only region of this Memory.
    * @param offsetBytes the starting offset with respect to this Memory
@@ -77,7 +77,14 @@ public abstract class Memory {
    */
   public abstract Memory region(long offsetBytes, long capacityBytes);
 
-  //ACCESS PRIMITIVE HEAP ARRAYS for readOnly
+  //BUFFER XXX
+  /**
+   * Convert this Memory to a Buffer
+   * @return Buffer
+   */
+  public abstract Buffer asBuffer();
+
+  //ACCESS PRIMITIVE HEAP ARRAYS for readOnly XXX
   /**
    * Wraps the given primitive array for read operations
    * @param arr the given primitive array

@@ -109,6 +109,13 @@ public abstract class WritableMemory extends Memory {
    */
   public abstract WritableMemory writableRegion(long offsetBytes, long capacityBytes);
 
+  //BUFFER XXX
+  /**
+   * Convert this WritableMemory to a WritableBuffer
+   * @return WritableBuffer
+   */
+  public abstract WritableBuffer asWritableBuffer();
+
   //ALLOCATE HEAP VIA AUTOMATIC BYTE ARRAY XXX
   /**
    * Creates on-heap WritableMemory with the given capacity
@@ -120,7 +127,7 @@ public abstract class WritableMemory extends Memory {
     return new WritableMemoryImpl(new ResourceState(arr, Prim.BYTE, arr.length));
   }
 
-  //ACCESS PRIMITIVE HEAP ARRAYS for write
+  //ACCESS PRIMITIVE HEAP ARRAYS for write XXX
   /**
    * Wraps the given primitive array for write operations
    * @param arr the given primitive array
@@ -195,7 +202,6 @@ public abstract class WritableMemory extends Memory {
   //END OF CONSTRUCTOR-TYPE METHODS
 
   //PRIMITIVE putXXX() and putXXXArray() XXX
-
   /**
    * Puts the boolean value at the given offset
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start

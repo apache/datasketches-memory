@@ -51,6 +51,7 @@ class WritableMemoryImpl extends WritableMemory {
     this.unsafeObjHeader = state.getUnsafeObjectHeader();
     this.capacity = state.getCapacity();
     this.cumBaseOffset = state.getCumBaseOffset();
+    this.state.setPositional(false);
   }
 
   //REGIONS XXX
@@ -70,6 +71,18 @@ class WritableMemoryImpl extends WritableMemory {
     newState.putCapacity(capacityBytes);
     return new WritableMemoryImpl(newState);
   }
+
+  //BUFFER XXX
+  @Override
+  public Buffer asBuffer() {
+    return new WritableBufferImpl(this.state.copy());
+  }
+
+  @Override
+  public WritableBuffer asWritableBuffer() {
+    return new WritableBufferImpl(this.state.copy());
+  }
+
 
   ///PRIMITIVE getXXX() and getXXXArray() XXX
   @Override
@@ -329,7 +342,7 @@ class WritableMemoryImpl extends WritableMemory {
     return value != 0;
   }
 
-  //OTHER READ METHODS
+  //OTHER READ METHODS XXX
 
   @Override
   public long getCapacity() {
@@ -573,7 +586,6 @@ class WritableMemoryImpl extends WritableMemory {
   }
 
   //Atomic Write Methods XXX
-
   @Override
   public long getAndAddLong(final long offsetBytes, final long delta) { //JDK 8+
     checkValid();
@@ -588,7 +600,6 @@ class WritableMemoryImpl extends WritableMemory {
     assertBounds(offsetBytes, ARRAY_LONG_INDEX_SCALE, capacity);
     final long add = cumBaseOffset + offsetBytes;
     return UnsafeUtil.compatibilityMethods.getAndSetLong(unsafeObj, add, newValue);
-    //return unsafe.getAndSetLong(unsafeObj, add, newValue);
   }
 
   @Override
@@ -608,7 +619,6 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void clear() {
-    checkValid();
     fill(0, capacity, (byte) 0);
   }
 
@@ -651,15 +661,13 @@ class WritableMemoryImpl extends WritableMemory {
   }
 
   //OTHER XXX
-
   @Override
   public MemoryRequest getMemoryRequest() { //only applicable to writable
     checkValid();
     return this.state.getMemoryRequest();
   }
 
-  //RESTRICTED READ AND WRITE
-
+  //RESTRICTED READ AND WRITE XXX
   private final void checkValid() { //applies to both readable and writable
     assert this.state.isValid() : "Memory not valid.";
   }

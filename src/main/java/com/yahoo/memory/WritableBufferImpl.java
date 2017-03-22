@@ -50,6 +50,7 @@ class WritableBufferImpl extends WritableBuffer {
     this.unsafeObjHeader = state.getUnsafeObjectHeader();
     this.capacity = state.getCapacity();
     this.cumBaseOffset = state.getCumBaseOffset();
+    this.state.setPositional(true);
   }
 
   //REGIONS XXX
@@ -68,6 +69,17 @@ class WritableBufferImpl extends WritableBuffer {
     newState.putRegionOffset(newState.getRegionOffset() + offsetBytes);
     newState.putCapacity(capacityBytes);
     return new WritableBufferImpl(newState);
+  }
+
+  //MEMORY XXX
+  @Override
+  public Memory asMemory() {
+    return new WritableMemoryImpl(this.state.copy());
+  }
+
+  @Override
+  public WritableMemory asWritableMemory() {
+    return new WritableMemoryImpl(this.state.copy());
   }
 
   //PRIMITIVE getXXX() and getXXXArray() XXX
@@ -587,6 +599,7 @@ class WritableBufferImpl extends WritableBuffer {
     incPos(copyBytes);
   }
 
+  //Atomic Write Methods XXX
   @Override
   public long getAndAddLong(final long delta) {
     checkValid();
@@ -598,17 +611,25 @@ class WritableBufferImpl extends WritableBuffer {
   }
 
   @Override
-  public boolean compareAndSwapLong(final long expect, final long update) {
-    // TODO Auto-generated method stub
-    return false;
+  public long getAndSetLong(final long newValue) {
+    checkValid();
+    final long pos = getPos();
+    assertBounds(pos, ARRAY_LONG_INDEX_SCALE, capacity);
+    final long add = cumBaseOffset + pos;
+    incPos(ARRAY_LONG_INDEX_SCALE);
+    return UnsafeUtil.compatibilityMethods.getAndSetLong(unsafeObj, add, newValue);
   }
 
   @Override
-  public long getAndSetLong(final long newValue) {
-    // TODO Auto-generated method stub
-    return 0;
+  public boolean compareAndSwapLong(final long expect, final long update) {
+    checkValid();
+    final long pos = getPos();
+    assertBounds(pos, ARRAY_INT_INDEX_SCALE, capacity);
+    incPos(ARRAY_LONG_INDEX_SCALE);
+    return unsafe.compareAndSwapLong(unsafeObj, cumBaseOffset + pos, expect, update);
   }
 
+  //OTHER WRITE METHODS XXX
   @Override
   public Object getArray() {
     checkValid();
@@ -622,28 +643,44 @@ class WritableBufferImpl extends WritableBuffer {
 
   @Override
   public void clearBits(final byte bitMask) {
-    // TODO Auto-generated method stub
-
+    checkValid();
+    final long pos = getPos();
+    assertBounds(pos, ARRAY_BYTE_INDEX_SCALE, capacity);
+    final long cumBaseOff = this.cumBaseOffset + pos;
+    int value = unsafe.getByte(this.unsafeObj, cumBaseOff) & 0XFF;
+    value &= ~bitMask;
+    unsafe.putByte(this.unsafeObj, cumBaseOff, (byte)value);
+    incPos(ARRAY_BYTE_INDEX_SCALE);
   }
 
   @Override
   public void fill(final byte value) {
-    // TODO Auto-generated method stub
-
+    checkValid();
+    final long pos = getPos();
+    final long len = getHigh() - pos;
+    assertBounds(pos, len, this.capacity);
+    unsafe.setMemory(this.unsafeObj, this.cumBaseOffset + pos, len, value);
   }
 
   @Override
   public void setBits(final byte bitMask) {
-    // TODO Auto-generated method stub
-
+    checkValid();
+    final long pos = getPos();
+    assertBounds(pos, ARRAY_BYTE_INDEX_SCALE, this.capacity);
+    final long myOffset = this.cumBaseOffset + pos;
+    final byte value = unsafe.getByte(this.unsafeObj, myOffset);
+    unsafe.putByte(this.unsafeObj, myOffset, (byte)(value | bitMask));
+    incPos(ARRAY_BYTE_INDEX_SCALE);
   }
 
+  //OTHER XXX
   @Override
   public MemoryRequest getMemoryRequest() {
+    checkValid();
     return this.state.getMemoryRequest();
   }
 
-  //RESTRICTED READ AND WRITE
+  //RESTRICTED READ AND WRITE XXX
   private final void checkValid() { //applies to both readable and writable
     assert this.state.isValid() : "Memory not valid.";
   }

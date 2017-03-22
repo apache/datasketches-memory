@@ -78,6 +78,13 @@ public abstract class Buffer extends BaseBuffer {
    */
   public abstract Buffer region();
 
+  //MEMORY XXX
+  /**
+   * Convert this Buffer to a Memory
+   * @return Memory
+   */
+  public abstract Memory asMemory();
+
   //ACCESS PRIMITIVE HEAP ARRAYS for readOnly XXX
   /**
    * Wraps the given primitive array for read operations

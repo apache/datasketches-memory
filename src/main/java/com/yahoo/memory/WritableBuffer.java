@@ -21,7 +21,6 @@ public abstract class WritableBuffer extends Buffer {
     super(capacity);
   }
 
-
   //BYTE BUFFER XXX
   /**
    * Accesses the given ByteBuffer for write operations.
@@ -114,6 +113,13 @@ public abstract class WritableBuffer extends Buffer {
    */
   public abstract WritableBuffer writableRegion(long offsetBytes, long capacityBytes);
 
+  //MEMORY XXX
+  /**
+   * Convert this WritableBuffer to a WritableMemory
+   * @return WritableMemory
+   */
+  public abstract WritableMemory asWritableMemory();
+
   //ALLOCATE HEAP VIA AUTOMATIC BYTE ARRAY XXX
   /**
    * Creates on-heap WritableBuffer with the given capacity
@@ -124,6 +130,7 @@ public abstract class WritableBuffer extends Buffer {
     final byte[] arr = new byte[capacityBytes];
     return new WritableBufferImpl(new ResourceState(arr, Prim.BYTE, arr.length));
   }
+  //END OF CONSTRUCTOR-TYPE METHODS
 
   //ACCESS PRIMITIVE HEAP ARRAYS for write XXX
   /**

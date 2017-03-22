@@ -40,10 +40,11 @@ class BaseBuffer {
       if (byteBuf != null) {
         this.pos = byteBuf.position();
         this.high = byteBuf.limit();
+      } else {
+        this.pos = 0;
+        this.high = this.cap;
       }
       this.low = 0;
-      this.pos = 0;
-      this.high = this.cap;
     }
     state.putBaseBuffer(this);
   }

@@ -435,7 +435,7 @@ public class WritableMemoryImplTest {
     try (WritableMemoryDirectHandler wrh1 = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh1.get();
 
-      CommonTest.toHexStringAllMemTests(mem); //requires println enabled to visually check
+      CommonMemoryTest.toHexStringAllMemTests(mem); //requires println enabled to visually check
     }
   }
 
@@ -445,7 +445,7 @@ public class WritableMemoryImplTest {
     try (WritableMemoryDirectHandler wrh1 = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh1.get();
 
-      CommonTest.setClearMemoryRegionsTests(mem); //requires println enabled to visually check
+      CommonMemoryTest.setClearMemoryRegionsTests(mem); //requires println enabled to visually check
       for (int i = 0; i < memCapacity; i++) {
         assertEquals(mem.getByte(i), 0);
       }
@@ -459,7 +459,7 @@ public class WritableMemoryImplTest {
       WritableMemory mem = wrh.get();
       assertEquals(mem.getCapacity(), memCapacity);
 
-      CommonTest.setGetTests(mem);
+      CommonMemoryTest.setGetTests(mem);
     }
   }
 
@@ -470,7 +470,7 @@ public class WritableMemoryImplTest {
       WritableMemory mem = wrh.get();
       assertEquals(memCapacity, mem.getCapacity());
 
-      CommonTest.setGetArraysTests(mem);
+      CommonMemoryTest.setGetArraysTests(mem);
     }
   }
 
@@ -481,7 +481,7 @@ public class WritableMemoryImplTest {
       WritableMemory mem = wrh.get();
       assertEquals(memCapacity, mem.getCapacity());
 
-      CommonTest.setGetPartialArraysWithOffsetTests(mem);
+      CommonMemoryTest.setGetPartialArraysWithOffsetTests(mem);
     }
   }
 
@@ -494,7 +494,7 @@ public class WritableMemoryImplTest {
       assertEquals(memCapacity, mem.getCapacity());
       mem.clear();
 
-      CommonTest.setClearIsBitsTests(mem);
+      CommonMemoryTest.setClearIsBitsTests(mem);
     }
   }
 
@@ -504,7 +504,7 @@ public class WritableMemoryImplTest {
     try (WritableMemoryDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh.get();
       assertEquals(mem.getCapacity(), memCapacity);
-      CommonTest.atomicMethodTests(mem);
+      CommonMemoryTest.atomicMethodTests(mem);
     }
   }
 

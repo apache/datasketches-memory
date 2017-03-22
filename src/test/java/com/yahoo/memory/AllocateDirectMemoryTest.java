@@ -10,7 +10,7 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-public class AllocateDirectTest {
+public class AllocateDirectMemoryTest {
 
   @Test
   public void checkAllocateDirect() {

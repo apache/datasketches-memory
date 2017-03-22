@@ -15,7 +15,7 @@ import java.io.File;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
-public class AllocateDirectMapTest {
+public class AllocateDirectMapMemoryTest {
   MemoryMapHandler hand = null;
 
   @Test

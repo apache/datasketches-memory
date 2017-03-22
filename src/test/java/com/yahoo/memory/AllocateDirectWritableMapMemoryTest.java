@@ -18,7 +18,7 @@ import java.io.UnsupportedEncodingException;
 
 import org.testng.annotations.Test;
 
-public class AllocateDirectWritableMapTest {
+public class AllocateDirectWritableMapMemoryTest {
 
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void testMapException() throws Exception {

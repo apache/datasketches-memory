@@ -9,8 +9,6 @@ import java.nio.ByteBuffer;
 
 import org.testng.annotations.Test;
 
-import com.yahoo.memory.WritableMemory;
-
 public class WritableMemoryTest {
 
   @Test(expectedExceptions = IllegalArgumentException.class)

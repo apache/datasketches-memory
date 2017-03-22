@@ -11,8 +11,6 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.yahoo.memory.WritableMemory;
-
 public class CommonTest {
 
   public static void setGetTests(WritableMemory mem) {

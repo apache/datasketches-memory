@@ -723,6 +723,19 @@ public class WritableMemoryImplTest {
     }
   }
 
+  @Test
+    public void checkDuplicate() {
+    WritableMemory wmem = WritableMemory.allocate(64);
+    for (int i = 0; i < 64; i++) { wmem.putByte(i, (byte)i); }
+    WritableMemory wmem2 = wmem.writableDuplicate();
+    for (int i = 0; i < 64; i++) {
+      assertEquals(wmem2.getByte(i), i);
+    }
+    Memory mem = wmem.duplicate();
+    for (int i = 0; i < 64; i++) {
+      assertEquals(mem.getByte(i), i);
+    }
+  }
 
   @Test
   public void printlnTest() {

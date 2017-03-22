@@ -11,7 +11,7 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-public class CommonTest {
+public class CommonMemoryTest {
 
   public static void setGetTests(WritableMemory mem) {
     mem.putBoolean(0, true);

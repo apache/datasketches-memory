@@ -51,10 +51,19 @@ class WritableMemoryImpl extends WritableMemory {
     this.unsafeObjHeader = state.getUnsafeObjectHeader();
     this.capacity = state.getCapacity();
     this.cumBaseOffset = state.getCumBaseOffset();
-    this.state.setPositional(false);
   }
 
-  //REGIONS XXX
+  //REGIONS/DUPLICATES XXX
+  @Override
+  public Memory duplicate() {
+    return region(0, this.capacity);
+  }
+
+  @Override
+  public WritableMemory writableDuplicate() {
+    return writableRegion(0, this.capacity);
+  }
+
   @Override
   public Memory region(final long offsetBytes, final long capacityBytes) {
     checkValid();
@@ -267,6 +276,7 @@ class WritableMemoryImpl extends WritableMemory {
   public int compareTo(final long thisOffsetBytes, final long thisLengthBytes, final Memory that,
       final long thatOffsetBytes, final long thatLengthBytes) {
     checkValid();
+    ((WritableMemoryImpl)that).checkValid();
     assertBounds(thisOffsetBytes, thisLengthBytes, this.capacity);
     assertBounds(thatOffsetBytes, thatLengthBytes, that.getCapacity());
     final long thisAdd = this.getCumulativeOffset(thisOffsetBytes);

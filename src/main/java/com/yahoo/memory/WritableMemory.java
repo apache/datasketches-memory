@@ -100,7 +100,13 @@ public abstract class WritableMemory extends Memory {
     return WritableMemoryDirectHandler.allocDirect(state);
   }
 
-  //REGIONS XXX
+  //REGIONS/DUPLICATES XXX
+  /**
+   * Returns a writable duplicate view of this Memory.
+   * @return a writable duplicate view of this Memory
+   */
+  public abstract WritableMemory writableDuplicate();
+
   /**
    * Returns a writable region of this WritableMemory
    * @param offsetBytes the starting offset with respect to this WritableMemory

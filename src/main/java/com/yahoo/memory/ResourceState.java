@@ -112,9 +112,9 @@ final class ResourceState {
 
   //POSITIONAL
   /**
-   * Place holder for future positional memory extension.
+   * BaseBuffer.
    */
-  private boolean positional_ = false;
+  private BaseBuffer baseBuf_ = null;
 
   //ENDIANNESS PLACE HOLDERS
 
@@ -137,7 +137,7 @@ final class ResourceState {
     compute();
   }
 
-  ResourceState copy() {
+  ResourceState copy() { //shallow copy
     final ResourceState out = new ResourceState();
     //FOUNDATION PARAMETERS
     out.nativeBaseOffset_ = nativeBaseOffset_;
@@ -164,7 +164,7 @@ final class ResourceState {
     out.mbb_ = mbb_;
 
     //POSITIONAL
-    out.positional_ = positional_;
+    out.baseBuf_ = baseBuf_;
 
     //ENDIANNESS PLACE HOLDERS
     out.myOrder_ = myOrder_;
@@ -226,6 +226,10 @@ final class ResourceState {
     return memReq_;
   }
 
+  BaseBuffer getBaseBuffer() {
+    return baseBuf_;
+  }
+
   boolean isResourceReadOnly() {
     return resourceIsReadOnly_.get();
   }
@@ -236,10 +240,6 @@ final class ResourceState {
 
   boolean isDirect() {
     return nativeBaseOffset_ > 0L;
-  }
-
-  boolean isPositional() {
-    return positional_;
   }
 
   void putNativeBaseOffset(final long nativeBaseOffset) {
@@ -317,16 +317,16 @@ final class ResourceState {
     this.memReq_ = memReq;
   }
 
+  void putBaseBuffer(final BaseBuffer baseBuf) {
+    this.baseBuf_ = baseBuf;
+  }
+
   void setResourceReadOnly() {
     this.resourceIsReadOnly_.change();
   }
 
   void setInvalid() {
     this.valid_.change();
-  }
-
-  void setPositional(final boolean positional) {
-    this.positional_ = positional;
   }
 
   ByteOrder order() {

@@ -44,19 +44,32 @@ class WritableBufferImpl extends WritableBuffer {
   final long cumBaseOffset; //Holds the cum offset to the start of data.
 
   WritableBufferImpl(final ResourceState state) {
-    super(state.getCapacity());
+    super(state);
     this.state = state;
     this.unsafeObj = state.getUnsafeObject();
     this.unsafeObjHeader = state.getUnsafeObjectHeader();
     this.capacity = state.getCapacity();
     this.cumBaseOffset = state.getCumBaseOffset();
-    this.state.setPositional(true);
   }
 
-  //REGIONS XXX
+  //REGIONS/DUPLICATES XXX
+  @Override
+  public Buffer duplicate() {
+    return writableRegion(0, this.capacity);
+  }
+
+  @Override
+  public WritableBuffer writableDuplicate() {
+    return writableRegion(0, this.capacity);
+  }
+
   @Override
   public Buffer region() {
-    checkValid();
+    return writableRegion(getPos(), getHigh() - getPos());
+  }
+
+  @Override
+  public WritableBuffer writableRegion() {
     return writableRegion(getPos(), getHigh() - getPos());
   }
 
@@ -74,11 +87,13 @@ class WritableBufferImpl extends WritableBuffer {
   //MEMORY XXX
   @Override
   public Memory asMemory() {
+    checkValid();
     return new WritableMemoryImpl(this.state.copy());
   }
 
   @Override
   public WritableMemory asWritableMemory() {
+    checkValid();
     return new WritableMemoryImpl(this.state.copy());
   }
 
@@ -292,6 +307,11 @@ class WritableBufferImpl extends WritableBuffer {
   }
 
   //OTHER PRIMITIVE READ METHODS: copy, final isYYYY(), final areYYYY() XXX
+
+  @Override
+  public int compareTo(final Buffer that) {
+    return 0;  //TODO convert the Memory based compareTo to static so it can be leveraged here.
+  }
 
   @Override
   public boolean isAllBitsClear(final byte bitMask) {

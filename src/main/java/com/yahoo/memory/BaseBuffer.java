@@ -21,17 +21,24 @@ package com.yahoo.memory;
  * @author Lee Rhodes
  */
 class BaseBuffer {
-  private long pos;
   private long low;
+  private long pos;
   private long high;
   private long cap;
 
-  BaseBuffer(final long capacity) {
-    assert capacity > 0;
-    this.cap = capacity;
-    this.low = 0;
-    this.pos = 0;
-    this.high = capacity;
+  BaseBuffer(final ResourceState state) {
+    this.cap = state.getCapacity();
+    final BaseBuffer baseBuf = state.getBaseBuffer();
+    if (baseBuf != null) {
+      this.low = baseBuf.getLow();
+      this.pos = baseBuf.getPos();
+      this.high = baseBuf.getHigh();
+    } else {
+      this.low = 0;
+      this.pos = 0;
+      this.high = this.cap;
+    }
+    state.putBaseBuffer(this);
   }
 
   /**
@@ -71,6 +78,14 @@ class BaseBuffer {
    */
   long getHigh() {
     return this.high;
+  }
+
+  /**
+   * Gets cap
+   * @return cap
+   */
+  long getCap() {
+    return this.cap;
   }
 
   /**

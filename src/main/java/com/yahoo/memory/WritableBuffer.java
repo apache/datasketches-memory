@@ -17,8 +17,8 @@ import java.nio.ByteOrder;
  */
 public abstract class WritableBuffer extends Buffer {
 
-  WritableBuffer(final long capacity) {
-    super(capacity);
+  WritableBuffer(final ResourceState state) {
+    super(state);
   }
 
   //BYTE BUFFER XXX
@@ -104,7 +104,21 @@ public abstract class WritableBuffer extends Buffer {
     return WritableBufferDirectHandler.allocDirect(state);
   }
 
-  //REGIONS XXX
+  //REGIONS/DUPLICATES XXX
+  /**
+   * Returns a writable duplicate view of this Buffer with the same but independent values of
+   * low, pos, high and capacity.
+   * @return a writable duplicate view of this Buffer with the same but independent values of
+   * low, pos, high and capacity.
+   */
+  public abstract WritableBuffer writableDuplicate();
+
+  /**
+   * Returns a writable region of this WritableBuffer
+   * @return a writable region of this WritableBuffer
+   */
+  public abstract WritableBuffer writableRegion();
+
   /**
    * Returns a writable region of this WritableBuffer
    * @param offsetBytes the starting offset with respect to this WritableBuffer

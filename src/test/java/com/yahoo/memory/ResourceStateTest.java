@@ -7,7 +7,6 @@ package com.yahoo.memory;
 
 import static com.yahoo.memory.UnsafeUtil.ARRAY_DOUBLE_INDEX_SCALE;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
@@ -18,11 +17,14 @@ import org.testng.annotations.Test;
 public class ResourceStateTest {
 
   @Test
-  public void checkPositional() {
+  public void checkBaseBufferAndState() {
     ResourceState state = new ResourceState();
-    assertFalse(state.isPositional());
-    state.setPositional(true);
-    assertTrue(state.isPositional());
+    state.putCapacity(1 << 20);
+    assertTrue(state.getBaseBuffer() == null);
+    BaseBuffer baseBuf = new BaseBuffer(state);
+    assertTrue(state.getBaseBuffer() != null);
+    assertEquals(baseBuf.getHigh(), 1 << 20);
+    assertEquals(baseBuf.getCap(), 1 << 20);
   }
 
   @Test

@@ -20,8 +20,8 @@ import java.nio.ByteOrder;
  */
 public abstract class Buffer extends BaseBuffer {
 
-  Buffer(final long capacity) {
-    super(capacity);
+  Buffer(final ResourceState state) {
+    super(state);
   }
 
   //BYTE BUFFER XXX
@@ -71,7 +71,15 @@ public abstract class Buffer extends BaseBuffer {
     return BufferMapHandler.map(state);
   }
 
-  //REGIONS XXX
+  //REGIONS/DUPLICATES XXX
+  /**
+   * Returns a read only duplicate view of this Buffer with the same but independent values of
+   * low, pos, high and capacity.
+   * @return a read only duplicate view of this Buffer with the same but independent values of
+   * low, pos, high and capacity.
+   */
+  public abstract Buffer duplicate();
+
   /**
    * Returns a read only region of this Buffer starting at position ending at limit.
    * @return a read only region of this Buffer
@@ -302,6 +310,15 @@ public abstract class Buffer extends BaseBuffer {
   public abstract boolean isAnyBitsSet(byte bitMask);
 
   //OTHER READ METHODS XXX
+
+  /**
+   * Compares <i>this</i> with <i>that</i> starting with the <i>pos</i> of each and ending
+   * at the <i>high</i> of each.
+   * @param that the other Memory to compare with
+   * @return <i>(this &lt; that) ? -1 : (this &gt; that) ? 1 : 0;</i>
+   * @see Memory#compareTo(long, long, Memory, long, long)
+   */
+  public abstract int compareTo(Buffer that);
 
   /**
    * Gets the capacity of this Buffer in bytes

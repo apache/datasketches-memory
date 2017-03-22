@@ -68,7 +68,13 @@ public abstract class Memory {
     return MemoryMapHandler.map(state);
   }
 
-  //REGIONS XXX
+  //REGIONS/DUPLICATES XXX
+  /**
+   * Returns a read only duplicate view of this Memory.
+   * @return a read only duplicate view of this Memory
+   */
+  public abstract Memory duplicate();
+
   /**
    * Returns a read only region of this Memory.
    * @param offsetBytes the starting offset with respect to this Memory

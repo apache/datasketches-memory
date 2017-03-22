@@ -218,29 +218,14 @@ public class CommonTest {
   }
 
   public static void atomicMethodTests(WritableMemory mem) {
-//    mem.putInt(0, 500);
-//    mem.getAndAddInt(0, 1);
-//    assertEquals(mem.getInt(0), 501);
-
     mem.putLong(0, 500);
     mem.getAndAddLong(0, 1);
     assertEquals(mem.getLong(0), 501);
-
-//    mem.putInt(0, 500);
-//    boolean b = mem.compareAndSwapInt(0, 500, 501);
-//    assertTrue(b);
-//    assertEquals(mem.getInt(0), 501);
 
     mem.putInt(0, 500);
     boolean b = mem.compareAndSwapLong(0, 500, 501);
     assertTrue(b);
     assertEquals(mem.getLong(0), 501);
-
-//    mem.putInt(0, 500);
-//    int oldInt = mem.getAndSetInt(0, 501);
-//    int newInt = mem.getInt(0);
-//    assertEquals(oldInt, 500);
-//    assertEquals(newInt, 501);
 
     mem.putLong(0, 500);
     long oldLong = mem.getAndSetLong(0, 501);

@@ -17,6 +17,4 @@ public class WritableMemoryTest {
     WritableMemory.wrap(bb);
   }
 
-
-
 }

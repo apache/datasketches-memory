@@ -7,6 +7,9 @@ package com.yahoo.memory;
 
 import static com.yahoo.memory.UnsafeUtil.assertBounds;
 
+/**
+ * @author Lee Rhodes
+ */
 final class Util {
 
   /**

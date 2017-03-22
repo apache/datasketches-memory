@@ -709,6 +709,22 @@ public class WritableMemoryImplTest {
   }
 
   @Test
+  public void checkAsBuffer() {
+    WritableMemory wmem = WritableMemory.allocate(64);
+    WritableBuffer wbuf = wmem.asWritableBuffer();
+    wbuf.setPos(32);
+    for (int i = 32; i < 64; i++) { wbuf.putByte((byte)i); }
+    //println(wbuf.toHexString("Buf", 0, (int)wbuf.getCapacity()));
+
+    Buffer buf = wmem.asBuffer();
+    buf.setPos(32);
+    for (int i = 32; i < 64; i++) {
+      assertEquals(buf.getByte(), i);
+    }
+  }
+
+
+  @Test
   public void printlnTest() {
     println("PRINTING: "+this.getClass().getName());
   }

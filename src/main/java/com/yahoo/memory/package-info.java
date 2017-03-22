@@ -22,6 +22,7 @@
  *     Memory mem = wMem;
  * }</pre>
  * </li>
+ *
  * <li>The native memory and the memory mapped file resources implement {@code AutoCloseable} so
  * that these resources are automatically closed if wrapped in a try-with-resources (TRW) block.
  * These resources are acquired using simple handlers that implement the {@code close()}
@@ -39,6 +40,17 @@
  * }</pre>
  * </li>
  *
+ *<li>This package offers both a direct offset access API (<i>Memory</i>) and a positional API
+ *(<i>Buffer</i>). Moving back and forth between these two views of the same resource is simple:
+ *<pre>{@code
+ *    Memory mem = ...
+ *    Buffer buf = mem.asBuffer();
+ *    ...
+ *    Memory mem2 = buf.asMemory();
+ *    ...
+ * }</pre>
+ * </li>
+ *
  * <li>With asserts enabled in the JVM, all methods are checked for bounds and
  * use-after-close violations.</li>
  *
@@ -49,5 +61,6 @@
  * }</pre>
  * </li>
  * </ul>
+ * @author Lee Rhodes
  */
 package com.yahoo.memory;

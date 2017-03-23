@@ -116,8 +116,9 @@ public class AllocateDirectMapMemoryTest {
   @AfterClass
   public void afterAllTests() {
     Memory mem = hand.get();
-    assertTrue(mem.isValid());
-    hand.close();
+    if (mem.isValid()) {
+      hand.close();
+    }
     assertFalse(mem.isValid());
   }
 

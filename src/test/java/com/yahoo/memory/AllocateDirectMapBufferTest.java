@@ -116,8 +116,9 @@ public class AllocateDirectMapBufferTest {
   @AfterClass
   public void afterAllTests() {
     Buffer mem = hand.get();
-    assertTrue(mem.isValid());
-    hand.close();
+    if (mem.isValid()) {
+      hand.close();
+    }
     assertFalse(mem.isValid());
   }
 

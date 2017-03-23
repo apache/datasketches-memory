@@ -410,7 +410,6 @@ class WritableMemoryImpl extends WritableMemory {
   }
 
   //PRIMITIVE putXXX() and putXXXArray() implementations XXX
-
   @Override
   public void putBoolean(final long offsetBytes, final boolean value) {
     checkValid();

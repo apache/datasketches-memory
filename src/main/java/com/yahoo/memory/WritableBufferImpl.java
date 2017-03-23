@@ -392,7 +392,6 @@ class WritableBufferImpl extends WritableBuffer {
 
   @Override
   public boolean isValid() {
-    checkValid();
     return this.state.isValid();
   }
 

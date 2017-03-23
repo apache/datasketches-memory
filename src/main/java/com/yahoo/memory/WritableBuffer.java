@@ -72,37 +72,7 @@ public abstract class WritableBuffer extends Buffer {
   }
 
   //ALLOCATE DIRECT XXX
-  /**
-   * Allocates and provides access to capacityBytes directly in native (off-heap) memory
-   * leveraging the WritableBuffer API. The allocated memory will be 8-byte aligned, but may not
-   * be page aligned.
-   *
-   * <p><b>NOTE:</b> Native/Direct memory acquired using Unsafe may have garbage in it.
-   * It is the responsibility of the using class to clear this memory, if required,
-   * and to call <i>close()</i> when done.</p>
-   *
-   * @param capacityBytes the size of the desired memory in bytes
-   * @return WritableBufferMapHandler for managing this off-heap resource
-   */
-  public static WritableBufferDirectHandler allocateDirect(final long capacityBytes) {
-    return allocateDirect(capacityBytes, null);
-  }
-
-  /**
-   * Allocates and provides access to capacityBytes directly in native (off-heap) memory
-   * leveraging the WritableBuffer API.
-   * The allocated memory will be 8-byte aligned, but may not be page aligned.
-   * @param capacityBytes the size of the desired memory in bytes
-   * @param memReq optional callback
-   * @return WritableBufferMapHandler for managing this off-heap resource
-   */
-  public static WritableBufferDirectHandler allocateDirect(final long capacityBytes,
-      final MemoryRequest memReq) {
-    final ResourceState state = new ResourceState();
-    state.putCapacity(capacityBytes);
-    state.putMemoryRequest(memReq);
-    return WritableBufferDirectHandler.allocDirect(state);
-  }
+  //Use WritableMemory to allocate direct memory
 
   //REGIONS/DUPLICATES XXX
   /**

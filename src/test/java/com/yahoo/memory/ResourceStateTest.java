@@ -7,6 +7,7 @@ package com.yahoo.memory;
 
 import static com.yahoo.memory.UnsafeUtil.ARRAY_DOUBLE_INDEX_SCALE;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
@@ -98,9 +99,19 @@ public class ResourceStateTest {
   //StepBoolean checks
   @Test
   public void checkStepBoolean() {
-    StepBoolean step = new StepBoolean(false);
-    step.change();
-    assertTrue(step.hasChanged());
+    checkStepBoolean(true);
+    checkStepBoolean(false);
+  }
+
+  private static void checkStepBoolean(boolean init) {
+    StepBoolean step = new StepBoolean(init);
+    assertTrue(step.get() == init); //confirm init
+    assertTrue(step.change());      //1st change was successful
+    assertTrue(step.get() != init); //confirm it is different from init
+    assertTrue(step.hasChanged());  //confirm it was changed from init
+    assertFalse(step.change());     //2nd change, not successful
+    assertTrue(step.get() != init); //Still different from init
+    assertTrue(step.hasChanged());  //confirm it was changed from initial value
   }
 
   @Test

@@ -5,7 +5,7 @@
 
 package com.yahoo.memory;
 
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * This is a step boolean function that can change its state only once and is thread-safe.
@@ -13,13 +13,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author Lee Rhodes
  */
 final class StepBoolean {
-  private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-  private volatile boolean state;
   private final boolean initial;
+  private AtomicBoolean state = new AtomicBoolean(false);
 
   StepBoolean(final boolean initialValue) {
     this.initial = initialValue;
-    this.state = initialValue;
+    this.state.set(initialValue);
   }
 
   /**
@@ -27,12 +26,7 @@ final class StepBoolean {
    * @return the current state.
    */
   boolean get() {
-    try {
-      lock.readLock().lock();
-      return state;
-    } finally {
-      lock.readLock().unlock();
-    }
+    return this.state.get();
   }
 
   /**
@@ -41,16 +35,7 @@ final class StepBoolean {
    * @return true if the state changed due to this operation
    */
   boolean change() {
-    try {
-      lock.writeLock().lock();
-      if (state == initial) {
-        this.state = !initial;
-        return true;
-      }
-      return false;
-    } finally {
-      lock.writeLock().unlock();
-    }
+    return this.state.compareAndSet(this.initial, !this.initial);
   }
 
   /**
@@ -58,11 +43,6 @@ final class StepBoolean {
    * @return true if the state has changed from the initial state
    */
   boolean hasChanged() {
-    try {
-      lock.readLock().lock();
-      return state != initial;
-    } finally {
-      lock.readLock().unlock();
-    }
+    return !change();
   }
 }

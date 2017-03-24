@@ -55,34 +55,41 @@ class WritableBufferImpl extends WritableBuffer {
   //REGIONS/DUPLICATES XXX
   @Override
   public Buffer duplicate() {
-    return writableRegion(0, this.capacity);
+    return regOrDup(0, this.capacity, true);
   }
 
   @Override
   public WritableBuffer writableDuplicate() {
-    return writableRegion(0, this.capacity);
+    return regOrDup(0, this.capacity, true);
   }
 
   @Override
   public Buffer region() {
-    return writableRegion(getPosition(), getEnd() - getPosition());
+    return regOrDup(getPosition(), getEnd() - getPosition(), false);
   }
 
   @Override
   public WritableBuffer writableRegion() {
-    return writableRegion(getPosition(), getEnd() - getPosition());
+    return regOrDup(getPosition(), getEnd() - getPosition(), false);
   }
 
   @Override
   public WritableBuffer writableRegion(final long offsetBytes, final long capacityBytes) {
+    return regOrDup(offsetBytes, capacityBytes, false);
+  }
+
+  private WritableBuffer regOrDup(final long offsetBytes, final long capacityBytes,
+      final boolean dup) {
     checkValid();
     assert offsetBytes + capacityBytes <= this.capacity
         : "newOff + newCap: " + (offsetBytes + capacityBytes) + ", origCap: " + this.capacity;
     final ResourceState newState = this.state.copy();
     newState.putRegionOffset(newState.getRegionOffset() + offsetBytes);
     newState.putCapacity(capacityBytes);
+    if (!dup) { newState.putBaseBuffer(null); }
     return new WritableBufferImpl(newState);
   }
+
 
   //MEMORY XXX
   @Override

@@ -298,19 +298,21 @@ public class BufferTest2
     }
     bb.position(10);
 
-    Buffer buffer = Buffer.wrap(bb.slice().order(ByteOrder.nativeOrder()));
-    buffer.setPosition(30);
-    Buffer dupBuffer = buffer.duplicate();
+    Buffer buffer = Buffer.wrap(bb.slice().order(ByteOrder.nativeOrder())); //slice = 54
+    buffer.setPosition(30);//remaining = 24
+    Buffer dupBuffer = buffer.duplicate(); //all 54
+    println(dupBuffer.toHexString("dup", 0, (int) dupBuffer.getCapacity()));
     Buffer regionBuffer = buffer.region();
+    println(regionBuffer.toHexString("reg", 0, (int) regionBuffer.getCapacity()));
 
     assertEquals(dupBuffer.getStart(), buffer.getStart());
     assertEquals(regionBuffer.getStart(), buffer.getStart());
     assertEquals(dupBuffer.getEnd(), buffer.getEnd());
     assertEquals(regionBuffer.getEnd(), buffer.getEnd());
     assertEquals(dupBuffer.getPosition(), buffer.getPosition());
-    assertEquals(regionBuffer.getPosition(), buffer.getPosition());
+    assertEquals(regionBuffer.getPosition(), 0);
     assertEquals(dupBuffer.getCapacity(), buffer.getCapacity());
-    assertEquals(regionBuffer.getCapacity() + 30, buffer.getCapacity());
+    assertEquals(regionBuffer.getCapacity(), buffer.getCapacity() - 30);
   }
 
   @Test
@@ -333,4 +335,17 @@ public class BufferTest2
       assertEquals(memory.getByte(buffer.getPosition()), buffer.getByte());
     }
   }
+
+  @Test
+  public void printlnTest() {
+    println("PRINTING: "+this.getClass().getName());
+  }
+
+  /**
+   * @param s value to print
+   */
+  static void println(String s) {
+    System.out.println(s); //disable here
+  }
+
 }

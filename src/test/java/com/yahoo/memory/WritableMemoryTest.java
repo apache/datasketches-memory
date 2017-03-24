@@ -17,4 +17,10 @@ public class WritableMemoryTest {
     WritableMemory.wrap(bb);
   }
 
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void wrapWrongEndian2() {
+    ByteBuffer bb = ByteBuffer.allocate(64);
+    WritableBuffer.wrap(bb);
+  }
+
 }

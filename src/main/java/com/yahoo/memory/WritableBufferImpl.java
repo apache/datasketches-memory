@@ -315,10 +315,10 @@ class WritableBufferImpl extends WritableBuffer {
 
   //OTHER PRIMITIVE READ METHODS: copy, final isYYYY(), final areYYYY() XXX
 
-  @Override
-  public int compareTo(final Buffer that) {
-    return 0;  //TODO convert the Memory based compareTo to static so it can be leveraged here.
-  }
+  //  @Override
+  //  public int compareTo(final Buffer that) {
+  //    return 0;  //TODO convert the Memory based compareTo to static so it can be leveraged here.
+  //  }
 
   @Override
   public boolean isAllBitsClear(final byte bitMask) {

@@ -311,14 +311,14 @@ public abstract class Buffer extends BaseBuffer {
 
   //OTHER READ METHODS XXX
 
-  /**
-   * Compares <i>this</i> with <i>that</i> starting with the <i>pos</i> of each and ending
-   * at the <i>high</i> of each.
-   * @param that the other Memory to compare with
-   * @return <i>(this &lt; that) ? -1 : (this &gt; that) ? 1 : 0;</i>
-   * @see Memory#compareTo(long, long, Memory, long, long)
-   */
-  public abstract int compareTo(Buffer that);
+  //  /**
+  //   * Compares <i>this</i> with <i>that</i> starting with the <i>pos</i> of each and ending
+  //   * at the <i>high</i> of each.
+  //   * @param that the other Memory to compare with
+  //   * @return <i>(this &lt; that) ? -1 : (this &gt; that) ? 1 : 0;</i>
+  //   * @see Memory#compareTo(long, long, Memory, long, long)
+  //   */
+  //  public abstract int compareTo(Buffer that);
 
   /**
    * Gets the capacity of this Buffer in bytes

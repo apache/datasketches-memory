@@ -7,8 +7,7 @@ import java.nio.ByteOrder;
 
 import org.testng.annotations.Test;
 
-public class BufferTest2
-{
+public class BufferTest2 {
   @Test
   public void testWrapByteBuf() {
     ByteBuffer bb = ByteBuffer.allocate(64).order(ByteOrder.nativeOrder());
@@ -301,9 +300,7 @@ public class BufferTest2
     Buffer buffer = Buffer.wrap(bb.slice().order(ByteOrder.nativeOrder())); //slice = 54
     buffer.setPosition(30);//remaining = 24
     Buffer dupBuffer = buffer.duplicate(); //all 54
-    println(dupBuffer.toHexString("dup", 0, (int) dupBuffer.getCapacity()));
     Buffer regionBuffer = buffer.region();
-    println(regionBuffer.toHexString("reg", 0, (int) regionBuffer.getCapacity()));
 
     assertEquals(dupBuffer.getStart(), buffer.getStart());
     assertEquals(regionBuffer.getStart(), buffer.getStart());
@@ -345,7 +342,7 @@ public class BufferTest2
    * @param s value to print
    */
   static void println(String s) {
-    System.out.println(s); //disable here
+    //System.out.println(s); //disable here
   }
 
 }

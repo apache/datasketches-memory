@@ -313,51 +313,30 @@ class WritableBufferImpl extends WritableBuffer {
     incrementPosition(copyBytes);
   }
 
-  //OTHER PRIMITIVE READ METHODS: copy, final isYYYY(), final areYYYY() XXX
-
-  //  @Override
-  //  public int compareTo(final Buffer that) {
-  //    return 0;  //TODO convert the Memory based compareTo to static so it can be leveraged here.
-  //  }
-
+  //OTHER PRIMITIVE READ METHODS: copyTo, compareTo XXX
   @Override
-  public boolean isAllBitsClear(final byte bitMask) {
+  public int compareTo(final long thisOffsetBytes, final long thisLengthBytes, final Buffer that,
+      final long thatOffsetBytes, final long thatLengthBytes) {
     checkValid();
-    final long pos = getPosition();
-    assertBounds(pos, ARRAY_BYTE_INDEX_SCALE, capacity);
-    final int value = ~unsafe.getByte(unsafeObj, cumBaseOffset + pos) & bitMask & 0XFF;
-    incrementPosition(ARRAY_BYTE_INDEX_SCALE);
-    return value == bitMask;
+    ((WritableBufferImpl)that).checkValid();
+    assertBounds(thisOffsetBytes, thisLengthBytes, this.capacity);
+    assertBounds(thatOffsetBytes, thatLengthBytes, that.getCapacity());
+    final long thisAdd = this.getCumulativeOffset() + thisOffsetBytes;
+    final long thatAdd = that.getCumulativeOffset() + thatOffsetBytes;
+    final Object thisObj = (this.isDirect()) ? null : this.unsafeObj;
+    final Object thatObj = (that.isDirect()) ? null : ((WritableBuffer)that).getArray();
+    final long lenBytes = Math.min(thisLengthBytes, thatLengthBytes);
+    for (long i = 0; i < lenBytes; i++) {
+      final int thisByte = unsafe.getByte(thisObj, thisAdd + i);
+      final int thatByte = unsafe.getByte(thatObj, thatAdd + i);
+      if (thisByte < thatByte) { return -1; }
+      if (thisByte > thatByte) { return  1; }
+    }
+    if (thisLengthBytes < thatLengthBytes) { return -1; }
+    if (thisLengthBytes > thatLengthBytes) { return  1; }
+    return 0;
   }
 
-  @Override
-  public boolean isAllBitsSet(final byte bitMask) {
-    checkValid();
-    final long pos = getPosition();
-    assertBounds(pos, ARRAY_BYTE_INDEX_SCALE, capacity);
-    final int value = unsafe.getByte(unsafeObj, cumBaseOffset + pos) & bitMask & 0XFF;
-    incrementPosition(ARRAY_BYTE_INDEX_SCALE);
-    return value == bitMask;
-  }
-
-  @Override
-  public boolean isAnyBitsClear(final byte bitMask) {
-    checkValid();
-    final long pos = getPosition();
-    assertBounds(pos, ARRAY_BYTE_INDEX_SCALE, capacity);
-    final int value = ~unsafe.getByte(unsafeObj, cumBaseOffset + pos) & bitMask & 0XFF;
-    incrementPosition(ARRAY_BYTE_INDEX_SCALE);
-    return value != 0;
-  }
-
-  @Override
-  public boolean isAnyBitsSet(final byte bitMask) {
-    checkValid();
-    final long pos = getPosition();
-    assertBounds(pos, ARRAY_BYTE_INDEX_SCALE, capacity);
-    final int value = unsafe.getByte(unsafeObj, cumBaseOffset + pos) & bitMask & 0XFF;
-    return value != 0;
-  }
 
   //OTHER READ METHODS XXX
 

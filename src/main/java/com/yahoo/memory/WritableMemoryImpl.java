@@ -270,7 +270,7 @@ class WritableMemoryImpl extends WritableMemory {
       copyBytes);
   }
 
-  //OTHER PRIMITIVE READ METHODS: copy, isYYYY(), areYYYY() XXX
+  //OTHER PRIMITIVE READ METHODS: copyTo, compareTo XXX
 
   @Override
   public int compareTo(final long thisOffsetBytes, final long thisLengthBytes, final Memory that,
@@ -318,38 +318,6 @@ class WritableMemoryImpl extends WritableMemory {
       srcAdd += chunkBytes;
       dstAdd += chunkBytes;
     }
-  }
-
-  @Override
-  public boolean isAllBitsClear(final long offsetBytes, final byte bitMask) {
-    checkValid();
-    assertBounds(offsetBytes, ARRAY_BYTE_INDEX_SCALE, capacity);
-    final int value = ~unsafe.getByte(unsafeObj, cumBaseOffset + offsetBytes) & bitMask & 0XFF;
-    return value == bitMask;
-  }
-
-  @Override
-  public boolean isAllBitsSet(final long offsetBytes, final byte bitMask) {
-    checkValid();
-    assertBounds(offsetBytes, ARRAY_BYTE_INDEX_SCALE, capacity);
-    final int value = unsafe.getByte(unsafeObj, cumBaseOffset + offsetBytes) & bitMask & 0XFF;
-    return value == bitMask;
-  }
-
-  @Override
-  public boolean isAnyBitsClear(final long offsetBytes, final byte bitMask) {
-    checkValid();
-    assertBounds(offsetBytes, ARRAY_BYTE_INDEX_SCALE, capacity);
-    final int value = ~unsafe.getByte(unsafeObj, cumBaseOffset + offsetBytes) & bitMask & 0XFF;
-    return value != 0;
-  }
-
-  @Override
-  public boolean isAnyBitsSet(final long offsetBytes, final byte bitMask) {
-    checkValid();
-    assertBounds(offsetBytes, ARRAY_BYTE_INDEX_SCALE, capacity);
-    final int value = unsafe.getByte(unsafeObj, cumBaseOffset + offsetBytes) & bitMask & 0XFF;
-    return value != 0;
   }
 
   //OTHER READ METHODS XXX

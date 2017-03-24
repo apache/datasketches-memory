@@ -6,7 +6,6 @@
 package com.yahoo.memory;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
@@ -219,42 +218,6 @@ public class CommonMemoryTest {
     mem.getShortArray(0, dstArray8, 2, items/2);
     for (int i=2; i<items; i++) {
       assertEquals(dstArray8[i], srcArray8[i]);
-    }
-  }
-
-  @Test
-  public void checkSetClearIsBits() {
-    int memCapacity = 8;
-    try (WritableMemoryDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh.get();
-      assertEquals(memCapacity, mem.getCapacity());
-      mem.clear();
-      setClearIsBitsTests(mem);
-    }
-  }
-
-  public static void setClearIsBitsTests(WritableMemory mem) {
-  //single bits
-    for (int i=0; i<8; i++) {
-      byte bitMask = (byte)(1 << i);
-      assertTrue(mem.isAnyBitsClear(0, bitMask));
-      mem.setBits(0, bitMask);
-      assertTrue(mem.isAnyBitsSet(0, bitMask));
-      mem.clearBits(0, bitMask);
-      assertTrue(mem.isAnyBitsClear(0, bitMask));
-    }
-
-    //multiple bits
-    for (int i=0; i<7; i++) {
-      byte bitMask1 = (byte)(1 << i);
-      byte bitMask2 = (byte)(3 << i);
-      assertTrue(mem.isAnyBitsClear(0, bitMask1));
-      assertTrue(mem.isAnyBitsClear(0, bitMask2));
-      mem.setBits(0, bitMask1); //set one bit
-      assertTrue(mem.isAnyBitsSet(0, bitMask2));
-      assertTrue(mem.isAnyBitsClear(0, bitMask2));
-      assertFalse(mem.isAllBitsSet(0, bitMask2));
-      assertFalse(mem.isAllBitsClear(0, bitMask2));
     }
   }
 

@@ -5,7 +5,6 @@
 
 package com.yahoo.memory;
 
-import java.io.File;
 //import static com.yahoo.memory.UnsafeUtil.LS;
 //import static com.yahoo.memory.UnsafeUtil.assertBounds;
 //import static com.yahoo.memory.UnsafeUtil.unsafe;
@@ -42,34 +41,7 @@ public abstract class Buffer extends BaseBuffer {
   }
 
   //MAP XXX
-  /**
-   * Allocates direct memory used to memory map files for positional read operations
-   * (including those &gt; 2GB).
-   * @param file the given file to map
-   * @return BufferMapHandler for managing this map
-   * @throws Exception file not found or RuntimeException, etc.
-   */
-  public static BufferMapHandler map(final File file) throws Exception {
-    return map(file, 0, file.length());
-  }
-
-  /**
-   * Allocates direct memory used to memory map files for positional read operations
-   * (including those &gt; 2GB).
-   * @param file the given file to map
-   * @param fileOffset the position in the given file
-   * @param capacity the size of the allocated direct memory
-   * @return BufferMapHandler for managing this map
-   * @throws Exception file not found or RuntimeException, etc.
-   */
-  public static BufferMapHandler map(final File file, final long fileOffset, final long capacity)
-      throws Exception {
-    final ResourceState state = new ResourceState();
-    state.putFile(file);
-    state.putFileOffset(fileOffset);
-    state.putCapacity(capacity);
-    return BufferMapHandler.map(state);
-  }
+  //Use Memory for mapping files
 
   //REGIONS/DUPLICATES XXX
   /**
@@ -279,47 +251,24 @@ public abstract class Buffer extends BaseBuffer {
    */
   public abstract void getShortArray(short[] dstArray, int dstOffset, int length);
 
-  //OTHER PRIMITIVE READ METHODS: copy, isYYYY(), areYYYY() XXX
-
+  //OTHER PRIMITIVE READ METHODS: copyTo, compareTo XXX
   /**
-   * Returns true if all bits defined by the bitMask are clear
-   * @param bitMask bits set to one will be checked
-   * @return true if all bits defined by the bitMask are clear
+   * Compares the bytes of this Memory to <i>that</i> Memory.  This uses absolute offsets not
+   * the start, position and end.
+   * Returns <i>(this &lt; that) ? -1 : (this &gt; that) ? 1 : 0;</i>.
+   * If all bytes are equal up to the shorter of the two lengths, the shorter length is considered
+   * to be less than the other.
+   * @param thisOffsetBytes the starting offset for <i>this Memory</i>
+   * @param thisLengthBytes the length of the region to compare from <i>this Memory</i>
+   * @param that the other Memory to compare with
+   * @param thatOffsetBytes the starting offset for <i>that Memory</i>
+   * @param thatLengthBytes the length of the region to compare from <i>that Memory</i>
+   * @return <i>(this &lt; that) ? -1 : (this &gt; that) ? 1 : 0;</i>
    */
-  public abstract boolean isAllBitsClear(byte bitMask);
-
-  /**
-   * Returns true if all bits defined by the bitMask are set
-   * @param bitMask bits set to one will be checked
-   * @return true if all bits defined by the bitMask are set
-   */
-  public abstract boolean isAllBitsSet(byte bitMask);
-
-  /**
-   * Returns true if any bits defined by the bitMask are clear
-   * @param bitMask bits set to one will be checked
-   * @return true if any bits defined by the bitMask are clear
-   */
-  public abstract boolean isAnyBitsClear(byte bitMask);
-
-  /**
-   * Returns true if any bits defined by the bitMask are set
-   * @param bitMask bits set to one will be checked
-   * @return true if any bits defined by the bitMask are set
-   */
-  public abstract boolean isAnyBitsSet(byte bitMask);
+  public abstract int compareTo(long thisOffsetBytes, long thisLengthBytes, Buffer that,
+      long thatOffsetBytes, long thatLengthBytes);
 
   //OTHER READ METHODS XXX
-
-  //  /**
-  //   * Compares <i>this</i> with <i>that</i> starting with the <i>pos</i> of each and ending
-  //   * at the <i>high</i> of each.
-  //   * @param that the other Memory to compare with
-  //   * @return <i>(this &lt; that) ? -1 : (this &gt; that) ? 1 : 0;</i>
-  //   * @see Memory#compareTo(long, long, Memory, long, long)
-  //   */
-  //  public abstract int compareTo(Buffer that);
-
   /**
    * Gets the capacity of this Buffer in bytes
    * @return the capacity of this Buffer in bytes

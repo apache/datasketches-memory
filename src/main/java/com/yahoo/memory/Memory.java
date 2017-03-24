@@ -299,7 +299,7 @@ public abstract class Memory {
   public abstract void getShortArray(long offsetBytes, short[] dstArray, int dstOffset,
       int length);
 
-  //OTHER PRIMITIVE READ METHODS: copy, isYYYY(), areYYYY() XXX
+  //OTHER PRIMITIVE READ METHODS: copyTo, compareTo XXX
   /**
    * Compares the bytes of this Memory to <i>that</i> Memory.
    * Returns <i>(this &lt; that) ? -1 : (this &gt; that) ? 1 : 0;</i>.
@@ -326,38 +326,6 @@ public abstract class Memory {
    */
   public abstract void copyTo(long srcOffsetBytes, WritableMemory destination, long dstOffsetBytes,
       long lengthBytes);
-
-  /**
-   * Returns true if all bits defined by the bitMask are clear
-   * @param offsetBytes offset bytes relative to this Memory start
-   * @param bitMask bits set to one will be checked
-   * @return true if all bits defined by the bitMask are clear
-   */
-  public abstract boolean isAllBitsClear(long offsetBytes, byte bitMask);
-
-  /**
-   * Returns true if all bits defined by the bitMask are set
-   * @param offsetBytes offset bytes relative to this Memory start
-   * @param bitMask bits set to one will be checked
-   * @return true if all bits defined by the bitMask are set
-   */
-  public abstract boolean isAllBitsSet(long offsetBytes, byte bitMask);
-
-  /**
-   * Returns true if any bits defined by the bitMask are clear
-   * @param offsetBytes offset bytes relative to this Memory start
-   * @param bitMask bits set to one will be checked
-   * @return true if any bits defined by the bitMask are clear
-   */
-  public abstract boolean isAnyBitsClear(long offsetBytes, byte bitMask);
-
-  /**
-   * Returns true if any bits defined by the bitMask are set
-   * @param offsetBytes offset bytes relative to this Memory start
-   * @param bitMask bits set to one will be checked
-   * @return true if any bits defined by the bitMask are set
-   */
-  public abstract boolean isAnyBitsSet(long offsetBytes, byte bitMask);
 
   //OTHER READ METHODS XXX
   /**

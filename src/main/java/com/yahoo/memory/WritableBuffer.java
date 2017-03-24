@@ -5,7 +5,6 @@
 
 package com.yahoo.memory;
 
-import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -42,34 +41,7 @@ public abstract class WritableBuffer extends Buffer {
   }
 
   //MAP XXX
-  /**
-   * Allocates direct memory used to memory map files for write operations
-   * (including those &gt; 2GB).
-   * @param file the given file to map
-   * @return WritableBufferMapHandler for managing this map
-   * @throws Exception file not found or RuntimeException, etc.
-   */
-  public static WritableBufferMapHandler writableMap(final File file) throws Exception {
-    return writableMap(file, 0, file.length());
-  }
-
-  /**
-   * Allocates direct memory used to memory map files for write operations
-   * (including those &gt; 2GB).
-   * @param file the given file to map
-   * @param fileOffset the position in the given file
-   * @param capacity the size of the allocated direct memory
-   * @return WritableBufferMapHandler for managing this map
-   * @throws Exception file not found or RuntimeException, etc.
-   */
-  public static WritableBufferMapHandler writableMap(final File file, final long fileOffset,
-      final long capacity) throws Exception {
-    final ResourceState state = new ResourceState();
-    state.putFile(file);
-    state.putFileOffset(fileOffset);
-    state.putCapacity(capacity);
-    return WritableBufferMapHandler.map(state);
-  }
+  //Use WritableMemory for mapping files
 
   //ALLOCATE DIRECT XXX
   //Use WritableMemory to allocate direct memory

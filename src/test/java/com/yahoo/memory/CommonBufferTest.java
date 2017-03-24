@@ -6,7 +6,6 @@
 package com.yahoo.memory;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
@@ -250,55 +249,6 @@ public class CommonBufferTest {
     buf.getShortArray(dstArray8, 2, items/2);
     for (int i=2; i<items; i++) {
       assertEquals(dstArray8[i], srcArray8[i]);
-    }
-  }
-
-  @Test
-  public void checkSetClearIsBits() {
-    int memCapacity = 8;
-    try (WritableMemoryDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh.get();
-      mem.clear();
-      WritableBuffer buf = mem.asWritableBuffer();
-      assertEquals(buf.getCapacity(), memCapacity);
-      setClearIsBitsTests(buf);
-    }
-  }
-
-  public static void setClearIsBitsTests(WritableBuffer buf) {
-  //single bits
-    for (int i=0; i<8; i++) {
-      byte bitMask = (byte)(1 << i);
-      buf.resetPosition();
-      assertTrue(buf.isAnyBitsClear(bitMask));
-      buf.resetPosition();
-      buf.setBits(bitMask);
-      buf.resetPosition();
-      assertTrue(buf.isAnyBitsSet(bitMask));
-      buf.resetPosition();
-      buf.clearBits(bitMask);
-      buf.resetPosition();
-      assertTrue(buf.isAnyBitsClear(bitMask));
-    }
-
-    //multiple bits
-    for (int i=0; i<7; i++) {
-      byte bitMask1 = (byte)(1 << i);
-      byte bitMask2 = (byte)(3 << i);
-      buf.resetPosition();
-      assertTrue(buf.isAnyBitsClear(bitMask1));
-      buf.resetPosition();
-      assertTrue(buf.isAnyBitsClear(bitMask2));
-      buf.resetPosition();
-      buf.setBits(bitMask1); //set one bit
-      buf.resetPosition();
-      assertTrue(buf.isAnyBitsSet(bitMask2));
-      buf.resetPosition();
-      assertTrue(buf.isAnyBitsClear(bitMask2));
-      buf.resetPosition();
-      assertFalse(buf.isAllBitsSet(bitMask2));
-      buf.resetPosition();
-      assertFalse(buf.isAllBitsClear(bitMask2));
     }
   }
 

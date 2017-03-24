@@ -574,61 +574,65 @@ public class WritableBufferImplTest {
     UnsafeUtil.checkBounds(50, 50, 100);
   }
 
-//  @Test
-//  public void checkCompareToHeap() {
-//    byte[] arr1 = new byte[] {0, 1, 2, 3};
-//    byte[] arr2 = new byte[] {0, 1, 2, 4};
-//    byte[] arr3 = new byte[] {0, 1, 2, 3, 4};
-//
-//    Buffer buf1 = Buffer.wrap(arr1);
-//    Buffer buf2 = Buffer.wrap(arr2);
-//    Buffer buf3 = Buffer.wrap(arr3);
-//
-//    int comp = buf1.compareTo(buf1);
-//    assertEquals(comp, 0);
-//    comp = buf1.compareTo(buf2);
-//    assertEquals(comp, -1);
-//    comp = buf2.compareTo(buf1);
-//    assertEquals(comp, 1);
-//    //different lengths
-//    comp = buf1.compareTo(buf3);
-//    assertEquals(comp, -1);
-//    comp = buf3.compareTo(0, 5, buf1, 0, 4);
-//    assertEquals(comp, 1);
-//  }
-//
-//  @Test
-//  public void checkCompareToDirect() {
-//    byte[] arr1 = new byte[] {0, 1, 2, 3};
-//    byte[] arr2 = new byte[] {0, 1, 2, 4};
-//    byte[] arr3 = new byte[] {0, 1, 2, 3, 4};
-//
-//    try (WritableMemoryDirectHandler h1 = WritableMemory.allocateDirect(4);
-//        WritableMemoryDirectHandler h2 = WritableMemory.allocateDirect(4);
-//        WritableMemoryDirectHandler h3 = WritableMemory.allocateDirect(5))
-//    {
-//      WritableMemory mem1 = h1.get();
-//      mem1.putByteArray(0, arr1, 0, 4);
-//
-//      WritableMemory mem2 = h2.get();
-//      mem2.putByteArray(0, arr2, 0, 4);
-//
-//      WritableMemory mem3 = h3.get();
-//      mem3.putByteArray(0, arr3, 0, 5);
-//
-//      int comp = mem1.compareTo(0, 3, mem2, 0, 3);
-//      assertEquals(comp, 0);
-//      comp = mem1.compareTo(0, 4, mem2, 0, 4);
-//      assertEquals(comp, -1);
-//      comp = mem2.compareTo(0, 4, mem1, 0, 4);
-//      assertEquals(comp, 1);
-//      //different lengths
-//      comp = mem1.compareTo(0, 4, mem3, 0, 5);
-//      assertEquals(comp, -1);
-//      comp = mem3.compareTo(0, 5, mem1, 0, 4);
-//      assertEquals(comp, 1);
-//    }
-//  }
+  @Test
+  public void checkCompareToHeap() {
+    byte[] arr1 = new byte[] {0, 1, 2, 3};
+    byte[] arr2 = new byte[] {0, 1, 2, 4};
+    byte[] arr3 = new byte[] {0, 1, 2, 3, 4};
+
+    Buffer buf1 = Buffer.wrap(arr1);
+    Buffer buf2 = Buffer.wrap(arr2);
+    Buffer buf3 = Buffer.wrap(arr3);
+
+    int comp = buf1.compareTo(0, 3, buf2, 0, 3);
+    assertEquals(comp, 0);
+    comp = buf1.compareTo(0, 4, buf2, 0, 4);
+    assertEquals(comp, -1);
+    comp = buf2.compareTo(0, 4, buf1, 0, 4);
+    assertEquals(comp, 1);
+    //different lengths
+    comp = buf1.compareTo(0, 4, buf3, 0, 5);
+    assertEquals(comp, -1);
+    comp = buf3.compareTo(0, 5, buf1, 0, 4);
+    assertEquals(comp, 1);
+  }
+
+  @Test
+  public void checkCompareToDirect() {
+    byte[] arr1 = new byte[] {0, 1, 2, 3};
+    byte[] arr2 = new byte[] {0, 1, 2, 4};
+    byte[] arr3 = new byte[] {0, 1, 2, 3, 4};
+
+    try (WritableMemoryDirectHandler h1 = WritableMemory.allocateDirect(4);
+        WritableMemoryDirectHandler h2 = WritableMemory.allocateDirect(4);
+        WritableMemoryDirectHandler h3 = WritableMemory.allocateDirect(5))
+    {
+      WritableMemory mem1 = h1.get();
+      mem1.putByteArray(0, arr1, 0, 4);
+
+      WritableMemory mem2 = h2.get();
+      mem2.putByteArray(0, arr2, 0, 4);
+
+      WritableMemory mem3 = h3.get();
+      mem3.putByteArray(0, arr3, 0, 5);
+
+      Buffer buf1 = mem1.asBuffer();
+      Buffer buf2 = mem2.asBuffer();
+      Buffer buf3 = mem3.asBuffer();
+
+      int comp = buf1.compareTo(0, 3, buf2, 0, 3);
+      assertEquals(comp, 0);
+      comp = buf1.compareTo(0, 4, buf2, 0, 4);
+      assertEquals(comp, -1);
+      comp = buf2.compareTo(0, 4, buf1, 0, 4);
+      assertEquals(comp, 1);
+      //different lengths
+      comp = buf1.compareTo(0, 4, buf3, 0, 5);
+      assertEquals(comp, -1);
+      comp = buf3.compareTo(0, 5, buf1, 0, 4);
+      assertEquals(comp, 1);
+    }
+  }
 
   @Test
   public void checkAsBuffer() {

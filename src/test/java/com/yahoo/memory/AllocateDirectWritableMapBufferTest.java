@@ -64,7 +64,7 @@ public class AllocateDirectWritableMapBufferTest {
       wrh.force();
       //confirm correct string
       byte[] buf = new byte[(int)corrBytes];
-      wMap.setPos(0);
+      wMap.setPosition(0);
       wMap.getByteArray(buf, 0, (int)corrBytes);
       String bufStr = new String(buf, UTF_8);
       assertEquals(bufStr, correctStr);

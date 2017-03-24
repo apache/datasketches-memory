@@ -24,8 +24,7 @@ public class ResourceStateTest {
     assertTrue(state.getBaseBuffer() == null);
     BaseBuffer baseBuf = new BaseBuffer(state);
     assertTrue(state.getBaseBuffer() != null);
-    assertEquals(baseBuf.getHigh(), 1 << 20);
-    assertEquals(baseBuf.getCap(), 1 << 20);
+    assertEquals(baseBuf.getEnd(), 1 << 20);
   }
 
   @Test

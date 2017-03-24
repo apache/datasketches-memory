@@ -427,87 +427,6 @@ public class WritableMemoryImplTest {
     }
   }
 
-  //Tests using CommonTests
-
-  @Test
-  public void checkToHexStringAllMem() {
-    int memCapacity = 48; //must be 48
-    try (WritableMemoryDirectHandler wrh1 = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh1.get();
-
-      CommonMemoryTest.toHexStringAllMemTests(mem); //requires println enabled to visually check
-    }
-  }
-
-  @Test
-  public void checkSetClearMemoryRegions() {
-    int memCapacity = 64; //must be 64
-    try (WritableMemoryDirectHandler wrh1 = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh1.get();
-
-      CommonMemoryTest.setClearMemoryRegionsTests(mem); //requires println enabled to visually check
-      for (int i = 0; i < memCapacity; i++) {
-        assertEquals(mem.getByte(i), 0);
-      }
-    }
-  }
-
-  @Test
-  public void checkSetGet() {
-    int memCapacity = 16; //must be 16
-    try (WritableMemoryDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh.get();
-      assertEquals(mem.getCapacity(), memCapacity);
-
-      CommonMemoryTest.setGetTests(mem);
-    }
-  }
-
-  @Test
-  public void checkSetGetArrays() {
-    int memCapacity = 32;
-    try (WritableMemoryDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh.get();
-      assertEquals(memCapacity, mem.getCapacity());
-
-      CommonMemoryTest.setGetArraysTests(mem);
-    }
-  }
-
-  @Test
-  public void checkSetGetPartialArraysWithOffset() {
-    int memCapacity = 32;
-    try (WritableMemoryDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh.get();
-      assertEquals(memCapacity, mem.getCapacity());
-
-      CommonMemoryTest.setGetPartialArraysWithOffsetTests(mem);
-    }
-  }
-
-  @Test
-  public void checkSetClearIsBits() {
-    int memCapacity = 8;
-    try (WritableMemoryDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh.get();
-
-      assertEquals(memCapacity, mem.getCapacity());
-      mem.clear();
-
-      CommonMemoryTest.setClearIsBitsTests(mem);
-    }
-  }
-
-  @Test
-  public void checkAtomicMethods() {
-    int memCapacity = 8;
-    try (WritableMemoryDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh.get();
-      assertEquals(mem.getCapacity(), memCapacity);
-      CommonMemoryTest.atomicMethodTests(mem);
-    }
-  }
-
   @Test
   public void checkByteBufferWrap() {
     int memCapacity = 64;
@@ -712,12 +631,12 @@ public class WritableMemoryImplTest {
   public void checkAsBuffer() {
     WritableMemory wmem = WritableMemory.allocate(64);
     WritableBuffer wbuf = wmem.asWritableBuffer();
-    wbuf.setPos(32);
+    wbuf.setPosition(32);
     for (int i = 32; i < 64; i++) { wbuf.putByte((byte)i); }
     //println(wbuf.toHexString("Buf", 0, (int)wbuf.getCapacity()));
 
     Buffer buf = wmem.asBuffer();
-    buf.setPos(32);
+    buf.setPosition(32);
     for (int i = 32; i < 64; i++) {
       assertEquals(buf.getByte(), i);
     }

@@ -11,10 +11,10 @@ import java.nio.ByteBuffer;
  * A new positional API. This is different from and simpler than Java Buffer positional approach.
  * <ul><li>All based on longs instead of ints.</li>
  * <li>Eliminated "mark". Rarely used and confusing with its silent side effects.</li>
- * <li>The invariants are 0 <= low <= pos <= high <= cap.</li>
- * <li>It always starts up as (0, 0, cap, cap).</li>
- * <li>You set (low, pos, cap) in one call with {@link #setLowPosHigh(long, long, long)}</li>
- * <li>Added incPos(long), which is much easier when you know the increment.</li>
+ * <li>The invariants are 0 <= start <= position <= end <= capacity.</li>
+ * <li>It always starts up as (0, 0, capacity, capacity).</li>
+ * <li>You set (start, position, end) in one call with {@link #setStartPositionEnd(long, long, long)}</li>
+ * <li>Added incrementPosition(long), which is much easier when you know the increment.</li>
  * <li>This approach eliminated a number of methods and checks, and has no unseen side effects,
  * e.g., mark being invalidated.</li>
  * <li>Clearer method naming (IMHO).</li>
@@ -23,138 +23,130 @@ import java.nio.ByteBuffer;
  * @author Lee Rhodes
  */
 class BaseBuffer {
-  private long low;
+  private long start;
   private long pos;
-  private long high;
+  private long end;
   private long cap;
 
   BaseBuffer(final ResourceState state) {
     this.cap = state.getCapacity();
     final BaseBuffer baseBuf = state.getBaseBuffer();
     if (baseBuf != null) {
-      this.low = baseBuf.getLow();
-      this.pos = baseBuf.getPos();
-      this.high = baseBuf.getHigh();
+      this.start = baseBuf.getStart();
+      this.pos = baseBuf.getPosition();
+      this.end = baseBuf.getEnd();
     } else {
       final ByteBuffer byteBuf = state.getByteBuffer();
       if (byteBuf != null) {
         this.pos = byteBuf.position();
-        this.high = byteBuf.limit();
+        this.end = byteBuf.limit();
       } else {
         this.pos = 0;
-        this.high = this.cap;
+        this.end = this.cap;
       }
-      this.low = 0;
+      this.start = 0;
     }
     state.putBaseBuffer(this);
   }
 
   /**
-   * Sets low, position, and high
-   * @param low the low
-   * @param pos the position bewteen low and high
-   * @param high the high
+   * Sets start, position, and end
+   * @param start the start position in the buffer
+   * @param position the position bewteen start and end
+   * @param end the end position in the buffer
    * @return BaseBuffer
    */
-  BaseBuffer setLowPosHigh(final long low, final long pos, final long high) {
-    assertInvariants(low, pos, high, this.cap);
-    this.low = low;
-    this.high = high;
-    this.pos = pos;
+  BaseBuffer setStartPositionEnd(final long start, final long position, final long end) {
+    assertInvariants(start, position, end, this.cap);
+    this.start = start;
+    this.end = end;
+    this.pos = position;
     return this;
   }
 
   /**
-   * Gets low
-   * @return low
+   * Gets start
+   * @return start
    */
-  long getLow() {
-    return this.low;
+  long getStart() {
+    return this.start;
   }
 
   /**
    * Gets the current position
    * @return the current position
    */
-  long getPos() {
+  long getPosition() {
     return this.pos;
   }
 
   /**
-   * Gets high
-   * @return high
+   * Gets end
+   * @return end
    */
-  long getHigh() {
-    return this.high;
-  }
-
-  /**
-   * Gets cap
-   * @return cap
-   */
-  long getCap() {
-    return this.cap;
+  long getEnd() {
+    return this.end;
   }
 
   /**
    * Sets the position
-   * @param pos the given position
+   * @param position the given position
    * @return BaseBuffer
    */
-  BaseBuffer setPos(final long pos) {
-    assertInvariants(this.low, pos, this.high, this.cap);
-    this.pos = pos;
+  BaseBuffer setPosition(final long position) {
+    assertInvariants(this.start, position, this.end, this.cap);
+    this.pos = position;
     return this;
   }
 
   /**
-   * Increments the current pos by inc
-   * @param inc the increment
+   * Increments the current position by the given increment
+   * @param increment the increment
    * @return BaseBuffer
    */
-  BaseBuffer incPos(final long inc) {
-    assertInvariants(this.low, this.pos + inc, this.high, this.cap);
-    this.pos += inc;
+  BaseBuffer incrementPosition(final long increment) {
+    assertInvariants(this.start, this.pos + increment, this.end, this.cap);
+    this.pos += increment;
     return this;
   }
 
   /**
-   * Resets the pos to low,
+   * Resets the position to start,
    * This does not modify any data.
    * @return BaseBuffer
    */
-  BaseBuffer resetPos() {
-    this.pos = this.low;
+  BaseBuffer resetPosition() {
+    this.pos = this.start;
     return this;
   }
 
   /**
-   * The number of elements remaining between the pos and high
-   * @return (high - pos)
+   * The number of elements remaining between the pos and end
+   * @return (end - position)
    */
   long getRemaining()  {
-    return this.high - this.pos;
+    return this.end - this.pos;
   }
 
   /**
-   * Returns true if there are elements remaining between the pos and high
-   * @return (high - pos) > 0
+   * Returns true if there are elements remaining between the pos and end
+   * @return (end - position) > 0
    */
   boolean hasRemaining() {
-    return (this.high - this.pos) > 0;
+    return (this.end - this.pos) > 0;
   }
 
-  static final void assertInvariants(final long low, final long pos, final long high,
+  static final void assertInvariants(final long start, final long pos, final long end,
       final long cap) {
-    assert (low | pos | high | cap | (pos - low) | (high - pos) | (cap - high) ) >= 0L
+    assert (start | pos | end | cap | (pos - start) | (end - pos) | (cap - end) ) >= 0L
         : "Violation of Invariants: "
-        + "low: " + low
+        + "start: " + start
         + " <= pos: " + pos
-        + " <= high: " + high
+        + " <= end: " + end
         + " <= cap: " + cap
-        + "; (pos - low): " + (pos - low)
-        + ", (high - pos): " + (high - pos)
-        + ", (cap - high): " + (cap - high);
+        + "; (pos - start): " + (pos - start)
+        + ", (end - pos): " + (end - pos)
+        + ", (cap - end): " + (cap - end);
   }
 
 }

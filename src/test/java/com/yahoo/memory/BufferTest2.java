@@ -1,13 +1,13 @@
 package com.yahoo.memory;
 
-import org.testng.annotations.Test;
+import static org.testng.Assert.assertEquals;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import static org.testng.Assert.assertEquals;
+import org.testng.annotations.Test;
 
-public class BufferTest
+public class BufferTest2
 {
   @Test
   public void testWrapByteBuf() {
@@ -63,7 +63,7 @@ public class BufferTest
       assertEquals(byteArray[i++], buffer.getByte());
     }
 
-    buffer.setPos(0);
+    buffer.setPosition(0);
     byte[] copyByteArray = new byte[64];
     buffer.getByteArray(copyByteArray, 0, 64);
     assertEquals(byteArray, copyByteArray);
@@ -86,7 +86,7 @@ public class BufferTest
       assertEquals(charArray[i++], buffer.getChar());
     }
 
-    buffer.setPos(0);
+    buffer.setPosition(0);
     char[] copyCharArray = new char[64];
     buffer.getCharArray(copyCharArray, 0, 64);
     assertEquals(charArray, copyCharArray);
@@ -106,7 +106,7 @@ public class BufferTest
       assertEquals(shortArray[i++], buffer.getShort());
     }
 
-    buffer.setPos(0);
+    buffer.setPosition(0);
     short[] copyShortArray = new short[64];
     buffer.getShortArray(copyShortArray, 0, 64);
     assertEquals(shortArray, copyShortArray);
@@ -126,7 +126,7 @@ public class BufferTest
       assertEquals(intArray[i++], buffer.getInt());
     }
 
-    buffer.setPos(0);
+    buffer.setPosition(0);
     int[] copyIntArray = new int[64];
     buffer.getIntArray(copyIntArray, 0, 64);
     assertEquals(intArray, copyIntArray);
@@ -146,7 +146,7 @@ public class BufferTest
       assertEquals(longArray[i++], buffer.getLong());
     }
 
-    buffer.setPos(0);
+    buffer.setPosition(0);
     long[] copyLongArray = new long[64];
     buffer.getLongArray(copyLongArray, 0, 64);
     assertEquals(longArray, copyLongArray);
@@ -166,7 +166,7 @@ public class BufferTest
       assertEquals(floatArray[i++], buffer.getFloat());
     }
 
-    buffer.setPos(0);
+    buffer.setPosition(0);
     float[] copyFloatArray = new float[64];
     buffer.getFloatArray(copyFloatArray, 0, 64);
     assertEquals(floatArray, copyFloatArray);
@@ -186,7 +186,7 @@ public class BufferTest
       assertEquals(doubleArray[i++], buffer.getDouble());
     }
 
-    buffer.setPos(0);
+    buffer.setPosition(0);
     double[] copyDoubleArray = new double[64];
     buffer.getDoubleArray(copyDoubleArray, 0, 64);
     assertEquals(doubleArray, copyDoubleArray);
@@ -208,7 +208,7 @@ public class BufferTest
       assertEquals(booleanArray[i++], buffer.getBoolean());
     }
 
-    buffer.setPos(0);
+    buffer.setPosition(0);
     boolean[] copyBooleanArray = new boolean[64];
     buffer.getBooleanArray(copyBooleanArray, 0, 64);
     assertEquals(booleanArray, copyBooleanArray);
@@ -259,10 +259,10 @@ public class BufferTest
     bb.position(10);
 
     Buffer buffer = Buffer.wrap(bb);
-    assertEquals(bb.position(), buffer.getPos());
-    assertEquals(30, buffer.setPos(30).getPos());
-    assertEquals(40, buffer.incPos(10).getPos());
-    assertEquals(0, buffer.resetPos().getPos());
+    assertEquals(bb.position(), buffer.getPosition());
+    assertEquals(30, buffer.setPosition(30).getPosition());
+    assertEquals(40, buffer.incrementPosition(10).getPosition());
+    assertEquals(0, buffer.resetPosition().getPosition());
   }
 
   @Test
@@ -281,14 +281,14 @@ public class BufferTest
       assertEquals(bb.get(), buffer.getByte());
     }
 
-    assertEquals(bb.position(), buffer.getPos() + 10);
-    assertEquals(30, buffer.setPos(30).getPos());
-    assertEquals(40, buffer.incPos(10).getPos());
-    assertEquals(0, buffer.resetPos().getPos());
+    assertEquals(bb.position(), buffer.getPosition() + 10);
+    assertEquals(30, buffer.setPosition(30).getPosition());
+    assertEquals(40, buffer.incrementPosition(10).getPosition());
+    assertEquals(0, buffer.resetPosition().getPosition());
   }
 
   @Test
-  public void testDuplicateandRegion() {
+  public void testDuplicateAndRegion() {
     ByteBuffer bb = ByteBuffer.allocate(64).order(ByteOrder.nativeOrder());
 
     Byte b = 0;
@@ -299,18 +299,18 @@ public class BufferTest
     bb.position(10);
 
     Buffer buffer = Buffer.wrap(bb.slice().order(ByteOrder.nativeOrder()));
-    buffer.setPos(30);
+    buffer.setPosition(30);
     Buffer dupBuffer = buffer.duplicate();
     Buffer regionBuffer = buffer.region();
 
-    assertEquals(dupBuffer.getLow(), buffer.getLow());
-    assertEquals(regionBuffer.getLow(), buffer.getLow());
-    assertEquals(dupBuffer.getHigh(), buffer.getHigh());
-    assertEquals(regionBuffer.getHigh(), buffer.getHigh());
-    assertEquals(dupBuffer.getPos(), buffer.getPos());
-    assertEquals(regionBuffer.getPos(), buffer.getPos());
-    assertEquals(dupBuffer.getCap(), buffer.getCap());
-    assertEquals(regionBuffer.getCap() + 30, buffer.getCap());
+    assertEquals(dupBuffer.getStart(), buffer.getStart());
+    assertEquals(regionBuffer.getStart(), buffer.getStart());
+    assertEquals(dupBuffer.getEnd(), buffer.getEnd());
+    assertEquals(regionBuffer.getEnd(), buffer.getEnd());
+    assertEquals(dupBuffer.getPosition(), buffer.getPosition());
+    assertEquals(regionBuffer.getPosition(), buffer.getPosition());
+    assertEquals(dupBuffer.getCapacity(), buffer.getCapacity());
+    assertEquals(regionBuffer.getCapacity() + 30, buffer.getCapacity());
   }
 
   @Test
@@ -327,10 +327,10 @@ public class BufferTest
     Buffer buffer = Buffer.wrap(bb);
     Memory memory = buffer.asMemory();
 
-    assertEquals(buffer.getCap(), memory.getCapacity());
+    assertEquals(buffer.getCapacity(), memory.getCapacity());
 
     while(buffer.hasRemaining()){
-      assertEquals(memory.getByte(buffer.getPos()), buffer.getByte());
+      assertEquals(memory.getByte(buffer.getPosition()), buffer.getByte());
     }
   }
 }

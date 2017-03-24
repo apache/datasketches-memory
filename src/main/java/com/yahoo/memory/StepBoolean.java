@@ -16,9 +16,9 @@ final class StepBoolean {
   private final boolean initial;
   private AtomicBoolean state = new AtomicBoolean(false);
 
-  StepBoolean(final boolean initialValue) {
-    this.initial = initialValue;
-    this.state.set(initialValue);
+  StepBoolean(final boolean initialState) {
+    this.initial = initialState;
+    this.state.set(initialState);
   }
 
   /**

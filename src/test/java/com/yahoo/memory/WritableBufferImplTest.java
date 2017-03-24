@@ -650,7 +650,7 @@ public class WritableBufferImplTest {
   }
 
   @Test
-    public void checkDuplicate() {
+  public void checkDuplicate() {
     WritableMemory wmem = WritableMemory.allocate(64);
     for (int i = 0; i < 64; i++) { wmem.putByte(i, (byte)i); }
 
@@ -658,10 +658,21 @@ public class WritableBufferImplTest {
     for (int i = 0; i < 64; i++) {
       assertEquals(wbuf.getByte(), i);
     }
-    Buffer mem = wmem.asBuffer().duplicate();
+    Buffer buf = wmem.asBuffer().duplicate();
     for (int i = 0; i < 64; i++) {
-      assertEquals(mem.getByte(), i);
+      assertEquals(buf.getByte(), i);
     }
+
+    WritableMemory wmem2 = wbuf.asWritableMemory();
+    for (int i = 0; i < 64; i++) {
+      assertEquals(wmem2.getByte(i), i);
+    }
+  }
+
+  @Test
+  public void getMemoryRequest() {
+    WritableBuffer wbuf = WritableBuffer.allocate(64);
+    assertTrue(wbuf.getMemoryRequest() == null);
   }
 
   @Test

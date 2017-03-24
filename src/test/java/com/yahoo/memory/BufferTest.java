@@ -236,6 +236,13 @@ public class BufferTest {
     reg.getByte();
   }
 
+  @Test(expectedExceptions = AssertionError.class)
+  public void checkBaseBufferInvariants() {
+    BaseBuffer bb = new BaseBuffer(new ResourceState());
+    bb.setStartPositionEnd(1, 0, 2);
+  }
+
+
   @Test
   public void printlnTest() {
     println("PRINTING: "+this.getClass().getName());

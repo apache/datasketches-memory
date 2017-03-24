@@ -137,4 +137,45 @@ final class Util {
     return s;
   }
 
+  /**
+   * Return true if all the masked bits of value are zero
+   * @param value the value to be tested
+   * @param bitMask defines the bits of interest
+   * @return true if all the masked bits of value are zero
+   */
+  public static final boolean isAllBitsClear(final long value, final long bitMask) {
+    return (~value & bitMask) == bitMask;
+  }
+
+  /**
+   * Return true if all the masked bits of value are one
+   * @param value the value to be tested
+   * @param bitMask defines the bits of interest
+   * @return true if all the masked bits of value are one
+   */
+  public static final boolean isAllBitsSet(final long value, final long bitMask) {
+    return (value & bitMask) == bitMask;
+  }
+
+  /**
+   * Return true if any the masked bits of value are zero
+   * @param value the value to be tested
+   * @param bitMask defines the bits of interest
+   * @return true if any the masked bits of value are zero
+   */
+  public static final boolean isAnyBitsClear(final long value, final long bitMask) {
+    return (~value & bitMask) != 0;
+  }
+
+  /**
+   * Return true if any the masked bits of value are one
+   * @param value the value to be tested
+   * @param bitMask defines the bits of interest
+   * @return true if any the masked bits of value are one
+   */
+  public static final boolean isAnyBitsSet(final long value, final long bitMask) {
+    return (value & bitMask) != 0;
+  }
+
+
 }

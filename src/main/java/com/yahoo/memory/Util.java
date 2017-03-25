@@ -177,5 +177,4 @@ final class Util {
     return (value & bitMask) != 0;
   }
 
-
 }

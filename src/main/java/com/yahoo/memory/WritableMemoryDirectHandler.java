@@ -10,7 +10,7 @@ package com.yahoo.memory;
  * @author Lee Rhodes
  */
 //Implements combo of WritableMemory with writable AllocateDirect resource
-public class WritableMemoryDirectHandler implements AutoCloseable {
+public class WritableMemoryDirectHandler implements AutoCloseable, MemoryRequest {
   AllocateDirect direct;
   WritableMemory wMem;
 
@@ -34,9 +34,39 @@ public class WritableMemoryDirectHandler implements AutoCloseable {
     return wMem;
   }
 
+  //AutoCloseable
+
   @Override
   public void close() {
     direct.close();
+  }
+
+  //MemoryRequest
+
+  @Override
+  public WritableMemory request(long capacityBytes) {
+    return WritableMemory.allocate((int)capacityBytes); //default allocate on heap
+  }
+
+  @Override
+  public WritableMemory request(WritableMemory origMem, long copyToBytes, long capacityBytes) {
+    WritableMemory newMem = WritableMemory.allocate((int) capacityBytes);
+    newMem
+    if (copyToBytes > 0) {
+      origMem.copyTo(0, newMem, 0, copyToBytes);
+    }
+    return newMem.;
+  }
+
+  @Override
+  public void closeRequest(WritableMemory mem) {
+    close();
+  }
+
+  @Override
+  public void closeRequest(WritableMemory memToClose, WritableMemory newMem) {
+    // TODO Auto-generated method stub
+
   }
 
 }

@@ -29,7 +29,7 @@ final class AllocateDirect implements AutoCloseable {
     this.cleaner = Cleaner.create(this, new Deallocator(state));
   }
 
-  static AllocateDirect allocDirect(final ResourceState state) {
+  static AllocateDirect allocate(final ResourceState state) {
     state.putNativeBaseOffset(unsafe.allocateMemory(state.getCapacity()));
     return new AllocateDirect(state);
   }

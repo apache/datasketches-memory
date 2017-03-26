@@ -71,32 +71,18 @@ public abstract class WritableMemory extends Memory {
   /**
    * Allocates and provides access to capacityBytes directly in native (off-heap) memory
    * leveraging the WritableMemory API. The allocated memory will be 8-byte aligned, but may not
-   * be page aligned.
+   * be page aligned. 
    *
    * <p><b>NOTE:</b> Native/Direct memory acquired using Unsafe may have garbage in it.
    * It is the responsibility of the using class to clear this memory, if required,
    * and to call <i>close()</i> when done.</p>
-   *
+   * 
    * @param capacityBytes the size of the desired memory in bytes
    * @return WritableMemoryMapHandler for managing this off-heap resource
    */
   public static WritableMemoryDirectHandler allocateDirect(final long capacityBytes) {
-    return allocateDirect(capacityBytes, null);
-  }
-
-  /**
-   * Allocates and provides access to capacityBytes directly in native (off-heap) memory
-   * leveraging the WritableMemory API.
-   * The allocated memory will be 8-byte aligned, but may not be page aligned.
-   * @param capacityBytes the size of the desired memory in bytes
-   * @param memReq optional callback
-   * @return WritableMemoryMapHandler for managing this off-heap resource
-   */
-  public static WritableMemoryDirectHandler allocateDirect(final long capacityBytes,
-      final MemoryRequest memReq) {
     final ResourceState state = new ResourceState();
     state.putCapacity(capacityBytes);
-    state.putMemoryRequest(memReq);
     return WritableMemoryDirectHandler.allocDirect(state);
   }
 
@@ -426,7 +412,5 @@ public abstract class WritableMemory extends Memory {
    * @return a MemoryRequest or null
    */
   public abstract MemoryRequest getMemoryRequest();
-
-  public abstract void setMemoryRequest(MemoryRequest memReq);
 
 }

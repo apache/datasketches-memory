@@ -678,13 +678,6 @@ class WritableBufferImpl extends WritableBuffer {
     incrementPosition(ARRAY_BYTE_INDEX_SCALE);
   }
 
-  //OTHER XXX
-  @Override
-  public MemoryRequest getMemoryRequest() {
-    checkValid();
-    return this.state.getMemoryRequest();
-  }
-
   //RESTRICTED READ AND WRITE XXX
   private final void checkValid() { //applies to both readable and writable
     assert this.state.isValid() : "Memory not valid.";

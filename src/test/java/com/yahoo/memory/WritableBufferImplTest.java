@@ -670,12 +670,6 @@ public class WritableBufferImplTest {
   }
 
   @Test
-  public void getMemoryRequest() {
-    WritableBuffer wbuf = WritableBuffer.allocate(64);
-    assertTrue(wbuf.getMemoryRequest() == null);
-  }
-
-  @Test
   public void printlnTest() {
     println("PRINTING: "+this.getClass().getName());
   }

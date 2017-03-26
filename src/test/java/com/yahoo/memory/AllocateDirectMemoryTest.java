@@ -6,7 +6,6 @@
 package com.yahoo.memory;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
@@ -23,27 +22,14 @@ public class AllocateDirectMemoryTest {
         assertEquals(wMem1.getLong(i << 3), i);
       }
       wMem1.toHexString("Test", 0, 32 * 8);
-    }
-  }
-
-  private static class DummyMemReq implements MemoryRequest {
-    @Override public WritableMemory request(long capacityBytes) {
-      return null;
-    }
-    @Override public WritableMemory request(WritableMemory origMem, long copyToBytes,
-        long capacityBytes) {
-      return null;
-    }
-    @Override public void closeRequest(WritableMemory mem) {}
-    @Override public void closeRequest(WritableMemory memToFree, WritableMemory newMem) {}
-  }
-
-  @Test
-  public void checkAllocateDirectWithMemReq() {
-    MemoryRequest req = new DummyMemReq();
-    try (WritableMemoryDirectHandler wh = WritableMemory.allocateDirect(8, req)) {
-      WritableMemory wMem = wh.get();
-      assertTrue(req.equals(wMem.getMemoryRequest()));
+      
+      int longs2 = 64;
+      int bytes2 = longs2 << 3;
+      WritableMemory wMem2 = wMem1.getMemoryRequest().request(bytes2); //on heap
+      for (int i = 0; i<longs2; i++) { 
+          wMem2.putLong(i << 3, i);
+          assertEquals(wMem2.getLong(i << 3), i);
+        }
     }
   }
 

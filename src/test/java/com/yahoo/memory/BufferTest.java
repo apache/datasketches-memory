@@ -18,7 +18,7 @@ public class BufferTest {
   @Test
   public void checkDirectRoundTrip() {
     int n = 1024; //longs
-    try (WritableMemoryDirectHandler wh = WritableMemory.allocateDirect(n * 8, null)) {
+    try (WritableMemoryDirectHandler wh = WritableMemory.allocateDirect(n * 8)) {
       WritableMemory wmem = wh.get();
       WritableBuffer wbuf = wmem.asWritableBuffer();
       for (int i = 0; i < n; i++) wbuf.putLong(i);
@@ -212,7 +212,7 @@ public class BufferTest {
   @Test(expectedExceptions = AssertionError.class)
   public void checkParentUseAfterFree() {
     int bytes = 64 * 8;
-    @SuppressWarnings("resource") //intentionally not using try-with-resouces here
+    @SuppressWarnings("resource") //intentionally not using try-with-resources here
     WritableMemoryDirectHandler wh = WritableMemory.allocateDirect(bytes);
     WritableMemory wmem = wh.get();
     WritableBuffer wbuf = wmem.asWritableBuffer();
@@ -225,7 +225,7 @@ public class BufferTest {
   @Test(expectedExceptions = AssertionError.class)
   public void checkRegionUseAfterFree() {
     int bytes = 64;
-    @SuppressWarnings("resource") //intentionally not using try-with-resouces here
+    @SuppressWarnings("resource") //intentionally not using try-with-resources here
     WritableMemoryDirectHandler wh = WritableMemory.allocateDirect(bytes);
     Memory wmem = wh.get();
 

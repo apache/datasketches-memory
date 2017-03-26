@@ -338,11 +338,4 @@ public abstract class WritableBuffer extends Buffer {
    */
   public abstract void setBits(byte bitMask);
 
-  //OTHER XXX
-  /**
-   * Returns a MemoryRequest or null
-   * @return a MemoryRequest or null
-   */
-  public abstract MemoryRequest getMemoryRequest();
-
 }

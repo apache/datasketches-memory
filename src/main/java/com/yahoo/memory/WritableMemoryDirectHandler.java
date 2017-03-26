@@ -6,24 +6,35 @@
 package com.yahoo.memory;
 
 /**
- * Gets a WritableMemory for direct memory write operations
+ * Gets a WritableMemory for direct memory write operations. It is highly recommended that this be created inside a 
+ * <i>try-with-resources</i> statement.
+ * 
  * @author Lee Rhodes
  */
-//Implements combo of WritableMemory with writable AllocateDirect resource
+//Implements combination of WritableMemory with writable AllocateDirect resource
 public class WritableMemoryDirectHandler implements AutoCloseable, MemoryRequest {
-  AllocateDirect direct;
-  WritableMemory wMem;
+  AllocateDirect direct = null;
+  AllocateDirect newDirect = null;
+  WritableMemory wMem = null;
+  WritableMemory newWmem = null;
 
-  WritableMemoryDirectHandler(final AllocateDirect direct, final WritableMemory wMem) {
+  private WritableMemoryDirectHandler(final AllocateDirect direct, final WritableMemory wMem) {
     this.direct = direct;
     this.wMem = wMem;
   }
 
+  /**
+   * Factory method used for the allocation of a direct resource passing the given ResourceState
+   * @param state the given ResourceState
+   * @return WritableMemroyDirectHandler
+   */
   @SuppressWarnings("resource")
   static WritableMemoryDirectHandler allocDirect(final ResourceState state) {
-    final AllocateDirect direct = AllocateDirect.allocDirect(state);
+    final AllocateDirect direct = AllocateDirect.allocate(state);
     final WritableMemoryImpl wMem = new WritableMemoryImpl(state);
-    return new WritableMemoryDirectHandler(direct, wMem);
+    WritableMemoryDirectHandler handler = new WritableMemoryDirectHandler(direct, wMem);
+    state.putMemoryRequest(handler);
+    return handler;
   }
 
   /**
@@ -47,26 +58,4 @@ public class WritableMemoryDirectHandler implements AutoCloseable, MemoryRequest
   public WritableMemory request(long capacityBytes) {
     return WritableMemory.allocate((int)capacityBytes); //default allocate on heap
   }
-
-  @Override
-  public WritableMemory request(WritableMemory origMem, long copyToBytes, long capacityBytes) {
-    WritableMemory newMem = WritableMemory.allocate((int) capacityBytes);
-    newMem
-    if (copyToBytes > 0) {
-      origMem.copyTo(0, newMem, 0, copyToBytes);
-    }
-    return newMem.;
-  }
-
-  @Override
-  public void closeRequest(WritableMemory mem) {
-    close();
-  }
-
-  @Override
-  public void closeRequest(WritableMemory memToClose, WritableMemory newMem) {
-    // TODO Auto-generated method stub
-
-  }
-
 }

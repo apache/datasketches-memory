@@ -45,48 +45,6 @@ final class Util {
   }
 
   /**
-   * Exception handler for requesting a new Memory allocation of the given newCapacityBytes,
-   * using the MemoryRequest callback interface.
-   * If <i>copy</i> is true, the <i>origMem</i> will be copied into the new Memory.
-   *
-   * @param origMem The original Memory that needs to be replaced by a newly allocated Memory.
-   * @param newCapacityBytes The required capacity of the new Memory.
-   * @param copy if true, data from the origMem will be copied to the new Memory as space allows
-   * and the origMemory will be requested to be freed.
-   * If false, no copy will occur and the request to free the origMem will not occur.
-   * @return the newly requested Memory
-   */
-  public static WritableMemory memoryRequestHandler(final WritableMemory origMem,
-      final long newCapacityBytes, final boolean copy) {
-    final MemoryRequest memReq = origMem.getMemoryRequest();
-    if (memReq == null) {
-      throw new IllegalArgumentException(
-          "Insufficient space. MemoryRequest callback cannot be null.");
-    }
-    final WritableMemory newDstMem = (copy)
-        ? memReq.request(origMem, origMem.getCapacity(), newCapacityBytes)
-        : memReq.request(newCapacityBytes);
-
-    if (newDstMem == null) {
-      throw new IllegalArgumentException(
-          "Insufficient space and Memory returned by MemoryRequest cannot be null.");
-    }
-    final long newCap = newDstMem.getCapacity(); //may be more than requested, but not less.
-    if (newCap < newCapacityBytes) {
-      memReq.closeRequest(newDstMem);
-      throw new IllegalArgumentException(
-          "Insufficient space. Memory returned by MemoryRequest is not the requested capacity: "
-          + "Returned: " + newCap + " < Requested: " + newCapacityBytes);
-    }
-
-    if (copy) { //copy and request free.
-      origMem.copyTo(0, newDstMem, 0, Math.min(origMem.getCapacity(), newCap));
-      memReq.closeRequest(origMem, newDstMem);
-    }
-    return newDstMem;
-  }
-
-  /**
    * Prepend the given string with zeros. If the given string is equal or greater than the given
    * field length, it will be returned without modification.
    * @param s the given string

@@ -5,9 +5,6 @@
 
 package com.yahoo.memory;
 
-//import static com.yahoo.memory.UnsafeUtil.LS;
-//import static com.yahoo.memory.UnsafeUtil.assertBounds;
-//import static com.yahoo.memory.UnsafeUtil.unsafe;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -46,21 +43,22 @@ public abstract class Buffer extends BaseBuffer {
   //REGIONS/DUPLICATES XXX
   /**
    * Returns a read only duplicate view of this Buffer with the same but independent values of
-   * low, pos, high and capacity.
+   * start, position, end and capacity.
    * @return a read only duplicate view of this Buffer with the same but independent values of
-   * low, pos, high and capacity.
+   * start, position, end and capacity.
    */
   public abstract Buffer duplicate();
 
   /**
-   * Returns a read only region of this Buffer starting at position ending at limit.
-   * @return a read only region of this Buffer
+   * Returns a read only region of this Buffer starting at position ending at end.
+   * The region start and position will be zero, the region end and capacity will be this buffer's end minus position.
+   * @return a read only region of this Buffer.
    */
   public abstract Buffer region();
 
   //MEMORY XXX
   /**
-   * Convert this Buffer to a Memory
+   * Convert this Buffer to a Memory. The current start, position and end are ignored.
    * @return Memory
    */
   public abstract Memory asMemory();
@@ -140,7 +138,7 @@ public abstract class Buffer extends BaseBuffer {
 
   //PRIMITIVE getXXX() and getXXXArray() //XXX
   /**
-   * Gets the boolean value at the current position
+   * Gets the boolean value at the current position. Increments the position by <i>Boolean.BYTES</i>.
    * @return the boolean at the current position
    */
   public abstract boolean getBoolean();
@@ -154,7 +152,7 @@ public abstract class Buffer extends BaseBuffer {
   public abstract void getBooleanArray(boolean[] dstArray, int dstOffset, int length);
 
   /**
-   * Gets the byte value at the current position
+   * Gets the byte value at the current position. Increments the position by <i>Byte.BYTES</i>.
    * @return the byte at the current position
    */
   public abstract byte getByte();
@@ -168,7 +166,7 @@ public abstract class Buffer extends BaseBuffer {
   public abstract void getByteArray(byte[] dstArray, int dstOffset, int length);
 
   /**
-   * Gets the char value at the current position
+   * Gets the char value at the current position. Increments the position by <i>Char.BYTES</i>.
    * @return the char at the current position
    */
   public abstract char getChar();
@@ -182,7 +180,7 @@ public abstract class Buffer extends BaseBuffer {
   public abstract void getCharArray(char[] dstArray, int dstOffset, int length);
 
   /**
-   * Gets the double value at the current position
+   * Gets the double value at the current position. Increments the position by <i>Double.BYTES</i>.
    * @return the double at the current position
    */
   public abstract double getDouble();
@@ -196,7 +194,7 @@ public abstract class Buffer extends BaseBuffer {
   public abstract void getDoubleArray(double[] dstArray, int dstOffset, int length);
 
   /**
-   * Gets the float value at the current position
+   * Gets the float value at the current position. Increments the position by <i>Float.BYTES</i>.
    * @return the float at the current position
    */
   public abstract float getFloat();
@@ -210,7 +208,7 @@ public abstract class Buffer extends BaseBuffer {
   public abstract void getFloatArray(float[] dstArray, int dstOffset, int length);
 
   /**
-   * Gets the int value at the current position
+   * Gets the int value at the current position. Increments the position by <i>Int.BYTES</i>.
    * @return the int at the current position
    */
   public abstract int getInt();
@@ -224,7 +222,7 @@ public abstract class Buffer extends BaseBuffer {
   public abstract void getIntArray(int[] dstArray, int dstOffset, int length);
 
   /**
-   * Gets the long value at the current position
+   * Gets the long value at the current position. Increments the position by <i>Long.BYTES</i>.
    * @return the long at the current position
    */
   public abstract long getLong();
@@ -238,7 +236,7 @@ public abstract class Buffer extends BaseBuffer {
   public abstract void getLongArray(long[] dstArray, int dstOffset, int length);
 
   /**
-   * Gets the short value at the current position
+   * Gets the short value at the current position. Increments the position by <i>Short.BYTES</i>.
    * @return the short at the current position
    */
   public abstract short getShort();

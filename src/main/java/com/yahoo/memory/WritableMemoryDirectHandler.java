@@ -6,7 +6,7 @@
 package com.yahoo.memory;
 
 /**
- * Gets a WritableMemory for direct memory write operations. It is highly recommended that this be created inside a 
+ * Gets a WritableMemory for a writable direct memory resource. It is highly recommended that this be created inside a 
  * <i>try-with-resources</i> statement.
  * 
  * @author Lee Rhodes

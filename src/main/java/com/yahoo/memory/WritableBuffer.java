@@ -49,9 +49,9 @@ public abstract class WritableBuffer extends Buffer {
   //REGIONS/DUPLICATES XXX
   /**
    * Returns a writable duplicate view of this Buffer with the same but independent values of
-   * low, pos, high and capacity.
+   * start, position, end and capacity.
    * @return a writable duplicate view of this Buffer with the same but independent values of
-   * low, pos, high and capacity.
+   * start, position, end and capacity.
    */
   public abstract WritableBuffer writableDuplicate();
 
@@ -164,7 +164,7 @@ public abstract class WritableBuffer extends Buffer {
 
   //PRIMITIVE putXXX() and putXXXArray() XXX
   /**
-   * Puts the boolean value at the current position
+   * Puts the boolean value at the current position. Increments the position by <i>Boolean.BYTES</i>.
    * @param value the value to put
    */
   public abstract void putBoolean(boolean value);
@@ -179,7 +179,7 @@ public abstract class WritableBuffer extends Buffer {
       int length);
 
   /**
-   * Puts the byte value at the current position
+   * Puts the byte value at the current position. Increments the position by <i>Byte.BYTES</i>.
    * @param value the value to put
    */
   public abstract void putByte(byte value);
@@ -194,7 +194,7 @@ public abstract class WritableBuffer extends Buffer {
       int length);
 
   /**
-   * Puts the char value at the current position
+   * Puts the char value at the current position. Increments the position by <i>Char.BYTES</i>.
    * @param value the value to put
    */
   public abstract void putChar(char value);
@@ -209,7 +209,7 @@ public abstract class WritableBuffer extends Buffer {
       int length);
 
   /**
-   * Puts the double value at the current position
+   * Puts the double value at the current position. Increments the position by <i>Double.BYTES</i>.
    * @param value the value to put
    */
   public abstract void putDouble(double value);
@@ -224,7 +224,7 @@ public abstract class WritableBuffer extends Buffer {
       final int srcOffset, final int length);
 
   /**
-   * Puts the float value at the current position
+   * Puts the float value at the current position. Increments the position by <i>Float.BYTES</i>.
    * @param value the value to put
    */
   public abstract void putFloat(float value);
@@ -239,7 +239,7 @@ public abstract class WritableBuffer extends Buffer {
       final int srcOffset, final int length);
 
   /**
-   * Puts the int value at the current position
+   * Puts the int value at the current position. Increments the position by <i>Int.BYTES</i>.
    * @param value the value to put
    */
   public abstract void putInt(int value);
@@ -254,7 +254,7 @@ public abstract class WritableBuffer extends Buffer {
       final int srcOffset, final int length);
 
   /**
-   * Puts the long value at the current position
+   * Puts the long value at the current position. Increments the position by <i>Long.BYTES</i>.
    * @param value the value to put
    */
   public abstract void putLong(long value);
@@ -269,7 +269,7 @@ public abstract class WritableBuffer extends Buffer {
       final int srcOffset, final int length);
 
   /**
-   * Puts the short value at the current position
+   * Puts the short value at the current position. Increments the position by <i>Short.BYTES</i>.
    * @param value the value to put
    */
   public abstract void putShort(short value);
@@ -285,7 +285,7 @@ public abstract class WritableBuffer extends Buffer {
 
   //Atomic Methods XXX
   /**
-   * Atomically adds the given value to the long located at offsetBytes.
+   * Atomically adds the given value to the long located at offsetBytes. Increments the position by <i>Long.BYTES</i>.
    * @param delta the amount to add
    * @return the modified value
    */
@@ -293,7 +293,7 @@ public abstract class WritableBuffer extends Buffer {
 
   /**
    * Atomically sets the current value at the memory location to the given updated value
-   * if and only if the current value {@code ==} the expected value.
+   * if and only if the current value {@code ==} the expected value.  Increments the position by <i>Long.BYTES</i>.
    * @param expect the expected value
    * @param update the new value
    * @return {@code true} if successful. False return indicates that
@@ -302,7 +302,7 @@ public abstract class WritableBuffer extends Buffer {
   public abstract boolean compareAndSwapLong(long expect, long update);
 
   /**
-   * Atomically exchanges the given value with the current value located at offsetBytes.
+   * Atomically exchanges the given value with the current value located at offsetBytes. Increments the position by <i>Long.BYTES</i>.
    * @param newValue new value
    * @return the previous value
    */
@@ -316,24 +316,24 @@ public abstract class WritableBuffer extends Buffer {
   public abstract Object getArray();
 
   /**
-   * Clears all bytes of this Buffer from position to limit to zero
+   * Clears all bytes of this Buffer from position to end to zero. The position will be set to end.
    */
   public abstract void clear();
 
   /**
-   * Clears the bits defined by the bitMask
+   * Clears the bits defined by the bitMask. Increments the position by <i>Byte.BYTES</i>.
    * @param bitMask the bits set to one will be cleared
    */
   public abstract void clearBits(byte bitMask);
 
   /**
-   * Fills this Buffer from position to limit with the given byte value.
+   * Fills this Buffer from position to end with the given byte value.
    * @param value the given byte value
    */
   public abstract void fill(byte value);
 
   /**
-   * Sets the bits defined by the bitMask
+   * Sets the bits defined by the bitMask. Increments the position by <i>Byte.BYTES</i>.
    * @param bitMask the bits set to one will be set
    */
   public abstract void setBits(byte bitMask);

@@ -11,7 +11,7 @@
 
 ## [DataSketches Documentation](https://datasketches.github.io)
 
-## [New Memory JavaDocs](https://github.com/DataSketches/memory/blob/master/api/memory/snapshot/apidocs/index.html)
+## [New Memory JavaDocs](https://github.com/DataSketches/memory/blob/master/docs/memory/snapshot/apidocs/index.html)
 
 ## [Latest Release](https://github.com/DataSketches/memory/releases)
 

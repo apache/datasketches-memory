@@ -446,6 +446,8 @@ public class WritableBufferImplTest {
     }
 
     assertTrue(wbuf.hasByteBuffer());
+    ByteBuffer byteBuf2 = wbuf.getByteBuffer();
+    assertEquals(byteBuf2, byteBuf);
     //println( mem.toHexString("HeapBB", 0, memCapacity));
   }
 

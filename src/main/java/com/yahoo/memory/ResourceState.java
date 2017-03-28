@@ -16,9 +16,11 @@ import java.nio.MappedByteBuffer;
  */
 final class ResourceState {
 
-  /** Place holder for some future endian extension. */
+  /** 
+   * Native Endianness 
+   */
   private static final ByteOrder nativeOrder_ = ByteOrder.nativeOrder();
-
+  
   //FOUNDATION PARAMETERS
   /**
    * Only used to compute cumBaseOffset for off-heap resources.
@@ -62,7 +64,7 @@ final class ResourceState {
 
   //FLAGS
   /**
-   * Only set true if the backing resource has an independen read-only state and is, in fact,
+   * Only set true if the backing resource has an independent read-only state and is, in fact,
    * read-only. This can only be changed from false (writable) to true (read-only) once. The
    * initial state is false (writable).
    */
@@ -81,14 +83,14 @@ final class ResourceState {
    */
   private long regionOffset_ = 0L;
 
-  //BYTE BUFFER
+  //BYTE BUFFER RESOURCE
   /**
    * This holds a reference to a ByteBuffer until we are done with it.
    * This is also a user supplied parameter passed to AccessByteBuffer.
    */
   private ByteBuffer byteBuf_ = null;
 
-  //MAPPED FILES
+  //MEMORY MAPPED FILE RESOURCES
   /**
    * This is user supplied parameter that is passed to the mapping class..
    */
@@ -116,13 +118,10 @@ final class ResourceState {
    */
   private BaseBuffer baseBuf_ = null;
 
-  //ENDIANNESS PLACE HOLDERS
+  //ENDIANNESS PROPERTIES
+  private ByteOrder resourceOrder_ = nativeOrder_;
 
-  /** Place holder for some future endian extension. */
-  private ByteOrder myOrder_ = nativeOrder_;
-
-  /** Place holder for some future endian extension. */
-  private boolean swapBytes_ = false; //true if myOrder != nativeOrder_
+  private boolean swapBytes_ = false; //true if resourceOrder != nativeOrder_
 
   ResourceState() {}
 
@@ -144,20 +143,20 @@ final class ResourceState {
     out.unsafeObj_ = unsafeObj_;
     out.unsafeObjHeader_ = unsafeObjHeader_;
     out.capacity_ = capacity_;
-    //cumBaseOffset to compute
+    //cumBaseOffset is computed
     out.memReq_ = memReq_;
 
-    //Flags
+    //FLAGS
     out.resourceIsReadOnly_ = resourceIsReadOnly_;
     out.valid_ = valid_;
 
     //REGIONS
     out.regionOffset_ = regionOffset_;
 
-    //Byte Buffer
+    //BYTE BUFFER
     out.byteBuf_ = byteBuf_;
 
-    //Mapped files
+    //MEMORY MAPPED FILES
     out.file_ = file_;
     out.fileOffset_ = fileOffset_;
     out.raf_ = raf_;
@@ -166,8 +165,8 @@ final class ResourceState {
     //POSITIONAL
     out.baseBuf_ = baseBuf_;
 
-    //ENDIANNESS PLACE HOLDERS
-    out.myOrder_ = myOrder_;
+    //ENDIANNESS
+    out.resourceOrder_ = resourceOrder_;
     out.swapBytes_ = swapBytes_;
     out.compute();
     return out;
@@ -178,73 +177,18 @@ final class ResourceState {
         + ((unsafeObj_ == null) ? nativeBaseOffset_ : unsafeObjHeader_);
   }
 
+  //FOUNDATION PARAMETERS
   long getNativeBaseOffset() {
     return nativeBaseOffset_;
-  }
-
-  Object getUnsafeObject() {
-    return unsafeObj_;
-  }
-
-  long getUnsafeObjectHeader() {
-    return unsafeObjHeader_;
-  }
-
-  ByteBuffer getByteBuffer() {
-    return byteBuf_;
-  }
-
-  File getFile() {
-    return file_;
-  }
-
-  RandomAccessFile getRandomAccessFile() {
-    return raf_;
-  }
-
-  MappedByteBuffer getMappedByteBuffer() {
-    return mbb_;
-  }
-
-  long getFileOffset() {
-    return fileOffset_;
-  }
-
-  long getRegionOffset() {
-    return regionOffset_;
-  }
-
-  long getCapacity() {
-    return capacity_;
-  }
-
-  long getCumBaseOffset() {
-    return cumBaseOffset_;
-  }
-
-  MemoryRequest getMemoryRequest() {
-    return memReq_;
-  }
-
-  BaseBuffer getBaseBuffer() {
-    return baseBuf_;
-  }
-
-  boolean isResourceReadOnly() {
-    return resourceIsReadOnly_.get();
-  }
-
-  boolean isValid() {
-    return valid_.get();
-  }
-
-  boolean isDirect() {
-    return nativeBaseOffset_ > 0L;
   }
 
   void putNativeBaseOffset(final long nativeBaseOffset) {
     this.nativeBaseOffset_ = nativeBaseOffset;
     compute();
+  }
+  
+  Object getUnsafeObject() {
+    return unsafeObj_;
   }
 
   void putUnsafeObject(final Object unsafeObj) {
@@ -254,6 +198,10 @@ final class ResourceState {
     this.unsafeObj_ = unsafeObj;
     compute();
   }
+  
+  long getUnsafeObjectHeader() {
+    return unsafeObjHeader_;
+  }
 
   void putUnsafeObjectHeader(final long unsafeObjHeader) {
     if (unsafeObjHeader < 0) {
@@ -262,12 +210,81 @@ final class ResourceState {
     this.unsafeObjHeader_ = unsafeObjHeader;
     compute();
   }
+  
+  long getCapacity() {
+    return capacity_;
+  }
+  
+  void putCapacity(final long capacity) {
+    if (capacity <= 0) {
+      throw new IllegalArgumentException("Capacity may not be negative or zero.");
+    }
+    this.capacity_ = capacity;
+  }
+  
+  long getCumBaseOffset() {
+    return cumBaseOffset_;
+  }
+  
+  MemoryRequest getMemoryRequest() {
+    return memReq_;
+  }
+  
+  void putMemoryRequest(final MemoryRequest memReq) {
+    this.memReq_ = memReq;
+  }
+  
+  //FLAGS
+  boolean isResourceReadOnly() {
+    return resourceIsReadOnly_.get();
+  }
+  
+  void setResourceReadOnly() {
+    this.resourceIsReadOnly_.change();
+  }
+  
+  boolean isValid() {
+    return valid_.get();
+  }
+  
+  void setInvalid() {
+    this.valid_.change();
+  }
+  
+  boolean isDirect() {
+    return nativeBaseOffset_ > 0L;
+  }
+  
+  //REGIONS
+  long getRegionOffset() {
+    return regionOffset_;
+  }
+  
+  void putRegionOffset(final long regionOffset) {
+    if (regionOffset < 0) {
+      throw new IllegalArgumentException("Region Offset may not be negative.");
+    }
+    this.regionOffset_ = regionOffset;
+    compute();
+  }
+  
+  //BYTE BUFFER
+  ByteBuffer getByteBuffer() {
+    return byteBuf_;
+  }
 
   void putByteBuffer(final ByteBuffer byteBuf) {
     if (byteBuf == null) {
       throw new IllegalArgumentException("ByteBuffer may not be assigned null");
     }
     this.byteBuf_ = byteBuf;
+    resourceOrder_ = byteBuf_.order();
+    this.swapBytes_ = (resourceOrder_ != nativeOrder_);
+  }
+  
+  //MEMORY MAPPED FILES
+  File getFile() {
+    return file_;
   }
 
   void putFile(final File file) {
@@ -276,12 +293,31 @@ final class ResourceState {
     }
     this.file_ = file;
   }
+  
+  long getFileOffset() {
+    return fileOffset_;
+  }
+  
+  void putFileOffset(final long fileOffset) {
+    if (fileOffset < 0) {
+      throw new IllegalArgumentException("File Offset may not be negative.");
+    }
+    this.fileOffset_ = fileOffset;
+  }
+  
+  RandomAccessFile getRandomAccessFile() {
+    return raf_;
+  }
 
   void putRandomAccessFile(final RandomAccessFile raf) {
     if (raf == null) {
       throw new IllegalArgumentException("RandomAccessFile may not be assigned null");
     }
     this.raf_ = raf;
+  }
+  
+  MappedByteBuffer getMappedByteBuffer() {
+    return mbb_;
   }
 
   void putMappedByteBuffer(final MappedByteBuffer mbb) {
@@ -291,54 +327,27 @@ final class ResourceState {
     this.mbb_ = mbb;
   }
 
-  void putFileOffset(final long fileOffset) {
-    if (fileOffset < 0) {
-      throw new IllegalArgumentException("File Offset may not be negative.");
-    }
-    this.fileOffset_ = fileOffset;
-  }
-
-  void putRegionOffset(final long regionOffset) {
-    if (regionOffset < 0) {
-      throw new IllegalArgumentException("Region Offset may not be negative.");
-    }
-    this.regionOffset_ = regionOffset;
-    compute();
-  }
-
-  void putCapacity(final long capacity) {
-    if (capacity <= 0) {
-      throw new IllegalArgumentException("Capacity may not be negative or zero.");
-    }
-    this.capacity_ = capacity;
-  }
-
-  void putMemoryRequest(final MemoryRequest memReq) {
-    this.memReq_ = memReq;
+  //POSITIONAL BASE BUFFER
+  BaseBuffer getBaseBuffer() {
+    return baseBuf_;
   }
 
   void putBaseBuffer(final BaseBuffer baseBuf) {
     this.baseBuf_ = baseBuf;
   }
 
-  void setResourceReadOnly() {
-    this.resourceIsReadOnly_.change();
-  }
-
-  void setInvalid() {
-    this.valid_.change();
-  }
-
+  //ENDIANNESS
   ByteOrder order() {
-    return myOrder_;
+    return resourceOrder_;
   }
 
-  boolean swapBytes() {
+  void order(final ByteOrder resourceOrder) {
+    this.resourceOrder_ = resourceOrder;
+    this.swapBytes_ = (resourceOrder_ != nativeOrder_);
+  }
+  
+  boolean isSwapBytes() {
     return swapBytes_;
   }
 
-  void order(final ByteOrder order) {
-    this.myOrder_ = order;
-    this.swapBytes_ = (myOrder_ != nativeOrder_);
-  }
 }

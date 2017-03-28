@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteOrder;
 
 import org.testng.annotations.Test;
 
@@ -23,7 +24,7 @@ public class AllocateDirectWritableMapMemoryTest {
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void testMapException() throws Exception {
     File dummy = createFile("dummy.txt", ""); //zero length
-    Memory.map(dummy, 0, dummy.length());
+    Memory.map(dummy, 0, dummy.length(), ByteOrder.nativeOrder());
   }
 
   @Test(expectedExceptions = ReadOnlyException.class)
@@ -44,7 +45,7 @@ public class AllocateDirectWritableMapMemoryTest {
     byte[] correctByteArr = correctStr.getBytes(UTF_8);
     long corrBytes = correctByteArr.length;
 
-    try (MemoryMapHandler rh = Memory.map(origFile, 0, origBytes)) {
+    try (MemoryMapHandler rh = Memory.map(origFile, 0, origBytes, ByteOrder.nativeOrder())) {
       Memory map = rh.get();
       rh.load();
       assertTrue(rh.isLoaded());
@@ -55,7 +56,7 @@ public class AllocateDirectWritableMapMemoryTest {
       assertEquals(bufStr, origStr);
     }
 
-    try (WritableMemoryMapHandler wrh = WritableMemory.writableMap(origFile, 0, corrBytes)) { //longer
+    try (WritableMemoryMapHandler wrh = WritableMemory.writableMap(origFile, 0, corrBytes, ByteOrder.nativeOrder())) {
       WritableMemory wMap = wrh.get();
       wrh.load();
       assertTrue(wrh.isLoaded());

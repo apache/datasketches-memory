@@ -437,13 +437,15 @@ public class WritableMemoryImplTest {
       byteBuf.put(i, (byte) i);
     }
 
-    WritableMemory mem = WritableMemory.wrap(byteBuf);
+    WritableMemory wmem = WritableMemory.wrap(byteBuf);
 
     for (int i=0; i<memCapacity; i++) {
-      assertEquals(mem.getByte(i), byteBuf.get(i));
+      assertEquals(wmem.getByte(i), byteBuf.get(i));
     }
 
-    assertTrue(mem.hasByteBuffer());
+    assertTrue(wmem.hasByteBuffer());
+    ByteBuffer byteBuf2 = wmem.getByteBuffer();
+    assertEquals(byteBuf2, byteBuf);
     //println( mem.toHexString("HeapBB", 0, memCapacity));
   }
 

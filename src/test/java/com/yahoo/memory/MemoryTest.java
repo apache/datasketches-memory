@@ -6,6 +6,7 @@
 package com.yahoo.memory;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -116,12 +117,14 @@ public class MemoryTest {
     }
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void checkByteBufWrongOrder() {
     int n = 1024; //longs
     ByteBuffer bb = ByteBuffer.allocate(n * 8);
     bb.order(ByteOrder.BIG_ENDIAN);
-    Memory.wrap(bb);
+    Memory mem = Memory.wrap(bb);
+    assertTrue(mem.swapBytes());
+    assertEquals(mem.getResourceOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test

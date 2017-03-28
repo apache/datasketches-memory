@@ -33,6 +33,9 @@ import static com.yahoo.memory.UnsafeUtil.SHORT_SHIFT;
 import static com.yahoo.memory.UnsafeUtil.assertBounds;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 /**
  * @author Lee Rhodes
  */
@@ -353,6 +356,12 @@ class WritableBufferImpl extends WritableBuffer {
   }
 
   @Override
+  public ByteOrder getResourceOrder() {
+    checkValid();
+    return this.state.order();
+  }
+  
+  @Override
   public boolean hasArray() {
     checkValid();
     return (this.unsafeObj != null);
@@ -381,6 +390,11 @@ class WritableBufferImpl extends WritableBuffer {
     return this.state.isValid();
   }
 
+  @Override
+  public boolean swapBytes() {
+    return this.state.isSwapBytes();
+  }
+  
   @Override
   public String toHexString(final String header, final long offsetBytes, final int lengthBytes) {
     checkValid();
@@ -605,34 +619,7 @@ class WritableBufferImpl extends WritableBuffer {
   }
 
   //Atomic Write Methods XXX
-  @Override
-  public long getAndAddLong(final long delta) {
-    checkValid();
-    final long pos = getPosition();
-    assertBounds(pos, ARRAY_LONG_INDEX_SCALE, capacity);
-    final long add = cumBaseOffset + pos;
-    incrementPosition(ARRAY_LONG_INDEX_SCALE);
-    return UnsafeUtil.compatibilityMethods.getAndAddLong(unsafeObj, add, delta) + delta;
-  }
-
-  @Override
-  public long getAndSetLong(final long newValue) {
-    checkValid();
-    final long pos = getPosition();
-    assertBounds(pos, ARRAY_LONG_INDEX_SCALE, capacity);
-    final long add = cumBaseOffset + pos;
-    incrementPosition(ARRAY_LONG_INDEX_SCALE);
-    return UnsafeUtil.compatibilityMethods.getAndSetLong(unsafeObj, add, newValue);
-  }
-
-  @Override
-  public boolean compareAndSwapLong(final long expect, final long update) {
-    checkValid();
-    final long pos = getPosition();
-    assertBounds(pos, ARRAY_INT_INDEX_SCALE, capacity);
-    incrementPosition(ARRAY_LONG_INDEX_SCALE);
-    return unsafe.compareAndSwapLong(unsafeObj, cumBaseOffset + pos, expect, update);
-  }
+  //Use WritableMemory for atomic methods
 
   //OTHER WRITE METHODS XXX
   @Override
@@ -642,20 +629,14 @@ class WritableBufferImpl extends WritableBuffer {
   }
 
   @Override
+  public ByteBuffer getByteBuffer() {
+    checkValid();
+    return this.state.getByteBuffer();
+  }
+  
+  @Override
   public void clear() {
     fill((byte)0);
-  }
-
-  @Override
-  public void clearBits(final byte bitMask) {
-    checkValid();
-    final long pos = getPosition();
-    assertBounds(pos, ARRAY_BYTE_INDEX_SCALE, capacity);
-    final long cumBaseOff = this.cumBaseOffset + pos;
-    int value = unsafe.getByte(this.unsafeObj, cumBaseOff) & 0XFF;
-    value &= ~bitMask;
-    unsafe.putByte(this.unsafeObj, cumBaseOff, (byte)value);
-    incrementPosition(ARRAY_BYTE_INDEX_SCALE);
   }
 
   @Override
@@ -665,17 +646,6 @@ class WritableBufferImpl extends WritableBuffer {
     final long len = getEnd() - pos;
     assertBounds(pos, len, this.capacity);
     unsafe.setMemory(this.unsafeObj, this.cumBaseOffset + pos, len, value);
-  }
-
-  @Override
-  public void setBits(final byte bitMask) {
-    checkValid();
-    final long pos = getPosition();
-    assertBounds(pos, ARRAY_BYTE_INDEX_SCALE, this.capacity);
-    final long myOffset = this.cumBaseOffset + pos;
-    final byte value = unsafe.getByte(this.unsafeObj, myOffset);
-    unsafe.putByte(this.unsafeObj, myOffset, (byte)(value | bitMask));
-    incrementPosition(ARRAY_BYTE_INDEX_SCALE);
   }
 
   //RESTRICTED READ AND WRITE XXX

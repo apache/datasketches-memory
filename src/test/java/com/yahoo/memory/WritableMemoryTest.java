@@ -5,22 +5,30 @@
 
 package com.yahoo.memory;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import org.testng.annotations.Test;
 
 public class WritableMemoryTest {
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
-  public void wrapWrongEndian() {
-    ByteBuffer bb = ByteBuffer.allocate(64);
-    WritableMemory.wrap(bb);
+  @Test
+  public void wrapBigEndian() {
+    ByteBuffer bb = ByteBuffer.allocate(64); //big endian
+    WritableMemory wmem = WritableMemory.wrap(bb);
+    assertTrue(wmem.swapBytes());
+    assertEquals(wmem.getResourceOrder(), ByteOrder.BIG_ENDIAN);
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
-  public void wrapWrongEndian2() {
+  @Test
+  public void wrapBigEndian2() {
     ByteBuffer bb = ByteBuffer.allocate(64);
-    WritableBuffer.wrap(bb);
+    WritableBuffer wbuf = WritableBuffer.wrap(bb);
+    assertTrue(wbuf.swapBytes());
+    assertEquals(wbuf.getResourceOrder(), ByteOrder.BIG_ENDIAN);
   }
 
 }

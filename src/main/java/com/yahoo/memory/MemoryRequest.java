@@ -7,7 +7,7 @@ package com.yahoo.memory;
 
 /**
  * The MemoryRequest is a callback interface provides a means for a WritableMemory object to
- * request more memory from the parent class. This mechanism is only used with directly
+ * request more memory from the WritableMemoryDirectHandler. This mechanism is only used with directly
  * allocated native memory.
  *
  * @author Lee Rhodes

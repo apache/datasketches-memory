@@ -15,9 +15,10 @@ import java.nio.ByteOrder;
 
 /**
  * Provides read-only primitive and primitive array methods to any of the four resources
- * mentioned at the package level.
+ * mentioned in the package level documentation.
  *
  * @author Lee Rhodes
+ * @see com.yahoo.memory
  */
 public abstract class Memory {
 
@@ -28,10 +29,6 @@ public abstract class Memory {
    * @return the given ByteBuffer for read-only operations.
    */
   public static Memory wrap(final ByteBuffer byteBuf) {
-    if (byteBuf.order() != ByteOrder.nativeOrder()) {
-      throw new IllegalArgumentException(
-          "Memory does not support " + (byteBuf.order().toString()));
-    }
     final ResourceState state = new ResourceState();
     state.putByteBuffer(byteBuf);
     AccessByteBuffer.wrap(state);
@@ -40,14 +37,14 @@ public abstract class Memory {
 
   //MAP XXX
   /**
-   * Allocates direct memory used to memory map files for read operations
-   * (including those &gt; 2GB).
+   * Allocates direct memory used to memory map entire files for read operations
+   * (including those &gt; 2GB). This assumes that the file was written using native byte ordering.
    * @param file the given file to map
    * @return MemoryMapHandler for managing this map
    * @throws Exception file not found or RuntimeException, etc.
    */
   public static MemoryMapHandler map(final File file) throws Exception {
-    return map(file, 0, file.length());
+    return map(file, 0, file.length(), ByteOrder.nativeOrder());
   }
 
   /**
@@ -56,15 +53,17 @@ public abstract class Memory {
    * @param file the given file to map
    * @param fileOffset the position in the given file
    * @param capacity the size of the allocated direct memory
+   * @param byteOrder the endianness of the given file.
    * @return MemoryMapHandler for managing this map
    * @throws Exception file not found or RuntimeException, etc.
    */
-  public static MemoryMapHandler map(final File file, final long fileOffset, final long capacity)
+  public static MemoryMapHandler map(final File file, final long fileOffset, final long capacity, final ByteOrder byteOrder)
       throws Exception {
     final ResourceState state = new ResourceState();
     state.putFile(file);
     state.putFileOffset(fileOffset);
     state.putCapacity(capacity);
+    state.order(byteOrder);
     return MemoryMapHandler.map(state);
   }
 
@@ -318,10 +317,10 @@ public abstract class Memory {
   /**
    * Copies bytes from a source range of this Memory to a destination range of the given Memory
    * using the same low-level system copy function as found in
-   * {@link java.lang.System#arraycopy(Object, int, Object, int, int)}.
+   * {@link java.lang.System#arrayCopy(Object, int, Object, int, int)}.
    * @param srcOffsetBytes the source offset for this Memory
    * @param destination the destination Memory, which may not be Read-Only.
-   * @param dstOffsetBytes the destintaion offset
+   * @param dstOffsetBytes the destination offset
    * @param lengthBytes the number of bytes to copy
    */
   public abstract void copyTo(long srcOffsetBytes, WritableMemory destination, long dstOffsetBytes,
@@ -342,6 +341,12 @@ public abstract class Memory {
    */
   public abstract long getCumulativeOffset(final long offsetBytes);
 
+  /**
+   * Returns the ByteOrder for the backing resource.
+   * @return the ByteOrder for the backing resource.
+   */
+  public abstract ByteOrder getResourceOrder();
+  
   /**
    * Returns true if this Memory is backed by an on-heap primitive array
    * @return true if this Memory is backed by an on-heap primitive array
@@ -372,6 +377,12 @@ public abstract class Memory {
    */
   public abstract boolean isValid();
 
+  /**
+   * Return true if bytes need to be swapped based on resource ByteOrder.
+   * @return true if bytes need to be swapped based on resource ByteOrder.
+   */
+  public abstract boolean swapBytes();
+  
   /**
    * Returns a formatted hex string of a range of this Memory.
    * Used primarily for testing.

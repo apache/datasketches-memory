@@ -6,7 +6,6 @@
 package com.yahoo.memory;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 /**
  * Provides read and write, positional primitive and primitive array access to any of the four
@@ -29,10 +28,6 @@ public abstract class WritableBuffer extends Buffer {
   public static WritableBuffer wrap(final ByteBuffer byteBuf) {
     if (byteBuf.isReadOnly()) {
       throw new ReadOnlyException("ByteBuffer is read-only.");
-    }
-    if (byteBuf.order() != ByteOrder.nativeOrder()) {
-      throw new IllegalArgumentException(
-          "Buffer does not support " + (byteBuf.order().toString()));
     }
     final ResourceState state = new ResourceState();
     state.putByteBuffer(byteBuf);
@@ -86,7 +81,6 @@ public abstract class WritableBuffer extends Buffer {
     final byte[] arr = new byte[capacityBytes];
     return new WritableBufferImpl(new ResourceState(arr, Prim.BYTE, arr.length));
   }
-  //END OF CONSTRUCTOR-TYPE METHODS
 
   //ACCESS PRIMITIVE HEAP ARRAYS for write XXX
   /**
@@ -170,7 +164,7 @@ public abstract class WritableBuffer extends Buffer {
   public abstract void putBoolean(boolean value);
 
   /**
-   * Puts the boolean array at the current position
+   * Puts the boolean array at the current position. Increments the position by <i>Boolean.BYTES * (length - dstOffset)</i>.
    * @param srcArray The source array.
    * @param srcOffset offset in array units
    * @param length number of array units to transfer
@@ -185,7 +179,7 @@ public abstract class WritableBuffer extends Buffer {
   public abstract void putByte(byte value);
 
   /**
-   * Puts the byte array at the current position
+   * Puts the byte array at the current position. Increments the position by <i>Byte.BYTES * (length - dstOffset)</i>.
    * @param srcArray The source array.
    * @param srcOffset offset in array units
    * @param length number of array units to transfer
@@ -200,7 +194,7 @@ public abstract class WritableBuffer extends Buffer {
   public abstract void putChar(char value);
 
   /**
-   * Puts the char array at the current position
+   * Puts the char array at the current position. Increments the position by <i>Char.BYTES * (length - dstOffset)</i>.
    * @param srcArray The source array.
    * @param srcOffset offset in array units
    * @param length number of array units to transfer
@@ -215,7 +209,7 @@ public abstract class WritableBuffer extends Buffer {
   public abstract void putDouble(double value);
 
   /**
-   * Puts the double array at the current position
+   * Puts the double array at the current position. Increments the position by <i>Double.BYTES * (length - dstOffset)</i>.
    * @param srcArray The source array.
    * @param srcOffset offset in array units
    * @param length number of array units to transfer
@@ -230,7 +224,7 @@ public abstract class WritableBuffer extends Buffer {
   public abstract void putFloat(float value);
 
   /**
-   * Puts the float array at the current position
+   * Puts the float array at the current position. Increments the position by <i>Float.BYTES * (length - dstOffset)</i>.
    * @param srcArray The source array.
    * @param srcOffset offset in array units
    * @param length number of array units to transfer
@@ -245,7 +239,7 @@ public abstract class WritableBuffer extends Buffer {
   public abstract void putInt(int value);
 
   /**
-   * Puts the int array at the current position
+   * Puts the int array at the current position. Increments the position by <i>Int.BYTES * (length - dstOffset)</i>.
    * @param srcArray The source array.
    * @param srcOffset offset in array units
    * @param length number of array units to transfer
@@ -260,7 +254,7 @@ public abstract class WritableBuffer extends Buffer {
   public abstract void putLong(long value);
 
   /**
-   * Puts the long array at the current position
+   * Puts the long array at the current position. Increments the position by <i>Long.BYTES * (length - dstOffset)</i>.
    * @param srcArray The source array.
    * @param srcOffset offset in array units
    * @param length number of array units to transfer
@@ -275,7 +269,7 @@ public abstract class WritableBuffer extends Buffer {
   public abstract void putShort(short value);
 
   /**
-   * Puts the short array at the current position
+   * Puts the short array at the current position. Increments the position by <i>Short.BYTES * (length - dstOffset)</i>.
    * @param srcArray The source array.
    * @param srcOffset offset in array units
    * @param length number of array units to transfer
@@ -284,29 +278,7 @@ public abstract class WritableBuffer extends Buffer {
       final int srcOffset, final int length);
 
   //Atomic Methods XXX
-  /**
-   * Atomically adds the given value to the long located at offsetBytes. Increments the position by <i>Long.BYTES</i>.
-   * @param delta the amount to add
-   * @return the modified value
-   */
-  public abstract long getAndAddLong(long delta);
-
-  /**
-   * Atomically sets the current value at the memory location to the given updated value
-   * if and only if the current value {@code ==} the expected value.  Increments the position by <i>Long.BYTES</i>.
-   * @param expect the expected value
-   * @param update the new value
-   * @return {@code true} if successful. False return indicates that
-   * the current value at the memory location was not equal to the expected value.
-   */
-  public abstract boolean compareAndSwapLong(long expect, long update);
-
-  /**
-   * Atomically exchanges the given value with the current value located at offsetBytes. Increments the position by <i>Long.BYTES</i>.
-   * @param newValue new value
-   * @return the previous value
-   */
-  public abstract long getAndSetLong(long newValue);
+  //Use WritableMemory for atomic methods
 
   //OTHER WRITE METHODS XXX
   /**
@@ -316,26 +288,20 @@ public abstract class WritableBuffer extends Buffer {
   public abstract Object getArray();
 
   /**
+   * Returns the backing ByteBuffer if it exists, otherwise returns null.
+   * @return the backing ByteBuffer if it exists, otherwise returns null.
+   */
+  public abstract ByteBuffer getByteBuffer();
+  
+  /**
    * Clears all bytes of this Buffer from position to end to zero. The position will be set to end.
    */
   public abstract void clear();
 
   /**
-   * Clears the bits defined by the bitMask. Increments the position by <i>Byte.BYTES</i>.
-   * @param bitMask the bits set to one will be cleared
-   */
-  public abstract void clearBits(byte bitMask);
-
-  /**
-   * Fills this Buffer from position to end with the given byte value.
+   * Fills this Buffer from position to end with the given byte value. The position will be set to end.
    * @param value the given byte value
    */
   public abstract void fill(byte value);
-
-  /**
-   * Sets the bits defined by the bitMask. Increments the position by <i>Byte.BYTES</i>.
-   * @param bitMask the bits set to one will be set
-   */
-  public abstract void setBits(byte bitMask);
 
 }

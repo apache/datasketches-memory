@@ -35,6 +35,9 @@ import static com.yahoo.memory.UnsafeUtil.assertBounds;
 import static com.yahoo.memory.UnsafeUtil.checkOverlap;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 /**
  * @author Lee Rhodes
  */
@@ -91,7 +94,6 @@ class WritableMemoryImpl extends WritableMemory {
   public WritableBuffer asWritableBuffer() {
     return new WritableBufferImpl(this.state.copy());
   }
-
 
   ///PRIMITIVE getXXX() and getXXXArray() XXX
   @Override
@@ -271,7 +273,6 @@ class WritableMemoryImpl extends WritableMemory {
   }
 
   //OTHER PRIMITIVE READ METHODS: copyTo, compareTo XXX
-
   @Override
   public int compareTo(final long thisOffsetBytes, final long thisLengthBytes, final Memory that,
       final long thatOffsetBytes, final long thatLengthBytes) {
@@ -321,48 +322,58 @@ class WritableMemoryImpl extends WritableMemory {
   }
 
   //OTHER READ METHODS XXX
-
   @Override
   public long getCapacity() {
     checkValid();
-    return capacity;
+    return this.capacity;
   }
 
   @Override
   public long getCumulativeOffset(final long offsetBytes) {
     checkValid();
-    return cumBaseOffset + offsetBytes;
+    return this.cumBaseOffset + offsetBytes;
   }
 
   @Override
+  public ByteOrder getResourceOrder() {
+    checkValid();
+    return this.state.order();
+  }
+  
+  @Override
   public boolean hasArray() {
     checkValid();
-    return unsafeObj != null;
+    return this.unsafeObj != null;
   }
 
   @Override
   public boolean hasByteBuffer() {
     checkValid();
-    return state.getByteBuffer() != null;
+    return this.state.getByteBuffer() != null;
   }
 
   @Override
   public boolean isDirect() {
     checkValid();
-    return state.isDirect();
+    return this.state.isDirect();
   }
 
   @Override
   public boolean isResourceReadOnly() {
     checkValid();
-    return state.isResourceReadOnly();
+    return this.state.isResourceReadOnly();
   }
 
   @Override
   public boolean isValid() {
-    return state.isValid();
+    return this.state.isValid();
   }
 
+  @Override
+  public boolean swapBytes() {
+    return this.state.isSwapBytes();
+  }
+  
   @Override
   public String toHexString(final String header, final long offsetBytes, final int lengthBytes) {
     checkValid();
@@ -587,13 +598,18 @@ class WritableMemoryImpl extends WritableMemory {
   }
 
   //OTHER WRITE METHODS XXX
-
   @Override
   public Object getArray() {
     checkValid();
     return unsafeObj;
   }
 
+  @Override
+  public ByteBuffer getByteBuffer() {
+    checkValid();
+    return this.state.getByteBuffer();
+  }
+  
   @Override
   public void clear() {
     fill(0, capacity, (byte) 0);

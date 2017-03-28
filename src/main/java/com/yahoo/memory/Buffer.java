@@ -10,9 +10,10 @@ import java.nio.ByteOrder;
 
 /**
  * Provides read-only, positional primitive and primitive array methods to any of the four resources
- * mentioned at the package level.
+ * mentioned in the package level documentation.
  *
  * @author Lee Rhodes
+ * @see com.yahoo.memory
  */
 public abstract class Buffer extends BaseBuffer {
 
@@ -27,10 +28,6 @@ public abstract class Buffer extends BaseBuffer {
    * @return the given ByteBuffer for read-only operations.
    */
   public static Buffer wrap(final ByteBuffer byteBuf) {
-    if (byteBuf.order() != ByteOrder.nativeOrder()) {
-      throw new IllegalArgumentException(
-          "Buffer does not support " + (byteBuf.order().toString()));
-    }
     final ResourceState state = new ResourceState();
     state.putByteBuffer(byteBuf);
     AccessByteBuffer.wrap(state);
@@ -144,7 +141,7 @@ public abstract class Buffer extends BaseBuffer {
   public abstract boolean getBoolean();
 
   /**
-   * Gets the boolean array at the current position
+   * Gets the boolean array at the current position. Increments the position by <i>Boolean.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
    * @param length number of array units to transfer
@@ -158,7 +155,7 @@ public abstract class Buffer extends BaseBuffer {
   public abstract byte getByte();
 
   /**
-   * Gets the byte array at the current position
+   * Gets the byte array at the current position. Increments the position by <i>Byte.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
    * @param length number of array units to transfer
@@ -172,7 +169,7 @@ public abstract class Buffer extends BaseBuffer {
   public abstract char getChar();
 
   /**
-   * Gets the char array at the current position
+   * Gets the char array at the current position. Increments the position by <i>Char.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
    * @param length number of array units to transfer
@@ -186,7 +183,7 @@ public abstract class Buffer extends BaseBuffer {
   public abstract double getDouble();
 
   /**
-   * Gets the double array at the current position
+   * Gets the double array at the current position. Increments the position by <i>Double.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
    * @param length number of array units to transfer
@@ -200,7 +197,7 @@ public abstract class Buffer extends BaseBuffer {
   public abstract float getFloat();
 
   /**
-   * Gets the float array at the current position
+   * Gets the float array at the current position. Increments the position by <i>Float.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
    * @param length number of array units to transfer
@@ -214,7 +211,7 @@ public abstract class Buffer extends BaseBuffer {
   public abstract int getInt();
 
   /**
-   * Gets the int array at the current position
+   * Gets the int array at the current position. Increments the position by <i>Int.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
    * @param length number of array units to transfer
@@ -228,7 +225,7 @@ public abstract class Buffer extends BaseBuffer {
   public abstract long getLong();
 
   /**
-   * Gets the long array at the current position
+   * Gets the long array at the current position. Increments the position by <i>Long.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
    * @param length number of array units to transfer
@@ -242,7 +239,7 @@ public abstract class Buffer extends BaseBuffer {
   public abstract short getShort();
 
   /**
-   * Gets the short array at the current position
+   * Gets the short array at the current position. Increments the position by <i>Short.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
    * @param length number of array units to transfer
@@ -281,6 +278,12 @@ public abstract class Buffer extends BaseBuffer {
   public abstract long getCumulativeOffset();
 
   /**
+   * Returns the ByteOrder for the backing resource.
+   * @return the ByteOrder for the backing resource.
+   */
+  public abstract ByteOrder getResourceOrder();
+  
+  /**
    * Returns true if this Buffer is backed by an on-heap primitive array
    * @return true if this Buffer is backed by an on-heap primitive array
    */
@@ -311,6 +314,12 @@ public abstract class Buffer extends BaseBuffer {
   public abstract boolean isValid();
 
   /**
+   * Return true if bytes need to be swapped based on resource ByteOrder.
+   * @return true if bytes need to be swapped based on resource ByteOrder.
+   */
+  public abstract boolean swapBytes();
+  
+  /**
    * Returns a formatted hex string of a range of this Buffer.
    * Used primarily for testing.
    * @param header descriptive header
@@ -319,6 +328,5 @@ public abstract class Buffer extends BaseBuffer {
    * @return a formatted hex string in a human readable array
    */
   public abstract String toHexString(String header, long offsetBytes, int lengthBytes);
-
 
 }

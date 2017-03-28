@@ -5,13 +5,7 @@
 
 package com.yahoo.memory;
 
-import static com.yahoo.memory.Util.isAllBitsClear;
-import static com.yahoo.memory.Util.isAllBitsSet;
-import static com.yahoo.memory.Util.isAnyBitsClear;
-import static com.yahoo.memory.Util.isAnyBitsSet;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
@@ -258,93 +252,6 @@ public class CommonBufferTest {
   }
 
   @Test
-  public void checkSetClearIsBits() {
-    int memCapacity = 8;
-    try (WritableMemoryDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh.get();
-      WritableBuffer wbuf = mem.asWritableBuffer();
-      assertEquals(wbuf.getCapacity(), memCapacity);
-      wbuf.clear();
-      setClearIsBitsTests(wbuf);
-    }
-  }
-
-  public static void setClearIsBitsTests(WritableBuffer wbuf) {
-  //single bits
-    for (int i=0; i<8; i++) {
-      long bitMask = (1 << i);
-      wbuf.resetPosition();
-      long v = wbuf.getByte() & 0XFFL;
-      assertTrue(isAnyBitsClear(v, bitMask));
-      wbuf.resetPosition();
-      wbuf.setBits((byte) bitMask);
-      wbuf.resetPosition();
-      v = wbuf.getByte() & 0XFFL;
-      assertTrue(isAnyBitsSet(v, bitMask));
-      wbuf.resetPosition();
-      wbuf.clearBits((byte) bitMask);
-      wbuf.resetPosition();
-      v = wbuf.getByte() & 0XFFL;
-      assertTrue(isAnyBitsClear(v, bitMask));
-    }
-
-    //multiple bits
-    for (int i=0; i<7; i++) {
-      long bitMask1 = (1 << i);
-      long bitMask2 = (3 << i);
-      wbuf.resetPosition();
-      long v = wbuf.getByte() & 0XFFL;
-      assertTrue(isAnyBitsClear(v, bitMask1));
-      assertTrue(isAnyBitsClear(v, bitMask2));
-      wbuf.resetPosition();
-      wbuf.setBits((byte) bitMask1); //set one bit
-      wbuf.resetPosition();
-      v = wbuf.getByte() & 0XFFL;
-      assertTrue(isAnyBitsSet(v, bitMask2));
-      assertTrue(isAnyBitsClear(v, bitMask2));
-      assertFalse(isAllBitsSet(v, bitMask2));
-      assertFalse(isAllBitsClear(v, bitMask2));
-    }
-  }
-
-  @Test
-  public void checkAtomicMethods() {
-    int memCapacity = 8;
-    try (WritableMemoryDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh.get();
-      WritableBuffer buf = mem.asWritableBuffer();
-      assertEquals(buf.getCapacity(), memCapacity);
-      atomicMethodTests(buf);
-    }
-  }
-
-  public static void atomicMethodTests(WritableBuffer buf) {
-    buf.resetPosition();
-    buf.putLong(500);
-    buf.resetPosition();
-    buf.getAndAddLong(1);
-    buf.resetPosition();
-    assertEquals(buf.getLong(), 501);
-
-    buf.resetPosition();
-    buf.putInt(500);
-    buf.resetPosition();
-    boolean b = buf.compareAndSwapLong(500, 501);
-    assertTrue(b);
-    buf.resetPosition();
-    assertEquals(buf.getLong(), 501);
-
-    buf.resetPosition();
-    buf.putLong(500);
-    buf.resetPosition();
-    long oldLong = buf.getAndSetLong(501);
-    buf.resetPosition();
-    long newLong = buf.getLong();
-    assertEquals(oldLong, 500);
-    assertEquals(newLong, 501);
-  }
-
-  @Test
   public void checkSetClearMemoryRegions() {
     int memCapacity = 64; //must be 64
     try (WritableMemoryDirectHandler wrh1 = WritableMemory.allocateDirect(memCapacity)) {
@@ -360,7 +267,7 @@ public class CommonBufferTest {
     }
   }
 
-  //enable println stmts to visually check
+  //enable println statements to visually check
   public static void setClearMemoryRegionsTests(WritableBuffer buf) {
     int accessCapacity = (int)buf.getCapacity();
 

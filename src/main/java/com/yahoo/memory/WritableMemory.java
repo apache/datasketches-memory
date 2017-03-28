@@ -27,10 +27,6 @@ public abstract class WritableMemory extends Memory {
     if (byteBuf.isReadOnly()) {
       throw new ReadOnlyException("ByteBuffer is read-only.");
     }
-    if (byteBuf.order() != ByteOrder.nativeOrder()) {
-      throw new IllegalArgumentException(
-          "Memory does not support " + (byteBuf.order().toString()));
-    }
     final ResourceState state = new ResourceState();
     state.putByteBuffer(byteBuf);
     AccessByteBuffer.wrap(state);
@@ -40,13 +36,13 @@ public abstract class WritableMemory extends Memory {
   //MAP XXX
   /**
    * Allocates direct memory used to memory map files for write operations
-   * (including those &gt; 2GB).
+   * (including those &gt; 2GB). This assumes that the file was written using native byte ordering.
    * @param file the given file to map
    * @return WritableMemoryMapHandler for managing this map
    * @throws Exception file not found or RuntimeException, etc.
    */
   public static WritableMemoryMapHandler writableMap(final File file) throws Exception {
-    return writableMap(file, 0, file.length());
+    return writableMap(file, 0, file.length(), ByteOrder.nativeOrder());
   }
 
   /**
@@ -55,15 +51,17 @@ public abstract class WritableMemory extends Memory {
    * @param file the given file to map
    * @param fileOffset the position in the given file
    * @param capacity the size of the allocated direct memory
+   * @param byteOrder the endianness of the given file.
    * @return WritableMemoryMapHandler for managing this map
    * @throws Exception file not found or RuntimeException, etc.
    */
   public static WritableMemoryMapHandler writableMap(final File file, final long fileOffset,
-      final long capacity) throws Exception {
+      final long capacity, final ByteOrder byteOrder) throws Exception {
     final ResourceState state = new ResourceState();
     state.putFile(file);
     state.putFileOffset(fileOffset);
     state.putCapacity(capacity);
+    state.order(byteOrder);
     return WritableMemoryMapHandler.map(state);
   }
 
@@ -366,6 +364,11 @@ public abstract class WritableMemory extends Memory {
   public abstract Object getArray();
 
   /**
+   * Returns the backing ByteBuffer if it exists, otherwise returns null.
+   * @return the backing ByteBuffer if it exists, otherwise returns null.
+   */
+  public abstract ByteBuffer getByteBuffer();
+  /**
    * Clears all bytes of this Memory to zero
    */
   public abstract void clear();
@@ -404,7 +407,6 @@ public abstract class WritableMemory extends Memory {
    * @param bitMask the bits set to one will be set
    */
   public abstract void setBits(long offsetBytes, byte bitMask);
-
 
   //OTHER XXX
   /**

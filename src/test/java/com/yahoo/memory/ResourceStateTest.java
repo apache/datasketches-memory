@@ -37,7 +37,7 @@ public class ResourceStateTest {
       state.order(ByteOrder.LITTLE_ENDIAN);
     }
     assertTrue(state.order() != ByteOrder.nativeOrder());
-    assertTrue(state.swapBytes());
+    assertTrue(state.isSwapBytes());
   }
 
   @Test

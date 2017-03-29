@@ -317,7 +317,7 @@ public abstract class Memory {
   /**
    * Copies bytes from a source range of this Memory to a destination range of the given Memory
    * using the same low-level system copy function as found in
-   * {@link java.lang.System#arrayCopy(Object, int, Object, int, int)}.
+   * {@link java.lang.System#arraycopy(Object, int, Object, int, int)}.
    * @param srcOffsetBytes the source offset for this Memory
    * @param destination the destination Memory, which may not be Read-Only.
    * @param dstOffsetBytes the destination offset

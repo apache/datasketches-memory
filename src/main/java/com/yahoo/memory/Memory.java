@@ -443,5 +443,21 @@ public abstract class Memory {
     return sb.toString();
   }
 
+  //MONITORING
+  /**
+   * Gets the current number of active direct memory allocations.
+   * @return the current number of active direct memory allocations.
+   */
+  public static long getCurrentDirectMemoryAllocations() {
+    return ResourceState.currentDirectMemoryAllocations_.get();
+  }
+  
+  /**
+   * Gets the current size of active direct memory allocated.
+   * @return the current size of active direct memory allocated.
+   */
+  public static long getCurrentDirectMemoryAllocated() {
+    return ResourceState.currentDirectMemoryAllocated_.get();
+  }
 
 }

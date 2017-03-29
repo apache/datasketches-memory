@@ -216,13 +216,31 @@ public class MemoryTest {
     region.getByte(0);
   }
 
+  @SuppressWarnings("resource")
+  @Test
+  public void checkMonitorStats() {
+    int bytes = 1024;
+    WritableMemoryDirectHandler wh1 = WritableMemory.allocateDirect(bytes);
+    WritableMemoryDirectHandler wh2 = WritableMemory.allocateDirect(bytes);
+    assertEquals(Memory.getCurrentDirectMemoryAllocations(), 2L);
+    assertEquals(Memory.getCurrentDirectMemoryAllocated(), 2 * bytes);
+
+    wh1.close();
+    assertEquals(Memory.getCurrentDirectMemoryAllocations(), 1L);
+    assertEquals(Memory.getCurrentDirectMemoryAllocated(), bytes);
+    
+    wh2.close();
+    assertEquals(Memory.getCurrentDirectMemoryAllocations(), 0L);
+    assertEquals(Memory.getCurrentDirectMemoryAllocated(), 0L);
+  }
+  
   @Test
   public void printlnTest() {
     println("PRINTING: "+this.getClass().getName());
   }
 
   /**
-   * @param s blah
+   * @param s value to print
    */
   static void println(final String s) {
     //System.out.println(s);

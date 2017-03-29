@@ -10,6 +10,7 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Lee Rhodes
@@ -20,6 +21,10 @@ final class ResourceState {
    * Native Endianness 
    */
   private static final ByteOrder nativeOrder_ = ByteOrder.nativeOrder();
+  
+  //Monitoring
+  static AtomicLong currentDirectMemoryAllocations_ = new AtomicLong();
+  static AtomicLong currentDirectMemoryAllocated_ = new AtomicLong();
   
   //FOUNDATION PARAMETERS
   /**

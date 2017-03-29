@@ -66,10 +66,10 @@ class AllocateDirectMap implements Map {
     // Read a byte from each page to bring it into memory.
     final int ps = unsafe.pageSize();
     final int count = pageCount(ps, this.state.getCapacity());
-    long a = this.state.getNativeBaseOffset();
+    long nativeBaseOffset = this.state.getNativeBaseOffset();
     for (int i = 0; i < count; i++) {
-      unsafe.getByte(a);
-      a += ps;
+      unsafe.getByte(nativeBaseOffset);
+      nativeBaseOffset += ps;
     }
   }
 
@@ -94,10 +94,11 @@ class AllocateDirectMap implements Map {
   @Override
   public void close() {
     try {
-      this.cleaner.clean();
-      ResourceState.currentDirectMemoryAllocations_.decrementAndGet();
-      ResourceState.currentDirectMemoryAllocated_.addAndGet(-state.getCapacity());
-      this.state.setInvalid();
+      if (state.isValid()) {
+        ResourceState.currentDirectMemoryAllocations_.decrementAndGet();
+        ResourceState.currentDirectMemoryAllocated_.addAndGet(-state.getCapacity());
+      }
+      this.cleaner.clean(); //sets invalid
     } catch (final Exception e) {
       throw e;
     }
@@ -168,27 +169,27 @@ class AllocateDirectMap implements Map {
   }
 
   /**
-   * Creates a mapping of the file on disk starting at position and of size length to pages in OS.
+   * Creates a mapping of the file on disk starting at file position and of size length to pages in OS.
    * May throw OutOfMemory error if you have exhausted memory. Force garbage collection and
    * re-attempt.
    * @param fileChannel the FileChannel
-   * @param position the offset in bytes
-   * @param len the length in bytes
-   * @return the direct memory address
+   * @param position the offset in bytes into the file
+   * @param lengthBytes the length in bytes
+   * @return the native base offset address
    * @throws RuntimeException Encountered an exception while mapping
    */
-  static final long map(final FileChannel fileChannel, final long position, final long len)
+  static final long map(final FileChannel fileChannel, final long position, final long lengthBytes)
       throws RuntimeException {
     final int pagePosition = (int) (position % unsafe.pageSize());
     final long mapPosition = position - pagePosition;
-    final long mapSize = len + pagePosition;
+    final long mapSize = lengthBytes + pagePosition;
 
     try {
       final Method method =
           FileChannelImpl.class.getDeclaredMethod("map0", int.class, long.class, long.class);
       method.setAccessible(true);
-      final long addr = (long) method.invoke(fileChannel, 1, mapPosition, mapSize);
-      return addr;
+      final long nativeBaseOffset = (long) method.invoke(fileChannel, 1, mapPosition, mapSize);
+      return nativeBaseOffset;
     } catch (final Exception e) {
       throw new RuntimeException(
           String.format("Encountered %s exception while mapping", e.getClass()));

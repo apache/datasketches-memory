@@ -230,6 +230,7 @@ public class MemoryTest {
     assertEquals(Memory.getCurrentDirectMemoryAllocated(), bytes);
     
     wh2.close();
+    wh2.close(); //check that it doesn't go negative.
     assertEquals(Memory.getCurrentDirectMemoryAllocations(), 0L);
     assertEquals(Memory.getCurrentDirectMemoryAllocated(), 0L);
   }

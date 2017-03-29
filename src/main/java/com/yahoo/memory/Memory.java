@@ -427,6 +427,7 @@ public abstract class Memory {
     sb.append("MemReq, hashCode    : ").append(memReqStr).append(LS);
     sb.append("Valid               : ").append(state.isValid()).append(LS);
     sb.append("Resource Read Only  : ").append(state.isResourceReadOnly()).append(LS);
+    sb.append("Resource Endianness : ").append(state.order().toString()).append(LS);
     sb.append("JDK Version         : ").append(UnsafeUtil.JDK).append(LS);
     //Data detail
     sb.append("Data, littleEndian  :  0  1  2  3  4  5  6  7");

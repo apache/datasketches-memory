@@ -8,6 +8,7 @@ package com.yahoo.memory;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -218,7 +219,7 @@ public class MemoryTest {
 
   @SuppressWarnings("resource")
   @Test
-  public void checkMonitorStats() {
+  public void checkMonitorDirectStats() {
     int bytes = 1024;
     WritableMemoryDirectHandler wh1 = WritableMemory.allocateDirect(bytes);
     WritableMemoryDirectHandler wh2 = WritableMemory.allocateDirect(bytes);
@@ -233,6 +234,28 @@ public class MemoryTest {
     wh2.close(); //check that it doesn't go negative.
     assertEquals(Memory.getCurrentDirectMemoryAllocations(), 0L);
     assertEquals(Memory.getCurrentDirectMemoryAllocated(), 0L);
+  }
+  
+  @SuppressWarnings("resource")
+  @Test
+  public void checkMonitorDirectMapStats() throws Exception {
+    File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
+    long bytes = file.length();
+    
+    MemoryMapHandler mmh1 = Memory.map(file);
+    MemoryMapHandler mmh2 = Memory.map(file);
+    
+    assertEquals(Memory.getCurrentDirectMemoryMapAllocations(), 2L);
+    assertEquals(Memory.getCurrentDirectMemoryMapAllocated(), 2 * bytes);
+
+    mmh1.close();
+    assertEquals(Memory.getCurrentDirectMemoryMapAllocations(), 1L);
+    assertEquals(Memory.getCurrentDirectMemoryMapAllocated(), bytes);
+    
+    mmh2.close();
+    mmh2.close(); //check that it doesn't go negative.
+    assertEquals(Memory.getCurrentDirectMemoryMapAllocations(), 0L);
+    assertEquals(Memory.getCurrentDirectMemoryMapAllocated(), 0L);
   }
   
   @Test

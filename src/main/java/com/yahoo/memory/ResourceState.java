@@ -25,6 +25,8 @@ final class ResourceState {
   //Monitoring
   static AtomicLong currentDirectMemoryAllocations_ = new AtomicLong();
   static AtomicLong currentDirectMemoryAllocated_ = new AtomicLong();
+  static AtomicLong currentDirectMemoryMapAllocations_ = new AtomicLong();
+  static AtomicLong currentDirectMemoryMapAllocated_ = new AtomicLong();
   
   //FOUNDATION PARAMETERS
   /**

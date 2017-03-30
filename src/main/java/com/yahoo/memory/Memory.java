@@ -461,4 +461,20 @@ public abstract class Memory {
     return ResourceState.currentDirectMemoryAllocated_.get();
   }
 
+  /**
+   * Gets the current number of active direct memory map allocations.
+   * @return the current number of active direct memory map allocations.
+   */
+  public static long getCurrentDirectMemoryMapAllocations() {
+    return ResourceState.currentDirectMemoryMapAllocations_.get();
+  }
+  
+  /**
+   * Gets the current size of active direct memory map allocated.
+   * @return the current size of active direct memory map allocated.
+   */
+  public static long getCurrentDirectMemoryMapAllocated() {
+    return ResourceState.currentDirectMemoryMapAllocated_.get();
+  }
+  
 }

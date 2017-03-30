@@ -42,8 +42,8 @@ class AllocateDirectMap implements Map {
   AllocateDirectMap(final ResourceState state) {
     this.state = state;
     this.cleaner = Cleaner.create(this, new Deallocator(state));
-    ResourceState.currentDirectMemoryAllocations_.incrementAndGet();
-    ResourceState.currentDirectMemoryAllocated_.addAndGet(state.getCapacity());
+    ResourceState.currentDirectMemoryMapAllocations_.incrementAndGet();
+    ResourceState.currentDirectMemoryMapAllocated_.addAndGet(state.getCapacity());
   }
 
   /**
@@ -95,8 +95,8 @@ class AllocateDirectMap implements Map {
   public void close() {
     try {
       if (state.isValid()) {
-        ResourceState.currentDirectMemoryAllocations_.decrementAndGet();
-        ResourceState.currentDirectMemoryAllocated_.addAndGet(-state.getCapacity());
+        ResourceState.currentDirectMemoryMapAllocations_.decrementAndGet();
+        ResourceState.currentDirectMemoryMapAllocated_.addAndGet(-state.getCapacity());
       }
       this.cleaner.clean(); //sets invalid
     } catch (final Exception e) {

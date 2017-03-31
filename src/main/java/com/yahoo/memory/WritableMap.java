@@ -8,7 +8,9 @@ package com.yahoo.memory;
 /**
  * Writable interface for a memory mapped file
  *
+ * @author Roman Leventov
  * @author Lee Rhodes
+ * @author Praveenkumar Venkatesan
  */
 interface WritableMap extends Map {
 

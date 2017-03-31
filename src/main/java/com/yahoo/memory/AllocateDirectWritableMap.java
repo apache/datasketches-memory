@@ -13,8 +13,9 @@ import java.nio.MappedByteBuffer;
  * Allocates direct memory used to memory map files for write operations
  * (including those &gt; 2GB).
  *
- * @author Praveenkumar Venkatesan
  * @author Lee Rhodes
+ * @author Roman Leventov
+ * @author Praveenkumar Venkatesan
  */
 //Called from WritableMemory, implements combo of WritableMemory with WritableMap resource
 final class AllocateDirectWritableMap extends AllocateDirectMap implements WritableMap {
@@ -45,10 +46,10 @@ final class AllocateDirectWritableMap extends AllocateDirectMap implements Writa
   public void force() {
     try {
       final Method method = MappedByteBuffer.class.getDeclaredMethod("force0",
-          FileDescriptor.class, long.class, long.class);
+              FileDescriptor.class, long.class, long.class);
       method.setAccessible(true);
       method.invoke(super.state.getMappedByteBuffer(), super.state.getRandomAccessFile().getFD(),
-          super.state.getNativeBaseOffset(), super.state.getCapacity());
+              super.state.getNativeBaseOffset(), super.state.getCapacity());
     } catch (final Exception e) {
       throw new RuntimeException(String.format("Encountered %s exception in force", e.getClass()));
     }

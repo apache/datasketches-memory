@@ -8,7 +8,9 @@ package com.yahoo.memory;
 /**
  * Read only interface for a memory mapped file
  *
+ * @author Roman Leventov
  * @author Lee Rhodes
+ * @author Praveenkumar Venkatesan
  */
 interface Map extends AutoCloseable {
 

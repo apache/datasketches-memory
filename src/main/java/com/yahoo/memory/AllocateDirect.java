@@ -10,6 +10,7 @@ import static com.yahoo.memory.UnsafeUtil.unsafe;
 import sun.misc.Cleaner;
 
 /**
+ * @author Roman Leventov
  * @author Lee Rhodes
  */
 final class AllocateDirect implements AutoCloseable {
@@ -26,7 +27,7 @@ final class AllocateDirect implements AutoCloseable {
    */
   private AllocateDirect(final ResourceState state) {
     this.state = state;
-    this.cleaner = Cleaner.create(this, new Deallocator(state));
+    cleaner = Cleaner.create(this, new Deallocator(state));
     ResourceState.currentDirectMemoryAllocations_.incrementAndGet();
     ResourceState.currentDirectMemoryAllocated_.addAndGet(state.getCapacity());
   }
@@ -39,11 +40,11 @@ final class AllocateDirect implements AutoCloseable {
   @Override
   public void close() {
     try {
-      if (this.state.isValid()) {
+      if (state.isValid()) {
         ResourceState.currentDirectMemoryAllocations_.decrementAndGet();
         ResourceState.currentDirectMemoryAllocated_.addAndGet(-state.getCapacity());
       }
-      this.cleaner.clean(); //sets invalid
+      cleaner.clean(); //sets invalid
     } catch (final Exception e) {
       throw e;
     }
@@ -56,20 +57,20 @@ final class AllocateDirect implements AutoCloseable {
     private final ResourceState parentStateRef;
 
     private Deallocator(final ResourceState state) {
-      this.actualNativeBaseOffset = state.getNativeBaseOffset();
+      actualNativeBaseOffset = state.getNativeBaseOffset();
       assert (actualNativeBaseOffset != 0);
-      this.parentStateRef = state;
+      parentStateRef = state;
     }
 
     @Override
     public void run() {
-      if (this.actualNativeBaseOffset == 0) {
+      if (actualNativeBaseOffset == 0) {
         // Paranoia
         return;
       }
-      unsafe.freeMemory(this.actualNativeBaseOffset);
-      this.actualNativeBaseOffset = 0L;
-      this.parentStateRef.setInvalid(); //The only place valid is set invalid.
+      unsafe.freeMemory(actualNativeBaseOffset);
+      actualNativeBaseOffset = 0L;
+      parentStateRef.setInvalid(); //The only place valid is set invalid.
     }
   }
 

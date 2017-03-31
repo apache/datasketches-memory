@@ -39,6 +39,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
+ * @author Roman Leventov
  * @author Lee Rhodes
  */
 class WritableMemoryImpl extends WritableMemory {
@@ -50,21 +51,21 @@ class WritableMemoryImpl extends WritableMemory {
 
   WritableMemoryImpl(final ResourceState state) {
     this.state = state;
-    this.unsafeObj = state.getUnsafeObject();
-    this.unsafeObjHeader = state.getUnsafeObjectHeader();
-    this.capacity = state.getCapacity();
-    this.cumBaseOffset = state.getCumBaseOffset();
+    unsafeObj = state.getUnsafeObject();
+    unsafeObjHeader = state.getUnsafeObjectHeader();
+    capacity = state.getCapacity();
+    cumBaseOffset = state.getCumBaseOffset();
   }
 
   //REGIONS/DUPLICATES XXX
   @Override
   public Memory duplicate() {
-    return region(0, this.capacity);
+    return region(0, capacity);
   }
 
   @Override
   public WritableMemory writableDuplicate() {
-    return writableRegion(0, this.capacity);
+    return writableRegion(0, capacity);
   }
 
   @Override
@@ -76,9 +77,9 @@ class WritableMemoryImpl extends WritableMemory {
   @Override
   public WritableMemory writableRegion(final long offsetBytes, final long capacityBytes) {
     checkValid();
-    assert offsetBytes + capacityBytes <= this.capacity
-        : "newOff + newCap: " + (offsetBytes + capacityBytes) + ", origCap: " + this.capacity;
-    final ResourceState newState = this.state.copy();
+    assert (offsetBytes + capacityBytes) <= capacity
+            : "newOff + newCap: " + (offsetBytes + capacityBytes) + ", origCap: " + capacity;
+    final ResourceState newState = state.copy();
     newState.putRegionOffset(newState.getRegionOffset() + offsetBytes);
     newState.putCapacity(capacityBytes);
     return new WritableMemoryImpl(newState);
@@ -87,79 +88,79 @@ class WritableMemoryImpl extends WritableMemory {
   //BUFFER XXX
   @Override
   public Buffer asBuffer() {
-    return new WritableBufferImpl(this.state.copy());
+    return new WritableBufferImpl(state.copy());
   }
 
   @Override
   public WritableBuffer asWritableBuffer() {
-    return new WritableBufferImpl(this.state.copy());
+    return new WritableBufferImpl(state.copy());
   }
 
   ///PRIMITIVE getXXX() and getXXXArray() XXX
   @Override
   public boolean getBoolean(final long offsetBytes) {
     checkValid();
-    assertBounds(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE, this.capacity);
-    return unsafe.getBoolean(this.unsafeObj, this.cumBaseOffset + offsetBytes);
+    assertBounds(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE, capacity);
+    return unsafe.getBoolean(unsafeObj, cumBaseOffset + offsetBytes);
   }
 
   @Override
   public void getBooleanArray(final long offsetBytes, final boolean[] dstArray, final int dstOffset,
-      final int length) {
+          final int length) {
     checkValid();
     final long copyBytes = length << BOOLEAN_SHIFT;
-    assertBounds(offsetBytes, copyBytes, this.capacity);
+    assertBounds(offsetBytes, copyBytes, capacity);
     assertBounds(dstOffset, length, dstArray.length);
     unsafe.copyMemory(
-      this.unsafeObj,
-      this.cumBaseOffset + offsetBytes,
-      dstArray,
-      ARRAY_BOOLEAN_BASE_OFFSET + (dstOffset << BOOLEAN_SHIFT),
-      copyBytes);
+            unsafeObj,
+            cumBaseOffset + offsetBytes,
+            dstArray,
+            ARRAY_BOOLEAN_BASE_OFFSET + (dstOffset << BOOLEAN_SHIFT),
+            copyBytes);
   }
 
   @Override
   public byte getByte(final long offsetBytes) {
     checkValid();
     assertBounds(offsetBytes, ARRAY_BYTE_INDEX_SCALE, capacity);
-    return unsafe.getByte(this.unsafeObj, this.cumBaseOffset + offsetBytes);
+    return unsafe.getByte(unsafeObj, cumBaseOffset + offsetBytes);
   }
 
   @Override
   public void getByteArray(final long offsetBytes, final byte[] dstArray, final int dstOffset,
-      final int length) {
+          final int length) {
     checkValid();
     final long copyBytes = length << BYTE_SHIFT;
-    assertBounds(offsetBytes, copyBytes, this.capacity);
+    assertBounds(offsetBytes, copyBytes, capacity);
     assertBounds(dstOffset, length, dstArray.length);
     unsafe.copyMemory(
-      this.unsafeObj,
-      this.cumBaseOffset + offsetBytes,
-      dstArray,
-      ARRAY_BYTE_BASE_OFFSET + (dstOffset << BYTE_SHIFT),
-      copyBytes);
+            unsafeObj,
+            cumBaseOffset + offsetBytes,
+            dstArray,
+            ARRAY_BYTE_BASE_OFFSET + (dstOffset << BYTE_SHIFT),
+            copyBytes);
   }
 
   @Override
   public char getChar(final long offsetBytes) {
     checkValid();
-    assertBounds(offsetBytes, ARRAY_CHAR_INDEX_SCALE, this.capacity);
-    return unsafe.getChar(this.unsafeObj, this.cumBaseOffset + offsetBytes);
+    assertBounds(offsetBytes, ARRAY_CHAR_INDEX_SCALE, capacity);
+    return unsafe.getChar(unsafeObj, cumBaseOffset + offsetBytes);
   }
 
   @Override
   public void getCharArray(final long offsetBytes, final char[] dstArray, final int dstOffset,
-      final int length) {
+          final int length) {
     checkValid();
     final long copyBytes = length << CHAR_SHIFT;
-    assertBounds(offsetBytes, copyBytes, this.capacity);
+    assertBounds(offsetBytes, copyBytes, capacity);
     assertBounds(dstOffset, length, dstArray.length);
     unsafe.copyMemory(
-      this.unsafeObj,
-      this.cumBaseOffset + offsetBytes,
-      dstArray,
-      ARRAY_CHAR_BASE_OFFSET + (dstOffset << CHAR_SHIFT),
-      copyBytes);
+            unsafeObj,
+            cumBaseOffset + offsetBytes,
+            dstArray,
+            ARRAY_CHAR_BASE_OFFSET + (dstOffset << CHAR_SHIFT),
+            copyBytes);
   }
 
   @Override
@@ -171,118 +172,118 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void getDoubleArray(final long offsetBytes, final double[] dstArray, final int dstOffset,
-      final int length) {
+          final int length) {
     checkValid();
     final long copyBytes = length << DOUBLE_SHIFT;
-    assertBounds(offsetBytes, copyBytes, this.capacity);
+    assertBounds(offsetBytes, copyBytes, capacity);
     assertBounds(dstOffset, length, dstArray.length);
     unsafe.copyMemory(
-      this.unsafeObj,
-      this.cumBaseOffset + offsetBytes,
-      dstArray,
-      ARRAY_DOUBLE_BASE_OFFSET + (dstOffset << DOUBLE_SHIFT),
-      copyBytes);
+            unsafeObj,
+            cumBaseOffset + offsetBytes,
+            dstArray,
+            ARRAY_DOUBLE_BASE_OFFSET + (dstOffset << DOUBLE_SHIFT),
+            copyBytes);
   }
 
   @Override
   public float getFloat(final long offsetBytes) {
     checkValid();
-    assertBounds(offsetBytes, ARRAY_FLOAT_INDEX_SCALE, this.capacity);
-    return unsafe.getFloat(this.unsafeObj, this.cumBaseOffset + offsetBytes);
+    assertBounds(offsetBytes, ARRAY_FLOAT_INDEX_SCALE, capacity);
+    return unsafe.getFloat(unsafeObj, cumBaseOffset + offsetBytes);
   }
 
   @Override
   public void getFloatArray(final long offsetBytes, final float[] dstArray, final int dstOffset,
-      final int length) {
+          final int length) {
     checkValid();
     final long copyBytes = length << FLOAT_SHIFT;
-    assertBounds(offsetBytes, copyBytes, this.capacity);
+    assertBounds(offsetBytes, copyBytes, capacity);
     assertBounds(dstOffset, length, dstArray.length);
     unsafe.copyMemory(
-      this.unsafeObj,
-      this.cumBaseOffset + offsetBytes,
-      dstArray,
-      ARRAY_FLOAT_BASE_OFFSET + (dstOffset << FLOAT_SHIFT),
-      copyBytes);
+            unsafeObj,
+            cumBaseOffset + offsetBytes,
+            dstArray,
+            ARRAY_FLOAT_BASE_OFFSET + (dstOffset << FLOAT_SHIFT),
+            copyBytes);
   }
 
   @Override
   public int getInt(final long offsetBytes) {
     checkValid();
-    assertBounds(offsetBytes, ARRAY_INT_INDEX_SCALE, this.capacity);
-    return unsafe.getInt(this.unsafeObj, this.cumBaseOffset + offsetBytes);
+    assertBounds(offsetBytes, ARRAY_INT_INDEX_SCALE, capacity);
+    return unsafe.getInt(unsafeObj, cumBaseOffset + offsetBytes);
   }
 
   @Override
   public void getIntArray(final long offsetBytes, final int[] dstArray, final int dstOffset,
-      final int length) {
+          final int length) {
     checkValid();
     final long copyBytes = length << INT_SHIFT;
-    assertBounds(offsetBytes, copyBytes, this.capacity);
+    assertBounds(offsetBytes, copyBytes, capacity);
     assertBounds(dstOffset, length, dstArray.length);
     unsafe.copyMemory(
-      this.unsafeObj,
-      this.cumBaseOffset + offsetBytes,
-      dstArray,
-      ARRAY_INT_BASE_OFFSET + (dstOffset << INT_SHIFT),
-      copyBytes);
+            unsafeObj,
+            cumBaseOffset + offsetBytes,
+            dstArray,
+            ARRAY_INT_BASE_OFFSET + (dstOffset << INT_SHIFT),
+            copyBytes);
   }
 
   @Override
   public long getLong(final long offsetBytes) {
     checkValid();
-    assertBounds(offsetBytes, ARRAY_LONG_INDEX_SCALE, this.capacity);
-    return unsafe.getLong(this.unsafeObj, this.cumBaseOffset + offsetBytes);
+    assertBounds(offsetBytes, ARRAY_LONG_INDEX_SCALE, capacity);
+    return unsafe.getLong(unsafeObj, cumBaseOffset + offsetBytes);
   }
 
   @Override
   public void getLongArray(final long offsetBytes, final long[] dstArray, final int dstOffset,
-      final int length) {
+          final int length) {
     checkValid();
     final long copyBytes = length << LONG_SHIFT;
-    assertBounds(offsetBytes, copyBytes, this.capacity);
+    assertBounds(offsetBytes, copyBytes, capacity);
     assertBounds(dstOffset, length, dstArray.length);
     unsafe.copyMemory(
-      this.unsafeObj,
-      this.cumBaseOffset + offsetBytes,
-      dstArray,
-      ARRAY_LONG_BASE_OFFSET + (dstOffset << LONG_SHIFT),
-      copyBytes);
+            unsafeObj,
+            cumBaseOffset + offsetBytes,
+            dstArray,
+            ARRAY_LONG_BASE_OFFSET + (dstOffset << LONG_SHIFT),
+            copyBytes);
   }
 
   @Override
   public short getShort(final long offsetBytes) {
     checkValid();
-    assertBounds(offsetBytes, ARRAY_SHORT_INDEX_SCALE, this.capacity);
-    return unsafe.getShort(this.unsafeObj, this.cumBaseOffset + offsetBytes);
+    assertBounds(offsetBytes, ARRAY_SHORT_INDEX_SCALE, capacity);
+    return unsafe.getShort(unsafeObj, cumBaseOffset + offsetBytes);
   }
 
   @Override
   public void getShortArray(final long offsetBytes, final short[] dstArray, final int dstOffset,
-      final int length) {
+          final int length) {
     checkValid();
     final long copyBytes = length << SHORT_SHIFT;
-    assertBounds(offsetBytes, copyBytes, this.capacity);
+    assertBounds(offsetBytes, copyBytes, capacity);
     assertBounds(dstOffset, length, dstArray.length);
     unsafe.copyMemory(
-      this.unsafeObj,
-      this.cumBaseOffset + offsetBytes,
-      dstArray,
-      ARRAY_SHORT_BASE_OFFSET + (dstOffset << SHORT_SHIFT),
-      copyBytes);
+            unsafeObj,
+            cumBaseOffset + offsetBytes,
+            dstArray,
+            ARRAY_SHORT_BASE_OFFSET + (dstOffset << SHORT_SHIFT),
+            copyBytes);
   }
 
   //OTHER PRIMITIVE READ METHODS: copyTo, compareTo XXX
   @Override
   public int compareTo(final long thisOffsetBytes, final long thisLengthBytes, final Memory that,
-      final long thatOffsetBytes, final long thatLengthBytes) {
+          final long thatOffsetBytes, final long thatLengthBytes) {
     checkValid();
     ((WritableMemoryImpl)that).checkValid();
-    assertBounds(thisOffsetBytes, thisLengthBytes, this.capacity);
+    assertBounds(thisOffsetBytes, thisLengthBytes, capacity);
     assertBounds(thatOffsetBytes, thatLengthBytes, that.getCapacity());
-    final long thisAdd = this.getCumulativeOffset(thisOffsetBytes);
+    final long thisAdd = getCumulativeOffset(thisOffsetBytes);
     final long thatAdd = that.getCumulativeOffset(thatOffsetBytes);
-    final Object thisObj = (this.isDirect()) ? null : this.unsafeObj;
+    final Object thisObj = (isDirect()) ? null : unsafeObj;
     final Object thatObj = (that.isDirect()) ? null : ((WritableMemory)that).getArray();
     final long lenBytes = Math.min(thisLengthBytes, thatLengthBytes);
     for (long i = 0; i < lenBytes; i++) {
@@ -298,279 +299,279 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void copyTo(final long srcOffsetBytes, final WritableMemory destination,
-      final long dstOffsetBytes, final long lengthBytes) {
+          final long dstOffsetBytes, final long lengthBytes) {
     checkValid();
-    assertBounds(srcOffsetBytes, lengthBytes, this.capacity);
+    assertBounds(srcOffsetBytes, lengthBytes, capacity);
     assertBounds(dstOffsetBytes, lengthBytes, destination.getCapacity());
     assert ((this == destination)
-      ? checkOverlap(srcOffsetBytes, dstOffsetBytes, lengthBytes)
-      : true) : "Region Overlap" ;
+            ? checkOverlap(srcOffsetBytes, dstOffsetBytes, lengthBytes)
+                    : true) : "Region Overlap" ;
 
-    long srcAdd = this.getCumulativeOffset(srcOffsetBytes);
-    long dstAdd = destination.getCumulativeOffset(dstOffsetBytes);
-    final Object srcParent = (this.isDirect()) ? null : unsafeObj;
-    final Object dstParent = (destination.isDirect()) ? null : destination.getArray();
-    long lenBytes = lengthBytes;
+            long srcAdd = getCumulativeOffset(srcOffsetBytes);
+            long dstAdd = destination.getCumulativeOffset(dstOffsetBytes);
+            final Object srcParent = (isDirect()) ? null : unsafeObj;
+            final Object dstParent = (destination.isDirect()) ? null : destination.getArray();
+            long lenBytes = lengthBytes;
 
-    while (lenBytes > 0) {
-      final long chunkBytes = (lenBytes > UNSAFE_COPY_THRESHOLD) ? UNSAFE_COPY_THRESHOLD : lenBytes;
-      unsafe.copyMemory(srcParent, srcAdd, dstParent, dstAdd, lenBytes);
-      lenBytes -= chunkBytes;
-      srcAdd += chunkBytes;
-      dstAdd += chunkBytes;
-    }
+            while (lenBytes > 0) {
+              final long chunkBytes = (lenBytes > UNSAFE_COPY_THRESHOLD) ? UNSAFE_COPY_THRESHOLD : lenBytes;
+              unsafe.copyMemory(srcParent, srcAdd, dstParent, dstAdd, lenBytes);
+              lenBytes -= chunkBytes;
+              srcAdd += chunkBytes;
+              dstAdd += chunkBytes;
+            }
   }
 
   //OTHER READ METHODS XXX
   @Override
   public long getCapacity() {
     checkValid();
-    return this.capacity;
+    return capacity;
   }
 
   @Override
   public long getCumulativeOffset(final long offsetBytes) {
     checkValid();
-    return this.cumBaseOffset + offsetBytes;
+    return cumBaseOffset + offsetBytes;
   }
 
   @Override
   public ByteOrder getResourceOrder() {
     checkValid();
-    return this.state.order();
+    return state.order();
   }
-  
+
   @Override
   public boolean hasArray() {
     checkValid();
-    return this.unsafeObj != null;
+    return unsafeObj != null;
   }
 
   @Override
   public boolean hasByteBuffer() {
     checkValid();
-    return this.state.getByteBuffer() != null;
+    return state.getByteBuffer() != null;
   }
 
   @Override
   public boolean isDirect() {
     checkValid();
-    return this.state.isDirect();
+    return state.isDirect();
   }
 
   @Override
   public boolean isResourceReadOnly() {
     checkValid();
-    return this.state.isResourceReadOnly();
+    return state.isResourceReadOnly();
   }
 
   @Override
   public boolean isValid() {
-    return this.state.isValid();
+    return state.isValid();
   }
 
   @Override
   public boolean swapBytes() {
-    return this.state.isSwapBytes();
+    return state.isSwapBytes();
   }
-  
+
   @Override
   public String toHexString(final String header, final long offsetBytes, final int lengthBytes) {
     checkValid();
     final String klass = this.getClass().getSimpleName();
     final String s1 = String.format("(..., %d, %d)", offsetBytes, lengthBytes);
-    final long hcode = this.hashCode() & 0XFFFFFFFFL;
+    final long hcode = hashCode() & 0XFFFFFFFFL;
     final String call = ".toHexString" + s1 + ", hashCode: " + hcode;
     final StringBuilder sb = new StringBuilder();
     sb.append("### ").append(klass).append(" SUMMARY ###").append(LS);
     sb.append("Header Comment      : ").append(header).append(LS);
     sb.append("Call Params         : ").append(call);
-    return Memory.toHex(sb.toString(), offsetBytes, lengthBytes, this.state);
+    return Memory.toHex(sb.toString(), offsetBytes, lengthBytes, state);
   }
 
   //PRIMITIVE putXXX() and putXXXArray() implementations XXX
   @Override
   public void putBoolean(final long offsetBytes, final boolean value) {
     checkValid();
-    assertBounds(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE, this.capacity);
-    unsafe.putBoolean(this.unsafeObj, this.cumBaseOffset + offsetBytes, value);
+    assertBounds(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE, capacity);
+    unsafe.putBoolean(unsafeObj, cumBaseOffset + offsetBytes, value);
   }
 
   @Override
   public void putBooleanArray(final long offsetBytes, final boolean[] srcArray, final int srcOffset,
-      final int length) {
+          final int length) {
     checkValid();
     final long copyBytes = length << BOOLEAN_SHIFT;
     assertBounds(srcOffset, length, srcArray.length);
-    assertBounds(offsetBytes, copyBytes, this.capacity);
+    assertBounds(offsetBytes, copyBytes, capacity);
     unsafe.copyMemory(
-      srcArray,
-      ARRAY_BOOLEAN_BASE_OFFSET + (srcOffset << BOOLEAN_SHIFT),
-      this.unsafeObj,
-      this.cumBaseOffset + offsetBytes,
-      copyBytes
-      );
+            srcArray,
+            ARRAY_BOOLEAN_BASE_OFFSET + (srcOffset << BOOLEAN_SHIFT),
+            unsafeObj,
+            cumBaseOffset + offsetBytes,
+            copyBytes
+            );
   }
 
   @Override
   public void putByte(final long offsetBytes, final byte value) {
     checkValid();
-    assertBounds(offsetBytes, ARRAY_BYTE_INDEX_SCALE, this.capacity);
-    unsafe.putByte(this.unsafeObj, this.cumBaseOffset + offsetBytes, value);
+    assertBounds(offsetBytes, ARRAY_BYTE_INDEX_SCALE, capacity);
+    unsafe.putByte(unsafeObj, cumBaseOffset + offsetBytes, value);
   }
 
   @Override
   public void putByteArray(final long offsetBytes, final byte[] srcArray, final int srcOffset,
-      final int length) {
+          final int length) {
     checkValid();
     final long copyBytes = length << BYTE_SHIFT;
     assertBounds(srcOffset, length, srcArray.length);
-    assertBounds(offsetBytes, copyBytes, this.capacity);
+    assertBounds(offsetBytes, copyBytes, capacity);
     unsafe.copyMemory(
-      srcArray,
-      ARRAY_BYTE_BASE_OFFSET + (srcOffset << BYTE_SHIFT),
-      this.unsafeObj,
-      cumBaseOffset + offsetBytes,
-      copyBytes
-      );
+            srcArray,
+            ARRAY_BYTE_BASE_OFFSET + (srcOffset << BYTE_SHIFT),
+            unsafeObj,
+            cumBaseOffset + offsetBytes,
+            copyBytes
+            );
   }
 
   @Override
   public void putChar(final long offsetBytes, final char value) {
     checkValid();
-    assertBounds(offsetBytes, ARRAY_CHAR_INDEX_SCALE, this.capacity);
-    unsafe.putChar(this.unsafeObj, this.cumBaseOffset + offsetBytes, value);
+    assertBounds(offsetBytes, ARRAY_CHAR_INDEX_SCALE, capacity);
+    unsafe.putChar(unsafeObj, cumBaseOffset + offsetBytes, value);
   }
 
   @Override
   public void putCharArray(final long offsetBytes, final char[] srcArray, final int srcOffset,
-      final int length) {
+          final int length) {
     checkValid();
     final long copyBytes = length << CHAR_SHIFT;
     assertBounds(srcOffset, length, srcArray.length);
-    assertBounds(offsetBytes, copyBytes, this.capacity);
+    assertBounds(offsetBytes, copyBytes, capacity);
     unsafe.copyMemory(
-      srcArray,
-      ARRAY_CHAR_BASE_OFFSET + (srcOffset << CHAR_SHIFT),
-      this.unsafeObj,
-      this.cumBaseOffset + offsetBytes,
-      copyBytes
-      );
+            srcArray,
+            ARRAY_CHAR_BASE_OFFSET + (srcOffset << CHAR_SHIFT),
+            unsafeObj,
+            cumBaseOffset + offsetBytes,
+            copyBytes
+            );
   }
 
   @Override
   public void putDouble(final long offsetBytes, final double value) {
     checkValid();
-    assertBounds(offsetBytes, ARRAY_DOUBLE_INDEX_SCALE, this.capacity);
-    unsafe.putDouble(this.unsafeObj, this.cumBaseOffset + offsetBytes, value);
+    assertBounds(offsetBytes, ARRAY_DOUBLE_INDEX_SCALE, capacity);
+    unsafe.putDouble(unsafeObj, cumBaseOffset + offsetBytes, value);
   }
 
   @Override
   public void putDoubleArray(final long offsetBytes, final double[] srcArray, final int srcOffset,
-      final int length) {
+          final int length) {
     checkValid();
     final long copyBytes = length << DOUBLE_SHIFT;
     assertBounds(srcOffset, length, srcArray.length);
-    assertBounds(offsetBytes, copyBytes, this.capacity);
+    assertBounds(offsetBytes, copyBytes, capacity);
     unsafe.copyMemory(
-      srcArray,
-      ARRAY_DOUBLE_BASE_OFFSET + (srcOffset << DOUBLE_SHIFT),
-      this.unsafeObj,
-      this.cumBaseOffset + offsetBytes,
-      copyBytes
-      );
+            srcArray,
+            ARRAY_DOUBLE_BASE_OFFSET + (srcOffset << DOUBLE_SHIFT),
+            unsafeObj,
+            cumBaseOffset + offsetBytes,
+            copyBytes
+            );
   }
 
   @Override
   public void putFloat(final long offsetBytes, final float value) {
     checkValid();
-    assertBounds(offsetBytes, ARRAY_FLOAT_INDEX_SCALE, this.capacity);
-    unsafe.putFloat(this.unsafeObj, this.cumBaseOffset + offsetBytes, value);
+    assertBounds(offsetBytes, ARRAY_FLOAT_INDEX_SCALE, capacity);
+    unsafe.putFloat(unsafeObj, cumBaseOffset + offsetBytes, value);
   }
 
   @Override
   public void putFloatArray(final long offsetBytes, final float[] srcArray, final int srcOffset,
-      final int length) {
+          final int length) {
     checkValid();
     final long copyBytes = length << FLOAT_SHIFT;
     assertBounds(srcOffset, length, srcArray.length);
-    assertBounds(offsetBytes, copyBytes, this.capacity);
+    assertBounds(offsetBytes, copyBytes, capacity);
     unsafe.copyMemory(
-      srcArray,
-      ARRAY_FLOAT_BASE_OFFSET + (srcOffset << FLOAT_SHIFT),
-      this.unsafeObj,
-      this.cumBaseOffset + offsetBytes,
-      copyBytes
-      );
+            srcArray,
+            ARRAY_FLOAT_BASE_OFFSET + (srcOffset << FLOAT_SHIFT),
+            unsafeObj,
+            cumBaseOffset + offsetBytes,
+            copyBytes
+            );
   }
 
   @Override
   public void putInt(final long offsetBytes, final int value) {
     checkValid();
-    assertBounds(offsetBytes, ARRAY_INT_INDEX_SCALE, this.capacity);
-    unsafe.putInt(this.unsafeObj, this.cumBaseOffset + offsetBytes, value);
+    assertBounds(offsetBytes, ARRAY_INT_INDEX_SCALE, capacity);
+    unsafe.putInt(unsafeObj, cumBaseOffset + offsetBytes, value);
   }
 
   @Override
   public void putIntArray(final long offsetBytes, final int[] srcArray, final int srcOffset,
-      final int length) {
+          final int length) {
     checkValid();
     final long copyBytes = length << INT_SHIFT;
     assertBounds(srcOffset, length, srcArray.length);
-    assertBounds(offsetBytes, copyBytes, this.capacity);
+    assertBounds(offsetBytes, copyBytes, capacity);
     unsafe.copyMemory(
-      srcArray,
-      ARRAY_INT_BASE_OFFSET + (srcOffset << INT_SHIFT),
-      this.unsafeObj,
-      this.cumBaseOffset + offsetBytes,
-      copyBytes
-      );
+            srcArray,
+            ARRAY_INT_BASE_OFFSET + (srcOffset << INT_SHIFT),
+            unsafeObj,
+            cumBaseOffset + offsetBytes,
+            copyBytes
+            );
   }
 
   @Override
   public void putLong(final long offsetBytes, final long value) {
     checkValid();
-    assertBounds(offsetBytes, ARRAY_LONG_INDEX_SCALE, this.capacity);
-    unsafe.putLong(this.unsafeObj, this.cumBaseOffset + offsetBytes, value);
+    assertBounds(offsetBytes, ARRAY_LONG_INDEX_SCALE, capacity);
+    unsafe.putLong(unsafeObj, cumBaseOffset + offsetBytes, value);
   }
 
   @Override
   public void putLongArray(final long offsetBytes, final long[] srcArray, final int srcOffset,
-      final int length) {
+          final int length) {
     checkValid();
     final long copyBytes = length << LONG_SHIFT;
     assertBounds(srcOffset, length, srcArray.length);
-    assertBounds(offsetBytes, copyBytes, this.capacity);
+    assertBounds(offsetBytes, copyBytes, capacity);
     unsafe.copyMemory(
-      srcArray,
-      ARRAY_LONG_BASE_OFFSET + (srcOffset << LONG_SHIFT),
-      this.unsafeObj,
-      this.cumBaseOffset + offsetBytes,
-      copyBytes
-      );
+            srcArray,
+            ARRAY_LONG_BASE_OFFSET + (srcOffset << LONG_SHIFT),
+            unsafeObj,
+            cumBaseOffset + offsetBytes,
+            copyBytes
+            );
   }
 
   @Override
   public void putShort(final long offsetBytes, final short value) {
     checkValid();
-    assertBounds(offsetBytes, ARRAY_SHORT_INDEX_SCALE, this.capacity);
-    unsafe.putLong(this.unsafeObj, this.cumBaseOffset + offsetBytes, value);
+    assertBounds(offsetBytes, ARRAY_SHORT_INDEX_SCALE, capacity);
+    unsafe.putLong(unsafeObj, cumBaseOffset + offsetBytes, value);
   }
 
   @Override
   public void putShortArray(final long offsetBytes, final short[] srcArray, final int srcOffset,
-      final int length) {
+          final int length) {
     checkValid();
     final long copyBytes = length << SHORT_SHIFT;
     assertBounds(srcOffset, length, srcArray.length);
-    assertBounds(offsetBytes, copyBytes, this.capacity);
+    assertBounds(offsetBytes, copyBytes, capacity);
     unsafe.copyMemory(
-      srcArray,
-      ARRAY_SHORT_BASE_OFFSET + (srcOffset << SHORT_SHIFT),
-      this.unsafeObj,
-      this.cumBaseOffset + offsetBytes,
-      copyBytes
-      );
+            srcArray,
+            ARRAY_SHORT_BASE_OFFSET + (srcOffset << SHORT_SHIFT),
+            unsafeObj,
+            cumBaseOffset + offsetBytes,
+            copyBytes
+            );
   }
 
   //Atomic Write Methods XXX
@@ -607,9 +608,9 @@ class WritableMemoryImpl extends WritableMemory {
   @Override
   public ByteBuffer getByteBuffer() {
     checkValid();
-    return this.state.getByteBuffer();
+    return state.getByteBuffer();
   }
-  
+
   @Override
   public void clear() {
     fill(0, capacity, (byte) 0);
@@ -625,10 +626,10 @@ class WritableMemoryImpl extends WritableMemory {
   public void clearBits(final long offsetBytes, final byte bitMask) {
     checkValid();
     assertBounds(offsetBytes, ARRAY_BYTE_INDEX_SCALE, capacity);
-    final long cumBaseOff = this.cumBaseOffset + offsetBytes;
-    int value = unsafe.getByte(this.unsafeObj, cumBaseOff) & 0XFF;
+    final long cumBaseOff = cumBaseOffset + offsetBytes;
+    int value = unsafe.getByte(unsafeObj, cumBaseOff) & 0XFF;
     value &= ~bitMask;
-    unsafe.putByte(this.unsafeObj, cumBaseOff, (byte)value);
+    unsafe.putByte(unsafeObj, cumBaseOff, (byte)value);
   }
 
   @Override
@@ -640,29 +641,29 @@ class WritableMemoryImpl extends WritableMemory {
   @Override
   public void fill(final long offsetBytes, final long lengthBytes, final byte value) {
     checkValid();
-    assertBounds(offsetBytes, lengthBytes, this.capacity);
-    unsafe.setMemory(this.unsafeObj, this.cumBaseOffset + offsetBytes, lengthBytes, value);
+    assertBounds(offsetBytes, lengthBytes, capacity);
+    unsafe.setMemory(unsafeObj, cumBaseOffset + offsetBytes, lengthBytes, value);
   }
 
   @Override
   public void setBits(final long offsetBytes, final byte bitMask) {
     checkValid();
-    assertBounds(offsetBytes, ARRAY_BYTE_INDEX_SCALE, this.capacity);
-    final long myOffset = this.cumBaseOffset + offsetBytes;
-    final byte value = unsafe.getByte(this.unsafeObj, myOffset);
-    unsafe.putByte(this.unsafeObj, myOffset, (byte)(value | bitMask));
+    assertBounds(offsetBytes, ARRAY_BYTE_INDEX_SCALE, capacity);
+    final long myOffset = cumBaseOffset + offsetBytes;
+    final byte value = unsafe.getByte(unsafeObj, myOffset);
+    unsafe.putByte(unsafeObj, myOffset, (byte)(value | bitMask));
   }
 
   //OTHER XXX
   @Override
   public MemoryRequest getMemoryRequest() { //only applicable to writable
     checkValid();
-    return this.state.getMemoryRequest();
+    return state.getMemoryRequest();
   }
 
   //RESTRICTED READ AND WRITE XXX
   private final void checkValid() { //applies to both readable and writable
-    assert this.state.isValid() : "Memory not valid.";
+    assert state.isValid() : "Memory not valid.";
   }
 
 }

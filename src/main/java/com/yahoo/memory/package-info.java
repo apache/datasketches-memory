@@ -76,6 +76,7 @@
  * use-after-close violations.</li>
  * </ul>
  *
+ * @author Roman Leventov
  * @author Lee Rhodes
  */
 package com.yahoo.memory;

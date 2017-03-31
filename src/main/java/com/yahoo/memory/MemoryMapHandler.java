@@ -6,8 +6,10 @@
 package com.yahoo.memory;
 
 /**
- * Gets a Memory for a memory-mapped, read-only file resource, It is highly recommended that this 
+ * Gets a Memory for a memory-mapped, read-only file resource, It is highly recommended that this
  * be created inside a <i>try-with-resources</i> statement.
+ *
+ * @author Roman Leventov
  * @author Lee Rhodes
  */
 //Implements combo of Memory with Map resource.

@@ -13,6 +13,7 @@ import java.nio.ByteOrder;
  * Provides read and write primitive and primitive array access to any of the four resources
  * mentioned at the package level.
  *
+ * @author Roman Leventov
  * @author Lee Rhodes
  */
 public abstract class WritableMemory extends Memory {
@@ -56,7 +57,7 @@ public abstract class WritableMemory extends Memory {
    * @throws Exception file not found or RuntimeException, etc.
    */
   public static WritableMemoryMapHandler writableMap(final File file, final long fileOffset,
-      final long capacity, final ByteOrder byteOrder) throws Exception {
+          final long capacity, final ByteOrder byteOrder) throws Exception {
     final ResourceState state = new ResourceState();
     state.putFile(file);
     state.putFileOffset(fileOffset);
@@ -69,12 +70,12 @@ public abstract class WritableMemory extends Memory {
   /**
    * Allocates and provides access to capacityBytes directly in native (off-heap) memory
    * leveraging the WritableMemory API. The allocated memory will be 8-byte aligned, but may not
-   * be page aligned. 
+   * be page aligned.
    *
    * <p><b>NOTE:</b> Native/Direct memory acquired using Unsafe may have garbage in it.
    * It is the responsibility of the using class to clear this memory, if required,
    * and to call <i>close()</i> when done.</p>
-   * 
+   *
    * @param capacityBytes the size of the desired memory in bytes
    * @return WritableMemoryMapHandler for managing this off-heap resource
    */
@@ -207,7 +208,7 @@ public abstract class WritableMemory extends Memory {
    * @param length number of array units to transfer
    */
   public abstract void putBooleanArray(long offsetBytes, boolean[] srcArray, int srcOffset,
-      int length);
+          int length);
 
   /**
    * Puts the byte value at the given offset
@@ -224,7 +225,7 @@ public abstract class WritableMemory extends Memory {
    * @param length number of array units to transfer
    */
   public abstract void putByteArray(long offsetBytes, byte[] srcArray, int srcOffset,
-      int length);
+          int length);
 
   /**
    * Puts the char value at the given offset
@@ -241,7 +242,7 @@ public abstract class WritableMemory extends Memory {
    * @param length number of array units to transfer
    */
   public abstract void putCharArray(long offsetBytes, char[] srcArray, int srcOffset,
-      int length);
+          int length);
 
   /**
    * Puts the double value at the given offset
@@ -258,7 +259,7 @@ public abstract class WritableMemory extends Memory {
    * @param length number of array units to transfer
    */
   public abstract void putDoubleArray(long offsetBytes, double[] srcArray,
-      final int srcOffset, final int length);
+          final int srcOffset, final int length);
 
   /**
    * Puts the float value at the given offset
@@ -275,7 +276,7 @@ public abstract class WritableMemory extends Memory {
    * @param length number of array units to transfer
    */
   public abstract void putFloatArray(long offsetBytes, float[] srcArray,
-      final int srcOffset, final int length);
+          final int srcOffset, final int length);
 
   /**
    * Puts the int value at the given offset
@@ -292,7 +293,7 @@ public abstract class WritableMemory extends Memory {
    * @param length number of array units to transfer
    */
   public abstract void putIntArray(long offsetBytes, int[] srcArray,
-      final int srcOffset, final int length);
+          final int srcOffset, final int length);
 
   /**
    * Puts the long value at the given offset
@@ -309,7 +310,7 @@ public abstract class WritableMemory extends Memory {
    * @param length number of array units to transfer
    */
   public abstract void putLongArray(long offsetBytes, long[] srcArray,
-      final int srcOffset, final int length);
+          final int srcOffset, final int length);
 
   /**
    * Puts the short value at the given offset
@@ -326,7 +327,7 @@ public abstract class WritableMemory extends Memory {
    * @param length number of array units to transfer
    */
   public abstract void putShortArray(long offsetBytes, short[] srcArray,
-      final int srcOffset, final int length);
+          final int srcOffset, final int length);
 
   //Atomic Methods XXX
   /**
@@ -368,7 +369,7 @@ public abstract class WritableMemory extends Memory {
    * @return the backing ByteBuffer if it exists, otherwise returns null.
    */
   public abstract ByteBuffer getByteBuffer();
-  
+
   /**
    * Clears all bytes of this Memory to zero
    */

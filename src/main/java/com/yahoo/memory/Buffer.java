@@ -12,7 +12,9 @@ import java.nio.ByteOrder;
  * Provides read-only, positional primitive and primitive array methods to any of the four resources
  * mentioned in the package level documentation.
  *
+ * @author Roman Leventov
  * @author Lee Rhodes
+ *
  * @see com.yahoo.memory
  */
 public abstract class Buffer extends BaseBuffer {
@@ -48,7 +50,7 @@ public abstract class Buffer extends BaseBuffer {
 
   /**
    * Returns a read only region of this Buffer starting at position ending at end.
-   * The region start and position will be zero, the region end and capacity will be this buffer's end 
+   * The region start and position will be zero, the region end and capacity will be this buffer's end
    * minus position.
    * @return a read only region of this Buffer.
    */
@@ -142,7 +144,7 @@ public abstract class Buffer extends BaseBuffer {
   public abstract boolean getBoolean();
 
   /**
-   * Gets the boolean array at the current position. Increments the position by 
+   * Gets the boolean array at the current position. Increments the position by
    * <i>Boolean.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
@@ -157,7 +159,7 @@ public abstract class Buffer extends BaseBuffer {
   public abstract byte getByte();
 
   /**
-   * Gets the byte array at the current position. Increments the position by 
+   * Gets the byte array at the current position. Increments the position by
    * <i>Byte.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
@@ -172,7 +174,7 @@ public abstract class Buffer extends BaseBuffer {
   public abstract char getChar();
 
   /**
-   * Gets the char array at the current position. Increments the position by 
+   * Gets the char array at the current position. Increments the position by
    * <i>Char.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
@@ -187,7 +189,7 @@ public abstract class Buffer extends BaseBuffer {
   public abstract double getDouble();
 
   /**
-   * Gets the double array at the current position. Increments the position by 
+   * Gets the double array at the current position. Increments the position by
    * <i>Double.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
@@ -202,7 +204,7 @@ public abstract class Buffer extends BaseBuffer {
   public abstract float getFloat();
 
   /**
-   * Gets the float array at the current position. Increments the position by 
+   * Gets the float array at the current position. Increments the position by
    * <i>Float.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
@@ -217,7 +219,7 @@ public abstract class Buffer extends BaseBuffer {
   public abstract int getInt();
 
   /**
-   * Gets the int array at the current position. Increments the position by 
+   * Gets the int array at the current position. Increments the position by
    * <i>Int.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
@@ -232,7 +234,7 @@ public abstract class Buffer extends BaseBuffer {
   public abstract long getLong();
 
   /**
-   * Gets the long array at the current position. Increments the position by 
+   * Gets the long array at the current position. Increments the position by
    * <i>Long.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
@@ -247,7 +249,7 @@ public abstract class Buffer extends BaseBuffer {
   public abstract short getShort();
 
   /**
-   * Gets the short array at the current position. Increments the position by 
+   * Gets the short array at the current position. Increments the position by
    * <i>Short.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
@@ -270,7 +272,7 @@ public abstract class Buffer extends BaseBuffer {
    * @return <i>(this &lt; that) ? -1 : (this &gt; that) ? 1 : 0;</i>
    */
   public abstract int compareTo(long thisOffsetBytes, long thisLengthBytes, Buffer that,
-      long thatOffsetBytes, long thatLengthBytes);
+          long thatOffsetBytes, long thatLengthBytes);
 
   //OTHER READ METHODS XXX
   /**
@@ -291,7 +293,7 @@ public abstract class Buffer extends BaseBuffer {
    * @return the ByteOrder for the backing resource.
    */
   public abstract ByteOrder getResourceOrder();
-  
+
   /**
    * Returns true if this Buffer is backed by an on-heap primitive array
    * @return true if this Buffer is backed by an on-heap primitive array
@@ -327,7 +329,7 @@ public abstract class Buffer extends BaseBuffer {
    * @return true if bytes need to be swapped based on resource ByteOrder.
    */
   public abstract boolean swapBytes();
-  
+
   /**
    * Returns a formatted hex string of a range of this Buffer.
    * Used primarily for testing.

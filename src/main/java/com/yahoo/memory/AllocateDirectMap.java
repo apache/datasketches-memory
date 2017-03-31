@@ -30,8 +30,9 @@ import sun.nio.ch.FileChannelImpl;
  * Allocates direct memory used to memory map files for read operations.
  * (including those &gt; 2GB).
  *
- * @author Praveenkumar Venkatesan
+ * @author Roman Leventov
  * @author Lee Rhodes
+ * @author Praveenkumar Venkatesan
  */
 class AllocateDirectMap implements Map {
   final ResourceState state;
@@ -39,7 +40,7 @@ class AllocateDirectMap implements Map {
 
   AllocateDirectMap(final ResourceState state) {
     this.state = state;
-    this.cleaner = Cleaner.create(this, new Deallocator(state));
+    cleaner = Cleaner.create(this, new Deallocator(state));
     ResourceState.currentDirectMemoryMapAllocations_.incrementAndGet();
     ResourceState.currentDirectMemoryMapAllocated_.addAndGet(state.getCapacity());
   }
@@ -63,8 +64,8 @@ class AllocateDirectMap implements Map {
     madvise();
     // Read a byte from each page to bring it into memory.
     final int ps = unsafe.pageSize();
-    final int count = pageCount(ps, this.state.getCapacity());
-    long nativeBaseOffset = this.state.getNativeBaseOffset();
+    final int count = pageCount(ps, state.getCapacity());
+    long nativeBaseOffset = state.getNativeBaseOffset();
     for (int i = 0; i < count; i++) {
       unsafe.getByte(nativeBaseOffset);
       nativeBaseOffset += ps;
@@ -74,18 +75,18 @@ class AllocateDirectMap implements Map {
   @Override
   public boolean isLoaded() {
     final int ps = unsafe.pageSize();
-    final long nativeBaseOffset = this.state.getNativeBaseOffset();
+    final long nativeBaseOffset = state.getNativeBaseOffset();
     try {
 
-      final int pageCount = pageCount(ps, this.state.getCapacity());
+      final int pageCount = pageCount(ps, state.getCapacity());
       final Method method =
-          MappedByteBuffer.class.getDeclaredMethod("isLoaded0", long.class, long.class, int.class);
+              MappedByteBuffer.class.getDeclaredMethod("isLoaded0", long.class, long.class, int.class);
       method.setAccessible(true);
-      return (boolean) method.invoke(this.state.getMappedByteBuffer(), nativeBaseOffset,
-          this.state.getCapacity(), pageCount);
+      return (boolean) method.invoke(state.getMappedByteBuffer(), nativeBaseOffset,
+              state.getCapacity(), pageCount);
     } catch (final Exception e) {
       throw new RuntimeException(
-          String.format("Encountered %s exception while loading", e.getClass()));
+              String.format("Encountered %s exception while loading", e.getClass()));
     }
   }
 
@@ -96,7 +97,7 @@ class AllocateDirectMap implements Map {
         ResourceState.currentDirectMemoryMapAllocations_.decrementAndGet();
         ResourceState.currentDirectMemoryMapAllocated_.addAndGet(-state.getCapacity());
       }
-      this.cleaner.clean(); //sets invalid
+      cleaner.clean(); //sets invalid
     } catch (final Exception e) {
       throw e;
     }
@@ -132,22 +133,22 @@ class AllocateDirectMap implements Map {
   }
 
   static final int pageCount(final int ps, final long capacity) {
-    return (int) ( (capacity == 0) ? 0 : (capacity - 1L) / ps + 1L);
+    return (int) ( (capacity == 0) ? 0 : ((capacity - 1L) / ps) + 1L);
   }
 
   static final MappedByteBuffer createDummyMbbInstance(final long nativeBaseAddress)
-      throws RuntimeException {
+          throws RuntimeException {
     try {
       final Class<?> cl = Class.forName("java.nio.DirectByteBuffer");
       final Constructor<?> ctor =
-          cl.getDeclaredConstructor(int.class, long.class, FileDescriptor.class, Runnable.class);
+              cl.getDeclaredConstructor(int.class, long.class, FileDescriptor.class, Runnable.class);
       ctor.setAccessible(true);
       final MappedByteBuffer mbb = (MappedByteBuffer) ctor.newInstance(0, // some junk capacity
-          nativeBaseAddress, null, null);
+              nativeBaseAddress, null, null);
       return mbb;
     } catch (final Exception e) {
       throw new RuntimeException(
-          "Could not create Dummy MappedByteBuffer instance: " + e.getClass());
+              "Could not create Dummy MappedByteBuffer instance: " + e.getClass());
     }
   }
 
@@ -158,11 +159,11 @@ class AllocateDirectMap implements Map {
     try {
       final Method method = MappedByteBuffer.class.getDeclaredMethod("load0", long.class, long.class);
       method.setAccessible(true);
-      method.invoke(this.state.getMappedByteBuffer(), this.state.getNativeBaseOffset(),
-          this.state.getCapacity());
+      method.invoke(state.getMappedByteBuffer(), state.getNativeBaseOffset(),
+              state.getCapacity());
     } catch (final Exception e) {
       throw new RuntimeException(
-          String.format("Encountered %s exception while loading", e.getClass()));
+              String.format("Encountered %s exception while loading", e.getClass()));
     }
   }
 
@@ -177,26 +178,26 @@ class AllocateDirectMap implements Map {
    * @throws RuntimeException Encountered an exception while mapping
    */
   static final long map(final FileChannel fileChannel, final long position, final long lengthBytes)
-      throws RuntimeException {
+          throws RuntimeException {
     final int pagePosition = (int) (position % unsafe.pageSize());
     final long mapPosition = position - pagePosition;
     final long mapSize = lengthBytes + pagePosition;
 
     try {
       final Method method =
-          FileChannelImpl.class.getDeclaredMethod("map0", int.class, long.class, long.class);
+              FileChannelImpl.class.getDeclaredMethod("map0", int.class, long.class, long.class);
       method.setAccessible(true);
       final long nativeBaseOffset = (long) method.invoke(fileChannel, 1, mapPosition, mapSize);
       return nativeBaseOffset;
     } catch (final Exception e) {
       throw new RuntimeException(
-          String.format("Encountered %s exception while mapping", e.getClass()));
+              String.format("Encountered %s exception while mapping", e.getClass()));
     }
   }
 
   private static final class Deallocator implements Runnable {
-    private RandomAccessFile myRaf;
-    private FileChannel myFc;
+    private final RandomAccessFile myRaf;
+    private final FileChannel myFc;
     //This is the only place the actual native offset is kept for use by unsafe.freeMemory();
     //It can never be modified until it is deallocated.
     private long actualNativeBaseOffset;
@@ -204,23 +205,23 @@ class AllocateDirectMap implements Map {
     private final ResourceState parentStateRef;
 
     private Deallocator(final ResourceState state) {
-      this.myRaf = state.getRandomAccessFile();
+      myRaf = state.getRandomAccessFile();
       assert (myRaf != null);
-      this.myFc = myRaf.getChannel();
-      this.actualNativeBaseOffset = state.getNativeBaseOffset();
+      myFc = myRaf.getChannel();
+      actualNativeBaseOffset = state.getNativeBaseOffset();
       assert (actualNativeBaseOffset != 0);
-      this.myCapacity = state.getCapacity();
+      myCapacity = state.getCapacity();
       assert (myCapacity != 0);
-      this.parentStateRef = state;
+      parentStateRef = state;
     }
 
     @Override
     public void run() {
-      if (this.myFc != null) {
+      if (myFc != null) {
         unmap();
       }
-      this.actualNativeBaseOffset = 0L;
-      this.parentStateRef.setInvalid(); //The only place valid is set invalid.
+      actualNativeBaseOffset = 0L;
+      parentStateRef.setInvalid(); //The only place valid is set invalid.
     }
 
     /**
@@ -230,11 +231,11 @@ class AllocateDirectMap implements Map {
       try {
         final Method method = FileChannelImpl.class.getDeclaredMethod("unmap0", long.class, long.class);
         method.setAccessible(true);
-        method.invoke(this.myFc, this.actualNativeBaseOffset, this.myCapacity);
-        this.myRaf.close();
+        method.invoke(myFc, actualNativeBaseOffset, myCapacity);
+        myRaf.close();
       } catch (final Exception e) {
         throw new RuntimeException(
-            String.format("Encountered %s exception while freeing memory", e.getClass()));
+                String.format("Encountered %s exception while freeing memory", e.getClass()));
       }
     }
   } //End of class Deallocator
@@ -242,8 +243,8 @@ class AllocateDirectMap implements Map {
   static final void checkOffsetAndCapacity(final long offset, final long capacity) {
     if (((offset) | (capacity - 1L) | (offset + capacity)) < 0) {
       throw new IllegalArgumentException(
-          "offset: " + offset + ", capacity: " + capacity
-          + ", offset + capacity: " + (offset + capacity));
+              "offset: " + offset + ", capacity: " + capacity
+              + ", offset + capacity: " + (offset + capacity));
     }
   }
 

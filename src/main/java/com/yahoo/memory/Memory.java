@@ -17,7 +17,9 @@ import java.nio.ByteOrder;
  * Provides read-only primitive and primitive array methods to any of the four resources
  * mentioned in the package level documentation.
  *
+ * @author Roman Leventov
  * @author Lee Rhodes
+ *
  * @see com.yahoo.memory
  */
 public abstract class Memory {
@@ -57,9 +59,9 @@ public abstract class Memory {
    * @return MemoryMapHandler for managing this map
    * @throws Exception file not found or RuntimeException, etc.
    */
-  public static MemoryMapHandler map(final File file, final long fileOffset, final long capacity, 
+  public static MemoryMapHandler map(final File file, final long fileOffset, final long capacity,
           final ByteOrder byteOrder)
-      throws Exception {
+                  throws Exception {
     final ResourceState state = new ResourceState();
     state.putFile(file);
     state.putFileOffset(fileOffset);
@@ -179,7 +181,7 @@ public abstract class Memory {
    * @param length number of array units to transfer
    */
   public abstract void getBooleanArray(long offsetBytes, boolean[] dstArray, int dstOffset,
-      int length);
+          int length);
 
   /**
    * Gets the byte value at the given offset
@@ -196,7 +198,7 @@ public abstract class Memory {
    * @param length number of array units to transfer
    */
   public abstract void getByteArray(long offsetBytes, byte[] dstArray, int dstOffset,
-      int length);
+          int length);
 
   /**
    * Gets the char value at the given offset
@@ -213,7 +215,7 @@ public abstract class Memory {
    * @param length number of array units to transfer
    */
   public abstract void getCharArray(long offsetBytes, char[] dstArray, int dstOffset,
-      int length);
+          int length);
 
   /**
    * Gets the double value at the given offset
@@ -230,7 +232,7 @@ public abstract class Memory {
    * @param length number of array units to transfer
    */
   public abstract void getDoubleArray(long offsetBytes, double[] dstArray, int dstOffset,
-      int length);
+          int length);
 
   /**
    * Gets the float value at the given offset
@@ -247,7 +249,7 @@ public abstract class Memory {
    * @param length number of array units to transfer
    */
   public abstract void getFloatArray(long offsetBytes, float[] dstArray, int dstOffset,
-      int length);
+          int length);
 
   /**
    * Gets the int value at the given offset
@@ -264,7 +266,7 @@ public abstract class Memory {
    * @param length number of array units to transfer
    */
   public abstract void getIntArray(long offsetBytes, int[] dstArray, int dstOffset,
-      int length);
+          int length);
 
   /**
    * Gets the long value at the given offset
@@ -297,7 +299,7 @@ public abstract class Memory {
    * @param length number of array units to transfer
    */
   public abstract void getShortArray(long offsetBytes, short[] dstArray, int dstOffset,
-      int length);
+          int length);
 
   //OTHER PRIMITIVE READ METHODS: copyTo, compareTo XXX
   /**
@@ -313,7 +315,7 @@ public abstract class Memory {
    * @return <i>(this &lt; that) ? -1 : (this &gt; that) ? 1 : 0;</i>
    */
   public abstract int compareTo(long thisOffsetBytes, long thisLengthBytes, Memory that,
-      long thatOffsetBytes, long thatLengthBytes);
+          long thatOffsetBytes, long thatLengthBytes);
 
   /**
    * Copies bytes from a source range of this Memory to a destination range of the given Memory
@@ -325,7 +327,7 @@ public abstract class Memory {
    * @param lengthBytes the number of bytes to copy
    */
   public abstract void copyTo(long srcOffsetBytes, WritableMemory destination, long dstOffsetBytes,
-      long lengthBytes);
+          long lengthBytes);
 
   //OTHER READ METHODS XXX
   /**
@@ -347,7 +349,7 @@ public abstract class Memory {
    * @return the ByteOrder for the backing resource.
    */
   public abstract ByteOrder getResourceOrder();
-  
+
   /**
    * Returns true if this Memory is backed by an on-heap primitive array
    * @return true if this Memory is backed by an on-heap primitive array
@@ -383,7 +385,7 @@ public abstract class Memory {
    * @return true if bytes need to be swapped based on resource ByteOrder.
    */
   public abstract boolean swapBytes();
-  
+
   /**
    * Returns a formatted hex string of a range of this Memory.
    * Used primarily for testing.
@@ -404,18 +406,18 @@ public abstract class Memory {
    * @return a formatted hex string in a human readable array
    */
   static String toHex(final String preamble, final long offsetBytes, final int lengthBytes,
-      final ResourceState state) {
+          final ResourceState state) {
     assertBounds(offsetBytes, lengthBytes, state.getCapacity());
     final StringBuilder sb = new StringBuilder();
     final Object uObj = state.getUnsafeObject();
     final String uObjStr = (uObj == null) ? "null"
-        : uObj.getClass().getSimpleName() + ", " + (uObj.hashCode() & 0XFFFFFFFFL);
+            : uObj.getClass().getSimpleName() + ", " + (uObj.hashCode() & 0XFFFFFFFFL);
     final ByteBuffer bb = state.getByteBuffer();
     final String bbStr = (bb == null) ? "null"
-        : bb.getClass().getSimpleName() + ", " + (bb.hashCode() & 0XFFFFFFFFL);
+            : bb.getClass().getSimpleName() + ", " + (bb.hashCode() & 0XFFFFFFFFL);
     final MemoryRequest memReq = state.getMemoryRequest();
     final String memReqStr = (memReq == null) ? "null"
-        : memReq.getClass().getSimpleName() + ", " + (memReq.hashCode() & 0XFFFFFFFFL);
+            : memReq.getClass().getSimpleName() + ", " + (memReq.hashCode() & 0XFFFFFFFFL);
     final long cumBaseOffset = state.getCumBaseOffset();
     sb.append(preamble).append(LS);
     sb.append("NativeBaseOffset    : ").append(state.getNativeBaseOffset()).append(LS);
@@ -453,7 +455,7 @@ public abstract class Memory {
   public static long getCurrentDirectMemoryAllocations() {
     return ResourceState.currentDirectMemoryAllocations_.get();
   }
-  
+
   /**
    * Gets the current size of active direct memory allocated.
    * @return the current size of active direct memory allocated.
@@ -469,7 +471,7 @@ public abstract class Memory {
   public static long getCurrentDirectMemoryMapAllocations() {
     return ResourceState.currentDirectMemoryMapAllocations_.get();
   }
-  
+
   /**
    * Gets the current size of active direct memory map allocated.
    * @return the current size of active direct memory map allocated.
@@ -477,5 +479,5 @@ public abstract class Memory {
   public static long getCurrentDirectMemoryMapAllocated() {
     return ResourceState.currentDirectMemoryMapAllocated_.get();
   }
-  
+
 }

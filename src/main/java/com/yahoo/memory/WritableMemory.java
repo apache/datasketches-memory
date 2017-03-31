@@ -368,6 +368,7 @@ public abstract class WritableMemory extends Memory {
    * @return the backing ByteBuffer if it exists, otherwise returns null.
    */
   public abstract ByteBuffer getByteBuffer();
+  
   /**
    * Clears all bytes of this Memory to zero
    */

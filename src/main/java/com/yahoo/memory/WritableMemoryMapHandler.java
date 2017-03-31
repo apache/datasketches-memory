@@ -6,16 +6,16 @@
 package com.yahoo.memory;
 
 /**
- * Gets a WritableMemory for a writable memory-mapped file resource. It is highly recommended that this be created inside a 
- * <i>try-with-resources</i> statement.
+ * Gets a WritableMemory for a writable memory-mapped file resource. It is highly recommended
+ * that this be created inside a <i>try-with-resources</i> statement.
  * @author Lee Rhodes
  */
 //Implements combo of WritableMemory with WritableMap resource
-public class WritableMemoryMapHandler implements WritableMap {
+public final class WritableMemoryMapHandler implements WritableMap {
   AllocateDirectWritableMap dirWmap;
   WritableMemoryImpl wMem;
 
-  WritableMemoryMapHandler(final AllocateDirectWritableMap dirWmap, final WritableMemoryImpl wMem) {
+  private WritableMemoryMapHandler(final AllocateDirectWritableMap dirWmap, final WritableMemoryImpl wMem) {
     this.dirWmap = dirWmap;
     this.wMem = wMem;
   }

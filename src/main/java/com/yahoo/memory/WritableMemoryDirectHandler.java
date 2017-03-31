@@ -6,17 +6,15 @@
 package com.yahoo.memory;
 
 /**
- * Gets a WritableMemory for a writable direct memory resource. It is highly recommended that this be created inside a 
- * <i>try-with-resources</i> statement.
- * 
+ * Gets a WritableMemory for a writable direct memory resource. It is highly recommended that
+ * this be created inside a <i>try-with-resources</i> statement.
+ *
  * @author Lee Rhodes
  */
 //Implements combination of WritableMemory with writable AllocateDirect resource
-public class WritableMemoryDirectHandler implements AutoCloseable, MemoryRequest {
+public final class WritableMemoryDirectHandler implements AutoCloseable, MemoryRequest {
   AllocateDirect direct = null;
-  AllocateDirect newDirect = null;
   WritableMemory wMem = null;
-  WritableMemory newWmem = null;
 
   private WritableMemoryDirectHandler(final AllocateDirect direct, final WritableMemory wMem) {
     this.direct = direct;
@@ -32,7 +30,7 @@ public class WritableMemoryDirectHandler implements AutoCloseable, MemoryRequest
   static WritableMemoryDirectHandler allocDirect(final ResourceState state) {
     final AllocateDirect direct = AllocateDirect.allocate(state);
     final WritableMemoryImpl wMem = new WritableMemoryImpl(state);
-    WritableMemoryDirectHandler handler = new WritableMemoryDirectHandler(direct, wMem);
+    final WritableMemoryDirectHandler handler = new WritableMemoryDirectHandler(direct, wMem);
     state.putMemoryRequest(handler);
     return handler;
   }
@@ -55,7 +53,7 @@ public class WritableMemoryDirectHandler implements AutoCloseable, MemoryRequest
   //MemoryRequest
 
   @Override
-  public WritableMemory request(long capacityBytes) {
+  public WritableMemory request(final long capacityBytes) {
     return WritableMemory.allocate((int)capacityBytes); //default allocate on heap
   }
 }

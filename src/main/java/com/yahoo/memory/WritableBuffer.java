@@ -164,7 +164,8 @@ public abstract class WritableBuffer extends Buffer {
   public abstract void putBoolean(boolean value);
 
   /**
-   * Puts the boolean array at the current position. Increments the position by <i>Boolean.BYTES * (length - dstOffset)</i>.
+   * Puts the boolean array at the current position. Increments the position by 
+   * <i>Boolean.BYTES * (length - dstOffset)</i>.
    * @param srcArray The source array.
    * @param srcOffset offset in array units
    * @param length number of array units to transfer
@@ -179,7 +180,8 @@ public abstract class WritableBuffer extends Buffer {
   public abstract void putByte(byte value);
 
   /**
-   * Puts the byte array at the current position. Increments the position by <i>Byte.BYTES * (length - dstOffset)</i>.
+   * Puts the byte array at the current position. Increments the position by 
+   * <i>Byte.BYTES * (length - dstOffset)</i>.
    * @param srcArray The source array.
    * @param srcOffset offset in array units
    * @param length number of array units to transfer
@@ -194,7 +196,8 @@ public abstract class WritableBuffer extends Buffer {
   public abstract void putChar(char value);
 
   /**
-   * Puts the char array at the current position. Increments the position by <i>Char.BYTES * (length - dstOffset)</i>.
+   * Puts the char array at the current position. Increments the position by 
+   * <i>Char.BYTES * (length - dstOffset)</i>.
    * @param srcArray The source array.
    * @param srcOffset offset in array units
    * @param length number of array units to transfer
@@ -209,7 +212,8 @@ public abstract class WritableBuffer extends Buffer {
   public abstract void putDouble(double value);
 
   /**
-   * Puts the double array at the current position. Increments the position by <i>Double.BYTES * (length - dstOffset)</i>.
+   * Puts the double array at the current position. Increments the position by 
+   * <i>Double.BYTES * (length - dstOffset)</i>.
    * @param srcArray The source array.
    * @param srcOffset offset in array units
    * @param length number of array units to transfer
@@ -224,7 +228,8 @@ public abstract class WritableBuffer extends Buffer {
   public abstract void putFloat(float value);
 
   /**
-   * Puts the float array at the current position. Increments the position by <i>Float.BYTES * (length - dstOffset)</i>.
+   * Puts the float array at the current position. Increments the position by 
+   * <i>Float.BYTES * (length - dstOffset)</i>.
    * @param srcArray The source array.
    * @param srcOffset offset in array units
    * @param length number of array units to transfer
@@ -239,7 +244,8 @@ public abstract class WritableBuffer extends Buffer {
   public abstract void putInt(int value);
 
   /**
-   * Puts the int array at the current position. Increments the position by <i>Int.BYTES * (length - dstOffset)</i>.
+   * Puts the int array at the current position. Increments the position by 
+   * <i>Int.BYTES * (length - dstOffset)</i>.
    * @param srcArray The source array.
    * @param srcOffset offset in array units
    * @param length number of array units to transfer
@@ -254,7 +260,8 @@ public abstract class WritableBuffer extends Buffer {
   public abstract void putLong(long value);
 
   /**
-   * Puts the long array at the current position. Increments the position by <i>Long.BYTES * (length - dstOffset)</i>.
+   * Puts the long array at the current position. Increments the position by 
+   * <i>Long.BYTES * (length - dstOffset)</i>.
    * @param srcArray The source array.
    * @param srcOffset offset in array units
    * @param length number of array units to transfer
@@ -269,7 +276,8 @@ public abstract class WritableBuffer extends Buffer {
   public abstract void putShort(short value);
 
   /**
-   * Puts the short array at the current position. Increments the position by <i>Short.BYTES * (length - dstOffset)</i>.
+   * Puts the short array at the current position. Increments the position by 
+   * <i>Short.BYTES * (length - dstOffset)</i>.
    * @param srcArray The source array.
    * @param srcOffset offset in array units
    * @param length number of array units to transfer

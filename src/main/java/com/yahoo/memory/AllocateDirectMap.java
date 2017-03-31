@@ -5,7 +5,6 @@
 
 package com.yahoo.memory;
 
-
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 
 import java.io.File;
@@ -37,7 +36,6 @@ import sun.nio.ch.FileChannelImpl;
 class AllocateDirectMap implements Map {
   final ResourceState state;
   final Cleaner cleaner;
-
 
   AllocateDirectMap(final ResourceState state) {
     this.state = state;
@@ -106,7 +104,7 @@ class AllocateDirectMap implements Map {
 
   // Restricted methods
 
-  //does the actual mapping work
+  //Does the actual mapping work
   @SuppressWarnings("resource")
   static final ResourceState mapper(final ResourceState state) throws Exception {
     final long fileOffset = state.getFileOffset();
@@ -126,7 +124,7 @@ class AllocateDirectMap implements Map {
     final long nativeBaseOffset = map(fc, fileOffset, capacity);
     state.putNativeBaseOffset(nativeBaseOffset);
 
-    // len can be more than the file.length
+    // length can be set more than the file.length
     raf.setLength(capacity);
     final MappedByteBuffer mbb = createDummyMbbInstance(nativeBaseOffset);
     state.putMappedByteBuffer(mbb);
@@ -239,7 +237,6 @@ class AllocateDirectMap implements Map {
             String.format("Encountered %s exception while freeing memory", e.getClass()));
       }
     }
-
   } //End of class Deallocator
 
   static final void checkOffsetAndCapacity(final long offset, final long capacity) {
@@ -263,27 +260,24 @@ class AllocateDirectMap implements Map {
       // File presence is guaranteed. Ignore
       e.printStackTrace();
     }
-    if (attributes != null) {
-      // A file is read-only in Linux-derived OSes only when it has 0444 permissions.
-      // Here we are going to ignore the Owner W,E bits to allow root/owner testing.
-      final Set<PosixFilePermission> permissions = attributes.permissions();
-      int bits = 0;
-      bits |= ((permissions.contains(PosixFilePermission.OWNER_READ))     ? 1 << 8 : 0);
-      //bits |= ((permissions.contains(PosixFilePermission.OWNER_WRITE))    ? 1 << 7 : 0);
-      //bits |= ((permissions.contains(PosixFilePermission.OWNER_EXECUTE))  ? 1 << 6 : 0);
-      bits |= ((permissions.contains(PosixFilePermission.GROUP_READ))     ? 1 << 5 : 0);
-      bits |= ((permissions.contains(PosixFilePermission.GROUP_WRITE))    ? 1 << 4 : 0);
-      bits |= ((permissions.contains(PosixFilePermission.GROUP_EXECUTE))  ? 1 << 3 : 0);
-      bits |= ((permissions.contains(PosixFilePermission.OTHERS_READ))    ? 1 << 2 : 0);
-      bits |= ((permissions.contains(PosixFilePermission.OTHERS_WRITE))   ? 1 << 1 : 0);
-      bits |= ((permissions.contains(PosixFilePermission.OTHERS_EXECUTE)) ? 1      : 0);
-      //System.out.println(Util.zeroPad(Integer.toBinaryString(bits), 32));
-      //System.out.println(Util.zeroPad(Integer.toOctalString(bits), 4));
-      if (bits == 0444) {
-        return true;
-      }
-    }
-    return false;
+    if (attributes == null) { return false; }
+
+    // A file is read-only in Linux-derived OSes only when it has 0444 permissions.
+    final Set<PosixFilePermission> permissions = attributes.permissions();
+    int bits = 0;
+    bits |= ((permissions.contains(PosixFilePermission.OWNER_READ))     ? 1 << 8 : 0);
+    bits |= ((permissions.contains(PosixFilePermission.OWNER_WRITE))    ? 1 << 7 : 0);
+    bits |= ((permissions.contains(PosixFilePermission.OWNER_EXECUTE))  ? 1 << 6 : 0);
+    bits |= ((permissions.contains(PosixFilePermission.GROUP_READ))     ? 1 << 5 : 0);
+    bits |= ((permissions.contains(PosixFilePermission.GROUP_WRITE))    ? 1 << 4 : 0);
+    bits |= ((permissions.contains(PosixFilePermission.GROUP_EXECUTE))  ? 1 << 3 : 0);
+    bits |= ((permissions.contains(PosixFilePermission.OTHERS_READ))    ? 1 << 2 : 0);
+    bits |= ((permissions.contains(PosixFilePermission.OTHERS_WRITE))   ? 1 << 1 : 0);
+    bits |= ((permissions.contains(PosixFilePermission.OTHERS_EXECUTE)) ? 1      : 0);
+    //System.out.println(Util.zeroPad(Integer.toBinaryString(bits), 32));
+    //System.out.println(Util.zeroPad(Integer.toOctalString(bits), 4));
+    // Here we are going to ignore the Owner Write & Execute bits to allow root/owner testing.
+    return ((bits & 0477) == 0444);
   }
 
 }

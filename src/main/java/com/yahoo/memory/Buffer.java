@@ -48,7 +48,8 @@ public abstract class Buffer extends BaseBuffer {
 
   /**
    * Returns a read only region of this Buffer starting at position ending at end.
-   * The region start and position will be zero, the region end and capacity will be this buffer's end minus position.
+   * The region start and position will be zero, the region end and capacity will be this buffer's end 
+   * minus position.
    * @return a read only region of this Buffer.
    */
   public abstract Buffer region();
@@ -141,7 +142,8 @@ public abstract class Buffer extends BaseBuffer {
   public abstract boolean getBoolean();
 
   /**
-   * Gets the boolean array at the current position. Increments the position by <i>Boolean.BYTES * (length - dstOffset)</i>.
+   * Gets the boolean array at the current position. Increments the position by 
+   * <i>Boolean.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
    * @param length number of array units to transfer
@@ -155,7 +157,8 @@ public abstract class Buffer extends BaseBuffer {
   public abstract byte getByte();
 
   /**
-   * Gets the byte array at the current position. Increments the position by <i>Byte.BYTES * (length - dstOffset)</i>.
+   * Gets the byte array at the current position. Increments the position by 
+   * <i>Byte.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
    * @param length number of array units to transfer
@@ -169,7 +172,8 @@ public abstract class Buffer extends BaseBuffer {
   public abstract char getChar();
 
   /**
-   * Gets the char array at the current position. Increments the position by <i>Char.BYTES * (length - dstOffset)</i>.
+   * Gets the char array at the current position. Increments the position by 
+   * <i>Char.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
    * @param length number of array units to transfer
@@ -183,7 +187,8 @@ public abstract class Buffer extends BaseBuffer {
   public abstract double getDouble();
 
   /**
-   * Gets the double array at the current position. Increments the position by <i>Double.BYTES * (length - dstOffset)</i>.
+   * Gets the double array at the current position. Increments the position by 
+   * <i>Double.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
    * @param length number of array units to transfer
@@ -197,7 +202,8 @@ public abstract class Buffer extends BaseBuffer {
   public abstract float getFloat();
 
   /**
-   * Gets the float array at the current position. Increments the position by <i>Float.BYTES * (length - dstOffset)</i>.
+   * Gets the float array at the current position. Increments the position by 
+   * <i>Float.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
    * @param length number of array units to transfer
@@ -211,7 +217,8 @@ public abstract class Buffer extends BaseBuffer {
   public abstract int getInt();
 
   /**
-   * Gets the int array at the current position. Increments the position by <i>Int.BYTES * (length - dstOffset)</i>.
+   * Gets the int array at the current position. Increments the position by 
+   * <i>Int.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
    * @param length number of array units to transfer
@@ -225,7 +232,8 @@ public abstract class Buffer extends BaseBuffer {
   public abstract long getLong();
 
   /**
-   * Gets the long array at the current position. Increments the position by <i>Long.BYTES * (length - dstOffset)</i>.
+   * Gets the long array at the current position. Increments the position by 
+   * <i>Long.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
    * @param length number of array units to transfer
@@ -239,7 +247,8 @@ public abstract class Buffer extends BaseBuffer {
   public abstract short getShort();
 
   /**
-   * Gets the short array at the current position. Increments the position by <i>Short.BYTES * (length - dstOffset)</i>.
+   * Gets the short array at the current position. Increments the position by 
+   * <i>Short.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
    * @param length number of array units to transfer

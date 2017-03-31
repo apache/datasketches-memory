@@ -57,7 +57,8 @@ public abstract class Memory {
    * @return MemoryMapHandler for managing this map
    * @throws Exception file not found or RuntimeException, etc.
    */
-  public static MemoryMapHandler map(final File file, final long fileOffset, final long capacity, final ByteOrder byteOrder)
+  public static MemoryMapHandler map(final File file, final long fileOffset, final long capacity, 
+          final ByteOrder byteOrder)
       throws Exception {
     final ResourceState state = new ResourceState();
     state.putFile(file);

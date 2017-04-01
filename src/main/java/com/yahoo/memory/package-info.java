@@ -46,7 +46,7 @@
  *     WritableMemory wMem = handler.get();
  *     doWork(wMem) // read and write to memory mapped file.
  *     handler.close();
- * }
+ * }</pre>
  *
  * Where it is desirable to pass ownership of the resource (and the {@code close()} responsibility)
  * one can not use the TWR block. Instead:<pre>{@code

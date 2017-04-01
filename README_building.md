@@ -3,7 +3,7 @@ Use Apache Maven 3.0 to build this project
 
 ### Compiling and JDK7 vs JDK8
 The internal com.yahoo.sketches.memory (Memory) repository leverages new API methods introduced with JDK8. 
-The Memory package detects the JDK verion, and if it is not JDK8, replaces these
+The Memory package detects the JDK version, and if it is not JDK8, replaces these
 JDK8 methods with surrogates using JDK7, which will be slower. 
  
 In order for this to work, this library must be compiled using jdk8 

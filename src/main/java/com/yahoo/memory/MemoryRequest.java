@@ -21,4 +21,9 @@ public interface MemoryRequest {
    */
   WritableMemory request(long capacityBytes);
 
+  /**
+   * Request close of the AutoCloseable resource.
+   */
+  void requestClose();
+
 }

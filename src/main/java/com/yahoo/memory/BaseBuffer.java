@@ -13,7 +13,8 @@ import java.nio.ByteBuffer;
  * <li>Eliminated "mark". Rarely used and confusing with its silent side effects.</li>
  * <li>The invariants are 0 <= start <= position <= end <= capacity.</li>
  * <li>It always starts up as (0, 0, capacity, capacity).</li>
- * <li>You set (start, position, end) in one call with {@link #setStartPositionEnd(long, long, long)}</li>
+ * <li>You set (start, position, end) in one call with
+ * {@link #setStartPositionEnd(long, long, long)}</li>
  * <li>Added incrementPosition(long), which is much easier when you know the increment.</li>
  * <li>This approach eliminated a number of methods and checks, and has no unseen side effects,
  * e.g., mark being invalidated.</li>
@@ -26,25 +27,25 @@ class BaseBuffer {
   private long start;
   private long pos;
   private long end;
-  private long cap;
+  private final long cap;
 
   BaseBuffer(final ResourceState state) {
-    this.cap = state.getCapacity();
+    cap = state.getCapacity();
     final BaseBuffer baseBuf = state.getBaseBuffer();
     if (baseBuf != null) {
-      this.start = baseBuf.getStart();
-      this.pos = baseBuf.getPosition();
-      this.end = baseBuf.getEnd();
+      start = baseBuf.getStart();
+      pos = baseBuf.getPosition();
+      end = baseBuf.getEnd();
     } else {
       final ByteBuffer byteBuf = state.getByteBuffer();
       if (byteBuf != null) {
-        this.pos = byteBuf.position();
-        this.end = byteBuf.limit();
+        pos = byteBuf.position();
+        end = byteBuf.limit();
       } else {
-        this.pos = 0;
-        this.end = this.cap;
+        pos = 0;
+        end = cap;
       }
-      this.start = 0;
+      start = 0;
     }
     state.putBaseBuffer(this);
   }
@@ -52,15 +53,15 @@ class BaseBuffer {
   /**
    * Sets start, position, and end
    * @param start the start position in the buffer
-   * @param position the position bewteen start and end
+   * @param position the position between start and end
    * @param end the end position in the buffer
    * @return BaseBuffer
    */
-  BaseBuffer setStartPositionEnd(final long start, final long position, final long end) {
-    assertInvariants(start, position, end, this.cap);
+  public BaseBuffer setStartPositionEnd(final long start, final long position, final long end) {
+    assertInvariants(start, position, end, cap);
     this.start = start;
     this.end = end;
-    this.pos = position;
+    pos = position;
     return this;
   }
 
@@ -69,7 +70,7 @@ class BaseBuffer {
    * @return start
    */
   long getStart() {
-    return this.start;
+    return start;
   }
 
   /**
@@ -77,7 +78,7 @@ class BaseBuffer {
    * @return the current position
    */
   long getPosition() {
-    return this.pos;
+    return pos;
   }
 
   /**
@@ -85,7 +86,7 @@ class BaseBuffer {
    * @return end
    */
   long getEnd() {
-    return this.end;
+    return end;
   }
 
   /**
@@ -94,8 +95,8 @@ class BaseBuffer {
    * @return BaseBuffer
    */
   BaseBuffer setPosition(final long position) {
-    assertInvariants(this.start, position, this.end, this.cap);
-    this.pos = position;
+    assertInvariants(start, position, end, cap);
+    pos = position;
     return this;
   }
 
@@ -105,8 +106,8 @@ class BaseBuffer {
    * @return BaseBuffer
    */
   BaseBuffer incrementPosition(final long increment) {
-    assertInvariants(this.start, this.pos + increment, this.end, this.cap);
-    this.pos += increment;
+    assertInvariants(start, pos + increment, end, cap);
+    pos += increment;
     return this;
   }
 
@@ -116,7 +117,7 @@ class BaseBuffer {
    * @return BaseBuffer
    */
   BaseBuffer resetPosition() {
-    this.pos = this.start;
+    pos = start;
     return this;
   }
 
@@ -125,7 +126,7 @@ class BaseBuffer {
    * @return (end - position)
    */
   long getRemaining()  {
-    return this.end - this.pos;
+    return end - pos;
   }
 
   /**
@@ -133,7 +134,7 @@ class BaseBuffer {
    * @return (end - position) > 0
    */
   boolean hasRemaining() {
-    return (this.end - this.pos) > 0;
+    return (end - pos) > 0;
   }
 
   static final void assertInvariants(final long start, final long pos, final long end,

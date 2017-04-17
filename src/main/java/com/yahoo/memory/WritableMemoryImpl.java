@@ -661,6 +661,11 @@ class WritableMemoryImpl extends WritableMemory {
     return state.getMemoryRequest();
   }
 
+  @Override
+  public void setMemoryRequest(final MemoryRequest memReq) {
+    state.setMemoryRequest(memReq);
+  }
+
   //RESTRICTED READ AND WRITE XXX
   private final void checkValid() { //applies to both readable and writable
     assert state.isValid() : "Memory not valid.";

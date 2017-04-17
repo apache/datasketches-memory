@@ -417,4 +417,10 @@ public abstract class WritableMemory extends Memory {
    */
   public abstract MemoryRequest getMemoryRequest();
 
+  /**
+   * Sets a MemoryRequest for this WritableMemory
+   * @param memReq the given MemoryRequest
+   */
+  public abstract void setMemoryRequest(MemoryRequest memReq);
+
 }

@@ -15,18 +15,18 @@ public class AllocateDirectMemoryTest {
   public void checkAllocateDirect() {
     int longs = 32;
     int bytes = longs << 3;
-    try (WritableMemoryDirectHandler wh = WritableMemory.allocateDirect(bytes)) {
+    try (WritableDirectHandler wh = WritableMemory.allocateDirect(bytes)) {
       WritableMemory wMem1 = wh.get();
       for (int i = 0; i<longs; i++) {
         wMem1.putLong(i << 3, i);
         assertEquals(wMem1.getLong(i << 3), i);
       }
       wMem1.toHexString("Test", 0, 32 * 8);
-      
+
       int longs2 = 64;
       int bytes2 = longs2 << 3;
       WritableMemory wMem2 = wMem1.getMemoryRequest().request(bytes2); //on heap
-      for (int i = 0; i<longs2; i++) { 
+      for (int i = 0; i < longs2; i++) {
           wMem2.putLong(i << 3, i);
           assertEquals(wMem2.getLong(i << 3), i);
         }

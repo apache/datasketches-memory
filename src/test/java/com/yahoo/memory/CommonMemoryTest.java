@@ -20,7 +20,7 @@ public class CommonMemoryTest {
   @Test
   public void checkSetGet() {
     int memCapacity = 16; //must be at least 8
-    try (WritableMemoryDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh.get();
       assertEquals(mem.getCapacity(), memCapacity);
       setGetTests(mem);
@@ -72,7 +72,7 @@ public class CommonMemoryTest {
   @Test
   public void checkSetGetArrays() {
     int memCapacity = 32;
-    try (WritableMemoryDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh.get();
       assertEquals(memCapacity, mem.getCapacity());
       setGetArraysTests(mem);
@@ -152,7 +152,7 @@ public class CommonMemoryTest {
   @Test
   public void checkSetGetPartialArraysWithOffset() {
     int memCapacity = 32;
-    try (WritableMemoryDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh.get();
       assertEquals(memCapacity, mem.getCapacity());
       setGetPartialArraysWithOffsetTests(mem);
@@ -229,7 +229,7 @@ public class CommonMemoryTest {
   @Test
   public void checkSetClearIsBits() {
     int memCapacity = 8;
-    try (WritableMemoryDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh.get();
       assertEquals(memCapacity, mem.getCapacity());
       mem.clear();
@@ -270,7 +270,7 @@ public class CommonMemoryTest {
   @Test
   public void checkAtomicMethods() {
     int memCapacity = 8;
-    try (WritableMemoryDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh.get();
       assertEquals(mem.getCapacity(), memCapacity);
       atomicMethodTests(mem);
@@ -297,7 +297,7 @@ public class CommonMemoryTest {
   @Test
   public void checkSetClearMemoryRegions() {
     int memCapacity = 64; //must be 64
-    try (WritableMemoryDirectHandler wrh1 = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableDirectHandler wrh1 = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh1.get();
 
       setClearMemoryRegionsTests(mem); //requires println enabled to visually check
@@ -368,7 +368,7 @@ public class CommonMemoryTest {
   @Test
   public void checkToHexStringAllMem() {
     int memCapacity = 48; //must be 48
-    try (WritableMemoryDirectHandler wrh1 = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableDirectHandler wrh1 = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh1.get();
       toHexStringAllMemTests(mem); //requires println enabled to visually check
     }

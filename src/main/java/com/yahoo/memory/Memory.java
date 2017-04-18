@@ -45,7 +45,7 @@ public abstract class Memory {
    * @return MemoryMapHandler for managing this map
    * @throws Exception file not found or RuntimeException, etc.
    */
-  public static MemoryMapHandler map(final File file) throws Exception {
+  public static MapHandler map(final File file) throws Exception {
     return map(file, 0, file.length(), ByteOrder.nativeOrder());
   }
 
@@ -59,7 +59,7 @@ public abstract class Memory {
    * @return MemoryMapHandler for managing this map
    * @throws Exception file not found or RuntimeException, etc.
    */
-  public static MemoryMapHandler map(final File file, final long fileOffset, final long capacity,
+  public static MapHandler map(final File file, final long fileOffset, final long capacity,
           final ByteOrder byteOrder)
                   throws Exception {
     final ResourceState state = new ResourceState();
@@ -67,7 +67,7 @@ public abstract class Memory {
     state.putFileOffset(fileOffset);
     state.putCapacity(capacity);
     state.order(byteOrder);
-    return MemoryMapHandler.map(state);
+    return MapHandler.map(state);
   }
 
   //REGIONS/DUPLICATES XXX

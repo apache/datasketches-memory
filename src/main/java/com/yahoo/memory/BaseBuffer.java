@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
  * A new positional API. This is different from and simpler than Java Buffer positional approach.
  * <ul><li>All based on longs instead of ints.</li>
  * <li>Eliminated "mark". Rarely used and confusing with its silent side effects.</li>
- * <li>The invariants are 0 <= start <= position <= end <= capacity.</li>
+ * <li>The invariants are {@code 0 <= start <= position <= end <= capacity}.</li>
  * <li>It always starts up as (0, 0, capacity, capacity).</li>
  * <li>You set (start, position, end) in one call with
  * {@link #setStartPositionEnd(long, long, long)}</li>
@@ -51,9 +51,9 @@ class BaseBuffer {
   }
 
   /**
-   * Sets start, position, and end
+   * Sets start position, current position, and end position
    * @param start the start position in the buffer
-   * @param position the position between start and end
+   * @param position the current position between the start and end
    * @param end the end position in the buffer
    * @return BaseBuffer
    */
@@ -66,10 +66,10 @@ class BaseBuffer {
   }
 
   /**
-   * Gets start
-   * @return start
+   * Gets start position
+   * @return start position
    */
-  long getStart() {
+  public long getStart() {
     return start;
   }
 
@@ -77,24 +77,24 @@ class BaseBuffer {
    * Gets the current position
    * @return the current position
    */
-  long getPosition() {
+  public long getPosition() {
     return pos;
   }
 
   /**
-   * Gets end
-   * @return end
+   * Gets the end position
+   * @return the end position
    */
-  long getEnd() {
+  public long getEnd() {
     return end;
   }
 
   /**
-   * Sets the position
-   * @param position the given position
+   * Sets the current position
+   * @param position the given current position
    * @return BaseBuffer
    */
-  BaseBuffer setPosition(final long position) {
+  public BaseBuffer setPosition(final long position) {
     assertInvariants(start, position, end, cap);
     pos = position;
     return this;
@@ -102,38 +102,38 @@ class BaseBuffer {
 
   /**
    * Increments the current position by the given increment
-   * @param increment the increment
+   * @param increment the given increment
    * @return BaseBuffer
    */
-  BaseBuffer incrementPosition(final long increment) {
+  public BaseBuffer incrementPosition(final long increment) {
     assertInvariants(start, pos + increment, end, cap);
     pos += increment;
     return this;
   }
 
   /**
-   * Resets the position to start,
+   * Resets the current position to the start position,
    * This does not modify any data.
    * @return BaseBuffer
    */
-  BaseBuffer resetPosition() {
+  public BaseBuffer resetPosition() {
     pos = start;
     return this;
   }
 
   /**
-   * The number of elements remaining between the pos and end
-   * @return (end - position)
+   * The number of elements remaining between the current position and the end position
+   * @return {@code (end - position)}
    */
-  long getRemaining()  {
+  public long getRemaining()  {
     return end - pos;
   }
 
   /**
-   * Returns true if there are elements remaining between the pos and end
-   * @return (end - position) > 0
+   * Returns true if there are elements remaining between the current position and the end position
+   * @return {@code (end - position) > 0}
    */
-  boolean hasRemaining() {
+  public boolean hasRemaining() {
     return (end - pos) > 0;
   }
 

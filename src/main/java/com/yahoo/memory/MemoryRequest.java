@@ -22,8 +22,11 @@ public interface MemoryRequest {
   WritableMemory request(long capacityBytes);
 
   /**
-   * Request close of the AutoCloseable resource.
+   * Request to close the AutoCloseable resource.
+   * This may be ignored depending on the implementation.
+   * @param memoryToClose the relevant WritbleMemory to be considered for closing.
+   * @param newMemory the newly allocated WritableMemory
    */
-  void requestClose();
+  void requestClose(WritableMemory memoryToClose, WritableMemory newMemory);
 
 }

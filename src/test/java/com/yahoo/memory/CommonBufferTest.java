@@ -14,7 +14,7 @@ public class CommonBufferTest {
   @Test
   public void checkSetGet() {
     int memCapacity = 60; //must be at least 60
-    try (WritableMemoryDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh.get();
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
@@ -63,7 +63,7 @@ public class CommonBufferTest {
   @Test
   public void checkSetGetArrays() {
     int memCapacity = 32;
-    try (WritableMemoryDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh.get();
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
@@ -160,7 +160,7 @@ public class CommonBufferTest {
   @Test
   public void checkSetGetPartialArraysWithOffset() {
     int memCapacity = 32;
-    try (WritableMemoryDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh.get();
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
@@ -254,7 +254,7 @@ public class CommonBufferTest {
   @Test
   public void checkSetClearMemoryRegions() {
     int memCapacity = 64; //must be 64
-    try (WritableMemoryDirectHandler wrh1 = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableDirectHandler wrh1 = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh1.get();
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
@@ -343,7 +343,7 @@ public class CommonBufferTest {
   @Test
   public void checkToHexStringAllMem() {
     int memCapacity = 48; //must be 48
-    try (WritableMemoryDirectHandler wrh1 = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableDirectHandler wrh1 = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh1.get();
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);

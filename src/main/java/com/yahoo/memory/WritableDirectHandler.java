@@ -14,12 +14,12 @@ package com.yahoo.memory;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-//Implements combination of WritableMemory with writable AllocateDirect resource
-public class WritableMemoryDirectHandler implements AutoCloseable, MemoryRequest {
+//Joins a WritableHandler with writable, AutoCloseable AllocateDirect resource
+public class WritableDirectHandler implements AutoCloseable, MemoryRequest, WritableHandler {
   AllocateDirect direct = null;
   WritableMemory wMem = null;
 
-  WritableMemoryDirectHandler(final AllocateDirect direct, final WritableMemory wMem) {
+  protected WritableDirectHandler(final AllocateDirect direct, final WritableMemory wMem) {
     this.direct = direct;
     this.wMem = wMem;
   }
@@ -27,21 +27,18 @@ public class WritableMemoryDirectHandler implements AutoCloseable, MemoryRequest
   /**
    * Factory method used for the allocation of a direct resource passing the given ResourceState
    * @param state the given ResourceState
-   * @return WritableMemroyDirectHandler
+   * @return WritableDirectHandler
    */
   @SuppressWarnings("resource")
-  static WritableMemoryDirectHandler allocDirect(final ResourceState state) {
+  static WritableDirectHandler allocDirect(final ResourceState state) {
     final AllocateDirect direct = AllocateDirect.allocate(state);
     final WritableMemoryImpl wMem = new WritableMemoryImpl(state);
-    final WritableMemoryDirectHandler handler = new WritableMemoryDirectHandler(direct, wMem);
+    final WritableDirectHandler handler = new WritableDirectHandler(direct, wMem);
     state.setMemoryRequest(handler);
     return handler;
   }
 
-  /**
-   * Return a WritableMemory for direct memory write operations
-   * @return a WritableMemory for direct memory write operations
-   */
+  @Override
   public WritableMemory get() {
     return wMem;
   }
@@ -50,22 +47,24 @@ public class WritableMemoryDirectHandler implements AutoCloseable, MemoryRequest
 
   @Override
   public void close() {
-    direct.close();
+    if ((direct != null) && (direct.state.isValid())) {
+      direct.close();
+      direct = null;
+    }
   }
 
   //MemoryRequest
 
   @Override
   public WritableMemory request(final long capacityBytes) {
-    final WritableMemory mem = WritableMemory.allocate((int)capacityBytes); //default allocate on heap
-    mem.setMemoryRequest(this);
-    return mem;
+    final WritableMemory wmem = WritableMemory.allocate((int)capacityBytes); //default allocate on heap
+    wMem = wmem;
+    wmem.setMemoryRequest(this);
+    return wmem;
   }
 
   @Override
-  public void requestClose() {
-    if (direct.state.isValid()) {
-      close();
-    }
+  public void requestClose(final WritableMemory memoryToClose, final WritableMemory newMemory) {
+    direct.close();
   }
 }

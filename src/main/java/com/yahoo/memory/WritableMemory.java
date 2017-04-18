@@ -42,7 +42,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemoryMapHandler for managing this map
    * @throws Exception file not found or RuntimeException, etc.
    */
-  public static WritableMemoryMapHandler writableMap(final File file) throws Exception {
+  public static WritableMapHandler writableMap(final File file) throws Exception {
     return writableMap(file, 0, file.length(), ByteOrder.nativeOrder());
   }
 
@@ -56,14 +56,14 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemoryMapHandler for managing this map
    * @throws Exception file not found or RuntimeException, etc.
    */
-  public static WritableMemoryMapHandler writableMap(final File file, final long fileOffset,
+  public static WritableMapHandler writableMap(final File file, final long fileOffset,
           final long capacity, final ByteOrder byteOrder) throws Exception {
     final ResourceState state = new ResourceState();
     state.putFile(file);
     state.putFileOffset(fileOffset);
     state.putCapacity(capacity);
     state.order(byteOrder);
-    return WritableMemoryMapHandler.map(state);
+    return WritableMapHandler.map(state);
   }
 
   //ALLOCATE DIRECT XXX
@@ -79,10 +79,10 @@ public abstract class WritableMemory extends Memory {
    * @param capacityBytes the size of the desired memory in bytes
    * @return WritableMemoryMapHandler for managing this off-heap resource
    */
-  public static WritableMemoryDirectHandler allocateDirect(final long capacityBytes) {
+  public static WritableDirectHandler allocateDirect(final long capacityBytes) {
     final ResourceState state = new ResourceState();
     state.putCapacity(capacityBytes);
-    return WritableMemoryDirectHandler.allocDirect(state);
+    return WritableDirectHandler.allocDirect(state);
   }
 
   //REGIONS/DUPLICATES XXX

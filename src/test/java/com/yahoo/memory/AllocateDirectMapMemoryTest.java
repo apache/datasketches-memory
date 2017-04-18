@@ -17,12 +17,12 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 public class AllocateDirectMapMemoryTest {
-  MemoryMapHandler hand = null;
+  MapHandler hand = null;
 
   @Test
   public void simpleMap() throws Exception {
     File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
-    try (MemoryMapHandler rh = Memory.map(file)) {
+    try (MapHandler rh = Memory.map(file)) {
       rh.close();
     }
   }
@@ -30,19 +30,19 @@ public class AllocateDirectMapMemoryTest {
   @Test
   public void testIllegalArguments() throws Exception {
     File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
-    try (MemoryMapHandler rh = Memory.map(file, -1, Integer.MAX_VALUE, ByteOrder.nativeOrder())) {
+    try (MapHandler rh = Memory.map(file, -1, Integer.MAX_VALUE, ByteOrder.nativeOrder())) {
       fail("Failed: testIllegalArgumentException: Position was negative.");
     } catch (IllegalArgumentException e) {
       //ok
     }
 
-    try (MemoryMapHandler rh = Memory.map(file, 0, -1, ByteOrder.nativeOrder())) {
+    try (MapHandler rh = Memory.map(file, 0, -1, ByteOrder.nativeOrder())) {
       fail("Failed: testIllegalArgumentException: Size was negative.");
     } catch (IllegalArgumentException e) {
       //ok
     }
 
-    try (MemoryMapHandler rh = Memory.map(file, Long.MAX_VALUE, 2, ByteOrder.nativeOrder())) {
+    try (MapHandler rh = Memory.map(file, Long.MAX_VALUE, 2, ByteOrder.nativeOrder())) {
       fail("Failed: testIllegalArgumentException: Sum of position + size is negative.");
     } catch (IllegalArgumentException e) {
       //ok
@@ -53,7 +53,7 @@ public class AllocateDirectMapMemoryTest {
   public void testMapAndMultipleClose() throws Exception {
     File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
     long memCapacity = file.length();
-    try (MemoryMapHandler rh = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
+    try (MapHandler rh = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
       Memory map = rh.get();
       assertEquals(memCapacity, map.getCapacity());
       rh.close();
@@ -69,7 +69,7 @@ public class AllocateDirectMapMemoryTest {
   public void testReadFailAfterClose() throws Exception {
     File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
     long memCapacity = file.length();
-    try (MemoryMapHandler rh = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
+    try (MapHandler rh = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
       Memory mmf = rh.get();
       rh.close();
       mmf.getByte(0);
@@ -82,7 +82,7 @@ public class AllocateDirectMapMemoryTest {
   public void testLoad() throws Exception {
     File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
     long memCapacity = file.length();
-    try (MemoryMapHandler rh = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
+    try (MapHandler rh = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
       rh.load();
       assertTrue(rh.isLoaded());
       rh.close();
@@ -93,7 +93,7 @@ public class AllocateDirectMapMemoryTest {
   public void testHandlerHandoffWithTWR() throws Exception {
     File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
     long memCapacity = file.length();
-    try (MemoryMapHandler rh = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
+    try (MapHandler rh = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
       rh.load();
       assertTrue(rh.isLoaded());
       hand = rh;
@@ -107,7 +107,7 @@ public class AllocateDirectMapMemoryTest {
   public void testHandoffWithoutClose() throws Exception {
     File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
     long memCapacity = file.length();
-    MemoryMapHandler rh = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder());
+    MapHandler rh = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder());
     rh.load();
     assertTrue(rh.isLoaded());
     hand = rh;

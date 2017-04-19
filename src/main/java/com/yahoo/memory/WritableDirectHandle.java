@@ -1,0 +1,49 @@
+/*
+ * Copyright 2017, Yahoo! Inc. Licensed under the terms of the
+ * Apache License 2.0. See LICENSE file at the project root for terms.
+ */
+
+package com.yahoo.memory;
+
+/**
+ * Gets a WritableMemory for a writable direct memory resource. It is highly recommended that
+ * this be created inside a <i>try-with-resources</i> statement. This implements a very simple
+ * MemoryRequest management function that just allocates any request onto the heap. This class can
+ * be overridden if more sophisticated memory management is required.
+ *
+ * @author Roman Leventov
+ * @author Lee Rhodes
+ */
+//Joins a WritableHandler with writable, AutoCloseable AllocateDirect resource
+public class WritableDirectHandle implements AutoCloseable, WritableHandle {
+  AllocateDirect direct = null;
+  WritableMemory wMem = null;
+
+  public WritableDirectHandle(final AllocateDirect direct, final WritableMemory wMem) {
+    this.direct = direct;
+    this.wMem = wMem;
+  }
+
+  public void putWritableMemory(final WritableMemory wMem) {
+    this.wMem = wMem;
+  }
+
+  public void putResource(final AllocateDirect direct) {
+    this.direct = direct;
+  }
+
+  @Override
+  public WritableMemory get() {
+    return wMem;
+  }
+
+  //AutoCloseable
+
+  @Override
+  public void close() {
+    if ((direct != null) && (direct.state.isValid())) {
+      direct.close();
+      direct = null;
+    }
+  }
+}

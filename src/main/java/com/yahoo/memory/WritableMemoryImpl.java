@@ -656,14 +656,24 @@ class WritableMemoryImpl extends WritableMemory {
 
   //OTHER XXX
   @Override
-  public MemoryRequest getMemoryRequest() { //only applicable to writable
+  public MemoryRequestServer getMemoryRequestServer() { //only applicable to writable
     checkValid();
-    return state.getMemoryRequest();
+    return state.getMemoryRequestServer();
   }
 
   @Override
-  public void setMemoryRequest(final MemoryRequest memReq) {
-    state.setMemoryRequest(memReq);
+  public void setMemoryRequest(final MemoryRequestServer memReqSvr) {
+    state.setMemoryRequestServer(memReqSvr);
+  }
+
+  @Override
+  public WritableDirectHandle getHandle() {
+    return state.getHandle();
+  }
+
+  @Override
+  public void setHandle(final WritableDirectHandle handle) {
+    state.setHandle(handle);
   }
 
   //RESTRICTED READ AND WRITE XXX

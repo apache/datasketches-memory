@@ -45,7 +45,7 @@ public class AllocateDirectWritableMapMemoryTest {
     byte[] correctByteArr = correctStr.getBytes(UTF_8);
     long corrBytes = correctByteArr.length;
 
-    try (MapHandler rh = Memory.map(origFile, 0, origBytes, ByteOrder.nativeOrder())) {
+    try (MapHandle rh = Memory.map(origFile, 0, origBytes, ByteOrder.nativeOrder())) {
       Memory map = rh.get();
       rh.load();
       assertTrue(rh.isLoaded());

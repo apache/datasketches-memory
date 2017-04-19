@@ -77,12 +77,11 @@ public abstract class WritableMemory extends Memory {
    * and to call <i>close()</i> when done.</p>
    *
    * @param capacityBytes the size of the desired memory in bytes
-   * @return WritableMemoryMapHandler for managing this off-heap resource
+   * @return WritableMemoryMapHandler for this off-heap resource
    */
-  public static WritableDirectHandler allocateDirect(final long capacityBytes) {
-    final ResourceState state = new ResourceState();
-    state.putCapacity(capacityBytes);
-    return WritableDirectHandler.allocDirect(state);
+  public static WritableDirectHandle allocateDirect(final long capacityBytes) {
+    final MemoryManager memMgr = DefaultMemoryManager.getInstance();
+    return memMgr.allocateDirect(capacityBytes);
   }
 
   //REGIONS/DUPLICATES XXX
@@ -415,12 +414,16 @@ public abstract class WritableMemory extends Memory {
    * Returns a MemoryRequest or null
    * @return a MemoryRequest or null
    */
-  public abstract MemoryRequest getMemoryRequest();
+  public abstract MemoryRequestServer getMemoryRequestServer();
 
   /**
    * Sets a MemoryRequest for this WritableMemory
-   * @param memReq the given MemoryRequest
+   * @param memReqSvr the given MemoryRequest
    */
-  public abstract void setMemoryRequest(MemoryRequest memReq);
+  public abstract void setMemoryRequest(MemoryRequestServer memReqSvr);
+
+  public abstract WritableDirectHandle getHandle();
+
+  public abstract void setHandle(WritableDirectHandle handle);
 
 }

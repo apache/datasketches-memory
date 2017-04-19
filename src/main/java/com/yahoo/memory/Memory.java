@@ -45,7 +45,7 @@ public abstract class Memory {
    * @return MemoryMapHandler for managing this map
    * @throws Exception file not found or RuntimeException, etc.
    */
-  public static MapHandler map(final File file) throws Exception {
+  public static MapHandle map(final File file) throws Exception {
     return map(file, 0, file.length(), ByteOrder.nativeOrder());
   }
 
@@ -59,7 +59,7 @@ public abstract class Memory {
    * @return MemoryMapHandler for managing this map
    * @throws Exception file not found or RuntimeException, etc.
    */
-  public static MapHandler map(final File file, final long fileOffset, final long capacity,
+  public static MapHandle map(final File file, final long fileOffset, final long capacity,
           final ByteOrder byteOrder)
                   throws Exception {
     final ResourceState state = new ResourceState();
@@ -67,7 +67,7 @@ public abstract class Memory {
     state.putFileOffset(fileOffset);
     state.putCapacity(capacity);
     state.order(byteOrder);
-    return MapHandler.map(state);
+    return MapHandle.map(state);
   }
 
   //REGIONS/DUPLICATES XXX
@@ -415,9 +415,9 @@ public abstract class Memory {
     final ByteBuffer bb = state.getByteBuffer();
     final String bbStr = (bb == null) ? "null"
             : bb.getClass().getSimpleName() + ", " + (bb.hashCode() & 0XFFFFFFFFL);
-    final MemoryRequest memReq = state.getMemoryRequest();
-    final String memReqStr = (memReq == null) ? "null"
-            : memReq.getClass().getSimpleName() + ", " + (memReq.hashCode() & 0XFFFFFFFFL);
+    final MemoryRequestServer memReqSvr = state.getMemoryRequestServer();
+    final String memReqStr = (memReqSvr == null) ? "null"
+            : memReqSvr.getClass().getSimpleName() + ", " + (memReqSvr.hashCode() & 0XFFFFFFFFL);
     final long cumBaseOffset = state.getCumBaseOffset();
     sb.append(preamble).append(LS);
     sb.append("NativeBaseOffset    : ").append(state.getNativeBaseOffset()).append(LS);

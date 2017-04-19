@@ -22,7 +22,7 @@ public class WritableBufferImplTest {
   public void checkNativeCapacityAndClose() {
     int memCapacity = 64;
     @SuppressWarnings("resource") //intentionally not using try-with-resouces here
-    WritableDirectHandler wmh = WritableMemory.allocateDirect(memCapacity);
+    WritableDirectHandle wmh = WritableMemory.allocateDirect(memCapacity);
     WritableMemory wmem = wmh.get();
     WritableBuffer wbuf = wmem.asWritableBuffer();
     assertEquals(wbuf.getCapacity(), memCapacity);
@@ -183,7 +183,7 @@ public class WritableBufferImplTest {
   @Test
   public void checkNativeBaseBound() {
     int memCapacity = 64;
-    try (WritableDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableDirectHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory wmem = wrh.get();
       WritableBuffer wbuf = wmem.asWritableBuffer();
       wbuf.toHexString("Force Assertion Error", memCapacity, 8);
@@ -195,7 +195,7 @@ public class WritableBufferImplTest {
   @Test
   public void checkNativeSrcArrayBound() {
     long memCapacity = 64;
-    try (WritableDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableDirectHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory wmem = wrh.get();
       WritableBuffer wbuf = wmem.asWritableBuffer();
       byte[] srcArray = { 1, -2, 3, -4 };
@@ -422,7 +422,7 @@ public class WritableBufferImplTest {
   @Test(expectedExceptions = AssertionError.class)
   public void checkRegionBounds() {
     int memCapacity = 64;
-    try (WritableDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableDirectHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory wmem = wrh.get();
       WritableBuffer wbuf = wmem.asWritableBuffer();
       wbuf.writableRegion(1, 64); //wrong!
@@ -541,7 +541,7 @@ public class WritableBufferImplTest {
     int memCapacity = 64;
     WritableBuffer mem = WritableBuffer.allocate(memCapacity);
     assertFalse(mem.isDirect());
-    try (WritableDirectHandler wrh = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableDirectHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem2 = wrh.get();
       WritableBuffer wbuf = mem2.asWritableBuffer();
       assertTrue(wbuf.isDirect());
@@ -605,9 +605,9 @@ public class WritableBufferImplTest {
     byte[] arr2 = new byte[] {0, 1, 2, 4};
     byte[] arr3 = new byte[] {0, 1, 2, 3, 4};
 
-    try (WritableDirectHandler h1 = WritableMemory.allocateDirect(4);
-        WritableDirectHandler h2 = WritableMemory.allocateDirect(4);
-        WritableDirectHandler h3 = WritableMemory.allocateDirect(5))
+    try (WritableDirectHandle h1 = WritableMemory.allocateDirect(4);
+        WritableDirectHandle h2 = WritableMemory.allocateDirect(4);
+        WritableDirectHandle h3 = WritableMemory.allocateDirect(5))
     {
       WritableMemory mem1 = h1.get();
       mem1.putByteArray(0, arr1, 0, 4);

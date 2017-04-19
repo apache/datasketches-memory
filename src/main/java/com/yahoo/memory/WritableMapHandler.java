@@ -13,7 +13,7 @@ package com.yahoo.memory;
  * @author Lee Rhodes
  */
 //Joins a WritableHandler with an AutoCloseable WritableMap resource
-public final class WritableMapHandler implements WritableMap, WritableHandler {
+public final class WritableMapHandler implements WritableMap, WritableHandle {
   AllocateDirectWritableMap dirWmap;
   WritableMemoryImpl wMem;
 

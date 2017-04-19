@@ -12,7 +12,7 @@ package com.yahoo.memory;
  *
  * @author Lee Rhodes
  */
-public interface MemoryRequest {
+public interface MemoryRequestServer {
 
   /**
    * Request new WritableMemory with the given capacity.

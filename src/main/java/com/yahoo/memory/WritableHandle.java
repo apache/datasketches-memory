@@ -8,11 +8,11 @@ package com.yahoo.memory;
 /**
  * @author Lee Rhodes
  */
-public interface Handler {
+public interface WritableHandle {
 
   /**
-   * Gets a Memory
-   * @return a Memory
+   * Gets a WritableMemory
+   * @return a WritableMemory
    */
-  Memory get();
+  WritableMemory get();
 }

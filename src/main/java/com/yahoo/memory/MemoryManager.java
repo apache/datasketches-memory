@@ -7,12 +7,10 @@ package com.yahoo.memory;
 
 /**
  * @author Lee Rhodes
+ *
  */
-public interface WritableHandler {
+public interface MemoryManager extends MemoryRequestServer {
 
-  /**
-   * Gets a WritableMemory
-   * @return a WritableMemory
-   */
-  WritableMemory get();
+  WritableDirectHandle allocateDirect(long capacityBytes);
+
 }

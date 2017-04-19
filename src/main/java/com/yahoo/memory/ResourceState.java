@@ -56,18 +56,23 @@ final class ResourceState {
   /**
    * The size of the backing resource in bytes. Used by all methods when checking bounds.
    */
-  private long capacity_ = 0L;//##
+  private long capacity_ = 0L;
 
   /**
    * This becomes the base offset used by all Unsafe calls.
    */
-  private long cumBaseOffset_ = 0L; //##Holds the cumulative offset to the start of data.
+  private long cumBaseOffset_ = 0L; //Holds the cumulative offset to the start of data.
 
   /**
    * Only relevant when user allocated direct memory is the backing resource. It is a callback
    * mechanism for the client of a resource to request more memory from the owner of the resource.
    */
-  private MemoryRequest memReq_ = null; //##
+  private MemoryRequestServer memReqSvr_ = DefaultMemoryManager.getInstance();
+
+  /**
+   * Only relevant when user allocated direct memory is the backing resource.
+   */
+  private WritableDirectHandle handle_;
 
   //FLAGS
   /**
@@ -151,7 +156,7 @@ final class ResourceState {
     out.unsafeObjHeader_ = unsafeObjHeader_;
     out.capacity_ = capacity_;
     //cumBaseOffset is computed
-    out.memReq_ = memReq_;
+    out.memReqSvr_ = memReqSvr_;
 
     //FLAGS
     out.resourceIsReadOnly_ = resourceIsReadOnly_;
@@ -233,12 +238,20 @@ final class ResourceState {
     return cumBaseOffset_;
   }
 
-  MemoryRequest getMemoryRequest() {
-    return memReq_;
+  MemoryRequestServer getMemoryRequestServer() {
+    return memReqSvr_;
   }
 
-  void setMemoryRequest(final MemoryRequest memReq) {
-    memReq_ = memReq;
+  void setMemoryRequestServer(final MemoryRequestServer memReqSvr) {
+    memReqSvr_ = memReqSvr;
+  }
+
+  WritableDirectHandle getHandle() {
+    return handle_;
+  }
+
+  void setHandle(final WritableDirectHandle handler) {
+    handle_ = handler;
   }
 
   //FLAGS

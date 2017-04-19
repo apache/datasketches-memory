@@ -19,7 +19,7 @@ public class MemoryTest {
   @Test
   public void checkDirectRoundTrip() {
     int n = 1024; //longs
-    try (WritableDirectHandler wh = WritableMemory.allocateDirect(n * 8)) {
+    try (WritableDirectHandle wh = WritableMemory.allocateDirect(n * 8)) {
       WritableMemory mem = wh.get();
       for (int i = 0; i < n; i++) mem.putLong(i * 8, i);
       for (int i = 0; i < n; i++) {
@@ -196,7 +196,7 @@ public class MemoryTest {
   public void checkParentUseAfterFree() {
     int bytes = 64 * 8;
     @SuppressWarnings("resource") //intentionally not using try-with-resouces here
-    WritableDirectHandler wh = WritableMemory.allocateDirect(bytes);
+    WritableDirectHandle wh = WritableMemory.allocateDirect(bytes);
     WritableMemory wmem = wh.get();
     wh.close();
     //with -ea assert: Memory not valid.
@@ -208,7 +208,7 @@ public class MemoryTest {
   public void checkRegionUseAfterFree() {
     int bytes = 64;
     @SuppressWarnings("resource") //intentionally not using try-with-resouces here
-    WritableDirectHandler wh = WritableMemory.allocateDirect(bytes);
+    WritableDirectHandle wh = WritableMemory.allocateDirect(bytes);
     Memory wmem = wh.get();
     Memory region = wmem.region(0L, bytes);
     wh.close();
@@ -221,8 +221,8 @@ public class MemoryTest {
   @Test
   public void checkMonitorDirectStats() {
     int bytes = 1024;
-    WritableDirectHandler wh1 = WritableMemory.allocateDirect(bytes);
-    WritableDirectHandler wh2 = WritableMemory.allocateDirect(bytes);
+    WritableDirectHandle wh1 = WritableMemory.allocateDirect(bytes);
+    WritableDirectHandle wh2 = WritableMemory.allocateDirect(bytes);
     assertEquals(Memory.getCurrentDirectMemoryAllocations(), 2L);
     assertEquals(Memory.getCurrentDirectMemoryAllocated(), 2 * bytes);
 
@@ -242,8 +242,8 @@ public class MemoryTest {
     File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
     long bytes = file.length();
     
-    MapHandler mmh1 = Memory.map(file);
-    MapHandler mmh2 = Memory.map(file);
+    MapHandle mmh1 = Memory.map(file);
+    MapHandle mmh2 = Memory.map(file);
     
     assertEquals(Memory.getCurrentDirectMemoryMapAllocations(), 2L);
     assertEquals(Memory.getCurrentDirectMemoryMapAllocated(), 2 * bytes);

@@ -6,6 +6,7 @@
 package com.yahoo.memory;
 
 /**
+ * A handle for Memory.
  * @author Lee Rhodes
  */
 public interface Handle {

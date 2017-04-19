@@ -10,6 +10,8 @@ import static com.yahoo.memory.UnsafeUtil.unsafe;
 import sun.misc.Cleaner;
 
 /**
+ * Provides access to direct (native) memory.
+ *
  * @author Roman Leventov
  * @author Lee Rhodes
  */

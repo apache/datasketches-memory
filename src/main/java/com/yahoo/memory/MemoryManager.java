@@ -6,6 +6,9 @@
 package com.yahoo.memory;
 
 /**
+ * Defines the basic methods for managing the allocation and closing
+ * of direct memory.
+ *
  * @author Lee Rhodes
  *
  */

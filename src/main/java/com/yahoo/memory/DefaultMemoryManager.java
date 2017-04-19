@@ -6,15 +6,15 @@
 package com.yahoo.memory;
 
 /**
+ * Implements a very simple memory management function that allocates new requests onto the heap.
  * @author Lee Rhodes
- *
  */
-public final class DefaultMemoryManager implements MemoryManager {
+final class DefaultMemoryManager implements MemoryManager {
   private static final MemoryManager memMgr = new DefaultMemoryManager();
 
   private DefaultMemoryManager() {}
 
-  public static MemoryManager getInstance() {
+  static MemoryManager getInstance() {
     return memMgr;
   }
 

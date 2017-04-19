@@ -13,6 +13,8 @@ import java.nio.MappedByteBuffer;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
+ * Keeps the configuration state primarily for Resources.
+ *
  * @author Lee Rhodes
  */
 final class ResourceState {

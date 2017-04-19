@@ -37,6 +37,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
+ * Implementation of WritableBuffer
  * @author Roman Leventov
  * @author Lee Rhodes
  */

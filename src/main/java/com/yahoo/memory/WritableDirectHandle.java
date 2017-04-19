@@ -6,10 +6,8 @@
 package com.yahoo.memory;
 
 /**
- * Gets a WritableMemory for a writable direct memory resource. It is highly recommended that
- * this be created inside a <i>try-with-resources</i> statement. This implements a very simple
- * MemoryRequest management function that just allocates any request onto the heap. This class can
- * be overridden if more sophisticated memory management is required.
+ * References a WritableMemory for a writable direct memory resource. It is highly recommended that
+ * this be created inside a <i>try-with-resources</i> statement.
  *
  * @author Roman Leventov
  * @author Lee Rhodes

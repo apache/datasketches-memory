@@ -6,6 +6,7 @@
 package com.yahoo.memory;
 
 /**
+ * A handle for WritableMemory
  * @author Lee Rhodes
  */
 public interface WritableHandle {

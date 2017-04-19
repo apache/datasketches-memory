@@ -12,6 +12,8 @@ import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 
 /**
+ * Acquires access to a ByteBuffer.
+ *
  * @author Lee Rhodes
  * @author Praveenkumar Venkatesan
  */

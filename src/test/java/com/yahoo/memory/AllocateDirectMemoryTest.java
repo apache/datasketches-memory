@@ -25,11 +25,13 @@ public class AllocateDirectMemoryTest {
 
       int longs2 = 64;
       int bytes2 = longs2 << 3;
-      WritableMemory wMem2 = wMem1.getMemoryRequestServer().request(bytes2); //on heap
+      MemoryRequestServer memReqSvr = wMem1.getMemoryRequestServer();
+      WritableMemory wMem2 = memReqSvr.request(bytes2); //on heap
       for (int i = 0; i < longs2; i++) {
           wMem2.putLong(i << 3, i);
           assertEquals(wMem2.getLong(i << 3), i);
-        }
+      }
+      memReqSvr.requestClose(wMem1, wMem2);
     }
   }
 

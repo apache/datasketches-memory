@@ -22,14 +22,6 @@ public class WritableDirectHandle implements AutoCloseable, WritableHandle {
     this.wMem = wMem;
   }
 
-  public void putWritableMemory(final WritableMemory wMem) {
-    this.wMem = wMem;
-  }
-
-  public void putResource(final AllocateDirect direct) {
-    this.direct = direct;
-  }
-
   @Override
   public WritableMemory get() {
     return wMem;

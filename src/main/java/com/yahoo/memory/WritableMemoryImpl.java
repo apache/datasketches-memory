@@ -556,7 +556,7 @@ class WritableMemoryImpl extends WritableMemory {
   public void putShort(final long offsetBytes, final short value) {
     checkValid();
     assertBounds(offsetBytes, ARRAY_SHORT_INDEX_SCALE, capacity);
-    unsafe.putLong(unsafeObj, cumBaseOffset + offsetBytes, value);
+    unsafe.putShort(unsafeObj, cumBaseOffset + offsetBytes, value);
   }
 
   @Override

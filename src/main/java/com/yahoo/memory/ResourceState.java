@@ -277,6 +277,15 @@ final class ResourceState {
     return nativeBaseOffset_ > 0L;
   }
 
+  boolean isSameResource(final ResourceState that) {
+    if (this == that) { return true; }
+
+    return (getCumBaseOffset() == that.getCumBaseOffset())
+            && (getCapacity() == that.getCapacity())
+            && (getUnsafeObject() == that.getUnsafeObject())
+            && (getByteBuffer() == that.getByteBuffer());
+  }
+
   //REGIONS
   long getRegionOffset() {
     return regionOffset_;

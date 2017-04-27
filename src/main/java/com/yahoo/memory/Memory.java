@@ -375,6 +375,16 @@ public abstract class Memory {
   public abstract boolean isResourceReadOnly();
 
   /**
+   * Returns true if the backing resource of this is identical with the backing resource
+   * of that. If the backing resource is a heap array or ByteBuffer, the offset and
+   * capacity must also be identical.
+   * @param that A different given Memory object
+   * @return true if the backing resource of this is identical with the backing resource
+   * of that.
+   */
+  public abstract boolean isSameResource(Memory that);
+
+  /**
    * Returns true if this Memory is valid() and has not been closed.
    * @return true if this Memory is valid() and has not been closed.
    */
@@ -479,5 +489,7 @@ public abstract class Memory {
   public static long getCurrentDirectMemoryMapAllocated() {
     return ResourceState.currentDirectMemoryMapAllocated_.get();
   }
+
+  abstract ResourceState getResourceState();
 
 }

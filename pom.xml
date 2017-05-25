@@ -41,7 +41,7 @@
 
     <contributors>
         <contributor>
-            <url>https://github.com/DataSketches/sketches-core/graphs/contributors</url>
+            <url>https://github.com/DataSketches/memory/graphs/contributors</url>
         </contributor>
     </contributors>
     <!-- End Project Information -->
@@ -58,7 +58,7 @@
     <!-- Environment Settings -->
     <issueManagement>
         <system>GitHub Issues</system>
-        <url>https://github.com/DataSketches/sketches-core/issues</url>
+        <url>https://github.com/DataSketches/memory/issues</url>
     </issueManagement>
 
     <ciManagement>
@@ -313,7 +313,7 @@
               <plugin>
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-dependency-plugin</artifactId>
-                  <version>3.0.0</version>
+                  <version>3.0.1</version>
               </plugin>
 
               <plugin>
@@ -373,7 +373,7 @@
               <plugin>
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-surefire-plugin</artifactId>
-                  <version>2.19.1</version>
+                  <version>2.20</version>
               </plugin>
 
               <!-- OTHER -->

@@ -9,7 +9,6 @@
     <groupId>com.yahoo.datasketches</groupId>
     <artifactId>memory</artifactId>
     <version>0.9.9-SNAPSHOT</version>
-    <!-- <packaging>pom</packaging> -->
 
     <!-- Project Information -->
     <name>${project.groupId}:${project.artifactId}</name>
@@ -410,7 +409,7 @@
               <plugin>
                 <groupId>com.versioneye</groupId>
                 <artifactId>versioneye-maven-plugin</artifactId>
-                <version>3.11.1</version>
+                <version>3.11.2</version>
               </plugin>
 
             </plugins>

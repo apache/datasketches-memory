@@ -56,7 +56,7 @@ public abstract class Buffer extends BaseBuffer {
    */
   public abstract Buffer region();
 
-  //MEMORY XXX
+  //BUFFER XXX
   /**
    * Convert this Buffer to a Memory. The current start, position and end are ignored.
    * @return Memory
@@ -259,16 +259,16 @@ public abstract class Buffer extends BaseBuffer {
 
   //OTHER PRIMITIVE READ METHODS: copyTo, compareTo XXX
   /**
-   * Compares the bytes of this Memory to <i>that</i> Memory.  This uses absolute offsets not
+   * Compares the bytes of this Buffer to <i>that</i> Buffer.  This uses absolute offsets not
    * the start, position and end.
    * Returns <i>(this &lt; that) ? -1 : (this &gt; that) ? 1 : 0;</i>.
    * If all bytes are equal up to the shorter of the two lengths, the shorter length is considered
    * to be less than the other.
-   * @param thisOffsetBytes the starting offset for <i>this Memory</i>
-   * @param thisLengthBytes the length of the region to compare from <i>this Memory</i>
-   * @param that the other Memory to compare with
-   * @param thatOffsetBytes the starting offset for <i>that Memory</i>
-   * @param thatLengthBytes the length of the region to compare from <i>that Memory</i>
+   * @param thisOffsetBytes the starting offset for <i>this Buffer</i>
+   * @param thisLengthBytes the length of the region to compare from <i>this Buffer</i>
+   * @param that the other Buffer to compare with
+   * @param thatOffsetBytes the starting offset for <i>that Buffer</i>
+   * @param thatLengthBytes the length of the region to compare from <i>that Buffer</i>
    * @return <i>(this &lt; that) ? -1 : (this &gt; that) ? 1 : 0;</i>
    */
   public abstract int compareTo(long thisOffsetBytes, long thisLengthBytes, Buffer that,
@@ -282,9 +282,10 @@ public abstract class Buffer extends BaseBuffer {
   public abstract long getCapacity();
 
   /**
-   * Returns the cumulative offset in bytes of this Buffer at the current position.
+   * Returns the cumulative offset in bytes of this Buffer from the backing resource
+   * including the Java object header, if any.
    *
-   * @return the cumulative offset in bytes of this Buffer at the current position.
+   * @return the cumulative offset in bytes of this Buffer.
    */
   public abstract long getCumulativeOffset();
 

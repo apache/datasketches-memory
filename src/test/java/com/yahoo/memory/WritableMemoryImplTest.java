@@ -255,7 +255,7 @@ public class WritableMemoryImplTest {
       mem.clear();
       //println(mem.toHexString("Clear 64", 0, memCapacity));
 
-      for (int i=0; i < memCapacity/2; i++) {
+      for (int i=0; i < (memCapacity/2); i++) {
         mem.putByte(i, (byte) i);
       }
       //println(mem.toHexString("Set 1st 32 to ints ", 0, memCapacity));
@@ -645,9 +645,10 @@ public class WritableMemoryImplTest {
   }
 
   @Test
-    public void checkDuplicate() {
+  public void checkDuplicate() {
     WritableMemory wmem = WritableMemory.allocate(64);
     for (int i = 0; i < 64; i++) { wmem.putByte(i, (byte)i); }
+
     WritableMemory wmem2 = wmem.writableDuplicate();
     for (int i = 0; i < 64; i++) {
       assertEquals(wmem2.getByte(i), i);
@@ -656,6 +657,14 @@ public class WritableMemoryImplTest {
     for (int i = 0; i < 64; i++) {
       assertEquals(mem.getByte(i), i);
     }
+  }
+
+  @Test
+  public void checkCumAndRegionOffset() {
+    WritableMemory wmem = WritableMemory.allocate(64);
+    WritableMemory reg = wmem.writableRegion(32, 32);
+    assertEquals(reg.getRegionOffset(0), 32);
+    assertEquals(reg.getCumulativeOffset(0), 32 + 16);
   }
 
   @Test

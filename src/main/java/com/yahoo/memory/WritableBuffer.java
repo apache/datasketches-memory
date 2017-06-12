@@ -313,4 +313,13 @@ public abstract class WritableBuffer extends Buffer {
    */
   public abstract void fill(byte value);
 
+  //OTHER XXX
+  /**
+   * Returns the offset of the start of this WritableBuffer from the backing resource,
+   * but not including any Java object header.
+   *
+   * @return the offset of the start of this WritableBuffer from the backing resource.
+   */
+  public abstract long getRegionOffset();
+
 }

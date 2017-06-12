@@ -672,6 +672,15 @@ public class WritableBufferImplTest {
   }
 
   @Test
+  public void checkCumAndRegionOffset() {
+    WritableMemory wmem = WritableMemory.allocate(64);
+    WritableMemory reg = wmem.writableRegion(32, 32);
+    WritableBuffer buf = reg.asWritableBuffer();
+    assertEquals(buf.getRegionOffset(), 32);
+    assertEquals(buf.getCumulativeOffset(), 32 + 16);
+  }
+
+  @Test
   public void printlnTest() {
     println("PRINTING: "+this.getClass().getName());
   }

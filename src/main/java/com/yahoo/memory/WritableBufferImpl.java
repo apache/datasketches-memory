@@ -46,7 +46,7 @@ class WritableBufferImpl extends WritableBuffer {
   final Object unsafeObj; //Array objects are held here.
   final long unsafeObjHeader; //Heap ByteBuffer includes the slice() offset here.
   final long capacity;
-  final long cumBaseOffset; //Holds the cum offset to the start of data.
+  final long cumBaseOffset; //Holds the cumulative offset to the start of data.
 
   WritableBufferImpl(final ResourceState state) {
     super(state);
@@ -94,7 +94,6 @@ class WritableBufferImpl extends WritableBuffer {
     if (!dup) { newState.putBaseBuffer(null); }
     return new WritableBufferImpl(newState);
   }
-
 
   //MEMORY XXX
   @Override
@@ -342,7 +341,6 @@ class WritableBufferImpl extends WritableBuffer {
     return 0;
   }
 
-
   //OTHER READ METHODS XXX
 
   @Override
@@ -355,6 +353,12 @@ class WritableBufferImpl extends WritableBuffer {
   public long getCumulativeOffset() {
     checkValid();
     return cumBaseOffset;
+  }
+
+  @Override
+  public long getRegionOffset() {
+    checkValid();
+    return state.getRegionOffset();
   }
 
   @Override

@@ -337,6 +337,12 @@ class WritableMemoryImpl extends WritableMemory {
   }
 
   @Override
+  public long getRegionOffset(final long offsetBytes) {
+    checkValid();
+    return state.getRegionOffset() + offsetBytes;
+  }
+
+  @Override
   public ByteOrder getResourceOrder() {
     checkValid();
     return state.order();

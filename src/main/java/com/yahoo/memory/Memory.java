@@ -337,7 +337,8 @@ public abstract class Memory {
   public abstract long getCapacity();
 
   /**
-   * Returns the cumulative offset in bytes of this Memory including the given offsetBytes.
+   * Returns the cumulative offset in bytes of this Memory from the backing resource
+   * including the given offsetBytes and including the Java object header, if any.
    *
    * @param offsetBytes the given offset in bytes
    * @return the cumulative offset in bytes of this Memory including the given offsetBytes.

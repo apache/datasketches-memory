@@ -417,6 +417,15 @@ public abstract class WritableMemory extends Memory {
   public abstract MemoryRequestServer getMemoryRequestServer();
 
   /**
+   * Returns the offset of the start of this WritableMemory from the backing resource
+   * including the given offsetBytes, but not including any Java object header.
+   *
+   * @param offsetBytes the given offset in bytes
+   * @return the offset of the start of this WritableMemory from the backing resource.
+   */
+  public abstract long getRegionOffset(long offsetBytes);
+
+  /**
    * Sets a MemoryRequest for this WritableMemory
    * @param memReqSvr the given MemoryRequest
    */

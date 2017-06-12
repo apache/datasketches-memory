@@ -25,6 +25,14 @@ public class ResourceStateTest {
     BaseBuffer baseBuf = new BaseBuffer(state);
     assertTrue(state.getBaseBuffer() != null);
     assertEquals(baseBuf.getEnd(), 1 << 20);
+    state.putCapacity(0);
+
+    try {
+      state.putCapacity(-1);
+      fail();
+    } catch (IllegalArgumentException e) {
+      // ok
+    }
   }
 
   @Test

@@ -230,8 +230,8 @@ final class ResourceState {
   }
 
   void putCapacity(final long capacity) {
-    if (capacity <= 0) {
-      throw new IllegalArgumentException("Capacity may not be negative or zero.");
+    if (capacity < 0) {
+      throw new IllegalArgumentException("Capacity may not be negative.");
     }
     capacity_ = capacity;
   }

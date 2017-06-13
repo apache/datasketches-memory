@@ -42,21 +42,37 @@ public class CommonBufferTest {
 
     buf.resetPosition();
 
+    assertEquals(buf.getBoolean(buf.getPosition()), true);
     assertEquals(buf.getBoolean(), true);
+    assertEquals(buf.getBoolean(buf.getPosition()), false);
     assertEquals(buf.getBoolean(), false);
+    assertEquals(buf.getByte(buf.getPosition()), (byte) -1);
     assertEquals(buf.getByte(), (byte) -1);
+    assertEquals(buf.getByte(buf.getPosition()), (byte)0);
     assertEquals(buf.getByte(), (byte)0);
+    assertEquals(buf.getChar(buf.getPosition()), 'A');
     assertEquals(buf.getChar(), 'A');
+    assertEquals(buf.getChar(buf.getPosition()), 'Z');
     assertEquals(buf.getChar(), 'Z');
+    assertEquals(buf.getShort(buf.getPosition()), Short.MAX_VALUE);
     assertEquals(buf.getShort(), Short.MAX_VALUE);
+    assertEquals(buf.getShort(buf.getPosition()), Short.MIN_VALUE);
     assertEquals(buf.getShort(), Short.MIN_VALUE);
+    assertEquals(buf.getInt(buf.getPosition()), Integer.MAX_VALUE);
     assertEquals(buf.getInt(), Integer.MAX_VALUE);
+    assertEquals(buf.getInt(buf.getPosition()), Integer.MIN_VALUE);
     assertEquals(buf.getInt(), Integer.MIN_VALUE);
+    assertEquals(buf.getFloat(buf.getPosition()), Float.MAX_VALUE);
     assertEquals(buf.getFloat(), Float.MAX_VALUE);
+    assertEquals(buf.getFloat(buf.getPosition()), Float.MIN_VALUE);
     assertEquals(buf.getFloat(), Float.MIN_VALUE);
+    assertEquals(buf.getLong(buf.getPosition()), Long.MAX_VALUE);
     assertEquals(buf.getLong(), Long.MAX_VALUE);
+    assertEquals(buf.getLong(buf.getPosition()), Long.MIN_VALUE);
     assertEquals(buf.getLong(), Long.MIN_VALUE);
+    assertEquals(buf.getDouble(buf.getPosition()), Double.MAX_VALUE);
     assertEquals(buf.getDouble(), Double.MAX_VALUE);
+    assertEquals(buf.getDouble(buf.getPosition()), Double.MIN_VALUE);
     assertEquals(buf.getDouble(), Double.MIN_VALUE);
   }
 

@@ -55,6 +55,9 @@ public class MemoryTest {
       long v = mem.getLong(i * 8);
       assertEquals(v, i);
     }
+    // check 0 length array wraps
+    Memory memZeroLengthArray = WritableMemory.wrap(new byte[0]);
+    assertEquals(memZeroLengthArray.getCapacity(), 0);
   }
 
   @Test

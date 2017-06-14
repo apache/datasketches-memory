@@ -143,8 +143,8 @@ final class ResourceState {
   ResourceState(final Object obj, final Prim prim, final long arrLen) {
     unsafeObj_ = obj;
     unsafeObjHeader_ = prim.off();
-    if (arrLen <= 0) {
-      throw new IllegalArgumentException("Array length cannot be <= 0");
+    if (arrLen < 0) {
+      throw new IllegalArgumentException("Array length cannot be < 0");
     }
     capacity_ = arrLen << prim.shift();
     compute();

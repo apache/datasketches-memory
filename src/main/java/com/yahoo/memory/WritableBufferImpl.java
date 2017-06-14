@@ -47,7 +47,8 @@ class WritableBufferImpl extends WritableBuffer {
   final long unsafeObjHeader; //Heap ByteBuffer includes the slice() offset here.
   final long capacity;
   final long cumBaseOffset; //Holds the cumulative offset to the start of data.
-  final static WritableBufferImpl MEMORY_ZERO_SIZE; //Static variable for cases where bytebuf/array sizes are zero
+  //Static variable for cases where bytebuf/array sizes are zero
+  final static WritableBufferImpl MEMORY_ZERO_SIZE;
 
   static {
     MEMORY_ZERO_SIZE = new WritableBufferImpl(
@@ -127,7 +128,7 @@ class WritableBufferImpl extends WritableBuffer {
   }
 
   @Override
-  public boolean getBoolean(long offsetBytes) {
+  public boolean getBoolean(final long offsetBytes) {
     checkValid();
     assertBounds(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE, capacity);
     return unsafe.getBoolean(unsafeObj, cumBaseOffset + offsetBytes);
@@ -160,7 +161,7 @@ class WritableBufferImpl extends WritableBuffer {
   }
 
   @Override
-  public byte getByte(long offsetBytes) {
+  public byte getByte(final long offsetBytes) {
     checkValid();
     assertBounds(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE, capacity);
     return unsafe.getByte(unsafeObj, cumBaseOffset + offsetBytes);
@@ -193,7 +194,7 @@ class WritableBufferImpl extends WritableBuffer {
   }
 
   @Override
-  public char getChar(long offsetBytes) {
+  public char getChar(final long offsetBytes) {
     checkValid();
     assertBounds(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE, capacity);
     return unsafe.getChar(unsafeObj, cumBaseOffset + offsetBytes);
@@ -226,7 +227,7 @@ class WritableBufferImpl extends WritableBuffer {
   }
 
   @Override
-  public double getDouble(long offsetBytes) {
+  public double getDouble(final long offsetBytes) {
     checkValid();
     assertBounds(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE, capacity);
     return unsafe.getDouble(unsafeObj, cumBaseOffset + offsetBytes);
@@ -259,7 +260,7 @@ class WritableBufferImpl extends WritableBuffer {
   }
 
   @Override
-  public float getFloat(long offsetBytes) {
+  public float getFloat(final long offsetBytes) {
     checkValid();
     assertBounds(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE, capacity);
     return unsafe.getFloat(unsafeObj, cumBaseOffset + offsetBytes);
@@ -292,7 +293,7 @@ class WritableBufferImpl extends WritableBuffer {
   }
 
   @Override
-  public int getInt(long offsetBytes) {
+  public int getInt(final long offsetBytes) {
     checkValid();
     assertBounds(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE, capacity);
     return unsafe.getInt(unsafeObj, cumBaseOffset + offsetBytes);
@@ -325,7 +326,7 @@ class WritableBufferImpl extends WritableBuffer {
   }
 
   @Override
-  public long getLong(long offsetBytes) {
+  public long getLong(final long offsetBytes) {
     checkValid();
     assertBounds(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE, capacity);
     return unsafe.getLong(unsafeObj, cumBaseOffset + offsetBytes);
@@ -358,7 +359,7 @@ class WritableBufferImpl extends WritableBuffer {
   }
 
   @Override
-  public short getShort(long offsetBytes) {
+  public short getShort(final long offsetBytes) {
     checkValid();
     assertBounds(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE, capacity);
     return unsafe.getShort(unsafeObj, cumBaseOffset + offsetBytes);

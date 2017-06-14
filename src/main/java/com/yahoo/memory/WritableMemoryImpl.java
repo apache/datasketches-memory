@@ -49,7 +49,8 @@ class WritableMemoryImpl extends WritableMemory {
   final long unsafeObjHeader; //Heap ByteBuffer includes the slice() offset here.
   final long capacity;
   final long cumBaseOffset; //Holds the cum offset to the start of data.
-  final static WritableMemoryImpl MEMORY_ZERO_SIZE; //Static variable for cases where bytebuf/array sizes are zero
+  //Static variable for cases where bytebuf/array sizes are zero
+  final static WritableMemoryImpl MEMORY_ZERO_SIZE;
 
   static {
     MEMORY_ZERO_SIZE = new WritableMemoryImpl(

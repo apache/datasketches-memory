@@ -13,8 +13,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
 
-import com.beust.jcommander.internal.Lists;
 import org.testng.annotations.Test;
+import org.testng.collections.Lists;
 
 public class MemoryTest {
 
@@ -77,6 +77,7 @@ public class MemoryTest {
 
     // check 0 length array wraps
     List<Memory> memoryToCheck = Lists.newArrayList();
+    memoryToCheck.add(WritableMemory.wrap(ByteBuffer.allocate(0)));
     memoryToCheck.add(WritableMemory.wrap(new boolean[0]));
     memoryToCheck.add(WritableMemory.wrap(new byte[0]));
     memoryToCheck.add(WritableMemory.wrap(new char[0]));
@@ -85,6 +86,7 @@ public class MemoryTest {
     memoryToCheck.add(WritableMemory.wrap(new long[0]));
     memoryToCheck.add(WritableMemory.wrap(new float[0]));
     memoryToCheck.add(WritableMemory.wrap(new double[0]));
+    memoryToCheck.add(Memory.wrap(ByteBuffer.allocate(0)));
     memoryToCheck.add(Memory.wrap(new boolean[0]));
     memoryToCheck.add(Memory.wrap(new byte[0]));
     memoryToCheck.add(Memory.wrap(new char[0]));

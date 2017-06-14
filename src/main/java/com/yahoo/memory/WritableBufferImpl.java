@@ -456,6 +456,11 @@ class WritableBufferImpl extends WritableBuffer {
   }
 
   @Override
+  public boolean isSameResource(final Buffer that) {
+    return state.isSameResource(that.getResourceState());
+  }
+
+  @Override
   public boolean isValid() {
     return state.isValid();
   }
@@ -721,5 +726,10 @@ class WritableBufferImpl extends WritableBuffer {
   //RESTRICTED READ AND WRITE XXX
   private final void checkValid() { //applies to both readable and writable
     assert state.isValid() : "Memory not valid.";
+  }
+
+  @Override
+  ResourceState getResourceState() {
+    return state;
   }
 }

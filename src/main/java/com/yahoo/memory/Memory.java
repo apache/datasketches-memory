@@ -31,7 +31,7 @@ public abstract class Memory {
    * @return the given ByteBuffer for read-only operations.
    */
   public static Memory wrap(final ByteBuffer byteBuf) {
-    if (byteBuf != null && byteBuf.capacity() == 0) {
+    if ((byteBuf != null) && (byteBuf.capacity() == 0)) {
       return WritableMemoryImpl.MEMORY_ZERO_SIZE;
     }
     final ResourceState state = new ResourceState();
@@ -411,12 +411,12 @@ public abstract class Memory {
   public abstract boolean isResourceReadOnly();
 
   /**
-   * Returns true if the backing resource of this is identical with the backing resource
-   * of that. If the backing resource is a heap array or ByteBuffer, the offset and
+   * Returns true if the backing resource of <i>this</i> is identical with the backing resource
+   * of <i>that</i>. If the backing resource is a heap array or ByteBuffer, the offset and
    * capacity must also be identical.
    * @param that A different given Memory object
-   * @return true if the backing resource of this is identical with the backing resource
-   * of that.
+   * @return true if the backing resource of <i>this</i> is identical with the backing resource
+   * of <i>that</i>.
    */
   public abstract boolean isSameResource(Memory that);
 

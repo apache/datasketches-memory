@@ -30,7 +30,7 @@ public abstract class Buffer extends BaseBuffer {
    * @return the given ByteBuffer for read-only operations.
    */
   public static Buffer wrap(final ByteBuffer byteBuf) {
-    if (byteBuf != null && byteBuf.capacity() == 0) {
+    if ((byteBuf != null) && (byteBuf.capacity() == 0)) {
       return WritableBufferImpl.MEMORY_ZERO_SIZE;
     }
     final ResourceState state = new ResourceState();
@@ -411,6 +411,16 @@ public abstract class Buffer extends BaseBuffer {
   public abstract boolean isResourceReadOnly();
 
   /**
+   * Returns true if the backing resource of <i>this</i> is identical with the backing resource
+   * of <i>that</i>. If the backing resource is a heap array or ByteBuffer, the offset and
+   * capacity must also be identical.
+   * @param that A different given Buffer object
+   * @return true if the backing resource of <i>this</i> is identical with the backing resource
+   * of <i>that</i>.
+   */
+  public abstract boolean isSameResource(Buffer that);
+
+  /**
    * Returns true if this Buffer is valid() and has not been closed.
    * @return true if this Buffer is valid() and has not been closed.
    */
@@ -432,4 +442,5 @@ public abstract class Buffer extends BaseBuffer {
    */
   public abstract String toHexString(String header, long offsetBytes, int lengthBytes);
 
+  abstract ResourceState getResourceState();
 }

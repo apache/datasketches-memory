@@ -681,6 +681,14 @@ public class WritableBufferImplTest {
   }
 
   @Test
+  public void checkIsSameResource() {
+    byte[] byteArr = new byte[64];
+    WritableBuffer wbuf1 = WritableBuffer.wrap(byteArr);
+    WritableBuffer wbuf2 = WritableBuffer.wrap(byteArr);
+    assertTrue(wbuf1.isSameResource(wbuf2));
+  }
+
+  @Test
   public void printlnTest() {
     println("PRINTING: "+this.getClass().getName());
   }

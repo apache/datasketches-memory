@@ -26,12 +26,11 @@ public abstract class WritableBuffer extends Buffer {
    * @param byteBuf the given ByteBuffer
    * @return the given ByteBuffer for write operations.
    */
-  @SuppressWarnings("null")
   public static WritableBuffer wrap(final ByteBuffer byteBuf) {
-    if (byteBuf != null && byteBuf.capacity() == 0) {
+    if (byteBuf.capacity() == 0) {
       return WritableBufferImpl.MEMORY_ZERO_SIZE;
     }
-    if (byteBuf != null && byteBuf.isReadOnly()) {
+    if (byteBuf.isReadOnly()) {
       throw new ReadOnlyException("ByteBuffer is read-only.");
     }
     final ResourceState state = new ResourceState();

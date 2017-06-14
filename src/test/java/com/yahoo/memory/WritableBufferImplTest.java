@@ -530,10 +530,10 @@ public class WritableBufferImplTest {
     //println( mem.toHexString("HeapBB", 0, memCapacity));
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void checkLongArrEmptyExcep() {
-    long[] arr = new long[0];
-    Buffer.wrap(arr);
+    Buffer buffer = Buffer.wrap(new long[0]);
+    assertEquals(buffer.getCapacity(), 0);
   }
 
   @Test
@@ -565,10 +565,10 @@ public class WritableBufferImplTest {
     }
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void checkEmptyIntArray() {
-    int[] intArr = new int[0];
-    Buffer.wrap(intArr);
+    Buffer buffer = Buffer.wrap(new int[0]);
+    assertEquals(buffer.getCapacity(), 0);
   }
 
   @Test

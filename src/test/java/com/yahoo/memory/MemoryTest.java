@@ -77,6 +77,7 @@ public class MemoryTest {
 
     // check 0 length array wraps
     List<Memory> memoryToCheck = Lists.newArrayList();
+    memoryToCheck.add(WritableMemory.allocate(0));
     memoryToCheck.add(WritableMemory.wrap(ByteBuffer.allocate(0)));
     memoryToCheck.add(WritableMemory.wrap(new boolean[0]));
     memoryToCheck.add(WritableMemory.wrap(new byte[0]));

@@ -66,6 +66,7 @@ public class BufferTest {
     assertEquals(buffZeroLengthArrayWrap.getCapacity(), 0);
     // check 0 length array wraps
     List<Buffer> buffersToCheck = Lists.newArrayList();
+    buffersToCheck.add(WritableBuffer.allocate(0));
     buffersToCheck.add(WritableBuffer.wrap(ByteBuffer.allocate(0)));
     buffersToCheck.add(WritableBuffer.wrap(new boolean[0]));
     buffersToCheck.add(WritableBuffer.wrap(new byte[0]));

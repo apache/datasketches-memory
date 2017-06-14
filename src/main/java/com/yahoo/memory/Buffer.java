@@ -144,6 +144,13 @@ public abstract class Buffer extends BaseBuffer {
   public abstract boolean getBoolean();
 
   /**
+   * Gets the boolean value at the given offset
+   * @param offsetBytes offset bytes relative to this Memory start
+   * @return the boolean at the given offset
+   */
+  public abstract boolean getBoolean(long offsetBytes);
+
+  /**
    * Gets the boolean array at the current position. Increments the position by
    * <i>Boolean.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
@@ -157,6 +164,13 @@ public abstract class Buffer extends BaseBuffer {
    * @return the byte at the current position
    */
   public abstract byte getByte();
+
+  /**
+   * Gets the byte value at the given offset
+   * @param offsetBytes offset bytes relative to this Memory start
+   * @return the byte at the given offset
+   */
+  public abstract byte getByte(long offsetBytes);
 
   /**
    * Gets the byte array at the current position. Increments the position by
@@ -174,6 +188,13 @@ public abstract class Buffer extends BaseBuffer {
   public abstract char getChar();
 
   /**
+   * Gets the char value at the given offset
+   * @param offsetBytes offset bytes relative to this Memory start
+   * @return the char at the given offset
+   */
+  public abstract char getChar(long offsetBytes);
+
+  /**
    * Gets the char array at the current position. Increments the position by
    * <i>Char.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
@@ -187,6 +208,13 @@ public abstract class Buffer extends BaseBuffer {
    * @return the double at the current position
    */
   public abstract double getDouble();
+
+  /**
+   * Gets the double value at the given offset
+   * @param offsetBytes offset bytes relative to this Memory start
+   * @return the double at the given offset
+   */
+  public abstract double getDouble(long offsetBytes);
 
   /**
    * Gets the double array at the current position. Increments the position by
@@ -204,6 +232,13 @@ public abstract class Buffer extends BaseBuffer {
   public abstract float getFloat();
 
   /**
+   * Gets the float value at the given offset
+   * @param offsetBytes offset bytes relative to this Memory start
+   * @return the float at the given offset
+   */
+  public abstract float getFloat(long offsetBytes);
+
+  /**
    * Gets the float array at the current position. Increments the position by
    * <i>Float.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
@@ -217,6 +252,13 @@ public abstract class Buffer extends BaseBuffer {
    * @return the int at the current position
    */
   public abstract int getInt();
+
+  /**
+   * Gets the int value at the given offset
+   * @param offsetBytes offset bytes relative to this Memory start
+   * @return the int at the given offset
+   */
+  public abstract int getInt(long offsetBytes);
 
   /**
    * Gets the int array at the current position. Increments the position by
@@ -234,6 +276,13 @@ public abstract class Buffer extends BaseBuffer {
   public abstract long getLong();
 
   /**
+   * Gets the long value at the given offset
+   * @param offsetBytes offset bytes relative to this Memory start
+   * @return the long at the given offset
+   */
+  public abstract long getLong(long offsetBytes);
+
+  /**
    * Gets the long array at the current position. Increments the position by
    * <i>Long.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
@@ -247,6 +296,13 @@ public abstract class Buffer extends BaseBuffer {
    * @return the short at the current position
    */
   public abstract short getShort();
+
+  /**
+   * Gets the short value at the given offset
+   * @param offsetBytes offset bytes relative to this Memory start
+   * @return the short at the given offset
+   */
+  public abstract short getShort(long offsetBytes);
 
   /**
    * Gets the short array at the current position. Increments the position by

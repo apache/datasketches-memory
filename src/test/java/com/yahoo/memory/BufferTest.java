@@ -62,6 +62,23 @@ public class BufferTest {
     // Check Zero length array wraps
     Buffer buffZeroLengthArrayWrap = Buffer.wrap(new byte[0]);
     assertEquals(buffZeroLengthArrayWrap.getCapacity(), 0);
+    // check 0 length array wraps
+    Buffer bufferZeroLengthArrayBoolean = WritableBuffer.wrap(new boolean[0]);
+    Buffer bufferZeroLengthArrayByte = WritableBuffer.wrap(new byte[0]);
+    Buffer bufferZeroLengthArrayChar = WritableBuffer.wrap(new char[0]);
+    Buffer bufferZeroLengthArrayShort = WritableBuffer.wrap(new short[0]);
+    Buffer bufferZeroLengthArrayInt = WritableBuffer.wrap(new int[0]);
+    Buffer bufferZeroLengthArrayLong = WritableBuffer.wrap(new long[0]);
+    Buffer bufferZeroLengthArrayFloat = WritableBuffer.wrap(new float[0]);
+    Buffer bufferZeroLengthArrayDouble = WritableBuffer.wrap(new double[0]);
+    assertEquals(bufferZeroLengthArrayBoolean.getCapacity(), 0);
+    assertEquals(bufferZeroLengthArrayByte.getCapacity(), 0);
+    assertEquals(bufferZeroLengthArrayChar.getCapacity(), 0);
+    assertEquals(bufferZeroLengthArrayShort.getCapacity(), 0);
+    assertEquals(bufferZeroLengthArrayInt.getCapacity(), 0);
+    assertEquals(bufferZeroLengthArrayLong.getCapacity(), 0);
+    assertEquals(bufferZeroLengthArrayFloat.getCapacity(), 0);
+    assertEquals(bufferZeroLengthArrayDouble.getCapacity(), 0);
   }
 
   @Test

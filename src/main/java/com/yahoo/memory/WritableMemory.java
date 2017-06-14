@@ -28,6 +28,9 @@ public abstract class WritableMemory extends Memory {
     if (byteBuf.isReadOnly()) {
       throw new ReadOnlyException("ByteBuffer is read-only.");
     }
+    if (byteBuf.remaining() == 0) {
+      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+    }
     final ResourceState state = new ResourceState();
     state.putByteBuffer(byteBuf);
     AccessByteBuffer.wrap(state);
@@ -113,6 +116,9 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory allocate(final int capacityBytes) {
+    if (capacityBytes == 0) {
+      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+    }
     final byte[] arr = new byte[capacityBytes];
     return new WritableMemoryImpl(new ResourceState(arr, Prim.BYTE, arr.length));
   }
@@ -124,6 +130,9 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final boolean[] arr) {
+    if (arr != null && arr.length == 0) {
+      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+    }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.BOOLEAN, arr.length));
   }
 
@@ -133,6 +142,9 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final byte[] arr) {
+    if (arr != null && arr.length == 0) {
+      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+    }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.BYTE, arr.length));
   }
 
@@ -142,6 +154,9 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final char[] arr) {
+    if (arr != null && arr.length == 0) {
+      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+    }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.CHAR, arr.length));
   }
 
@@ -151,6 +166,9 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final short[] arr) {
+    if (arr != null && arr.length == 0) {
+      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+    }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.SHORT, arr.length));
   }
 
@@ -160,6 +178,9 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final int[] arr) {
+    if (arr != null && arr.length == 0) {
+      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+    }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.INT, arr.length));
   }
 
@@ -169,6 +190,9 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final long[] arr) {
+    if (arr != null && arr.length == 0) {
+      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+    }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.LONG, arr.length));
   }
 
@@ -178,6 +202,9 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final float[] arr) {
+    if (arr != null && arr.length == 0) {
+      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+    }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.FLOAT, arr.length));
   }
 
@@ -187,6 +214,9 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final double[] arr) {
+    if (arr != null && arr.length == 0) {
+      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+    }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.DOUBLE, arr.length));
   }
   //END OF CONSTRUCTOR-TYPE METHODS

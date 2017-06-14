@@ -28,7 +28,7 @@ public abstract class WritableMemory extends Memory {
     if (byteBuf.isReadOnly()) {
       throw new ReadOnlyException("ByteBuffer is read-only.");
     }
-    if (byteBuf.remaining() == 0) {
+    if (byteBuf != null && byteBuf.capacity() == 0) {
       return WritableMemoryImpl.MEMORY_ZERO_SIZE;
     }
     final ResourceState state = new ResourceState();

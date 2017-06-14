@@ -31,7 +31,7 @@ public abstract class Memory {
    * @return the given ByteBuffer for read-only operations.
    */
   public static Memory wrap(final ByteBuffer byteBuf) {
-    if ((byteBuf != null) && (byteBuf.remaining() == 0)) {
+    if (byteBuf != null && byteBuf.capacity() == 0) {
       return WritableMemoryImpl.MEMORY_ZERO_SIZE;
     }
     final ResourceState state = new ResourceState();

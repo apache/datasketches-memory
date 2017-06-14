@@ -9,7 +9,9 @@ import static org.testng.Assert.*;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.List;
 
+import com.beust.jcommander.internal.Lists;
 import org.testng.annotations.Test;
 
 public class BufferTest {
@@ -63,22 +65,27 @@ public class BufferTest {
     Buffer buffZeroLengthArrayWrap = Buffer.wrap(new byte[0]);
     assertEquals(buffZeroLengthArrayWrap.getCapacity(), 0);
     // check 0 length array wraps
-    Buffer bufferZeroLengthArrayBoolean = WritableBuffer.wrap(new boolean[0]);
-    Buffer bufferZeroLengthArrayByte = WritableBuffer.wrap(new byte[0]);
-    Buffer bufferZeroLengthArrayChar = WritableBuffer.wrap(new char[0]);
-    Buffer bufferZeroLengthArrayShort = WritableBuffer.wrap(new short[0]);
-    Buffer bufferZeroLengthArrayInt = WritableBuffer.wrap(new int[0]);
-    Buffer bufferZeroLengthArrayLong = WritableBuffer.wrap(new long[0]);
-    Buffer bufferZeroLengthArrayFloat = WritableBuffer.wrap(new float[0]);
-    Buffer bufferZeroLengthArrayDouble = WritableBuffer.wrap(new double[0]);
-    assertEquals(bufferZeroLengthArrayBoolean.getCapacity(), 0);
-    assertEquals(bufferZeroLengthArrayByte.getCapacity(), 0);
-    assertEquals(bufferZeroLengthArrayChar.getCapacity(), 0);
-    assertEquals(bufferZeroLengthArrayShort.getCapacity(), 0);
-    assertEquals(bufferZeroLengthArrayInt.getCapacity(), 0);
-    assertEquals(bufferZeroLengthArrayLong.getCapacity(), 0);
-    assertEquals(bufferZeroLengthArrayFloat.getCapacity(), 0);
-    assertEquals(bufferZeroLengthArrayDouble.getCapacity(), 0);
+    List<Buffer> buffersToCheck = Lists.newArrayList();
+    buffersToCheck.add(WritableBuffer.wrap(new boolean[0]));
+    buffersToCheck.add(WritableBuffer.wrap(new byte[0]));
+    buffersToCheck.add(WritableBuffer.wrap(new char[0]));
+    buffersToCheck.add(WritableBuffer.wrap(new short[0]));
+    buffersToCheck.add(WritableBuffer.wrap(new int[0]));
+    buffersToCheck.add(WritableBuffer.wrap(new long[0]));
+    buffersToCheck.add(WritableBuffer.wrap(new float[0]));
+    buffersToCheck.add(WritableBuffer.wrap(new double[0]));
+    buffersToCheck.add(Buffer.wrap(new boolean[0]));
+    buffersToCheck.add(Buffer.wrap(new byte[0]));
+    buffersToCheck.add(Buffer.wrap(new char[0]));
+    buffersToCheck.add(Buffer.wrap(new short[0]));
+    buffersToCheck.add(Buffer.wrap(new int[0]));
+    buffersToCheck.add(Buffer.wrap(new long[0]));
+    buffersToCheck.add(Buffer.wrap(new float[0]));
+    buffersToCheck.add(Buffer.wrap(new double[0]));
+    //Check the buffer lengths
+    for (Buffer buffer : buffersToCheck) {
+      assertEquals(buffer.getCapacity(), 0);
+    }
   }
 
   @Test

@@ -11,7 +11,9 @@ import static org.testng.Assert.assertTrue;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.List;
 
+import com.beust.jcommander.internal.Lists;
 import org.testng.annotations.Test;
 
 public class MemoryTest {
@@ -72,6 +74,29 @@ public class MemoryTest {
     assertEquals(memZeroLengthArrayLong.getCapacity(), 0);
     assertEquals(memZeroLengthArrayFloat.getCapacity(), 0);
     assertEquals(memZeroLengthArrayDouble.getCapacity(), 0);
+
+    // check 0 length array wraps
+    List<Memory> memoryToCheck = Lists.newArrayList();
+    memoryToCheck.add(WritableMemory.wrap(new boolean[0]));
+    memoryToCheck.add(WritableMemory.wrap(new byte[0]));
+    memoryToCheck.add(WritableMemory.wrap(new char[0]));
+    memoryToCheck.add(WritableMemory.wrap(new short[0]));
+    memoryToCheck.add(WritableMemory.wrap(new int[0]));
+    memoryToCheck.add(WritableMemory.wrap(new long[0]));
+    memoryToCheck.add(WritableMemory.wrap(new float[0]));
+    memoryToCheck.add(WritableMemory.wrap(new double[0]));
+    memoryToCheck.add(Memory.wrap(new boolean[0]));
+    memoryToCheck.add(Memory.wrap(new byte[0]));
+    memoryToCheck.add(Memory.wrap(new char[0]));
+    memoryToCheck.add(Memory.wrap(new short[0]));
+    memoryToCheck.add(Memory.wrap(new int[0]));
+    memoryToCheck.add(Memory.wrap(new long[0]));
+    memoryToCheck.add(Memory.wrap(new float[0]));
+    memoryToCheck.add(Memory.wrap(new double[0]));
+    //Check the Memory lengths
+    for (Memory memory : memoryToCheck) {
+      assertEquals(memory.getCapacity(), 0);
+    }
   }
 
   @Test

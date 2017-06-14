@@ -73,6 +73,9 @@ public abstract class Buffer extends BaseBuffer {
    * @return Buffer for read operations
    */
   public static Buffer wrap(final boolean[] arr) {
+    if (arr != null && arr.length == 0) {
+      return WritableBufferImpl.MEMORY_ZERO_SIZE;
+    }
     return new WritableBufferImpl(new ResourceState(arr, Prim.BOOLEAN, arr.length));
   }
 

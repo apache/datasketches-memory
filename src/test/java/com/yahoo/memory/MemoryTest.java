@@ -56,8 +56,22 @@ public class MemoryTest {
       assertEquals(v, i);
     }
     // check 0 length array wraps
-    Memory memZeroLengthArray = WritableMemory.wrap(new byte[0]);
-    assertEquals(memZeroLengthArray.getCapacity(), 0);
+    Memory memZeroLengthArrayBoolean = WritableMemory.wrap(new boolean[0]);
+    Memory memZeroLengthArrayByte = WritableMemory.wrap(new byte[0]);
+    Memory memZeroLengthArrayChar = WritableMemory.wrap(new char[0]);
+    Memory memZeroLengthArrayShort = WritableMemory.wrap(new short[0]);
+    Memory memZeroLengthArrayInt = WritableMemory.wrap(new int[0]);
+    Memory memZeroLengthArrayLong = WritableMemory.wrap(new long[0]);
+    Memory memZeroLengthArrayFloat = WritableMemory.wrap(new float[0]);
+    Memory memZeroLengthArrayDouble = WritableMemory.wrap(new double[0]);
+    assertEquals(memZeroLengthArrayBoolean.getCapacity(), 0);
+    assertEquals(memZeroLengthArrayByte.getCapacity(), 0);
+    assertEquals(memZeroLengthArrayChar.getCapacity(), 0);
+    assertEquals(memZeroLengthArrayShort.getCapacity(), 0);
+    assertEquals(memZeroLengthArrayInt.getCapacity(), 0);
+    assertEquals(memZeroLengthArrayLong.getCapacity(), 0);
+    assertEquals(memZeroLengthArrayFloat.getCapacity(), 0);
+    assertEquals(memZeroLengthArrayDouble.getCapacity(), 0);
   }
 
   @Test

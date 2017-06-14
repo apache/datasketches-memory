@@ -122,7 +122,7 @@
                                 <dependency>
                                     <groupId>org.codehaus.plexus</groupId>
                                     <artifactId>plexus-compiler-javac-errorprone</artifactId>
-                                    <version>2.8.1</version>
+                                    <version>2.8.2</version>
                                 </dependency>
                             </dependencies>
                         </plugin>
@@ -139,7 +139,7 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>6.10</version>
+            <version>6.11</version>
             <scope>test</scope>
         </dependency>
         <!-- run locally for now
@@ -409,7 +409,7 @@
               <plugin>
                 <groupId>com.versioneye</groupId>
                 <artifactId>versioneye-maven-plugin</artifactId>
-                <version>3.11.2</version>
+                <version>3.11.4</version>
               </plugin>
 
             </plugins>

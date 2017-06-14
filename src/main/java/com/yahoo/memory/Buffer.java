@@ -30,7 +30,7 @@ public abstract class Buffer extends BaseBuffer {
    * @return the given ByteBuffer for read-only operations.
    */
   public static Buffer wrap(final ByteBuffer byteBuf) {
-    if ((byteBuf != null) && (byteBuf.remaining() == 0)) {
+    if (byteBuf != null && byteBuf.capacity() == 0) {
       return WritableBufferImpl.MEMORY_ZERO_SIZE;
     }
     final ResourceState state = new ResourceState();

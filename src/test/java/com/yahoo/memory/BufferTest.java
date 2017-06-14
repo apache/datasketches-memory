@@ -59,6 +59,9 @@ public class BufferTest {
       long v = buf.getLong();
       assertEquals(v, i);
     }
+    // Check Zero length array wraps
+    Buffer buffZeroLengthArrayWrap = Buffer.wrap(new byte[0]);
+    assertEquals(buffZeroLengthArrayWrap.getCapacity(), 0);
   }
 
   @Test

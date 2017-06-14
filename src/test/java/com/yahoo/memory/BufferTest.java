@@ -11,8 +11,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
 
-import com.beust.jcommander.internal.Lists;
 import org.testng.annotations.Test;
+import org.testng.collections.Lists;
 
 public class BufferTest {
 
@@ -66,6 +66,7 @@ public class BufferTest {
     assertEquals(buffZeroLengthArrayWrap.getCapacity(), 0);
     // check 0 length array wraps
     List<Buffer> buffersToCheck = Lists.newArrayList();
+    buffersToCheck.add(WritableBuffer.wrap(ByteBuffer.allocate(0)));
     buffersToCheck.add(WritableBuffer.wrap(new boolean[0]));
     buffersToCheck.add(WritableBuffer.wrap(new byte[0]));
     buffersToCheck.add(WritableBuffer.wrap(new char[0]));
@@ -74,6 +75,7 @@ public class BufferTest {
     buffersToCheck.add(WritableBuffer.wrap(new long[0]));
     buffersToCheck.add(WritableBuffer.wrap(new float[0]));
     buffersToCheck.add(WritableBuffer.wrap(new double[0]));
+    buffersToCheck.add(Buffer.wrap(ByteBuffer.allocate(0)));
     buffersToCheck.add(Buffer.wrap(new boolean[0]));
     buffersToCheck.add(Buffer.wrap(new byte[0]));
     buffersToCheck.add(Buffer.wrap(new char[0]));

@@ -34,7 +34,8 @@ public abstract class Buffer extends BaseBuffer {
       return WritableBufferImpl.MEMORY_ZERO_SIZE;
     }
     final ResourceState state = new ResourceState();
-    state.putByteBuffer(byteBuf);
+    ByteBuffer toByteBuf = byteBuf.slice();
+    state.putByteBuffer(toByteBuf);
     AccessByteBuffer.wrap(state);
     return new WritableBufferImpl(state);
   }

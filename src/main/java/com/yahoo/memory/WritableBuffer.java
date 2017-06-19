@@ -34,7 +34,8 @@ public abstract class WritableBuffer extends Buffer {
       throw new ReadOnlyException("ByteBuffer is read-only.");
     }
     final ResourceState state = new ResourceState();
-    state.putByteBuffer(byteBuf);
+    ByteBuffer toByteBuf = byteBuf.slice();
+    state.putByteBuffer(toByteBuf);
     AccessByteBuffer.wrap(state);
     return new WritableBufferImpl(state);
   }

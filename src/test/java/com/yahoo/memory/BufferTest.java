@@ -274,6 +274,26 @@ public class BufferTest {
     bb.setStartPositionEnd(1, 0, 2);
   }
 
+  @Test
+  public void testRegion() {
+    ByteBuffer byteBuffer = ByteBuffer.allocate(10);
+    byteBuffer.limit(7);
+    Buffer buff = Buffer.wrap(byteBuffer);
+    buff.getByte();
+    Buffer copyBuff = buff.region();
+    assertEquals(copyBuff.getEnd(), 6);
+    assertEquals(copyBuff.getCapacity(), 6);
+    assertEquals(copyBuff.getStart(), 0);
+    assertEquals(copyBuff.getPosition(), 0);
+
+    buff.setStartPositionEnd(1, 1, 5);
+    buff.getByte();
+    Buffer copyBuff2 = buff.region();
+    assertEquals(copyBuff2.getEnd(), 3);
+    assertEquals(copyBuff2.getCapacity(), 3);
+    assertEquals(copyBuff2.getStart(), 0);
+    assertEquals(copyBuff2.getPosition(), 0);
+  }
 
   @Test
   public void printlnTest() {
@@ -286,5 +306,4 @@ public class BufferTest {
   static void println(final String s) {
     //System.out.println(s);
   }
-
 }

@@ -23,7 +23,9 @@ public class MemoryTest {
     int n = 1024; //longs
     try (WritableDirectHandle wh = WritableMemory.allocateDirect(n * 8)) {
       WritableMemory mem = wh.get();
-      for (int i = 0; i < n; i++) mem.putLong(i * 8, i);
+      for (int i = 0; i < n; i++) {
+        mem.putLong(i * 8, i);
+      }
       for (int i = 0; i < n; i++) {
         long v = mem.getLong(i * 8);
         assertEquals(v, i);
@@ -35,7 +37,9 @@ public class MemoryTest {
   public void checkAutoHeapRoundTrip() {
     int n = 1024; //longs
     WritableMemory wmem = WritableMemory.allocate(n * 8);
-    for (int i = 0; i < n; i++) wmem.putLong(i * 8, i);
+    for (int i = 0; i < n; i++) {
+      wmem.putLong(i * 8, i);
+    }
     for (int i = 0; i < n; i++) {
       long v = wmem.getLong(i * 8);
       assertEquals(v, i);
@@ -47,7 +51,9 @@ public class MemoryTest {
     int n = 1024; //longs
     byte[] arr = new byte[n * 8];
     WritableMemory wmem = WritableMemory.wrap(arr);
-    for (int i = 0; i < n; i++) wmem.putLong(i * 8, i);
+    for (int i = 0; i < n; i++) {
+      wmem.putLong(i * 8, i);
+    }
     for (int i = 0; i < n; i++) {
       long v = wmem.getLong(i * 8);
       assertEquals(v, i);
@@ -274,35 +280,43 @@ public class MemoryTest {
     wh1.close();
     assertEquals(Memory.getCurrentDirectMemoryAllocations(), 1L);
     assertEquals(Memory.getCurrentDirectMemoryAllocated(), bytes);
-    
+
     wh2.close();
     wh2.close(); //check that it doesn't go negative.
     assertEquals(Memory.getCurrentDirectMemoryAllocations(), 0L);
     assertEquals(Memory.getCurrentDirectMemoryAllocated(), 0L);
   }
-  
+
   @SuppressWarnings("resource")
   @Test
   public void checkMonitorDirectMapStats() throws Exception {
     File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
     long bytes = file.length();
-    
+
     MapHandle mmh1 = Memory.map(file);
     MapHandle mmh2 = Memory.map(file);
-    
+
     assertEquals(Memory.getCurrentDirectMemoryMapAllocations(), 2L);
     assertEquals(Memory.getCurrentDirectMemoryMapAllocated(), 2 * bytes);
 
     mmh1.close();
     assertEquals(Memory.getCurrentDirectMemoryMapAllocations(), 1L);
     assertEquals(Memory.getCurrentDirectMemoryMapAllocated(), bytes);
-    
+
     mmh2.close();
     mmh2.close(); //check that it doesn't go negative.
     assertEquals(Memory.getCurrentDirectMemoryMapAllocations(), 0L);
     assertEquals(Memory.getCurrentDirectMemoryMapAllocated(), 0L);
   }
-  
+
+  @Test
+  public void checkNullMemReqSvr() {
+    Memory mem = Memory.wrap(new byte[16]);
+    ResourceState state = mem.getResourceState();
+    state.setMemoryRequestServer(null);
+    println(mem.toHexString("Test", 0, 16));
+  }
+
   @Test
   public void printlnTest() {
     println("PRINTING: "+this.getClass().getName());

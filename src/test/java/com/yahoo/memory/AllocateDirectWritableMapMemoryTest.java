@@ -30,7 +30,7 @@ public class AllocateDirectWritableMapMemoryTest {
   @Test(expectedExceptions = ReadOnlyException.class)
   public void simpleMap2() throws Exception {
     File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
-    try (WritableMapHandler rh = WritableMemory.writableMap(file)) {
+    try (WritableMapHandle rh = WritableMemory.writableMap(file)) {
       rh.close();
     }
   }
@@ -56,7 +56,7 @@ public class AllocateDirectWritableMapMemoryTest {
       assertEquals(bufStr, origStr);
     }
 
-    try (WritableMapHandler wrh = WritableMemory.writableMap(origFile, 0, corrBytes, ByteOrder.nativeOrder())) {
+    try (WritableMapHandle wrh = WritableMemory.writableMap(origFile, 0, corrBytes, ByteOrder.nativeOrder())) {
       WritableMemory wMap = wrh.get();
       wrh.load();
       assertTrue(wrh.isLoaded());

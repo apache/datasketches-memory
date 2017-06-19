@@ -126,4 +126,30 @@ public class ResourceStateTest {
     assertEquals(Prim.DOUBLE.scale(), ARRAY_DOUBLE_INDEX_SCALE);
   }
 
+  @SuppressWarnings("unused")
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void checkArrLen() {
+    byte[] arr = new byte[64];
+    ResourceState state = new ResourceState(arr, Prim.BYTE, -1);
+  }
+
+  @Test
+  public void checkIdentity() {
+    byte[] arr = new byte[64];
+    ResourceState state = new ResourceState(arr, Prim.BYTE, 64);
+    state.isSameResource(state);
+  }
+
+  @Test
+  public void printlnTest() {
+    println("PRINTING: "+this.getClass().getName());
+  }
+
+  /**
+   * @param s value to print
+   */
+  static void println(String s) {
+    //System.out.println(s); //disable here
+  }
+
 }

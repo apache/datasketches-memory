@@ -45,7 +45,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemoryMapHandler for managing this map
    * @throws Exception file not found or RuntimeException, etc.
    */
-  public static WritableMapHandler writableMap(final File file) throws Exception {
+  public static WritableMapHandle writableMap(final File file) throws Exception {
     return writableMap(file, 0, file.length(), ByteOrder.nativeOrder());
   }
 
@@ -59,14 +59,14 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemoryMapHandler for managing this map
    * @throws Exception file not found or RuntimeException, etc.
    */
-  public static WritableMapHandler writableMap(final File file, final long fileOffset,
+  public static WritableMapHandle writableMap(final File file, final long fileOffset,
           final long capacity, final ByteOrder byteOrder) throws Exception {
     final ResourceState state = new ResourceState();
     state.putFile(file);
     state.putFileOffset(fileOffset);
     state.putCapacity(capacity);
     state.order(byteOrder);
-    return WritableMapHandler.map(state);
+    return WritableMapHandle.map(state);
   }
 
   //ALLOCATE DIRECT XXX

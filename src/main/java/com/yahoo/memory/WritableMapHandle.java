@@ -12,21 +12,21 @@ package com.yahoo.memory;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-//Joins a WritableHandler with an AutoCloseable WritableMap resource
-public final class WritableMapHandler implements WritableMap, WritableHandle {
+//Joins a WritableHandle with an AutoCloseable WritableMap resource
+public final class WritableMapHandle implements WritableMap, WritableHandle {
   AllocateDirectWritableMap dirWmap;
   WritableMemoryImpl wMem;
 
-  private WritableMapHandler(final AllocateDirectWritableMap dirWmap, final WritableMemoryImpl wMem) {
+  private WritableMapHandle(final AllocateDirectWritableMap dirWmap, final WritableMemoryImpl wMem) {
     this.dirWmap = dirWmap;
     this.wMem = wMem;
   }
 
   @SuppressWarnings("resource") //called from memory
-  static WritableMapHandler map(final ResourceState state) throws Exception {
+  static WritableMapHandle map(final ResourceState state) throws Exception {
     final AllocateDirectWritableMap dirMap = AllocateDirectWritableMap.map(state);
     final WritableMemoryImpl wMem = new WritableMemoryImpl(state);
-    return new WritableMapHandler(dirMap, wMem);
+    return new WritableMapHandle(dirMap, wMem);
   }
 
   @Override

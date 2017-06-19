@@ -12,7 +12,7 @@ package com.yahoo.memory;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-//Joins a WritableHandler with writable, AutoCloseable AllocateDirect resource
+//Joins a WritableHandle with writable, AutoCloseable AllocateDirect resource
 public class WritableDirectHandle implements AutoCloseable, WritableHandle {
   AllocateDirect direct = null;
   WritableMemory wMem = null;

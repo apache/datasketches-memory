@@ -258,7 +258,7 @@ public class BufferTest2 {
     bb.position(10);
 
     Buffer buffer = Buffer.wrap(bb);
-    assertEquals(bb.position(), buffer.getPosition());
+    assertEquals(bb.position()-10, buffer.getPosition());
     assertEquals(30, buffer.setPosition(30).getPosition());
     assertEquals(40, buffer.incrementPosition(10).getPosition());
     assertEquals(0, buffer.resetPosition().getPosition());
@@ -305,7 +305,7 @@ public class BufferTest2 {
     assertEquals(dupBuffer.getStart(), buffer.getStart());
     assertEquals(regionBuffer.getStart(), buffer.getStart());
     assertEquals(dupBuffer.getEnd(), buffer.getEnd());
-    assertEquals(regionBuffer.getEnd(), buffer.getEnd());
+    assertEquals(regionBuffer.getEnd(), buffer.getEnd() - buffer.getPosition());
     assertEquals(dupBuffer.getPosition(), buffer.getPosition());
     assertEquals(regionBuffer.getPosition(), 0);
     assertEquals(dupBuffer.getCapacity(), buffer.getCapacity());

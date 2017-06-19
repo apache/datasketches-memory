@@ -40,12 +40,11 @@ class BaseBuffer {
       final ByteBuffer byteBuf = state.getByteBuffer();
       if (byteBuf != null) {
         pos = byteBuf.position();
-        end = byteBuf.limit();
       } else {
         pos = 0;
-        end = cap;
       }
       start = 0;
+      end = cap;
     }
     state.putBaseBuffer(this);
   }

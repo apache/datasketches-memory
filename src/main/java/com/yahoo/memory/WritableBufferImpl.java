@@ -68,39 +68,51 @@ class WritableBufferImpl extends WritableBuffer {
   //REGIONS/DUPLICATES XXX
   @Override
   public Buffer duplicate() {
-    return regOrDup(0, capacity, true);
+    return doDuplicate(0, capacity);
   }
 
   @Override
   public WritableBuffer writableDuplicate() {
-    return regOrDup(0, capacity, true);
+    return doDuplicate(0, capacity);
   }
 
   @Override
   public Buffer region() {
-    return regOrDup(getPosition(), getEnd() - getPosition(), false);
+    return doRegion(getPosition(), getEnd() - getPosition());
   }
 
   @Override
   public WritableBuffer writableRegion() {
-    return regOrDup(getPosition(), getEnd() - getPosition(), false);
+    return doRegion(getPosition(), getEnd() - getPosition());
   }
 
   @Override
   public WritableBuffer writableRegion(final long offsetBytes, final long capacityBytes) {
-    return regOrDup(offsetBytes, capacityBytes, false);
+    return doRegion(offsetBytes, capacityBytes);
   }
 
-  private WritableBuffer regOrDup(final long offsetBytes, final long capacityBytes,
-          final boolean dup) {
+  private WritableBuffer doRegion(final long offsetBytes, final long capacityBytes) {
     checkValid();
     assert (offsetBytes + capacityBytes) <= capacity
             : "newOff + newCap: " + (offsetBytes + capacityBytes) + ", origCap: " + capacity;
-    final ResourceState newState = state.copy();
+    final ResourceState newState = state.copy(); //creates new BaseBuffer(newState)
     newState.putRegionOffset(newState.getRegionOffset() + offsetBytes);
     newState.putCapacity(capacityBytes);
-    if (!dup) { newState.putBaseBuffer(null); }
-    return new WritableBufferImpl(newState);
+    final WritableBufferImpl wBufImpl = new WritableBufferImpl(newState);
+    wBufImpl.setStartPositionEnd(0L, 0L, capacityBytes);
+    return wBufImpl;
+  }
+
+  private WritableBuffer doDuplicate(final long offsetBytes, final long capacityBytes) {
+    checkValid();
+    assert (offsetBytes + capacityBytes) <= capacity
+            : "newOff + newCap: " + (offsetBytes + capacityBytes) + ", origCap: " + capacity;
+    final ResourceState newState = state.copy(); //creates new BaseBuffer(newState)
+    newState.putRegionOffset(newState.getRegionOffset() + offsetBytes);
+    newState.putCapacity(capacityBytes);
+    final WritableBufferImpl wBufImpl = new WritableBufferImpl(newState);
+    wBufImpl.setStartPositionEnd(getStart(), getPosition(), getEnd());
+    return wBufImpl;
   }
 
   //MEMORY XXX

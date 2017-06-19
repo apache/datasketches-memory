@@ -32,21 +32,25 @@ class BaseBuffer {
   BaseBuffer(final ResourceState state) {
     cap = state.getCapacity();
     final BaseBuffer baseBuf = state.getBaseBuffer();
-    if (baseBuf != null) {
-      start = baseBuf.getStart();
-      pos = baseBuf.getPosition();
-      end = baseBuf.getEnd();
-    } else {
+    if (baseBuf != null) { //BaseBuffer valid, comes from Buffer with valid state
+      start = 0;
+      pos = 0;
+      end = cap;
+      assertInvariants(start, pos, end, cap);
+    } else { //BaseBuffer null, comes from WritableMemory asBuffer()
+      start = 0;
       final ByteBuffer byteBuf = state.getByteBuffer();
       if (byteBuf != null) {
         pos = byteBuf.position();
         end = byteBuf.limit();
+        assertInvariants(start, pos, end, cap);
       } else {
         pos = 0;
         end = cap;
+        assertInvariants(start, pos, end, cap);
       }
-      start = 0;
     }
+    assertInvariants(start, pos, end, cap);
     state.putBaseBuffer(this);
   }
 
@@ -57,7 +61,7 @@ class BaseBuffer {
    * @param end the end position in the buffer
    * @return BaseBuffer
    */
-  public BaseBuffer setStartPositionEnd(final long start, final long position, final long end) {
+  public final BaseBuffer setStartPositionEnd(final long start, final long position, final long end) {
     assertInvariants(start, position, end, cap);
     this.start = start;
     this.end = end;

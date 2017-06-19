@@ -158,31 +158,31 @@ final class ResourceState {
     out.unsafeObjHeader_ = unsafeObjHeader_;
     out.capacity_ = capacity_;
     //cumBaseOffset is computed
-    out.memReqSvr_ = memReqSvr_;
+    out.memReqSvr_ = memReqSvr_; //retains memReqSvr reference
 
     //FLAGS
     out.resourceIsReadOnly_ = resourceIsReadOnly_;
-    out.valid_ = valid_;
+    out.valid_ = valid_; //retains valid reference
 
     //REGIONS
     out.regionOffset_ = regionOffset_;
 
     //BYTE BUFFER
-    out.byteBuf_ = byteBuf_;
+    out.byteBuf_ = byteBuf_; //retains ByteBuffer reference
 
     //MEMORY MAPPED FILES
-    out.file_ = file_;
+    out.file_ = file_; //retains file reference
     out.fileOffset_ = fileOffset_;
     out.raf_ = raf_;
     out.mbb_ = mbb_;
 
-    //POSITIONAL
-    out.baseBuf_ = baseBuf_;
-
     //ENDIANNESS
-    out.resourceOrder_ = resourceOrder_;
+    out.resourceOrder_ = resourceOrder_; //retains resourseOrder
     out.swapBytes_ = swapBytes_;
     out.compute();
+
+    //POSITIONAL
+    out.baseBuf_ = new BaseBuffer(out);
     return out;
   }
 

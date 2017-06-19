@@ -196,7 +196,7 @@ public class BufferTest2 {
     boolean[] booleanArray = new boolean[64];
 
     for (int i = 0; i < 64; i++) {
-      if (i % 3 == 0) {
+      if ((i % 3) == 0) {
         booleanArray[i] = true;
       }
     }
@@ -300,12 +300,12 @@ public class BufferTest2 {
     Buffer buffer = Buffer.wrap(bb.slice().order(ByteOrder.nativeOrder())); //slice = 54
     buffer.setPosition(30);//remaining = 24
     Buffer dupBuffer = buffer.duplicate(); //all 54
-    Buffer regionBuffer = buffer.region();
+    Buffer regionBuffer = buffer.region(); //24
 
     assertEquals(dupBuffer.getStart(), buffer.getStart());
     assertEquals(regionBuffer.getStart(), buffer.getStart());
     assertEquals(dupBuffer.getEnd(), buffer.getEnd());
-    assertEquals(regionBuffer.getEnd(), buffer.getEnd());
+    assertEquals(regionBuffer.getEnd(), buffer.getRemaining());
     assertEquals(dupBuffer.getPosition(), buffer.getPosition());
     assertEquals(regionBuffer.getPosition(), 0);
     assertEquals(dupBuffer.getCapacity(), buffer.getCapacity());

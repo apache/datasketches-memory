@@ -47,11 +47,11 @@ class WritableBufferImpl extends WritableBuffer {
   final long unsafeObjHeader; //Heap ByteBuffer includes the slice() offset here.
   final long capacity;
   final long cumBaseOffset; //Holds the cumulative offset to the start of data.
-  //Static variable for cases where bytebuf/array sizes are zero
-  final static WritableBufferImpl MEMORY_ZERO_SIZE;
+  //Static variable for cases where byteBuf/array sizes are zero
+  final static WritableBufferImpl ZERO_SIZE_BUFFER;
 
   static {
-    MEMORY_ZERO_SIZE = new WritableBufferImpl(
+    ZERO_SIZE_BUFFER = new WritableBufferImpl(
         new ResourceState(new byte[0], Prim.BYTE, 0)
     );
   }

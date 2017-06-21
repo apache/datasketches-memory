@@ -48,12 +48,12 @@ class WritableMemoryImpl extends WritableMemory {
   final Object unsafeObj; //Array objects are held here.
   final long unsafeObjHeader; //Heap ByteBuffer includes the slice() offset here.
   final long capacity;
-  final long cumBaseOffset; //Holds the cum offset to the start of data.
-  //Static variable for cases where bytebuf/array sizes are zero
-  final static WritableMemoryImpl MEMORY_ZERO_SIZE;
+  final long cumBaseOffset; //Holds the cumulative offset to the start of data.
+  //Static variable for cases where byteBuf/array sizes are zero
+  final static WritableMemoryImpl ZERO_SIZE_MEMORY;
 
   static {
-    MEMORY_ZERO_SIZE = new WritableMemoryImpl(
+    ZERO_SIZE_MEMORY = new WritableMemoryImpl(
         new ResourceState(new byte[0], Prim.BYTE, 0)
     );
   }
@@ -97,12 +97,18 @@ class WritableMemoryImpl extends WritableMemory {
   //BUFFER XXX
   @Override
   public Buffer asBuffer() {
-    return new WritableBufferImpl(state.copy());
+    return asWritableBuffer();
   }
 
   @Override
   public WritableBuffer asWritableBuffer() {
-    return new WritableBufferImpl(state.copy());
+    final ResourceState newState = state.copy();
+    final WritableBufferImpl impl = new WritableBufferImpl(newState); //with new BaseBuffer
+    final ByteBuffer byteBuf = newState.getByteBuffer();
+    if (byteBuf != null) {
+      impl.setStartPositionEnd(0, byteBuf.position(), byteBuf.limit());
+    } //else defaults
+    return impl;
   }
 
   ///PRIMITIVE getXXX() and getXXXArray() XXX

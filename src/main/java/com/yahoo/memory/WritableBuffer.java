@@ -27,16 +27,18 @@ public abstract class WritableBuffer extends Buffer {
    * @return the given ByteBuffer for write operations.
    */
   public static WritableBuffer wrap(final ByteBuffer byteBuf) {
-    if (byteBuf.capacity() == 0) {
-      return WritableBufferImpl.MEMORY_ZERO_SIZE;
-    }
     if (byteBuf.isReadOnly()) {
       throw new ReadOnlyException("ByteBuffer is read-only.");
+    }
+    if (byteBuf.capacity() == 0) {
+      return WritableBufferImpl.ZERO_SIZE_BUFFER;
     }
     final ResourceState state = new ResourceState();
     state.putByteBuffer(byteBuf);
     AccessByteBuffer.wrap(state);
-    return new WritableBufferImpl(state);
+    final WritableBufferImpl impl = new WritableBufferImpl(state);
+    impl.setStartPositionEnd(0, byteBuf.position(), byteBuf.limit());
+    return impl;
   }
 
   //MAP XXX
@@ -83,7 +85,7 @@ public abstract class WritableBuffer extends Buffer {
    */
   public static WritableBuffer allocate(final int capacityBytes) {
     if (capacityBytes == 0) {
-      return WritableBufferImpl.MEMORY_ZERO_SIZE;
+      return WritableBufferImpl.ZERO_SIZE_BUFFER;
     }
     final byte[] arr = new byte[capacityBytes];
     return new WritableBufferImpl(new ResourceState(arr, Prim.BYTE, arr.length));
@@ -98,7 +100,7 @@ public abstract class WritableBuffer extends Buffer {
   @SuppressWarnings("null")
   public static WritableBuffer wrap(final boolean[] arr) {
     if ((arr != null) && (arr.length == 0)) {
-      return WritableBufferImpl.MEMORY_ZERO_SIZE;
+      return WritableBufferImpl.ZERO_SIZE_BUFFER;
     }
     return new WritableBufferImpl(new ResourceState(arr, Prim.BOOLEAN, arr.length));
   }
@@ -111,7 +113,7 @@ public abstract class WritableBuffer extends Buffer {
   @SuppressWarnings("null")
   public static WritableBuffer wrap(final byte[] arr) {
     if ((arr != null) && (arr.length == 0)) {
-      return WritableBufferImpl.MEMORY_ZERO_SIZE;
+      return WritableBufferImpl.ZERO_SIZE_BUFFER;
     }
     return new WritableBufferImpl(new ResourceState(arr, Prim.BYTE, arr.length));
   }
@@ -124,7 +126,7 @@ public abstract class WritableBuffer extends Buffer {
   @SuppressWarnings("null")
   public static WritableBuffer wrap(final char[] arr) {
     if ((arr != null) && (arr.length == 0)) {
-      return WritableBufferImpl.MEMORY_ZERO_SIZE;
+      return WritableBufferImpl.ZERO_SIZE_BUFFER;
     }
     return new WritableBufferImpl(new ResourceState(arr, Prim.CHAR, arr.length));
   }
@@ -137,7 +139,7 @@ public abstract class WritableBuffer extends Buffer {
   @SuppressWarnings("null")
   public static WritableBuffer wrap(final short[] arr) {
     if ((arr != null) && (arr.length == 0)) {
-      return WritableBufferImpl.MEMORY_ZERO_SIZE;
+      return WritableBufferImpl.ZERO_SIZE_BUFFER;
     }
     return new WritableBufferImpl(new ResourceState(arr, Prim.SHORT, arr.length));
   }
@@ -150,7 +152,7 @@ public abstract class WritableBuffer extends Buffer {
   @SuppressWarnings("null")
   public static WritableBuffer wrap(final int[] arr) {
     if ((arr != null) && (arr.length == 0)) {
-      return WritableBufferImpl.MEMORY_ZERO_SIZE;
+      return WritableBufferImpl.ZERO_SIZE_BUFFER;
     }
     return new WritableBufferImpl(new ResourceState(arr, Prim.INT, arr.length));
   }
@@ -163,7 +165,7 @@ public abstract class WritableBuffer extends Buffer {
   @SuppressWarnings("null")
   public static WritableBuffer wrap(final long[] arr) {
     if ((arr != null) && (arr.length == 0)) {
-      return WritableBufferImpl.MEMORY_ZERO_SIZE;
+      return WritableBufferImpl.ZERO_SIZE_BUFFER;
     }
     return new WritableBufferImpl(new ResourceState(arr, Prim.LONG, arr.length));
   }
@@ -176,7 +178,7 @@ public abstract class WritableBuffer extends Buffer {
   @SuppressWarnings("null")
   public static WritableBuffer wrap(final float[] arr) {
     if ((arr != null) && (arr.length == 0)) {
-      return WritableBufferImpl.MEMORY_ZERO_SIZE;
+      return WritableBufferImpl.ZERO_SIZE_BUFFER;
     }
     return new WritableBufferImpl(new ResourceState(arr, Prim.FLOAT, arr.length));
   }
@@ -189,7 +191,7 @@ public abstract class WritableBuffer extends Buffer {
   @SuppressWarnings("null")
   public static WritableBuffer wrap(final double[] arr) {
     if ((arr != null) && (arr.length == 0)) {
-      return WritableBufferImpl.MEMORY_ZERO_SIZE;
+      return WritableBufferImpl.ZERO_SIZE_BUFFER;
     }
     return new WritableBufferImpl(new ResourceState(arr, Prim.DOUBLE, arr.length));
   }

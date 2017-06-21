@@ -5,8 +5,6 @@
 
 package com.yahoo.memory;
 
-import java.nio.ByteBuffer;
-
 /**
  * A new positional API. This is different from and simpler than Java Buffer positional approach.
  * <ul><li>All based on longs instead of ints.</li>
@@ -24,33 +22,15 @@ import java.nio.ByteBuffer;
  * @author Lee Rhodes
  */
 class BaseBuffer {
-  private long start;
-  private long pos;
-  private long end;
   private final long cap;
+  private long start = 0;
+  private long pos = 0;
+  private long end;
+
 
   BaseBuffer(final ResourceState state) {
     cap = state.getCapacity();
-    final BaseBuffer baseBuf = state.getBaseBuffer();
-    if (baseBuf != null) { //BaseBuffer valid, comes from Buffer with valid state
-      start = 0;
-      pos = 0;
-      end = cap;
-      assertInvariants(start, pos, end, cap);
-    } else { //BaseBuffer null, comes from WritableMemory asBuffer()
-      start = 0;
-      final ByteBuffer byteBuf = state.getByteBuffer();
-      if (byteBuf != null) {
-        pos = byteBuf.position();
-        end = byteBuf.limit();
-        assertInvariants(start, pos, end, cap);
-      } else {
-        pos = 0;
-        end = cap;
-        assertInvariants(start, pos, end, cap);
-      }
-    }
-    assertInvariants(start, pos, end, cap);
+    end = cap;
     state.putBaseBuffer(this);
   }
 

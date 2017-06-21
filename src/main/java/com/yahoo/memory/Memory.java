@@ -27,17 +27,18 @@ public abstract class Memory {
   //BYTE BUFFER XXX
   /**
    * Accesses the given ByteBuffer for read-only operations.
-   * @param byteBuf the given ByteBuffer
+   * @param byteBuf the given ByteBuffer, must not be null
    * @return the given ByteBuffer for read-only operations.
    */
   public static Memory wrap(final ByteBuffer byteBuf) {
     if ((byteBuf != null) && (byteBuf.capacity() == 0)) {
-      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     final ResourceState state = new ResourceState();
     state.putByteBuffer(byteBuf);
     AccessByteBuffer.wrap(state);
-    return new WritableMemoryImpl(state);
+    final WritableMemoryImpl impl = new WritableMemoryImpl(state);
+    return impl;
   }
 
   //MAP XXX
@@ -104,7 +105,7 @@ public abstract class Memory {
   @SuppressWarnings("null")
   public static Memory wrap(final boolean[] arr) {
     if ((arr != null) && (arr.length == 0)) {
-      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.BOOLEAN, arr.length));
   }
@@ -117,7 +118,7 @@ public abstract class Memory {
   @SuppressWarnings("null")
   public static Memory wrap(final byte[] arr) {
     if ((arr != null) && (arr.length == 0)) {
-      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.BYTE, arr.length));
   }
@@ -130,7 +131,7 @@ public abstract class Memory {
   @SuppressWarnings("null")
   public static Memory wrap(final char[] arr) {
     if ((arr != null) && (arr.length == 0)) {
-      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.CHAR, arr.length));
   }
@@ -143,7 +144,7 @@ public abstract class Memory {
   @SuppressWarnings("null")
   public static Memory wrap(final short[] arr) {
     if ((arr != null) && (arr.length == 0)) {
-      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.SHORT, arr.length));
   }
@@ -156,7 +157,7 @@ public abstract class Memory {
   @SuppressWarnings("null")
   public static Memory wrap(final int[] arr) {
     if ((arr != null) && (arr.length == 0)) {
-      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.INT, arr.length));
   }
@@ -169,7 +170,7 @@ public abstract class Memory {
   @SuppressWarnings("null")
   public static Memory wrap(final long[] arr) {
     if ((arr != null) && (arr.length == 0)) {
-      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.LONG, arr.length));
   }
@@ -182,7 +183,7 @@ public abstract class Memory {
   @SuppressWarnings("null")
   public static Memory wrap(final float[] arr) {
     if ((arr != null) && (arr.length == 0)) {
-      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.FLOAT, arr.length));
   }
@@ -195,7 +196,7 @@ public abstract class Memory {
   @SuppressWarnings("null")
   public static Memory wrap(final double[] arr) {
     if ((arr != null) && (arr.length == 0)) {
-      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.DOUBLE, arr.length));
   }

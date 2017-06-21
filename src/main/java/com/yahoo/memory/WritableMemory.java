@@ -29,12 +29,13 @@ public abstract class WritableMemory extends Memory {
       throw new ReadOnlyException("ByteBuffer is read-only.");
     }
     if (byteBuf.capacity() == 0) {
-      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     final ResourceState state = new ResourceState();
     state.putByteBuffer(byteBuf);
     AccessByteBuffer.wrap(state);
-    return new WritableMemoryImpl(state);
+    final WritableMemoryImpl impl = new WritableMemoryImpl(state);
+    return impl;
   }
 
   //MAP XXX
@@ -117,7 +118,7 @@ public abstract class WritableMemory extends Memory {
    */
   public static WritableMemory allocate(final int capacityBytes) {
     if (capacityBytes == 0) {
-      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     final byte[] arr = new byte[capacityBytes];
     return new WritableMemoryImpl(new ResourceState(arr, Prim.BYTE, arr.length));
@@ -132,7 +133,7 @@ public abstract class WritableMemory extends Memory {
   @SuppressWarnings("null")
   public static WritableMemory wrap(final boolean[] arr) {
     if ((arr != null) && (arr.length == 0)) {
-      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.BOOLEAN, arr.length));
   }
@@ -145,7 +146,7 @@ public abstract class WritableMemory extends Memory {
   @SuppressWarnings("null")
   public static WritableMemory wrap(final byte[] arr) {
     if ((arr != null) && (arr.length == 0)) {
-      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.BYTE, arr.length));
   }
@@ -158,7 +159,7 @@ public abstract class WritableMemory extends Memory {
   @SuppressWarnings("null")
   public static WritableMemory wrap(final char[] arr) {
     if ((arr != null) && (arr.length == 0)) {
-      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.CHAR, arr.length));
   }
@@ -171,7 +172,7 @@ public abstract class WritableMemory extends Memory {
   @SuppressWarnings("null")
   public static WritableMemory wrap(final short[] arr) {
     if ((arr != null) && (arr.length == 0)) {
-      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.SHORT, arr.length));
   }
@@ -184,7 +185,7 @@ public abstract class WritableMemory extends Memory {
   @SuppressWarnings("null")
   public static WritableMemory wrap(final int[] arr) {
     if ((arr != null) && (arr.length == 0)) {
-      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.INT, arr.length));
   }
@@ -197,7 +198,7 @@ public abstract class WritableMemory extends Memory {
   @SuppressWarnings("null")
   public static WritableMemory wrap(final long[] arr) {
     if ((arr != null) && (arr.length == 0)) {
-      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.LONG, arr.length));
   }
@@ -210,7 +211,7 @@ public abstract class WritableMemory extends Memory {
   @SuppressWarnings("null")
   public static WritableMemory wrap(final float[] arr) {
     if ((arr != null) && (arr.length == 0)) {
-      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.FLOAT, arr.length));
   }
@@ -223,7 +224,7 @@ public abstract class WritableMemory extends Memory {
   @SuppressWarnings("null")
   public static WritableMemory wrap(final double[] arr) {
     if ((arr != null) && (arr.length == 0)) {
-      return WritableMemoryImpl.MEMORY_ZERO_SIZE;
+      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.DOUBLE, arr.length));
   }

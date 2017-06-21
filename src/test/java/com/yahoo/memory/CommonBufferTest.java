@@ -19,6 +19,7 @@ public class CommonBufferTest {
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
       setGetTests(buf);
+      setGetTests2(buf);
     }
   }
 
@@ -26,7 +27,7 @@ public class CommonBufferTest {
     buf.putBoolean(true);
     buf.putBoolean(false);
     buf.putByte((byte) -1);
-    buf.putByte((byte)0);
+    buf.putByte((byte) 0);
     buf.putChar('A');
     buf.putChar('Z');
     buf.putShort(Short.MAX_VALUE);
@@ -74,6 +75,42 @@ public class CommonBufferTest {
     assertEquals(buf.getDouble(), Double.MAX_VALUE);
     assertEquals(buf.getDouble(buf.getPosition()), Double.MIN_VALUE);
     assertEquals(buf.getDouble(), Double.MIN_VALUE);
+  }
+
+  public static void setGetTests2(WritableBuffer buf) {
+    buf.putBoolean(0, true);
+    buf.putBoolean(1, false);
+    buf.putByte(2, (byte) -1);
+    buf.putByte(3, (byte) 0);
+    buf.putChar(4,'A');
+    buf.putChar(6,'Z');
+    buf.putShort(8, Short.MAX_VALUE);
+    buf.putShort(10, Short.MIN_VALUE);
+    buf.putInt(12, Integer.MAX_VALUE);
+    buf.putInt(16, Integer.MIN_VALUE);
+    buf.putFloat(20, Float.MAX_VALUE);
+    buf.putFloat(24, Float.MIN_VALUE);
+    buf.putLong(28, Long.MAX_VALUE);
+    buf.putLong(36, Long.MIN_VALUE);
+    buf.putDouble(44, Double.MAX_VALUE);
+    buf.putDouble(52, Double.MIN_VALUE);
+
+    assertEquals(buf.getBoolean(0), true);
+    assertEquals(buf.getBoolean(1), false);
+    assertEquals(buf.getByte(2), (byte) -1);
+    assertEquals(buf.getByte(3), (byte)0);
+    assertEquals(buf.getChar(4), 'A');
+    assertEquals(buf.getChar(6), 'Z');
+    assertEquals(buf.getShort(8), Short.MAX_VALUE);
+    assertEquals(buf.getShort(10), Short.MIN_VALUE);
+    assertEquals(buf.getInt(12), Integer.MAX_VALUE);
+    assertEquals(buf.getInt(16), Integer.MIN_VALUE);
+    assertEquals(buf.getFloat(20), Float.MAX_VALUE);
+    assertEquals(buf.getFloat(24), Float.MIN_VALUE);
+    assertEquals(buf.getLong(28), Long.MAX_VALUE);
+    assertEquals(buf.getLong(36), Long.MIN_VALUE);
+    assertEquals(buf.getDouble(44), Double.MAX_VALUE);
+    assertEquals(buf.getDouble(52), Double.MIN_VALUE);
   }
 
   @Test
@@ -298,7 +335,7 @@ public class CommonBufferTest {
     buf.setStartPositionEnd(reg1Start, reg1Start, reg1Len);
     buf.fill(b1);
     buf.resetPosition();
-    for (int i=reg1Start; i<reg1Len+reg1Start; i++) {
+    for (int i=reg1Start; i<(reg1Len+reg1Start); i++) {
       assertEquals(buf.getByte(), b1);
     }
     //println(buf.toHexString("Region1 to 5", reg1Start, reg1Len));
@@ -309,7 +346,7 @@ public class CommonBufferTest {
     buf.fill(b2);
     //println(mem.toHexString("Fill", 0, (int)mem.getCapacity()));
     buf.resetPosition();
-    for (int i=reg2Start; i<reg2Start+reg2Len; i++) {
+    for (int i=reg2Start; i<(reg2Start+reg2Len); i++) {
       assertEquals(buf.getByte(), b2);
     }
     //println(buf.toHexString("Region2 to 7", reg2Start, reg2Len));
@@ -320,7 +357,7 @@ public class CommonBufferTest {
     buf.resetPosition();
     buf.clear();
     buf.resetPosition();
-    for (int i=reg1Start; i<reg1Start+reg1Len; i++) {
+    for (int i=reg1Start; i<(reg1Start+reg1Len); i++) {
       assertEquals(buf.getByte(), zeroByte);
     }
     //println(buf.toHexString("Region1 cleared", reg1Start, reg1Len));
@@ -330,7 +367,7 @@ public class CommonBufferTest {
     buf.resetPosition();
     buf.clear();
     buf.resetPosition();
-    for (int i=reg2Start; i<reg2Len+reg2Start; i++) {
+    for (int i=reg2Start; i<(reg2Len+reg2Start); i++) {
       assertEquals(buf.getByte(), zeroByte);
     }
     //println(buf.toHexString("Region2 cleared", reg2Start, reg2Len));

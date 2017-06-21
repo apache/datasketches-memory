@@ -175,21 +175,23 @@ public abstract class Buffer extends BaseBuffer {
 
   //PRIMITIVE getXXX() and getXXXArray() //XXX
   /**
-   * Gets the boolean value at the current position. Increments the position by <i>Boolean.BYTES</i>.
+   * Gets the boolean value at the current position.
+   * Increments the position by <i>Boolean.BYTES</i>.
    * @return the boolean at the current position
    */
   public abstract boolean getBoolean();
 
   /**
-   * Gets the boolean value at the given offset
+   * Gets the boolean value at the given offset.
+   * This does not change the position.
    * @param offsetBytes offset bytes relative to this Memory start
    * @return the boolean at the given offset
    */
   public abstract boolean getBoolean(long offsetBytes);
 
   /**
-   * Gets the boolean array at the current position. Increments the position by
-   * <i>Boolean.BYTES * (length - dstOffset)</i>.
+   * Gets the boolean array at the current position.
+   * Increments the position by <i>Boolean.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
    * @param length number of array units to transfer
@@ -197,21 +199,23 @@ public abstract class Buffer extends BaseBuffer {
   public abstract void getBooleanArray(boolean[] dstArray, int dstOffset, int length);
 
   /**
-   * Gets the byte value at the current position. Increments the position by <i>Byte.BYTES</i>.
+   * Gets the byte value at the current position.
+   * Increments the position by <i>Byte.BYTES</i>.
    * @return the byte at the current position
    */
   public abstract byte getByte();
 
   /**
-   * Gets the byte value at the given offset
+   * Gets the byte value at the given offset.
+   * This does not change the position.
    * @param offsetBytes offset bytes relative to this Memory start
    * @return the byte at the given offset
    */
   public abstract byte getByte(long offsetBytes);
 
   /**
-   * Gets the byte array at the current position. Increments the position by
-   * <i>Byte.BYTES * (length - dstOffset)</i>.
+   * Gets the byte array at the current position.
+   * Increments the position by <i>Byte.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
    * @param length number of array units to transfer
@@ -219,21 +223,23 @@ public abstract class Buffer extends BaseBuffer {
   public abstract void getByteArray(byte[] dstArray, int dstOffset, int length);
 
   /**
-   * Gets the char value at the current position. Increments the position by <i>Char.BYTES</i>.
+   * Gets the char value at the current position.
+   * Increments the position by <i>Char.BYTES</i>.
    * @return the char at the current position
    */
   public abstract char getChar();
 
   /**
-   * Gets the char value at the given offset
+   * Gets the char value at the given offset.
+   * This does not change the position.
    * @param offsetBytes offset bytes relative to this Memory start
    * @return the char at the given offset
    */
   public abstract char getChar(long offsetBytes);
 
   /**
-   * Gets the char array at the current position. Increments the position by
-   * <i>Char.BYTES * (length - dstOffset)</i>.
+   * Gets the char array at the current position.
+   * Increments the position by <i>Char.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
    * @param length number of array units to transfer
@@ -241,21 +247,23 @@ public abstract class Buffer extends BaseBuffer {
   public abstract void getCharArray(char[] dstArray, int dstOffset, int length);
 
   /**
-   * Gets the double value at the current position. Increments the position by <i>Double.BYTES</i>.
+   * Gets the double value at the current position.
+   * Increments the position by <i>Double.BYTES</i>.
    * @return the double at the current position
    */
   public abstract double getDouble();
 
   /**
-   * Gets the double value at the given offset
+   * Gets the double value at the given offset.
+   * This does not change the position.
    * @param offsetBytes offset bytes relative to this Memory start
    * @return the double at the given offset
    */
   public abstract double getDouble(long offsetBytes);
 
   /**
-   * Gets the double array at the current position. Increments the position by
-   * <i>Double.BYTES * (length - dstOffset)</i>.
+   * Gets the double array at the current position.
+   * Increments the position by <i>Double.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
    * @param length number of array units to transfer
@@ -263,21 +271,23 @@ public abstract class Buffer extends BaseBuffer {
   public abstract void getDoubleArray(double[] dstArray, int dstOffset, int length);
 
   /**
-   * Gets the float value at the current position. Increments the position by <i>Float.BYTES</i>.
+   * Gets the float value at the current position.
+   * Increments the position by <i>Float.BYTES</i>.
    * @return the float at the current position
    */
   public abstract float getFloat();
 
   /**
-   * Gets the float value at the given offset
+   * Gets the float value at the given offset.
+   * This does not change the position.
    * @param offsetBytes offset bytes relative to this Memory start
    * @return the float at the given offset
    */
   public abstract float getFloat(long offsetBytes);
 
   /**
-   * Gets the float array at the current position. Increments the position by
-   * <i>Float.BYTES * (length - dstOffset)</i>.
+   * Gets the float array at the current position.
+   * Increments the position by <i>Float.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
    * @param length number of array units to transfer
@@ -285,21 +295,23 @@ public abstract class Buffer extends BaseBuffer {
   public abstract void getFloatArray(float[] dstArray, int dstOffset, int length);
 
   /**
-   * Gets the int value at the current position. Increments the position by <i>Int.BYTES</i>.
+   * Gets the int value at the current position.
+   * Increments the position by <i>Int.BYTES</i>.
    * @return the int at the current position
    */
   public abstract int getInt();
 
   /**
-   * Gets the int value at the given offset
+   * Gets the int value at the given offset.
+   * This does not change the position.
    * @param offsetBytes offset bytes relative to this Memory start
    * @return the int at the given offset
    */
   public abstract int getInt(long offsetBytes);
 
   /**
-   * Gets the int array at the current position. Increments the position by
-   * <i>Int.BYTES * (length - dstOffset)</i>.
+   * Gets the int array at the current position.
+   * Increments the position by <i>Int.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
    * @param length number of array units to transfer
@@ -307,21 +319,23 @@ public abstract class Buffer extends BaseBuffer {
   public abstract void getIntArray(int[] dstArray, int dstOffset, int length);
 
   /**
-   * Gets the long value at the current position. Increments the position by <i>Long.BYTES</i>.
+   * Gets the long value at the current position.
+   * Increments the position by <i>Long.BYTES</i>.
    * @return the long at the current position
    */
   public abstract long getLong();
 
   /**
-   * Gets the long value at the given offset
+   * Gets the long value at the given offset.
+   * This does not change the position.
    * @param offsetBytes offset bytes relative to this Memory start
    * @return the long at the given offset
    */
   public abstract long getLong(long offsetBytes);
 
   /**
-   * Gets the long array at the current position. Increments the position by
-   * <i>Long.BYTES * (length - dstOffset)</i>.
+   * Gets the long array at the current position.
+   * Increments the position by <i>Long.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
    * @param length number of array units to transfer
@@ -329,21 +343,23 @@ public abstract class Buffer extends BaseBuffer {
   public abstract void getLongArray(long[] dstArray, int dstOffset, int length);
 
   /**
-   * Gets the short value at the current position. Increments the position by <i>Short.BYTES</i>.
+   * Gets the short value at the current position.
+   * Increments the position by <i>Short.BYTES</i>.
    * @return the short at the current position
    */
   public abstract short getShort();
 
   /**
-   * Gets the short value at the given offset
+   * Gets the short value at the given offset.
+   * This does not change the position.
    * @param offsetBytes offset bytes relative to this Memory start
    * @return the short at the given offset
    */
   public abstract short getShort(long offsetBytes);
 
   /**
-   * Gets the short array at the current position. Increments the position by
-   * <i>Short.BYTES * (length - dstOffset)</i>.
+   * Gets the short array at the current position.
+   * Increments the position by <i>Short.BYTES * (length - dstOffset)</i>.
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
    * @param length number of array units to transfer

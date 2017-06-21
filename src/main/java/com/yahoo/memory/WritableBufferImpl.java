@@ -507,6 +507,13 @@ class WritableBufferImpl extends WritableBuffer {
   }
 
   @Override
+  public void putBoolean(final long offsetBytes, final boolean value) {
+    checkValid();
+    assertBounds(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE, capacity);
+    unsafe.putBoolean(unsafeObj, cumBaseOffset + offsetBytes, value);
+  }
+
+  @Override
   public void putBooleanArray(final boolean[] srcArray, final int srcOffset, final int length) {
     checkValid();
     final long pos = getPosition();
@@ -530,6 +537,13 @@ class WritableBufferImpl extends WritableBuffer {
     assertBounds(pos, ARRAY_BYTE_INDEX_SCALE, capacity);
     unsafe.putByte(unsafeObj, cumBaseOffset + pos, value);
     incrementPosition(ARRAY_BYTE_INDEX_SCALE);
+  }
+
+  @Override
+  public void putByte(final long offsetBytes, final byte value) {
+    checkValid();
+    assertBounds(offsetBytes, ARRAY_BYTE_INDEX_SCALE, capacity);
+    unsafe.putByte(unsafeObj, cumBaseOffset + offsetBytes, value);
   }
 
   @Override
@@ -559,6 +573,13 @@ class WritableBufferImpl extends WritableBuffer {
   }
 
   @Override
+  public void putChar(final long offsetBytes, final char value) {
+    checkValid();
+    assertBounds(offsetBytes, ARRAY_CHAR_INDEX_SCALE, capacity);
+    unsafe.putChar(unsafeObj, cumBaseOffset + offsetBytes, value);
+  }
+
+  @Override
   public void putCharArray(final char[] srcArray, final int srcOffset, final int length) {
     checkValid();
     final long pos = getPosition();
@@ -582,6 +603,13 @@ class WritableBufferImpl extends WritableBuffer {
     assertBounds(pos, ARRAY_DOUBLE_INDEX_SCALE, capacity);
     unsafe.putDouble(unsafeObj, cumBaseOffset + pos, value);
     incrementPosition(ARRAY_DOUBLE_INDEX_SCALE);
+  }
+
+  @Override
+  public void putDouble(final long offsetBytes, final double value) {
+    checkValid();
+    assertBounds(offsetBytes, ARRAY_DOUBLE_INDEX_SCALE, capacity);
+    unsafe.putDouble(unsafeObj, cumBaseOffset + offsetBytes, value);
   }
 
   @Override
@@ -611,6 +639,13 @@ class WritableBufferImpl extends WritableBuffer {
   }
 
   @Override
+  public void putFloat(final long offsetBytes, final float value) {
+    checkValid();
+    assertBounds(offsetBytes, ARRAY_FLOAT_INDEX_SCALE, capacity);
+    unsafe.putFloat(unsafeObj, cumBaseOffset + offsetBytes, value);
+  }
+
+  @Override
   public void putFloatArray(final float[] srcArray, final int srcOffset, final int length) {
     checkValid();
     final long pos = getPosition();
@@ -634,6 +669,13 @@ class WritableBufferImpl extends WritableBuffer {
     assertBounds(pos, ARRAY_INT_INDEX_SCALE, capacity);
     unsafe.putInt(unsafeObj, cumBaseOffset + pos, value);
     incrementPosition(ARRAY_INT_INDEX_SCALE);
+  }
+
+  @Override
+  public void putInt(final long offsetBytes, final int value) {
+    checkValid();
+    assertBounds(offsetBytes, ARRAY_INT_INDEX_SCALE, capacity);
+    unsafe.putInt(unsafeObj, cumBaseOffset + offsetBytes, value);
   }
 
   @Override
@@ -663,6 +705,13 @@ class WritableBufferImpl extends WritableBuffer {
   }
 
   @Override
+  public void putLong(final long offsetBytes, final long value) {
+    checkValid();
+    assertBounds(offsetBytes, ARRAY_LONG_INDEX_SCALE, capacity);
+    unsafe.putLong(unsafeObj, cumBaseOffset + offsetBytes, value);
+  }
+
+  @Override
   public void putLongArray(final long[] srcArray, final int srcOffset, final int length) {
     checkValid();
     final long pos = getPosition();
@@ -686,6 +735,13 @@ class WritableBufferImpl extends WritableBuffer {
     assertBounds(pos, ARRAY_SHORT_INDEX_SCALE, capacity);
     unsafe.putShort(unsafeObj, cumBaseOffset + pos, value);
     incrementPosition(ARRAY_SHORT_INDEX_SCALE);
+  }
+
+  @Override
+  public void putShort(final long offsetBytes, final short value) {
+    checkValid();
+    assertBounds(offsetBytes, ARRAY_SHORT_INDEX_SCALE, capacity);
+    unsafe.putShort(unsafeObj, cumBaseOffset + offsetBytes, value);
   }
 
   @Override

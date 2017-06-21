@@ -676,6 +676,18 @@ public class WritableMemoryImplTest {
   }
 
   @Test
+  public void checkAsWritableBufferWithBB() {
+    ByteBuffer byteBuf = ByteBuffer.allocate(64);
+    byteBuf.position(16);
+    byteBuf.limit(48);
+    WritableMemory wmem = WritableMemory.wrap(byteBuf);
+    WritableBuffer wbuf = wmem.asWritableBuffer();
+    assertEquals(wbuf.getCapacity(), 64);
+    assertEquals(wbuf.getPosition(), 16);
+    assertEquals(wbuf.getEnd(), 48);
+  }
+
+  @Test
   public void printlnTest() {
     println("PRINTING: "+this.getClass().getName());
   }

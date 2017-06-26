@@ -1,13 +1,11 @@
 /**
- * This package provides:
+ * <p>This package provides high performance primitive and primitive array access to direct (native),
+ * off-heap memory and memory-mapped file resources, and consistent views into
+ * {@link java.nio.ByteBuffer}, and on-heap primitive arrays.</p>
  *
- * <ul><li>High performance primitive and primitive array access to direct (native), off-heap memory
- * and memory-mapped file resources.</li>
+ * <p>In addition, this package provides:</p>
  *
- * <li>Consistent views into on-heap primitive array and {@link java.nio.ByteBuffer}
- * resources.</li>
- *
- * <li>Two different access APIs: read-only {@link com.yahoo.memory.Memory} and
+ * <ul><li>Two different access APIs: read-only {@link com.yahoo.memory.Memory} and
  * {@link com.yahoo.memory.WritableMemory} for absolute offset access,
  * and read-only {@link com.yahoo.memory.Buffer} and {@link com.yahoo.memory.WritableBuffer}
  * for relative positional access (similar to ByteBuffer).</li>

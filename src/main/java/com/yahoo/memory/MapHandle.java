@@ -12,12 +12,12 @@ package com.yahoo.memory;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-//Joins a Handle with an AutoCloseable Map resource.
-public class MapHandle implements Map, Handle {
+//Joins a Read-only Handle with an AutoCloseable Map resource.
+public final class MapHandle implements Map, Handle {
   AllocateDirectMap dirMap;
   WritableMemoryImpl wMem;
 
-  MapHandle(final AllocateDirectMap dirMap, final WritableMemoryImpl wMem) {
+  private MapHandle(final AllocateDirectMap dirMap, final WritableMemoryImpl wMem) {
     this.dirMap = dirMap;
     this.wMem = wMem;
   }

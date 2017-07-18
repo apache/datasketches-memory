@@ -644,7 +644,6 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void clear(final long offsetBytes, final long lengthBytes) {
-    checkValid();
     fill(offsetBytes, lengthBytes, (byte) 0);
   }
 
@@ -660,7 +659,6 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void fill(final byte value) {
-    checkValid();
     fill(0, capacity, value);
   }
 

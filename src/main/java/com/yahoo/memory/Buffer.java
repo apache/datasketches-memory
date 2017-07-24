@@ -445,7 +445,10 @@ public abstract class Buffer extends BaseBuffer {
   public abstract boolean isValid();
 
   /**
-   * Return true if bytes need to be swapped based on resource ByteOrder.
+   * Return true if bytes <b>need</b> to be swapped based on resource ByteOrder.
+   * This is a convenience method to indicate that the wrapped ByteBuffer has a Byte Order that
+   * is different from the native Byte Order. It is up to the user to perform the byte swapping
+   * if necessary.
    * @return true if bytes need to be swapped based on resource ByteOrder.
    */
   public abstract boolean swapBytes();

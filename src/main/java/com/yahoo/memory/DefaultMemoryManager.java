@@ -47,7 +47,9 @@ final class DefaultMemoryManager implements MemoryManager {
 
   @Override
   public void requestClose(final WritableMemory memoryToClose, final WritableMemory newMemory) {
-    memoryToClose.getHandle().close();
+    if (memoryToClose.getHandle() != null) {
+      memoryToClose.getHandle().close();
+    }
   }
 
 }

@@ -135,4 +135,9 @@ final class Util {
     return (value & bitMask) != 0;
   }
 
+  static final void nullCheck(final Object obj) {
+    if (obj == null) {
+      throw new IllegalArgumentException("An input argument is null.");
+    }
+  }
 }

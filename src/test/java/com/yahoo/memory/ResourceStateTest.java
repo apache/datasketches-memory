@@ -137,7 +137,8 @@ public class ResourceStateTest {
   public void checkIdentity() {
     byte[] arr = new byte[64];
     ResourceState state = new ResourceState(arr, Prim.BYTE, 64);
-    state.isSameResource(state);
+    boolean same = state.isSameResource(state);
+    assertTrue(same);
   }
 
   @Test

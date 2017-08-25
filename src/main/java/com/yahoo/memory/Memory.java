@@ -8,6 +8,7 @@ package com.yahoo.memory;
 import static com.yahoo.memory.UnsafeUtil.LS;
 import static com.yahoo.memory.UnsafeUtil.assertBounds;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
+import static com.yahoo.memory.Util.nullCheck;
 
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -102,9 +103,9 @@ public abstract class Memory {
    * @param arr the given primitive array
    * @return Memory for read operations
    */
-  @SuppressWarnings("null")
   public static Memory wrap(final boolean[] arr) {
-    if ((arr != null) && (arr.length == 0)) {
+    nullCheck(arr);
+    if (arr.length == 0) {
       return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.BOOLEAN, arr.length));
@@ -115,9 +116,9 @@ public abstract class Memory {
    * @param arr the given primitive array
    * @return Memory for read operations
    */
-  @SuppressWarnings("null")
   public static Memory wrap(final byte[] arr) {
-    if ((arr != null) && (arr.length == 0)) {
+    nullCheck(arr);
+    if (arr.length == 0) {
       return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.BYTE, arr.length));
@@ -128,9 +129,9 @@ public abstract class Memory {
    * @param arr the given primitive array
    * @return Memory for read operations
    */
-  @SuppressWarnings("null")
   public static Memory wrap(final char[] arr) {
-    if ((arr != null) && (arr.length == 0)) {
+    nullCheck(arr);
+    if (arr.length == 0) {
       return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.CHAR, arr.length));
@@ -141,9 +142,9 @@ public abstract class Memory {
    * @param arr the given primitive array
    * @return Memory for read operations
    */
-  @SuppressWarnings("null")
   public static Memory wrap(final short[] arr) {
-    if ((arr != null) && (arr.length == 0)) {
+    nullCheck(arr);
+    if (arr.length == 0) {
       return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.SHORT, arr.length));
@@ -154,9 +155,9 @@ public abstract class Memory {
    * @param arr the given primitive array
    * @return Memory for read operations
    */
-  @SuppressWarnings("null")
   public static Memory wrap(final int[] arr) {
-    if ((arr != null) && (arr.length == 0)) {
+    nullCheck(arr);
+    if (arr.length == 0) {
       return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.INT, arr.length));
@@ -167,9 +168,9 @@ public abstract class Memory {
    * @param arr the given primitive array
    * @return Memory for read operations
    */
-  @SuppressWarnings("null")
   public static Memory wrap(final long[] arr) {
-    if ((arr != null) && (arr.length == 0)) {
+    nullCheck(arr);
+    if (arr.length == 0) {
       return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.LONG, arr.length));
@@ -180,9 +181,9 @@ public abstract class Memory {
    * @param arr the given primitive array
    * @return Memory for read operations
    */
-  @SuppressWarnings("null")
   public static Memory wrap(final float[] arr) {
-    if ((arr != null) && (arr.length == 0)) {
+    nullCheck(arr);
+    if (arr.length == 0) {
       return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.FLOAT, arr.length));
@@ -193,9 +194,9 @@ public abstract class Memory {
    * @param arr the given primitive array
    * @return Memory for read operations
    */
-  @SuppressWarnings("null")
   public static Memory wrap(final double[] arr) {
-    if ((arr != null) && (arr.length == 0)) {
+    nullCheck(arr);
+    if (arr.length == 0) {
       return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.DOUBLE, arr.length));

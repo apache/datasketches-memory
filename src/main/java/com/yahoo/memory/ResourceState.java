@@ -141,9 +141,6 @@ final class ResourceState {
 
   //Constructor for heap primitive arrays
   ResourceState(final Object obj, final Prim prim, final long arrLen) {
-    if (obj == null) {
-      throw new IllegalArgumentException("Primitive array object may not be null");
-    }
     unsafeObj_ = obj;
     unsafeObjHeader_ = prim.off();
     if (arrLen < 0) {

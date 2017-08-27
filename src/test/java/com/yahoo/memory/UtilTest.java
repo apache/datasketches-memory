@@ -6,6 +6,7 @@
 package com.yahoo.memory;
 
 import static com.yahoo.memory.Util.characterPad;
+import static com.yahoo.memory.Util.nullCheck;
 import static com.yahoo.memory.Util.zeroPad;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -47,6 +48,10 @@ public class UtilTest {
     assertEquals(s, t);
   }
 
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void checkNullCheck() {
+    nullCheck(null);
+  }
 
   @Test
   public void printlnTest() {

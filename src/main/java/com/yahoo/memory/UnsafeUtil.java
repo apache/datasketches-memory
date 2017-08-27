@@ -90,7 +90,7 @@ public final class UnsafeUtil {
       throw new RuntimeException("Unable to acquire Unsafe. ", e);
     }
 
-    //4 on 32-bits systems and 64-bit systems < 32GB, otherwise 8.
+    //4 on 32-bit systems. 4 on 64-bit systems < 32GB, otherwise 8.
     //This alone is not an indicator of compressed ref (coop)
     ADDRESS_SIZE = unsafe.addressSize();
 
@@ -183,7 +183,7 @@ public final class UnsafeUtil {
     private final Unsafe myUnsafe;
 
     JDK8Compatible(final Unsafe unsafe) {
-      this.myUnsafe = unsafe;
+      myUnsafe = unsafe;
     }
 
     @Override
@@ -201,27 +201,27 @@ public final class UnsafeUtil {
     private final Unsafe myUnsafe;
 
     JDK7Compatible(final Unsafe unsafe) {
-      this.myUnsafe = unsafe;
+      myUnsafe = unsafe;
     }
 
     @Override
-    public long getAndAddLong(final Object obj, final long address, final long increment) {
+    public synchronized long getAndAddLong(final Object obj, final long address, final long increment) {
       long retVal;
       do {
         retVal = myUnsafe.getLongVolatile(obj, address);
       } while (!myUnsafe.compareAndSwapLong(obj, address, retVal, retVal + increment));
 
-      return retVal;
+      return myUnsafe.getLongVolatile(obj, address);
     }
 
     @Override
-    public long getAndSetLong(final Object obj, final long address, final long value) {
+    public synchronized long getAndSetLong(final Object obj, final long address, final long value) {
       long retVal;
       do {
         retVal = myUnsafe.getLongVolatile(obj, address);
       } while (!myUnsafe.compareAndSwapLong(obj, address, retVal, value));
 
-      return retVal;
+      return myUnsafe.getLongVolatile(obj, address);
     }
   }
 

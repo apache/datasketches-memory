@@ -45,6 +45,8 @@ public class UnsafeUtilTest {
         fail();
       }
 
+    } catch (RuntimeException e) {
+      throw new RuntimeException("Failed");
     } catch (Exception e) {
       throw new RuntimeException("Failed");
     }

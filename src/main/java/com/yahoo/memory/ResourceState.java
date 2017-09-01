@@ -278,6 +278,7 @@ final class ResourceState {
   }
 
   boolean isSameResource(final ResourceState that) {
+    if (that == null) { return false; }
     if (this == that) { return true; }
 
     return (getCumBaseOffset() == that.getCumBaseOffset())

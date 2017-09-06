@@ -388,6 +388,7 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public boolean isSameResource(final Memory that) {
+    if (that == null) { return false; }
     return state.isSameResource(that.getResourceState());
   }
 

@@ -8,6 +8,8 @@ package com.yahoo.memory;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_DOUBLE_INDEX_SCALE;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
@@ -21,9 +23,9 @@ public class ResourceStateTest {
   public void checkBaseBufferAndState() {
     ResourceState state = new ResourceState();
     state.putCapacity(1 << 20);
-    assertTrue(state.getBaseBuffer() == null);
+    assertNull(state.getBaseBuffer());
     BaseBuffer baseBuf = new BaseBuffer(state);
-    assertTrue(state.getBaseBuffer() != null);
+    assertNotNull(state.getBaseBuffer());
     assertEquals(baseBuf.getEnd(), 1 << 20);
     state.putCapacity(0);
 
@@ -58,7 +60,6 @@ public class ResourceStateTest {
     } catch (IllegalArgumentException e) {
       //ok
     }
-
 
     try {
       state.putUnsafeObjectHeader( -16L);
@@ -101,6 +102,19 @@ public class ResourceStateTest {
     } catch (IllegalArgumentException e) {
       //ok
     }
+  }
+
+  @Test
+  public void checkIsSameResource() {
+    WritableMemory wmem = WritableMemory.allocate(16);
+    Memory mem = wmem;
+    assertFalse(wmem.isSameResource(null));
+    assertTrue(wmem.isSameResource(mem));
+
+    WritableBuffer wbuf = wmem.asWritableBuffer();
+    Buffer buf = wbuf;
+    assertFalse(wbuf.isSameResource(null));
+    assertTrue(wbuf.isSameResource(buf));
   }
 
   //StepBoolean checks

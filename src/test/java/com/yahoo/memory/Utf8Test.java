@@ -40,13 +40,19 @@ public class Utf8Test {
   @Test
   public void testPutInvalidChars() {
     WritableMemory mem = WritableMemory.allocate(10);
+    WritableMemory emptyMem = WritableMemory.allocate(0);
     for (int i = Character.MIN_SURROGATE; i <= Character.MAX_SURROGATE; i++) {
-      try {
-        mem.putUtf8(0, new String(new char[] {(char) i}));
-        fail();
-      } catch (WritableMemoryImpl.UnpairedSurrogateException e) {
-        // Expected.
-      }
+      assertSurrogate(mem, (char) i);
+      assertSurrogate(emptyMem, (char) i);
+    }
+  }
+
+  private void assertSurrogate(WritableMemory mem, char c) {
+    try {
+      mem.putUtf8(0, new String(new char[] {c}));
+      fail();
+    } catch (WritableMemoryImpl.UnpairedSurrogateException e) {
+      // Expected.
     }
   }
 

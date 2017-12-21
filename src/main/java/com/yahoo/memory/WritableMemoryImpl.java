@@ -826,7 +826,8 @@ class WritableMemoryImpl extends WritableMemory {
                 || !Character.isSurrogatePair(c, src.charAt(i + 1)))) {
           throw new UnpairedSurrogateException(i, utf16Length);
         }
-        throw new IllegalArgumentException("Failed writing " + c + " at offset " + getOffsetBytes(j));
+        throw new IllegalArgumentException(
+                "Failed writing " + c + " at offset " + getOffsetBytes(j));
       }
     }
     return getOffsetBytes(j);

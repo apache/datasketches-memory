@@ -17,7 +17,8 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * Adapted version of https://github.com/google/protobuf/blob/3e944aec9ebdf5043780fba751d604c0a55511f2/
+ * Adapted version of
+ * https://github.com/google/protobuf/blob/3e944aec9ebdf5043780fba751d604c0a55511f2/
  * java/core/src/test/java/com/google/protobuf/DecodeUtf8Test.java
  *
  * Copyright 2008 Google Inc.  All rights reserved.
@@ -32,6 +33,19 @@ public class Utf8Test {
       if (i < Character.MIN_SURROGATE || i > Character.MAX_SURROGATE) {
         String str = new String(Character.toChars(i));
         assertRoundTrips(str);
+      }
+    }
+  }
+
+  @Test
+  public void testPutInvalidChars() {
+    WritableMemory mem = WritableMemory.allocate(10);
+    for (int i = Character.MIN_SURROGATE; i <= Character.MAX_SURROGATE; i++) {
+      try {
+        mem.putUtf8(0, new String(new char[] {(char) i}));
+        fail();
+      } catch (WritableMemoryImpl.UnpairedSurrogateException e) {
+        // Expected.
       }
     }
   }
@@ -238,7 +252,16 @@ public class Utf8Test {
 
     WritableMemory writeMem = WritableMemory.allocate(bytes.length);
     writeMem.putUtf8(0, str);
-    assertEquals(0, writeMem.compareTo(0, writeMem.getCapacity(), Memory.wrap(bytes), 0, bytes.length));
+    assertEquals(0, writeMem.compareTo(0, bytes.length, Memory.wrap(bytes), 0, bytes.length));
+
+    // Test write overflow
+    WritableMemory writeMem2 = WritableMemory.allocate(bytes.length - 1);
+    try {
+      writeMem2.putUtf8(0, str);
+      fail();
+    } catch (IllegalArgumentException e) {
+      // Expected.
+    }
   }
 
   private void assertDecode(String expected, String actual) {

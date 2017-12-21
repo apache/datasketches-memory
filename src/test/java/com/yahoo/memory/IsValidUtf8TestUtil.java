@@ -6,7 +6,8 @@
 package com.yahoo.memory;
 
 /**
- * Stripped down version of https://github.com/google/protobuf/blob/3e944aec9ebdf5043780fba751d604c0a55511f2/
+ * Stripped down version of
+ * https://github.com/google/protobuf/blob/3e944aec9ebdf5043780fba751d604c0a55511f2/
  * java/core/src/test/java/com/google/protobuf/IsValidUtf8TestUtil.java
  *
  * Copyright 2008 Google Inc.  All rights reserved.
@@ -47,21 +48,4 @@ public class IsValidUtf8TestUtil
       // Three byte characters
       THREE_BYTE_ROUNDTRIPPABLE_CHARACTERS;
 
-  // 1,048,576 [chars 0x10000L to 0x10FFFF]
-  static final long FOUR_BYTE_ROUNDTRIPPABLE_CHARACTERS = 0x10FFFF - 0x10000L + 1;
-
-  // 289,571,839
-  static final long EXPECTED_FOUR_BYTE_ROUNDTRIPPABLE_COUNT =
-      // All one byte characters
-      (long) Math.pow(EXPECTED_ONE_BYTE_ROUNDTRIPPABLE_COUNT, 4) +
-      // One and three byte characters
-      2 * THREE_BYTE_ROUNDTRIPPABLE_CHARACTERS * ONE_BYTE_ROUNDTRIPPABLE_CHARACTERS +
-      // Two two byte characters
-      TWO_BYTE_ROUNDTRIPPABLE_CHARACTERS * TWO_BYTE_ROUNDTRIPPABLE_CHARACTERS +
-      // Permutations of one and two byte characters
-      3 * TWO_BYTE_ROUNDTRIPPABLE_CHARACTERS * ONE_BYTE_ROUNDTRIPPABLE_CHARACTERS
-      * ONE_BYTE_ROUNDTRIPPABLE_CHARACTERS
-      +
-      // Four byte characters
-      FOUR_BYTE_ROUNDTRIPPABLE_CHARACTERS;
 }

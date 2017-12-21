@@ -43,7 +43,8 @@ import java.nio.ByteOrder;
 /**
  * Implementation of WritableMemory
  *
- * UTF-8 encoding/decoding is based on https://github.com/google/protobuf/blob/3e944aec9ebdf5043780fba751d604c0a55511f2/
+ * UTF-8 encoding/decoding is based on
+ * https://github.com/google/protobuf/blob/3e944aec9ebdf5043780fba751d604c0a55511f2/
  * java/core/src/main/java/com/google/protobuf/Utf8.java
  *
  * Copyright 2008 Google Inc.  All rights reserved.

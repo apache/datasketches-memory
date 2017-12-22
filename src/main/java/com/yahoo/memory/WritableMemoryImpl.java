@@ -41,13 +41,13 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
- * Implementation of WritableMemory
+ * Implementation of WritableMemory.
  *
- * UTF-8 encoding/decoding is based on
+ * <p>UTF-8 encoding/decoding is based on
  * https://github.com/google/protobuf/blob/3e944aec9ebdf5043780fba751d604c0a55511f2/
  * java/core/src/main/java/com/google/protobuf/Utf8.java
  *
- * Copyright 2008 Google Inc.  All rights reserved.
+ * <p>Copyright 2008 Google Inc.  All rights reserved.
  * https://developers.google.com/protocol-buffers/
  *
  * @author Roman Leventov
@@ -299,7 +299,7 @@ class WritableMemoryImpl extends WritableMemory {
   }
 
   @Override
-  public void getUtf8(long offsetBytes, Appendable dst, int utf8Length)
+  public void getUtf8(final long offsetBytes, final Appendable dst, final int utf8Length)
       throws IOException, Utf8CodingException {
     checkBounds(offsetBytes, utf8Length, capacity);
 
@@ -309,7 +309,7 @@ class WritableMemoryImpl extends WritableMemory {
     // Optimize for 100% ASCII (Hotspot loves small simple top-level loops like this).
     // This simple loop stops when we encounter a byte >= 0x80 (i.e. non-ASCII).
     while (address < addressLimit) {
-      byte b = unsafe.getByte(unsafeObj, address);
+      final byte b = unsafe.getByte(unsafeObj, address);
       if (!DecodeUtil.isOneByte(b)) {
         break;
       }
@@ -318,13 +318,13 @@ class WritableMemoryImpl extends WritableMemory {
     }
 
     while (address < addressLimit) {
-      byte byte1 = unsafe.getByte(unsafeObj, address++);
+      final byte byte1 = unsafe.getByte(unsafeObj, address++);
       if (DecodeUtil.isOneByte(byte1)) {
         dst.append((char) byte1);
         // It's common for there to be multiple ASCII characters in a run mixed in, so add an
         // extra optimized loop to take care of these runs.
         while (address < addressLimit) {
-          byte b = unsafe.getByte(unsafeObj, address);
+          final byte b = unsafe.getByte(unsafeObj, address);
           if (!DecodeUtil.isOneByte(b)) {
             break;
           }
@@ -338,7 +338,7 @@ class WritableMemoryImpl extends WritableMemory {
         DecodeUtil.handleTwoBytes(
             byte1, /* byte2 */ unsafe.getByte(unsafeObj, address++), dst);
       } else if (DecodeUtil.isThreeBytes(byte1)) {
-        if (address >= addressLimit - 1) {
+        if (address >= (addressLimit - 1)) {
           throw Utf8CodingException.input();
         }
         DecodeUtil.handleThreeBytes(
@@ -347,7 +347,7 @@ class WritableMemoryImpl extends WritableMemory {
             /* byte3 */ unsafe.getByte(unsafeObj, address++),
             dst);
       } else {
-        if (address >= addressLimit - 2) {
+        if (address >= (addressLimit - 2)) {
           throw Utf8CodingException.input();
         }
         DecodeUtil.handleFourBytes(
@@ -370,42 +370,42 @@ class WritableMemoryImpl extends WritableMemory {
     /**
      * Returns whether this is a single-byte codepoint (i.e., ASCII) with the form '0XXXXXXX'.
      */
-    private static boolean isOneByte(byte b) {
+    private static boolean isOneByte(final byte b) {
       return b >= 0;
     }
 
     /**
      * Returns whether this is a two-byte codepoint with the form '10XXXXXX'.
      */
-    private static boolean isTwoBytes(byte b) {
+    private static boolean isTwoBytes(final byte b) {
       return b < (byte) 0xE0;
     }
 
     /**
      * Returns whether this is a three-byte codepoint with the form '110XXXXX'.
      */
-    private static boolean isThreeBytes(byte b) {
+    private static boolean isThreeBytes(final byte b) {
       return b < (byte) 0xF0;
     }
 
-    private static void handleTwoBytes(byte byte1, byte byte2, Appendable dst)
+    private static void handleTwoBytes(final byte byte1, final byte byte2, final Appendable dst)
         throws IOException, Utf8CodingException {
       // Simultaneously checks for illegal trailing-byte in leading position (<= '11000000') and
       // overlong 2-byte, '11000001'.
-      if (byte1 < (byte) 0xC2
+      if ((byte1 < (byte) 0xC2)
           || isNotTrailingByte(byte2)) {
         throw Utf8CodingException.input();
       }
       dst.append((char) (((byte1 & 0x1F) << 6) | trailingByteValue(byte2)));
     }
 
-    private static void handleThreeBytes(byte byte1, byte byte2, byte byte3, Appendable dst)
-        throws IOException, Utf8CodingException {
+    private static void handleThreeBytes(final byte byte1, final byte byte2, final byte byte3,
+        final Appendable dst) throws IOException, Utf8CodingException {
       if (isNotTrailingByte(byte2)
           // overlong? 5 most significant bits must not all be zero
-          || (byte1 == (byte) 0xE0 && byte2 < (byte) 0xA0)
+          || ((byte1 == (byte) 0xE0) && (byte2 < (byte) 0xA0))
           // check for illegal surrogate codepoints
-          || (byte1 == (byte) 0xED && byte2 >= (byte) 0xA0)
+          || ((byte1 == (byte) 0xED) && (byte2 >= (byte) 0xA0))
           || isNotTrailingByte(byte3)) {
         throw Utf8CodingException.input();
       }
@@ -414,8 +414,8 @@ class WritableMemoryImpl extends WritableMemory {
     }
 
     private static void handleFourBytes(
-        byte byte1, byte byte2, byte byte3, byte byte4, Appendable dst)
-        throws IOException, Utf8CodingException {
+        final byte byte1, final byte byte2, final byte byte3, final byte byte4,
+        final Appendable dst) throws IOException, Utf8CodingException {
       if (isNotTrailingByte(byte2)
           // Check that 1 <= plane <= 16.  Tricky optimized form of:
           //   valid 4-byte leading byte?
@@ -424,12 +424,12 @@ class WritableMemoryImpl extends WritableMemory {
           //     byte1 == (byte) 0xF0 && byte2 < (byte) 0x90 ||
           //   codepoint larger than the highest code point (U+10FFFF)?
           //     byte1 == (byte) 0xF4 && byte2 > (byte) 0x8F)
-          || (((byte1 << 28) + (byte2 - (byte) 0x90)) >> 30) != 0
+          || ((((byte1 << 28) + (byte2 - (byte) 0x90)) >> 30) != 0)
           || isNotTrailingByte(byte3)
           || isNotTrailingByte(byte4)) {
         throw Utf8CodingException.input();
       }
-      int codepoint = ((byte1 & 0x07) << 18)
+      final int codepoint = ((byte1 & 0x07) << 18)
                       | (trailingByteValue(byte2) << 12)
                       | (trailingByteValue(byte3) << 6)
                       | trailingByteValue(byte4);
@@ -440,24 +440,24 @@ class WritableMemoryImpl extends WritableMemory {
     /**
      * Returns whether the byte is not a valid continuation of the form '10XXXXXX'.
      */
-    private static boolean isNotTrailingByte(byte b) {
+    private static boolean isNotTrailingByte(final byte b) {
       return b > (byte) 0xBF;
     }
 
     /**
      * Returns the actual value of the trailing byte (removes the prefix '10') for composition.
      */
-    private static int trailingByteValue(byte b) {
+    private static int trailingByteValue(final byte b) {
       return b & 0x3F;
     }
 
-    private static char highSurrogate(int codePoint) {
+    private static char highSurrogate(final int codePoint) {
       return (char) ((Character.MIN_HIGH_SURROGATE
                       - (Character.MIN_SUPPLEMENTARY_CODE_POINT >>> 10))
                      + (codePoint >>> 10));
     }
 
-    private static char lowSurrogate(int codePoint) {
+    private static char lowSurrogate(final int codePoint) {
       return (char) (Character.MIN_LOW_SURROGATE + (codePoint & 0x3ff));
     }
   }
@@ -780,13 +780,12 @@ class WritableMemoryImpl extends WritableMemory {
   }
 
   @Override
-  public long putUtf8(long offsetBytes, CharSequence src)
-  {
-    int utf16Length = src.length();
+  public long putUtf8(final long offsetBytes, final CharSequence src) {
+    final int utf16Length = src.length();
     long j = getCumulativeOffset(offsetBytes);
     int i = 0;
-    long limit = getCumulativeOffset(capacity);
-    for (char c; i < utf16Length && i + j < limit && (c = src.charAt(i)) < 0x80; i++) {
+    final long limit = getCumulativeOffset(capacity);
+    for (char c; (i < utf16Length) && ((i + j) < limit) && ((c = src.charAt(i)) < 0x80); i++) {
       unsafe.putByte(unsafeObj, j + i, (byte) c);
     }
     if (i == utf16Length) {
@@ -795,25 +794,25 @@ class WritableMemoryImpl extends WritableMemory {
     j += i;
     for (char c; i < utf16Length; i++) {
       c = src.charAt(i);
-      if (c < 0x80 && j < limit) {
+      if ((c < 0x80) && (j < limit)) {
         unsafe.putByte(unsafeObj, j++, (byte) c);
-      } else if (c < 0x800 && j <= limit - 2) { // 11 bits, two UTF-8 bytes
+      } else if ((c < 0x800) && (j <= (limit - 2))) { // 11 bits, two UTF-8 bytes
         unsafe.putByte(unsafeObj, j++, (byte) ((0xF << 6) | (c >>> 6)));
         unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & c)));
-      } else if ((c < Character.MIN_SURROGATE || Character.MAX_SURROGATE < c) && j <= limit - 3) {
+      } else if (((c < Character.MIN_SURROGATE) || (Character.MAX_SURROGATE < c)) && (j <= (limit - 3))) {
         // Maximum single-char code point is 0xFFFF, 16 bits, three UTF-8 bytes
         unsafe.putByte(unsafeObj, j++, (byte) ((0xF << 5) | (c >>> 12)));
         unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & (c >>> 6))));
         unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & c)));
-      } else if (j <= limit - 4) {
+      } else if (j <= (limit - 4)) {
         // Minimum code point represented by a surrogate pair is 0x10000, 17 bits,
         // four UTF-8 bytes
         final char low;
-        if (i + 1 == src.length()
+        if (((i + 1) == src.length())
             || !Character.isSurrogatePair(c, (low = src.charAt(++i)))) {
           throw new UnpairedSurrogateException((i - 1), utf16Length);
         }
-        int codePoint = Character.toCodePoint(c, low);
+        final int codePoint = Character.toCodePoint(c, low);
         unsafe.putByte(unsafeObj, j++, (byte) ((0xF << 4) | (codePoint >>> 18)));
         unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & (codePoint >>> 12))));
         unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & (codePoint >>> 6))));
@@ -821,8 +820,8 @@ class WritableMemoryImpl extends WritableMemory {
       } else {
         // If we are surrogates and we're not a surrogate pair, always throw an
         // UnpairedSurrogateException instead of an ArrayOutOfBoundsException.
-        if ((Character.MIN_SURROGATE <= c && c <= Character.MAX_SURROGATE)
-            && (i + 1 == src.length()
+        if (((Character.MIN_SURROGATE <= c) && (c <= Character.MAX_SURROGATE))
+            && (((i + 1) == src.length())
                 || !Character.isSurrogatePair(c, src.charAt(i + 1)))) {
           throw new UnpairedSurrogateException(i, utf16Length);
         }
@@ -834,7 +833,10 @@ class WritableMemoryImpl extends WritableMemory {
   }
 
   static class UnpairedSurrogateException extends IllegalArgumentException {
-    UnpairedSurrogateException(int index, int length) {
+
+    private static final long serialVersionUID = 1L;
+
+    UnpairedSurrogateException(final int index, final int length) {
       super("Unpaired surrogate at index " + index + " of " + length);
     }
   }

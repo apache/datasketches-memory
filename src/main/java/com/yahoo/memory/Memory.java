@@ -358,11 +358,11 @@ public abstract class Memory {
    * @param utf8Length the number of bytes to decode
    * @throws Utf8CodingException in case of malformed or illegal UTF-8 input
    */
-  public void getUtf8(long offsetBytes, StringBuilder dst, int utf8Length)
+  public void getUtf8(final long offsetBytes, final StringBuilder dst, final int utf8Length)
       throws Utf8CodingException {
     try {
       getUtf8(offsetBytes, (Appendable) dst, utf8Length);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new RuntimeException("Could not happen", e);
     }
   }

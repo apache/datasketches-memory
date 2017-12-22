@@ -6,7 +6,10 @@
 package com.yahoo.memory;
 
 public class Utf8CodingException extends RuntimeException {
-  public Utf8CodingException(String message) {
+
+  private static final long serialVersionUID = 1L;
+
+  public Utf8CodingException(final String message) {
     super(message);
   }
 

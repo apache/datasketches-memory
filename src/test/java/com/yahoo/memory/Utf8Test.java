@@ -8,13 +8,14 @@ package com.yahoo.memory;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
-import com.google.protobuf.ByteString;
-import org.testng.annotations.Test;
-
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
+import org.testng.annotations.Test;
+
+import com.google.protobuf.ByteString;
 
 /**
  * Adapted version of
@@ -30,7 +31,7 @@ public class Utf8Test {
   @Test
   public void testRoundTripAllValidChars() {
     for (int i = Character.MIN_CODE_POINT; i < Character.MAX_CODE_POINT; i++) {
-      if (i < Character.MIN_SURROGATE || i > Character.MAX_SURROGATE) {
+      if ((i < Character.MIN_SURROGATE) || (i > Character.MAX_SURROGATE)) {
         String str = new String(Character.toChars(i));
         assertRoundTrips(str);
       }
@@ -47,7 +48,7 @@ public class Utf8Test {
     }
   }
 
-  private void assertSurrogate(WritableMemory mem, char c) {
+  private static void assertSurrogate(WritableMemory mem, char c) {
     try {
       mem.putUtf8(0, new String(new char[] {c}));
       fail();
@@ -105,7 +106,7 @@ public class Utf8Test {
               valid++;
             }
             count++;
-            if (count % 1000000L == 0) {
+            if ((count % 1000000L) == 0) {
               logger.info("Processed " + (count / 1000000L) + " million characters");
             }
           }
@@ -216,7 +217,7 @@ public class Utf8Test {
     assertInvalidSlice(bytes, 0, bytes.length + 1);
   }
 
-  private void assertInvalid(int... bytesAsInt) {
+  private static void assertInvalid(int... bytesAsInt) {
     byte[] bytes = new byte[bytesAsInt.length];
     for (int i = 0; i < bytesAsInt.length; i++) {
       bytes[i] = (byte) bytesAsInt[i];
@@ -224,7 +225,7 @@ public class Utf8Test {
     assertInvalid(bytes);
   }
 
-  private void assertInvalid(byte[] bytes) {
+  private static void assertInvalid(byte[] bytes) {
     try {
       Memory.wrap(bytes).getUtf8(0, new StringBuilder(), bytes.length);
       fail();
@@ -233,7 +234,7 @@ public class Utf8Test {
     }
   }
 
-  private void assertInvalidSlice(byte[] bytes, int index, int size) {
+  private static void assertInvalidSlice(byte[] bytes, int index, int size) {
     try {
       Memory.wrap(bytes).getUtf8(index, new StringBuilder(), size);
       fail();
@@ -242,11 +243,11 @@ public class Utf8Test {
     }
   }
 
-  private void assertRoundTrips(String str) {
+  private static void assertRoundTrips(String str) {
     assertRoundTrips(str, 0, -1);
   }
 
-  private void assertRoundTrips(String str, int index, int size) {
+  private static void assertRoundTrips(String str, int index, int size) {
     byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
     if (size == -1) {
       size = bytes.length;
@@ -270,13 +271,13 @@ public class Utf8Test {
     }
   }
 
-  private void assertDecode(String expected, String actual) {
+  private static void assertDecode(String expected, String actual) {
     if (!expected.equals(actual)) {
       fail("Failure: Expected (" + codepoints(expected) + ") Actual (" + codepoints(actual) + ")");
     }
   }
 
-  private List<String> codepoints(String str) {
+  private static List<String> codepoints(String str) {
     List<String> codepoints = new ArrayList<>();
     for (int i = 0; i < str.length(); i++) {
       codepoints.add(Long.toHexString(str.charAt(i)));

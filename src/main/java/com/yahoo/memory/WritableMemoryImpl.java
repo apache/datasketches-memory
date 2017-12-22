@@ -360,108 +360,6 @@ class WritableMemoryImpl extends WritableMemory {
     }
   }
 
-  /**
-   * Utility methods for decoding bytes into {@link String}. Callers are responsible for extracting
-   * bytes (possibly using Unsafe methods), and checking remaining bytes. All other UTF-8 validity
-   * checks and codepoint conversion happen in this class.
-   */
-  private static class DecodeUtil {
-
-    /**
-     * Returns whether this is a single-byte codepoint (i.e., ASCII) with the form '0XXXXXXX'.
-     */
-    private static boolean isOneByte(final byte b) {
-      return b >= 0;
-    }
-
-    /**
-     * Returns whether this is a two-byte codepoint with the form '10XXXXXX'.
-     */
-    private static boolean isTwoBytes(final byte b) {
-      return b < (byte) 0xE0;
-    }
-
-    /**
-     * Returns whether this is a three-byte codepoint with the form '110XXXXX'.
-     */
-    private static boolean isThreeBytes(final byte b) {
-      return b < (byte) 0xF0;
-    }
-
-    private static void handleTwoBytes(final byte byte1, final byte byte2, final Appendable dst)
-        throws IOException, Utf8CodingException {
-      // Simultaneously checks for illegal trailing-byte in leading position (<= '11000000') and
-      // overlong 2-byte, '11000001'.
-      if ((byte1 < (byte) 0xC2)
-          || isNotTrailingByte(byte2)) {
-        throw Utf8CodingException.input();
-      }
-      dst.append((char) (((byte1 & 0x1F) << 6) | trailingByteValue(byte2)));
-    }
-
-    private static void handleThreeBytes(final byte byte1, final byte byte2, final byte byte3,
-        final Appendable dst) throws IOException, Utf8CodingException {
-      if (isNotTrailingByte(byte2)
-          // overlong? 5 most significant bits must not all be zero
-          || ((byte1 == (byte) 0xE0) && (byte2 < (byte) 0xA0))
-          // check for illegal surrogate codepoints
-          || ((byte1 == (byte) 0xED) && (byte2 >= (byte) 0xA0))
-          || isNotTrailingByte(byte3)) {
-        throw Utf8CodingException.input();
-      }
-      dst.append((char)
-          (((byte1 & 0x0F) << 12) | (trailingByteValue(byte2) << 6) | trailingByteValue(byte3)));
-    }
-
-    private static void handleFourBytes(
-        final byte byte1, final byte byte2, final byte byte3, final byte byte4,
-        final Appendable dst) throws IOException, Utf8CodingException {
-      if (isNotTrailingByte(byte2)
-          // Check that 1 <= plane <= 16.  Tricky optimized form of:
-          //   valid 4-byte leading byte?
-          // if (byte1 > (byte) 0xF4 ||
-          //   overlong? 4 most significant bits must not all be zero
-          //     byte1 == (byte) 0xF0 && byte2 < (byte) 0x90 ||
-          //   codepoint larger than the highest code point (U+10FFFF)?
-          //     byte1 == (byte) 0xF4 && byte2 > (byte) 0x8F)
-          || ((((byte1 << 28) + (byte2 - (byte) 0x90)) >> 30) != 0)
-          || isNotTrailingByte(byte3)
-          || isNotTrailingByte(byte4)) {
-        throw Utf8CodingException.input();
-      }
-      final int codepoint = ((byte1 & 0x07) << 18)
-                      | (trailingByteValue(byte2) << 12)
-                      | (trailingByteValue(byte3) << 6)
-                      | trailingByteValue(byte4);
-      dst.append(DecodeUtil.highSurrogate(codepoint));
-      dst.append(DecodeUtil.lowSurrogate(codepoint));
-    }
-
-    /**
-     * Returns whether the byte is not a valid continuation of the form '10XXXXXX'.
-     */
-    private static boolean isNotTrailingByte(final byte b) {
-      return b > (byte) 0xBF;
-    }
-
-    /**
-     * Returns the actual value of the trailing byte (removes the prefix '10') for composition.
-     */
-    private static int trailingByteValue(final byte b) {
-      return b & 0x3F;
-    }
-
-    private static char highSurrogate(final int codePoint) {
-      return (char) ((Character.MIN_HIGH_SURROGATE
-                      - (Character.MIN_SUPPLEMENTARY_CODE_POINT >>> 10))
-                     + (codePoint >>> 10));
-    }
-
-    private static char lowSurrogate(final int codePoint) {
-      return (char) (Character.MIN_LOW_SURROGATE + (codePoint & 0x3ff));
-    }
-  }
-
   //OTHER PRIMITIVE READ METHODS: copyTo, compareTo XXX
   @Override
   public int compareTo(final long thisOffsetBytes, final long thisLengthBytes, final Memory that,
@@ -795,7 +693,8 @@ class WritableMemoryImpl extends WritableMemory {
       } else if ((c < 0x800) && (j <= (limit - 2))) { // 11 bits, two UTF-8 bytes
         unsafe.putByte(unsafeObj, j++, (byte) ((0xF << 6) | (c >>> 6)));
         unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & c)));
-      } else if (((c < Character.MIN_SURROGATE) || (Character.MAX_SURROGATE < c)) && (j <= (limit - 3))) {
+      } else if (((c < Character.MIN_SURROGATE) || (Character.MAX_SURROGATE < c))
+          && (j <= (limit - 3))) {
         // Maximum single-char code point is 0xFFFF, 16 bits, three UTF-8 bytes
         unsafe.putByte(unsafeObj, j++, (byte) ((0xF << 5) | (c >>> 12)));
         unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & (c >>> 6))));
@@ -941,6 +840,108 @@ class WritableMemoryImpl extends WritableMemory {
   @Override
   ResourceState getResourceState() {
     return state;
+  }
+
+  /**
+   * Utility methods for decoding UTF-8 bytes into {@link String}. Callers are responsible for
+   * extracting bytes (possibly using Unsafe methods), and checking remaining bytes. All other
+   * UTF-8 validity checks and codepoint conversions happen in this class.
+   */
+  private static class DecodeUtil {
+
+    /**
+     * Returns whether this is a single-byte codepoint (i.e., ASCII) with the form '0XXXXXXX'.
+     */
+    private static boolean isOneByte(final byte b) {
+      return b >= 0;
+    }
+
+    /**
+     * Returns whether this is a two-byte codepoint with the form '10XXXXXX'.
+     */
+    private static boolean isTwoBytes(final byte b) {
+      return b < (byte) 0xE0;
+    }
+
+    /**
+     * Returns whether this is a three-byte codepoint with the form '110XXXXX'.
+     */
+    private static boolean isThreeBytes(final byte b) {
+      return b < (byte) 0xF0;
+    }
+
+    private static void handleTwoBytes(final byte byte1, final byte byte2, final Appendable dst)
+        throws IOException, Utf8CodingException {
+      // Simultaneously checks for illegal trailing-byte in leading position (<= '11000000') and
+      // overlong 2-byte, '11000001'.
+      if ((byte1 < (byte) 0xC2)
+          || isNotTrailingByte(byte2)) {
+        throw Utf8CodingException.input();
+      }
+      dst.append((char) (((byte1 & 0x1F) << 6) | trailingByteValue(byte2)));
+    }
+
+    private static void handleThreeBytes(final byte byte1, final byte byte2, final byte byte3,
+        final Appendable dst) throws IOException, Utf8CodingException {
+      if (isNotTrailingByte(byte2)
+          // overlong? 5 most significant bits must not all be zero
+          || ((byte1 == (byte) 0xE0) && (byte2 < (byte) 0xA0))
+          // check for illegal surrogate codepoints
+          || ((byte1 == (byte) 0xED) && (byte2 >= (byte) 0xA0))
+          || isNotTrailingByte(byte3)) {
+        throw Utf8CodingException.input();
+      }
+      dst.append((char)
+          (((byte1 & 0x0F) << 12) | (trailingByteValue(byte2) << 6) | trailingByteValue(byte3)));
+    }
+
+    private static void handleFourBytes(
+        final byte byte1, final byte byte2, final byte byte3, final byte byte4,
+        final Appendable dst) throws IOException, Utf8CodingException {
+      if (isNotTrailingByte(byte2)
+          // Check that 1 <= plane <= 16.  Tricky optimized form of:
+          //   valid 4-byte leading byte?
+          // if (byte1 > (byte) 0xF4 ||
+          //   overlong? 4 most significant bits must not all be zero
+          //     byte1 == (byte) 0xF0 && byte2 < (byte) 0x90 ||
+          //   codepoint larger than the highest code point (U+10FFFF)?
+          //     byte1 == (byte) 0xF4 && byte2 > (byte) 0x8F)
+          || ((((byte1 << 28) + (byte2 - (byte) 0x90)) >> 30) != 0)
+          || isNotTrailingByte(byte3)
+          || isNotTrailingByte(byte4)) {
+        throw Utf8CodingException.input();
+      }
+      final int codepoint = ((byte1 & 0x07) << 18)
+                      | (trailingByteValue(byte2) << 12)
+                      | (trailingByteValue(byte3) << 6)
+                      | trailingByteValue(byte4);
+      dst.append(DecodeUtil.highSurrogate(codepoint));
+      dst.append(DecodeUtil.lowSurrogate(codepoint));
+    }
+
+    /**
+     * Returns whether the byte is not a valid continuation of the form '10XXXXXX'.
+     */
+    private static boolean isNotTrailingByte(final byte b) {
+      return b > (byte) 0xBF;
+    }
+
+    /**
+     * Returns the actual value of the trailing byte (removes the prefix '10') for composition.
+     */
+    private static int trailingByteValue(final byte b) {
+      return b & 0x3F;
+    }
+
+    private static char highSurrogate(final int codePoint) {
+      return (char) ((Character.MIN_HIGH_SURROGATE
+                      - (Character.MIN_SUPPLEMENTARY_CODE_POINT >>> 10))
+                     + (codePoint >>> 10));
+    }
+
+    private static char lowSurrogate(final int codePoint) {
+      return (char) (Character.MIN_LOW_SURROGATE + (codePoint & 0x3ff));
+    }
   }
 
   static class UnpairedSurrogateException extends IllegalArgumentException {

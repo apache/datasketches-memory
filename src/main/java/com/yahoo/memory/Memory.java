@@ -361,6 +361,8 @@ public abstract class Memory {
   public void getUtf8(final long offsetBytes, final StringBuilder dst, final int utf8Length)
       throws Utf8CodingException {
     try {
+      // Ensure that we do at most one resize of internal StringBuilder's char array
+      dst.ensureCapacity(dst.length() + utf8Length);
       getUtf8(offsetBytes, (Appendable) dst, utf8Length);
     } catch (final IOException e) {
       throw new RuntimeException("Could not happen", e);

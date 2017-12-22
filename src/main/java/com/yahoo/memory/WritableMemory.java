@@ -369,6 +369,14 @@ public abstract class WritableMemory extends Memory {
   public abstract void putShortArray(long offsetBytes, short[] srcArray,
           final int srcOffset, final int length);
 
+  /**
+   * Puts characters from the given CharSequence, encoded in UTF-8.
+   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param src the CharSequence encode and put into this WritableMemory
+   * @return offset bytes relative to this WritableMemory start after the last written byte
+   */
+  public abstract long putUtf8(long offsetBytes, CharSequence src);
+
   //Atomic Methods XXX
   /**
    * Atomically adds the given value to the long located at offsetBytes.

@@ -524,10 +524,6 @@ class WritableMemoryImpl extends WritableMemory {
     return cumBaseOffset + offsetBytes;
   }
 
-  private long getOffsetBytes(final long cumulativeOffset) {
-    return cumulativeOffset - cumBaseOffset;
-  }
-
   @Override
   public long getRegionOffset(final long offsetBytes) {
     checkValid();
@@ -832,15 +828,6 @@ class WritableMemoryImpl extends WritableMemory {
     return getOffsetBytes(j);
   }
 
-  static class UnpairedSurrogateException extends IllegalArgumentException {
-
-    private static final long serialVersionUID = 1L;
-
-    UnpairedSurrogateException(final int index, final int length) {
-      super("Unpaired surrogate at index " + index + " of " + length);
-    }
-  }
-
   //Atomic Write Methods XXX
   @Override
   public long getAndAddLong(final long offsetBytes, final long delta) { //JDK 8+
@@ -942,6 +929,11 @@ class WritableMemoryImpl extends WritableMemory {
   }
 
   //RESTRICTED READ AND WRITE XXX
+
+  private long getOffsetBytes(final long cumulativeOffset) {
+    return cumulativeOffset - cumBaseOffset;
+  }
+
   private final void checkValid() { //applies to both readable and writable
     assert state.isValid() : "Memory not valid.";
   }
@@ -949,6 +941,15 @@ class WritableMemoryImpl extends WritableMemory {
   @Override
   ResourceState getResourceState() {
     return state;
+  }
+
+  static class UnpairedSurrogateException extends IllegalArgumentException {
+
+    private static final long serialVersionUID = 1L;
+
+    UnpairedSurrogateException(final int index, final int length) {
+      super("Unpaired surrogate at index " + index + " of " + length);
+    }
   }
 
 }

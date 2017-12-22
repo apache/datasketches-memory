@@ -11,6 +11,7 @@ import static com.yahoo.memory.UnsafeUtil.unsafe;
 import static com.yahoo.memory.Util.nullCheck;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -337,6 +338,34 @@ public abstract class Memory {
    */
   public abstract void getShortArray(long offsetBytes, short[] dstArray, int dstOffset,
           int length);
+
+  /**
+   * Decodes UTF-8 into the given appendable.
+   * @param offsetBytes offset bytes relative to the Memory start
+   * @param dst the appendable to append decoded characters to
+   * @param utf8Length the number of bytes to decode
+   * @throws IOException if dst.append() throws IOException
+   * @throws Utf8CodingException in case of malformed or illegal UTF-8 input
+   */
+  public abstract void getUtf8(long offsetBytes, Appendable dst, int utf8Length)
+      throws IOException, Utf8CodingException;
+
+  /**
+   * Decodes UTF-8 into the given StringBuilder. This method does *not* reset the length of the dst
+   * StringBuilder before appending characters to it.
+   * @param offsetBytes offset bytes relative to the Memory start
+   * @param dst the StringBuilder to append decoded characters to
+   * @param utf8Length the number of bytes to decode
+   * @throws Utf8CodingException in case of malformed or illegal UTF-8 input
+   */
+  public void getUtf8(long offsetBytes, StringBuilder dst, int utf8Length)
+      throws Utf8CodingException {
+    try {
+      getUtf8(offsetBytes, (Appendable) dst, utf8Length);
+    } catch (IOException e) {
+      throw new RuntimeException("Could not happen", e);
+    }
+  }
 
   //OTHER PRIMITIVE READ METHODS: copyTo, compareTo XXX
   /**

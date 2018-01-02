@@ -340,10 +340,13 @@ public abstract class Memory {
           int length);
 
   /**
-   * Decodes UTF-8 into the given appendable.
+   * Decodes UTF-8 encoded bytes, starting at offsetBytes and with a length of utf8Lengh,
+   * and appends the decoded characters onto the given Appendable.
+   * This is specifically designed to reduce the production of intermediate objects (garbage),
+   * thus significantly reducing pressure on the JVM Garbage Collector.
    * @param offsetBytes offset bytes relative to the Memory start
-   * @param dst the appendable to append decoded characters to
-   * @param utf8Length the number of bytes to decode
+   * @param dst the destination Appendable to append decoded characters to
+   * @param utf8Length the number of encoded UTF-8 bytes to decode
    * @throws IOException if dst.append() throws IOException
    * @throws Utf8CodingException in case of malformed or illegal UTF-8 input
    */
@@ -351,11 +354,15 @@ public abstract class Memory {
       throws IOException, Utf8CodingException;
 
   /**
-   * Decodes UTF-8 into the given StringBuilder. This method does *not* reset the length of the dst
-   * StringBuilder before appending characters to it.
+   * Decodes UTF-8 encoded bytes, starting at offsetBytes and with a length of utf8Lengh,
+   * and appends the decoded characters onto the given StringBuilder.
+   * This method does *not* reset the length of the destination StringBuilder before appending
+   * characters to it.
+   * This is specifically designed to reduce the production of intermediate objects (garbage),
+   * thus significantly reducing pressure on the JVM Garbage Collector.
    * @param offsetBytes offset bytes relative to the Memory start
-   * @param dst the StringBuilder to append decoded characters to
-   * @param utf8Length the number of bytes to decode
+   * @param dst the destination StringBuilder to append decoded characters to
+   * @param utf8Length the number of encoded UTF-8 bytes to decode
    * @throws Utf8CodingException in case of malformed or illegal UTF-8 input
    */
   public void getUtf8(final long offsetBytes, final StringBuilder dst, final int utf8Length)
@@ -365,7 +372,7 @@ public abstract class Memory {
       dst.ensureCapacity(dst.length() + utf8Length);
       getUtf8(offsetBytes, (Appendable) dst, utf8Length);
     } catch (final IOException e) {
-      throw new RuntimeException("Could not happen", e);
+      throw new RuntimeException("Should not happen", e);
     }
   }
 

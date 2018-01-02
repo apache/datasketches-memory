@@ -11,7 +11,6 @@ import static org.testng.Assert.fail;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.testng.annotations.Test;
 
@@ -26,7 +25,6 @@ import com.google.protobuf.ByteString;
  * https://developers.google.com/protocol-buffers/
  */
 public class Utf8Test {
-  private static Logger logger = Logger.getLogger(Utf8Test.class.getName());
 
   @Test
   public void testRoundTripAllValidChars() {
@@ -52,7 +50,7 @@ public class Utf8Test {
     try {
       mem.putUtf8(0, new String(new char[] {c}));
       fail();
-    } catch (WritableMemoryImpl.UnpairedSurrogateException e) {
+    } catch (Utf8.UnpairedSurrogateException e) {
       // Expected.
     }
   }
@@ -89,7 +87,7 @@ public class Utf8Test {
     assertEquals(IsValidUtf8TestUtil.EXPECTED_TWO_BYTE_ROUNDTRIPPABLE_COUNT, valid);
   }
 
-  @Test
+  //@Test  //This test is very long, but should be enabled with any changes to Utf8 class.
   public void testThreeBytes() {
     // Travis' OOM killer doesn't like this test
     if (System.getenv("TRAVIS") == null) {
@@ -107,7 +105,7 @@ public class Utf8Test {
             }
             count++;
             if ((count % 1000000L) == 0) {
-              logger.info("Processed " + (count / 1000000L) + " million characters");
+              println("Processed " + (count / 1000000L) + " million characters");
             }
           }
         }
@@ -215,6 +213,18 @@ public class Utf8Test {
     assertInvalidSlice(bytes, bytes.length, 1);
     assertInvalidSlice(bytes, bytes.length + 1, 0);
     assertInvalidSlice(bytes, 0, bytes.length + 1);
+  }
+
+  @Test
+  public void printlnTest() {
+    println("PRINTING: "+this.getClass().getName());
+  }
+
+  /**
+   * @param s value to print
+   */
+  static void println(String s) {
+    //System.out.println(s); //disable here
   }
 
   private static void assertInvalid(int... bytesAsInt) {

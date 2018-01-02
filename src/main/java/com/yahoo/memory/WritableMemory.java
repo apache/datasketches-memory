@@ -370,9 +370,12 @@ public abstract class WritableMemory extends Memory {
           final int srcOffset, final int length);
 
   /**
-   * Puts characters from the given CharSequence, encoded in UTF-8.
+   * Encodes characters from the given CharSequence into UTF-8 bytes and puts them into this
+   * <i>WritableMemory</i> begining at the given offsetBytes.
+   * This is specifically designed to reduce the production of intermediate objects (garbage),
+   * thus significantly reducing pressure on the JVM Garbage Collector.
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
-   * @param src the CharSequence encode and put into this WritableMemory
+   * @param src the source CharSequence to be encoded and put into this WritableMemory
    * @return offset bytes relative to this WritableMemory start after the last written byte
    */
   public abstract long putUtf8(long offsetBytes, CharSequence src);

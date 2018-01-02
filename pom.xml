@@ -139,7 +139,7 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>6.11</version>
+            <version>6.13.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -312,13 +312,13 @@
               <plugin>
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-compiler-plugin</artifactId>
-                  <version>3.6.2</version>
+                  <version>3.7.0</version>
               </plugin>
 
               <plugin>
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-dependency-plugin</artifactId>
-                  <version>3.0.1</version>
+                  <version>3.0.2</version>
               </plugin>
 
               <plugin>
@@ -348,7 +348,7 @@
               <plugin>
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-javadoc-plugin</artifactId>
-                  <version>2.10.4</version>
+                  <version>3.0.0</version>
               </plugin>
 
               <plugin>
@@ -372,7 +372,7 @@
               <plugin>
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-surefire-plugin</artifactId>
-                  <version>2.20</version>
+                  <version>2.20.1</version>
               </plugin>
 
               <!-- OTHER -->
@@ -385,7 +385,7 @@
               <plugin>
                   <groupId>org.codehaus.mojo</groupId>
                   <artifactId>license-maven-plugin</artifactId>
-                  <version>1.13</version>
+                  <version>1.14</version>
               </plugin>
 
               <plugin>

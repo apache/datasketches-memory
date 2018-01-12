@@ -27,7 +27,7 @@ import com.google.protobuf.ByteString;
 public class Utf8Test {
 
   @Test
-  public void testRoundTripAllValidChars() {
+  public void testRoundTripAllValidChars() { //the non-surrogate chars
     for (int i = Character.MIN_CODE_POINT; i < Character.MAX_CODE_POINT; i++) {
       if ((i < Character.MIN_SURROGATE) || (i > Character.MAX_SURROGATE)) {
         String str = new String(Character.toChars(i));
@@ -37,7 +37,7 @@ public class Utf8Test {
   }
 
   @Test
-  public void testPutInvalidChars() {
+  public void testPutInvalidChars() { //The surrogates must be a pair, thus invalid alone
     WritableMemory mem = WritableMemory.allocate(10);
     WritableMemory emptyMem = WritableMemory.allocate(0);
     for (int i = Character.MIN_SURROGATE; i <= Character.MAX_SURROGATE; i++) {
@@ -62,10 +62,10 @@ public class Utf8Test {
     int valid = 0;
     for (int i = Byte.MIN_VALUE; i <= Byte.MAX_VALUE; i++) {
       ByteString bs = ByteString.copyFrom(new byte[] {(byte) i });
-      if (!bs.isValidUtf8()) {
+      if (!bs.isValidUtf8()) { //from -128 to -1
         assertInvalid(bs.toByteArray());
       } else {
-        valid++;
+        valid++; //from 0 to 127
       }
     }
     assertEquals(IsValidUtf8TestUtil.EXPECTED_ONE_BYTE_ROUNDTRIPPABLE_COUNT, valid);
@@ -265,7 +265,7 @@ public class Utf8Test {
     StringBuilder sb = new StringBuilder();
 
     Memory.wrap(bytes).getUtf8(index, sb, size);
-    assertDecode(new String(bytes, index, size, StandardCharsets.UTF_8), sb.toString());
+    checkStrings(sb.toString(), new String(bytes, index, size, StandardCharsets.UTF_8));
 
     WritableMemory writeMem = WritableMemory.allocate(bytes.length);
     writeMem.putUtf8(0, str);
@@ -281,7 +281,7 @@ public class Utf8Test {
     }
   }
 
-  private static void assertDecode(String expected, String actual) {
+  private static void checkStrings(String actual, String expected) {
     if (!expected.equals(actual)) {
       fail("Failure: Expected (" + codepoints(expected) + ") Actual (" + codepoints(actual) + ")");
     }

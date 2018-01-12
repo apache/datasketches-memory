@@ -7,10 +7,12 @@ package com.yahoo.memory;
 
 import static com.yahoo.memory.UnsafeUtil.assertBounds;
 
+import java.util.Random;
+
 /**
  * @author Lee Rhodes
  */
-final class Util {
+public final class Util {
 
   /**
    * Searches a range of the specified array of longs for the specified value using the binary
@@ -66,8 +68,8 @@ final class Util {
    * @return prepended or postpended given string with the given character to fill the given field
    * length.
    */
-  public static final String characterPad(final String s, final int fieldLength, final char padChar,
-      final boolean postpend) {
+  public static final String characterPad(final String s, final int fieldLength,
+      final char padChar, final boolean postpend) {
     final char[] chArr = s.toCharArray();
     final int sLen = chArr.length;
     if (sLen < fieldLength) {
@@ -133,6 +135,57 @@ final class Util {
    */
   public static final boolean isAnyBitsSet(final long value, final long bitMask) {
     return (value & bitMask) != 0;
+  }
+
+  /**
+   * Creates random valid Character CodePoints (as integers). By definition, valid CodePoints
+   * are integers in the range 0 to Character.MAX_CODE_POINT, and exclude the surrogate values.
+   *
+   * @author Lee Rhodes
+   */
+  public static class RandomCodePoints {
+    private Random rand; //
+    private static final int ALL_CP = Character.MAX_CODE_POINT + 1;
+    private static final int MIN_SUR = Character.MIN_SURROGATE;
+    private static final int MAX_SUR = Character.MAX_SURROGATE;
+
+    /**
+     * @param deterministic if true, configure java.util.Random with a fixed seed.
+     */
+    public RandomCodePoints(final boolean deterministic) {
+      rand = deterministic ? new Random(0) : new Random();
+    }
+
+    /**
+     * Return the given array filled with random valid CodePoints.
+     * @param cpArr the given size of the array
+     * @return an array of given size of random valid CodePoints
+     */
+    public final void fillCodePointArray(final int[] cpArr) {
+      int arrLen = cpArr.length;
+      int idx = 0;
+
+      while (idx < arrLen) {
+        final int cp = rand.nextInt(ALL_CP); //includes 0, excludes ALL_CP
+        if ((cp >= MIN_SUR) && (cp <= MAX_SUR)) {
+          continue;
+        }
+        cpArr[idx++] = cp;
+      }
+    }
+
+    /**
+     * Return a single valid CodePoint.
+     * @return a single valid CodePoint.
+     */
+    public final int getCodePoint() {
+      while (true) {
+        int cp = rand.nextInt(ALL_CP); //includes 0, excludes ALL_CP
+        if ((cp < MIN_SUR) || (cp > MAX_SUR)) {
+          return cp;
+        }
+      }
+    }
   }
 
   static final void nullCheck(final Object obj) {

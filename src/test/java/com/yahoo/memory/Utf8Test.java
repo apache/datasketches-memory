@@ -275,14 +275,32 @@ public class Utf8Test {
     if (size == -1) {
       size = bytes.length;
     }
-    StringBuilder sb = new StringBuilder();
+    Memory mem = Memory.wrap(bytes);
 
-    Memory.wrap(bytes).getCharsAsUtf8(index, sb, size);
-    checkStrings(sb.toString(), new String(bytes, index, size, StandardCharsets.UTF_8));
+    byte[] bytes2 = new byte[bytes.length + 1];
+    System.arraycopy(bytes, 0, bytes2, 1, bytes.length);
+    Memory mem2 = Memory.wrap(bytes2).region(1, bytes.length);
 
     WritableMemory writeMem = WritableMemory.allocate(bytes.length);
-    writeMem.putCharsAsUtf8(0, str);
-    assertEquals(0, writeMem.compareTo(0, bytes.length, Memory.wrap(bytes), 0, bytes.length));
+    WritableMemory writeMem2 =
+            WritableMemory.allocate(bytes.length + 1).writableRegion(1, bytes.length);
+
+    // Test with Memory objects, where base offset != 0
+    assertRoundTrips(str, index, size, bytes, mem, writeMem);
+    assertRoundTrips(str, index, size, bytes, mem, writeMem2);
+    assertRoundTrips(str, index, size, bytes, mem2, writeMem);
+    assertRoundTrips(str, index, size, bytes, mem2, writeMem2);
+  }
+
+  private static void assertRoundTrips(String str, int index, int size, byte[] bytes, Memory mem,
+        WritableMemory writeMem) {
+    StringBuilder sb = new StringBuilder();
+
+    mem.getCharsAsUtf8(index, sb, size);
+    checkStrings(sb.toString(), new String(bytes, index, size, StandardCharsets.UTF_8));
+
+    assertEquals(writeMem.putCharsAsUtf8(0, str), bytes.length);
+    assertEquals(0, writeMem.compareTo(0, bytes.length, mem, 0, bytes.length));
 
     // Test write overflow
     WritableMemory writeMem2 = WritableMemory.allocate(bytes.length - 1);

@@ -216,6 +216,19 @@ public class Utf8Test {
   }
 
   @Test
+  public void checkUtf8CodingExceptionMessages() {
+    println(Utf8CodingException.badBytes(new byte[] {127,-128,-127,-126}));
+    println(Utf8CodingException.badBounds(128, 128));
+  }
+
+  @Test
+  public void checkLowMemoryCase() {
+    WritableMemory wmem = WritableMemory.allocate(6);
+    String src = "\u8fd4\u56de";
+    Utf8.putUtf8(0, src, wmem.getResourceState());
+  }
+
+  @Test
   public void printlnTest() {
     println("PRINTING: "+this.getClass().getName());
   }

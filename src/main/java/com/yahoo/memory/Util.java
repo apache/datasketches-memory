@@ -157,9 +157,8 @@ public final class Util {
     }
 
     /**
-     * Return the given array filled with random valid CodePoints.
-     * @param cpArr the given size of the array
-     * @return an array of given size of random valid CodePoints
+     * Fills the given array with random valid CodePoints.
+     * @param cpArr the array to fill
      */
     public final void fillCodePointArray(final int[] cpArr) {
       int arrLen = cpArr.length;

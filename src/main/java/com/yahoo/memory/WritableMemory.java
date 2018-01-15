@@ -378,7 +378,7 @@ public abstract class WritableMemory extends Memory {
    * @param src the source CharSequence to be encoded and put into this WritableMemory
    * @return offset bytes relative to this WritableMemory start after the last written byte
    */
-  public abstract long putUtf8(long offsetBytes, CharSequence src);
+  public abstract long putCharsAsUtf8(long offsetBytes, CharSequence src);
 
   //Atomic Methods XXX
   /**

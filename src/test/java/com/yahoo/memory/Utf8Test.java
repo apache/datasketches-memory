@@ -48,7 +48,7 @@ public class Utf8Test {
 
   private static void assertSurrogate(WritableMemory mem, char c) {
     try {
-      mem.putUtf8(0, new String(new char[] {c}));
+      mem.putCharsAsUtf8(0, new String(new char[] {c}));
       fail();
     } catch (Utf8.UnpairedSurrogateException e) {
       // Expected.
@@ -250,7 +250,7 @@ public class Utf8Test {
 
   private static void assertInvalid(byte[] bytes) {
     try {
-      Memory.wrap(bytes).getUtf8(0, new StringBuilder(), bytes.length);
+      Memory.wrap(bytes).getCharsAsUtf8(0, new StringBuilder(), bytes.length);
       fail();
     } catch (Utf8CodingException e) {
       // Expected.
@@ -259,7 +259,7 @@ public class Utf8Test {
 
   private static void assertInvalidSlice(byte[] bytes, int index, int size) {
     try {
-      Memory.wrap(bytes).getUtf8(index, new StringBuilder(), size);
+      Memory.wrap(bytes).getCharsAsUtf8(index, new StringBuilder(), size);
       fail();
     } catch (IllegalArgumentException e) {
       // Expected.
@@ -277,17 +277,17 @@ public class Utf8Test {
     }
     StringBuilder sb = new StringBuilder();
 
-    Memory.wrap(bytes).getUtf8(index, sb, size);
+    Memory.wrap(bytes).getCharsAsUtf8(index, sb, size);
     checkStrings(sb.toString(), new String(bytes, index, size, StandardCharsets.UTF_8));
 
     WritableMemory writeMem = WritableMemory.allocate(bytes.length);
-    writeMem.putUtf8(0, str);
+    writeMem.putCharsAsUtf8(0, str);
     assertEquals(0, writeMem.compareTo(0, bytes.length, Memory.wrap(bytes), 0, bytes.length));
 
     // Test write overflow
     WritableMemory writeMem2 = WritableMemory.allocate(bytes.length - 1);
     try {
-      writeMem2.putUtf8(0, str);
+      writeMem2.putCharsAsUtf8(0, str);
       fail();
     } catch (IllegalArgumentException e) {
       // Expected.

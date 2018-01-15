@@ -6,7 +6,9 @@ import static com.yahoo.memory.UnsafeUtil.unsafe;
 import java.io.IOException;
 
 /**
- * Encoding and decoding implementations of putUtf8 and getUtf8.
+ * Encoding and decoding implementations of {@link WritableMemory#putCharsAsUtf8} and {@link
+ * Memory#getCharsAsUtf8}.
+ *
  * This is specifically designed to reduce the production of intermediate objects (garbage),
  * thus significantly reducing pressure on the JVM Garbage Collector.
  *

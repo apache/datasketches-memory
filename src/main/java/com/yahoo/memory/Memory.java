@@ -350,7 +350,7 @@ public abstract class Memory {
    * @throws IOException if dst.append() throws IOException
    * @throws Utf8CodingException in case of malformed or illegal UTF-8 input
    */
-  public abstract void getUtf8(long offsetBytes, Appendable dst, int utf8Length)
+  public abstract void getCharsAsUtf8(long offsetBytes, Appendable dst, int utf8Length)
       throws IOException, Utf8CodingException;
 
   /**
@@ -365,12 +365,12 @@ public abstract class Memory {
    * @param utf8Length the number of encoded UTF-8 bytes to decode
    * @throws Utf8CodingException in case of malformed or illegal UTF-8 input
    */
-  public void getUtf8(final long offsetBytes, final StringBuilder dst, final int utf8Length)
+  public void getCharsAsUtf8(final long offsetBytes, final StringBuilder dst, final int utf8Length)
       throws Utf8CodingException {
     try {
       // Ensure that we do at most one resize of internal StringBuilder's char array
       dst.ensureCapacity(dst.length() + utf8Length);
-      getUtf8(offsetBytes, (Appendable) dst, utf8Length);
+      getCharsAsUtf8(offsetBytes, (Appendable) dst, utf8Length);
     } catch (final IOException e) {
       throw new RuntimeException("Should not happen", e);
     }

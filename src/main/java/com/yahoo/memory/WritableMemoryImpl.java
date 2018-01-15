@@ -290,7 +290,7 @@ class WritableMemoryImpl extends WritableMemory {
   }
 
   @Override
-  public void getUtf8(final long offsetBytes, final Appendable dst, final int utf8Length)
+  public void getCharsAsUtf8(final long offsetBytes, final Appendable dst, final int utf8Length)
       throws IOException, Utf8CodingException {
     Utf8.getUtf8(offsetBytes, dst, utf8Length, state);
   }
@@ -609,7 +609,7 @@ class WritableMemoryImpl extends WritableMemory {
   }
 
   @Override
-  public long putUtf8(final long offsetBytes, final CharSequence src) {
+  public long putCharsAsUtf8(final long offsetBytes, final CharSequence src) {
     return Utf8.putUtf8(offsetBytes, src, state);
   }
 

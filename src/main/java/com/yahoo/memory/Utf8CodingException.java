@@ -5,6 +5,12 @@
 
 package com.yahoo.memory;
 
+/**
+ * This exception will be thrown for errors encountered during either the encoding of characters
+ * to Utf8 bytes, or the decoding of Utf8 bytes to characters.
+ *
+ * @author Lee Rhodes
+ */
 public final class Utf8CodingException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;

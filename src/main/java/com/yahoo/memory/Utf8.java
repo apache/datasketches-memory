@@ -118,32 +118,42 @@ final class Utf8 {
     j += i;
     for (char c; i < utf16Length; i++) {
       c = src.charAt(i);
-      if ((c < 0x80) && (j < byteLimit)) { //ASCII
+      if ((c < 0x80) && (j < byteLimit)) {
+        //Encode ASCII, 0 through 0x007F.
         unsafe.putByte(unsafeObj, j++, (byte) c);
       }
-      //c MUST BE >= 0x80 || j >= byteLimit (memory has 0 capacity)
-      else if ((c < 0x800) && (j <= (byteLimit - 2))) { // 11 bits, two UTF-8 bytes.
-        //We have target space for at least 2 bytes.
-        //This is for almost all Latin-script alphabets plus Greek, Cyrillic, Hebrew, Arabic, etc..
+      //c MUST BE >= 0x0080 || j >= byteLimit
+      else if ((c < 0x800) && (j <= (byteLimit - 2))) {
+        //Encode 0x80 through 0x7FF.
+        //We must have target space for at least 2 Utf8 bytes.
+        //This is for almost all Latin-script alphabets plus Greek, Cyrillic, Hebrew, Arabic, etc.
         unsafe.putByte(unsafeObj, j++, (byte) ((0xF << 6) | (c >>> 6)));
         unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & c)));
       }
       //c > 0x800 || j > byteLimit - 2
       else if (((c < Character.MIN_SURROGATE) || (Character.MAX_SURROGATE < c))
-          && (j <= (byteLimit - 3))) { //Not a surrogate, AND we have target space for &ge; 3 bytes
-        // Maximum single-char code point is 0xFFFF, 16 bits, three UTF-8 bytes for the rest of
-        // the BMP.
+          && (j <= (byteLimit - 3))) {
+        //Encode the remainder of the BMP that are not surrogates:
+        //  0x0800 thru 0xD7FF; 0xE000 thru 0xFFFF, the max single-char code point
+        //We must have target space for at least 3 Utf8 bytes.
         unsafe.putByte(unsafeObj, j++, (byte) ((0xF << 5) | (c >>> 12)));
         unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & (c >>> 6))));
         unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & c)));
       }
-      //c is a surrogate || j > byteLimit - 3
-      else if (j <= (byteLimit - 4)) { //We know we have target space for 4 bytes. Thus,
-        //c and c+1 better be a surrogate pair.
+      //c is a surrogate (and don't know j) || j > byteLimit - 3
+
+      //Beyond this point the only way to properly encode code points outside the BMP into Utf8
+      // bytes is to use surrogate pairs of characters. Therefore, we must have at least 2 src
+      // characters remaining and at least 4 bytes of memory space remaining, and the next 2
+      // characters must be a surrogate pair.
+      else if (j <= (byteLimit - 4)) {
+        //We know we have target space for at least 4 bytes.
+        //And we know that c is a surrogate, so {c, c+1} better be a surrogate pair.
         // Minimum code point represented by a surrogate pair is 0x10000, 17 bits,
         // four UTF-8 bytes, code planes 1 - 16.
         final char low;
-        if (((i + 1) == utf16Length) //src too small for low surrogate pair; src bounds violation.
+        if (((i + 1) == utf16Length)
+            //Character src too small for low surrogate; src bounds violation.
             // OR not a surrogate pair
             || !Character.isSurrogatePair(c, (low = src.charAt(++i)))) {
           throw new UnpairedSurrogateException((i - 1), utf16Length);
@@ -154,6 +164,7 @@ final class Utf8 {
         unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & (codePoint >>> 6))));
         unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & codePoint)));
       }
+      //
       else { //We end up here if we have fewer than 4 bytes left in the target,
         // We must throw an exception, the question is which one.
         // If we are surrogates and we're not a surrogate pair, always throw an

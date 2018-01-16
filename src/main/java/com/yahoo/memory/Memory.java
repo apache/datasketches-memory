@@ -260,7 +260,10 @@ public abstract class Memory {
    * This is specifically designed to reduce the production of intermediate objects (garbage),
    * thus significantly reducing pressure on the JVM Garbage Collector.
    * @param offsetBytes offset bytes relative to the Memory start
-   * @param utf8LengthBytes the number of encoded UTF-8 bytes to decode
+   * @param utf8LengthBytes the number of encoded UTF-8 bytes to decode. It is assumed that the
+   * caller has the correct number of utf8 bytes required to decode the number of characters
+   * to be appended to dst. Characters outside the ASCII range can require 2, 3 or 4 bytes per
+   * character to decode.
    * @param dst the destination Appendable to append decoded characters to
    * @throws IOException if dst.append() throws IOException
    * @throws Utf8CodingException in case of malformed or illegal UTF-8 input
@@ -276,7 +279,10 @@ public abstract class Memory {
    * This is specifically designed to reduce the production of intermediate objects (garbage),
    * thus significantly reducing pressure on the JVM Garbage Collector.
    * @param offsetBytes offset bytes relative to the Memory start
-   * @param utf8LengthBytes the number of encoded UTF-8 bytes to decode
+   * @param utf8LengthBytes the number of encoded UTF-8 bytes to decode. It is assumed that the
+   * caller has the correct number of utf8 bytes required to decode the number of characters
+   * to be appended to dst. Characters outside the ASCII range can require 2, 3 or 4 bytes per
+   * character to decode.
    * @param dst the destination StringBuilder to append decoded characters to
    * @throws Utf8CodingException in case of malformed or illegal UTF-8 input
    */

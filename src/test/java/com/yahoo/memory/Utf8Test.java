@@ -222,9 +222,9 @@ public class Utf8Test {
   }
 
   @Test
-  public void checkLowMemoryCase() {
-    WritableMemory wmem = WritableMemory.allocate(6);
-    String src = "\u8fd4\u56de";
+  public void checkLowCornerCases() {
+    WritableMemory wmem = WritableMemory.allocate(3);
+    String src = "\uFFFF"; //"\uD841";//\uDF0E";
     Utf8.putCharsToUtf8(0, src, wmem.getResourceState());
   }
 

@@ -290,7 +290,10 @@ public abstract class WritableMemory extends Memory {
    * This is specifically designed to reduce the production of intermediate objects (garbage),
    * thus significantly reducing pressure on the JVM Garbage Collector.
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
-   * @param src the source CharSequence to be encoded and put into this WritableMemory
+   * @param src The source CharSequence to be encoded and put into this WritableMemory. It is
+   * the responsibility of the caller to provide sufficient capacity in this
+   * <i>WritableMemory</i> for the encoded Utf8 bytes. Characters outside the ASCII range can
+   * require 2, 3 or 4 bytes per character to encode.
    * @return offset bytes relative to this WritableMemory start after the last written byte
    */
   public abstract long putCharsToUtf8(long offsetBytes, CharSequence src);

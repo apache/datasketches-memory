@@ -180,6 +180,12 @@ class WritableMemoryImpl extends WritableMemory {
   }
 
   @Override
+  public void getCharsFromUtf8(final long offsetBytes, final int utf8Length, final Appendable dst)
+      throws IOException, Utf8CodingException {
+    Utf8.getCharsFromUtf8(offsetBytes, utf8Length, dst, state);
+  }
+
+  @Override
   public double getDouble(final long offsetBytes) {
     checkValid();
     assertBounds(offsetBytes, ARRAY_DOUBLE_INDEX_SCALE, capacity);
@@ -287,12 +293,6 @@ class WritableMemoryImpl extends WritableMemory {
         dstArray,
         ARRAY_SHORT_BASE_OFFSET + (dstOffset << SHORT_SHIFT),
         copyBytes);
-  }
-
-  @Override
-  public void getCharsAsUtf8(final long offsetBytes, final Appendable dst, final int utf8Length)
-      throws IOException, Utf8CodingException {
-    Utf8.getUtf8(offsetBytes, dst, utf8Length, state);
   }
 
   //OTHER PRIMITIVE READ METHODS: copyTo, compareTo XXX
@@ -494,6 +494,11 @@ class WritableMemoryImpl extends WritableMemory {
   }
 
   @Override
+  public long putCharsToUtf8(final long offsetBytes, final CharSequence src) {
+    return Utf8.putCharsToUtf8(offsetBytes, src, state);
+  }
+
+  @Override
   public void putDouble(final long offsetBytes, final double value) {
     checkValid();
     assertBounds(offsetBytes, ARRAY_DOUBLE_INDEX_SCALE, capacity);
@@ -606,11 +611,6 @@ class WritableMemoryImpl extends WritableMemory {
         cumBaseOffset + offsetBytes,
         copyBytes
     );
-  }
-
-  @Override
-  public long putCharsAsUtf8(final long offsetBytes, final CharSequence src) {
-    return Utf8.putUtf8(offsetBytes, src, state);
   }
 
   //Atomic Write Methods XXX

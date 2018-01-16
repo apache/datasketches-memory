@@ -285,6 +285,17 @@ public abstract class WritableMemory extends Memory {
           int length);
 
   /**
+   * Encodes characters from the given CharSequence into UTF-8 bytes and puts them into this
+   * <i>WritableMemory</i> begining at the given offsetBytes.
+   * This is specifically designed to reduce the production of intermediate objects (garbage),
+   * thus significantly reducing pressure on the JVM Garbage Collector.
+   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param src the source CharSequence to be encoded and put into this WritableMemory
+   * @return offset bytes relative to this WritableMemory start after the last written byte
+   */
+  public abstract long putCharsToUtf8(long offsetBytes, CharSequence src);
+
+  /**
    * Puts the double value at the given offset
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param value the value to put
@@ -368,17 +379,6 @@ public abstract class WritableMemory extends Memory {
    */
   public abstract void putShortArray(long offsetBytes, short[] srcArray,
           final int srcOffset, final int length);
-
-  /**
-   * Encodes characters from the given CharSequence into UTF-8 bytes and puts them into this
-   * <i>WritableMemory</i> begining at the given offsetBytes.
-   * This is specifically designed to reduce the production of intermediate objects (garbage),
-   * thus significantly reducing pressure on the JVM Garbage Collector.
-   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
-   * @param src the source CharSequence to be encoded and put into this WritableMemory
-   * @return offset bytes relative to this WritableMemory start after the last written byte
-   */
-  public abstract long putCharsAsUtf8(long offsetBytes, CharSequence src);
 
   //Atomic Methods XXX
   /**

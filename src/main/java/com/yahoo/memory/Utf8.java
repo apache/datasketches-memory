@@ -26,15 +26,16 @@ import java.io.IOException;
 //  method.
 final class Utf8 {
 
-  static final void getUtf8(final long offsetBytes, final Appendable dst, final int utf8Length,
-      final ResourceState state) throws IOException, Utf8CodingException {
+  static final void getCharsFromUtf8(final long offsetBytes, final int utf8LengthBytes,
+      final Appendable dst, final ResourceState state)
+          throws IOException, Utf8CodingException {
     assert state.isValid();
 
     //Why not use UnsafeUtil.assertBounds() like all other methods?
-    checkBounds(offsetBytes, utf8Length, state.getCapacity());
+    checkBounds(offsetBytes, utf8LengthBytes, state.getCapacity());
 
     long address = state.getCumBaseOffset() + offsetBytes;
-    final long addressLimit = address + utf8Length;
+    final long addressLimit = address + utf8LengthBytes;
     final Object unsafeObj = state.getUnsafeObject();
 
     // Optimize for 100% ASCII (Hotspot loves small simple top-level loops like this).
@@ -96,7 +97,8 @@ final class Utf8 {
     }
   }
 
-  static long putUtf8(final long offsetBytes, final CharSequence src, final ResourceState state) {
+  static long putCharsToUtf8(final long offsetBytes, final CharSequence src,
+      final ResourceState state) {
     assert state.isValid();
     final Object unsafeObj = state.getUnsafeObject();
     final long cumBaseOffset = state.getCumBaseOffset();

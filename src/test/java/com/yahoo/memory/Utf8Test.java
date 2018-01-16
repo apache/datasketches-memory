@@ -48,7 +48,7 @@ public class Utf8Test {
 
   private static void assertSurrogate(WritableMemory mem, char c) {
     try {
-      mem.putCharsAsUtf8(0, new String(new char[] {c}));
+      mem.putCharsToUtf8(0, new String(new char[] {c}));
       fail();
     } catch (Utf8.UnpairedSurrogateException e) {
       // Expected.
@@ -225,7 +225,7 @@ public class Utf8Test {
   public void checkLowMemoryCase() {
     WritableMemory wmem = WritableMemory.allocate(6);
     String src = "\u8fd4\u56de";
-    Utf8.putUtf8(0, src, wmem.getResourceState());
+    Utf8.putCharsToUtf8(0, src, wmem.getResourceState());
   }
 
   @Test
@@ -250,7 +250,7 @@ public class Utf8Test {
 
   private static void assertInvalid(byte[] bytes) {
     try {
-      Memory.wrap(bytes).getCharsAsUtf8(0, new StringBuilder(), bytes.length);
+      Memory.wrap(bytes).getCharsFromUtf8(0, bytes.length, new StringBuilder());
       fail();
     } catch (Utf8CodingException e) {
       // Expected.
@@ -259,7 +259,7 @@ public class Utf8Test {
 
   private static void assertInvalidSlice(byte[] bytes, int index, int size) {
     try {
-      Memory.wrap(bytes).getCharsAsUtf8(index, new StringBuilder(), size);
+      Memory.wrap(bytes).getCharsFromUtf8(index, size, new StringBuilder());
       fail();
     } catch (IllegalArgumentException e) {
       // Expected.
@@ -296,16 +296,16 @@ public class Utf8Test {
         WritableMemory writeMem) {
     StringBuilder sb = new StringBuilder();
 
-    mem.getCharsAsUtf8(index, sb, size);
+    mem.getCharsFromUtf8(index, size, sb);
     checkStrings(sb.toString(), new String(bytes, index, size, StandardCharsets.UTF_8));
 
-    assertEquals(writeMem.putCharsAsUtf8(0, str), bytes.length);
+    assertEquals(writeMem.putCharsToUtf8(0, str), bytes.length);
     assertEquals(0, writeMem.compareTo(0, bytes.length, mem, 0, bytes.length));
 
     // Test write overflow
     WritableMemory writeMem2 = WritableMemory.allocate(bytes.length - 1);
     try {
-      writeMem2.putCharsAsUtf8(0, str);
+      writeMem2.putCharsToUtf8(0, str);
       fail();
     } catch (IllegalArgumentException e) {
       // Expected.

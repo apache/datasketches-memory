@@ -66,8 +66,7 @@ public abstract class Memory {
    * @throws Exception file not found or RuntimeException, etc.
    */
   public static MapHandle map(final File file, final long fileOffset, final long capacity,
-          final ByteOrder byteOrder)
-                  throws Exception {
+      final ByteOrder byteOrder) throws Exception {
     final ResourceState state = new ResourceState();
     state.putFile(file);
     state.putFileOffset(fileOffset);
@@ -219,7 +218,7 @@ public abstract class Memory {
    * @param length number of array units to transfer
    */
   public abstract void getBooleanArray(long offsetBytes, boolean[] dstArray, int dstOffset,
-          int length);
+      int length);
 
   /**
    * Gets the byte value at the given offset
@@ -236,7 +235,7 @@ public abstract class Memory {
    * @param length number of array units to transfer
    */
   public abstract void getByteArray(long offsetBytes, byte[] dstArray, int dstOffset,
-          int length);
+      int length);
 
   /**
    * Gets the char value at the given offset
@@ -253,7 +252,44 @@ public abstract class Memory {
    * @param length number of array units to transfer
    */
   public abstract void getCharArray(long offsetBytes, char[] dstArray, int dstOffset,
-          int length);
+      int length);
+
+  /**
+   * Gets UTF-8 encoded bytes from this Memory, starting at offsetBytes to a length of
+   * utf8LengthBytes, decodes them into characters and appends them to the given Appendable.
+   * This is specifically designed to reduce the production of intermediate objects (garbage),
+   * thus significantly reducing pressure on the JVM Garbage Collector.
+   * @param offsetBytes offset bytes relative to the Memory start
+   * @param utf8LengthBytes the number of encoded UTF-8 bytes to decode
+   * @param dst the destination Appendable to append decoded characters to
+   * @throws IOException if dst.append() throws IOException
+   * @throws Utf8CodingException in case of malformed or illegal UTF-8 input
+   */
+  public abstract void getCharsFromUtf8(long offsetBytes, int utf8LengthBytes, Appendable dst)
+      throws IOException, Utf8CodingException;
+
+  /**
+   * Gets UTF-8 encoded bytes from this Memory, starting at offsetBytes to a length of
+   * utf8LengthBytes, decodes them into characters and appends them to the given StringBuilder.
+   * This method does *not* reset the length of the destination StringBuilder before appending
+   * characters to it.
+   * This is specifically designed to reduce the production of intermediate objects (garbage),
+   * thus significantly reducing pressure on the JVM Garbage Collector.
+   * @param offsetBytes offset bytes relative to the Memory start
+   * @param utf8LengthBytes the number of encoded UTF-8 bytes to decode
+   * @param dst the destination StringBuilder to append decoded characters to
+   * @throws Utf8CodingException in case of malformed or illegal UTF-8 input
+   */
+  public void getCharsFromUtf8(final long offsetBytes, final int utf8LengthBytes,
+      final StringBuilder dst) throws Utf8CodingException {
+    try {
+      // Ensure that we do at most one resize of internal StringBuilder's char array
+      dst.ensureCapacity(dst.length() + utf8LengthBytes);
+      getCharsFromUtf8(offsetBytes, utf8LengthBytes, (Appendable) dst);
+    } catch (final IOException e) {
+      throw new RuntimeException("Should not happen", e);
+    }
+  }
 
   /**
    * Gets the double value at the given offset
@@ -270,7 +306,7 @@ public abstract class Memory {
    * @param length number of array units to transfer
    */
   public abstract void getDoubleArray(long offsetBytes, double[] dstArray, int dstOffset,
-          int length);
+      int length);
 
   /**
    * Gets the float value at the given offset
@@ -287,7 +323,7 @@ public abstract class Memory {
    * @param length number of array units to transfer
    */
   public abstract void getFloatArray(long offsetBytes, float[] dstArray, int dstOffset,
-          int length);
+      int length);
 
   /**
    * Gets the int value at the given offset
@@ -304,7 +340,7 @@ public abstract class Memory {
    * @param length number of array units to transfer
    */
   public abstract void getIntArray(long offsetBytes, int[] dstArray, int dstOffset,
-          int length);
+      int length);
 
   /**
    * Gets the long value at the given offset
@@ -337,44 +373,7 @@ public abstract class Memory {
    * @param length number of array units to transfer
    */
   public abstract void getShortArray(long offsetBytes, short[] dstArray, int dstOffset,
-          int length);
-
-  /**
-   * Decodes UTF-8 encoded bytes, starting at offsetBytes and with a length of utf8Lengh,
-   * and appends the decoded characters onto the given Appendable.
-   * This is specifically designed to reduce the production of intermediate objects (garbage),
-   * thus significantly reducing pressure on the JVM Garbage Collector.
-   * @param offsetBytes offset bytes relative to the Memory start
-   * @param dst the destination Appendable to append decoded characters to
-   * @param utf8Length the number of encoded UTF-8 bytes to decode
-   * @throws IOException if dst.append() throws IOException
-   * @throws Utf8CodingException in case of malformed or illegal UTF-8 input
-   */
-  public abstract void getCharsAsUtf8(long offsetBytes, Appendable dst, int utf8Length)
-      throws IOException, Utf8CodingException;
-
-  /**
-   * Decodes UTF-8 encoded bytes, starting at offsetBytes and with a length of utf8Lengh,
-   * and appends the decoded characters onto the given StringBuilder.
-   * This method does *not* reset the length of the destination StringBuilder before appending
-   * characters to it.
-   * This is specifically designed to reduce the production of intermediate objects (garbage),
-   * thus significantly reducing pressure on the JVM Garbage Collector.
-   * @param offsetBytes offset bytes relative to the Memory start
-   * @param dst the destination StringBuilder to append decoded characters to
-   * @param utf8Length the number of encoded UTF-8 bytes to decode
-   * @throws Utf8CodingException in case of malformed or illegal UTF-8 input
-   */
-  public void getCharsAsUtf8(final long offsetBytes, final StringBuilder dst, final int utf8Length)
-      throws Utf8CodingException {
-    try {
-      // Ensure that we do at most one resize of internal StringBuilder's char array
-      dst.ensureCapacity(dst.length() + utf8Length);
-      getCharsAsUtf8(offsetBytes, (Appendable) dst, utf8Length);
-    } catch (final IOException e) {
-      throw new RuntimeException("Should not happen", e);
-    }
-  }
+      int length);
 
   //OTHER PRIMITIVE READ METHODS: copyTo, compareTo XXX
   /**
@@ -390,7 +389,7 @@ public abstract class Memory {
    * @return <i>(this &lt; that) ? -1 : (this &gt; that) ? 1 : 0;</i>
    */
   public abstract int compareTo(long thisOffsetBytes, long thisLengthBytes, Memory that,
-          long thatOffsetBytes, long thatLengthBytes);
+      long thatOffsetBytes, long thatLengthBytes);
 
   /**
    * Copies bytes from a source range of this Memory to a destination range of the given Memory
@@ -402,7 +401,7 @@ public abstract class Memory {
    * @param lengthBytes the number of bytes to copy
    */
   public abstract void copyTo(long srcOffsetBytes, WritableMemory destination, long dstOffsetBytes,
-          long lengthBytes);
+      long lengthBytes);
 
   //OTHER READ METHODS XXX
   /**
@@ -492,7 +491,7 @@ public abstract class Memory {
    * @return a formatted hex string in a human readable array
    */
   static String toHex(final String preamble, final long offsetBytes, final int lengthBytes,
-          final ResourceState state) {
+      final ResourceState state) {
     assertBounds(offsetBytes, lengthBytes, state.getCapacity());
     final StringBuilder sb = new StringBuilder();
     final Object uObj = state.getUnsafeObject();

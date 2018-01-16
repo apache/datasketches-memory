@@ -4,10 +4,12 @@ import static com.yahoo.memory.UnsafeUtil.checkBounds;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 
 import java.io.IOException;
+import java.nio.BufferOverflowException;
+import java.nio.CharBuffer;
 
 /**
- * Encoding and decoding implementations of {@link WritableMemory#putCharsAsUtf8} and {@link
- * Memory#getCharsAsUtf8}.
+ * Encoding and decoding implementations of {@link WritableMemory#putCharsToUtf8} and {@link
+ * Memory#getCharsFromUtf8}.
  *
  * This is specifically designed to reduce the production of intermediate objects (garbage),
  * thus significantly reducing pressure on the JVM Garbage Collector.
@@ -34,21 +36,85 @@ final class Utf8 {
     //Why not use UnsafeUtil.assertBounds() like all other methods?
     checkBounds(offsetBytes, utf8LengthBytes, state.getCapacity());
 
+    if (dst instanceof CharBuffer && ((CharBuffer) dst).hasArray()) {
+      getCharsFromUtf8CharBuffer(offsetBytes, ((CharBuffer) dst), utf8LengthBytes, state);
+      return;
+    }
     long address = state.getCumBaseOffset() + offsetBytes;
-    final long addressLimit = address + utf8LengthBytes;
+    int i = 0;
     final Object unsafeObj = state.getUnsafeObject();
 
     // Optimize for 100% ASCII (Hotspot loves small simple top-level loops like this).
     // This simple loop stops when we encounter a byte >= 0x80 (i.e. non-ASCII).
-    while (address < addressLimit) {
-      final byte b = unsafe.getByte(unsafeObj, address);
+    // Need to keep this loop int-indexed, because it's faster for Hotspot JIT, it doesn't insert
+    // savepoint polls on each iteration.
+    for (; i < utf8LengthBytes; i++) {
+      final byte b = unsafe.getByte(unsafeObj, address + i);
       if (!DecodeUtil.isOneByte(b)) {
         break;
       }
-      address++;
       dst.append((char) b);
     }
+    if (i == utf8LengthBytes) {
+      return;
+    }
 
+    getCharsFromUtf8NonAscii(dst, address + i, address + utf8LengthBytes, unsafeObj);
+  }
+
+  /**
+   * Optimize for heap CharBuffer manually, because Hotspot JIT doesn't itself unfold this
+   * abstraction well (doesn't hoist array bound checks, etc.)
+   */
+  private static void getCharsFromUtf8CharBuffer(final long offsetBytes, final CharBuffer cb,
+        final int utf8LengthBytes, final ResourceState state) {
+    char[] ca = cb.array();
+    int cp = cb.position() + cb.arrayOffset();
+    int cl = cb.arrayOffset() + cb.limit();
+    long address = state.getCumBaseOffset() + offsetBytes;
+    int i = 0;
+    final Object unsafeObj = state.getUnsafeObject();
+
+    // Optimize for 100% ASCII (Hotspot loves small simple top-level loops like this).
+    // This simple loop stops when we encounter a byte >= 0x80 (i.e. non-ASCII).
+    int cbNoCheckLimit = Math.min(utf8LengthBytes, cl - cp);
+    // Need to keep this loop int-indexed, because it's faster for Hotspot JIT, it doesn't insert
+    // savepoint polls on each iteration.
+    for (; i < cbNoCheckLimit; i++) {
+      final byte b = unsafe.getByte(unsafeObj, address + i);
+      if (!DecodeUtil.isOneByte(b)) {
+        break;
+      }
+      // Not checking CharBuffer bounds!
+      ca[cp++] = (char) b;
+    }
+
+    for (; i < utf8LengthBytes; i++) {
+      final byte b = unsafe.getByte(unsafeObj, address + i);
+      if (!DecodeUtil.isOneByte(b)) {
+        break;
+      }
+      checkCharBufferPos(cb, cp, cl);
+      ca[cp++] = (char) b;
+    }
+    if (i == utf8LengthBytes) {
+      cb.position(cp - cb.arrayOffset());
+      return;
+    }
+
+    getCharsFromUtf8NonAsciiCharBuffer(cb, ca, cp, cl, address + i, address + utf8LengthBytes,
+        unsafeObj);
+  }
+
+  private static void checkCharBufferPos(CharBuffer cb, int cp, int cl) {
+    if (cp == cl) {
+      cb.position(cp - cb.arrayOffset());
+      throw new BufferOverflowException();
+    }
+  }
+
+  private static void getCharsFromUtf8NonAscii(Appendable dst, long address, long addressLimit,
+        Object unsafeObj) throws IOException {
     while (address < addressLimit) {
       final byte byte1 = unsafe.getByte(unsafeObj, address++);
       if (DecodeUtil.isOneByte(byte1)) {
@@ -97,8 +163,73 @@ final class Utf8 {
     }
   }
 
+  private static void getCharsFromUtf8NonAsciiCharBuffer(CharBuffer cb, char[] ca, int cp, int cl,
+        long address, long addressLimit, Object unsafeObj) {
+    while (address < addressLimit) {
+      final byte byte1 = unsafe.getByte(unsafeObj, address++);
+      if (DecodeUtil.isOneByte(byte1)) {
+        checkCharBufferPos(cb, cp, cl);
+        ca[cp++] = (char) byte1;
+        // It's common for there to be multiple ASCII characters in a run mixed in, so add an
+        // extra optimized loop to take care of these runs.
+        while (address < addressLimit) {
+          final byte b = unsafe.getByte(unsafeObj, address);
+          if (!DecodeUtil.isOneByte(b)) {
+            break;
+          }
+          address++;
+          checkCharBufferPos(cb, cp, cl);
+          ca[cp++] = (char) b;
+        }
+      }
+      else if (DecodeUtil.isTwoBytes(byte1)) {
+        if (address >= addressLimit) {
+          cb.position(cp - cb.arrayOffset());
+          throw Utf8CodingException.inputBounds(address, addressLimit);
+        }
+        checkCharBufferPos(cb, cp, cl);
+        DecodeUtil.handleTwoBytesCharBuffer(
+                byte1,
+                /* byte2 */ unsafe.getByte(unsafeObj, address++),
+                cb, ca, cp);
+        cp++;
+      }
+      else if (DecodeUtil.isThreeBytes(byte1)) {
+        if (address >= (addressLimit - 1)) {
+          cb.position(cp - cb.arrayOffset());
+          throw Utf8CodingException.inputBounds(address + 1, addressLimit);
+        }
+        checkCharBufferPos(cb, cp, cl);
+        DecodeUtil.handleThreeBytesCharBuffer(
+                byte1,
+                /* byte2 */ unsafe.getByte(unsafeObj, address++),
+                /* byte3 */ unsafe.getByte(unsafeObj, address++),
+                cb, ca, cp);
+        cp++;
+      }
+      else {
+        if (address >= (addressLimit - 2)) {
+          cb.position(cp - cb.arrayOffset());
+          throw Utf8CodingException.inputBounds(address + 2, addressLimit);
+        }
+        if (cp >= cl - 1) {
+          cb.position(cp - cb.arrayOffset());
+          throw new BufferOverflowException();
+        }
+        DecodeUtil.handleFourBytesCharBuffer(
+                byte1,
+                /* byte2 */ unsafe.getByte(unsafeObj, address++),
+                /* byte3 */ unsafe.getByte(unsafeObj, address++),
+                /* byte4 */ unsafe.getByte(unsafeObj, address++),
+                cb, ca, cp);
+        cp += 2;
+      }
+    }
+    cb.position(cp - cb.arrayOffset());
+  }
+
   static long putCharsToUtf8(final long offsetBytes, final CharSequence src,
-      final ResourceState state) {
+        final ResourceState state) {
     assert state.isValid();
     final Object unsafeObj = state.getUnsafeObject();
     final long cumBaseOffset = state.getCumBaseOffset();
@@ -108,7 +239,7 @@ final class Utf8 {
     final long byteLimit = cumBaseOffset + state.getCapacity(); //absolute memory byte index limit
 
     final int utf16Length = src.length();
-    //Quickly dispatch an ANCII sequence
+    //Quickly dispatch an ASCII sequence
     for (char c; (i < utf16Length) && ((i + j) < byteLimit) && ((c = src.charAt(i)) < 0x80); i++) {
       unsafe.putByte(unsafeObj, j + i, (byte) c);
     }
@@ -268,6 +399,19 @@ final class Utf8 {
       dst.append((char) (((byte1 & 0x1F) << 6) | trailingByteValue(byte2)));
     }
 
+    private static void handleTwoBytesCharBuffer(final byte byte1, final byte byte2, final CharBuffer cb, char[] ca, int cp)
+            throws Utf8CodingException {
+      // Simultaneously checks for illegal trailing-byte in leading position (<= '11000000') and
+      // overlong 2-byte, '11000001'.
+      if ((byte1 < (byte) 0xC2)
+              || isNotTrailingByte(byte2)) {
+        byte[] out = new byte[] {byte1, byte2};
+        cb.position(cp - cb.arrayOffset());
+        throw Utf8CodingException.inputBytes(out);
+      }
+      ca[cp] = (char) (((byte1 & 0x1F) << 6) | trailingByteValue(byte2));
+    }
+
     private static void handleThreeBytes(final byte byte1, final byte byte2, final byte byte3,
         final Appendable dst) throws IOException, Utf8CodingException {
       if (isNotTrailingByte(byte2)
@@ -281,6 +425,22 @@ final class Utf8 {
       }
       dst.append((char)
           (((byte1 & 0x0F) << 12) | (trailingByteValue(byte2) << 6) | trailingByteValue(byte3)));
+    }
+
+    private static void handleThreeBytesCharBuffer(final byte byte1, final byte byte2, final byte byte3,
+                                         final CharBuffer cb, char[] ca, int cp) throws Utf8CodingException {
+      if (isNotTrailingByte(byte2)
+              // overlong? 5 most significant bits must not all be zero
+              || ((byte1 == (byte) 0xE0) && (byte2 < (byte) 0xA0))
+              // check for illegal surrogate codepoints
+              || ((byte1 == (byte) 0xED) && (byte2 >= (byte) 0xA0))
+              || isNotTrailingByte(byte3)) {
+        cb.position(cp - cb.arrayOffset());
+        byte[] out = new byte[] {byte1, byte2, byte3};
+        throw Utf8CodingException.inputBytes(out);
+      }
+      ca[cp] = (char)
+              (((byte1 & 0x0F) << 12) | (trailingByteValue(byte2) << 6) | trailingByteValue(byte3));
     }
 
     private static void handleFourBytes(
@@ -306,6 +466,32 @@ final class Utf8 {
                       | trailingByteValue(byte4);
       dst.append(DecodeUtil.highSurrogate(codepoint));
       dst.append(DecodeUtil.lowSurrogate(codepoint));
+    }
+
+    private static void handleFourBytesCharBuffer(
+            final byte byte1, final byte byte2, final byte byte3, final byte byte4,
+            final CharBuffer cb, char[] ca, int cp) throws Utf8CodingException {
+      if (isNotTrailingByte(byte2)
+              // Check that 1 <= plane <= 16.  Tricky optimized form of:
+              //   valid 4-byte leading byte?
+              // if (byte1 > (byte) 0xF4 ||
+              //   overlong? 4 most significant bits must not all be zero
+              //     byte1 == (byte) 0xF0 && byte2 < (byte) 0x90 ||
+              //   codepoint larger than the highest code point (U+10FFFF)?
+              //     byte1 == (byte) 0xF4 && byte2 > (byte) 0x8F)
+              || ((((byte1 << 28) + (byte2 - (byte) 0x90)) >> 30) != 0)
+              || isNotTrailingByte(byte3)
+              || isNotTrailingByte(byte4)) {
+        cb.position(cp - cb.arrayOffset());
+        byte[] out = new byte[] {byte1, byte2, byte3, byte4};
+        throw Utf8CodingException.inputBytes(out);
+      }
+      final int codepoint = ((byte1 & 0x07) << 18)
+              | (trailingByteValue(byte2) << 12)
+              | (trailingByteValue(byte3) << 6)
+              | trailingByteValue(byte4);
+      ca[cp] = DecodeUtil.highSurrogate(codepoint);
+      ca[cp + 1] = DecodeUtil.lowSurrogate(codepoint);
     }
 
     /**

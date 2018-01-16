@@ -8,13 +8,14 @@ package com.yahoo.memory;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
+import com.google.protobuf.ByteString;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.testng.annotations.Test;
-
-import com.google.protobuf.ByteString;
 
 /**
  * Adapted version of
@@ -27,7 +28,7 @@ import com.google.protobuf.ByteString;
 public class Utf8Test {
 
   @Test
-  public void testRoundTripAllValidChars() { //the non-surrogate chars
+  public void testRoundTripAllValidChars() throws IOException { //the non-surrogate chars
     for (int i = Character.MIN_CODE_POINT; i < Character.MAX_CODE_POINT; i++) {
       if ((i < Character.MIN_SURROGATE) || (i > Character.MAX_SURROGATE)) {
         String str = new String(Character.toChars(i));
@@ -129,7 +130,7 @@ public class Utf8Test {
   }
 
   @Test
-  public void testRealStrings() {
+  public void testRealStrings() throws IOException {
     // English
     assertRoundTrips("The quick brown fox jumps over the lazy dog");
     // German
@@ -200,7 +201,7 @@ public class Utf8Test {
   }
 
   @Test
-  public void testBufferSlice() {
+  public void testBufferSlice() throws IOException {
     String str = "The quick brown fox jumps over the lazy dog";
     assertRoundTrips(str, 10, 4);
     assertRoundTrips(str, str.length(), 0);
@@ -266,11 +267,11 @@ public class Utf8Test {
     }
   }
 
-  private static void assertRoundTrips(String str) {
+  private static void assertRoundTrips(String str) throws IOException {
     assertRoundTrips(str, 0, -1);
   }
 
-  private static void assertRoundTrips(String str, int index, int size) {
+  private static void assertRoundTrips(String str, int index, int size) throws IOException {
     byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
     if (size == -1) {
       size = bytes.length;
@@ -293,11 +294,19 @@ public class Utf8Test {
   }
 
   private static void assertRoundTrips(String str, int index, int size, byte[] bytes, Memory mem,
-        WritableMemory writeMem) {
+        WritableMemory writeMem) throws IOException {
     StringBuilder sb = new StringBuilder();
 
     mem.getCharsFromUtf8(index, size, sb);
     checkStrings(sb.toString(), new String(bytes, index, size, StandardCharsets.UTF_8));
+
+    CharBuffer cb = CharBuffer.allocate(bytes.length + 1);
+    cb.position(1);
+    // Make CharBuffer 1-based, to check correct offset handling
+    cb = cb.slice();
+    mem.getCharsFromUtf8(index, size, cb);
+    cb.flip();
+    checkStrings(cb.toString(), new String(bytes, index, size, StandardCharsets.UTF_8));
 
     assertEquals(writeMem.putCharsToUtf8(0, str), bytes.length);
     assertEquals(0, writeMem.compareTo(0, bytes.length, mem, 0, bytes.length));

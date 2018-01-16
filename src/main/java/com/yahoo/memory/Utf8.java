@@ -131,8 +131,7 @@ final class Utf8 {
         unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & c)));
       }
       //c > 0x800 || j > byteLimit - 2
-      else if (((c < Character.MIN_SURROGATE) || (Character.MAX_SURROGATE < c))
-          && (j <= (byteLimit - 3))) {
+      else if ( !Character.isSurrogate(c) && (j <= (byteLimit - 3))) {
         //Encode the remainder of the BMP that are not surrogates:
         //  0x0800 thru 0xD7FF; 0xE000 thru 0xFFFF, the max single-char code point
         //We must have target space for at least 3 Utf8 bytes.
@@ -169,8 +168,8 @@ final class Utf8 {
         // We must throw an exception, the question is which one.
         // If we are surrogates and we're not a surrogate pair, always throw an
         // UnpairedSurrogateException instead of an ArrayOutOfBoundsException.
-        if (((Character.MIN_SURROGATE <= c) && (c <= Character.MAX_SURROGATE))
-            && (((i + 1) == utf16Length) //src too small for low surrogate; bounds violation.
+        if ( Character.isSurrogate(c) && (((i + 1) == utf16Length)
+            //src too small for low surrogate; bounds violation.
                 || !Character.isSurrogatePair(c, src.charAt(i + 1)))) {
           throw new UnpairedSurrogateException(i, utf16Length);
         }

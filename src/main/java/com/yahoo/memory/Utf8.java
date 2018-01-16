@@ -33,7 +33,7 @@ final class Utf8 {
           throws IOException, Utf8CodingException {
     assert state.isValid();
 
-    //Why not use UnsafeUtil.assertBounds() like all other methods?
+    // checkBounds() instead of assertBounds(), because getChars works with "long" series of bytes
     checkBounds(offsetBytes, utf8LengthBytes, state.getCapacity());
 
     if (dst instanceof CharBuffer && ((CharBuffer) dst).hasArray()) {

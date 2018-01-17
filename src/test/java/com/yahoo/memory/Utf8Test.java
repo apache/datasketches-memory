@@ -5,10 +5,10 @@
 
 package com.yahoo.memory;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,9 +40,9 @@ public class Utf8Test {
   public void testPutInvalidChars() { //The surrogates must be a pair, thus invalid alone
     WritableMemory mem = WritableMemory.allocate(10);
     WritableMemory emptyMem = WritableMemory.allocate(0);
-    for (int i = Character.MIN_SURROGATE; i <= Character.MAX_SURROGATE; i++) {
-      assertSurrogate(mem, (char) i);
-      assertSurrogate(emptyMem, (char) i);
+    for (int c = Character.MIN_SURROGATE; c <= Character.MAX_SURROGATE; c++) {
+      assertSurrogate(mem, (char) c);
+      assertSurrogate(emptyMem, (char) c);
     }
   }
 
@@ -53,6 +53,64 @@ public class Utf8Test {
     } catch (Utf8CodingException e) {
       // Expected.
     }
+  }
+
+  @Test
+  public void testPutInvaidSurrogatePairs() {
+    WritableMemory mem = WritableMemory.allocate(4);
+    StringBuilder sb = new StringBuilder();
+    sb.append(Character.MIN_HIGH_SURROGATE);
+    sb.append(Character.MAX_HIGH_SURROGATE);
+    try {
+      mem.putCharsToUtf8(0, sb);
+    } catch (Utf8CodingException e) {
+      //Expected;
+    }
+  }
+
+  @Test
+  public void testPutHighBMP() {
+    WritableMemory mem = WritableMemory.allocate(2);
+    StringBuilder sb = new StringBuilder();
+    sb.append("\uE000");
+    try {
+      mem.putCharsToUtf8(0, sb);
+    } catch (Utf8CodingException e) {
+      //Expected;
+    }
+  }
+
+  @Test
+  public void testPutExtendedAscii() {
+    WritableMemory mem = WritableMemory.allocate(1);
+    StringBuilder sb = new StringBuilder();
+    sb.append("\u07FF");
+    try {
+      mem.putCharsToUtf8(0, sb);
+    } catch (Utf8CodingException e) {
+      //Expected;
+    }
+  }
+
+  @Test
+  public void testPutOneAsciiToEmpty() {
+    WritableMemory mem = WritableMemory.allocate(0);
+    StringBuilder sb = new StringBuilder();
+    sb.append("a");
+    try {
+      mem.putCharsToUtf8(0, sb);
+    } catch (Utf8CodingException e) {
+      //Expected;
+    }
+  }
+
+  @Test
+  public void testPutValidSurrogatePair() {
+    WritableMemory mem = WritableMemory.allocate(4);
+    StringBuilder sb = new StringBuilder();
+    sb.append(Character.MIN_HIGH_SURROGATE);
+    sb.append(Character.MIN_LOW_SURROGATE);
+    mem.putCharsToUtf8(0, sb);
   }
 
   // Test all 1, 2, 3 invalid byte combinations. Valid ones would have been covered above.
@@ -207,26 +265,13 @@ public class Utf8Test {
   }
 
   @Test
-  public void testInvalidBufferSlice() {
-    byte[] bytes  = "The quick brown fox jumps over the lazy dog".getBytes(StandardCharsets.UTF_8);
+  public void testInvalidBufferSlice() { //these are pure Memory bounds violations
+    byte[] bytes  = "The quick brown fox jumps over the lazy dog".getBytes(UTF_8);
     assertInvalidSlice(bytes, bytes.length - 3, 4);
     assertInvalidSlice(bytes, bytes.length, 1);
     assertInvalidSlice(bytes, bytes.length + 1, 0);
     assertInvalidSlice(bytes, 0, bytes.length + 1);
   }
-
-  //@Test
-//  public void checkUtf8CodingExceptionMessages() {
-//    println(Utf8CodingException.badBytes(new byte[] {127,-128,-127,-126}));
-//    println(Utf8CodingException.badBounds(128, 128));
-//  }
-
-//  @Test
-//  public void checkLowCornerCases() {
-//    WritableMemory wmem = WritableMemory.allocate(3);
-//    String src = "\uFFFF"; //"\uD841";//\uDF0E";
-//    Utf8.putCharsToUtf8(0, src, wmem.getResourceState());
-//  }
 
   @Test
   public void printlnTest() {
@@ -237,10 +282,10 @@ public class Utf8Test {
    * @param s value to print
    */
   static void println(String s) {
-    //System.out.println(s); //disable here
+    System.out.println(s); //disable here
   }
 
-  private static void assertInvalid(int... bytesAsInt) {
+  private static void assertInvalid(int... bytesAsInt) { //invalid byte sequences
     byte[] bytes = new byte[bytesAsInt.length];
     for (int i = 0; i < bytesAsInt.length; i++) {
       bytes[i] = (byte) bytesAsInt[i];
@@ -259,9 +304,10 @@ public class Utf8Test {
 
   private static void assertInvalidSlice(byte[] bytes, int index, int size) {
     try {
-      Memory.wrap(bytes).getCharsFromUtf8(index, size, new StringBuilder());
+      Memory mem = Memory.wrap(bytes);
+      mem.getCharsFromUtf8(index, size, new StringBuilder());
       fail();
-    } catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) { //Pure bounds violation
       // Expected.
     }
   }
@@ -271,7 +317,7 @@ public class Utf8Test {
   }
 
   private static void assertRoundTrips(String str, int index, int size) {
-    byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
+    byte[] bytes = str.getBytes(UTF_8);
     if (size == -1) {
       size = bytes.length;
     }
@@ -297,7 +343,7 @@ public class Utf8Test {
     StringBuilder sb = new StringBuilder();
 
     mem.getCharsFromUtf8(index, size, sb);
-    checkStrings(sb.toString(), new String(bytes, index, size, StandardCharsets.UTF_8));
+    checkStrings(sb.toString(), new String(bytes, index, size, UTF_8));
 
     assertEquals(writeMem.putCharsToUtf8(0, str), bytes.length);
     assertEquals(0, writeMem.compareTo(0, bytes.length, mem, 0, bytes.length));

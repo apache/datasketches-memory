@@ -50,7 +50,7 @@ public final class Utf8CodingException extends RuntimeException {
   }
 
   static Utf8CodingException illegalSurrogatePair(char c1, char c2) {
-    String s = "Char 1: " + Integer.toHexString(c1 & 0XFFFF)
+    String s = "Illegal Surrogate Pair: Char 1: " + Integer.toHexString(c1 & 0XFFFF)
       + ", Char 2: " + Integer.toHexString(c2 & 0XFFFF);
     return new Utf8CodingException(s);
   }
@@ -64,7 +64,7 @@ public final class Utf8CodingException extends RuntimeException {
     return s;
   }
 
-  static String badBytes(byte[] bytes) {
+  private static String badBytes(byte[] bytes) {
     StringBuilder sb = new StringBuilder();
     int len = bytes.length;
     int i = 0;

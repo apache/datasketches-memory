@@ -35,7 +35,6 @@ final class Utf8 {
           throws IOException, Utf8CodingException {
     assert state.isValid();
 
-    //Why not use UnsafeUtil.assertBounds() like all other methods?
     checkBounds(offsetBytes, utf8LengthBytes, state.getCapacity());
     final long cumBaseOffset = state.getCumBaseOffset();
     long address = cumBaseOffset + offsetBytes;
@@ -114,17 +113,17 @@ final class Utf8 {
     final Object unsafeObj = state.getUnsafeObject();
     final long cumBaseOffset = state.getCumBaseOffset();
 
-    long j = cumBaseOffset + offsetBytes; //absolute byte index in memory
+    long j = cumBaseOffset + offsetBytes; //used in unsafe for the index
     int i = 0; //src character index
-    final long byteLimit = cumBaseOffset + state.getCapacity(); //absolute memory byte index limit
+    final long byteLimit = cumBaseOffset + state.getCapacity(); //unsafe index limit
 
     final int utf16Length = src.length();
     //Quickly dispatch an ANCII sequence
     for (char c; (i < utf16Length) && ((i + j) < byteLimit) && ((c = src.charAt(i)) < 0x80); i++) {
       unsafe.putByte(unsafeObj, j + i, (byte) c);
     }
-    if (i == utf16Length) {
-      return (j + utf16Length) - cumBaseOffset; //done, return next relative byte index in memory
+    if (i == utf16Length) { //done, return next relative byte index in memory
+      return (j + utf16Length) - cumBaseOffset;
     }
     j += i;
     for (char c; i < utf16Length; i++) {
@@ -136,16 +135,16 @@ final class Utf8 {
       }
       //c MUST BE >= 0x0080 || j >= byteLimit
 
-      else if ((c < 0x800) && (j <= (byteLimit - 2))) {
+      else if ((c < 0x800) && (j < (byteLimit - 1))) {
         //Encode 0x80 through 0x7FF.
-        //We must have target space for at least 2 Utf8 bytes.
         //This is for almost all Latin-script alphabets plus Greek, Cyrillic, Hebrew, Arabic, etc.
+        //We must have target space for at least 2 Utf8 bytes.
         unsafe.putByte(unsafeObj, j++, (byte) ((0xF << 6) | (c >>> 6)));
         unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & c)));
       }
-      //c > 0x800 || j > byteLimit - 2
+      //c > 0x800 || j >= byteLimit - 1
 
-      else if ( !isSurrogate(c) && (j <= (byteLimit - 3))) {
+      else if ( !isSurrogate(c) && (j < (byteLimit - 2)) ) {
         //Encode the remainder of the BMP that are not surrogates:
         //  0x0800 thru 0xD7FF; 0xE000 thru 0xFFFF, the max single-char code point
         //We must have target space for at least 3 Utf8 bytes.
@@ -153,46 +152,56 @@ final class Utf8 {
         unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & (c >>> 6))));
         unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & c)));
       }
-      //c is a surrogate (and don't know j) || j > byteLimit - 3
+      //c is a surrogate || j >= byteLimit - 2
 
       //Beyond this point the only way to properly encode code points outside the BMP into Utf8
       // bytes is to use surrogate pairs of characters. Therefore, we must have at least 2 src
-      // characters remaining and at least 4 bytes of memory space remaining, and the next 2
+      // characters remaining, at least 4 bytes of memory space remaining, and the next 2
       // characters must be a surrogate pair.
       //
       // However, the other way to get to this point is if there was insufficient Memory space
-      //  to encode the current character from above.
+      //  to encode the current character from one of the ifs above.
 
       else {
         final char low;
-        if ( (i <= (utf16Length - 2)) && (j <= (byteLimit - 4))
-            && isSurrogatePair(c, low = src.charAt(i + 1)) ) {
+        if ( (i <= (utf16Length - 2))
+            && (j <= (byteLimit - 4))
+            && isSurrogatePair(c, low = src.charAt(i + 1)) ) { //we are good
           i++; //skip over low surrogate
           final int codePoint = toCodePoint(c, low);
           unsafe.putByte(unsafeObj, j++, (byte) ((0xF << 4) | (codePoint >>> 18)));
           unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & (codePoint >>> 12))));
           unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & (codePoint >>> 6))));
           unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & codePoint)));
-        } else {
-          //figure out what was wrong and throw intelligent message
+        }
+
+        else {
+          //We are going to throw an exception. So we have time to figure out
+          // what was wrong and hopefully throw an intelligent message!
+
+          //check the code point cases and their required memory limits
           if (   ((c < 0X0080) && (j >= byteLimit))
               || ((c < 0x0800) && (j >= (byteLimit - 1)))
               || ((c < 0xFFFF) && (j >= (byteLimit - 2))) ) {
             throw Utf8CodingException.outOfMemory();
           }
-          if (i > (utf16Length - 2)) {
-            //last char is an unpaired surrogate. output char
+
+          if (i > (utf16Length - 2)) { //the last char is an unpaired surrogate
             throw Utf8CodingException.unpairedSurrogate(c);
           }
-          else if (j > (byteLimit - 4)) {
-            //4 Memory bytes required to encode a surrogate pair -> remaining bytes.
+
+          if (j > (byteLimit - 4)) {
+            //4 Memory bytes required to encode a surrogate pair.
             final int remaining = (int) ((j - byteLimit) + 4L);
             throw Utf8CodingException.shortUtf8EncodeByteLength(remaining);
           }
-          else if (!isSurrogatePair(c, src.charAt(i + 1)) ) {
+
+          if (!isSurrogatePair(c, src.charAt(i + 1)) ) {
             //Not a surrogate pair.
             throw Utf8CodingException.illegalSurrogatePair(c, src.charAt(i + 1));
           }
+
+          //This should not happen :)
           throw new IllegalArgumentException("Unknown Utf8 encoding exception");
         }
       }
@@ -200,46 +209,6 @@ final class Utf8 {
     final long localOffsetBytes = j - cumBaseOffset;
     return localOffsetBytes;
   }
-
-
-    //      else if (j <= (byteLimit - 4)) {
-    //        //We know we have target space for at least 4 bytes.
-    //        //And we know that c is a surrogate, so {c, c+1} better be a surrogate pair.
-    //        // Minimum code point represented by a surrogate pair is 0x10000, 17 bits,
-    //        // four UTF-8 bytes, code planes 1 - 16.
-    //        final char low;
-    //        if (((i + 1) == utf16Length)
-    //            //Character src too small for low surrogate; src bounds violation.
-    //            // OR not a surrogate pair
-    //            || !Character.isSurrogatePair(c, (low = src.charAt(++i)))) {
-    //          throw new UnpairedSurrogateException((i - 1), utf16Length);
-    //        }
-    //        final int codePoint = Character.toCodePoint(c, low);
-    //        unsafe.putByte(unsafeObj, j++, (byte) ((0xF << 4) | (codePoint >>> 18)));
-    //        unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & (codePoint >>> 12))));
-    //        unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & (codePoint >>> 6))));
-    //        unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & codePoint)));
-    //      }
-    //      //
-    //      else { //We end up here if we have fewer than 4 bytes left in the target,
-    //        // We must throw an exception, the question is which one.
-    //        // If we are surrogates and we're not a surrogate pair, always throw an
-    //        // UnpairedSurrogateException instead of an ArrayOutOfBoundsException.
-    //        if ( Character.isSurrogate(c) && (((i + 1) == utf16Length)
-    //            //src too small for low surrogate; bounds violation.
-    //                || !Character.isSurrogatePair(c, src.charAt(i + 1)))) {
-    //          throw new UnpairedSurrogateException(i, utf16Length);
-    //        }
-    //        final long localOffsetBytes = j - cumBaseOffset;
-    //        throw new IllegalArgumentException(
-    //           "Insufficient Memory. Failed writing character \"" + c
-    //             + "\" at Memory byte offset " + localOffsetBytes);
-    //      }
-
-  //    }
-  //    final long localOffsetBytes = j - cumBaseOffset;
-  //    return localOffsetBytes;
-  //  }
 
   /**
    * Utility methods for decoding UTF-8 bytes into {@link String}. Callers are responsible for
@@ -311,7 +280,7 @@ final class Utf8 {
 
     /*
      * Note that if three-byte UTF-8 coding has been excluded and if the current byte is
-     * &ge; 0XF0, it must be four-byte UTF-8 encoding.
+     * &ge; 0XF0, it must be the start of a four-byte UTF-8 encoding.
      * This is for the less common CJKV characters, historic scripts, math symbols, emoji, etc.
      *
      * <p>Code Plane1 1 through 16, Code Point range U+10000 to U+10FFFF.
@@ -400,16 +369,5 @@ final class Utf8 {
       return (char) (Character.MIN_LOW_SURROGATE + (codePoint & 0x3ff));
     }
   }
-
-//  static class UnpairedSurrogateException extends IllegalArgumentException {
-//
-//    private static final long serialVersionUID = 1L;
-//
-//    UnpairedSurrogateException(final int index, final int length) {
-//      //if index + 1 == length, src too small for low surrogate; bounds violation.
-//      // else not a surrogate pair.
-//      super("Unpaired surrogate at character index " + index + " of " + length);
-//    }
-//  }
 
 }

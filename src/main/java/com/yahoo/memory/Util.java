@@ -212,7 +212,7 @@ public final class Util {
     public final int getCodePoint(final int startCP, final int endCP) {
       final int numCP = Math.min(endCP, 0X110000) - Math.min(0, startCP);
       while (true) {
-        int cp = startCP + rand.nextInt(numCP);
+        final int cp = startCP + rand.nextInt(numCP);
         if ((cp < MIN_SUR) || (cp > MAX_SUR)) {
           return cp;
         }

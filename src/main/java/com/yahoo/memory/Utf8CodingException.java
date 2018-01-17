@@ -19,16 +19,49 @@ public final class Utf8CodingException extends RuntimeException {
     super(message);
   }
 
-  static Utf8CodingException inputBounds(final long address, final long limit) {
-    return new Utf8CodingException("Bounds violation: " + badBounds(address, limit));
+  //Decode
+  static Utf8CodingException shortUtf8DecodeByteSequence(final byte leadByte, final long address,
+      final long limit, final int required) {
+    String s = "Too few Utf8 decode bytes remaining given the leading byte. "
+        + shortSeq(leadByte, address, limit, required);
+    return new Utf8CodingException(s);
   }
 
-  static Utf8CodingException inputBytes(final byte[] bytes) {
-    return new Utf8CodingException("Invalid UTF-8 input byte sequence: " + badBytes(bytes));
+  static Utf8CodingException illegalUtf8DecodeByteSequence(final byte[] bytes) {
+    String s = "Invalid UTF-8 decode byte sequence: " + badBytes(bytes);
+    return new Utf8CodingException(s);
   }
 
-  static String badBounds(long address, long limit) {
-    return "0X" + Long.toHexString(address) + " >= 0X" + Long.toHexString(limit);
+  //Encode
+  static Utf8CodingException outOfMemory() {
+    String s = "Out-of-memory with characters remaining to be encoded";
+    return new Utf8CodingException(s);
+  }
+
+  static Utf8CodingException unpairedSurrogate(char c) {
+    String s = "Last char to encode is an unpaired surrogate: 0X"
+        + Integer.toHexString(c & 0XFFFF);
+    return new Utf8CodingException(s);
+  }
+
+  static Utf8CodingException shortUtf8EncodeByteLength(final int remaining) {
+    String s = "Too few Memory bytes to encode a surrogate pair: " + remaining;
+    return new Utf8CodingException(s);
+  }
+
+  static Utf8CodingException illegalSurrogatePair(char c1, char c2) {
+    String s = "Char 1: " + Integer.toHexString(c1 & 0XFFFF)
+      + ", Char 2: " + Integer.toHexString(c2 & 0XFFFF);
+    return new Utf8CodingException(s);
+  }
+
+  private static String shortSeq(final byte leadByte, final long address, final long limit,
+      final int required) {
+    String s = "Lead byte: " + Integer.toHexString(leadByte & 0xFF)
+      + ", offset: 0X" + Long.toHexString(address)
+      + ", limit: 0X" + Long.toHexString(limit)
+      + ", required: " + required;
+    return s;
   }
 
   static String badBytes(byte[] bytes) {

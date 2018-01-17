@@ -282,7 +282,7 @@ public class Utf8Test {
    * @param s value to print
    */
   static void println(String s) {
-    System.out.println(s); //disable here
+    //System.out.println(s); //disable here
   }
 
   private static void assertInvalid(int... bytesAsInt) { //invalid byte sequences

@@ -126,6 +126,7 @@ final class Utf8 {
       return (j + utf16Length) - cumBaseOffset;
     }
     j += i;
+
     for (char c; i < utf16Length; i++) {
       c = src.charAt(i);
 
@@ -133,18 +134,22 @@ final class Utf8 {
         //Encode ASCII, 0 through 0x007F.
         unsafe.putByte(unsafeObj, j++, (byte) c);
       }
+
+      else
       //c MUST BE >= 0x0080 || j >= byteLimit
 
-      else if ((c < 0x800) && (j < (byteLimit - 1))) {
+      if ((c < 0x800) && (j < (byteLimit - 1))) {
         //Encode 0x80 through 0x7FF.
         //This is for almost all Latin-script alphabets plus Greek, Cyrillic, Hebrew, Arabic, etc.
         //We must have target space for at least 2 Utf8 bytes.
         unsafe.putByte(unsafeObj, j++, (byte) ((0xF << 6) | (c >>> 6)));
         unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & c)));
       }
-      //c > 0x800 || j >= byteLimit - 1
 
-      else if ( !isSurrogate(c) && (j < (byteLimit - 2)) ) {
+      else
+      //c > 0x800 || j >= byteLimit - 1 || j >= byteLimit
+
+      if ( !isSurrogate(c) && (j < (byteLimit - 2)) ) {
         //Encode the remainder of the BMP that are not surrogates:
         //  0x0800 thru 0xD7FF; 0xE000 thru 0xFFFF, the max single-char code point
         //We must have target space for at least 3 Utf8 bytes.
@@ -152,17 +157,23 @@ final class Utf8 {
         unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & (c >>> 6))));
         unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & c)));
       }
-      //c is a surrogate || j >= byteLimit - 2
-
-      //Beyond this point the only way to properly encode code points outside the BMP into Utf8
-      // bytes is to use surrogate pairs of characters. Therefore, we must have at least 2 src
-      // characters remaining, at least 4 bytes of memory space remaining, and the next 2
-      // characters must be a surrogate pair.
-      //
-      // However, the other way to get to this point is if there was insufficient Memory space
-      //  to encode the current character from one of the ifs above.
 
       else {
+      //c is a surrogate || j >= byteLimit - 2 || j >= byteLimit - 1 || j >= byteLimit
+
+      //At this point we are either:
+      // 1) Attempting to encode Code Points outside the BMP.
+      //
+      //    The only way to properly encode code points outside the BMP into Utf8 bytes is to use
+      //    High/Low pairs of surrogate characters. Therefore, we must have at least 2 source
+      //    characters remaining, at least 4 bytes of memory space remaining, and the next 2
+      //    characters must be a valid surrogate pair.
+      //
+      // 2) There is insufficient Memory space to encode the current character from one of the
+      //    ifs above.
+      //
+      // We proceed assuming (1). If the following test fails, we move to an exception.
+
         final char low;
         if ( (i <= (utf16Length - 2))
             && (j <= (byteLimit - 4))
@@ -179,7 +190,7 @@ final class Utf8 {
           //We are going to throw an exception. So we have time to figure out
           // what was wrong and hopefully throw an intelligent message!
 
-          //check the code point cases and their required memory limits
+          //check the BMP code point cases and their required memory limits
           if (   ((c < 0X0080) && (j >= byteLimit))
               || ((c < 0x0800) && (j >= (byteLimit - 1)))
               || ((c < 0xFFFF) && (j >= (byteLimit - 2))) ) {

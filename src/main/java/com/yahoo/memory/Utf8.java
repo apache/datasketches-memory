@@ -111,15 +111,16 @@ final class Utf8 {
         unsafeObj, cumBaseOffset);
   }
 
-  private static void checkCharBufferPos(CharBuffer cb, int cp, int cl) {
+  private static void checkCharBufferPos(final CharBuffer cb, final int cp, final int cl) {
     if (cp == cl) {
       cb.position(cp - cb.arrayOffset());
       throw new BufferOverflowException();
     }
   }
 
-  private static void getCharsFromUtf8NonAscii(Appendable dst, long address, long addressLimit,
-      Object unsafeObj, long cumBaseOffset) throws IOException {
+  private static void getCharsFromUtf8NonAscii(final Appendable dst, long address,
+      final long addressLimit, final Object unsafeObj, final long cumBaseOffset)
+          throws IOException {
     while (address < addressLimit) {
       final byte byte1 = unsafe.getByte(unsafeObj, address++);
       if (DecodeUtil.isOneByte(byte1)) {
@@ -174,8 +175,9 @@ final class Utf8 {
     }
   }
 
-  private static void getCharsFromUtf8NonAsciiCharBuffer(CharBuffer cb, char[] ca, int cp, int cl,
-        long address, long addressLimit, Object unsafeObj, long cumBaseOffset) {
+  private static void getCharsFromUtf8NonAsciiCharBuffer(final CharBuffer cb, final char[] ca,
+      int cp, final int cl, long address, final long addressLimit, final Object unsafeObj,
+      final long cumBaseOffset) {
     while (address < addressLimit) {
       final byte byte1 = unsafe.getByte(unsafeObj, address++);
       if (DecodeUtil.isOneByte(byte1)) {

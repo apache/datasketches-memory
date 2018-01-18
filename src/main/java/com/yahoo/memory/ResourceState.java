@@ -37,14 +37,14 @@ final class ResourceState {
    * A slice() of a Direct ByteBuffer includes the array_offset here.  It is originally computed
    * either from the Unsafe.allocateMemory() call or from the mapping class.
    */
-  private long nativeBaseOffset_ = 0L;
+  private long nativeBaseOffset_;
 
   /**
    * The object used in most Unsafe calls. This is effectively the array object if on-heap and
    * null for direct memory and determines how cumBaseOffset is computed.
    * This is effectively supplied by the user.
    */
-  private Object unsafeObj_ = null;
+  private Object unsafeObj_;
 
   /**
    * If unsafeObj_ is non-null, this is the object header space for the specific array type,
@@ -53,17 +53,17 @@ final class ResourceState {
    * heap ByteBuffer. This is used to compute cumBaseOffset for heap resources.
    * If this changes, cumBaseOffset is recomputed.
    */
-  private long unsafeObjHeader_ = 0L;
+  private long unsafeObjHeader_;
 
   /**
    * The size of the backing resource in bytes. Used by all methods when checking bounds.
    */
-  private long capacity_ = 0L;
+  private long capacity_;
 
   /**
    * This becomes the base offset used by all Unsafe calls.
    */
-  private long cumBaseOffset_ = 0L; //Holds the cumulative offset to the start of data.
+  private long cumBaseOffset_; //Holds the cumulative offset to the start of data.
 
   /**
    * Only relevant when user allocated direct memory is the backing resource. It is a callback
@@ -95,20 +95,20 @@ final class ResourceState {
    * This is the offset that defines the start of a sub-region of the backing resource. It is
    * used to compute cumBaseOffset. If this changes, cumBaseOffset is recomputed.
    */
-  private long regionOffset_ = 0L;
+  private long regionOffset_;
 
   //BYTE BUFFER RESOURCE
   /**
    * This holds a reference to a ByteBuffer until we are done with it.
    * This is also a user supplied parameter passed to AccessByteBuffer.
    */
-  private ByteBuffer byteBuf_ = null;
+  private ByteBuffer byteBuf_;
 
   //MEMORY MAPPED FILE RESOURCES
   /**
    * This is user supplied parameter that is passed to the mapping class..
    */
-  private File file_ = null;
+  private File file_;
 
   /**
    * The position or offset of a file that defines the starting region for the memory map. This is
@@ -119,23 +119,23 @@ final class ResourceState {
   /**
    * This is used by the mapping class as a passing parameter.
    */
-  private RandomAccessFile raf_ = null;
+  private RandomAccessFile raf_;
 
   /**
    * This is used by the mapping class as a passing parameter.
    */
-  private MappedByteBuffer mbb_ = null;
+  private MappedByteBuffer mbb_;
 
   //POSITIONAL
   /**
    * BaseBuffer.
    */
-  private BaseBuffer baseBuf_ = null;
+  private BaseBuffer baseBuf_;
 
   //ENDIANNESS PROPERTIES
   private ByteOrder resourceOrder_ = nativeOrder_;
 
-  private boolean swapBytes_ = false; //true if resourceOrder != nativeOrder_
+  private boolean swapBytes_; //true if resourceOrder != nativeOrder_
 
   ResourceState() {}
 

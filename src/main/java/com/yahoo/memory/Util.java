@@ -7,10 +7,12 @@ package com.yahoo.memory;
 
 import static com.yahoo.memory.UnsafeUtil.assertBounds;
 
+import java.util.Random;
+
 /**
  * @author Lee Rhodes
  */
-final class Util {
+public final class Util {
 
   /**
    * Searches a range of the specified array of longs for the specified value using the binary
@@ -66,8 +68,8 @@ final class Util {
    * @return prepended or postpended given string with the given character to fill the given field
    * length.
    */
-  public static final String characterPad(final String s, final int fieldLength, final char padChar,
-      final boolean postpend) {
+  public static final String characterPad(final String s, final int fieldLength,
+      final char padChar, final boolean postpend) {
     final char[] chArr = s.toCharArray();
     final int sLen = chArr.length;
     if (sLen < fieldLength) {
@@ -134,6 +136,91 @@ final class Util {
   public static final boolean isAnyBitsSet(final long value, final long bitMask) {
     return (value & bitMask) != 0;
   }
+
+  /**
+   * Creates random valid Character Code Points (as integers). By definition, valid CodePoints
+   * are integers in the range 0 to Character.MAX_CODE_POINT, and exclude the surrogate values.
+   *
+   * @author Lee Rhodes
+   */
+  public static class RandomCodePoints {
+    private Random rand; //
+    private static final int ALL_CP = Character.MAX_CODE_POINT + 1;
+    private static final int MIN_SUR = Character.MIN_SURROGATE;
+    private static final int MAX_SUR = Character.MAX_SURROGATE;
+
+    /**
+     * @param deterministic if true, configure java.util.Random with a fixed seed.
+     */
+    public RandomCodePoints(final boolean deterministic) {
+      rand = deterministic ? new Random(0) : new Random();
+    }
+
+    /**
+     * Fills the given array with random valid Code Points from 0, inclusive, to
+     * <i>Character.MAX_CODE_POINT</i>, inclusive.
+     * The surrogate range, which is from <i>Character.MIN_SURROGATE</i>, inclusive, to
+     * <i>Character.MAX_SURROGATE</i>, inclusive, is always <u>excluded</u>.
+     * @param cpArr the array to fill
+     */
+    public final void fillCodePointArray(final int[] cpArr) {
+      fillCodePointArray(cpArr, 0, ALL_CP);
+    }
+
+    /**
+     * Fills the given array with random valid Code Points from <i>startCP</i>, inclusive, to
+     * <i>endCP</i>, exclusive.
+     * The surrogate range, which is from <i>Character.MIN_SURROGATE</i>, inclusive, to
+     * <i>Character.MAX_SURROGATE</i>, inclusive, is always <u>excluded</u>.
+     * @param cpArr the array to fill
+     * @param startCP the starting Code Point, included.
+     * @param endCP the ending Code Point, excluded. This value cannot exceed 0x110000.
+     */
+    public final void fillCodePointArray(final int[] cpArr, final int startCP, final int endCP) {
+      final int arrLen = cpArr.length;
+      final int numCP = Math.min(endCP, 0X110000) - Math.min(0, startCP);
+      int idx = 0;
+      while (idx < arrLen) {
+        final int cp = startCP + rand.nextInt(numCP);
+        if ((cp >= MIN_SUR) && (cp <= MAX_SUR)) {
+          continue;
+        }
+        cpArr[idx++] = cp;
+      }
+    }
+
+    /**
+     * Return a single valid random Code Point from 0, inclusive, to
+     * <i>Character.MAX_CODE_POINT</i>, inclusive.
+     * The surrogate range, which is from <i>Character.MIN_SURROGATE</i>, inclusive, to
+     * <i>Character.MAX_SURROGATE</i>, inclusive, is always <u>excluded</u>.
+     * @return a single valid random CodePoint.
+     */
+    public final int getCodePoint() {
+      return getCodePoint(0, ALL_CP);
+    }
+
+    /**
+     * Return a single valid random Code Point from <i>startCP</i>, inclusive, to
+     * <i>endCP</i>, exclusive.
+     * The surrogate range, which is from <i>Character.MIN_SURROGATE</i>, inclusive, to
+     * <i>Character.MAX_SURROGATE</i>, inclusive, is always <u>excluded</u>.
+     * @param startCP the starting Code Point, included.
+     * @param endCP the ending Code Point, excluded. This value cannot exceed 0x110000.
+     * @return a single valid random CodePoint.
+     */
+    public final int getCodePoint(final int startCP, final int endCP) {
+      final int numCP = Math.min(endCP, 0X110000) - Math.min(0, startCP);
+      while (true) {
+        final int cp = startCP + rand.nextInt(numCP);
+        if ((cp < MIN_SUR) || (cp > MAX_SUR)) {
+          return cp;
+        }
+      }
+    }
+
+  }
+
 
   static final void nullCheck(final Object obj) {
     if (obj == null) {

@@ -10,6 +10,7 @@ import static com.yahoo.memory.Util.nullCheck;
 import static com.yahoo.memory.Util.zeroPad;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import org.testng.annotations.Test;
 
@@ -51,6 +52,32 @@ public class UtilTest {
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void checkNullCheck() {
     nullCheck(null);
+  }
+
+  @Test
+  public void checkCodePointArr() {
+    final Util.RandomCodePoints rvcp = new Util.RandomCodePoints(true);
+    final int n = 1000;
+    final int[] cpArr = new int[n];
+    rvcp.fillCodePointArray(cpArr);
+    for (int i = 0; i < n; i++) {
+      int cp = cpArr[i];
+      if ((cp >= Character.MIN_SURROGATE) && (cp <= Character.MAX_SURROGATE)) {
+        fail();
+      }
+    }
+  }
+
+  @Test
+  public void checkCodePoint() {
+    final Util.RandomCodePoints rvcp = new Util.RandomCodePoints(true);
+    final int n = 1000;
+    for (int i = 0; i < n; i++) {
+      int cp = rvcp.getCodePoint();
+      if ((cp >= Character.MIN_SURROGATE) && (cp <= Character.MAX_SURROGATE)) {
+        fail();
+      }
+    }
   }
 
   @Test

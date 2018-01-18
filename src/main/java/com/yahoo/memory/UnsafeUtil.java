@@ -21,7 +21,6 @@ import sun.misc.Unsafe;
  *
  * @author Lee Rhodes
  */
-//@SuppressWarnings("restriction")
 public final class UnsafeUtil {
   public static final Unsafe unsafe;
   public static final int JDK;

@@ -35,6 +35,7 @@ import static com.yahoo.memory.UnsafeUtil.assertBounds;
 import static com.yahoo.memory.UnsafeUtil.checkOverlap;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -176,6 +177,12 @@ class WritableMemoryImpl extends WritableMemory {
         dstArray,
         ARRAY_CHAR_BASE_OFFSET + (dstOffset << CHAR_SHIFT),
         copyBytes);
+  }
+
+  @Override
+  public void getCharsFromUtf8(final long offsetBytes, final int utf8Length, final Appendable dst)
+      throws IOException, Utf8CodingException {
+    Utf8.getCharsFromUtf8(offsetBytes, utf8Length, dst, state);
   }
 
   @Override
@@ -484,6 +491,11 @@ class WritableMemoryImpl extends WritableMemory {
         cumBaseOffset + offsetBytes,
         copyBytes
     );
+  }
+
+  @Override
+  public long putCharsToUtf8(final long offsetBytes, final CharSequence src) {
+    return Utf8.putCharsToUtf8(offsetBytes, src, state);
   }
 
   @Override

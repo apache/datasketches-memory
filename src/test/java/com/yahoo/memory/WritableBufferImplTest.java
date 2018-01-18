@@ -200,7 +200,7 @@ public class WritableBufferImplTest {
       WritableBuffer wbuf = wmem.asWritableBuffer();
       byte[] srcArray = { 1, -2, 3, -4 };
       wbuf.putByteArray(srcArray, 0, 5); //wrong!
-    } catch (AssertionError e) {
+    } catch (IllegalArgumentException e) {
       //pass
     }
   }

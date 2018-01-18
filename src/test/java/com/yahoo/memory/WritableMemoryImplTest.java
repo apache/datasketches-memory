@@ -186,7 +186,7 @@ public class WritableMemoryImplTest {
     try (WritableDirectHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh.get();
       mem.toHexString("Force Assertion Error", memCapacity, 8);
-    } catch (AssertionError e) {
+    } catch (IllegalArgumentException e) {
       //ok
     }
   }
@@ -198,7 +198,7 @@ public class WritableMemoryImplTest {
       WritableMemory mem = wrh.get();
       byte[] srcArray = { 1, -2, 3, -4 };
       mem.putByteArray(0L, srcArray, 0, 5);
-    } catch (AssertionError e) {
+    } catch (IllegalArgumentException e) {
       //pass
     }
   }
@@ -275,7 +275,7 @@ public class WritableMemoryImplTest {
       mem.copyTo(32, mem, 32, 33);  //hit source bound check
       fail("Did Not Catch Assertion Error: source bound");
     }
-    catch (AssertionError e) {
+    catch (IllegalArgumentException e) {
       //pass
     }
   }
@@ -288,7 +288,7 @@ public class WritableMemoryImplTest {
       mem.copyTo(0, mem, 32, 33);  //hit dst bound check
       fail("Did Not Catch Assertion Error: dst bound");
     }
-    catch (AssertionError e) {
+    catch (IllegalArgumentException e) {
       //pass
     }
   }

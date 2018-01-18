@@ -6,7 +6,7 @@
 package com.yahoo.memory;
 
 import static com.yahoo.memory.UnsafeUtil.LS;
-import static com.yahoo.memory.UnsafeUtil.assertBounds;
+import static com.yahoo.memory.UnsafeUtil.checkBounds;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 import static com.yahoo.memory.Util.nullCheck;
 
@@ -498,7 +498,7 @@ public abstract class Memory {
    */
   static String toHex(final String preamble, final long offsetBytes, final int lengthBytes,
       final ResourceState state) {
-    assertBounds(offsetBytes, lengthBytes, state.getCapacity());
+    checkBounds(offsetBytes, lengthBytes, state.getCapacity());
     final StringBuilder sb = new StringBuilder();
     final Object uObj = state.getUnsafeObject();
     final String uObjStr = (uObj == null) ? "null"

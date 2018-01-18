@@ -5,7 +5,7 @@
 
 package com.yahoo.memory;
 
-import static com.yahoo.memory.UnsafeUtil.assertBounds;
+import static com.yahoo.memory.UnsafeUtil.checkBounds;
 
 import java.util.Random;
 
@@ -31,7 +31,7 @@ public final class Util {
    */
   public static long binarySearchLongs(final Memory mem, final long fromLongIndex,
       final long toLongIndex, final long key) {
-    assertBounds(fromLongIndex << 3, (toLongIndex - fromLongIndex) << 3, mem.getCapacity());
+    checkBounds(fromLongIndex << 3, (toLongIndex - fromLongIndex) << 3, mem.getCapacity());
     long low = fromLongIndex;
     long high = toLongIndex - 1L;
 

@@ -9,14 +9,15 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
-import com.google.protobuf.ByteString;
-import org.testng.annotations.Test;
-
 import java.io.IOException;
 import java.nio.CharBuffer;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.testng.annotations.Test;
+
+import com.google.protobuf.ByteString;
+import com.yahoo.memory.Util.RandomCodePoints;
 
 /**
  * Adapted version of
@@ -275,9 +276,49 @@ public class Utf8Test {
     assertInvalidSlice(bytes, 0, bytes.length + 1);
   }
 
+  static final int end1ByteCP = 0X000080;
+  static final int end2ByteCP = 0X000800;
+  static final int end3ByteCP = 0X010000;
+  static final int end4ByteCP = 0X110000;
+  static final int startSurr  = 0X00D800;
+  static final int endSurr    = 0X00DFFF;
+
+  @Test
+  //randomly selects CP from a range that include 1, 2, 3 and 4 byte encodings.
+  // with 50% coming from plane 0 and 50% coming from plane 1.
+  public void checkRandomValidCodePoints() {
+    RandomCodePoints rcp = new RandomCodePoints(true);
+    int numCP = 1000;
+    int[] cpArr = new int[numCP];
+    rcp.fillCodePointArray(cpArr, 0, end3ByteCP * 2);
+    String rcpStr = new String(cpArr, 0, numCP);
+    //println(rcpStr);
+    WritableMemory wmem = WritableMemory.allocate(4 * numCP);
+    int utf8Bytes = (int) wmem.putCharsToUtf8(0, rcpStr);
+
+    StringBuilder sb = new StringBuilder();
+    try {
+      wmem.getCharsFromUtf8(0L, utf8Bytes, (Appendable) sb);
+    } catch (IOException | Utf8CodingException e) {
+      throw new RuntimeException(e);
+    }
+    checkStrings(sb.toString(), rcpStr);
+
+    CharBuffer cb = CharBuffer.allocate(rcpStr.length());
+    try {
+      wmem.getCharsFromUtf8(0L, utf8Bytes, cb);
+    } catch (IOException | Utf8CodingException e) {
+      throw new RuntimeException(e);
+    }
+    String cbStr = sb.toString();
+    assertEquals(cbStr.length(), rcpStr.length());
+    checkStrings(cbStr, rcpStr);
+  }
+
+
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+   println("PRINTING: "+this.getClass().getName());
   }
 
   /**
@@ -296,10 +337,18 @@ public class Utf8Test {
   }
 
   private static void assertInvalid(byte[] bytes) {
+    int bytesLen = bytes.length;
     try {
-      Memory.wrap(bytes).getCharsFromUtf8(0, bytes.length, new StringBuilder());
+      Memory.wrap(bytes).getCharsFromUtf8(0, bytesLen, new StringBuilder());
       fail();
     } catch (Utf8CodingException e) {
+      // Expected.
+    }
+    try {
+      CharBuffer cb = CharBuffer.allocate(bytesLen);
+      Memory.wrap(bytes).getCharsFromUtf8(0, bytesLen, cb);
+      fail();
+    } catch (Utf8CodingException | IOException e) {
       // Expected.
     }
   }
@@ -317,7 +366,6 @@ public class Utf8Test {
   private static void assertRoundTrips(String str) throws IOException {
     assertRoundTrips(str, 0, -1);
   }
-
 
   private static void assertRoundTrips(String str, int index, int size) throws IOException {
     byte[] bytes = str.getBytes(UTF_8);

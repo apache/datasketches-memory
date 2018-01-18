@@ -71,27 +71,27 @@ final class Utf8 {
    * Optimize for heap CharBuffer manually, because Hotspot JIT doesn't itself unfold this
    * abstraction well (doesn't hoist array bound checks, etc.)
    */
-  private static void getCharsFromUtf8CharBuffer(final long offsetBytes, final CharBuffer cb,
+  private static void getCharsFromUtf8CharBuffer(final long offsetBytes, final CharBuffer cbuf,
         final int utf8LengthBytes, final long cumBaseOffset, final ResourceState state) {
-    final char[] ca = cb.array();
-    int cp = cb.position() + cb.arrayOffset();
-    final int cl = cb.arrayOffset() + cb.limit();
+    final char[] carr = cbuf.array();
+    int cpos = cbuf.position() + cbuf.arrayOffset();
+    final int clim = cbuf.arrayOffset() + cbuf.limit();
     final long address = state.getCumBaseOffset() + offsetBytes;
     int i = 0;
     final Object unsafeObj = state.getUnsafeObject();
 
     // Optimize for 100% ASCII (Hotspot loves small simple top-level loops like this).
     // This simple loop stops when we encounter a byte >= 0x80 (i.e. non-ASCII).
-    final int cbNoCheckLimit = Math.min(utf8LengthBytes, cl - cp);
+    final int cbufNoCheckLimit = Math.min(utf8LengthBytes, clim - cpos);
     // Need to keep this loop int-indexed, because it's faster for Hotspot JIT, it doesn't insert
     // savepoint polls on each iteration.
-    for (; i < cbNoCheckLimit; i++) {
+    for (; i < cbufNoCheckLimit; i++) {
       final byte b = unsafe.getByte(unsafeObj, address + i);
       if (!DecodeUtil.isOneByte(b)) {
         break;
       }
       // Not checking CharBuffer bounds!
-      ca[cp++] = (char) b;
+      carr[cpos++] = (char) b;
     }
 
     for (; i < utf8LengthBytes; i++) {
@@ -99,21 +99,21 @@ final class Utf8 {
       if (!DecodeUtil.isOneByte(b)) {
         break;
       }
-      checkCharBufferPos(cb, cp, cl);
-      ca[cp++] = (char) b;
+      checkCharBufferPos(cbuf, cpos, clim);
+      carr[cpos++] = (char) b;
     }
     if (i == utf8LengthBytes) {
-      cb.position(cp - cb.arrayOffset());
+      cbuf.position(cpos - cbuf.arrayOffset());
       return;
     }
 
-    getCharsFromUtf8NonAsciiCharBuffer(cb, ca, cp, cl, address + i, address + utf8LengthBytes,
-        unsafeObj, cumBaseOffset);
+    getCharsFromUtf8NonAsciiCharBuffer(cbuf, carr, cpos, clim, address + i,
+        address + utf8LengthBytes, unsafeObj, cumBaseOffset);
   }
 
-  private static void checkCharBufferPos(final CharBuffer cb, final int cp, final int cl) {
-    if (cp == cl) {
-      cb.position(cp - cb.arrayOffset());
+  private static void checkCharBufferPos(final CharBuffer cbuf, final int cpos, final int clim) {
+    if (cpos == clim) {
+      cbuf.position(cpos - cbuf.arrayOffset());
       throw new BufferOverflowException();
     }
   }
@@ -175,14 +175,15 @@ final class Utf8 {
     }
   }
 
-  private static void getCharsFromUtf8NonAsciiCharBuffer(final CharBuffer cb, final char[] ca,
-      int cp, final int cl, long address, final long addressLimit, final Object unsafeObj,
+  private static void getCharsFromUtf8NonAsciiCharBuffer(final CharBuffer cbuf, final char[] carr,
+      int cpos, final int clim, long address, final long addressLimit, final Object unsafeObj,
       final long cumBaseOffset) {
+
     while (address < addressLimit) {
       final byte byte1 = unsafe.getByte(unsafeObj, address++);
       if (DecodeUtil.isOneByte(byte1)) {
-        checkCharBufferPos(cb, cp, cl);
-        ca[cp++] = (char) byte1;
+        checkCharBufferPos(cbuf, cpos, clim);
+        carr[cpos++] = (char) byte1;
         // It's common for there to be multiple ASCII characters in a run mixed in, so add an
         // extra optimized loop to take care of these runs.
         while (address < addressLimit) {
@@ -191,60 +192,60 @@ final class Utf8 {
             break;
           }
           address++;
-          checkCharBufferPos(cb, cp, cl);
-          ca[cp++] = (char) b;
+          checkCharBufferPos(cbuf, cpos, clim);
+          carr[cpos++] = (char) b;
         }
       }
       else if (DecodeUtil.isTwoBytes(byte1)) {
         if (address >= addressLimit) {
-          cb.position(cp - cb.arrayOffset());
+          cbuf.position(cpos - cbuf.arrayOffset());
           final long off = address - cumBaseOffset;
           final long limit = addressLimit - cumBaseOffset;
           throw Utf8CodingException.shortUtf8DecodeByteSequence(byte1, off, limit, 2);
         }
-        checkCharBufferPos(cb, cp, cl);
+        checkCharBufferPos(cbuf, cpos, clim);
         DecodeUtil.handleTwoBytesCharBuffer(
-                byte1,
-                /* byte2 */ unsafe.getByte(unsafeObj, address++),
-                cb, ca, cp);
-        cp++;
+          byte1,
+          /* byte2 */ unsafe.getByte(unsafeObj, address++),
+          cbuf, carr, cpos);
+        cpos++;
       }
       else if (DecodeUtil.isThreeBytes(byte1)) {
         if (address >= (addressLimit - 1)) {
-          cb.position(cp - cb.arrayOffset());
+          cbuf.position(cpos - cbuf.arrayOffset());
           final long off = address - cumBaseOffset;
           final long limit = addressLimit - cumBaseOffset;
           throw Utf8CodingException.shortUtf8DecodeByteSequence(byte1, off, limit, 3);
         }
-        checkCharBufferPos(cb, cp, cl);
+        checkCharBufferPos(cbuf, cpos, clim);
         DecodeUtil.handleThreeBytesCharBuffer(
-                byte1,
-                /* byte2 */ unsafe.getByte(unsafeObj, address++),
-                /* byte3 */ unsafe.getByte(unsafeObj, address++),
-                cb, ca, cp);
-        cp++;
+          byte1,
+          /* byte2 */ unsafe.getByte(unsafeObj, address++),
+          /* byte3 */ unsafe.getByte(unsafeObj, address++),
+          cbuf, carr, cpos);
+        cpos++;
       }
       else {
         if (address >= (addressLimit - 2)) {
-          cb.position(cp - cb.arrayOffset());
+          cbuf.position(cpos - cbuf.arrayOffset());
           final long off = address - cumBaseOffset;
           final long limit = addressLimit - cumBaseOffset;
           throw Utf8CodingException.shortUtf8DecodeByteSequence(byte1, off, limit, 4);
         }
-        if (cp >= (cl - 1)) {
-          cb.position(cp - cb.arrayOffset());
+        if (cpos >= (clim - 1)) {
+          cbuf.position(cpos - cbuf.arrayOffset());
           throw new BufferOverflowException();
         }
         DecodeUtil.handleFourBytesCharBuffer(
-                byte1,
-                /* byte2 */ unsafe.getByte(unsafeObj, address++),
-                /* byte3 */ unsafe.getByte(unsafeObj, address++),
-                /* byte4 */ unsafe.getByte(unsafeObj, address++),
-                cb, ca, cp);
-        cp += 2;
+          byte1,
+          /* byte2 */ unsafe.getByte(unsafeObj, address++),
+          /* byte3 */ unsafe.getByte(unsafeObj, address++),
+          /* byte4 */ unsafe.getByte(unsafeObj, address++),
+          cbuf, carr, cpos);
+        cpos += 2;
       }
     }
-    cb.position(cp - cb.arrayOffset());
+    cbuf.position(cpos - cbuf.arrayOffset());
   }
 
   //Encode
@@ -435,7 +436,7 @@ final class Utf8 {
      * &ge; 0XF0, it must be the start of a four-byte UTF-8 encoding.
      * This is for the less common CJKV characters, historic scripts, math symbols, emoji, etc.
      *
-     * <p>Code Plane1 1 through 16, Code Point range U+10000 to U+10FFFF.
+     * <p>Code Plane 1 through 16, Code Point range U+10000 to U+10FFFF.
      *
      * <p>Bit Patterns:
      * <ul><li>Byte 1: '11110xxx'</li>
@@ -445,7 +446,9 @@ final class Utf8 {
      * </ul>
      */
 
-    private static void handleTwoBytes(final byte byte1, final byte byte2, final Appendable dst)
+    private static void handleTwoBytes(
+        final byte byte1, final byte byte2,
+        final Appendable dst)
         throws IOException, Utf8CodingException {
       // Simultaneously checks for illegal trailing-byte in leading position (<= '11000000') and
       // overlong 2-byte, '11000001'.
@@ -457,12 +460,14 @@ final class Utf8 {
       dst.append((char) (((byte1 & 0x1F) << 6) | trailingByteValue(byte2)));
     }
 
-    private static void handleTwoBytesCharBuffer(final byte byte1, final byte byte2,
-        final CharBuffer cb, final char[] ca, final int cp) throws Utf8CodingException {
+    private static void handleTwoBytesCharBuffer(
+        final byte byte1, final byte byte2,
+        final CharBuffer cb, final char[] ca, final int cp)
+        throws Utf8CodingException {
       // Simultaneously checks for illegal trailing-byte in leading position (<= '11000000') and
       // overlong 2-byte, '11000001'.
       if ((byte1 < (byte) 0xC2)
-              || isNotTrailingByte(byte2)) {
+          || isNotTrailingByte(byte2)) {
         final byte[] out = new byte[] {byte1, byte2};
         cb.position(cp - cb.arrayOffset());
         throw Utf8CodingException.illegalUtf8DecodeByteSequence(out);
@@ -470,8 +475,10 @@ final class Utf8 {
       ca[cp] = (char) (((byte1 & 0x1F) << 6) | trailingByteValue(byte2));
     }
 
-    private static void handleThreeBytes(final byte byte1, final byte byte2, final byte byte3,
-        final Appendable dst) throws IOException, Utf8CodingException {
+    private static void handleThreeBytes(
+        final byte byte1, final byte byte2, final byte byte3,
+        final Appendable dst)
+        throws IOException, Utf8CodingException {
       if (isNotTrailingByte(byte2)
           // overlong? 5 most significant bits must not all be zero
           || ((byte1 == (byte) 0xE0) && (byte2 < (byte) 0xA0))
@@ -485,14 +492,16 @@ final class Utf8 {
           (((byte1 & 0x0F) << 12) | (trailingByteValue(byte2) << 6) | trailingByteValue(byte3)));
     }
 
-    private static void handleThreeBytesCharBuffer(final byte byte1, final byte byte2, final byte byte3,
-        final CharBuffer cb, final char[] ca, final int cp) throws Utf8CodingException {
+    private static void handleThreeBytesCharBuffer(
+        final byte byte1, final byte byte2, final byte byte3,
+        final CharBuffer cb, final char[] ca, final int cp)
+        throws Utf8CodingException {
       if (isNotTrailingByte(byte2)
-              // overlong? 5 most significant bits must not all be zero
-              || ((byte1 == (byte) 0xE0) && (byte2 < (byte) 0xA0))
-              // check for illegal surrogate codepoints
-              || ((byte1 == (byte) 0xED) && (byte2 >= (byte) 0xA0))
-              || isNotTrailingByte(byte3)) {
+          // overlong? 5 most significant bits must not all be zero
+          || ((byte1 == (byte) 0xE0) && (byte2 < (byte) 0xA0))
+          // check for illegal surrogate codepoints
+          || ((byte1 == (byte) 0xED) && (byte2 >= (byte) 0xA0))
+          || isNotTrailingByte(byte3)) {
         cb.position(cp - cb.arrayOffset());
         final byte[] out = new byte[] {byte1, byte2, byte3};
         throw Utf8CodingException.illegalUtf8DecodeByteSequence(out);
@@ -503,9 +512,10 @@ final class Utf8 {
 
     private static void handleFourBytes(
         final byte byte1, final byte byte2, final byte byte3, final byte byte4,
-        final Appendable dst) throws IOException, Utf8CodingException {
+        final Appendable dst)
+        throws IOException, Utf8CodingException {
       if (isNotTrailingByte(byte2)
-          // Check that 1 <= plane <= 16.  Tricky optimized form of:
+          // Check that 1 <= plane <= 16. Tricky optimized form of:
           //   valid 4-byte leading byte?
           // if (byte1 > (byte) 0xF4 ||
           //   overlong? 4 most significant bits must not all be zero
@@ -515,39 +525,40 @@ final class Utf8 {
           || ((((byte1 << 28) + (byte2 - (byte) 0x90)) >> 30) != 0)
           || isNotTrailingByte(byte3)
           || isNotTrailingByte(byte4)) {
-        final byte[] out = new byte[] {byte1, byte2, byte3, byte4};
+        final byte[] out = new byte[] { byte1, byte2, byte3, byte4 };
         throw Utf8CodingException.illegalUtf8DecodeByteSequence(out);
       }
       final int codepoint = ((byte1 & 0x07) << 18)
-                      | (trailingByteValue(byte2) << 12)
-                      | (trailingByteValue(byte3) << 6)
-                      | trailingByteValue(byte4);
+          | (trailingByteValue(byte2) << 12)
+          | (trailingByteValue(byte3) << 6)
+          | trailingByteValue(byte4);
       dst.append(DecodeUtil.highSurrogate(codepoint));
       dst.append(DecodeUtil.lowSurrogate(codepoint));
     }
 
     private static void handleFourBytesCharBuffer(
-            final byte byte1, final byte byte2, final byte byte3, final byte byte4,
-            final CharBuffer cb, final char[] ca, final int cp) throws Utf8CodingException {
+        final byte byte1, final byte byte2, final byte byte3, final byte byte4,
+        final CharBuffer cb, final char[] ca, final int cp)
+        throws Utf8CodingException {
       if (isNotTrailingByte(byte2)
-              // Check that 1 <= plane <= 16.  Tricky optimized form of:
-              //   valid 4-byte leading byte?
-              // if (byte1 > (byte) 0xF4 ||
-              //   overlong? 4 most significant bits must not all be zero
-              //     byte1 == (byte) 0xF0 && byte2 < (byte) 0x90 ||
-              //   codepoint larger than the highest code point (U+10FFFF)?
-              //     byte1 == (byte) 0xF4 && byte2 > (byte) 0x8F)
-              || ((((byte1 << 28) + (byte2 - (byte) 0x90)) >> 30) != 0)
-              || isNotTrailingByte(byte3)
-              || isNotTrailingByte(byte4)) {
+          // Check that 1 <= plane <= 16. Tricky optimized form of:
+          //   valid 4-byte leading byte?
+          // if (byte1 > (byte) 0xF4 ||
+          //   overlong? 4 most significant bits must not all be zero
+          //     byte1 == (byte) 0xF0 && byte2 < (byte) 0x90 ||
+          //   codepoint larger than the highest code point (U+10FFFF)?
+          //     byte1 == (byte) 0xF4 && byte2 > (byte) 0x8F)
+          || ((((byte1 << 28) + (byte2 - (byte) 0x90)) >> 30) != 0)
+          || isNotTrailingByte(byte3)
+          || isNotTrailingByte(byte4)) {
         cb.position(cp - cb.arrayOffset());
-        final byte[] out = new byte[] {byte1, byte2, byte3, byte4};
+        final byte[] out = new byte[] { byte1, byte2, byte3, byte4 };
         throw Utf8CodingException.illegalUtf8DecodeByteSequence(out);
       }
       final int codepoint = ((byte1 & 0x07) << 18)
-              | (trailingByteValue(byte2) << 12)
-              | (trailingByteValue(byte3) << 6)
-              | trailingByteValue(byte4);
+          | (trailingByteValue(byte2) << 12)
+          | (trailingByteValue(byte3) << 6)
+          | trailingByteValue(byte4);
       ca[cp] = DecodeUtil.highSurrogate(codepoint);
       ca[cp + 1] = DecodeUtil.lowSurrogate(codepoint);
     }
@@ -567,9 +578,10 @@ final class Utf8 {
     }
 
     private static char highSurrogate(final int codePoint) {
-      return (char) ((Character.MIN_HIGH_SURROGATE
-                      - (Character.MIN_SUPPLEMENTARY_CODE_POINT >>> 10))
-                     + (codePoint >>> 10));
+      return (char)
+          ((Character.MIN_HIGH_SURROGATE
+          - (Character.MIN_SUPPLEMENTARY_CODE_POINT >>> 10))
+          + (codePoint >>> 10));
     }
 
     private static char lowSurrogate(final int codePoint) {

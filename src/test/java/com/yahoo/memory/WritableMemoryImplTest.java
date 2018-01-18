@@ -186,7 +186,7 @@ public class WritableMemoryImplTest {
     try (WritableDirectHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh.get();
       mem.toHexString("Force Assertion Error", memCapacity, 8);
-    } catch (AssertionError e) {
+    } catch (IllegalArgumentException e) {
       //ok
     }
   }

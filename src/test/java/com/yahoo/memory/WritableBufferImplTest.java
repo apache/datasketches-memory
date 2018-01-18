@@ -187,7 +187,7 @@ public class WritableBufferImplTest {
       WritableMemory wmem = wrh.get();
       WritableBuffer wbuf = wmem.asWritableBuffer();
       wbuf.toHexString("Force Assertion Error", memCapacity, 8);
-    } catch (AssertionError e) {
+    } catch (IllegalArgumentException e) {
       //ok
     }
   }

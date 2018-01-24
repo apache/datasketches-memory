@@ -98,7 +98,7 @@ public abstract class Memory {
 
   //ACCESS PRIMITIVE HEAP ARRAYS for readOnly XXX
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Memory for read operations
    */
@@ -111,20 +111,33 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Memory for read operations
    */
   public static Memory wrap(final byte[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
-    }
-    return new WritableMemoryImpl(new ResourceState(arr, Prim.BYTE, arr.length));
+    return wrap(arr, ByteOrder.nativeOrder());
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with the given byte order.
+   * @param arr the given primitive array
+   * @param byteOrder the byte order
+   * @return Memory for read operations
+   */
+  public static Memory wrap(final byte[] arr, ByteOrder byteOrder) {
+      nullCheck(arr);
+      nullCheck(byteOrder);
+      if (arr.length == 0) {
+          return WritableMemoryImpl.ZERO_SIZE_MEMORY;
+      }
+      ResourceState state = new ResourceState(arr, Prim.BYTE, arr.length);
+      state.order(byteOrder);
+      return new WritableMemoryImpl(state);
+  }
+
+  /**
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Memory for read operations
    */
@@ -137,7 +150,7 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Memory for read operations
    */
@@ -150,7 +163,7 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Memory for read operations
    */
@@ -163,7 +176,7 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Memory for read operations
    */
@@ -176,7 +189,7 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Memory for read operations
    */
@@ -189,7 +202,7 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Memory for read operations
    */

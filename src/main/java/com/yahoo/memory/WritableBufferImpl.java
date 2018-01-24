@@ -96,7 +96,7 @@ class WritableBufferImpl extends WritableBuffer {
     checkValid();
     assert (offsetBytes + capacityBytes) <= capacity
             : "newOff + newCap: " + (offsetBytes + capacityBytes) + ", origCap: " + capacity;
-    final ResourceState newState = state.copy(); //creates new BaseBuffer(newState)
+    final ResourceState newState = state.copy();
     newState.putRegionOffset(newState.getRegionOffset() + offsetBytes);
     newState.putCapacity(capacityBytes);
     final WritableBufferImpl wBufImpl = new WritableBufferImpl(newState);
@@ -108,7 +108,7 @@ class WritableBufferImpl extends WritableBuffer {
     checkValid();
     assert (offsetBytes + capacityBytes) <= capacity
             : "newOff + newCap: " + (offsetBytes + capacityBytes) + ", origCap: " + capacity;
-    final ResourceState newState = state.copy(); //creates new BaseBuffer(newState)
+    final ResourceState newState = state.copy();
     newState.putRegionOffset(newState.getRegionOffset() + offsetBytes);
     newState.putCapacity(capacityBytes);
     final WritableBufferImpl wBufImpl = new WritableBufferImpl(newState);

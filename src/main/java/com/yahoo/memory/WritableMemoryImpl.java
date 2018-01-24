@@ -104,7 +104,7 @@ class WritableMemoryImpl extends WritableMemory {
   @Override
   public WritableBuffer asWritableBuffer() {
     final ResourceState newState = state.copy();
-    final WritableBufferImpl impl = new WritableBufferImpl(newState); //with new BaseBuffer
+    final WritableBufferImpl impl = new WritableBufferImpl(newState);
     final ByteBuffer byteBuf = newState.getByteBuffer();
     if (byteBuf != null) {
       impl.setStartPositionEnd(0, byteBuf.position(), byteBuf.limit());

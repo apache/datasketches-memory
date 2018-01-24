@@ -183,9 +183,6 @@ final class ResourceState {
     this.resourceOrder_ = toCopy.resourceOrder_; //retains resourseOrder
     this.swapBytes_ = toCopy.swapBytes_;
     compute();
-
-    //POSITIONAL
-    this.baseBuf_ = new BaseBuffer(this);
   }
 
   ResourceState copy() { //shallow copy

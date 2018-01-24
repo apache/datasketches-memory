@@ -6,7 +6,6 @@
 package com.yahoo.memory;
 
 import static com.yahoo.memory.UnsafeUtil.LS;
-import static com.yahoo.memory.UnsafeUtil.checkBounds;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 import static com.yahoo.memory.Util.nullCheck;
 
@@ -426,6 +425,15 @@ public abstract class Memory {
   public abstract long getCumulativeOffset(final long offsetBytes);
 
   /**
+   * Checks that the specified range of bytes is within bounds of this Memory object, throws
+   * {@link IllegalArgumentException} if it's not: i. e. if offsetBytes < 0, or length < 0, or
+   * offsetBytes + length > {@link #getCapacity()}.
+   * @param offsetBytes the offset of the range of bytes to check
+   * @param length the length of the range of bytes to check
+   */
+  public abstract void checkBounds(final long offsetBytes, final long length);
+
+  /**
    * Returns the ByteOrder for the backing resource.
    * @return the ByteOrder for the backing resource.
    */
@@ -498,7 +506,7 @@ public abstract class Memory {
    */
   static String toHex(final String preamble, final long offsetBytes, final int lengthBytes,
       final ResourceState state) {
-    checkBounds(offsetBytes, lengthBytes, state.getCapacity());
+    UnsafeUtil.checkBounds(offsetBytes, lengthBytes, state.getCapacity());
     final StringBuilder sb = new StringBuilder();
     final Object uObj = state.getUnsafeObject();
     final String uObjStr = (uObj == null) ? "null"

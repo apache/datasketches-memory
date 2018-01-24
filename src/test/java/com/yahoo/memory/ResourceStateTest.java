@@ -117,24 +117,6 @@ public class ResourceStateTest {
     assertTrue(wbuf.isSameResource(buf));
   }
 
-  //StepBoolean checks
-  @Test
-  public void checkStepBoolean() {
-    checkStepBoolean(true);
-    checkStepBoolean(false);
-  }
-
-  private static void checkStepBoolean(boolean init) {
-    StepBoolean step = new StepBoolean(init);
-    assertTrue(step.get() == init); //confirm init
-    assertTrue(step.change());      //1st change was successful
-    assertTrue(step.get() != init); //confirm it is different from init
-    assertTrue(step.hasChanged());  //confirm it was changed from init
-    assertFalse(step.change());     //2nd change, not successful
-    assertTrue(step.get() != init); //Still different from init
-    assertTrue(step.hasChanged());  //confirm it was changed from initial value
-  }
-
   @Test
   public void checkPrim() {
     assertEquals(Prim.DOUBLE.scale(), ARRAY_DOUBLE_INDEX_SCALE);

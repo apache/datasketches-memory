@@ -418,7 +418,7 @@ public class WritableMemoryImplTest {
 
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void checkRegionBounds() {
     int memCapacity = 64;
     try (WritableDirectHandle wrh = WritableMemory.allocateDirect(memCapacity)) {

@@ -32,7 +32,6 @@ import static com.yahoo.memory.UnsafeUtil.LS;
 import static com.yahoo.memory.UnsafeUtil.SHORT_SHIFT;
 import static com.yahoo.memory.UnsafeUtil.UNSAFE_COPY_THRESHOLD;
 import static com.yahoo.memory.UnsafeUtil.assertBounds;
-import static com.yahoo.memory.UnsafeUtil.checkBounds;
 import static com.yahoo.memory.UnsafeUtil.checkOverlap;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 
@@ -88,8 +87,7 @@ class WritableMemoryImpl extends WritableMemory {
   @Override
   public WritableMemory writableRegion(final long offsetBytes, final long capacityBytes) {
     assertValid();
-    assert (offsetBytes + capacityBytes) <= capacity
-        : "newOff + newCap: " + (offsetBytes + capacityBytes) + ", origCap: " + capacity;
+    checkBounds(offsetBytes, capacityBytes);
     final ResourceState newState = state.copy();
     newState.putRegionOffset(newState.getRegionOffset() + offsetBytes);
     newState.putCapacity(capacityBytes);
@@ -105,7 +103,7 @@ class WritableMemoryImpl extends WritableMemory {
   @Override
   public WritableBuffer asWritableBuffer() {
     final ResourceState newState = state.copy();
-    final WritableBufferImpl impl = new WritableBufferImpl(newState); //with new BaseBuffer
+    final WritableBufferImpl impl = new WritableBufferImpl(newState);
     final ByteBuffer byteBuf = newState.getByteBuffer();
     if (byteBuf != null) {
       impl.setStartPositionEnd(0, byteBuf.position(), byteBuf.limit());
@@ -126,8 +124,8 @@ class WritableMemoryImpl extends WritableMemory {
       final int length) {
     assertValid();
     final long copyBytes = length << BOOLEAN_SHIFT;
-    checkBounds(offsetBytes, copyBytes, capacity);
-    checkBounds(dstOffset, length, dstArray.length);
+    checkBounds(offsetBytes, copyBytes);
+    UnsafeUtil.checkBounds(dstOffset, length, dstArray.length);
     unsafe.copyMemory(
         unsafeObj,
         cumBaseOffset + offsetBytes,
@@ -148,8 +146,8 @@ class WritableMemoryImpl extends WritableMemory {
       final int length) {
     assertValid();
     final long copyBytes = length << BYTE_SHIFT;
-    checkBounds(offsetBytes, copyBytes, capacity);
-    checkBounds(dstOffset, length, dstArray.length);
+    checkBounds(offsetBytes, copyBytes);
+    UnsafeUtil.checkBounds(dstOffset, length, dstArray.length);
     unsafe.copyMemory(
         unsafeObj,
         cumBaseOffset + offsetBytes,
@@ -170,8 +168,8 @@ class WritableMemoryImpl extends WritableMemory {
       final int length) {
     assertValid();
     final long copyBytes = length << CHAR_SHIFT;
-    checkBounds(offsetBytes, copyBytes, capacity);
-    checkBounds(dstOffset, length, dstArray.length);
+    checkBounds(offsetBytes, copyBytes);
+    UnsafeUtil.checkBounds(dstOffset, length, dstArray.length);
     unsafe.copyMemory(
         unsafeObj,
         cumBaseOffset + offsetBytes,
@@ -198,8 +196,8 @@ class WritableMemoryImpl extends WritableMemory {
       final int length) {
     assertValid();
     final long copyBytes = length << DOUBLE_SHIFT;
-    checkBounds(offsetBytes, copyBytes, capacity);
-    checkBounds(dstOffset, length, dstArray.length);
+    checkBounds(offsetBytes, copyBytes);
+    UnsafeUtil.checkBounds(dstOffset, length, dstArray.length);
     unsafe.copyMemory(
         unsafeObj,
         cumBaseOffset + offsetBytes,
@@ -220,8 +218,8 @@ class WritableMemoryImpl extends WritableMemory {
       final int length) {
     assertValid();
     final long copyBytes = length << FLOAT_SHIFT;
-    checkBounds(offsetBytes, copyBytes, capacity);
-    checkBounds(dstOffset, length, dstArray.length);
+    checkBounds(offsetBytes, copyBytes);
+    UnsafeUtil.checkBounds(dstOffset, length, dstArray.length);
     unsafe.copyMemory(
         unsafeObj,
         cumBaseOffset + offsetBytes,
@@ -242,8 +240,8 @@ class WritableMemoryImpl extends WritableMemory {
       final int length) {
     assertValid();
     final long copyBytes = length << INT_SHIFT;
-    checkBounds(offsetBytes, copyBytes, capacity);
-    checkBounds(dstOffset, length, dstArray.length);
+    checkBounds(offsetBytes, copyBytes);
+    UnsafeUtil.checkBounds(dstOffset, length, dstArray.length);
     unsafe.copyMemory(
         unsafeObj,
         cumBaseOffset + offsetBytes,
@@ -264,8 +262,8 @@ class WritableMemoryImpl extends WritableMemory {
       final int length) {
     assertValid();
     final long copyBytes = length << LONG_SHIFT;
-    checkBounds(offsetBytes, copyBytes, capacity);
-    checkBounds(dstOffset, length, dstArray.length);
+    checkBounds(offsetBytes, copyBytes);
+    UnsafeUtil.checkBounds(dstOffset, length, dstArray.length);
     unsafe.copyMemory(
         unsafeObj,
         cumBaseOffset + offsetBytes,
@@ -286,8 +284,8 @@ class WritableMemoryImpl extends WritableMemory {
       final int length) {
     assertValid();
     final long copyBytes = length << SHORT_SHIFT;
-    checkBounds(offsetBytes, copyBytes, capacity);
-    checkBounds(dstOffset, length, dstArray.length);
+    checkBounds(offsetBytes, copyBytes);
+    UnsafeUtil.checkBounds(dstOffset, length, dstArray.length);
     unsafe.copyMemory(
         unsafeObj,
         cumBaseOffset + offsetBytes,
@@ -302,8 +300,8 @@ class WritableMemoryImpl extends WritableMemory {
       final long thatOffsetBytes, final long thatLengthBytes) {
     assertValid();
     ((WritableMemoryImpl)that).assertValid();
-    checkBounds(thisOffsetBytes, thisLengthBytes, capacity);
-    checkBounds(thatOffsetBytes, thatLengthBytes, that.getCapacity());
+    checkBounds(thisOffsetBytes, thisLengthBytes);
+    that.checkBounds(thatOffsetBytes, thatLengthBytes);
     final long thisAdd = getCumulativeOffset(thisOffsetBytes);
     final long thatAdd = that.getCumulativeOffset(thatOffsetBytes);
     final Object thisObj = (isDirect()) ? null : unsafeObj;
@@ -315,17 +313,15 @@ class WritableMemoryImpl extends WritableMemory {
       if (thisByte < thatByte) { return -1; }
       if (thisByte > thatByte) { return  1; }
     }
-    if (thisLengthBytes < thatLengthBytes) { return -1; }
-    if (thisLengthBytes > thatLengthBytes) { return  1; }
-    return 0;
+    return Long.compare(thisLengthBytes, thatLengthBytes);
   }
 
   @Override
   public void copyTo(final long srcOffsetBytes, final WritableMemory destination,
       final long dstOffsetBytes, final long lengthBytes) {
     assertValid();
-    checkBounds(srcOffsetBytes, lengthBytes, capacity);
-    checkBounds(dstOffsetBytes, lengthBytes, destination.getCapacity());
+    checkBounds(srcOffsetBytes, lengthBytes);
+    destination.checkBounds(dstOffsetBytes, lengthBytes);
     assert ((this == destination)
         ? checkOverlap(srcOffsetBytes, dstOffsetBytes, lengthBytes)
         : true) : "Region Overlap" ;
@@ -356,6 +352,12 @@ class WritableMemoryImpl extends WritableMemory {
   public long getCumulativeOffset(final long offsetBytes) {
     assertValid();
     return cumBaseOffset + offsetBytes;
+  }
+
+  @Override
+  public void checkBounds(long offsetBytes, long length) {
+    assertValid();
+    UnsafeUtil.checkBounds(offsetBytes, length, capacity);
   }
 
   @Override
@@ -437,8 +439,8 @@ class WritableMemoryImpl extends WritableMemory {
       final int length) {
     assertValid();
     final long copyBytes = length << BOOLEAN_SHIFT;
-    checkBounds(srcOffset, length, srcArray.length);
-    checkBounds(offsetBytes, copyBytes, capacity);
+    UnsafeUtil.checkBounds(srcOffset, length, srcArray.length);
+    checkBounds(offsetBytes, copyBytes);
     unsafe.copyMemory(
         srcArray,
         ARRAY_BOOLEAN_BASE_OFFSET + (srcOffset << BOOLEAN_SHIFT),
@@ -460,8 +462,8 @@ class WritableMemoryImpl extends WritableMemory {
       final int length) {
     assertValid();
     final long copyBytes = length << BYTE_SHIFT;
-    checkBounds(srcOffset, length, srcArray.length);
-    checkBounds(offsetBytes, copyBytes, capacity);
+    UnsafeUtil.checkBounds(srcOffset, length, srcArray.length);
+    checkBounds(offsetBytes, copyBytes);
     unsafe.copyMemory(
         srcArray,
         ARRAY_BYTE_BASE_OFFSET + (srcOffset << BYTE_SHIFT),
@@ -483,8 +485,8 @@ class WritableMemoryImpl extends WritableMemory {
       final int length) {
     assertValid();
     final long copyBytes = length << CHAR_SHIFT;
-    checkBounds(srcOffset, length, srcArray.length);
-    checkBounds(offsetBytes, copyBytes, capacity);
+    UnsafeUtil.checkBounds(srcOffset, length, srcArray.length);
+    checkBounds(offsetBytes, copyBytes);
     unsafe.copyMemory(
         srcArray,
         ARRAY_CHAR_BASE_OFFSET + (srcOffset << CHAR_SHIFT),
@@ -511,8 +513,8 @@ class WritableMemoryImpl extends WritableMemory {
       final int length) {
     assertValid();
     final long copyBytes = length << DOUBLE_SHIFT;
-    checkBounds(srcOffset, length, srcArray.length);
-    checkBounds(offsetBytes, copyBytes, capacity);
+    UnsafeUtil.checkBounds(srcOffset, length, srcArray.length);
+    checkBounds(offsetBytes, copyBytes);
     unsafe.copyMemory(
         srcArray,
         ARRAY_DOUBLE_BASE_OFFSET + (srcOffset << DOUBLE_SHIFT),
@@ -534,8 +536,8 @@ class WritableMemoryImpl extends WritableMemory {
       final int length) {
     assertValid();
     final long copyBytes = length << FLOAT_SHIFT;
-    checkBounds(srcOffset, length, srcArray.length);
-    checkBounds(offsetBytes, copyBytes, capacity);
+    UnsafeUtil.checkBounds(srcOffset, length, srcArray.length);
+    checkBounds(offsetBytes, copyBytes);
     unsafe.copyMemory(
         srcArray,
         ARRAY_FLOAT_BASE_OFFSET + (srcOffset << FLOAT_SHIFT),
@@ -557,8 +559,8 @@ class WritableMemoryImpl extends WritableMemory {
       final int length) {
     assertValid();
     final long copyBytes = length << INT_SHIFT;
-    checkBounds(srcOffset, length, srcArray.length);
-    checkBounds(offsetBytes, copyBytes, capacity);
+    UnsafeUtil.checkBounds(srcOffset, length, srcArray.length);
+    checkBounds(offsetBytes, copyBytes);
     unsafe.copyMemory(
         srcArray,
         ARRAY_INT_BASE_OFFSET + (srcOffset << INT_SHIFT),
@@ -580,8 +582,8 @@ class WritableMemoryImpl extends WritableMemory {
       final int length) {
     assertValid();
     final long copyBytes = length << LONG_SHIFT;
-    checkBounds(srcOffset, length, srcArray.length);
-    checkBounds(offsetBytes, copyBytes, capacity);
+    UnsafeUtil.checkBounds(srcOffset, length, srcArray.length);
+    checkBounds(offsetBytes, copyBytes);
     unsafe.copyMemory(
         srcArray,
         ARRAY_LONG_BASE_OFFSET + (srcOffset << LONG_SHIFT),
@@ -603,8 +605,8 @@ class WritableMemoryImpl extends WritableMemory {
       final int length) {
     assertValid();
     final long copyBytes = length << SHORT_SHIFT;
-    checkBounds(srcOffset, length, srcArray.length);
-    checkBounds(offsetBytes, copyBytes, capacity);
+    UnsafeUtil.checkBounds(srcOffset, length, srcArray.length);
+    checkBounds(offsetBytes, copyBytes);
     unsafe.copyMemory(
         srcArray,
         ARRAY_SHORT_BASE_OFFSET + (srcOffset << SHORT_SHIFT),
@@ -679,7 +681,7 @@ class WritableMemoryImpl extends WritableMemory {
   @Override
   public void fill(final long offsetBytes, final long lengthBytes, final byte value) {
     assertValid();
-    checkBounds(offsetBytes, lengthBytes, capacity);
+    checkBounds(offsetBytes, lengthBytes);
     unsafe.setMemory(unsafeObj, cumBaseOffset + offsetBytes, lengthBytes, value);
   }
 

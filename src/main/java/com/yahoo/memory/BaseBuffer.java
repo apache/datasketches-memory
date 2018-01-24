@@ -21,7 +21,7 @@ package com.yahoo.memory;
  *
  * @author Lee Rhodes
  */
-class BaseBuffer {
+public class BaseBuffer {
   private final long cap;
   private long start = 0;
   private long pos = 0;

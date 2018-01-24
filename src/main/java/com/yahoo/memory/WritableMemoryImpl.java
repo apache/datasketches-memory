@@ -314,9 +314,7 @@ class WritableMemoryImpl extends WritableMemory {
       if (thisByte < thatByte) { return -1; }
       if (thisByte > thatByte) { return  1; }
     }
-    if (thisLengthBytes < thatLengthBytes) { return -1; }
-    if (thisLengthBytes > thatLengthBytes) { return  1; }
-    return 0;
+    return Long.compare(thisLengthBytes, thatLengthBytes);
   }
 
   @Override

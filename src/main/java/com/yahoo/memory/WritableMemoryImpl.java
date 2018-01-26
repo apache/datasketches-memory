@@ -352,7 +352,7 @@ class WritableMemoryImpl extends WritableMemory {
   }
 
   @Override
-  public void checkBounds(long offsetBytes, long length) {
+  public void checkBounds(final long offsetBytes, final long length) {
     assertValid();
     UnsafeUtil.checkBounds(offsetBytes, length, capacity);
   }

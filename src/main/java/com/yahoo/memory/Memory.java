@@ -122,18 +122,20 @@ public abstract class Memory {
   /**
    * Wraps the given primitive array for read operations, with the given byte order.
    * @param arr the given primitive array
+   * @param offset the byte offset into the given array
+   * @param length the number of bytes to include from the given array
    * @param byteOrder the byte order
    * @return Memory for read operations
    */
   public static Memory wrap(final byte[] arr, final int offset, final int length,
-          ByteOrder byteOrder) {
+          final ByteOrder byteOrder) {
       nullCheck(arr);
       nullCheck(byteOrder);
       UnsafeUtil.checkBounds(offset, length, arr.length);
       if (length == 0) {
           return WritableMemoryImpl.ZERO_SIZE_MEMORY;
       }
-      ResourceState state = new ResourceState(arr, Prim.BYTE, length);
+      final ResourceState state = new ResourceState(arr, Prim.BYTE, length);
       state.putRegionOffset(offset);
       state.order(byteOrder);
       return new WritableMemoryImpl(state);

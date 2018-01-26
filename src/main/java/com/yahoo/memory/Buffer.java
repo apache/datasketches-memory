@@ -410,6 +410,15 @@ public abstract class Buffer extends BaseBuffer {
   public abstract void checkBounds(final long offsetBytes, final long length);
 
   /**
+   * Checks that the specified range of bytes is within limits of this Buffer object, throws
+   * {@link IllegalArgumentException} if it's not: i. e. if offsetBytes &lt; 0, or length &lt; 0,
+   * or offsetBytes &lt; {@link #getStart()}, or offsetBytes + length &gt; {@link #getEnd()}.
+   * @param offsetBytes the offset of the range of bytes to check
+   * @param length the length of the range of bytes to check
+   */
+  public abstract void checkLimits(final long offsetBytes, final long length);
+
+  /**
    * Returns the ByteOrder for the backing resource.
    * @return the ByteOrder for the backing resource.
    */
@@ -473,6 +482,4 @@ public abstract class Buffer extends BaseBuffer {
    * @return a formatted hex string in a human readable array
    */
   public abstract String toHexString(String header, long offsetBytes, int lengthBytes);
-
-  abstract ResourceState getResourceState();
 }

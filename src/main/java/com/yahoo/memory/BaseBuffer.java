@@ -22,15 +22,17 @@ package com.yahoo.memory;
  * @author Lee Rhodes
  */
 public class BaseBuffer {
-  private final long cap;
+  final ResourceState state;
+  final long capacity;
   private long start = 0;
   private long pos = 0;
   private long end;
 
 
   BaseBuffer(final ResourceState state) {
-    cap = state.getCapacity();
-    end = cap;
+    this.state = state;
+    capacity = state.getCapacity();
+    end = capacity;
     state.putBaseBuffer(this);
   }
 
@@ -41,8 +43,9 @@ public class BaseBuffer {
    * @param end the end position in the buffer
    * @return BaseBuffer
    */
-  public final BaseBuffer setStartPositionEnd(final long start, final long position, final long end) {
-    assertInvariants(start, position, end, cap);
+  public final BaseBuffer setStartPositionEnd(final long start, final long position,
+        final long end) {
+    assertInvariants(start, position, end, capacity);
     this.start = start;
     this.end = end;
     pos = position;
@@ -79,7 +82,7 @@ public class BaseBuffer {
    * @return BaseBuffer
    */
   public BaseBuffer setPosition(final long position) {
-    assertInvariants(start, position, end, cap);
+    assertInvariants(start, position, end, capacity);
     pos = position;
     return this;
   }
@@ -90,9 +93,15 @@ public class BaseBuffer {
    * @return BaseBuffer
    */
   public BaseBuffer incrementPosition(final long increment) {
-    assertInvariants(start, pos + increment, end, cap);
-    pos += increment;
+    incrementPosition(pos, increment);
     return this;
+  }
+
+  void incrementPosition(final long pos, final long increment) {
+    assertValid();
+    final long newPos = pos + increment;
+    assertInvariants(start, newPos, end, capacity);
+    this.pos = newPos;
   }
 
   /**
@@ -134,4 +143,34 @@ public class BaseBuffer {
         + ", (cap - end): " + (cap - end);
   }
 
+  static final void checkInvariants(final long start, final long pos, final long end,
+        final long cap) {
+    if ((start | pos | end | cap | (pos - start) | (end - pos) | (cap - end) ) < 0L) {
+      throw new IllegalArgumentException(
+          "Violation of Invariants: "
+              + "start: " + start
+              + " <= pos: " + pos
+              + " <= end: " + end
+              + " <= cap: " + cap
+              + "; (pos - start): " + (pos - start)
+              + ", (end - pos): " + (end - pos)
+              + ", (cap - end): " + (cap - end)
+      );
+    }
+  }
+
+  //RESTRICTED READ AND WRITE XXX
+  final void assertValid() { //applies to both readable and writable
+    assert state.isValid() : "Memory not valid.";
+  }
+
+  final void checkValid() {
+    if (!state.isValid()) {
+      throw new IllegalStateException("Memory not valid.");
+    }
+  }
+
+  final ResourceState getResourceState() {
+    return state;
+  }
 }

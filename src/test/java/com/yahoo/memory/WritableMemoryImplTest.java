@@ -653,10 +653,6 @@ public class WritableMemoryImplTest {
     for (int i = 0; i < 64; i++) {
       assertEquals(wmem2.getByte(i), i);
     }
-    Memory mem = wmem.duplicate();
-    for (int i = 0; i < 64; i++) {
-      assertEquals(mem.getByte(i), i);
-    }
   }
 
   @Test

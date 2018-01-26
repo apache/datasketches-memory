@@ -69,11 +69,6 @@ class WritableMemoryImpl extends WritableMemory {
 
   //REGIONS/DUPLICATES XXX
   @Override
-  public Memory duplicate() {
-    return region(0, capacity);
-  }
-
-  @Override
   public WritableMemory writableDuplicate() {
     return writableRegion(0, capacity);
   }

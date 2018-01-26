@@ -488,7 +488,6 @@ class WritableBufferImpl extends WritableBuffer {
   @Override
   public void putByte(final byte value) {
     final long pos = getPosition();
-    assertBounds(pos, ARRAY_BYTE_INDEX_SCALE);
     incrementPosition(pos, ARRAY_BYTE_INDEX_SCALE);
     unsafe.putByte(unsafeObj, cumBaseOffset + pos, value);
   }

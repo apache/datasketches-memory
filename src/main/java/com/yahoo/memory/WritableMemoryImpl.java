@@ -608,7 +608,7 @@ class WritableMemoryImpl extends WritableMemory {
   @Override
   public boolean compareAndSwapLong(final long offsetBytes, final long expect, final long update) {
     assertValid();
-    assertBounds(offsetBytes, ARRAY_INT_INDEX_SCALE, capacity);
+    assertBounds(offsetBytes, ARRAY_LONG_INDEX_SCALE, capacity);
     return unsafe.compareAndSwapLong(unsafeObj, cumBaseOffset + offsetBytes, expect, update);
   }
 

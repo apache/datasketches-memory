@@ -31,7 +31,6 @@ import static com.yahoo.memory.UnsafeUtil.LONG_SHIFT;
 import static com.yahoo.memory.UnsafeUtil.LS;
 import static com.yahoo.memory.UnsafeUtil.SHORT_SHIFT;
 import static com.yahoo.memory.UnsafeUtil.UNSAFE_COPY_THRESHOLD;
-import static com.yahoo.memory.UnsafeUtil.assertBounds;
 import static com.yahoo.memory.UnsafeUtil.checkOverlap;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 
@@ -104,8 +103,7 @@ class WritableMemoryImpl extends WritableMemory {
   ///PRIMITIVE getXXX() and getXXXArray() XXX
   @Override
   public boolean getBoolean(final long offsetBytes) {
-    assertValid();
-    assertBounds(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE, capacity);
+    assertBounds(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE);
     return unsafe.getBoolean(unsafeObj, cumBaseOffset + offsetBytes);
   }
 
@@ -125,8 +123,7 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public byte getByte(final long offsetBytes) {
-    assertValid();
-    assertBounds(offsetBytes, ARRAY_BYTE_INDEX_SCALE, capacity);
+    assertBounds(offsetBytes, ARRAY_BYTE_INDEX_SCALE);
     return unsafe.getByte(unsafeObj, cumBaseOffset + offsetBytes);
   }
 
@@ -146,8 +143,7 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public char getChar(final long offsetBytes) {
-    assertValid();
-    assertBounds(offsetBytes, ARRAY_CHAR_INDEX_SCALE, capacity);
+    assertBounds(offsetBytes, ARRAY_CHAR_INDEX_SCALE);
     return unsafe.getChar(unsafeObj, cumBaseOffset + offsetBytes);
   }
 
@@ -173,8 +169,7 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public double getDouble(final long offsetBytes) {
-    assertValid();
-    assertBounds(offsetBytes, ARRAY_DOUBLE_INDEX_SCALE, capacity);
+    assertBounds(offsetBytes, ARRAY_DOUBLE_INDEX_SCALE);
     return unsafe.getDouble(unsafeObj, cumBaseOffset + offsetBytes);
   }
 
@@ -194,8 +189,7 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public float getFloat(final long offsetBytes) {
-    assertValid();
-    assertBounds(offsetBytes, ARRAY_FLOAT_INDEX_SCALE, capacity);
+    assertBounds(offsetBytes, ARRAY_FLOAT_INDEX_SCALE);
     return unsafe.getFloat(unsafeObj, cumBaseOffset + offsetBytes);
   }
 
@@ -215,8 +209,7 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public int getInt(final long offsetBytes) {
-    assertValid();
-    assertBounds(offsetBytes, ARRAY_INT_INDEX_SCALE, capacity);
+    assertBounds(offsetBytes, ARRAY_INT_INDEX_SCALE);
     return unsafe.getInt(unsafeObj, cumBaseOffset + offsetBytes);
   }
 
@@ -236,8 +229,7 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public long getLong(final long offsetBytes) {
-    assertValid();
-    assertBounds(offsetBytes, ARRAY_LONG_INDEX_SCALE, capacity);
+    assertBounds(offsetBytes, ARRAY_LONG_INDEX_SCALE);
     return unsafe.getLong(unsafeObj, cumBaseOffset + offsetBytes);
   }
 
@@ -257,8 +249,7 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public short getShort(final long offsetBytes) {
-    assertValid();
-    assertBounds(offsetBytes, ARRAY_SHORT_INDEX_SCALE, capacity);
+    assertBounds(offsetBytes, ARRAY_SHORT_INDEX_SCALE);
     return unsafe.getShort(unsafeObj, cumBaseOffset + offsetBytes);
   }
 
@@ -340,6 +331,11 @@ class WritableMemoryImpl extends WritableMemory {
     UnsafeUtil.checkBounds(offsetBytes, length, capacity);
   }
 
+  private void assertBounds(final long offsetBytes, final long length) {
+    assertValid();
+    UnsafeUtil.assertBounds(offsetBytes, length, capacity);
+  }
+
   @Override
   public long getRegionOffset(final long offsetBytes) {
     assertValid();
@@ -409,8 +405,7 @@ class WritableMemoryImpl extends WritableMemory {
   //PRIMITIVE putXXX() and putXXXArray() implementations XXX
   @Override
   public void putBoolean(final long offsetBytes, final boolean value) {
-    assertValid();
-    assertBounds(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE, capacity);
+    assertBounds(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE);
     unsafe.putBoolean(unsafeObj, cumBaseOffset + offsetBytes, value);
   }
 
@@ -431,8 +426,7 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void putByte(final long offsetBytes, final byte value) {
-    assertValid();
-    assertBounds(offsetBytes, ARRAY_BYTE_INDEX_SCALE, capacity);
+    assertBounds(offsetBytes, ARRAY_BYTE_INDEX_SCALE);
     unsafe.putByte(unsafeObj, cumBaseOffset + offsetBytes, value);
   }
 
@@ -453,8 +447,7 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void putChar(final long offsetBytes, final char value) {
-    assertValid();
-    assertBounds(offsetBytes, ARRAY_CHAR_INDEX_SCALE, capacity);
+    assertBounds(offsetBytes, ARRAY_CHAR_INDEX_SCALE);
     unsafe.putChar(unsafeObj, cumBaseOffset + offsetBytes, value);
   }
 
@@ -480,8 +473,7 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void putDouble(final long offsetBytes, final double value) {
-    assertValid();
-    assertBounds(offsetBytes, ARRAY_DOUBLE_INDEX_SCALE, capacity);
+    assertBounds(offsetBytes, ARRAY_DOUBLE_INDEX_SCALE);
     unsafe.putDouble(unsafeObj, cumBaseOffset + offsetBytes, value);
   }
 
@@ -502,8 +494,7 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void putFloat(final long offsetBytes, final float value) {
-    assertValid();
-    assertBounds(offsetBytes, ARRAY_FLOAT_INDEX_SCALE, capacity);
+    assertBounds(offsetBytes, ARRAY_FLOAT_INDEX_SCALE);
     unsafe.putFloat(unsafeObj, cumBaseOffset + offsetBytes, value);
   }
 
@@ -524,8 +515,7 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void putInt(final long offsetBytes, final int value) {
-    assertValid();
-    assertBounds(offsetBytes, ARRAY_INT_INDEX_SCALE, capacity);
+    assertBounds(offsetBytes, ARRAY_INT_INDEX_SCALE);
     unsafe.putInt(unsafeObj, cumBaseOffset + offsetBytes, value);
   }
 
@@ -546,8 +536,7 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void putLong(final long offsetBytes, final long value) {
-    assertValid();
-    assertBounds(offsetBytes, ARRAY_LONG_INDEX_SCALE, capacity);
+    assertBounds(offsetBytes, ARRAY_LONG_INDEX_SCALE);
     unsafe.putLong(unsafeObj, cumBaseOffset + offsetBytes, value);
   }
 
@@ -568,8 +557,7 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void putShort(final long offsetBytes, final short value) {
-    assertValid();
-    assertBounds(offsetBytes, ARRAY_SHORT_INDEX_SCALE, capacity);
+    assertBounds(offsetBytes, ARRAY_SHORT_INDEX_SCALE);
     unsafe.putShort(unsafeObj, cumBaseOffset + offsetBytes, value);
   }
 
@@ -591,24 +579,21 @@ class WritableMemoryImpl extends WritableMemory {
   //Atomic Write Methods XXX
   @Override
   public long getAndAddLong(final long offsetBytes, final long delta) { //JDK 8+
-    assertValid();
-    assertBounds(offsetBytes, ARRAY_LONG_INDEX_SCALE, capacity);
+    assertBounds(offsetBytes, ARRAY_LONG_INDEX_SCALE);
     final long add = cumBaseOffset + offsetBytes;
     return UnsafeUtil.compatibilityMethods.getAndAddLong(unsafeObj, add, delta) + delta;
   }
 
   @Override
   public long getAndSetLong(final long offsetBytes, final long newValue) { //JDK 8+
-    assertValid();
-    assertBounds(offsetBytes, ARRAY_LONG_INDEX_SCALE, capacity);
+    assertBounds(offsetBytes, ARRAY_LONG_INDEX_SCALE);
     final long add = cumBaseOffset + offsetBytes;
     return UnsafeUtil.compatibilityMethods.getAndSetLong(unsafeObj, add, newValue);
   }
 
   @Override
   public boolean compareAndSwapLong(final long offsetBytes, final long expect, final long update) {
-    assertValid();
-    assertBounds(offsetBytes, ARRAY_LONG_INDEX_SCALE, capacity);
+    assertBounds(offsetBytes, ARRAY_LONG_INDEX_SCALE);
     return unsafe.compareAndSwapLong(unsafeObj, cumBaseOffset + offsetBytes, expect, update);
   }
 
@@ -637,8 +622,7 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void clearBits(final long offsetBytes, final byte bitMask) {
-    assertValid();
-    assertBounds(offsetBytes, ARRAY_BYTE_INDEX_SCALE, capacity);
+    assertBounds(offsetBytes, ARRAY_BYTE_INDEX_SCALE);
     final long cumBaseOff = cumBaseOffset + offsetBytes;
     int value = unsafe.getByte(unsafeObj, cumBaseOff) & 0XFF;
     value &= ~bitMask;
@@ -658,8 +642,7 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void setBits(final long offsetBytes, final byte bitMask) {
-    assertValid();
-    assertBounds(offsetBytes, ARRAY_BYTE_INDEX_SCALE, capacity);
+    assertBounds(offsetBytes, ARRAY_BYTE_INDEX_SCALE);
     final long myOffset = cumBaseOffset + offsetBytes;
     final byte value = unsafe.getByte(unsafeObj, myOffset);
     unsafe.putByte(unsafeObj, myOffset, (byte)(value | bitMask));

@@ -104,10 +104,7 @@ class WritableMemoryImpl extends WritableMemory {
   public WritableBuffer asWritableBuffer() {
     final ResourceState newState = state.copy();
     final WritableBufferImpl impl = new WritableBufferImpl(newState);
-    final ByteBuffer byteBuf = newState.getByteBuffer();
-    if (byteBuf != null) {
-      impl.setStartPositionEnd(0, byteBuf.position(), byteBuf.limit());
-    } //else defaults
+    impl.setStartPositionEnd(0, 0, state.getCapacity());
     return impl;
   }
 

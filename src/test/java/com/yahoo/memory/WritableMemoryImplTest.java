@@ -683,8 +683,8 @@ public class WritableMemoryImplTest {
     WritableMemory wmem = WritableMemory.wrap(byteBuf);
     WritableBuffer wbuf = wmem.asWritableBuffer();
     assertEquals(wbuf.getCapacity(), 64);
-    assertEquals(wbuf.getPosition(), 16);
-    assertEquals(wbuf.getEnd(), 48);
+    assertEquals(wbuf.getPosition(), 0);
+    assertEquals(wbuf.getEnd(), 64);
   }
 
   @Test

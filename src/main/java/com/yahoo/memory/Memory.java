@@ -444,8 +444,8 @@ public abstract class Memory {
 
   /**
    * Checks that the specified range of bytes is within bounds of this Memory object, throws
-   * {@link IllegalArgumentException} if it's not: i. e. if offsetBytes &lt; 0, or length &lt; 0, or
-   * offsetBytes + length &gt; {@link #getCapacity()}.
+   * {@link IllegalArgumentException} if it's not: i. e. if offsetBytes &lt; 0, or length &lt; 0,
+   * or offsetBytes + length &gt; {@link #getCapacity()}.
    * @param offsetBytes the offset of the range of bytes to check
    * @param length the length of the range of bytes to check
    */

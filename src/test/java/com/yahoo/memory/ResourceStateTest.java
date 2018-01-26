@@ -124,15 +124,15 @@ public class ResourceStateTest {
     checkStepBoolean(false);
   }
 
-  private static void checkStepBoolean(boolean init) {
-    StepBoolean step = new StepBoolean(init);
-    assertTrue(step.get() == init); //confirm init
-    assertTrue(step.change());      //1st change was successful
-    assertTrue(step.get() != init); //confirm it is different from init
-    assertTrue(step.hasChanged());  //confirm it was changed from init
-    assertFalse(step.change());     //2nd change, not successful
-    assertTrue(step.get() != init); //Still different from init
-    assertTrue(step.hasChanged());  //confirm it was changed from initial value
+  private static void checkStepBoolean(boolean initialState) {
+    StepBoolean step = new StepBoolean(initialState);
+    assertTrue(step.get() == initialState); //confirm initialState
+    step.change();
+    assertTrue(step.hasChanged());      //1st change was successful
+    assertTrue(step.get() != initialState); //confirm it is different from initialState
+    step.change();
+    assertTrue(step.get() != initialState); //Still different from initialState
+    assertTrue(step.hasChanged());  //confirm it was changed from initialState value
   }
 
   @Test

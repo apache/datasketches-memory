@@ -107,7 +107,9 @@ public abstract class WritableMemory extends Memory {
 
   //BUFFER XXX
   /**
-   * Convert this WritableMemory to a WritableBuffer
+   * Convert this WritableMemory to a WritableBuffer.
+   * The <i>start</i>, <i>position</i> and <i>end</i> are set to zero, zero, and <i>capacity</i>,
+   * respectively.
    * @return WritableBuffer
    */
   public abstract WritableBuffer asWritableBuffer();

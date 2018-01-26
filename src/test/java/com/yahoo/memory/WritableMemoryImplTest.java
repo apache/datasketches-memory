@@ -418,7 +418,7 @@ public class WritableMemoryImplTest {
 
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void checkRegionBounds() {
     int memCapacity = 64;
     try (WritableDirectHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
@@ -653,10 +653,6 @@ public class WritableMemoryImplTest {
     for (int i = 0; i < 64; i++) {
       assertEquals(wmem2.getByte(i), i);
     }
-    Memory mem = wmem.duplicate();
-    for (int i = 0; i < 64; i++) {
-      assertEquals(mem.getByte(i), i);
-    }
   }
 
   @Test
@@ -683,8 +679,8 @@ public class WritableMemoryImplTest {
     WritableMemory wmem = WritableMemory.wrap(byteBuf);
     WritableBuffer wbuf = wmem.asWritableBuffer();
     assertEquals(wbuf.getCapacity(), 64);
-    assertEquals(wbuf.getPosition(), 16);
-    assertEquals(wbuf.getEnd(), 48);
+    assertEquals(wbuf.getPosition(), 0);
+    assertEquals(wbuf.getEnd(), 64);
   }
 
   @Test

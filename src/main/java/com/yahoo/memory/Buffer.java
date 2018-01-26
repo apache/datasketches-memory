@@ -49,16 +49,16 @@ public abstract class Buffer extends BaseBuffer {
   //REGIONS/DUPLICATES XXX
   /**
    * Returns a read only duplicate view of this Buffer with the same but independent values of
-   * start, position, end and capacity.
+   * start, position, and end.
    * @return a read only duplicate view of this Buffer with the same but independent values of
-   * start, position, end and capacity.
+   * start, position, and end.
    */
   public abstract Buffer duplicate();
 
   /**
    * Returns a read only region of this Buffer starting at position ending at end.
-   * The region start and position will be zero, the region end and capacity will be this buffer's end
-   * minus position.
+   * The region start and position will be zero, the region end and capacity will be this
+   * buffer's end minus position.
    * @return a read only region of this Buffer.
    */
   public abstract Buffer region();
@@ -72,7 +72,7 @@ public abstract class Buffer extends BaseBuffer {
 
   //ACCESS PRIMITIVE HEAP ARRAYS for readOnly XXX
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Buffer for read operations
    */
@@ -85,7 +85,7 @@ public abstract class Buffer extends BaseBuffer {
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Buffer for read operations
    */
@@ -98,7 +98,7 @@ public abstract class Buffer extends BaseBuffer {
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Buffer for read operations
    */
@@ -111,7 +111,7 @@ public abstract class Buffer extends BaseBuffer {
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Buffer for read operations
    */
@@ -124,7 +124,7 @@ public abstract class Buffer extends BaseBuffer {
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Buffer for read operations
    */
@@ -137,7 +137,7 @@ public abstract class Buffer extends BaseBuffer {
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Buffer for read operations
    */
@@ -150,7 +150,7 @@ public abstract class Buffer extends BaseBuffer {
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Buffer for read operations
    */
@@ -163,7 +163,7 @@ public abstract class Buffer extends BaseBuffer {
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Buffer for read operations
    */
@@ -370,11 +370,11 @@ public abstract class Buffer extends BaseBuffer {
 
   //OTHER PRIMITIVE READ METHODS: copyTo, compareTo XXX
   /**
-   * Compares the bytes of this Buffer to <i>that</i> Buffer.  This uses absolute offsets not
-   * the start, position and end.
+   * Compares the bytes of this Buffer to <i>that</i> Buffer.
+   * This uses absolute offsets not the start, position and end.
    * Returns <i>(this &lt; that) ? -1 : (this &gt; that) ? 1 : 0;</i>.
-   * If all bytes are equal up to the shorter of the two lengths, the shorter length is considered
-   * to be less than the other.
+   * If all bytes are equal up to the shorter of the two lengths, the shorter length is
+   * considered to be less than the other.
    * @param thisOffsetBytes the starting offset for <i>this Buffer</i>
    * @param thisLengthBytes the length of the region to compare from <i>this Buffer</i>
    * @param that the other Buffer to compare with
@@ -399,6 +399,15 @@ public abstract class Buffer extends BaseBuffer {
    * @return the cumulative offset in bytes of this Buffer.
    */
   public abstract long getCumulativeOffset();
+
+  /**
+   * Checks that the specified range of bytes is within bounds of this Memory object, throws
+   * {@link IllegalArgumentException} if it's not: i. e. if offsetBytes &lt; 0, or length &lt; 0,
+   * or offsetBytes + length &gt; {@link #getCapacity()}.
+   * @param offsetBytes the offset of the range of bytes to check
+   * @param length the length of the range of bytes to check
+   */
+  public abstract void checkBounds(final long offsetBytes, final long length);
 
   /**
    * Returns the ByteOrder for the backing resource.

@@ -19,6 +19,23 @@ import java.nio.ByteBuffer;
  */
 final class AccessByteBuffer {
 
+  private static final Field BYTE_BUFFER_OFFSET_FIELD;
+  private static final Field BYTE_BUFFER_HB_FIELD;
+
+  static {
+    try {
+      BYTE_BUFFER_OFFSET_FIELD = ByteBuffer.class.getDeclaredField("offset");
+      BYTE_BUFFER_OFFSET_FIELD.setAccessible(true);
+
+      BYTE_BUFFER_HB_FIELD = ByteBuffer.class.getDeclaredField("hb");
+      BYTE_BUFFER_HB_FIELD.setAccessible(true);
+    }
+    catch (final NoSuchFieldException e) {
+      throw new RuntimeException(
+              "Could not get offset/byteArray from OnHeap ByteBuffer instance: " + e.getClass());
+    }
+  }
+
   private AccessByteBuffer() { }
 
   //The provided ByteBuffer may be either readOnly or writable
@@ -44,16 +61,13 @@ final class AccessByteBuffer {
       final Object unsafeObj;
       final long regionOffset;
       try {
-        Field field = ByteBuffer.class.getDeclaredField("offset");
-        field.setAccessible(true);
         //includes the slice() offset for heap.
-        regionOffset = ((Integer)field.get(byteBuf)).longValue() * ARRAY_BYTE_INDEX_SCALE;
+        regionOffset = ((Integer)BYTE_BUFFER_OFFSET_FIELD.get(byteBuf)).longValue()
+                * ARRAY_BYTE_INDEX_SCALE;
 
-        field = ByteBuffer.class.getDeclaredField("hb"); //the backing byte[] from HeapByteBuffer
-        field.setAccessible(true);
-        unsafeObj = field.get(byteBuf);
+        unsafeObj = BYTE_BUFFER_HB_FIELD.get(byteBuf); //the backing byte[] from HeapByteBuffer
       }
-      catch (final IllegalAccessException | NoSuchFieldException e) {
+      catch (final IllegalAccessException e) {
         throw new RuntimeException(
                 "Could not get offset/byteArray from OnHeap ByteBuffer instance: " + e.getClass());
       }

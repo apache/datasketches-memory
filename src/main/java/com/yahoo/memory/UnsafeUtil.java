@@ -128,8 +128,8 @@ public final class UnsafeUtil {
   private UnsafeUtil() {}
 
   /**
-   * Perform bounds checking using java assert (if enabled) checking the requested offset and length
-   * against the allocated size.
+   * Perform bounds checking using java assert (if enabled) checking the requested offset and
+   * length against the allocated size.
    * If reqOff + reqLen &gt; allocSize or any of the parameters are negative an exception will
    * be thrown.
    * @param reqOff the requested offset

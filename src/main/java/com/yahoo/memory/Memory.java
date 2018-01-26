@@ -6,7 +6,6 @@
 package com.yahoo.memory;
 
 import static com.yahoo.memory.UnsafeUtil.LS;
-import static com.yahoo.memory.UnsafeUtil.checkBounds;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 import static com.yahoo.memory.Util.nullCheck;
 
@@ -75,13 +74,7 @@ public abstract class Memory {
     return MapHandle.map(state);
   }
 
-  //REGIONS/DUPLICATES XXX
-  /**
-   * Returns a read only duplicate view of this Memory.
-   * @return a read only duplicate view of this Memory
-   */
-  public abstract Memory duplicate();
-
+  //REGIONS XXX
   /**
    * Returns a read only region of this Memory.
    * @param offsetBytes the starting offset with respect to this Memory
@@ -92,14 +85,16 @@ public abstract class Memory {
 
   //BUFFER XXX
   /**
-   * Convert this Memory to a Buffer
+   * Convert this Memory to a Buffer.
+   * The <i>start</i>, <i>position</i> and <i>end</i> are set to zero, zero, and <i>capacity</i>,
+   * respectively.
    * @return Buffer
    */
   public abstract Buffer asBuffer();
 
   //ACCESS PRIMITIVE HEAP ARRAYS for readOnly XXX
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Memory for read operations
    */
@@ -112,20 +107,38 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Memory for read operations
    */
   public static Memory wrap(final byte[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
-    }
-    return new WritableMemoryImpl(new ResourceState(arr, Prim.BYTE, arr.length));
+    return wrap(arr, 0, arr.length, ByteOrder.nativeOrder());
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with the given byte order.
+   * @param arr the given primitive array
+   * @param offset the byte offset into the given array
+   * @param length the number of bytes to include from the given array
+   * @param byteOrder the byte order
+   * @return Memory for read operations
+   */
+  public static Memory wrap(final byte[] arr, final int offset, final int length,
+          final ByteOrder byteOrder) {
+      nullCheck(arr);
+      nullCheck(byteOrder);
+      UnsafeUtil.checkBounds(offset, length, arr.length);
+      if (length == 0) {
+          return WritableMemoryImpl.ZERO_SIZE_MEMORY;
+      }
+      final ResourceState state = new ResourceState(arr, Prim.BYTE, length);
+      state.putRegionOffset(offset);
+      state.order(byteOrder);
+      return new WritableMemoryImpl(state);
+  }
+
+  /**
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Memory for read operations
    */
@@ -138,7 +151,7 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Memory for read operations
    */
@@ -151,7 +164,7 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Memory for read operations
    */
@@ -164,7 +177,7 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Memory for read operations
    */
@@ -177,7 +190,7 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Memory for read operations
    */
@@ -190,7 +203,7 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Memory for read operations
    */
@@ -426,6 +439,15 @@ public abstract class Memory {
   public abstract long getCumulativeOffset(final long offsetBytes);
 
   /**
+   * Checks that the specified range of bytes is within bounds of this Memory object, throws
+   * {@link IllegalArgumentException} if it's not: i. e. if offsetBytes &lt; 0, or length &lt; 0,
+   * or offsetBytes + length &gt; {@link #getCapacity()}.
+   * @param offsetBytes the offset of the range of bytes to check
+   * @param length the length of the range of bytes to check
+   */
+  public abstract void checkBounds(final long offsetBytes, final long length);
+
+  /**
    * Returns the ByteOrder for the backing resource.
    * @return the ByteOrder for the backing resource.
    */
@@ -498,7 +520,7 @@ public abstract class Memory {
    */
   static String toHex(final String preamble, final long offsetBytes, final int lengthBytes,
       final ResourceState state) {
-    checkBounds(offsetBytes, lengthBytes, state.getCapacity());
+    UnsafeUtil.checkBounds(offsetBytes, lengthBytes, state.getCapacity());
     final StringBuilder sb = new StringBuilder();
     final Object uObj = state.getUnsafeObject();
     final String uObjStr = (uObj == null) ? "null"

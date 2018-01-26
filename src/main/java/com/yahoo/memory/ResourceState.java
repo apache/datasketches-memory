@@ -25,10 +25,10 @@ final class ResourceState {
   private static final ByteOrder nativeOrder_ = ByteOrder.nativeOrder();
 
   //Monitoring
-  static AtomicLong currentDirectMemoryAllocations_ = new AtomicLong();
-  static AtomicLong currentDirectMemoryAllocated_ = new AtomicLong();
-  static AtomicLong currentDirectMemoryMapAllocations_ = new AtomicLong();
-  static AtomicLong currentDirectMemoryMapAllocated_ = new AtomicLong();
+  static final AtomicLong currentDirectMemoryAllocations_ = new AtomicLong();
+  static final AtomicLong currentDirectMemoryAllocated_ = new AtomicLong();
+  static final AtomicLong currentDirectMemoryMapAllocations_ = new AtomicLong();
+  static final AtomicLong currentDirectMemoryMapAllocated_ = new AtomicLong();
 
   //FOUNDATION PARAMETERS
   /**
@@ -79,16 +79,16 @@ final class ResourceState {
   //FLAGS
   /**
    * Only set true if the backing resource has an independent read-only state and is, in fact,
-   * read-only. This can only be changed from false (writable) to true (read-only) once. The
-   * initial state is false (writable).
+   * read-only. This can only be changed from writable (false) to read-only (true) once. The
+   * initial state is writable (false).
    */
-  private StepBoolean resourceIsReadOnly_ = new StepBoolean(false); //initial state is writable
+  private StepBoolean resourceIsReadOnly_;
 
   /**
-   * Only the backing resources that use AutoCloseable can set this to false.  It can only be
-   * changed from true to false once. The initial state is valid.
+   * Only the backing resources that uses AutoCloseable can set this to false.  It can only be
+   * changed from true to false once. The initial state is valid (true).
    */
-  private StepBoolean valid_ = new StepBoolean(true);
+  private StepBoolean valid_;
 
   //REGIONS
   /**
@@ -137,10 +137,14 @@ final class ResourceState {
 
   private boolean swapBytes_; //true if resourceOrder != nativeOrder_
 
-  ResourceState() {}
+  ResourceState() {
+    resourceIsReadOnly_ = new StepBoolean(false);
+    valid_ = new StepBoolean(true);
+  }
 
   //Constructor for heap primitive arrays
   ResourceState(final Object obj, final Prim prim, final long arrLen) {
+    this();
     unsafeObj_ = obj;
     unsafeObjHeader_ = prim.off();
     if (arrLen < 0) {
@@ -150,40 +154,39 @@ final class ResourceState {
     compute();
   }
 
-  ResourceState copy() { //shallow copy
-    final ResourceState out = new ResourceState();
+  private ResourceState(final ResourceState toCopy) {
     //FOUNDATION PARAMETERS
-    out.nativeBaseOffset_ = nativeBaseOffset_;
-    out.unsafeObj_ = unsafeObj_;
-    out.unsafeObjHeader_ = unsafeObjHeader_;
-    out.capacity_ = capacity_;
+    nativeBaseOffset_ = toCopy.nativeBaseOffset_;
+    unsafeObj_ = toCopy.unsafeObj_;
+    unsafeObjHeader_ = toCopy.unsafeObjHeader_;
+    capacity_ = toCopy.capacity_;
     //cumBaseOffset is computed
-    out.memReqSvr_ = memReqSvr_; //retains memReqSvr reference
+    memReqSvr_ = toCopy.memReqSvr_; //retains memReqSvr reference
 
     //FLAGS
-    out.resourceIsReadOnly_ = resourceIsReadOnly_;
-    out.valid_ = valid_; //retains valid reference
+    resourceIsReadOnly_ = toCopy.resourceIsReadOnly_;
+    valid_ = toCopy.valid_; //retains valid reference
 
     //REGIONS
-    out.regionOffset_ = regionOffset_;
+    regionOffset_ = toCopy.regionOffset_;
 
     //BYTE BUFFER
-    out.byteBuf_ = byteBuf_; //retains ByteBuffer reference
+    byteBuf_ = toCopy.byteBuf_; //retains ByteBuffer reference
 
     //MEMORY MAPPED FILES
-    out.file_ = file_; //retains file reference
-    out.fileOffset_ = fileOffset_;
-    out.raf_ = raf_;
-    out.mbb_ = mbb_;
+    file_ = toCopy.file_; //retains file reference
+    fileOffset_ = toCopy.fileOffset_;
+    raf_ = toCopy.raf_;
+    mbb_ = toCopy.mbb_;
 
     //ENDIANNESS
-    out.resourceOrder_ = resourceOrder_; //retains resourseOrder
-    out.swapBytes_ = swapBytes_;
-    out.compute();
+    resourceOrder_ = toCopy.resourceOrder_; //retains resourseOrder
+    swapBytes_ = toCopy.swapBytes_;
+    compute();
+  }
 
-    //POSITIONAL
-    out.baseBuf_ = new BaseBuffer(out);
-    return out;
+  ResourceState copy() { //shallow copy
+    return new ResourceState(this);
   }
 
   private void compute() {

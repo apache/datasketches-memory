@@ -374,7 +374,7 @@ class WritableBufferImpl extends WritableBuffer {
   }
 
   @Override
-  public void checkBounds(long offsetBytes, long length) {
+  public void checkBounds(final long offsetBytes, final long length) {
     checkValid();
     UnsafeUtil.checkBounds(offsetBytes, length, capacity);
   }

@@ -152,7 +152,7 @@ class WritableBufferImpl extends WritableBuffer {
 
   @Override
   public byte getByte(final long offsetBytes) {
-    assertBounds(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE);
+    assertBounds(offsetBytes, ARRAY_BYTE_INDEX_SCALE);
     return unsafe.getByte(unsafeObj, cumBaseOffset + offsetBytes);
   }
 
@@ -180,7 +180,7 @@ class WritableBufferImpl extends WritableBuffer {
 
   @Override
   public char getChar(final long offsetBytes) {
-    assertBounds(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE);
+    assertBounds(offsetBytes, ARRAY_CHAR_INDEX_SCALE);
     return unsafe.getChar(unsafeObj, cumBaseOffset + offsetBytes);
   }
 
@@ -208,7 +208,7 @@ class WritableBufferImpl extends WritableBuffer {
 
   @Override
   public double getDouble(final long offsetBytes) {
-    assertBounds(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE);
+    assertBounds(offsetBytes, ARRAY_DOUBLE_INDEX_SCALE);
     return unsafe.getDouble(unsafeObj, cumBaseOffset + offsetBytes);
   }
 
@@ -236,7 +236,7 @@ class WritableBufferImpl extends WritableBuffer {
 
   @Override
   public float getFloat(final long offsetBytes) {
-    assertBounds(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE);
+    assertBounds(offsetBytes, ARRAY_FLOAT_INDEX_SCALE);
     return unsafe.getFloat(unsafeObj, cumBaseOffset + offsetBytes);
   }
 
@@ -264,7 +264,7 @@ class WritableBufferImpl extends WritableBuffer {
 
   @Override
   public int getInt(final long offsetBytes) {
-    assertBounds(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE);
+    assertBounds(offsetBytes, ARRAY_INT_INDEX_SCALE);
     return unsafe.getInt(unsafeObj, cumBaseOffset + offsetBytes);
   }
 
@@ -292,7 +292,7 @@ class WritableBufferImpl extends WritableBuffer {
 
   @Override
   public long getLong(final long offsetBytes) {
-    assertBounds(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE);
+    assertBounds(offsetBytes, ARRAY_LONG_INDEX_SCALE);
     return unsafe.getLong(unsafeObj, cumBaseOffset + offsetBytes);
   }
 
@@ -320,7 +320,7 @@ class WritableBufferImpl extends WritableBuffer {
 
   @Override
   public short getShort(final long offsetBytes) {
-    assertBounds(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE);
+    assertBounds(offsetBytes, ARRAY_SHORT_INDEX_SCALE);
     return unsafe.getShort(unsafeObj, cumBaseOffset + offsetBytes);
   }
 

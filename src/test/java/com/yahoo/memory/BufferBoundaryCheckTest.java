@@ -7,15 +7,15 @@ package com.yahoo.memory;
 
 import org.testng.annotations.Test;
 
-public class MemoryBoundaryCheckTest {
+public class BufferBoundaryCheckTest {
 
-  private final WritableBuffer writableBuffer = WritableMemory.allocate(8).asWritableBuffer();
+  private final WritableMemory writableMemory = WritableMemory.allocate(8);
 
   @Test
   public void testGetBoolean() {
-    writableBuffer.getBoolean(7);
+    writableMemory.getBoolean(7);
     try {
-      writableBuffer.getBoolean(8);
+      writableMemory.getBoolean(8);
       throw new RuntimeException("Expected AssertionError");
     } catch (final AssertionError expected) {
       // ignore
@@ -24,9 +24,9 @@ public class MemoryBoundaryCheckTest {
 
   @Test
   public void testPutBoolean() {
-    writableBuffer.putBoolean(7, true);
+    writableMemory.putBoolean(7, true);
     try {
-      writableBuffer.putBoolean(8, true);
+      writableMemory.putBoolean(8, true);
       throw new RuntimeException("Expected AssertionError");
     } catch (final AssertionError expected) {
       // ignore
@@ -35,9 +35,9 @@ public class MemoryBoundaryCheckTest {
 
   @Test
   public void testGetByte() {
-    writableBuffer.getByte(7);
+    writableMemory.getByte(7);
     try {
-      writableBuffer.getByte(8);
+      writableMemory.getByte(8);
       throw new RuntimeException("Expected AssertionError");
     } catch (final AssertionError expected) {
       // ignore
@@ -46,9 +46,9 @@ public class MemoryBoundaryCheckTest {
 
   @Test
   public void testPutByte() {
-    writableBuffer.putByte(7, (byte) 1);
+    writableMemory.putByte(7, (byte) 1);
     try {
-      writableBuffer.putByte(8, (byte) 1);
+      writableMemory.putByte(8, (byte) 1);
       throw new RuntimeException("Expected AssertionError");
     } catch (final AssertionError expected) {
       // ignore
@@ -57,9 +57,9 @@ public class MemoryBoundaryCheckTest {
 
   @Test
   public void testGetChar() {
-    writableBuffer.getChar(6);
+    writableMemory.getChar(6);
     try {
-      writableBuffer.getChar(7);
+      writableMemory.getChar(7);
       throw new RuntimeException("Expected AssertionError");
     } catch (final AssertionError expected) {
       // ignore
@@ -68,9 +68,9 @@ public class MemoryBoundaryCheckTest {
 
   @Test
   public void testPutChar() {
-    writableBuffer.putChar(6, 'a');
+    writableMemory.putChar(6, 'a');
     try {
-      writableBuffer.putChar(7, 'a');
+      writableMemory.putChar(7, 'a');
       throw new RuntimeException("Expected AssertionError");
     } catch (final AssertionError expected) {
       // ignore
@@ -79,9 +79,9 @@ public class MemoryBoundaryCheckTest {
 
   @Test
   public void testGetShort() {
-    writableBuffer.getShort(6);
+    writableMemory.getShort(6);
     try {
-      writableBuffer.getShort(7);
+      writableMemory.getShort(7);
       throw new RuntimeException("Expected AssertionError");
     } catch (final AssertionError expected) {
       // ignore
@@ -90,9 +90,9 @@ public class MemoryBoundaryCheckTest {
 
   @Test
   public void testPutShort() {
-    writableBuffer.putShort(6, (short) 1);
+    writableMemory.putShort(6, (short) 1);
     try {
-      writableBuffer.putShort(7, (short) 1);
+      writableMemory.putShort(7, (short) 1);
       throw new RuntimeException("Expected AssertionError");
     } catch (final AssertionError expected) {
       // ignore
@@ -101,9 +101,9 @@ public class MemoryBoundaryCheckTest {
 
   @Test
   public void testGetInt() {
-    writableBuffer.getInt(4);
+    writableMemory.getInt(4);
     try {
-      writableBuffer.getInt(5);
+      writableMemory.getInt(5);
       throw new RuntimeException("Expected AssertionError");
     } catch (final AssertionError expected) {
       // ignore
@@ -112,9 +112,9 @@ public class MemoryBoundaryCheckTest {
 
   @Test
   public void testPutInt() {
-    writableBuffer.putInt(4, 1);
+    writableMemory.putInt(4, 1);
     try {
-      writableBuffer.putInt(5, 1);
+      writableMemory.putInt(5, 1);
       throw new RuntimeException("Expected AssertionError");
     } catch (final AssertionError expected) {
       // ignore
@@ -123,9 +123,9 @@ public class MemoryBoundaryCheckTest {
 
   @Test
   public void testGetFloat() {
-    writableBuffer.getFloat(4);
+    writableMemory.getFloat(4);
     try {
-      writableBuffer.getFloat(5);
+      writableMemory.getFloat(5);
       throw new RuntimeException("Expected AssertionError");
     } catch (final AssertionError expected) {
       // ignore
@@ -134,9 +134,9 @@ public class MemoryBoundaryCheckTest {
 
   @Test
   public void testPutFloat() {
-    writableBuffer.putFloat(4, 1f);
+    writableMemory.putFloat(4, 1f);
     try {
-      writableBuffer.putFloat(5, 1f);
+      writableMemory.putFloat(5, 1f);
       throw new RuntimeException("Expected AssertionError");
     } catch (final AssertionError expected) {
       // ignore
@@ -145,9 +145,9 @@ public class MemoryBoundaryCheckTest {
 
   @Test
   public void testGetLong() {
-    writableBuffer.getLong(0);
+    writableMemory.getLong(0);
     try {
-      writableBuffer.getLong(1);
+      writableMemory.getLong(1);
       throw new RuntimeException("Expected AssertionError");
     } catch (final AssertionError expected) {
       // ignore
@@ -156,9 +156,9 @@ public class MemoryBoundaryCheckTest {
 
   @Test
   public void testPutLong() {
-    writableBuffer.putLong(0, 1L);
+    writableMemory.putLong(0, 1L);
     try {
-      writableBuffer.putLong(1, 1L);
+      writableMemory.putLong(1, 1L);
       throw new RuntimeException("Expected AssertionError");
     } catch (final AssertionError expected) {
       // ignore
@@ -167,9 +167,9 @@ public class MemoryBoundaryCheckTest {
 
   @Test
   public void testGetDouble() {
-    writableBuffer.getDouble(0);
+    writableMemory.getDouble(0);
     try {
-      writableBuffer.getDouble(1);
+      writableMemory.getDouble(1);
       throw new RuntimeException("Expected AssertionError");
     } catch (final AssertionError expected) {
       // ignore
@@ -178,9 +178,42 @@ public class MemoryBoundaryCheckTest {
 
   @Test
   public void testPutDouble() {
-    writableBuffer.putDouble(0, 1d);
+    writableMemory.putDouble(0, 1d);
     try {
-      writableBuffer.putDouble(1, 1d);
+      writableMemory.putDouble(1, 1d);
+      throw new RuntimeException("Expected AssertionError");
+    } catch (final AssertionError expected) {
+      // ignore
+    }
+  }
+
+  @Test
+  public void testGetAndAddLong() {
+    writableMemory.getAndAddLong(0, 1L);
+    try {
+      writableMemory.getAndAddLong(1, 1L);
+      throw new RuntimeException("Expected AssertionError");
+    } catch (final AssertionError expected) {
+      // ignore
+    }
+  }
+
+  @Test
+  public void testGetAndSetLong() {
+    writableMemory.getAndSetLong(0, 1L);
+    try {
+      writableMemory.getAndSetLong(1, 1L);
+      throw new RuntimeException("Expected AssertionError");
+    } catch (final AssertionError expected) {
+      // ignore
+    }
+  }
+
+  @Test
+  public void testCompareAndSwapLong() {
+    writableMemory.compareAndSwapLong(0, 0L, 1L);
+    try {
+      writableMemory.compareAndSwapLong(1, 0L, 1L);
       throw new RuntimeException("Expected AssertionError");
     } catch (final AssertionError expected) {
       // ignore

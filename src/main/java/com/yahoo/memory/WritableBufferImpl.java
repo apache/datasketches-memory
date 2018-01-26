@@ -21,8 +21,6 @@ import static com.yahoo.memory.UnsafeUtil.ARRAY_LONG_BASE_OFFSET;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_LONG_INDEX_SCALE;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_SHORT_BASE_OFFSET;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_SHORT_INDEX_SCALE;
-import static com.yahoo.memory.UnsafeUtil.BOOLEAN_SHIFT;
-import static com.yahoo.memory.UnsafeUtil.BYTE_SHIFT;
 import static com.yahoo.memory.UnsafeUtil.CHAR_SHIFT;
 import static com.yahoo.memory.UnsafeUtil.DOUBLE_SHIFT;
 import static com.yahoo.memory.UnsafeUtil.FLOAT_SHIFT;
@@ -142,14 +140,14 @@ class WritableBufferImpl extends WritableBuffer {
   @Override
   public void getBooleanArray(final boolean[] dstArray, final int dstOffset, final int length) {
     final long pos = getPosition();
-    final long copyBytes = length << BOOLEAN_SHIFT;
+    final long copyBytes = length;
     checkBounds(pos, copyBytes);
     UnsafeUtil.checkBounds(dstOffset, length, dstArray.length);
     unsafe.copyMemory(
             unsafeObj,
             cumBaseOffset + pos,
             dstArray,
-            ARRAY_BOOLEAN_BASE_OFFSET + (dstOffset << BOOLEAN_SHIFT),
+            ARRAY_BOOLEAN_BASE_OFFSET + dstOffset,
             copyBytes);
     incrementPosition(copyBytes);
   }
@@ -174,14 +172,14 @@ class WritableBufferImpl extends WritableBuffer {
   @Override
   public void getByteArray(final byte[] dstArray, final int dstOffset, final int length) {
     final long pos = getPosition();
-    final long copyBytes = length << BYTE_SHIFT;
+    final long copyBytes = length;
     checkBounds(pos, copyBytes);
     UnsafeUtil.checkBounds(dstOffset, length, dstArray.length);
     unsafe.copyMemory(
             unsafeObj,
             cumBaseOffset + pos,
             dstArray,
-            ARRAY_BYTE_BASE_OFFSET + (dstOffset << BYTE_SHIFT),
+            ARRAY_BYTE_BASE_OFFSET + dstOffset,
             copyBytes);
     incrementPosition(copyBytes);
   }
@@ -206,14 +204,14 @@ class WritableBufferImpl extends WritableBuffer {
   @Override
   public void getCharArray(final char[] dstArray, final int dstOffset, final int length) {
     final long pos = getPosition();
-    final long copyBytes = length << CHAR_SHIFT;
+    final long copyBytes = ((long) length) << CHAR_SHIFT;
     checkBounds(pos, copyBytes);
     UnsafeUtil.checkBounds(dstOffset, length, dstArray.length);
     unsafe.copyMemory(
             unsafeObj,
             cumBaseOffset + pos,
             dstArray,
-            ARRAY_CHAR_BASE_OFFSET + (dstOffset << CHAR_SHIFT),
+            ARRAY_CHAR_BASE_OFFSET + (((long) dstOffset) << CHAR_SHIFT),
             copyBytes);
     incrementPosition(copyBytes);
   }
@@ -238,14 +236,14 @@ class WritableBufferImpl extends WritableBuffer {
   @Override
   public void getDoubleArray(final double[] dstArray, final int dstOffset, final int length) {
     final long pos = getPosition();
-    final long copyBytes = length << DOUBLE_SHIFT;
+    final long copyBytes = ((long) length) << DOUBLE_SHIFT;
     checkBounds(pos, copyBytes);
     UnsafeUtil.checkBounds(dstOffset, length, dstArray.length);
     unsafe.copyMemory(
             unsafeObj,
             cumBaseOffset + pos,
             dstArray,
-            ARRAY_DOUBLE_BASE_OFFSET + (dstOffset << DOUBLE_SHIFT),
+            ARRAY_DOUBLE_BASE_OFFSET + (((long) dstOffset) << DOUBLE_SHIFT),
             copyBytes);
     incrementPosition(copyBytes);
   }
@@ -270,14 +268,14 @@ class WritableBufferImpl extends WritableBuffer {
   @Override
   public void getFloatArray(final float[] dstArray, final int dstOffset, final int length) {
     final long pos = getPosition();
-    final long copyBytes = length << FLOAT_SHIFT;
+    final long copyBytes = ((long) length) << FLOAT_SHIFT;
     checkBounds(pos, copyBytes);
     UnsafeUtil.checkBounds(dstOffset, length, dstArray.length);
     unsafe.copyMemory(
             unsafeObj,
             cumBaseOffset + pos,
             dstArray,
-            ARRAY_FLOAT_BASE_OFFSET + (dstOffset << FLOAT_SHIFT),
+            ARRAY_FLOAT_BASE_OFFSET + (((long) dstOffset) << FLOAT_SHIFT),
             copyBytes);
     incrementPosition(copyBytes);
   }
@@ -302,14 +300,14 @@ class WritableBufferImpl extends WritableBuffer {
   @Override
   public void getIntArray(final int[] dstArray, final int dstOffset, final int length) {
     final long pos = getPosition();
-    final long copyBytes = length << INT_SHIFT;
+    final long copyBytes = ((long) length) << INT_SHIFT;
     checkBounds(pos, copyBytes);
     UnsafeUtil.checkBounds(dstOffset, length, dstArray.length);
     unsafe.copyMemory(
             unsafeObj,
             cumBaseOffset + pos,
             dstArray,
-            ARRAY_INT_BASE_OFFSET + (dstOffset << INT_SHIFT),
+            ARRAY_INT_BASE_OFFSET + (((long) dstOffset) << INT_SHIFT),
             copyBytes);
     incrementPosition(copyBytes);
   }
@@ -334,14 +332,14 @@ class WritableBufferImpl extends WritableBuffer {
   @Override
   public void getLongArray(final long[] dstArray, final int dstOffset, final int length) {
     final long pos = getPosition();
-    final long copyBytes = length << LONG_SHIFT;
+    final long copyBytes = ((long) length) << LONG_SHIFT;
     checkBounds(pos, copyBytes);
     UnsafeUtil.checkBounds(dstOffset, length, dstArray.length);
     unsafe.copyMemory(
             unsafeObj,
             cumBaseOffset + pos,
             dstArray,
-            ARRAY_LONG_BASE_OFFSET + (dstOffset << LONG_SHIFT),
+            ARRAY_LONG_BASE_OFFSET + (((long) dstOffset) << LONG_SHIFT),
             copyBytes);
     incrementPosition(copyBytes);
   }
@@ -366,14 +364,14 @@ class WritableBufferImpl extends WritableBuffer {
   @Override
   public void getShortArray(final short[] dstArray, final int dstOffset, final int length) {
     final long pos = getPosition();
-    final long copyBytes = length << SHORT_SHIFT;
+    final long copyBytes = ((long) length) << SHORT_SHIFT;
     checkBounds(pos, copyBytes);
     UnsafeUtil.checkBounds(dstOffset, length, dstArray.length);
     unsafe.copyMemory(
             unsafeObj,
             cumBaseOffset + pos,
             dstArray,
-            ARRAY_SHORT_BASE_OFFSET + (dstOffset << SHORT_SHIFT),
+            ARRAY_SHORT_BASE_OFFSET + (((long) dstOffset) << SHORT_SHIFT),
             copyBytes);
     incrementPosition(copyBytes);
   }
@@ -507,12 +505,12 @@ class WritableBufferImpl extends WritableBuffer {
   @Override
   public void putBooleanArray(final boolean[] srcArray, final int srcOffset, final int length) {
     final long pos = getPosition();
-    final long copyBytes = length << BOOLEAN_SHIFT;
+    final long copyBytes = length;
     UnsafeUtil.checkBounds(srcOffset, length, srcArray.length);
     checkBounds(pos, copyBytes);
     unsafe.copyMemory(
             srcArray,
-            ARRAY_BOOLEAN_BASE_OFFSET + (srcOffset << BOOLEAN_SHIFT),
+            ARRAY_BOOLEAN_BASE_OFFSET + srcOffset,
             unsafeObj,
             cumBaseOffset + pos,
             copyBytes
@@ -539,12 +537,12 @@ class WritableBufferImpl extends WritableBuffer {
   @Override
   public void putByteArray(final byte[] srcArray, final int srcOffset, final int length) {
     final long pos = getPosition();
-    final long copyBytes = length << BYTE_SHIFT;
+    final long copyBytes = length;
     UnsafeUtil.checkBounds(srcOffset, length, srcArray.length);
     checkBounds(pos, copyBytes);
     unsafe.copyMemory(
             srcArray,
-            ARRAY_BYTE_BASE_OFFSET + (srcOffset << BYTE_SHIFT),
+            ARRAY_BYTE_BASE_OFFSET + srcOffset,
             unsafeObj,
             cumBaseOffset + pos,
             copyBytes
@@ -571,12 +569,12 @@ class WritableBufferImpl extends WritableBuffer {
   @Override
   public void putCharArray(final char[] srcArray, final int srcOffset, final int length) {
     final long pos = getPosition();
-    final long copyBytes = length << CHAR_SHIFT;
+    final long copyBytes = ((long) length) << CHAR_SHIFT;
     UnsafeUtil.checkBounds(srcOffset, length, srcArray.length);
     checkBounds(pos, copyBytes);
     unsafe.copyMemory(
             srcArray,
-            ARRAY_CHAR_BASE_OFFSET + (srcOffset << CHAR_SHIFT),
+            ARRAY_CHAR_BASE_OFFSET + (((long) srcOffset) << CHAR_SHIFT),
             unsafeObj,
             cumBaseOffset + pos,
             copyBytes
@@ -603,12 +601,12 @@ class WritableBufferImpl extends WritableBuffer {
   @Override
   public void putDoubleArray(final double[] srcArray, final int srcOffset, final int length) {
     final long pos = getPosition();
-    final long copyBytes = length << DOUBLE_SHIFT;
+    final long copyBytes = ((long) length) << DOUBLE_SHIFT;
     UnsafeUtil.checkBounds(srcOffset, length, srcArray.length);
     checkBounds(pos, copyBytes);
     unsafe.copyMemory(
             srcArray,
-            ARRAY_DOUBLE_BASE_OFFSET + (srcOffset << DOUBLE_SHIFT),
+            ARRAY_DOUBLE_BASE_OFFSET + (((long) srcOffset) << DOUBLE_SHIFT),
             unsafeObj,
             cumBaseOffset + pos,
             copyBytes
@@ -635,12 +633,12 @@ class WritableBufferImpl extends WritableBuffer {
   @Override
   public void putFloatArray(final float[] srcArray, final int srcOffset, final int length) {
     final long pos = getPosition();
-    final long copyBytes = length << FLOAT_SHIFT;
+    final long copyBytes = ((long) length) << FLOAT_SHIFT;
     UnsafeUtil.checkBounds(srcOffset, length, srcArray.length);
     checkBounds(pos, copyBytes);
     unsafe.copyMemory(
             srcArray,
-            ARRAY_FLOAT_BASE_OFFSET + (srcOffset << FLOAT_SHIFT),
+            ARRAY_FLOAT_BASE_OFFSET + (((long) srcOffset) << FLOAT_SHIFT),
             unsafeObj,
             cumBaseOffset + pos,
             copyBytes
@@ -667,12 +665,12 @@ class WritableBufferImpl extends WritableBuffer {
   @Override
   public void putIntArray(final int[] srcArray, final int srcOffset, final int length) {
     final long pos = getPosition();
-    final long copyBytes = length << INT_SHIFT;
+    final long copyBytes = ((long) length) << INT_SHIFT;
     UnsafeUtil.checkBounds(srcOffset, length, srcArray.length);
     checkBounds(pos, copyBytes);
     unsafe.copyMemory(
             srcArray,
-            ARRAY_INT_BASE_OFFSET + (srcOffset << INT_SHIFT),
+            ARRAY_INT_BASE_OFFSET + (((long) srcOffset) << INT_SHIFT),
             unsafeObj,
             cumBaseOffset + pos,
             copyBytes
@@ -699,12 +697,12 @@ class WritableBufferImpl extends WritableBuffer {
   @Override
   public void putLongArray(final long[] srcArray, final int srcOffset, final int length) {
     final long pos = getPosition();
-    final long copyBytes = length << LONG_SHIFT;
+    final long copyBytes = ((long) length) << LONG_SHIFT;
     UnsafeUtil.checkBounds(srcOffset, length, srcArray.length);
     checkBounds(pos, copyBytes);
     unsafe.copyMemory(
             srcArray,
-            ARRAY_LONG_BASE_OFFSET + (srcOffset << LONG_SHIFT),
+            ARRAY_LONG_BASE_OFFSET + (((long) srcOffset) << LONG_SHIFT),
             unsafeObj,
             cumBaseOffset + pos,
             copyBytes
@@ -731,12 +729,12 @@ class WritableBufferImpl extends WritableBuffer {
   @Override
   public void putShortArray(final short[] srcArray, final int srcOffset, final int length) {
     final long pos = getPosition();
-    final long copyBytes = length << SHORT_SHIFT;
+    final long copyBytes = ((long) length) << SHORT_SHIFT;
     UnsafeUtil.checkBounds(srcOffset, length, srcArray.length);
     checkBounds(pos, copyBytes);
     unsafe.copyMemory(
             srcArray,
-            ARRAY_SHORT_BASE_OFFSET + (srcOffset << SHORT_SHIFT),
+            ARRAY_SHORT_BASE_OFFSET + (((long) srcOffset) << SHORT_SHIFT),
             unsafeObj,
             cumBaseOffset + pos,
             copyBytes

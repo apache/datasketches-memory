@@ -30,6 +30,7 @@ import static com.yahoo.memory.UnsafeUtil.DOUBLE_SHIFT;
 import static com.yahoo.memory.UnsafeUtil.FLOAT_SHIFT;
 import static com.yahoo.memory.UnsafeUtil.INT_SHIFT;
 import static com.yahoo.memory.UnsafeUtil.LONG_SHIFT;
+import static com.yahoo.memory.UnsafeUtil.OBJECT_SHIFT;
 import static com.yahoo.memory.UnsafeUtil.SHORT_SHIFT;
 
 /**
@@ -46,27 +47,27 @@ enum Prim {
   LONG(ARRAY_LONG_BASE_OFFSET, ARRAY_LONG_INDEX_SCALE, LONG_SHIFT),
   FLOAT(ARRAY_FLOAT_BASE_OFFSET, ARRAY_FLOAT_INDEX_SCALE, FLOAT_SHIFT),
   DOUBLE(ARRAY_DOUBLE_BASE_OFFSET, ARRAY_DOUBLE_INDEX_SCALE, DOUBLE_SHIFT),
-  OBJECT(ARRAY_OBJECT_BASE_OFFSET, ARRAY_OBJECT_INDEX_SCALE, 1);
+  OBJECT(ARRAY_OBJECT_BASE_OFFSET, ARRAY_OBJECT_INDEX_SCALE, OBJECT_SHIFT);
 
-  private final int arrBaseOff_;
-  private final int arrIdxScale_;
-  private final int sizeShift_;
+  private final long arrBaseOff_;
+  private final long arrIdxScale_;
+  private final long sizeShift_;
 
-  private Prim(final int arrBaseOff, final int arrIdxScale, final int sizeShift) {
+  private Prim(final long arrBaseOff, final long arrIdxScale, final long sizeShift) {
     this.arrBaseOff_ = arrBaseOff;
     this.arrIdxScale_ = arrIdxScale;
     this.sizeShift_ = sizeShift;
   }
 
-  int off() {
+  long off() {
     return arrBaseOff_;
   }
 
-  int scale() {
+  long scale() {
     return arrIdxScale_;
   }
 
-  int shift() {
+  long shift() {
     return sizeShift_;
   }
 

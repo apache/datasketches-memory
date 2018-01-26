@@ -49,16 +49,16 @@ public abstract class Buffer extends BaseBuffer {
   //REGIONS/DUPLICATES XXX
   /**
    * Returns a read only duplicate view of this Buffer with the same but independent values of
-   * start, position, end and capacity.
+   * start, position, and end.
    * @return a read only duplicate view of this Buffer with the same but independent values of
-   * start, position, end and capacity.
+   * start, position, and end.
    */
   public abstract Buffer duplicate();
 
   /**
    * Returns a read only region of this Buffer starting at position ending at end.
-   * The region start and position will be zero, the region end and capacity will be this buffer's end
-   * minus position.
+   * The region start and position will be zero, the region end and capacity will be this
+   * buffer's end minus position.
    * @return a read only region of this Buffer.
    */
   public abstract Buffer region();

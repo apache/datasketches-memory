@@ -68,12 +68,12 @@ class WritableBufferImpl extends WritableBuffer {
   //REGIONS/DUPLICATES XXX
   @Override
   public Buffer duplicate() {
-    return doDuplicate(0, capacity);
+    return doDuplicate();
   }
 
   @Override
   public WritableBuffer writableDuplicate() {
-    return doDuplicate(0, capacity);
+    return doDuplicate();
   }
 
   @Override
@@ -101,12 +101,9 @@ class WritableBufferImpl extends WritableBuffer {
     return wBufImpl;
   }
 
-  private WritableBuffer doDuplicate(final long offsetBytes, final long capacityBytes) {
-    checkBounds(offsetBytes, capacityBytes);
-    final ResourceState newState = state.copy();
-    newState.putRegionOffset(newState.getRegionOffset() + offsetBytes);
-    newState.putCapacity(capacityBytes);
-    final WritableBufferImpl wBufImpl = new WritableBufferImpl(newState);
+  private WritableBuffer doDuplicate() {
+    checkBounds(0, capacity);
+    final WritableBufferImpl wBufImpl = new WritableBufferImpl(state);
     wBufImpl.setStartPositionEnd(getStart(), getPosition(), getEnd());
     return wBufImpl;
   }
@@ -115,13 +112,13 @@ class WritableBufferImpl extends WritableBuffer {
   @Override
   public Memory asMemory() {
     assertValid();
-    return new WritableMemoryImpl(state.copy());
+    return new WritableMemoryImpl(state);
   }
 
   @Override
   public WritableMemory asWritableMemory() {
     assertValid();
-    return new WritableMemoryImpl(state.copy());
+    return new WritableMemoryImpl(state);
   }
 
   //PRIMITIVE getXXX() and getXXXArray() XXX

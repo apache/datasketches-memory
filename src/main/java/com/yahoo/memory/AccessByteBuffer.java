@@ -30,7 +30,7 @@ final class AccessByteBuffer {
       BYTE_BUFFER_HB_FIELD = ByteBuffer.class.getDeclaredField("hb");
       BYTE_BUFFER_HB_FIELD.setAccessible(true);
     }
-    catch (NoSuchFieldException e) {
+    catch (final NoSuchFieldException e) {
       throw new RuntimeException(
               "Could not get offset/byteArray from OnHeap ByteBuffer instance: " + e.getClass());
     }

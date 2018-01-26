@@ -79,14 +79,14 @@ final class ResourceState {
   //FLAGS
   /**
    * Only set true if the backing resource has an independent read-only state and is, in fact,
-   * read-only. This can only be changed from false (writable) to true (read-only) once. The
-   * initial state is false (writable). The initial state is writable.
+   * read-only. This can only be changed from writable (false) to read-only (true) once. The
+   * initial state is writable (false).
    */
   private StepBoolean resourceIsReadOnly_;
 
   /**
-   * Only the backing resources that use AutoCloseable can set this to false.  It can only be
-   * changed from true to false once. The initial state is valid.
+   * Only the backing resources that uses AutoCloseable can set this to false.  It can only be
+   * changed from true to false once. The initial state is valid (true).
    */
   private StepBoolean valid_;
 
@@ -154,34 +154,34 @@ final class ResourceState {
     compute();
   }
 
-  private ResourceState(ResourceState toCopy) {
+  private ResourceState(final ResourceState toCopy) {
     //FOUNDATION PARAMETERS
-    this.nativeBaseOffset_ = toCopy.nativeBaseOffset_;
-    this.unsafeObj_ = toCopy.unsafeObj_;
-    this.unsafeObjHeader_ = toCopy.unsafeObjHeader_;
-    this.capacity_ = toCopy.capacity_;
+    nativeBaseOffset_ = toCopy.nativeBaseOffset_;
+    unsafeObj_ = toCopy.unsafeObj_;
+    unsafeObjHeader_ = toCopy.unsafeObjHeader_;
+    capacity_ = toCopy.capacity_;
     //cumBaseOffset is computed
-    this.memReqSvr_ = toCopy.memReqSvr_; //retains memReqSvr reference
+    memReqSvr_ = toCopy.memReqSvr_; //retains memReqSvr reference
 
     //FLAGS
-    this.resourceIsReadOnly_ = toCopy.resourceIsReadOnly_;
-    this.valid_ = toCopy.valid_; //retains valid reference
+    resourceIsReadOnly_ = toCopy.resourceIsReadOnly_;
+    valid_ = toCopy.valid_; //retains valid reference
 
     //REGIONS
-    this.regionOffset_ = toCopy.regionOffset_;
+    regionOffset_ = toCopy.regionOffset_;
 
     //BYTE BUFFER
-    this.byteBuf_ = toCopy.byteBuf_; //retains ByteBuffer reference
+    byteBuf_ = toCopy.byteBuf_; //retains ByteBuffer reference
 
     //MEMORY MAPPED FILES
-    this.file_ = toCopy.file_; //retains file reference
-    this.fileOffset_ = toCopy.fileOffset_;
-    this.raf_ = toCopy.raf_;
-    this.mbb_ = toCopy.mbb_;
+    file_ = toCopy.file_; //retains file reference
+    fileOffset_ = toCopy.fileOffset_;
+    raf_ = toCopy.raf_;
+    mbb_ = toCopy.mbb_;
 
     //ENDIANNESS
-    this.resourceOrder_ = toCopy.resourceOrder_; //retains resourseOrder
-    this.swapBytes_ = toCopy.swapBytes_;
+    resourceOrder_ = toCopy.resourceOrder_; //retains resourseOrder
+    swapBytes_ = toCopy.swapBytes_;
     compute();
   }
 

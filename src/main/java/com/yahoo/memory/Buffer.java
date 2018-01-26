@@ -370,11 +370,11 @@ public abstract class Buffer extends BaseBuffer {
 
   //OTHER PRIMITIVE READ METHODS: copyTo, compareTo XXX
   /**
-   * Compares the bytes of this Buffer to <i>that</i> Buffer.  This uses absolute offsets not
-   * the start, position and end.
+   * Compares the bytes of this Buffer to <i>that</i> Buffer.
+   * This uses absolute offsets not the start, position and end.
    * Returns <i>(this &lt; that) ? -1 : (this &gt; that) ? 1 : 0;</i>.
-   * If all bytes are equal up to the shorter of the two lengths, the shorter length is considered
-   * to be less than the other.
+   * If all bytes are equal up to the shorter of the two lengths, the shorter length is
+   * considered to be less than the other.
    * @param thisOffsetBytes the starting offset for <i>this Buffer</i>
    * @param thisLengthBytes the length of the region to compare from <i>this Buffer</i>
    * @param that the other Buffer to compare with

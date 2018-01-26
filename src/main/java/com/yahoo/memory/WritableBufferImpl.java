@@ -381,7 +381,7 @@ class WritableBufferImpl extends WritableBuffer {
 
   @Override
   public void checkLimits(final long offsetBytes, final long length) {
-    assertValid();
+    checkValid();
     checkInvariants(getStart(), offsetBytes + length, getEnd(), getCapacity());
   }
 

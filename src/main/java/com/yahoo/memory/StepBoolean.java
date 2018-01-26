@@ -11,10 +11,12 @@ package com.yahoo.memory;
  * @author Lee Rhodes
  */
 final class StepBoolean {
+  private final boolean initialState;
   private volatile boolean state;
 
   StepBoolean(final boolean initialState) {
-    this.state = initialState;
+    this.initialState = initialState;
+    state = initialState;
   }
 
   /**
@@ -22,11 +24,21 @@ final class StepBoolean {
    * @return the current state.
    */
   boolean get() {
-    return this.state;
+    return state;
   }
 
-  void set(boolean state)
-  {
-    this.state = state;
+  /**
+   * This changes the state of this step boolean function if it has not yet changed.
+   */
+  void change() {
+    state = !initialState;
+  }
+
+  /**
+   * Return true if the state has changed from the initial state
+   * @return true if the state has changed from the initial state
+   */
+  boolean hasChanged() {
+    return state == !initialState;
   }
 }

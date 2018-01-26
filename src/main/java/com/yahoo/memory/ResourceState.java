@@ -265,7 +265,7 @@ final class ResourceState {
   }
 
   void setResourceReadOnly() {
-    resourceIsReadOnly_.set(true);
+    resourceIsReadOnly_.change();
   }
 
   boolean isValid() {
@@ -273,7 +273,7 @@ final class ResourceState {
   }
 
   void setInvalid() {
-    valid_.set(false);
+    valid_.change();
   }
 
   boolean isDirect() {

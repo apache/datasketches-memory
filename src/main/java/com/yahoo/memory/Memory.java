@@ -116,7 +116,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final byte[] arr) {
-    return wrap(arr, ByteOrder.nativeOrder());
+    return wrap(arr, 0, arr.length, ByteOrder.nativeOrder());
   }
 
   /**
@@ -125,13 +125,16 @@ public abstract class Memory {
    * @param byteOrder the byte order
    * @return Memory for read operations
    */
-  public static Memory wrap(final byte[] arr, ByteOrder byteOrder) {
+  public static Memory wrap(final byte[] arr, final int offset, final int length,
+          ByteOrder byteOrder) {
       nullCheck(arr);
       nullCheck(byteOrder);
-      if (arr.length == 0) {
+      UnsafeUtil.checkBounds(offset, length, arr.length);
+      if (length == 0) {
           return WritableMemoryImpl.ZERO_SIZE_MEMORY;
       }
-      ResourceState state = new ResourceState(arr, Prim.BYTE, arr.length);
+      ResourceState state = new ResourceState(arr, Prim.BYTE, length);
+      state.putRegionOffset(offset);
       state.order(byteOrder);
       return new WritableMemoryImpl(state);
   }

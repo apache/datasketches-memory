@@ -72,7 +72,7 @@ public abstract class Buffer extends BaseBuffer {
 
   //ACCESS PRIMITIVE HEAP ARRAYS for readOnly XXX
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Buffer for read operations
    */
@@ -85,7 +85,7 @@ public abstract class Buffer extends BaseBuffer {
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Buffer for read operations
    */
@@ -98,7 +98,7 @@ public abstract class Buffer extends BaseBuffer {
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Buffer for read operations
    */
@@ -111,7 +111,7 @@ public abstract class Buffer extends BaseBuffer {
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Buffer for read operations
    */
@@ -124,7 +124,7 @@ public abstract class Buffer extends BaseBuffer {
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Buffer for read operations
    */
@@ -137,7 +137,7 @@ public abstract class Buffer extends BaseBuffer {
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Buffer for read operations
    */
@@ -150,7 +150,7 @@ public abstract class Buffer extends BaseBuffer {
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Buffer for read operations
    */
@@ -163,7 +163,7 @@ public abstract class Buffer extends BaseBuffer {
   }
 
   /**
-   * Wraps the given primitive array for read operations
+   * Wraps the given primitive array for read operations, with native byte order.
    * @param arr the given primitive array
    * @return Buffer for read operations
    */

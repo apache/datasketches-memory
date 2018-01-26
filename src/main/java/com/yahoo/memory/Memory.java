@@ -91,7 +91,9 @@ public abstract class Memory {
 
   //BUFFER XXX
   /**
-   * Convert this Memory to a Buffer
+   * Convert this Memory to a Buffer.
+   * The <i>start</i>, <i>position</i> and <i>end</i> are set to zero, zero, and <i>capacity</i>,
+   * respectively.
    * @return Buffer
    */
   public abstract Buffer asBuffer();

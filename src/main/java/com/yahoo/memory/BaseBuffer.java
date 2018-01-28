@@ -130,6 +130,15 @@ public class BaseBuffer {
     return (end - pos) > 0;
   }
 
+  /**
+   * The invariants equation is: {@code 0 <= start <= position <= end <= capacity}.
+   * If this equation is violated and assertions are enabled,
+   * an <i>AssertionError</i> will be thrown.
+   * @param start the lowest start position
+   * @param pos the current position
+   * @param end the highest position
+   * @param cap the capacity of the backing buffer.
+   */
   static final void assertInvariants(final long start, final long pos, final long end,
       final long cap) {
     assert (start | pos | end | cap | (pos - start) | (end - pos) | (cap - end) ) >= 0L
@@ -143,6 +152,14 @@ public class BaseBuffer {
         + ", (cap - end): " + (cap - end);
   }
 
+  /**
+   * The invariants equation is: {@code 0 <= start <= position <= end <= capacity}.
+   * If this equation is violated an <i>IllegalArgumentException</i> will be thrown.
+   * @param start the lowest start position
+   * @param pos the current position
+   * @param end the highest position
+   * @param cap the capacity of the backing buffer.
+   */
   static final void checkInvariants(final long start, final long pos, final long end,
         final long cap) {
     if ((start | pos | end | cap | (pos - start) | (end - pos) | (cap - end) ) < 0L) {

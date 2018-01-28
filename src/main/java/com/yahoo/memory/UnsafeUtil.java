@@ -129,9 +129,9 @@ public final class UnsafeUtil {
   private UnsafeUtil() {}
 
   /**
-   * Perform bounds checking using java assert (if enabled) checking the requested offset and
-   * length against the allocated size.
-   * If reqOff + reqLen &gt; allocSize or any of the parameters are negative an exception will
+   * Assert the requested offset and length against the allocated size.
+   * The invariants equation is: {@code 0 <= reqOff <= reqLen <= reqOff + reqLen <= allocSize}.
+   * If this equation is violated and assertions are enabled, an {@link AssertionError} will
    * be thrown.
    * @param reqOff the requested offset
    * @param reqLen the requested length
@@ -145,8 +145,8 @@ public final class UnsafeUtil {
 
   /**
    * Check the requested offset and length against the allocated size.
-   * If reqOff + reqLen &gt; allocSize or any of the parameters are negative an exception will
-   * be thrown.
+   * The invariants equation is: {@code 0 <= reqOff <= reqLen <= reqOff + reqLen <= allocSize}.
+   * If this equation is violated an {@link IllegalArgumentException} will be thrown.
    * @param reqOff the requested offset
    * @param reqLen the requested length
    * @param allocSize the allocated size.

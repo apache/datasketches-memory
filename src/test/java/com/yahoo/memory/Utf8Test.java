@@ -315,6 +315,12 @@ public class Utf8Test {
     checkStrings(cbStr, rcpStr);
   }
 
+  @Test
+  public void checkRandomValidCodePoints2() {
+    //checks the non-deterministic constructor
+    @SuppressWarnings("unused")
+    RandomCodePoints rcp = new RandomCodePoints(false);
+  }
 
   @Test
   public void printlnTest() {

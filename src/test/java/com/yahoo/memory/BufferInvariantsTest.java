@@ -14,22 +14,8 @@ import org.testng.annotations.Test;
 
 /**
  * @author Lee Rhodes
- *
  */
 public class BufferInvariantsTest {
-
-  @Test
-  public void checkLimits() {
-    Buffer buf = Buffer.wrap(new byte[100]);
-    buf.setStartPositionEnd(40, 45, 50);
-    buf.setStartPositionEnd(0, 0, 100);
-    try {
-      buf.setStartPositionEnd(0, 0, 101);
-      fail();
-    } catch (AssertionError e) {
-      //ok
-    }
-  }
 
   @Test
   public void testRegion() {

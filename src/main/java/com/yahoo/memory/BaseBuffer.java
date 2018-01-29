@@ -37,35 +37,27 @@ public class BaseBuffer {
   }
 
   /**
-   * Sets start position, current position, and end position
-   * @param start the start position in the buffer
-   * @param position the current position between the start and end
-   * @param end the end position in the buffer
+   * Increments the current position by the given increment.
+   * Asserts that the resource is valid and that the positional invariants are not violated,
+   * otherwise, if asserts are enabled throws an {@link AssertionError}.
+   * @param increment the given increment
    * @return BaseBuffer
    */
-  public final BaseBuffer setStartPositionEnd(final long start, final long position,
-        final long end) {
-    assertInvariants(start, position, end, capacity);
-    this.start = start;
-    this.end = end;
-    pos = position;
+  public BaseBuffer incrementPosition(final long increment) {
+    incrementPositionAndAssert(pos, increment);
     return this;
   }
 
   /**
-   * Gets start position
-   * @return start position
+   * Increments the current position by the given increment.
+   * Checks that the resource is valid and that the positional invariants are not violated,
+   * otherwise throws an {@link IllegalArgumentException}.
+   * @param increment the given increment
+   * @return BaseBuffer
    */
-  public long getStart() {
-    return start;
-  }
-
-  /**
-   * Gets the current position
-   * @return the current position
-   */
-  public long getPosition() {
-    return pos;
+  public BaseBuffer incrementPositionAndCheck(final long increment) {
+    incrementPositionAndCheck(pos, increment);
+    return this;
   }
 
   /**
@@ -77,41 +69,19 @@ public class BaseBuffer {
   }
 
   /**
-   * Sets the current position
-   * @param position the given current position
-   * @return BaseBuffer
+   * Gets the current position
+   * @return the current position
    */
-  public BaseBuffer setPosition(final long position) {
-    assertInvariants(start, position, end, capacity);
-    pos = position;
-    return this;
+  public long getPosition() {
+    return pos;
   }
 
   /**
-   * Increments the current position by the given increment
-   * @param increment the given increment
-   * @return BaseBuffer
+   * Gets start position
+   * @return start position
    */
-  public BaseBuffer incrementPosition(final long increment) {
-    incrementPosition(pos, increment);
-    return this;
-  }
-
-  void incrementPosition(final long pos, final long increment) {
-    assertValid();
-    final long newPos = pos + increment;
-    assertInvariants(start, newPos, end, capacity);
-    this.pos = newPos;
-  }
-
-  /**
-   * Resets the current position to the start position,
-   * This does not modify any data.
-   * @return BaseBuffer
-   */
-  public BaseBuffer resetPosition() {
-    pos = start;
-    return this;
+  public long getStart() {
+    return start;
   }
 
   /**
@@ -128,6 +98,93 @@ public class BaseBuffer {
    */
   public boolean hasRemaining() {
     return (end - pos) > 0;
+  }
+
+  /**
+   * Resets the current position to the start position,
+   * This does not modify any data.
+   * @return BaseBuffer
+   */
+  public BaseBuffer resetPosition() {
+    pos = start;
+    return this;
+  }
+
+  /**
+   * Sets the current position.
+   * Asserts that the positional invariants are not violated,
+   * otherwise, if asserts are enabled throws an {@link AssertionError}.
+   * @param position the given current position.
+   * @return BaseBuffer
+   */
+  public BaseBuffer setPosition(final long position) {
+    assertInvariants(start, position, end, capacity);
+    pos = position;
+    return this;
+  }
+
+  /**
+   * Sets the current position.
+   * Checks that the positional invariants are not violated,
+   * otherwise, throws an {@link IllegalArgumentException}.
+   * @param position the given current position.
+   * @return BaseBuffer
+   */
+  public BaseBuffer setPositionAndCheck(final long position) {
+    checkInvariants(start, position, end, capacity);
+    pos = position;
+    return this;
+  }
+
+  /**
+   * Sets start position, current position, and end position.
+   * Asserts that the positional invariants are not violated,
+   * otherwise, if asserts are enabled throws an {@link AssertionError}.
+   * @param start the start position in the buffer
+   * @param position the current position between the start and end
+   * @param end the end position in the buffer
+   * @return BaseBuffer
+   */
+  public final BaseBuffer setStartPositionEnd(final long start, final long position,
+        final long end) {
+    assertInvariants(start, position, end, capacity);
+    this.start = start;
+    this.end = end;
+    pos = position;
+    return this;
+  }
+
+  /**
+   * Sets start position, current position, and end position.
+   * Checks that the positional invariants are not violated,
+   * otherwise, throws an {@link IllegalArgumentException}.
+   * @param start the start position in the buffer
+   * @param position the current position between the start and end
+   * @param end the end position in the buffer
+   * @return BaseBuffer
+   */
+  public final BaseBuffer setStartPositionEndAndCheck(final long start, final long position,
+        final long end) {
+    checkInvariants(start, position, end, capacity);
+    this.start = start;
+    this.end = end;
+    pos = position;
+    return this;
+  }
+
+  //RESTRICTED XXX
+  void incrementPositionAndAssert(final long position, final long increment) {
+    assertValid();
+    final long newPos = position + increment;
+    assertInvariants(start, newPos, end, capacity);
+    pos = newPos;
+  }
+
+  void incrementPositionAndCheck(final long pos, final long increment) {
+    checkValid();
+    final long newPos = pos + increment;
+    checkInvariants(start, newPos, end, capacity);
+    this.pos = newPos;
   }
 
   /**
@@ -176,7 +233,6 @@ public class BaseBuffer {
     }
   }
 
-  //RESTRICTED READ AND WRITE XXX
   final void assertValid() { //applies to both readable and writable
     assert state.isValid() : "Memory not valid.";
   }

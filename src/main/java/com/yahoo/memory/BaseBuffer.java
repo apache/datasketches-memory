@@ -44,7 +44,7 @@ public class BaseBuffer {
    * @return BaseBuffer
    */
   public BaseBuffer incrementPosition(final long increment) {
-    incrementPositionAndAssert(pos, increment);
+    incrementAndAssertPosition(pos, increment);
     return this;
   }
 
@@ -55,8 +55,8 @@ public class BaseBuffer {
    * @param increment the given increment
    * @return BaseBuffer
    */
-  public BaseBuffer incrementPositionAndCheck(final long increment) {
-    incrementPositionAndCheck(pos, increment);
+  public BaseBuffer incrementAndCheckPosition(final long increment) {
+    incrementAndCheckPosition(pos, increment);
     return this;
   }
 
@@ -130,7 +130,7 @@ public class BaseBuffer {
    * @param position the given current position.
    * @return BaseBuffer
    */
-  public BaseBuffer setPositionAndCheck(final long position) {
+  public BaseBuffer setAndCheckPosition(final long position) {
     checkInvariants(start, position, end, capacity);
     pos = position;
     return this;
@@ -163,7 +163,7 @@ public class BaseBuffer {
    * @param end the end position in the buffer
    * @return BaseBuffer
    */
-  public final BaseBuffer setStartPositionEndAndCheck(final long start, final long position,
+  public final BaseBuffer setAndCheckStartPositionEnd(final long start, final long position,
         final long end) {
     checkInvariants(start, position, end, capacity);
     this.start = start;
@@ -173,15 +173,13 @@ public class BaseBuffer {
   }
 
   //RESTRICTED XXX
-  void incrementPositionAndAssert(final long position, final long increment) {
-    assertValid();
+  void incrementAndAssertPosition(final long position, final long increment) {
     final long newPos = position + increment;
     assertInvariants(start, newPos, end, capacity);
     pos = newPos;
   }
 
-  void incrementPositionAndCheck(final long pos, final long increment) {
-    checkValid();
+  void incrementAndCheckPosition(final long pos, final long increment) {
     final long newPos = pos + increment;
     checkInvariants(start, newPos, end, capacity);
     this.pos = newPos;
@@ -230,16 +228,6 @@ public class BaseBuffer {
               + ", (end - pos): " + (end - pos)
               + ", (cap - end): " + (cap - end)
       );
-    }
-  }
-
-  final void assertValid() { //applies to both readable and writable
-    assert state.isValid() : "Memory not valid.";
-  }
-
-  final void checkValid() {
-    if (!state.isValid()) {
-      throw new IllegalStateException("Memory not valid.");
     }
   }
 

@@ -94,7 +94,7 @@ public abstract class Memory {
 
   //ACCESS PRIMITIVE HEAP ARRAYS for readOnly XXX
   /**
-   * Wraps the given primitive array for read operations, with native byte order.
+   * Wraps the given primitive array for read operations assuming native byte order.
    * @param arr the given primitive array
    * @return Memory for read operations
    */
@@ -107,7 +107,7 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations, with native byte order.
+   * Wraps the given primitive array for read operations assuming native byte order.
    * @param arr the given primitive array
    * @return Memory for read operations
    */
@@ -116,7 +116,17 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations, with the given byte order.
+   * Wraps the given primitive array for read operations assuming the given byte order.
+   * @param arr the given primitive array
+   * @param byteOrder the byte order
+   * @return Memory for read operations
+   */
+  public static Memory wrap(final byte[] arr, final ByteOrder byteOrder) {
+      return wrap(arr, 0, arr.length, byteOrder);
+  }
+
+  /**
+   * Wraps the given primitive array for read operations assuming the given byte order.
    * @param arr the given primitive array
    * @param offset the byte offset into the given array
    * @param length the number of bytes to include from the given array
@@ -138,7 +148,7 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations, with native byte order.
+   * Wraps the given primitive array for read operations assuming native byte order.
    * @param arr the given primitive array
    * @return Memory for read operations
    */
@@ -151,7 +161,7 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations, with native byte order.
+   * Wraps the given primitive array for read operations assuming native byte order.
    * @param arr the given primitive array
    * @return Memory for read operations
    */
@@ -164,7 +174,7 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations, with native byte order.
+   * Wraps the given primitive array for read operations assuming native byte order.
    * @param arr the given primitive array
    * @return Memory for read operations
    */
@@ -177,7 +187,7 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations, with native byte order.
+   * Wraps the given primitive array for read operations assuming native byte order.
    * @param arr the given primitive array
    * @return Memory for read operations
    */
@@ -190,7 +200,7 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations, with native byte order.
+   * Wraps the given primitive array for read operations assuming native byte order.
    * @param arr the given primitive array
    * @return Memory for read operations
    */
@@ -203,7 +213,7 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations, with native byte order.
+   * Wraps the given primitive array for read operations assuming native byte order.
    * @param arr the given primitive array
    * @return Memory for read operations
    */
@@ -394,7 +404,7 @@ public abstract class Memory {
   public abstract void getShortArray(long offsetBytes, short[] dstArray, int dstOffset,
       int length);
 
-  //OTHER PRIMITIVE READ METHODS: copyTo, compareTo XXX
+  //OTHER PRIMITIVE READ METHODS: compareTo, copyTo XXX
   /**
    * Compares the bytes of this Memory to <i>that</i> Memory.
    * Returns <i>(this &lt; that) ? -1 : (this &gt; that) ? 1 : 0;</i>.
@@ -423,6 +433,8 @@ public abstract class Memory {
       long lengthBytes);
 
   //OTHER READ METHODS XXX
+  public abstract void checkValidAndBounds(long offset, long length);
+
   /**
    * Gets the capacity of this Memory in bytes
    * @return the capacity of this Memory in bytes
@@ -437,15 +449,6 @@ public abstract class Memory {
    * @return the cumulative offset in bytes of this Memory including the given offsetBytes.
    */
   public abstract long getCumulativeOffset(final long offsetBytes);
-
-  /**
-   * Checks that the specified range of bytes is within bounds of this Memory object, throws
-   * {@link IllegalArgumentException} if it's not: i. e. if offsetBytes &lt; 0, or length &lt; 0,
-   * or offsetBytes + length &gt; {@link #getCapacity()}.
-   * @param offsetBytes the offset of the range of bytes to check
-   * @param length the length of the range of bytes to check
-   */
-  public abstract void checkBounds(final long offsetBytes, final long length);
 
   /**
    * Returns the ByteOrder for the backing resource.

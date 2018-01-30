@@ -154,38 +154,38 @@ final class ResourceState {
     compute();
   }
 
-  private ResourceState(final ResourceState toCopy) {
+  private ResourceState(final ResourceState src) {
     //FOUNDATION PARAMETERS
-    nativeBaseOffset_ = toCopy.nativeBaseOffset_;
-    unsafeObj_ = toCopy.unsafeObj_;
-    unsafeObjHeader_ = toCopy.unsafeObjHeader_;
-    capacity_ = toCopy.capacity_;
+    nativeBaseOffset_ = src.nativeBaseOffset_;
+    unsafeObj_ = src.unsafeObj_;
+    unsafeObjHeader_ = src.unsafeObjHeader_;
+    capacity_ = src.capacity_;
     //cumBaseOffset is computed
-    memReqSvr_ = toCopy.memReqSvr_; //retains memReqSvr reference
+    memReqSvr_ = src.memReqSvr_; //retains memReqSvr reference
 
     //FLAGS
-    resourceIsReadOnly_ = toCopy.resourceIsReadOnly_;
-    valid_ = toCopy.valid_; //retains valid reference
+    resourceIsReadOnly_ = src.resourceIsReadOnly_;
+    valid_ = src.valid_; //retains valid reference
 
     //REGIONS
-    regionOffset_ = toCopy.regionOffset_;
+    regionOffset_ = src.regionOffset_;
 
     //BYTE BUFFER
-    byteBuf_ = toCopy.byteBuf_; //retains ByteBuffer reference
+    byteBuf_ = src.byteBuf_; //retains ByteBuffer reference
 
     //MEMORY MAPPED FILES
-    file_ = toCopy.file_; //retains file reference
-    fileOffset_ = toCopy.fileOffset_;
-    raf_ = toCopy.raf_;
-    mbb_ = toCopy.mbb_;
+    file_ = src.file_; //retains file reference
+    fileOffset_ = src.fileOffset_;
+    raf_ = src.raf_;
+    mbb_ = src.mbb_;
 
     //ENDIANNESS
-    resourceOrder_ = toCopy.resourceOrder_; //retains resourseOrder
-    swapBytes_ = toCopy.swapBytes_;
+    resourceOrder_ = src.resourceOrder_; //retains resourseOrder
+    swapBytes_ = src.swapBytes_;
     compute();
   }
 
-  ResourceState copy() { //shallow copy
+  ResourceState copy() {
     return new ResourceState(this);
   }
 
@@ -268,14 +268,6 @@ final class ResourceState {
     resourceIsReadOnly_.change();
   }
 
-  boolean isValid() {
-    return valid_.get();
-  }
-
-  void setInvalid() {
-    valid_.change();
-  }
-
   boolean isDirect() {
     return nativeBaseOffset_ > 0L;
   }
@@ -288,6 +280,24 @@ final class ResourceState {
             && (getCapacity() == that.getCapacity())
             && (getUnsafeObject() == that.getUnsafeObject())
             && (getByteBuffer() == that.getByteBuffer());
+  }
+
+  boolean isValid() {
+    return valid_.get();
+  }
+
+  void setInvalid() {
+    valid_.change();
+  }
+
+  final void assertValid() {
+    assert valid_.get() : "Memory not valid.";
+  }
+
+  final void checkValid() {
+    if (!valid_.get()) {
+      throw new IllegalStateException("Memory not valid.");
+    }
   }
 
   //REGIONS

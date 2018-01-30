@@ -35,8 +35,7 @@ final class Utf8 {
   static final void getCharsFromUtf8(final long offsetBytes, final int utf8LengthBytes,
       final Appendable dst, final ResourceState state)
           throws IOException, Utf8CodingException {
-    assert state.isValid();
-
+    state.checkValid();
     checkBounds(offsetBytes, utf8LengthBytes, state.getCapacity());
     final long cumBaseOffset = state.getCumBaseOffset();
     final long address = cumBaseOffset + offsetBytes;
@@ -251,7 +250,7 @@ final class Utf8 {
   //Encode
   static long putCharsToUtf8(final long offsetBytes, final CharSequence src,
         final ResourceState state) {
-    assert state.isValid();
+    state.checkValid();
     final Object unsafeObj = state.getUnsafeObject();
     final long cumBaseOffset = state.getCumBaseOffset();
 

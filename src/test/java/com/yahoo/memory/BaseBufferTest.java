@@ -30,25 +30,25 @@ public class BaseBufferTest {
   @Test
   public void checkLimitsAndCheck() {
     Buffer buf = Buffer.wrap(new byte[100]);
-    buf.setStartPositionEndAndCheck(40, 45, 50);
-    buf.setStartPositionEndAndCheck(0, 0, 100);
+    buf.setAndCheckStartPositionEnd(40, 45, 50);
+    buf.setAndCheckStartPositionEnd(0, 0, 100);
     try {
-      buf.setStartPositionEndAndCheck(0, 0, 101);
+      buf.setAndCheckStartPositionEnd(0, 0, 101);
       fail();
     } catch (IllegalArgumentException e) {
       //ok
     }
-    buf.setPositionAndCheck(100);
+    buf.setAndCheckPosition(100);
     try {
-      buf.setPositionAndCheck(101);
+      buf.setAndCheckPosition(101);
       fail();
     } catch (IllegalArgumentException e) {
       //ok
     }
     buf.setPosition(99);
-    buf.incrementPositionAndCheck(1L);
+    buf.incrementAndCheckPosition(1L);
     try {
-      buf.incrementPositionAndCheck(1L);
+      buf.incrementAndCheckPosition(1L);
       fail();
     } catch (IllegalArgumentException e) {
       //ok

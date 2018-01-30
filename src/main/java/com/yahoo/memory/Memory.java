@@ -112,7 +112,17 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final byte[] arr) {
-    return wrap(arr, 0, arr.length, ByteOrder.nativeOrder());
+    return wrap(arr, ByteOrder.nativeOrder());
+  }
+
+  /**
+   * Wraps the given primitive array for read operations, with the given byte order.
+   * @param arr the given primitive array
+   * @param byteOrder the byte order
+   * @return Memory for read operations
+   */
+  public static Memory wrap(final byte[] arr, final ByteOrder byteOrder) {
+    return wrap(arr, 0, arr.length, byteOrder);
   }
 
   /**

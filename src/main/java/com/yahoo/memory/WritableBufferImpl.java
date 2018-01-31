@@ -120,7 +120,9 @@ class WritableBufferImpl extends WritableBuffer {
   @Override
   public WritableMemory asWritableMemory() {
     state.checkValid();
-    return (originMemory != null) ? originMemory : new WritableMemoryImpl(state);
+    if (originMemory != null) { return originMemory; }
+    originMemory = new WritableMemoryImpl(state);
+    return originMemory;
   }
 
   //PRIMITIVE getXXX() and getXXXArray() XXX

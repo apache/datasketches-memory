@@ -63,7 +63,7 @@ public abstract class Buffer extends BaseBuffer {
    */
   public abstract Buffer region();
 
-  //BUFFER XXX
+  //MEMORY XXX
   /**
    * Convert this Buffer to a Memory. The current start, position and end are ignored.
    * @return Memory

@@ -54,6 +54,7 @@ import java.nio.ByteOrder;
  * @author Lee Rhodes
  */
 class WritableBufferImpl extends WritableBuffer {
+  final ResourceState state;
   final Object unsafeObj; //Array objects are held here.
   final long unsafeObjHeader; //Heap ByteBuffer includes the slice() offset here.
   final long cumBaseOffset; //Holds the cumulative offset to the start of data.
@@ -69,6 +70,7 @@ class WritableBufferImpl extends WritableBuffer {
 
   WritableBufferImpl(final ResourceState state) {
     super(state);
+    this.state = state;
     unsafeObj = state.getUnsafeObject();
     unsafeObjHeader = state.getUnsafeObjectHeader();
     cumBaseOffset = state.getCumBaseOffset();
@@ -371,7 +373,7 @@ class WritableBufferImpl extends WritableBuffer {
   public int compareTo(final long thisOffsetBytes, final long thisLengthBytes, final Buffer that,
           final long thatOffsetBytes, final long thatLengthBytes) {
     state.checkValid();
-    that.state.checkValid();
+    that.getResourceState().checkValid();
     checkBounds(thisOffsetBytes, thisLengthBytes, capacity);
     checkBounds(thatOffsetBytes, thatLengthBytes, that.capacity);
     final long thisAdd = getCumulativeOffset() + thisOffsetBytes;
@@ -746,4 +748,9 @@ class WritableBufferImpl extends WritableBuffer {
     unsafe.setMemory(unsafeObj, cumBaseOffset + pos, len, value);
   }
 
+  @Override
+  final ResourceState getResourceState() {
+    state.assertValid();
+    return state;
+  }
 }

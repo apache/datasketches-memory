@@ -473,4 +473,6 @@ public abstract class Buffer extends BaseBuffer {
    * @return a formatted hex string in a human readable array
    */
   public abstract String toHexString(String header, long offsetBytes, int lengthBytes);
+
+  abstract ResourceState getResourceState();
 }

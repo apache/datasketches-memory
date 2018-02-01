@@ -28,10 +28,8 @@ import static com.yahoo.memory.UnsafeUtil.INT_SHIFT;
 import static com.yahoo.memory.UnsafeUtil.LONG_SHIFT;
 import static com.yahoo.memory.UnsafeUtil.LS;
 import static com.yahoo.memory.UnsafeUtil.SHORT_SHIFT;
-import static com.yahoo.memory.UnsafeUtil.UNSAFE_COPY_THRESHOLD;
 import static com.yahoo.memory.UnsafeUtil.assertBounds;
 import static com.yahoo.memory.UnsafeUtil.checkBounds;
-import static com.yahoo.memory.UnsafeUtil.checkOverlap;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 
 import java.io.IOException;
@@ -306,7 +304,13 @@ class WritableMemoryImpl extends WritableMemory {
   public int compareTo(final long thisOffsetBytes, final long thisLengthBytes, final Memory that,
       final long thatOffsetBytes, final long thatLengthBytes) {
     state.checkValid();
-    ((WritableMemoryImpl)that).state.checkValid();
+    if (isSameResource(that)) {
+      if (thisOffsetBytes == thatOffsetBytes) {
+        return 0;
+      }
+    } else {
+      that.getResourceState().checkValid();
+    }
     checkBounds(thisOffsetBytes, thisLengthBytes, capacity);
     checkBounds(thatOffsetBytes, thatLengthBytes, that.getCapacity());
     final long thisAdd = getCumulativeOffset(thisOffsetBytes);
@@ -327,26 +331,22 @@ class WritableMemoryImpl extends WritableMemory {
   public void copyTo(final long srcOffsetBytes, final WritableMemory destination,
       final long dstOffsetBytes, final long lengthBytes) {
     state.checkValid();
-    ((WritableMemoryImpl)destination).state.checkValid();
+    if (isSameResource(destination)) {
+      if (srcOffsetBytes == dstOffsetBytes) {
+        return;
+      }
+    } else {
+      destination.getResourceState().checkValid();
+    }
     checkBounds(srcOffsetBytes, lengthBytes, capacity);
     checkBounds(dstOffsetBytes, lengthBytes, destination.getCapacity());
-    assert ((this == destination)
-        ? checkOverlap(srcOffsetBytes, dstOffsetBytes, lengthBytes)
-        : true) : "Region Overlap" ;
 
-    long srcAdd = getCumulativeOffset(srcOffsetBytes);
-    long dstAdd = destination.getCumulativeOffset(dstOffsetBytes);
+    final long srcAdd = getCumulativeOffset(srcOffsetBytes);
+    final long dstAdd = destination.getCumulativeOffset(dstOffsetBytes);
     final Object srcParent = (isDirect()) ? null : unsafeObj;
     final Object dstParent = (destination.isDirect()) ? null : destination.getArray();
-    long lenBytes = lengthBytes;
-
-    while (lenBytes > 0) {
-      final long chunkBytes = (lenBytes > UNSAFE_COPY_THRESHOLD) ? UNSAFE_COPY_THRESHOLD : lenBytes;
-      unsafe.copyMemory(srcParent, srcAdd, dstParent, dstAdd, lenBytes);
-      lenBytes -= chunkBytes;
-      srcAdd += chunkBytes;
-      dstAdd += chunkBytes;
-    }
+    final long lenBytes = lengthBytes;
+    unsafe.copyMemory(srcParent, srcAdd, dstParent, dstAdd, lenBytes);
   }
 
   //OTHER READ METHODS XXX
@@ -408,7 +408,7 @@ class WritableMemoryImpl extends WritableMemory {
   public boolean isSameResource(final Memory that) {
     if (that == null) { return false; }
     state.checkValid();
-    ((WritableMemoryImpl) that).state.checkValid();
+    that.getResourceState().checkValid();
     return state.isSameResource(that.getResourceState());
   }
 
@@ -734,7 +734,6 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   ResourceState getResourceState() {
-    state.assertValid();
     return state;
   }
 

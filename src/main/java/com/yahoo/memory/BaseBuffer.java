@@ -22,7 +22,6 @@ package com.yahoo.memory;
  * @author Lee Rhodes
  */
 public class BaseBuffer {
-  final ResourceState state;
   final long capacity;
   private long start = 0;
   private long pos = 0;
@@ -30,7 +29,6 @@ public class BaseBuffer {
 
 
   BaseBuffer(final ResourceState state) {
-    this.state = state;
     capacity = state.getCapacity();
     end = capacity;
     state.putBaseBuffer(this);
@@ -229,9 +227,5 @@ public class BaseBuffer {
               + ", (cap - end): " + (cap - end)
       );
     }
-  }
-
-  final ResourceState getResourceState() {
-    return state;
   }
 }

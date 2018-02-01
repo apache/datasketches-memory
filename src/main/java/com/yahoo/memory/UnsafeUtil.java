@@ -159,19 +159,6 @@ public final class UnsafeUtil {
     }
   }
 
-  /**
-   * Return true if the given offsets and length do not overlap.
-   * @param srcOff the start of the source region
-   * @param dstOff the start of the destination region
-   * @param length the length of both regions
-   * @return true if the given offsets and length do not overlap.
-   */
-  public static boolean checkOverlap(final long srcOff, final long dstOff, final long length) {
-    final long min = Math.min(srcOff, dstOff);
-    final long max = Math.max(srcOff, dstOff);
-    return (min + length) <= max;
-  }
-
   interface JDKCompatibility {
 
     long getAndAddLong(Object obj, long address, long increment);

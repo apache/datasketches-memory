@@ -304,6 +304,8 @@ class WritableMemoryImpl extends WritableMemory {
   public int compareTo(final long thisOffsetBytes, final long thisLengthBytes, final Memory that,
       final long thatOffsetBytes, final long thatLengthBytes) {
     state.checkValid();
+    checkBounds(thisOffsetBytes, thisLengthBytes, capacity);
+    checkBounds(thatOffsetBytes, thatLengthBytes, that.getCapacity());
     if (isSameResource(that)) {
       if (thisOffsetBytes == thatOffsetBytes) {
         return 0;
@@ -311,8 +313,6 @@ class WritableMemoryImpl extends WritableMemory {
     } else {
       that.getResourceState().checkValid();
     }
-    checkBounds(thisOffsetBytes, thisLengthBytes, capacity);
-    checkBounds(thatOffsetBytes, thatLengthBytes, that.getCapacity());
     final long thisAdd = getCumulativeOffset(thisOffsetBytes);
     final long thatAdd = that.getCumulativeOffset(thatOffsetBytes);
     final Object thisObj = (isDirect()) ? null : unsafeObj;
@@ -331,6 +331,8 @@ class WritableMemoryImpl extends WritableMemory {
   public void copyTo(final long srcOffsetBytes, final WritableMemory destination,
       final long dstOffsetBytes, final long lengthBytes) {
     state.checkValid();
+    checkBounds(srcOffsetBytes, lengthBytes, capacity);
+    checkBounds(dstOffsetBytes, lengthBytes, destination.getCapacity());
     if (isSameResource(destination)) {
       if (srcOffsetBytes == dstOffsetBytes) {
         return;
@@ -338,9 +340,6 @@ class WritableMemoryImpl extends WritableMemory {
     } else {
       destination.getResourceState().checkValid();
     }
-    checkBounds(srcOffsetBytes, lengthBytes, capacity);
-    checkBounds(dstOffsetBytes, lengthBytes, destination.getCapacity());
-
     final long srcAdd = getCumulativeOffset(srcOffsetBytes);
     final long dstAdd = destination.getCumulativeOffset(dstOffsetBytes);
     final Object srcParent = (isDirect()) ? null : unsafeObj;

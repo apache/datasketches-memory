@@ -206,6 +206,13 @@ public class WritableMemoryImplTest {
   //Copy Within tests
 
   @Test
+  public void checkDegenerateCopyTo() {
+    WritableMemory wmem = WritableMemory.allocate(64);
+    wmem.copyTo(0, wmem, 0, 64);
+    //TODO
+  }
+
+  @Test
   public void checkCopyWithinNativeSmall() {
     int memCapacity = 64;
     int half = memCapacity/2;
@@ -562,6 +569,7 @@ public class WritableMemoryImplTest {
     Memory mem1 = Memory.wrap(arr1);
     Memory mem2 = Memory.wrap(arr2);
     Memory mem3 = Memory.wrap(arr3);
+    Memory mem4 = Memory.wrap(arr3); //same resource
 
     int comp = mem1.compareTo(0, 3, mem2, 0, 3);
     assertEquals(comp, 0);
@@ -574,6 +582,11 @@ public class WritableMemoryImplTest {
     assertEquals(comp, -1);
     comp = mem3.compareTo(0, 5, mem1, 0, 4);
     assertEquals(comp, 1);
+    comp = mem3.compareTo(0,  5, mem4, 0, 5);
+    assertEquals(comp, 0);
+    comp = mem3.compareTo(0, 4, mem4, 1, 4);
+    assertEquals(comp, -1);
+    mem3.checkValidAndBounds(0, 5);
   }
 
   @Test

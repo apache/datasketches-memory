@@ -58,7 +58,7 @@ public class MemoryTest {
       long v = wmem.getLong(i * 8);
       assertEquals(v, i);
     }
-    Memory mem = Memory.wrap(arr);
+    Memory mem = Memory.wrap(arr, ByteOrder.nativeOrder());
     for (int i = 0; i < n; i++) {
       long v = mem.getLong(i * 8);
       assertEquals(v, i);

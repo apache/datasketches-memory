@@ -49,7 +49,7 @@ public abstract class WritableBuffer extends Buffer {
   //ALLOCATE DIRECT XXX
   //Use WritableMemory to allocate direct memory
 
-  //REGIONS/DUPLICATES XXX
+  //DUPLICATES & REGIONS XXX
   /**
    * Returns a writable duplicate view of this Buffer with the same but independent values of
    * start, position, end and capacity.
@@ -59,8 +59,11 @@ public abstract class WritableBuffer extends Buffer {
   public abstract WritableBuffer writableDuplicate();
 
   /**
-   * Returns a writable region of this WritableBuffer
-   * @return a writable region of this WritableBuffer
+   * Returns a writable region of this WritableBuffer defined by the current position and end.
+   * This is equivalent to {@code writableRegion(getPosition(), getEnd() - getPosition());}.
+   * The new independent start and position will be zero and the end and capacity will be
+   * {@code getEnd() - getPosition()}.
+   * @return a writable region of this WritableBuffer defined by the current position and end.
    */
   public abstract WritableBuffer writableRegion();
 
@@ -399,9 +402,6 @@ public abstract class WritableBuffer extends Buffer {
    */
   public abstract void putShortArray(short[] srcArray,
           final int srcOffset, final int length);
-
-  //Atomic Methods XXX
-  //Use WritableMemory for atomic methods
 
   //OTHER WRITE METHODS XXX
   /**

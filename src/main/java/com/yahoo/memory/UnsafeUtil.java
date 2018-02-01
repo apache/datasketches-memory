@@ -26,40 +26,48 @@ public final class UnsafeUtil {
   public static final int JDK;
   static final JDKCompatibility compatibilityMethods;
 
-
-  public static final int ADDRESS_SIZE; //not an indicator of whether compressed references are used.
+  //not an indicator of whether compressed references are used.
+  public static final int ADDRESS_SIZE;
 
   //For 64-bit JVMs: varies depending on coop: 16 for JVM <= 32GB; 24 for JVM > 32GB
-  public static final int ARRAY_BOOLEAN_BASE_OFFSET;
-  public static final int ARRAY_BYTE_BASE_OFFSET;
-  public static final int ARRAY_SHORT_BASE_OFFSET;
-  public static final int ARRAY_CHAR_BASE_OFFSET;
-  public static final int ARRAY_INT_BASE_OFFSET;
-  public static final int ARRAY_LONG_BASE_OFFSET;
-  public static final int ARRAY_FLOAT_BASE_OFFSET;
-  public static final int ARRAY_DOUBLE_BASE_OFFSET;
-  public static final int ARRAY_OBJECT_BASE_OFFSET;
+  // Making this constant long-typed, rather than int, to exclude possibility of accidental overflow
+  // in expressions like arrayLength * ARRAY_BYTE_BASE_OFFSET, where arrayLength is int-typed. The
+  // same consideration for constants below: ARRAY_*_INDEX_SCALE, ARRAY_*_INDEX_SHIFT.
+  public static final long ARRAY_BOOLEAN_BASE_OFFSET;
+  public static final long ARRAY_BYTE_BASE_OFFSET;
+  public static final long ARRAY_SHORT_BASE_OFFSET;
+  public static final long ARRAY_CHAR_BASE_OFFSET;
+  public static final long ARRAY_INT_BASE_OFFSET;
+  public static final long ARRAY_LONG_BASE_OFFSET;
+  public static final long ARRAY_FLOAT_BASE_OFFSET;
+  public static final long ARRAY_DOUBLE_BASE_OFFSET;
+  public static final long ARRAY_OBJECT_BASE_OFFSET;
 
   //@formatter:off
-  public static final int ARRAY_BOOLEAN_INDEX_SCALE; // 1
-  public static final int ARRAY_BYTE_INDEX_SCALE;    // 1
-  public static final int ARRAY_SHORT_INDEX_SCALE;   // 2
-  public static final int ARRAY_CHAR_INDEX_SCALE;    // 2
-  public static final int ARRAY_INT_INDEX_SCALE;     // 4
-  public static final int ARRAY_LONG_INDEX_SCALE;    // 8
-  public static final int ARRAY_FLOAT_INDEX_SCALE;   // 4
-  public static final int ARRAY_DOUBLE_INDEX_SCALE;  // 8
-  public static final int ARRAY_OBJECT_INDEX_SCALE;  // varies, 4 or 8 depending on coop
+
+  // Setting those values directly instead of using unsafe.arrayIndexScale(), because it may be
+  // beneficial for runtime execution, those values are backed into generated machine code as
+  // constants. E. g. see https://shipilev.net/jvm-anatomy-park/14-constant-variables/
+  public static final int ARRAY_BOOLEAN_INDEX_SCALE = 1;
+  public static final int ARRAY_BYTE_INDEX_SCALE    = 1;
+  public static final long ARRAY_SHORT_INDEX_SCALE  = 2;
+  public static final long ARRAY_CHAR_INDEX_SCALE   = 2;
+  public static final long ARRAY_INT_INDEX_SCALE    = 4;
+  public static final long ARRAY_LONG_INDEX_SCALE   = 8;
+  public static final long ARRAY_FLOAT_INDEX_SCALE  = 4;
+  public static final long ARRAY_DOUBLE_INDEX_SCALE = 8;
+  public static final long ARRAY_OBJECT_INDEX_SCALE;  // varies, 4 or 8 depending on coop
 
   //Used to convert "type" to bytes:  bytes = longs << LONG_SHIFT
-  public static final int BOOLEAN_SHIFT   = 0;
-  public static final int BYTE_SHIFT      = 0;
-  public static final int SHORT_SHIFT     = 1;
-  public static final int CHAR_SHIFT      = 1;
-  public static final int INT_SHIFT       = 2;
-  public static final int LONG_SHIFT      = 3;
-  public static final int FLOAT_SHIFT     = 2;
-  public static final int DOUBLE_SHIFT    = 3;
+  public static final int BOOLEAN_SHIFT    = 0;
+  public static final int BYTE_SHIFT       = 0;
+  public static final long SHORT_SHIFT     = 1;
+  public static final long CHAR_SHIFT      = 1;
+  public static final long INT_SHIFT       = 2;
+  public static final long LONG_SHIFT      = 3;
+  public static final long FLOAT_SHIFT     = 2;
+  public static final long DOUBLE_SHIFT    = 3;
+  public static final long OBJECT_SHIFT;     // varies, 2 or 3 depending on coop
 
   public static final String LS = System.getProperty("line.separator");
 
@@ -103,15 +111,8 @@ public final class UnsafeUtil {
     ARRAY_DOUBLE_BASE_OFFSET = unsafe.arrayBaseOffset(double[].class);
     ARRAY_OBJECT_BASE_OFFSET = unsafe.arrayBaseOffset(Object[].class);
 
-    ARRAY_BOOLEAN_INDEX_SCALE = unsafe.arrayIndexScale(boolean[].class);
-    ARRAY_BYTE_INDEX_SCALE = unsafe.arrayIndexScale(byte[].class);
-    ARRAY_SHORT_INDEX_SCALE = unsafe.arrayIndexScale(short[].class);
-    ARRAY_CHAR_INDEX_SCALE = unsafe.arrayIndexScale(char[].class);
-    ARRAY_INT_INDEX_SCALE = unsafe.arrayIndexScale(int[].class);
-    ARRAY_LONG_INDEX_SCALE = unsafe.arrayIndexScale(long[].class);
-    ARRAY_FLOAT_INDEX_SCALE = unsafe.arrayIndexScale(float[].class);
-    ARRAY_DOUBLE_INDEX_SCALE = unsafe.arrayIndexScale(double[].class);
     ARRAY_OBJECT_INDEX_SCALE = unsafe.arrayIndexScale(Object[].class);
+    OBJECT_SHIFT = ARRAY_OBJECT_INDEX_SCALE == 4 ? 2 : 3;
 
     final String jdkVer = System.getProperty("java.version");
     if (jdkVer.startsWith("1.7")) {
@@ -128,9 +129,9 @@ public final class UnsafeUtil {
   private UnsafeUtil() {}
 
   /**
-   * Perform bounds checking using java assert (if enabled) checking the requested offset and
-   * length against the allocated size.
-   * If reqOff + reqLen &gt; allocSize or any of the parameters are negative an exception will
+   * Assert the requested offset and length against the allocated size.
+   * The invariants equation is: {@code 0 <= reqOff <= reqLen <= reqOff + reqLen <= allocSize}.
+   * If this equation is violated and assertions are enabled, an {@link AssertionError} will
    * be thrown.
    * @param reqOff the requested offset
    * @param reqLen the requested length
@@ -144,8 +145,8 @@ public final class UnsafeUtil {
 
   /**
    * Check the requested offset and length against the allocated size.
-   * If reqOff + reqLen &gt; allocSize or any of the parameters are negative an exception will
-   * be thrown.
+   * The invariants equation is: {@code 0 <= reqOff <= reqLen <= reqOff + reqLen <= allocSize}.
+   * If this equation is violated an {@link IllegalArgumentException} will be thrown.
    * @param reqOff the requested offset
    * @param reqLen the requested length
    * @param allocSize the allocated size.
@@ -153,22 +154,9 @@ public final class UnsafeUtil {
   public static void checkBounds(final long reqOff, final long reqLen, final long allocSize) {
     if ((reqOff | reqLen | (reqOff + reqLen) | (allocSize - (reqOff + reqLen))) < 0) {
       throw new IllegalArgumentException(
-          "reqOffset: " + reqOff + ", reqLength: "
+          "reqOffset: " + reqOff + ", reqLength: " + reqLen
               + ", (reqOff + reqLen): " + (reqOff + reqLen) + ", allocSize: " + allocSize);
     }
-  }
-
-  /**
-   * Return true if the given offsets and length do not overlap.
-   * @param srcOff the start of the source region
-   * @param dstOff the start of the destination region
-   * @param length the length of both regions
-   * @return true if the given offsets and length do not overlap.
-   */
-  public static boolean checkOverlap(final long srcOff, final long dstOff, final long length) {
-    final long min = Math.min(srcOff, dstOff);
-    final long max = Math.max(srcOff, dstOff);
-    return (min + length) <= max;
   }
 
   interface JDKCompatibility {

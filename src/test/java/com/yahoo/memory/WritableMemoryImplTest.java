@@ -248,26 +248,6 @@ public class WritableMemoryImplTest {
   }
 
   @Test
-  public void checkCopyWithinNativeOverlap() {
-    int memCapacity = 64;
-    try (WritableDirectHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh.get();
-      mem.clear();
-      //println(mem.toHexString("Clear 64", 0, memCapacity));
-
-      for (int i=0; i < (memCapacity/2); i++) {
-        mem.putByte(i, (byte) i);
-      }
-      //println(mem.toHexString("Set 1st 32 to ints ", 0, memCapacity));
-
-      mem.copyTo(0, mem, memCapacity/4, memCapacity/2);
-      fail("Did Not Catch Assertion Error: Region Overlap");
-    } catch (AssertionError e) {
-      //pass
-    }
-  }
-
-  @Test
   public void checkCopyWithinNativeSrcBound() {
     int memCapacity = 64;
     try (WritableDirectHandle wrh = WritableMemory.allocateDirect(memCapacity)) {

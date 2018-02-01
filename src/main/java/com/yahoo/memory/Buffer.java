@@ -46,7 +46,7 @@ public abstract class Buffer extends BaseBuffer {
   //MAP XXX
   //Use Memory for mapping files
 
-  //REGIONS/DUPLICATES XXX
+  //DUPLICATES & REGIONS XXX
   /**
    * Returns a read only duplicate view of this Buffer with the same but independent values of
    * start, position, and end.
@@ -387,6 +387,15 @@ public abstract class Buffer extends BaseBuffer {
 
   //OTHER READ METHODS XXX
   /**
+   * Checks that the specified range of bytes is within bounds of this Memory object, throws
+   * {@link IllegalArgumentException} if it's not: i. e. if offsetBytes &lt; 0, or length &lt; 0,
+   * or offsetBytes + length &gt; {@link #getCapacity()}.
+   * @param offsetBytes the offset of the range of bytes to check
+   * @param length the length of the range of bytes to check
+   */
+  public abstract void checkValidAndBounds(final long offsetBytes, final long length);
+
+  /**
    * Gets the capacity of this Buffer in bytes
    * @return the capacity of this Buffer in bytes
    */
@@ -399,15 +408,6 @@ public abstract class Buffer extends BaseBuffer {
    * @return the cumulative offset in bytes of this Buffer.
    */
   public abstract long getCumulativeOffset();
-
-  /**
-   * Checks that the specified range of bytes is within bounds of this Memory object, throws
-   * {@link IllegalArgumentException} if it's not: i. e. if offsetBytes &lt; 0, or length &lt; 0,
-   * or offsetBytes + length &gt; {@link #getCapacity()}.
-   * @param offsetBytes the offset of the range of bytes to check
-   * @param length the length of the range of bytes to check
-   */
-  public abstract void checkBounds(final long offsetBytes, final long length);
 
   /**
    * Returns the ByteOrder for the backing resource.

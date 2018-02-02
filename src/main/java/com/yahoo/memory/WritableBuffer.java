@@ -5,8 +5,6 @@
 
 package com.yahoo.memory;
 
-import static com.yahoo.memory.Util.nullCheck;
-
 import java.nio.ByteBuffer;
 
 /**
@@ -44,7 +42,7 @@ public abstract class WritableBuffer extends Buffer {
   }
 
   //MAP XXX
-  //Use WritableMemory for mapping files
+  //Use WritableMemory for mapping files and then asWritableBuffer()
 
   //ALLOCATE DIRECT XXX
   //Use WritableMemory to allocate direct memory
@@ -97,109 +95,7 @@ public abstract class WritableBuffer extends Buffer {
   }
 
   //ACCESS PRIMITIVE HEAP ARRAYS for write XXX
-  /**
-   * Wraps the given primitive array for write operations
-   * @param arr the given primitive array
-   * @return WritableBuffer for write operations
-   */
-  public static WritableBuffer wrap(final boolean[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableBufferImpl.ZERO_SIZE_BUFFER;
-    }
-    return new WritableBufferImpl(new ResourceState(arr, Prim.BOOLEAN, arr.length));
-  }
-
-  /**
-   * Wraps the given primitive array for write operations
-   * @param arr the given primitive array
-   * @return WritableBuffer for write operations
-   */
-  public static WritableBuffer wrap(final byte[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableBufferImpl.ZERO_SIZE_BUFFER;
-    }
-    return new WritableBufferImpl(new ResourceState(arr, Prim.BYTE, arr.length));
-  }
-
-  /**
-   * Wraps the given primitive array for write operations
-   * @param arr the given primitive array
-   * @return WritableBuffer for write operations
-   */
-  public static WritableBuffer wrap(final char[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableBufferImpl.ZERO_SIZE_BUFFER;
-    }
-    return new WritableBufferImpl(new ResourceState(arr, Prim.CHAR, arr.length));
-  }
-
-  /**
-   * Wraps the given primitive array for write operations
-   * @param arr the given primitive array
-   * @return WritableBuffer for write operations
-   */
-  public static WritableBuffer wrap(final short[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableBufferImpl.ZERO_SIZE_BUFFER;
-    }
-    return new WritableBufferImpl(new ResourceState(arr, Prim.SHORT, arr.length));
-  }
-
-  /**
-   * Wraps the given primitive array for write operations
-   * @param arr the given primitive array
-   * @return WritableBuffer for write operations
-   */
-  public static WritableBuffer wrap(final int[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableBufferImpl.ZERO_SIZE_BUFFER;
-    }
-    return new WritableBufferImpl(new ResourceState(arr, Prim.INT, arr.length));
-  }
-
-  /**
-   * Wraps the given primitive array for write operations
-   * @param arr the given primitive array
-   * @return WritableBuffer for write operations
-   */
-  public static WritableBuffer wrap(final long[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableBufferImpl.ZERO_SIZE_BUFFER;
-    }
-    return new WritableBufferImpl(new ResourceState(arr, Prim.LONG, arr.length));
-  }
-
-  /**
-   * Wraps the given primitive array for write operations
-   * @param arr the given primitive array
-   * @return WritableBuffer for write operations
-   */
-  public static WritableBuffer wrap(final float[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableBufferImpl.ZERO_SIZE_BUFFER;
-    }
-    return new WritableBufferImpl(new ResourceState(arr, Prim.FLOAT, arr.length));
-  }
-
-  /**
-   * Wraps the given primitive array for write operations
-   * @param arr the given primitive array
-   * @return WritableBuffer for write operations
-   */
-  public static WritableBuffer wrap(final double[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableBufferImpl.ZERO_SIZE_BUFFER;
-    }
-    return new WritableBufferImpl(new ResourceState(arr, Prim.DOUBLE, arr.length));
-  }
+  //use WritableMemory and then asWritableBuffer().
   //END OF CONSTRUCTOR-TYPE METHODS
 
   //PRIMITIVE putXXX() and putXXXArray() XXX

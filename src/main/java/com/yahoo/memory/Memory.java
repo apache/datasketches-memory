@@ -100,11 +100,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final boolean[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
-    }
-    return new WritableMemoryImpl(new ResourceState(arr, Prim.BOOLEAN, arr.length));
+    return WritableMemory.wrap(arr);
   }
 
   /**
@@ -154,11 +150,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final char[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
-    }
-    return new WritableMemoryImpl(new ResourceState(arr, Prim.CHAR, arr.length));
+    return WritableMemory.wrap(arr);
   }
 
   /**
@@ -167,11 +159,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final short[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
-    }
-    return new WritableMemoryImpl(new ResourceState(arr, Prim.SHORT, arr.length));
+    return WritableMemory.wrap(arr);
   }
 
   /**
@@ -180,11 +168,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final int[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
-    }
-    return new WritableMemoryImpl(new ResourceState(arr, Prim.INT, arr.length));
+    return WritableMemory.wrap(arr);
   }
 
   /**
@@ -193,11 +177,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final long[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
-    }
-    return new WritableMemoryImpl(new ResourceState(arr, Prim.LONG, arr.length));
+    return WritableMemory.wrap(arr);
   }
 
   /**
@@ -206,11 +186,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final float[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
-    }
-    return new WritableMemoryImpl(new ResourceState(arr, Prim.FLOAT, arr.length));
+    return WritableMemory.wrap(arr);
   }
 
   /**
@@ -219,11 +195,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final double[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
-    }
-    return new WritableMemoryImpl(new ResourceState(arr, Prim.DOUBLE, arr.length));
+    return WritableMemory.wrap(arr);
   }
 
   //PRIMITIVE getXXX() and getXXXArray() XXX

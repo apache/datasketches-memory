@@ -5,8 +5,6 @@
 
 package com.yahoo.memory;
 
-import static com.yahoo.memory.Util.nullCheck;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -44,7 +42,7 @@ public abstract class Buffer extends BaseBuffer {
   }
 
   //MAP XXX
-  //Use Memory for mapping files
+  //Use Memory for mapping files and the asBuffer()
 
   //DUPLICATES & REGIONS XXX
   /**
@@ -71,109 +69,8 @@ public abstract class Buffer extends BaseBuffer {
   public abstract Memory asMemory();
 
   //ACCESS PRIMITIVE HEAP ARRAYS for readOnly XXX
-  /**
-   * Wraps the given primitive array for read operations, with native byte order.
-   * @param arr the given primitive array
-   * @return Buffer for read operations
-   */
-  public static Buffer wrap(final boolean[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableBufferImpl.ZERO_SIZE_BUFFER;
-    }
-    return new WritableBufferImpl(new ResourceState(arr, Prim.BOOLEAN, arr.length));
-  }
-
-  /**
-   * Wraps the given primitive array for read operations, with native byte order.
-   * @param arr the given primitive array
-   * @return Buffer for read operations
-   */
-  public static Buffer wrap(final byte[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableBufferImpl.ZERO_SIZE_BUFFER;
-    }
-    return new WritableBufferImpl(new ResourceState(arr, Prim.BYTE, arr.length));
-  }
-
-  /**
-   * Wraps the given primitive array for read operations, with native byte order.
-   * @param arr the given primitive array
-   * @return Buffer for read operations
-   */
-  public static Buffer wrap(final char[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableBufferImpl.ZERO_SIZE_BUFFER;
-    }
-    return new WritableBufferImpl(new ResourceState(arr, Prim.CHAR, arr.length));
-  }
-
-  /**
-   * Wraps the given primitive array for read operations, with native byte order.
-   * @param arr the given primitive array
-   * @return Buffer for read operations
-   */
-  public static Buffer wrap(final short[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableBufferImpl.ZERO_SIZE_BUFFER;
-    }
-    return new WritableBufferImpl(new ResourceState(arr, Prim.SHORT, arr.length));
-  }
-
-  /**
-   * Wraps the given primitive array for read operations, with native byte order.
-   * @param arr the given primitive array
-   * @return Buffer for read operations
-   */
-  public static Buffer wrap(final int[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableBufferImpl.ZERO_SIZE_BUFFER;
-    }
-    return new WritableBufferImpl(new ResourceState(arr, Prim.INT, arr.length));
-  }
-
-  /**
-   * Wraps the given primitive array for read operations, with native byte order.
-   * @param arr the given primitive array
-   * @return Buffer for read operations
-   */
-  public static Buffer wrap(final long[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableBufferImpl.ZERO_SIZE_BUFFER;
-    }
-    return new WritableBufferImpl(new ResourceState(arr, Prim.LONG, arr.length));
-  }
-
-  /**
-   * Wraps the given primitive array for read operations, with native byte order.
-   * @param arr the given primitive array
-   * @return Buffer for read operations
-   */
-  public static Buffer wrap(final float[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableBufferImpl.ZERO_SIZE_BUFFER;
-    }
-    return new WritableBufferImpl(new ResourceState(arr, Prim.FLOAT, arr.length));
-  }
-
-  /**
-   * Wraps the given primitive array for read operations, with native byte order.
-   * @param arr the given primitive array
-   * @return Buffer for read operations
-   */
-  public static Buffer wrap(final double[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableBufferImpl.ZERO_SIZE_BUFFER;
-    }
-    return new WritableBufferImpl(new ResourceState(arr, Prim.DOUBLE, arr.length));
-  }
+  // use Memory or WritableMemory and then asBuffer().
+  //END OF CONSTRUCTOR-TYPE METHODS
 
   //PRIMITIVE getXXX() and getXXXArray() //XXX
   /**

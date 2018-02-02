@@ -16,7 +16,7 @@ public class BaseBufferTest {
 
   @Test
   public void checkLimits() {
-    Buffer buf = Buffer.wrap(new byte[100]);
+    Buffer buf = Memory.wrap(new byte[100]).asBuffer();
     buf.setStartPositionEnd(40, 45, 50);
     buf.setStartPositionEnd(0, 0, 100);
     try {
@@ -29,7 +29,7 @@ public class BaseBufferTest {
 
   @Test
   public void checkLimitsAndCheck() {
-    Buffer buf = Buffer.wrap(new byte[100]);
+    Buffer buf = Memory.wrap(new byte[100]).asBuffer();
     buf.setAndCheckStartPositionEnd(40, 45, 50);
     buf.setAndCheckStartPositionEnd(0, 0, 100);
     try {

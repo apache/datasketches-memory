@@ -219,7 +219,6 @@ public class MemoryTest {
     Memory reg = mem.region(n2 * 8, n2 * 8);
     for (int i = 0; i < n2; i++) {
       assertEquals(reg.getLong(i * 8), i + n2);
-      //println("" + reg.getLong(i * 8));
     }
   }
 

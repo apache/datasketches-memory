@@ -99,6 +99,28 @@ public class BufferTest {
   }
 
   @Test
+  public void simpleBBTest() {
+    int n = 1024; //longs
+    byte[] arr = new byte[n * 8];
+    ByteBuffer bb = ByteBuffer.wrap(arr);
+    bb.order(ByteOrder.nativeOrder());
+
+    WritableBuffer wbuf = WritableBuffer.wrap(bb);
+    for (int i = 0; i < n; i++) { //write to wbuf
+      wbuf.putLong(i);
+    }
+    wbuf.resetPosition();
+    for (int i = 0; i < n; i++) { //read from wbuf
+      long v = wbuf.getLong();
+      assertEquals(v, i);
+    }
+    for (int i = 0; i < n; i++) { //read from BB
+      long v = bb.getLong();
+      assertEquals(v, i);
+    }
+  }
+
+  @Test
   public void checkByteBufHeap() {
     int n = 1024; //longs
     byte[] arr = new byte[n * 8];

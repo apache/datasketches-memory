@@ -27,24 +27,11 @@ public class AllocateDirectWritableMapMemoryTest {
     Memory.map(dummy, 0, dummy.length(), ByteOrder.nativeOrder());
   }
 
-  @SuppressWarnings("unused")
-  @Test
-  public void simpleMap() throws Exception {
-    File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
-    try (MapHandle h = Memory.map(file)) {
-      Memory mem = h.get();
-      byte[] bytes = new byte[(int)mem.getCapacity()];
-      mem.getByteArray(0, bytes, 0, bytes.length);
-      String text = new String(bytes);
-      //System.out.println(text);
-    }
-  }
-
   @Test(expectedExceptions = ReadOnlyException.class)
   public void simpleMap2() throws Exception {
     File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
     try (WritableMapHandle rh = WritableMemory.writableMap(file)) {
-      //rh.close();
+      rh.close();
     }
   }
 

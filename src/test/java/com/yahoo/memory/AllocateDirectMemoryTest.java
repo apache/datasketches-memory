@@ -12,19 +12,7 @@ import org.testng.annotations.Test;
 public class AllocateDirectMemoryTest {
 
   @Test
-  public void simpleAllocateDirect() {
-    int longs = 32;
-    try (WritableDirectHandle wh = WritableMemory.allocateDirect(longs << 3)) {
-      WritableMemory wMem1 = wh.get();
-      for (int i = 0; i<longs; i++) {
-        wMem1.putLong(i << 3, i);
-        assertEquals(wMem1.getLong(i << 3), i);
-      }
-    }
-  }
-
-  @Test
-  public void simpleMemoryRequestServer() {
+  public void checkAllocateDirect() {
     int longs = 32;
     int bytes = longs << 3;
     try (WritableDirectHandle wh = WritableMemory.allocateDirect(bytes)) {

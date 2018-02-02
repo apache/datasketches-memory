@@ -5,7 +5,8 @@
 
 package com.yahoo.memory;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -23,7 +24,9 @@ public class BufferTest {
     try (WritableDirectHandle wh = WritableMemory.allocateDirect(n * 8)) {
       WritableMemory wmem = wh.get();
       WritableBuffer wbuf = wmem.asWritableBuffer();
-      for (int i = 0; i < n; i++) wbuf.putLong(i);
+      for (int i = 0; i < n; i++) {
+        wbuf.putLong(i);
+      }
       wbuf.resetPosition();
       for (int i = 0; i < n; i++) {
         long v = wbuf.getLong();
@@ -36,7 +39,9 @@ public class BufferTest {
   public void checkAutoHeapRoundTrip() {
     int n = 1024; //longs
     WritableBuffer wbuf = WritableBuffer.allocate(n * 8);
-    for (int i = 0; i < n; i++) wbuf.putLong(i);
+    for (int i = 0; i < n; i++) {
+      wbuf.putLong(i);
+    }
     wbuf.resetPosition();
     for (int i = 0; i < n; i++) {
       long v = wbuf.getLong();
@@ -48,43 +53,45 @@ public class BufferTest {
   public void checkArrayWrap() {
     int n = 1024; //longs
     byte[] arr = new byte[n * 8];
-    WritableBuffer wbuf = WritableBuffer.wrap(arr);
-    for (int i = 0; i < n; i++) wbuf.putLong(i);
+    WritableBuffer wbuf = WritableMemory.wrap(arr).asWritableBuffer();
+    for (int i = 0; i < n; i++) {
+      wbuf.putLong(i);
+    }
     wbuf.resetPosition();
     for (int i = 0; i < n; i++) {
       long v = wbuf.getLong();
       assertEquals(v, i);
     }
-    Buffer buf = Buffer.wrap(arr);
+    Buffer buf = Memory.wrap(arr).asBuffer();
     buf.resetPosition();
     for (int i = 0; i < n; i++) {
       long v = buf.getLong();
       assertEquals(v, i);
     }
     // Check Zero length array wraps
-    Buffer buffZeroLengthArrayWrap = Buffer.wrap(new byte[0]);
+    Buffer buffZeroLengthArrayWrap = Memory.wrap(new byte[0]).asBuffer();
     assertEquals(buffZeroLengthArrayWrap.getCapacity(), 0);
     // check 0 length array wraps
     List<Buffer> buffersToCheck = Lists.newArrayList();
     buffersToCheck.add(WritableBuffer.allocate(0));
     buffersToCheck.add(WritableBuffer.wrap(ByteBuffer.allocate(0)));
-    buffersToCheck.add(WritableBuffer.wrap(new boolean[0]));
-    buffersToCheck.add(WritableBuffer.wrap(new byte[0]));
-    buffersToCheck.add(WritableBuffer.wrap(new char[0]));
-    buffersToCheck.add(WritableBuffer.wrap(new short[0]));
-    buffersToCheck.add(WritableBuffer.wrap(new int[0]));
-    buffersToCheck.add(WritableBuffer.wrap(new long[0]));
-    buffersToCheck.add(WritableBuffer.wrap(new float[0]));
-    buffersToCheck.add(WritableBuffer.wrap(new double[0]));
+    buffersToCheck.add(WritableMemory.wrap(new boolean[0]).asWritableBuffer());
+    buffersToCheck.add(WritableMemory.wrap(new byte[0]).asWritableBuffer());
+    buffersToCheck.add(WritableMemory.wrap(new char[0]).asWritableBuffer());
+    buffersToCheck.add(WritableMemory.wrap(new short[0]).asWritableBuffer());
+    buffersToCheck.add(WritableMemory.wrap(new int[0]).asWritableBuffer());
+    buffersToCheck.add(WritableMemory.wrap(new long[0]).asWritableBuffer());
+    buffersToCheck.add(WritableMemory.wrap(new float[0]).asWritableBuffer());
+    buffersToCheck.add(WritableMemory.wrap(new double[0]).asWritableBuffer());
     buffersToCheck.add(Buffer.wrap(ByteBuffer.allocate(0)));
-    buffersToCheck.add(Buffer.wrap(new boolean[0]));
-    buffersToCheck.add(Buffer.wrap(new byte[0]));
-    buffersToCheck.add(Buffer.wrap(new char[0]));
-    buffersToCheck.add(Buffer.wrap(new short[0]));
-    buffersToCheck.add(Buffer.wrap(new int[0]));
-    buffersToCheck.add(Buffer.wrap(new long[0]));
-    buffersToCheck.add(Buffer.wrap(new float[0]));
-    buffersToCheck.add(Buffer.wrap(new double[0]));
+    buffersToCheck.add(Memory.wrap(new boolean[0]).asBuffer());
+    buffersToCheck.add(Memory.wrap(new byte[0]).asBuffer());
+    buffersToCheck.add(Memory.wrap(new char[0]).asBuffer());
+    buffersToCheck.add(Memory.wrap(new short[0]).asBuffer());
+    buffersToCheck.add(Memory.wrap(new int[0]).asBuffer());
+    buffersToCheck.add(Memory.wrap(new long[0]).asBuffer());
+    buffersToCheck.add(Memory.wrap(new float[0]).asBuffer());
+    buffersToCheck.add(Memory.wrap(new double[0]).asBuffer());
     //Check the buffer lengths
     for (Buffer buffer : buffersToCheck) {
       assertEquals(buffer.getCapacity(), 0);
@@ -111,7 +118,7 @@ public class BufferTest {
       long v = bb.getLong(i * 8);
       assertEquals(v, i);
     }
-    Buffer buf1 = Buffer.wrap(arr);
+    Buffer buf1 = Memory.wrap(arr).asBuffer();
     for (int i = 0; i < n; i++) { //read from wrapped arr
       long v = buf1.getLong();
       assertEquals(v, i);
@@ -209,7 +216,7 @@ public class BufferTest {
     long[] arr = new long[n];
     for (int i = 0; i < n; i++) { arr[i] = i; }
 
-    Buffer buf = Buffer.wrap(arr);
+    Buffer buf = Memory.wrap(arr).asBuffer();
     buf.setPosition(n2 * 8);
     Buffer reg = buf.region();
     for (int i = 0; i < n2; i++) {
@@ -225,7 +232,7 @@ public class BufferTest {
     int n2 = n / 2;
     long[] arr = new long[n];
     for (int i = 0; i < n; i++) { arr[i] = i; }
-    WritableBuffer wbuf = WritableBuffer.wrap(arr);
+    WritableBuffer wbuf = WritableMemory.wrap(arr).asWritableBuffer();
     for (int i = 0; i < n; i++) {
       assertEquals(wbuf.getLong(), i); //write all
       //println("" + wmem.getLong(i * 8));

@@ -432,7 +432,7 @@ class WritableMemoryImpl extends WritableMemory {
     final StringBuilder sb = new StringBuilder();
     sb.append("### ").append(klass).append(" SUMMARY ###").append(LS);
     sb.append("Header Comment      : ").append(header).append(LS);
-    sb.append("Call Params         : ").append(call);
+    sb.append("Call Parameters     : ").append(call);
     return Memory.toHex(sb.toString(), offsetBytes, lengthBytes, state);
   }
 

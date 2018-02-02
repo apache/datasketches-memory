@@ -56,7 +56,7 @@ public class BufferTest2 {
       byteArray[i] = i;
     }
 
-    Buffer buffer = Buffer.wrap(byteArray);
+    Buffer buffer = Memory.wrap(byteArray).asBuffer();
     int i = 0;
     while (buffer.hasRemaining()) {
       assertEquals(byteArray[i++], buffer.getByte());
@@ -79,7 +79,7 @@ public class BufferTest2 {
       charArray[i] = i;
     }
 
-    Buffer buffer = Buffer.wrap(charArray);
+    Buffer buffer = Memory.wrap(charArray).asBuffer();
     int i = 0;
     while (buffer.hasRemaining()) {
       assertEquals(charArray[i++], buffer.getChar());
@@ -99,7 +99,7 @@ public class BufferTest2 {
       shortArray[i] = i;
     }
 
-    Buffer buffer = Buffer.wrap(shortArray);
+    Buffer buffer = Memory.wrap(shortArray).asBuffer();
     int i = 0;
     while (buffer.hasRemaining()) {
       assertEquals(shortArray[i++], buffer.getShort());
@@ -119,7 +119,7 @@ public class BufferTest2 {
       intArray[i] = i;
     }
 
-    Buffer buffer = Buffer.wrap(intArray);
+    Buffer buffer = Memory.wrap(intArray).asBuffer();
     int i = 0;
     while (buffer.hasRemaining()) {
       assertEquals(intArray[i++], buffer.getInt());
@@ -139,7 +139,7 @@ public class BufferTest2 {
       longArray[i] = i;
     }
 
-    Buffer buffer = Buffer.wrap(longArray);
+    Buffer buffer = Memory.wrap(longArray).asBuffer();
     int i = 0;
     while (buffer.hasRemaining()) {
       assertEquals(longArray[i++], buffer.getLong());
@@ -159,7 +159,7 @@ public class BufferTest2 {
       floatArray[i] = i;
     }
 
-    Buffer buffer = Buffer.wrap(floatArray);
+    Buffer buffer = Memory.wrap(floatArray).asBuffer();
     int i = 0;
     while (buffer.hasRemaining()) {
       assertEquals(floatArray[i++], buffer.getFloat());
@@ -179,7 +179,7 @@ public class BufferTest2 {
       doubleArray[i] = i;
     }
 
-    Buffer buffer = Buffer.wrap(doubleArray);
+    Buffer buffer = Memory.wrap(doubleArray).asBuffer();
     int i = 0;
     while (buffer.hasRemaining()) {
       assertEquals(doubleArray[i++], buffer.getDouble());
@@ -201,7 +201,7 @@ public class BufferTest2 {
       }
     }
 
-    Buffer buffer = Buffer.wrap(booleanArray);
+    Buffer buffer = Memory.wrap(booleanArray).asBuffer();
     int i = 0;
     while (buffer.hasRemaining()) {
       assertEquals(booleanArray[i++], buffer.getBoolean());

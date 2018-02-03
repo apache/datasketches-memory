@@ -66,7 +66,7 @@ final class Utf8 {
     getCharsFromUtf8NonAscii(dst, address + i, address + utf8LengthBytes, unsafeObj, cumBaseOffset);
   }
 
-  /**
+  /*
    * Optimize for heap CharBuffer manually, because Hotspot JIT doesn't itself unfold this
    * abstraction well (doesn't hoist array bound checks, etc.)
    */
@@ -562,14 +562,14 @@ final class Utf8 {
       ca[cp + 1] = DecodeUtil.lowSurrogate(codepoint);
     }
 
-    /**
+    /*
      * Returns whether the byte is not a valid continuation of the form '10XXXXXX'.
      */
     private static boolean isNotTrailingByte(final byte b) {
       return b > (byte) 0xBF;
     }
 
-    /**
+    /*
      * Returns the actual value of the trailing byte (removes the prefix '10') for composition.
      */
     private static int trailingByteValue(final byte b) {

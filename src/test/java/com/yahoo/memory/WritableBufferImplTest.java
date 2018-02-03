@@ -539,7 +539,7 @@ public class WritableBufferImplTest {
   @Test
   public void checkIsDirect() {
     int memCapacity = 64;
-    WritableBuffer mem = WritableBuffer.allocate(memCapacity);
+    WritableBuffer mem = WritableMemory.allocate(memCapacity).asWritableBuffer();
     assertFalse(mem.isDirect());
     try (WritableDirectHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem2 = wrh.get();
@@ -702,6 +702,5 @@ public class WritableBufferImplTest {
   static void println(String s) {
     //System.out.println(s); //disable here
   }
-
 
 }

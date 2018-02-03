@@ -31,7 +31,7 @@ public abstract class WritableBuffer extends Buffer {
       throw new ReadOnlyException("ByteBuffer is read-only.");
     }
     if (byteBuf.capacity() == 0) {
-      return WritableBufferImpl.ZERO_SIZE_BUFFER;
+      return WritableBufferImpl.ZERO_SIZE_ARRAY_BUFFER;
     }
     final ResourceState state = new ResourceState();
     state.putByteBuffer(byteBuf);
@@ -45,7 +45,7 @@ public abstract class WritableBuffer extends Buffer {
   //Use WritableMemory for mapping files and then asWritableBuffer()
 
   //ALLOCATE DIRECT XXX
-  //Use WritableMemory to allocate direct memory
+  //Use WritableMemory to allocate direct memory and then asWritableBuffer().
 
   //DUPLICATES & REGIONS XXX
   /**
@@ -79,20 +79,6 @@ public abstract class WritableBuffer extends Buffer {
    * @return WritableMemory
    */
   public abstract WritableMemory asWritableMemory();
-
-  //ALLOCATE HEAP VIA AUTOMATIC BYTE ARRAY XXX
-  /**
-   * Creates on-heap WritableBuffer with the given capacity
-   * @param capacityBytes the given capacity in bytes
-   * @return WritableBuffer for write operations
-   */
-  public static WritableBuffer allocate(final int capacityBytes) {
-    if (capacityBytes == 0) {
-      return WritableBufferImpl.ZERO_SIZE_BUFFER;
-    }
-    final byte[] arr = new byte[capacityBytes];
-    return new WritableBufferImpl(new ResourceState(arr, Prim.BYTE, arr.length));
-  }
 
   //ACCESS PRIMITIVE HEAP ARRAYS for write XXX
   //use WritableMemory and then asWritableBuffer().

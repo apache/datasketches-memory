@@ -31,7 +31,7 @@ public abstract class Buffer extends BaseBuffer {
    */
   public static Buffer wrap(final ByteBuffer byteBuf) {
     if (byteBuf.capacity() == 0) {
-      return WritableBufferImpl.ZERO_SIZE_BUFFER;
+      return WritableBufferImpl.ZERO_SIZE_ARRAY_BUFFER;
     }
     final ResourceState state = new ResourceState();
     state.putByteBuffer(byteBuf);

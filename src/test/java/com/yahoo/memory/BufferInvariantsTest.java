@@ -74,7 +74,7 @@ public class BufferInvariantsTest {
   @Test
   public void testBuf() {
     int n = 25;
-    WritableBuffer buf = WritableBuffer.allocate(n);
+    WritableBuffer buf = WritableMemory.allocate(n).asWritableBuffer();
     for (byte i = 0; i < n; i++) { buf.putByte(i); }
     buf.setPosition(0);
     assertEquals(buf.getPosition(), 0);

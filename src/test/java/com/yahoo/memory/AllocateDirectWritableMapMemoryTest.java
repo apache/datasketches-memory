@@ -27,7 +27,6 @@ public class AllocateDirectWritableMapMemoryTest {
     Memory.map(dummy, 0, dummy.length(), ByteOrder.nativeOrder());
   }
 
-  @SuppressWarnings("unused")
   @Test
   public void simpleMap() throws Exception {
     File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
@@ -35,8 +34,8 @@ public class AllocateDirectWritableMapMemoryTest {
       Memory mem = h.get();
       byte[] bytes = new byte[(int)mem.getCapacity()];
       mem.getByteArray(0, bytes, 0, bytes.length);
-      String text = new String(bytes);
-      //System.out.println(text);
+      String text = new String(bytes, UTF_8);
+      println(text);
     }
   }
 
@@ -120,5 +119,17 @@ public class AllocateDirectWritableMapMemoryTest {
       e.printStackTrace();
     }
     return file;
+  }
+
+  @Test
+  public void printlnTest() {
+    println("PRINTING: "+this.getClass().getName());
+  }
+
+  /**
+   * @param s String to print
+   */
+  static void println(final String s) {
+    //System.out.println(s);
   }
 }

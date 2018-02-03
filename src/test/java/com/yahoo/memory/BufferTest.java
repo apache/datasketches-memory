@@ -38,7 +38,7 @@ public class BufferTest {
   @Test
   public void checkAutoHeapRoundTrip() {
     int n = 1024; //longs
-    WritableBuffer wbuf = WritableBuffer.allocate(n * 8);
+    WritableBuffer wbuf = WritableMemory.allocate(n * 8).asWritableBuffer();
     for (int i = 0; i < n; i++) {
       wbuf.putLong(i);
     }
@@ -73,7 +73,7 @@ public class BufferTest {
     assertEquals(buffZeroLengthArrayWrap.getCapacity(), 0);
     // check 0 length array wraps
     List<Buffer> buffersToCheck = Lists.newArrayList();
-    buffersToCheck.add(WritableBuffer.allocate(0));
+    buffersToCheck.add(WritableMemory.allocate(0).asWritableBuffer());
     buffersToCheck.add(WritableBuffer.wrap(ByteBuffer.allocate(0)));
     buffersToCheck.add(WritableMemory.wrap(new boolean[0]).asWritableBuffer());
     buffersToCheck.add(WritableMemory.wrap(new byte[0]).asWritableBuffer());
@@ -221,7 +221,7 @@ public class BufferTest {
     long[] arr = new long[n];
     for (int i = 0; i < n; i++) { arr[i] = i; }
 
-    WritableBuffer wbuf = WritableBuffer.allocate(n * 8);
+    WritableBuffer wbuf = WritableMemory.allocate(n * 8).asWritableBuffer();
     wbuf.putLongArray(arr, 0, n);
     long[] arr2 = new long[n];
     wbuf.resetPosition();

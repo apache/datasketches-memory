@@ -60,12 +60,10 @@ class WritableBufferImpl extends WritableBuffer {
   final long cumBaseOffset; //Holds the cumulative offset to the start of data.
   WritableMemoryImpl originMemory = null; //If I came from here ...
   //Static variable for cases where byteBuf/array sizes are zero
-  final static WritableBufferImpl ZERO_SIZE_BUFFER;
+  final static WritableBufferImpl ZERO_SIZE_ARRAY_BUFFER;
 
   static {
-    ZERO_SIZE_BUFFER = new WritableBufferImpl(
-        new ResourceState(new byte[0], Prim.BYTE, 0)
-    );
+    ZERO_SIZE_ARRAY_BUFFER = new WritableBufferImpl(new ResourceState(new byte[0], Prim.BYTE, 0));
   }
 
   WritableBufferImpl(final ResourceState state) {

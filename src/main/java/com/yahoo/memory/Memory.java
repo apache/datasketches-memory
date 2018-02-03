@@ -32,14 +32,7 @@ public abstract class Memory {
    * @return the given ByteBuffer for read-only operations.
    */
   public static Memory wrap(final ByteBuffer byteBuf) {
-    if ((byteBuf != null) && (byteBuf.capacity() == 0)) {
-      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
-    }
-    final ResourceState state = new ResourceState();
-    state.putByteBuffer(byteBuf);
-    AccessByteBuffer.wrap(state);
-    final WritableMemoryImpl impl = new WritableMemoryImpl(state);
-    return impl;
+    return WritableMemory.wrapBB(byteBuf);
   }
 
   //MAP XXX
@@ -136,7 +129,7 @@ public abstract class Memory {
       nullCheck(byteOrder);
       UnsafeUtil.checkBounds(offset, length, arr.length);
       if (length == 0) {
-          return WritableMemoryImpl.ZERO_SIZE_MEMORY;
+          return WritableMemoryImpl.ZERO_SIZE_ARRAY_MEMORY;
       }
       final ResourceState state = new ResourceState(arr, Prim.BYTE, length);
       state.putRegionOffset(offset);

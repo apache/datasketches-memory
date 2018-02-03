@@ -61,10 +61,10 @@ class WritableMemoryImpl extends WritableMemory {
   final long capacity;
   final long cumBaseOffset; //Holds the cumulative offset to the start of data.
   //Static variable for cases where byteBuf/array sizes are zero
-  final static WritableMemoryImpl ZERO_SIZE_MEMORY;
+  final static WritableMemoryImpl ZERO_SIZE_ARRAY_MEMORY;
 
   static {
-    ZERO_SIZE_MEMORY = new WritableMemoryImpl(
+    ZERO_SIZE_ARRAY_MEMORY = new WritableMemoryImpl(
         new ResourceState(new byte[0], Prim.BYTE, 0)
     );
   }

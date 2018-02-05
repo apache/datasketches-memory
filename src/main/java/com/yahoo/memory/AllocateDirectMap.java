@@ -168,17 +168,17 @@ class AllocateDirectMap implements Map {
   }
 
   /**
-   * Creates a mapping of the file on disk starting at file position and of size length to pages in OS.
-   * May throw OutOfMemory error if you have exhausted memory. Force garbage collection and
-   * re-attempt.
+   * Creates a mapping of the file on disk starting at file position and of size length to pages
+   * in OS. This may throw OutOfMemory error if you have exhausted memory. You can try to force
+   * garbage collection and re-attempt.
    * @param fileChannel the FileChannel
    * @param position the offset in bytes into the file
    * @param lengthBytes the length in bytes
    * @return the native base offset address
    * @throws RuntimeException Encountered an exception while mapping
    */
-  static final long map(final FileChannel fileChannel, final long position, final long lengthBytes)
-          throws RuntimeException {
+  private static final long map(final FileChannel fileChannel, final long position,
+      final long lengthBytes) throws RuntimeException {
     final int pagePosition = (int) (position % unsafe.pageSize());
     final long mapPosition = position - pagePosition;
     final long mapSize = lengthBytes + pagePosition;
@@ -241,7 +241,7 @@ class AllocateDirectMap implements Map {
   } //End of class Deallocator
 
   static final void checkOffsetAndCapacity(final long offset, final long capacity) {
-    if (((offset) | (capacity - 1L) | (offset + capacity)) < 0) {
+    if (((offset) | (capacity - 1) | (offset + capacity)) < 0) {
       throw new IllegalArgumentException(
               "offset: " + offset + ", capacity: " + capacity
               + ", offset + capacity: " + (offset + capacity));

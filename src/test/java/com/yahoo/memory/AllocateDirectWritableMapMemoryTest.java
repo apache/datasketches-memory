@@ -68,7 +68,8 @@ public class AllocateDirectWritableMapMemoryTest {
       assertEquals(bufStr, origStr);
     }
 
-    try (WritableMapHandle wrh = WritableMemory.writableMap(origFile, 0, corrBytes, ByteOrder.nativeOrder())) {
+    try (WritableMapHandle wrh = WritableMemory.writableMap(origFile, 0, corrBytes,
+        ByteOrder.nativeOrder())) {
       WritableMemory wMap = wrh.get();
       wrh.load();
       assertTrue(wrh.isLoaded());

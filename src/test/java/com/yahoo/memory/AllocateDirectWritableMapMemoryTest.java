@@ -21,12 +21,6 @@ import org.testng.annotations.Test;
 
 public class AllocateDirectWritableMapMemoryTest {
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
-  public void testMapException() throws Exception {
-    File dummy = createFile("dummy.txt", ""); //zero length
-    Memory.map(dummy, 0, dummy.length(), ByteOrder.nativeOrder());
-  }
-
   @Test
   public void simpleMap() throws Exception {
     File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
@@ -38,6 +32,47 @@ public class AllocateDirectWritableMapMemoryTest {
       println(text);
     }
   }
+
+  @Test
+  public void copyOffHeapToMemoryMappedFile() throws Exception {
+    long bytes = 1L << 10; //small for unit tests.  Make it larger than 2GB if you like.
+    long longs = bytes >>> 3;
+
+    File file = new File("TestFile.bin");
+    if (file.exists()) { file.delete(); }
+    assert file.createNewFile();
+    assert file.setWritable(true, false);
+    assert file.isFile();
+    file.deleteOnExit();  //comment out if you want to examine the file.
+
+    try (
+        WritableMapHandle dstHandle
+          = WritableMemory.writableMap(file, 0, bytes, ByteOrder.nativeOrder());
+        WritableDirectHandle srcHandle = WritableMemory.allocateDirect(bytes)) {
+
+      WritableMemory dstMem = dstHandle.get();
+      WritableMemory srcMem = srcHandle.get();
+
+      for (long i = 0; i < (longs); i++) {
+        srcMem.putLong(i << 3, i); //load source with consecutive longs
+      }
+
+      srcMem.copyTo(0, dstMem, 0, srcMem.getCapacity()); //off-heap to off-heap copy
+
+      dstHandle.force(); //push any remaining to the file
+
+      //check end value
+      assertEquals(dstMem.getLong((longs - 1L) << 3), longs - 1L);
+    }
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void testMapException() throws Exception {
+    File dummy = createFile("dummy.txt", ""); //zero length
+    Memory.map(dummy, 0, dummy.length(), ByteOrder.nativeOrder());
+  }
+
+
 
   @Test(expectedExceptions = ReadOnlyException.class)
   public void simpleMap2() throws Exception {

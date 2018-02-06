@@ -168,11 +168,11 @@ class AllocateDirectMap implements Map {
   }
 
   /**
-   * Creates a mapping of the file on disk starting at file position and of size length to pages
-   * in OS. This may throw OutOfMemory error if you have exhausted memory. You can try to force
-   * garbage collection and re-attempt.
+   * Creates a mapping of the FileChannel starting at position and of size length to pages
+   * in the OS. This may throw OutOfMemory error if you have exhausted memory.
+   * You can try to force garbage collection and re-attempt.
    * @param fileChannel the FileChannel
-   * @param position the offset in bytes into the file
+   * @param position the offset in bytes into the FileChannel
    * @param lengthBytes the length in bytes
    * @return the native base offset address
    * @throws RuntimeException Encountered an exception while mapping
@@ -229,7 +229,8 @@ class AllocateDirectMap implements Map {
      */
     private void unmap() throws RuntimeException {
       try {
-        final Method method = FileChannelImpl.class.getDeclaredMethod("unmap0", long.class, long.class);
+        final Method method = FileChannelImpl.class.getDeclaredMethod("unmap0", long.class,
+            long.class);
         method.setAccessible(true);
         method.invoke(myFc, actualNativeBaseOffset, myCapacity);
         myRaf.close();

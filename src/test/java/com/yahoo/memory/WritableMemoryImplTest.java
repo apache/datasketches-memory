@@ -516,12 +516,6 @@ public class WritableMemoryImplTest {
   }
 
   @Test
-  public void checkLongArrEmptyExcep() {
-    Memory memory = Memory.wrap(new long[0]);
-    assertEquals(memory.getCapacity(), 0);
-  }
-
-  @Test
   public void checkIsDirect() {
     int memCapacity = 64;
     WritableMemory mem = WritableMemory.allocate(memCapacity);
@@ -532,7 +526,6 @@ public class WritableMemoryImplTest {
       wrh.close();
     }
   }
-
 
   @Test
   public void checkIsReadOnly() {
@@ -547,12 +540,6 @@ public class WritableMemoryImplTest {
     for (int i = 0; i < wmem.getCapacity(); i++) {
       assertEquals(wmem.getByte(i), memRO.getByte(i));
     }
-  }
-
-  @Test
-  public void checkEmptyIntArray() {
-    Memory memory = Memory.wrap(new int[0]);
-    assertEquals(memory.getCapacity(), 0);
   }
 
   @Test

@@ -6,7 +6,9 @@
 package com.yahoo.memory;
 
 import static com.yahoo.memory.Util.characterPad;
+import static com.yahoo.memory.Util.negativeCheck;
 import static com.yahoo.memory.Util.nullCheck;
+import static com.yahoo.memory.Util.zeroCheck;
 import static com.yahoo.memory.Util.zeroPad;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -49,9 +51,27 @@ public class UtilTest {
     assertEquals(s, t);
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
-  public void checkNullCheck() {
-    nullCheck(null);
+  @Test
+  public void checkNullZeroNegativeChecks() {
+    Object obj = null;
+    try {
+      nullCheck(obj, "Test Object");
+      fail();
+    } catch (IllegalArgumentException e) {
+      //OK
+    }
+    try {
+      zeroCheck(0, "Test Long");
+      fail();
+    } catch (IllegalArgumentException e) {
+      //OK
+    }
+    try {
+      negativeCheck(-1L, "Test Long");
+      fail();
+    } catch (IllegalArgumentException e) {
+      //OK
+    }
   }
 
   @Test

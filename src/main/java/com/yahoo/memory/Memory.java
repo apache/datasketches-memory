@@ -7,7 +7,7 @@ package com.yahoo.memory;
 
 import static com.yahoo.memory.UnsafeUtil.LS;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
-import static com.yahoo.memory.Util.nullCheck;
+import static com.yahoo.memory.Util.zeroCheck;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,15 +50,16 @@ public abstract class Memory {
   /**
    * Allocates direct memory used to memory map files for read operations
    * (including those &gt; 2GB).
-   * @param file the given file to map
-   * @param fileOffset the position in the given file
-   * @param capacity the size of the allocated direct memory
-   * @param byteOrder the endianness of the given file.
+   * @param file the given file to map. It may not be null.
+   * @param fileOffset the position in the given file. It may not be negative.
+   * @param capacity the size of the allocated direct memory. It may not be negative or zero.
+   * @param byteOrder the endianness of the given file. It may not be null.
    * @return MemoryMapHandler for managing this map
    * @throws Exception file not found or RuntimeException, etc.
    */
   public static MapHandle map(final File file, final long fileOffset, final long capacity,
       final ByteOrder byteOrder) throws Exception {
+    zeroCheck(capacity, "Capacity");
     final ResourceState state = new ResourceState();
     state.putFile(file);
     state.putFileOffset(fileOffset);
@@ -125,8 +126,6 @@ public abstract class Memory {
    */
   public static Memory wrap(final byte[] arr, final int offset, final int length,
           final ByteOrder byteOrder) {
-      nullCheck(arr);
-      nullCheck(byteOrder);
       UnsafeUtil.checkBounds(offset, length, arr.length);
       if (length == 0) {
           return WritableMemoryImpl.ZERO_SIZE_ARRAY_MEMORY;

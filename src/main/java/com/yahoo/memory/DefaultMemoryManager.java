@@ -30,12 +30,11 @@ final class DefaultMemoryManager implements MemoryManager {
     state.putCapacity(capacityBytes);
     final AllocateDirect direct = AllocateDirect.allocate(state);
     final WritableMemory wMem = new WritableMemoryImpl(state);
-    final WritableDirectHandle handler = new WritableDirectHandle(direct, wMem);
+    final WritableDirectHandle handle = new WritableDirectHandle(direct, wMem);
     state.setMemoryRequestServer(this);
-    state.setHandle(handler);
-    return handler;
+    state.setHandle(handle);
+    return handle;
   }
-
 
   @Override
   public WritableMemory request(final long capacityBytes) { //default allocate on heap

@@ -531,12 +531,6 @@ public class WritableBufferImplTest {
   }
 
   @Test
-  public void checkLongArrEmptyExcep() {
-    Buffer buffer = Memory.wrap(new long[0]).asBuffer();
-    assertEquals(buffer.getCapacity(), 0);
-  }
-
-  @Test
   public void checkIsDirect() {
     int memCapacity = 64;
     WritableBuffer mem = WritableMemory.allocate(memCapacity).asWritableBuffer();
@@ -548,7 +542,6 @@ public class WritableBufferImplTest {
       wrh.close();
     }
   }
-
 
   @Test
   public void checkIsReadOnly() {
@@ -563,12 +556,6 @@ public class WritableBufferImplTest {
     for (int i = 0; i < srcArray.length; i++) {
       assertEquals(buf.getLong(), srcArray[i]);
     }
-  }
-
-  @Test
-  public void checkEmptyIntArray() {
-    Buffer buffer = Memory.wrap(new int[0]).asBuffer();
-    assertEquals(buffer.getCapacity(), 0);
   }
 
   @Test

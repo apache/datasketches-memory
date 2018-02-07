@@ -5,7 +5,7 @@
 
 package com.yahoo.memory;
 
-import static com.yahoo.memory.Util.nullCheck;
+import static com.yahoo.memory.Util.zeroCheck;
 
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -34,9 +34,6 @@ public abstract class WritableMemory extends Memory {
   }
 
   static WritableMemory wrapBB(final ByteBuffer byteBuf) {
-    if (byteBuf.capacity() == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_ARRAY_MEMORY;
-    }
     final ResourceState state = new ResourceState();
     state.putByteBuffer(byteBuf);
     AccessByteBuffer.wrap(state);
@@ -59,20 +56,21 @@ public abstract class WritableMemory extends Memory {
   /**
    * Allocates direct memory used to memory map files for write operations
    * (including those &gt; 2GB).
-   * @param file the given file to map
-   * @param fileOffset the position in the given file
-   * @param capacity the size of the allocated direct memory
-   * @param byteOrder the endianness of the given file.
+   * @param file the given file to map. It may not be null.
+   * @param fileOffset the position in the given file. It may not be negative.
+   * @param capacityBytes the size of the allocated direct memory. It may not be negative or zero.
+   * @param byteOrder the endianness of the given file. It may not be null.
    * @return WritableMemoryMapHandler for managing this map
    * @throws Exception file not found or RuntimeException, etc.
    */
   //Developer notes: WritableMapHandle does not extend MapHandle. There is only one get().
   public static WritableMapHandle writableMap(final File file, final long fileOffset,
-          final long capacity, final ByteOrder byteOrder) throws Exception {
+          final long capacityBytes, final ByteOrder byteOrder) throws Exception {
+    zeroCheck(capacityBytes, "Capacity");
     final ResourceState state = new ResourceState();
     state.putFile(file);
     state.putFileOffset(fileOffset);
-    state.putCapacity(capacity);
+    state.putCapacity(capacityBytes);
     state.order(byteOrder);
     return WritableMapHandle.map(state);
   }
@@ -91,6 +89,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemoryMapHandler for this off-heap resource
    */
   public static WritableDirectHandle allocateDirect(final long capacityBytes) {
+    zeroCheck(capacityBytes, "Capacity");  //TODO
     final MemoryManager memMgr = DefaultMemoryManager.getInstance();
     return memMgr.allocateDirect(capacityBytes);
   }
@@ -126,9 +125,6 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory allocate(final int capacityBytes) {
-    if (capacityBytes == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_ARRAY_MEMORY;
-    }
     final byte[] arr = new byte[capacityBytes];
     return new WritableMemoryImpl(new ResourceState(arr, Prim.BYTE, arr.length));
   }
@@ -140,10 +136,6 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final boolean[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_ARRAY_MEMORY;
-    }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.BOOLEAN, arr.length));
   }
 
@@ -153,10 +145,6 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final byte[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_ARRAY_MEMORY;
-    }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.BYTE, arr.length));
   }
 
@@ -166,10 +154,6 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final char[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_ARRAY_MEMORY;
-    }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.CHAR, arr.length));
   }
 
@@ -179,10 +163,6 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final short[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_ARRAY_MEMORY;
-    }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.SHORT, arr.length));
   }
 
@@ -192,10 +172,6 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final int[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_ARRAY_MEMORY;
-    }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.INT, arr.length));
   }
 
@@ -205,10 +181,6 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final long[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_ARRAY_MEMORY;
-    }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.LONG, arr.length));
   }
 
@@ -218,10 +190,6 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final float[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_ARRAY_MEMORY;
-    }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.FLOAT, arr.length));
   }
 
@@ -231,10 +199,6 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final double[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_ARRAY_MEMORY;
-    }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.DOUBLE, arr.length));
   }
   //END OF CONSTRUCTOR-TYPE METHODS

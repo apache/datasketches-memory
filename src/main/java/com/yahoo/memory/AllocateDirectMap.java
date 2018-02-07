@@ -110,7 +110,6 @@ class AllocateDirectMap implements Map {
   static final ResourceState mapper(final ResourceState state) throws Exception {
     final long fileOffset = state.getFileOffset();
     final long capacity = state.getCapacity();
-    checkOffsetAndCapacity(fileOffset, capacity);
 
     final File file = state.getFile();
 
@@ -221,7 +220,7 @@ class AllocateDirectMap implements Map {
         unmap();
       }
       actualNativeBaseOffset = 0L;
-      parentStateRef.setInvalid(); //The only place valid is set invalid.
+      parentStateRef.setInvalid();
     }
 
     /**
@@ -240,14 +239,6 @@ class AllocateDirectMap implements Map {
       }
     }
   } //End of class Deallocator
-
-  static final void checkOffsetAndCapacity(final long offset, final long capacity) {
-    if (((offset) | (capacity - 1) | (offset + capacity)) < 0) {
-      throw new IllegalArgumentException(
-              "offset: " + offset + ", capacity: " + capacity
-              + ", offset + capacity: " + (offset + capacity));
-    }
-  }
 
   static final boolean isFileReadOnly(final File file) {
     if (System.getProperty("os.name").startsWith("Windows")) {

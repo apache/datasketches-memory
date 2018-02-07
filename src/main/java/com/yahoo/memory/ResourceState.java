@@ -5,6 +5,9 @@
 
 package com.yahoo.memory;
 
+import static com.yahoo.memory.Util.negativeCheck;
+import static com.yahoo.memory.Util.nullCheck;
+
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -144,16 +147,16 @@ final class ResourceState {
 
   //Constructor for heap primitive arrays
   ResourceState(final Object obj, final Prim prim, final long arrLen) {
-    this();
+    this(); //writable, valid
+    nullCheck(obj, "Array Object");
+    capacityCheck(arrLen);
     unsafeObj_ = obj;
     unsafeObjHeader_ = prim.off();
-    if (arrLen < 0) {
-      throw new IllegalArgumentException("Array length cannot be < 0");
-    }
     capacity_ = arrLen << prim.shift();
     compute();
   }
 
+  //copy construtor
   private ResourceState(final ResourceState src) {
     //FOUNDATION PARAMETERS
     nativeBaseOffset_ = src.nativeBaseOffset_;
@@ -200,6 +203,7 @@ final class ResourceState {
   }
 
   void putNativeBaseOffset(final long nativeBaseOffset) {
+    negativeCheck(nativeBaseOffset, "nativeBaseOffset");
     nativeBaseOffset_ = nativeBaseOffset;
     compute();
   }
@@ -208,10 +212,9 @@ final class ResourceState {
     return unsafeObj_;
   }
 
+  //starts null, then only changed once to non-null array object
   void putUnsafeObject(final Object unsafeObj) {
-    if (unsafeObj == null) {
-      throw new IllegalArgumentException("Object may not be assigned null");
-    }
+    nullCheck(unsafeObj, "Array Object");
     unsafeObj_ = unsafeObj;
     compute();
   }
@@ -221,9 +224,7 @@ final class ResourceState {
   }
 
   void putUnsafeObjectHeader(final long unsafeObjHeader) {
-    if (unsafeObjHeader < 0) {
-      throw new IllegalArgumentException("Object Header may not be negative.");
-    }
+    negativeCheck(unsafeObjHeader, "Object Header");
     unsafeObjHeader_ = unsafeObjHeader;
     compute();
   }
@@ -233,9 +234,7 @@ final class ResourceState {
   }
 
   void putCapacity(final long capacity) {
-    if (capacity < 0) {
-      throw new IllegalArgumentException("Capacity may not be negative.");
-    }
+    capacityCheck(capacity);
     capacity_ = capacity;
   }
 
@@ -248,15 +247,15 @@ final class ResourceState {
   }
 
   void setMemoryRequestServer(final MemoryRequestServer memReqSvr) {
-    memReqSvr_ = memReqSvr;
+    memReqSvr_ = memReqSvr; //may be null
   }
 
   WritableDirectHandle getHandle() {
     return handle_;
   }
 
-  void setHandle(final WritableDirectHandle handler) {
-    handle_ = handler;
+  void setHandle(final WritableDirectHandle handle) {
+    handle_ = handle; //may be set null
   }
 
   //FLAGS
@@ -273,7 +272,7 @@ final class ResourceState {
   }
 
   boolean isSameResource(final ResourceState that) {
-    //null should be checked before we get here
+    if (that == null) { return false; }
     if (this == that) { return true; }
 
     return (getCumBaseOffset() == that.getCumBaseOffset())
@@ -306,9 +305,7 @@ final class ResourceState {
   }
 
   void putRegionOffset(final long regionOffset) {
-    if (regionOffset < 0) {
-      throw new IllegalArgumentException("Region Offset may not be negative.");
-    }
+    negativeCheck(regionOffset, "Region Offset");
     regionOffset_ = regionOffset;
     compute();
   }
@@ -319,9 +316,7 @@ final class ResourceState {
   }
 
   void putByteBuffer(final ByteBuffer byteBuf) {
-    if (byteBuf == null) {
-      throw new IllegalArgumentException("ByteBuffer may not be assigned null");
-    }
+    nullCheck(byteBuf, "ByteBuffer");
     byteBuf_ = byteBuf;
     resourceOrder_ = byteBuf_.order();
     swapBytes_ = (resourceOrder_ != nativeOrder_);
@@ -333,9 +328,7 @@ final class ResourceState {
   }
 
   void putFile(final File file) {
-    if (file == null) {
-      throw new IllegalArgumentException("File may not be assigned null");
-    }
+    nullCheck(file, "File");
     file_ = file;
   }
 
@@ -344,9 +337,7 @@ final class ResourceState {
   }
 
   void putFileOffset(final long fileOffset) {
-    if (fileOffset < 0) {
-      throw new IllegalArgumentException("File Offset may not be negative.");
-    }
+    negativeCheck(fileOffset, "File Offset");
     fileOffset_ = fileOffset;
   }
 
@@ -355,9 +346,7 @@ final class ResourceState {
   }
 
   void putRandomAccessFile(final RandomAccessFile raf) {
-    if (raf == null) {
-      throw new IllegalArgumentException("RandomAccessFile may not be assigned null");
-    }
+    nullCheck(raf, "RandomAccessFile");
     raf_ = raf;
   }
 
@@ -366,9 +355,7 @@ final class ResourceState {
   }
 
   void putMappedByteBuffer(final MappedByteBuffer mbb) {
-    if (mbb == null) {
-      throw new IllegalArgumentException("MappedByteBuffer may not be assigned null");
-    }
+    nullCheck(mbb, "MappedByteBuffer");
     mbb_ = mbb;
   }
 
@@ -378,6 +365,7 @@ final class ResourceState {
   }
 
   void putBaseBuffer(final BaseBuffer baseBuf) {
+    nullCheck(baseBuf, "BaseBuffer");
     baseBuf_ = baseBuf;
   }
 
@@ -387,12 +375,18 @@ final class ResourceState {
   }
 
   void order(final ByteOrder resourceOrder) {
+    nullCheck(resourceOrder, "ByteOrder");
     resourceOrder_ = resourceOrder;
     swapBytes_ = (resourceOrder_ != nativeOrder_);
   }
 
   boolean isSwapBytes() {
     return swapBytes_;
+  }
+
+  static void capacityCheck(final long capacity) {
+    //Util.zeroCheck(capacity, "Capacity"); //use if zero is not legal
+    Util.negativeCheck(capacity, "Capacity"); //use if zero is legal
   }
 
 }

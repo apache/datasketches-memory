@@ -451,6 +451,8 @@ class WritableBufferImpl extends WritableBuffer {
   @Override
   public boolean isSameResource(final Buffer that) {
     if (that == null) { return false; }
+    state.assertValid();
+    that.getResourceState().checkValid();
     return state.isSameResource(that.getResourceState());
   }
 

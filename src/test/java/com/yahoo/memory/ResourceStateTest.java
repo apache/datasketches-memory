@@ -27,8 +27,6 @@ public class ResourceStateTest {
     BaseBuffer baseBuf = new BaseBuffer(state);
     assertNotNull(state.getBaseBuffer());
     assertEquals(baseBuf.getEnd(), 1 << 20);
-    state.putCapacity(0);
-
     try {
       state.putCapacity(-1);
       fail();

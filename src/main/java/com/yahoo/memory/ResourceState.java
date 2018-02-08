@@ -149,7 +149,7 @@ final class ResourceState {
   ResourceState(final Object obj, final Prim prim, final long arrLen) {
     this(); //writable, valid
     nullCheck(obj, "Array Object");
-    capacityCheck(arrLen);
+    Util.negativeCheck(arrLen, "Capacity");
     unsafeObj_ = obj;
     unsafeObjHeader_ = prim.off();
     capacity_ = arrLen << prim.shift();
@@ -234,7 +234,7 @@ final class ResourceState {
   }
 
   void putCapacity(final long capacity) {
-    capacityCheck(capacity);
+    Util.negativeCheck(capacity, "Capacity");
     capacity_ = capacity;
   }
 
@@ -382,11 +382,6 @@ final class ResourceState {
 
   boolean isSwapBytes() {
     return swapBytes_;
-  }
-
-  static void capacityCheck(final long capacity) {
-    //Util.zeroCheck(capacity, "Capacity"); //use if zero is not legal
-    Util.negativeCheck(capacity, "Capacity"); //use if zero is legal
   }
 
 }

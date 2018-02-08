@@ -8,6 +8,7 @@ package com.yahoo.memory;
 import static com.yahoo.memory.UnsafeUtil.LS;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 import static com.yahoo.memory.Util.zeroCheck;
+import static com.yahoo.memory.WritableMemoryImpl.DEGENERATE_MEMORY;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +29,9 @@ public abstract class Memory {
   //BYTE BUFFER XXX
   /**
    * Accesses the given ByteBuffer for read-only operations.
+   *
+   * <p>Note that if the ByteBuffer capacity is zero this will
+   * return a Memory backed by a heap byte array of size zero.
    * @param byteBuf the given ByteBuffer, must not be null
    * @return the given ByteBuffer for read-only operations.
    */
@@ -38,10 +42,11 @@ public abstract class Memory {
   //MAP XXX
   /**
    * Allocates direct memory used to memory map entire files for read operations
-   * (including those &gt; 2GB). This assumes that the file was written using native byte ordering.
+   * (including those &gt; 2GB). This assumes that the file was written using native byte
+   * ordering.
    * @param file the given file to map
-   * @return MemoryMapHandler for managing this map
-   * @throws Exception file not found or RuntimeException, etc.
+   * @return MapHandle for managing this map
+   * @throws Exception if file not found or internal RuntimeException is thrown.
    */
   public static MapHandle map(final File file) throws Exception {
     return map(file, 0, file.length(), ByteOrder.nativeOrder());
@@ -72,7 +77,9 @@ public abstract class Memory {
   // duplicates are not needed.
   /**
    * Returns a read only region of this Memory.
-   * @param offsetBytes the starting offset with respect to this Memory
+   * @param offsetBytes the starting offset with respect to this Memory.
+   * If the capacityBytes is zero this method will
+   * return a Memory backed by a heap byte array of size zero.
    * @param capacityBytes the capacity of the region in bytes
    * @return a read only region of this Memory
    */
@@ -90,7 +97,9 @@ public abstract class Memory {
   //ACCESS PRIMITIVE HEAP ARRAYS for readOnly XXX
   /**
    * Wraps the given primitive array for read operations assuming native byte order.
-   * @param arr the given primitive array
+   * @param arr the given primitive array.
+   * If the array is size zero this method will
+   * return a Memory backed by a heap byte array of size zero.
    * @return Memory for read operations
    */
   public static Memory wrap(final boolean[] arr) {
@@ -99,7 +108,9 @@ public abstract class Memory {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order.
-   * @param arr the given primitive array
+   * @param arr the given primitive array.
+   * If the array is size zero this method will
+   * return a Memory backed by a heap byte array of size zero.
    * @return Memory for read operations
    */
   public static Memory wrap(final byte[] arr) {
@@ -108,7 +119,9 @@ public abstract class Memory {
 
   /**
    * Wraps the given primitive array for read operations assuming the given byte order.
-   * @param arr the given primitive array
+   * @param arr the given primitive array.
+   * If the array is size zero this method will
+   * return a Memory backed by a heap byte array of size zero.
    * @param byteOrder the byte order
    * @return Memory for read operations
    */
@@ -118,7 +131,9 @@ public abstract class Memory {
 
   /**
    * Wraps the given primitive array for read operations assuming the given byte order.
-   * @param arr the given primitive array
+   * @param arr the given primitive array.
+   * If the array is size zero this method will
+   * return a Memory backed by a heap byte array of size zero.
    * @param offset the byte offset into the given array
    * @param length the number of bytes to include from the given array
    * @param byteOrder the byte order
@@ -127,9 +142,7 @@ public abstract class Memory {
   public static Memory wrap(final byte[] arr, final int offset, final int length,
           final ByteOrder byteOrder) {
       UnsafeUtil.checkBounds(offset, length, arr.length);
-      if (length == 0) {
-          return WritableMemoryImpl.ZERO_SIZE_ARRAY_MEMORY;
-      }
+      if (length == 0) { return DEGENERATE_MEMORY; }
       final ResourceState state = new ResourceState(arr, Prim.BYTE, length);
       state.putRegionOffset(offset);
       state.order(byteOrder);
@@ -138,7 +151,9 @@ public abstract class Memory {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order.
-   * @param arr the given primitive array
+   * @param arr the given primitive array.
+   * If the array is size zero this method will
+   * return a Memory backed by a heap byte array of size zero.
    * @return Memory for read operations
    */
   public static Memory wrap(final char[] arr) {
@@ -147,7 +162,9 @@ public abstract class Memory {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order.
-   * @param arr the given primitive array
+   * @param arr the given primitive array.
+   * If the array is size zero this method will
+   * return a Memory backed by a heap byte array of size zero.
    * @return Memory for read operations
    */
   public static Memory wrap(final short[] arr) {
@@ -156,7 +173,9 @@ public abstract class Memory {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order.
-   * @param arr the given primitive array
+   * @param arr the given primitive array.
+   * If the array is size zero this method will
+   * return a Memory backed by a heap byte array of size zero.
    * @return Memory for read operations
    */
   public static Memory wrap(final int[] arr) {
@@ -165,7 +184,9 @@ public abstract class Memory {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order.
-   * @param arr the given primitive array
+   * @param arr the given primitive array.
+   * If the array is size zero this method will
+   * return a Memory backed by a heap byte array of size zero.
    * @return Memory for read operations
    */
   public static Memory wrap(final long[] arr) {
@@ -174,7 +195,9 @@ public abstract class Memory {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order.
-   * @param arr the given primitive array
+   * @param arr the given primitive array.
+   * If the array is size zero this method will
+   * return a Memory backed by a heap byte array of size zero.
    * @return Memory for read operations
    */
   public static Memory wrap(final float[] arr) {
@@ -183,7 +206,9 @@ public abstract class Memory {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order.
-   * @param arr the given primitive array
+   * @param arr the given primitive array.
+   * If the array is size zero this method will
+   * return a Memory backed by a heap byte array of size zero.
    * @return Memory for read operations
    */
   public static Memory wrap(final double[] arr) {

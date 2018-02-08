@@ -60,11 +60,12 @@ class WritableMemoryImpl extends WritableMemory {
   final long unsafeObjHeader; //Heap ByteBuffer includes the slice() offset here.
   final long capacity;
   final long cumBaseOffset; //Holds the cumulative offset to the start of data.
-  //Static variable for cases where byteBuf/array sizes are zero
-  final static WritableMemoryImpl ZERO_SIZE_ARRAY_MEMORY;
+
+  //Static variable for cases where byteBuf/array/direct sizes are zero
+  final static WritableMemoryImpl DEGENERATE_MEMORY;
 
   static {
-    ZERO_SIZE_ARRAY_MEMORY = new WritableMemoryImpl(
+    DEGENERATE_MEMORY = new WritableMemoryImpl(
         new ResourceState(new byte[0], Prim.BYTE, 0)
     );
   }
@@ -81,7 +82,6 @@ class WritableMemoryImpl extends WritableMemory {
   @Override
   public WritableMemory writableDuplicate() {
     state.checkValid();
-    checkBounds(0, capacity, capacity);
     final WritableMemoryImpl wMemImpl = new WritableMemoryImpl(state);
     return wMemImpl;
   }
@@ -94,6 +94,7 @@ class WritableMemoryImpl extends WritableMemory {
   @Override
   public WritableMemory writableRegion(final long offsetBytes, final long capacityBytes) {
     state.checkValid();
+    if (capacityBytes == 0) { return DEGENERATE_MEMORY; }
     checkBounds(offsetBytes, capacityBytes, capacity);
     final ResourceState newState = state.copy();
     newState.putRegionOffset(newState.getRegionOffset() + offsetBytes);

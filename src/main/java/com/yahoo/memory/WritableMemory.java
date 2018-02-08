@@ -6,6 +6,7 @@
 package com.yahoo.memory;
 
 import static com.yahoo.memory.Util.zeroCheck;
+import static com.yahoo.memory.WritableMemoryImpl.DEGENERATE_MEMORY;
 
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -23,6 +24,9 @@ public abstract class WritableMemory extends Memory {
   //BYTE BUFFER XXX
   /**
    * Accesses the given ByteBuffer for write operations.
+   *
+   * <p>Note that if the ByteBuffer capacity is zero this will
+   * return a WritableMemory backed by a heap byte array of size zero.
    * @param byteBuf the given ByteBuffer
    * @return the given ByteBuffer for write operations.
    */
@@ -34,6 +38,7 @@ public abstract class WritableMemory extends Memory {
   }
 
   static WritableMemory wrapBB(final ByteBuffer byteBuf) {
+    if (byteBuf.capacity() == 0) { return DEGENERATE_MEMORY; }
     final ResourceState state = new ResourceState();
     state.putByteBuffer(byteBuf);
     AccessByteBuffer.wrap(state);
@@ -85,11 +90,15 @@ public abstract class WritableMemory extends Memory {
    * It is the responsibility of the using class to clear this memory, if required,
    * and to call <i>close()</i> when done.</p>
    *
-   * @param capacityBytes the size of the desired memory in bytes
+   * @param capacityBytes the size of the desired memory in bytes.
+   * If capacityBytes is zero the WritableDirectHandle get() will
+   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemoryMapHandler for this off-heap resource
    */
   public static WritableDirectHandle allocateDirect(final long capacityBytes) {
-    zeroCheck(capacityBytes, "Capacity");  //TODO
+    if (capacityBytes == 0) {
+      return new WritableDirectHandle(null, DEGENERATE_MEMORY);
+    }
     final MemoryManager memMgr = DefaultMemoryManager.getInstance();
     return memMgr.allocateDirect(capacityBytes);
   }
@@ -104,7 +113,9 @@ public abstract class WritableMemory extends Memory {
   /**
    * Returns a writable region of this WritableMemory
    * @param offsetBytes the starting offset with respect to this WritableMemory
-   * @param capacityBytes the capacity of the region in bytes
+   * @param capacityBytes the capacity of the region in bytes.
+   * If capacityBytes is zero this method will
+   * return a WritableMemory backed by a heap byte array of size zero.
    * @return a writable region of this WritableMemory
    */
   public abstract WritableMemory writableRegion(long offsetBytes, long capacityBytes);
@@ -121,10 +132,13 @@ public abstract class WritableMemory extends Memory {
   //ALLOCATE HEAP VIA AUTOMATIC BYTE ARRAY XXX
   /**
    * Creates on-heap WritableMemory with the given capacity
-   * @param capacityBytes the given capacity in bytes
+   * @param capacityBytes the given capacity in bytes.
+   * If capacityBytes is zero this method will
+   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemory for write operations
    */
   public static WritableMemory allocate(final int capacityBytes) {
+    if (capacityBytes == 0) { return DEGENERATE_MEMORY; }
     final byte[] arr = new byte[capacityBytes];
     return new WritableMemoryImpl(new ResourceState(arr, Prim.BYTE, arr.length));
   }
@@ -132,73 +146,97 @@ public abstract class WritableMemory extends Memory {
   //ACCESS PRIMITIVE HEAP ARRAYS for write XXX
   /**
    * Wraps the given primitive array for write operations
-   * @param arr the given primitive array
+   * @param arr the given primitive array.
+   * If the array is size zero this method will
+   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final boolean[] arr) {
+    if (arr.length == 0) { return DEGENERATE_MEMORY; }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.BOOLEAN, arr.length));
   }
 
   /**
    * Wraps the given primitive array for write operations
-   * @param arr the given primitive array
+   * @param arr the given primitive array.
+   * If the array is size zero this method will
+   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final byte[] arr) {
+    if (arr.length == 0) { return DEGENERATE_MEMORY; }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.BYTE, arr.length));
   }
 
   /**
    * Wraps the given primitive array for write operations
-   * @param arr the given primitive array
+   * @param arr the given primitive array.
+   * If the array is size zero this method will
+   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final char[] arr) {
+    if (arr.length == 0) { return DEGENERATE_MEMORY; }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.CHAR, arr.length));
   }
 
   /**
    * Wraps the given primitive array for write operations
-   * @param arr the given primitive array
+   * @param arr the given primitive array.
+   * If the array is size zero this method will
+   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final short[] arr) {
+    if (arr.length == 0) { return DEGENERATE_MEMORY; }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.SHORT, arr.length));
   }
 
   /**
    * Wraps the given primitive array for write operations
-   * @param arr the given primitive array
+   * @param arr the given primitive array.
+   * If the array is size zero this method will
+   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final int[] arr) {
+    if (arr.length == 0) { return DEGENERATE_MEMORY; }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.INT, arr.length));
   }
 
   /**
    * Wraps the given primitive array for write operations
-   * @param arr the given primitive array
+   * @param arr the given primitive array.
+   * If the array is size zero this method will
+   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final long[] arr) {
+    if (arr.length == 0) { return DEGENERATE_MEMORY; }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.LONG, arr.length));
   }
 
   /**
    * Wraps the given primitive array for write operations
-   * @param arr the given primitive array
+   * @param arr the given primitive array.
+   * If the array is size zero this method will
+   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final float[] arr) {
+    if (arr.length == 0) { return DEGENERATE_MEMORY; }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.FLOAT, arr.length));
   }
 
   /**
    * Wraps the given primitive array for write operations
-   * @param arr the given primitive array
+   * @param arr the given primitive array.
+   * If the array is size zero this method will
+   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final double[] arr) {
+    if (arr.length == 0) { return DEGENERATE_MEMORY; }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.DOUBLE, arr.length));
   }
   //END OF CONSTRUCTOR-TYPE METHODS

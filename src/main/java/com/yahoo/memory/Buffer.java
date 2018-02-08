@@ -26,19 +26,14 @@ public abstract class Buffer extends BaseBuffer {
   //BYTE BUFFER XXX
   /**
    * Accesses the given ByteBuffer for read-only operations.
+   *
+   * <p>Note that if the ByteBuffer capacity is zero this will
+   * return a Buffer backed by a heap byte array of size zero.
    * @param byteBuf the given ByteBuffer, must not be null.
    * @return the given ByteBuffer for read-only operations.
    */
   public static Buffer wrap(final ByteBuffer byteBuf) {
-    if (byteBuf.capacity() == 0) {
-      return WritableBufferImpl.ZERO_SIZE_ARRAY_BUFFER;
-    }
-    final ResourceState state = new ResourceState();
-    state.putByteBuffer(byteBuf);
-    AccessByteBuffer.wrap(state);
-    final WritableBufferImpl impl = new WritableBufferImpl(state);
-    impl.setStartPositionEnd(0, byteBuf.position(), byteBuf.limit());
-    return impl;
+    return WritableBuffer.wrapBB(byteBuf);
   }
 
   //MAP XXX

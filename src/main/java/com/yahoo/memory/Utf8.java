@@ -1,6 +1,5 @@
 package com.yahoo.memory;
 
-import static com.yahoo.memory.UnsafeUtil.checkBounds;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 import static java.lang.Character.isSurrogate;
 import static java.lang.Character.isSurrogatePair;
@@ -32,26 +31,26 @@ import java.nio.CharBuffer;
 final class Utf8 {
 
   //Decode
-  static final void getCharsFromUtf8(final long offsetBytes, final int utf8LengthBytes,
+  static final int getCharsFromUtf8(final long offsetBytes, final int utf8LengthBytes,
       final Appendable dst, final ResourceState state)
           throws IOException, Utf8CodingException {
-    state.checkValid();
-    checkBounds(offsetBytes, utf8LengthBytes, state.getCapacity());
     final long cumBaseOffset = state.getCumBaseOffset();
-    final long address = cumBaseOffset + offsetBytes;
-    final Object unsafeObj = state.getUnsafeObject();
 
     if ((dst instanceof CharBuffer) && ((CharBuffer) dst).hasArray()) {
-      getCharsFromUtf8CharBuffer(offsetBytes, ((CharBuffer) dst), utf8LengthBytes, cumBaseOffset,
-          state);
-      return;
+      return getCharBufferCharsFromUtf8(offsetBytes, ((CharBuffer) dst), utf8LengthBytes,
+          cumBaseOffset, state);
     }
-    int i = 0;
+
+    //Decode Direct CharBuffers and all other Appendables
+
+    final long address = cumBaseOffset + offsetBytes;
+    final Object unsafeObj = state.getUnsafeObject();
 
     // Optimize for 100% ASCII (Hotspot loves small simple top-level loops like this).
     // This simple loop stops when we encounter a byte >= 0x80 (i.e. non-ASCII).
     // Need to keep this loop int-indexed, because it's faster for Hotspot JIT, it doesn't insert
     // savepoint polls on each iteration.
+    int i = 0;
     for (; i < utf8LengthBytes; i++) {
       final byte b = unsafe.getByte(unsafeObj, address + i);
       if (!DecodeUtil.isOneByte(b)) {
@@ -60,23 +59,24 @@ final class Utf8 {
       dst.append((char) b);
     }
     if (i == utf8LengthBytes) {
-      return;
+      return i;
     }
-
-    getCharsFromUtf8NonAscii(dst, address + i, address + utf8LengthBytes, unsafeObj, cumBaseOffset);
+    return getNonAsciiCharsFromUtf8(dst, address + i, address + utf8LengthBytes, unsafeObj,
+        cumBaseOffset) + i;
   }
 
   /*
    * Optimize for heap CharBuffer manually, because Hotspot JIT doesn't itself unfold this
    * abstraction well (doesn't hoist array bound checks, etc.)
    */
-  private static void getCharsFromUtf8CharBuffer(final long offsetBytes, final CharBuffer cbuf,
+  private static int getCharBufferCharsFromUtf8(final long offsetBytes, final CharBuffer cbuf,
         final int utf8LengthBytes, final long cumBaseOffset, final ResourceState state) {
     final char[] carr = cbuf.array();
-    int cpos = cbuf.position() + cbuf.arrayOffset();
+    final int startCpos = cbuf.position() + cbuf.arrayOffset();
+    int cpos = startCpos;
     final int clim = cbuf.arrayOffset() + cbuf.limit();
     final long address = state.getCumBaseOffset() + offsetBytes;
-    int i = 0;
+    int i = 0; //byte index
     final Object unsafeObj = state.getUnsafeObject();
 
     // Optimize for 100% ASCII (Hotspot loves small simple top-level loops like this).
@@ -103,78 +103,14 @@ final class Utf8 {
     }
     if (i == utf8LengthBytes) {
       cbuf.position(cpos - cbuf.arrayOffset());
-      return;
+      return cpos - startCpos;
     }
 
-    getCharsFromUtf8NonAsciiCharBuffer(cbuf, carr, cpos, clim, address + i,
-        address + utf8LengthBytes, unsafeObj, cumBaseOffset);
+    return getCharBufferNonAsciiCharsFromUtf8(cbuf, carr, cpos, clim, address + i,
+        address + utf8LengthBytes, unsafeObj, cumBaseOffset) - cbuf.arrayOffset();
   }
 
-  private static void checkCharBufferPos(final CharBuffer cbuf, final int cpos, final int clim) {
-    if (cpos == clim) {
-      cbuf.position(cpos - cbuf.arrayOffset());
-      throw new BufferOverflowException();
-    }
-  }
-
-  private static void getCharsFromUtf8NonAscii(final Appendable dst, long address,
-      final long addressLimit, final Object unsafeObj, final long cumBaseOffset)
-          throws IOException {
-    while (address < addressLimit) {
-      final byte byte1 = unsafe.getByte(unsafeObj, address++);
-      if (DecodeUtil.isOneByte(byte1)) {
-        dst.append((char) byte1);
-        // It's common for there to be multiple ASCII characters in a run mixed in, so add an
-        // extra optimized loop to take care of these runs.
-        while (address < addressLimit) {
-          final byte b = unsafe.getByte(unsafeObj, address);
-          if (!DecodeUtil.isOneByte(b)) {
-            break;
-          }
-          address++;
-          dst.append((char) b);
-        }
-      }
-      else if (DecodeUtil.isTwoBytes(byte1)) {
-        if (address >= addressLimit) {
-          final long off = address - cumBaseOffset;
-          final long limit = addressLimit - cumBaseOffset;
-          throw Utf8CodingException.shortUtf8DecodeByteSequence(byte1, off, limit, 2);
-        }
-        DecodeUtil.handleTwoBytes(
-            byte1,
-            /* byte2 */ unsafe.getByte(unsafeObj, address++),
-            dst);
-      }
-      else if (DecodeUtil.isThreeBytes(byte1)) {
-        if (address >= (addressLimit - 1)) {
-          final long off = address - cumBaseOffset;
-          final long limit = addressLimit - cumBaseOffset;
-          throw Utf8CodingException.shortUtf8DecodeByteSequence(byte1, off, limit, 3);
-        }
-        DecodeUtil.handleThreeBytes(
-            byte1,
-            /* byte2 */ unsafe.getByte(unsafeObj, address++),
-            /* byte3 */ unsafe.getByte(unsafeObj, address++),
-            dst);
-      }
-      else {
-        if (address >= (addressLimit - 2)) {
-          final long off = address - cumBaseOffset;
-          final long limit = addressLimit - cumBaseOffset;
-          throw Utf8CodingException.shortUtf8DecodeByteSequence(byte1, off, limit, 4);
-        }
-        DecodeUtil.handleFourBytes(
-            byte1,
-            /* byte2 */ unsafe.getByte(unsafeObj, address++),
-            /* byte3 */ unsafe.getByte(unsafeObj, address++),
-            /* byte4 */ unsafe.getByte(unsafeObj, address++),
-            dst);
-      }
-    }
-  }
-
-  private static void getCharsFromUtf8NonAsciiCharBuffer(final CharBuffer cbuf, final char[] carr,
+  private static int getCharBufferNonAsciiCharsFromUtf8(final CharBuffer cbuf, final char[] carr,
       int cpos, final int clim, long address, final long addressLimit, final Object unsafeObj,
       final long cumBaseOffset) {
 
@@ -245,12 +181,86 @@ final class Utf8 {
       }
     }
     cbuf.position(cpos - cbuf.arrayOffset());
+    return cpos;
   }
 
+  //Decodes into Appendable destination
+  //returns num of chars decoded
+  private static int getNonAsciiCharsFromUtf8(final Appendable dst, long address,
+      final long addressLimit, final Object unsafeObj, final long cumBaseOffset)
+          throws IOException {
+    int chars = 0;
+    while (address < addressLimit) {
+      final byte byte1 = unsafe.getByte(unsafeObj, address++);
+      if (DecodeUtil.isOneByte(byte1)) {
+        dst.append((char) byte1);
+        chars++;
+        // It's common for there to be multiple ASCII characters in a run mixed in, so add an
+        // extra optimized loop to take care of these runs.
+        while (address < addressLimit) {
+          final byte b = unsafe.getByte(unsafeObj, address);
+          if (!DecodeUtil.isOneByte(b)) {
+            break;
+          }
+          address++;
+          dst.append((char) b);
+          chars++;
+        }
+      }
+      else if (DecodeUtil.isTwoBytes(byte1)) {
+        if (address >= addressLimit) {
+          final long off = address - cumBaseOffset;
+          final long limit = addressLimit - cumBaseOffset;
+          throw Utf8CodingException.shortUtf8DecodeByteSequence(byte1, off, limit, 2);
+        }
+        DecodeUtil.handleTwoBytes(
+            byte1,
+            /* byte2 */ unsafe.getByte(unsafeObj, address++),
+            dst);
+        chars++;
+      }
+      else if (DecodeUtil.isThreeBytes(byte1)) {
+        if (address >= (addressLimit - 1)) {
+          final long off = address - cumBaseOffset;
+          final long limit = addressLimit - cumBaseOffset;
+          throw Utf8CodingException.shortUtf8DecodeByteSequence(byte1, off, limit, 3);
+        }
+        DecodeUtil.handleThreeBytes(
+            byte1,
+            /* byte2 */ unsafe.getByte(unsafeObj, address++),
+            /* byte3 */ unsafe.getByte(unsafeObj, address++),
+            dst);
+        chars++;
+      }
+      else {
+        if (address >= (addressLimit - 2)) {
+          final long off = address - cumBaseOffset;
+          final long limit = addressLimit - cumBaseOffset;
+          throw Utf8CodingException.shortUtf8DecodeByteSequence(byte1, off, limit, 4);
+        }
+        DecodeUtil.handleFourBytes(
+            byte1,
+            /* byte2 */ unsafe.getByte(unsafeObj, address++),
+            /* byte3 */ unsafe.getByte(unsafeObj, address++),
+            /* byte4 */ unsafe.getByte(unsafeObj, address++),
+            dst);
+        chars += 2;
+      }
+    }
+    return chars;
+  }
+
+  private static void checkCharBufferPos(final CharBuffer cbuf, final int cpos, final int clim) {
+    if (cpos == clim) {
+      cbuf.position(cpos - cbuf.arrayOffset());
+      throw new BufferOverflowException();
+    }
+  }
+
+  /******************/
   //Encode
   static long putCharsToUtf8(final long offsetBytes, final CharSequence src,
         final ResourceState state) {
-    state.checkValid();
     final Object unsafeObj = state.getUnsafeObject();
     final long cumBaseOffset = state.getCumBaseOffset();
 
@@ -362,6 +372,7 @@ final class Utf8 {
     return localOffsetBytes;
   }
 
+  /*****************/
   /**
    * Utility methods for decoding UTF-8 bytes into {@link String}. Callers are responsible for
    * extracting bytes (possibly using Unsafe methods), and checking remaining bytes. All other

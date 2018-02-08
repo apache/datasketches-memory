@@ -5,6 +5,8 @@
 
 package com.yahoo.memory;
 
+import static com.yahoo.memory.WritableBufferImpl.DEGENERATE_BUFFER;
+
 import java.nio.ByteBuffer;
 
 /**
@@ -30,9 +32,11 @@ public abstract class WritableBuffer extends Buffer {
     if (byteBuf.isReadOnly()) {
       throw new ReadOnlyException("ByteBuffer is read-only.");
     }
-    if (byteBuf.capacity() == 0) {
-      return WritableBufferImpl.ZERO_SIZE_ARRAY_BUFFER;
-    }
+    return wrapBB(byteBuf);
+  }
+
+  static WritableBuffer wrapBB(final ByteBuffer byteBuf) {
+    if (byteBuf.capacity() == 0) { return DEGENERATE_BUFFER; }
     final ResourceState state = new ResourceState();
     state.putByteBuffer(byteBuf);
     AccessByteBuffer.wrap(state);

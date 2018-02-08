@@ -65,9 +65,7 @@ class WritableMemoryImpl extends WritableMemory {
   final static WritableMemoryImpl DEGENERATE_MEMORY;
 
   static {
-    DEGENERATE_MEMORY = new WritableMemoryImpl(
-        new ResourceState(new byte[0], Prim.BYTE, 0)
-    );
+    DEGENERATE_MEMORY = new WritableMemoryImpl(new ResourceState(new byte[0], Prim.BYTE, 0));
   }
 
   WritableMemoryImpl(final ResourceState state) {
@@ -185,9 +183,11 @@ class WritableMemoryImpl extends WritableMemory {
   }
 
   @Override
-  public void getCharsFromUtf8(final long offsetBytes, final int utf8Length, final Appendable dst)
+  public int getCharsFromUtf8(final long offsetBytes, final int utf8LengthBytes, final Appendable dst)
       throws IOException, Utf8CodingException {
-    Utf8.getCharsFromUtf8(offsetBytes, utf8Length, dst, state);
+    state.checkValid();
+    checkBounds(offsetBytes, utf8LengthBytes, state.getCapacity());
+    return Utf8.getCharsFromUtf8(offsetBytes, utf8LengthBytes, dst, state);
   }
 
   @Override
@@ -509,6 +509,7 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public long putCharsToUtf8(final long offsetBytes, final CharSequence src) {
+    state.checkValid();
     return Utf8.putCharsToUtf8(offsetBytes, src, state);
   }
 

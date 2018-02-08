@@ -30,11 +30,11 @@ import com.yahoo.memory.Util.RandomCodePoints;
 public class Utf8Test {
 
   @Test
-  public void testRoundTripAllValidChars() throws IOException { //the non-surrogate chars
-    for (int i = Character.MIN_CODE_POINT; i < Character.MAX_CODE_POINT; i++) {
-      if ((i < Character.MIN_SURROGATE) || (i > Character.MAX_SURROGATE)) {
-        String str = new String(Character.toChars(i));
-        assertRoundTrips(str);
+  public void testRoundTripAllValidCodePoints() throws IOException { //the non-surrogate code pts
+    for (int cp = Character.MIN_CODE_POINT; cp < Character.MAX_CODE_POINT; cp++) {
+      if (!isSurrogateCodePoint(cp)) {
+        String refStr = new String(Character.toChars(cp));
+        assertRoundTrips(refStr);
       }
     }
   }
@@ -222,6 +222,24 @@ public class Utf8Test {
   }
 
   @Test
+  public void checkNonEmptyDestination() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("abc");
+    final int startChars = sb.toString().toCharArray().length;
+    String addStr = "Quizdeltagerne spiste jordb\u00e6r med fl\u00f8de, mens cirkusklovnen";
+    final byte[] addByteArr = addStr.getBytes(UTF_8);
+    final int addBytes = addByteArr.length;
+    WritableMemory addMem = WritableMemory.wrap(addByteArr);
+    final int decodedChars = addMem.getCharsFromUtf8(0, addBytes, sb);
+    String finalStr = sb.toString();
+    final int finalChars = finalStr.toCharArray().length;
+    assertEquals(decodedChars + startChars, finalChars);
+    println("Decoded chars: " + decodedChars);
+    println("Final chars: " + finalChars);
+    println(sb.toString());
+  }
+
+  @Test
   public void testOverlong() {
     assertInvalid(0xc0, 0xaf);
     assertInvalid(0xe0, 0x80, 0xaf);
@@ -263,8 +281,8 @@ public class Utf8Test {
   @Test
   public void testBufferSlice() throws IOException {
     String str = "The quick brown fox jumps over the lazy dog";
-    assertRoundTrips(str, 10, 4);
-    assertRoundTrips(str, str.length(), 0);
+    assertRoundTrips(str, 4, 10, 4);
+    assertRoundTrips(str, 0, str.length(), 0);
   }
 
   @Test
@@ -322,17 +340,7 @@ public class Utf8Test {
     RandomCodePoints rcp = new RandomCodePoints(false);
   }
 
-  @Test
-  public void printlnTest() {
-   println("PRINTING: "+this.getClass().getName());
-  }
 
-  /**
-   * @param s value to print
-   */
-  static void println(String s) {
-    //System.out.println(s); //disable here
-  }
 
   private static void assertInvalid(int... bytesAsInt) { //invalid byte sequences
     byte[] bytes = new byte[bytesAsInt.length];
@@ -369,58 +377,80 @@ public class Utf8Test {
     }
   }
 
-  private static void assertRoundTrips(String str) throws IOException {
-    assertRoundTrips(str, 0, -1);
+  /**
+   * Performs round-trip test using the given reference string
+   * @param refStr the reference string
+   * @throws IOException
+   */
+  private static void assertRoundTrips(String refStr) throws IOException {
+    assertRoundTrips(refStr, refStr.toCharArray().length, 0, -1);
   }
 
-  private static void assertRoundTrips(String str, int index, int size) throws IOException {
-    byte[] bytes = str.getBytes(UTF_8);
-    if (size == -1) {
-      size = bytes.length;
+  /**
+   * Performs round-trip test using the given reference string
+   * @param refStr the reference string
+   * @param refSubCharLen the number of characters expected to be decoded
+   * @param offsetBytes starting utf8 byte offset
+   * @param utf8LengthBytes length of utf8 bytes
+   * @throws IOException
+   */
+  private static void assertRoundTrips(String refStr, int refSubCharLen, int offsetBytes,
+      int utf8LengthBytes) throws IOException {
+    byte[] refByteArr = refStr.getBytes(UTF_8);
+    if (utf8LengthBytes == -1) {
+      utf8LengthBytes = refByteArr.length;
     }
-    Memory mem = Memory.wrap(bytes);
+    Memory refMem = Memory.wrap(refByteArr);
 
-    byte[] bytes2 = new byte[bytes.length + 1];
-    System.arraycopy(bytes, 0, bytes2, 1, bytes.length);
-    Memory mem2 = Memory.wrap(bytes2).region(1, bytes.length);
+    byte[] refByteArr2 = new byte[refByteArr.length + 1];
+    System.arraycopy(refByteArr, 0, refByteArr2, 1, refByteArr.length);
+    Memory refReg = Memory.wrap(refByteArr2).region(1, refByteArr.length);
 
-    WritableMemory writeMem = WritableMemory.allocate(bytes.length);
-    WritableMemory writeMem2 =
-            WritableMemory.allocate(bytes.length + 1).writableRegion(1, bytes.length);
+    WritableMemory dstMem = WritableMemory.allocate(refByteArr.length);
+    WritableMemory dstMem2 =
+            WritableMemory.allocate(refByteArr.length + 1).writableRegion(1, refByteArr.length);
 
     // Test with Memory objects, where base offset != 0
-    assertRoundTrips(str, index, size, bytes, mem, writeMem);
-    assertRoundTrips(str, index, size, bytes, mem, writeMem2);
-    assertRoundTrips(str, index, size, bytes, mem2, writeMem);
-    assertRoundTrips(str, index, size, bytes, mem2, writeMem2);
+    assertRoundTrips(refStr, refSubCharLen, offsetBytes, utf8LengthBytes, refByteArr, refMem, dstMem);
+    assertRoundTrips(refStr, refSubCharLen, offsetBytes, utf8LengthBytes, refByteArr, refMem, dstMem2);
+    assertRoundTrips(refStr, refSubCharLen, offsetBytes, utf8LengthBytes, refByteArr, refReg, dstMem);
+    assertRoundTrips(refStr, refSubCharLen, offsetBytes, utf8LengthBytes, refByteArr, refReg, dstMem2);
   }
 
-  private static void assertRoundTrips(String str, int index, int size, byte[] bytes, Memory mem,
-        WritableMemory writeMem) throws IOException {
+  private static void assertRoundTrips(String refStr, int refSubCharLen, int offsetBytes,
+      int utf8LengthBytes, byte[] refByteArr, Memory refMem, WritableMemory dstMem)
+          throws IOException {
     StringBuilder sb = new StringBuilder();
 
-    mem.getCharsFromUtf8(index, size, sb);
-    checkStrings(sb.toString(), new String(bytes, index, size, UTF_8));
+    int charPos = refMem.getCharsFromUtf8(offsetBytes, utf8LengthBytes, sb);
+    checkStrings(sb.toString(), new String(refByteArr, offsetBytes, utf8LengthBytes, UTF_8));
+    assertEquals(charPos, refSubCharLen);
 
-    CharBuffer cb = CharBuffer.allocate(bytes.length + 1);
+    CharBuffer cb = CharBuffer.allocate(refByteArr.length + 1);
     cb.position(1);
     // Make CharBuffer 1-based, to check correct offset handling
     cb = cb.slice();
-    mem.getCharsFromUtf8(index, size, cb);
+    refMem.getCharsFromUtf8(offsetBytes, utf8LengthBytes, cb);
     cb.flip();
-    checkStrings(cb.toString(), new String(bytes, index, size, UTF_8));
+    checkStrings(cb.toString(), new String(refByteArr, offsetBytes, utf8LengthBytes, UTF_8));
 
-    assertEquals(writeMem.putCharsToUtf8(0, str), bytes.length);
-    assertEquals(0, writeMem.compareTo(0, bytes.length, mem, 0, bytes.length));
+    long encodedUtf8Bytes = dstMem.putCharsToUtf8(0, refStr); //encodes entire refStr
+    assertEquals(encodedUtf8Bytes, refByteArr.length); //compares bytes length
+    //compare the actual bytes encoded
+    assertEquals(0, dstMem.compareTo(0, refByteArr.length, refMem, 0, refByteArr.length));
 
     // Test write overflow
-    WritableMemory writeMem2 = WritableMemory.allocate(bytes.length - 1);
+    WritableMemory writeMem2 = WritableMemory.allocate(refByteArr.length - 1);
     try {
-      writeMem2.putCharsToUtf8(0, str);
+      writeMem2.putCharsToUtf8(0, refStr);
       fail();
     } catch (Utf8CodingException e) {
       // Expected.
     }
+  }
+
+  private static boolean isSurrogateCodePoint(final int cp) {
+    return (cp >= Character.MIN_SURROGATE) && (cp <= Character.MAX_SURROGATE);
   }
 
   private static void checkStrings(String actual, String expected) {
@@ -437,4 +467,15 @@ public class Utf8Test {
     return codepoints;
   }
 
+  @Test
+  public void printlnTest() {
+   println("PRINTING: "+this.getClass().getName());
+  }
+
+  /**
+   * @param s value to print
+   */
+  static void println(String s) {
+    System.out.println(s); //disable here
+  }
 }

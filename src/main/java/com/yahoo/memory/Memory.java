@@ -278,10 +278,11 @@ public abstract class Memory {
    * to be appended to dst. Characters outside the ASCII range can require 2, 3 or 4 bytes per
    * character to decode.
    * @param dst the destination Appendable to append decoded characters to
+   * @return the character position in the destination after the last character decoded.
    * @throws IOException if dst.append() throws IOException
    * @throws Utf8CodingException in case of malformed or illegal UTF-8 input
    */
-  public abstract void getCharsFromUtf8(long offsetBytes, int utf8LengthBytes, Appendable dst)
+  public abstract int getCharsFromUtf8(long offsetBytes, int utf8LengthBytes, Appendable dst)
       throws IOException, Utf8CodingException;
 
   /**
@@ -296,15 +297,16 @@ public abstract class Memory {
    * caller has the correct number of utf8 bytes required to decode the number of characters
    * to be appended to dst. Characters outside the ASCII range can require 2, 3 or 4 bytes per
    * character to decode.
-   * @param dst the destination StringBuilder to append decoded characters to
+   * @param dst the destination StringBuilder to append decoded characters to.
+   * @return the number of characters decoded.
    * @throws Utf8CodingException in case of malformed or illegal UTF-8 input
    */
-  public void getCharsFromUtf8(final long offsetBytes, final int utf8LengthBytes,
+  public int getCharsFromUtf8(final long offsetBytes, final int utf8LengthBytes,
       final StringBuilder dst) throws Utf8CodingException {
     try {
       // Ensure that we do at most one resize of internal StringBuilder's char array
       dst.ensureCapacity(dst.length() + utf8LengthBytes);
-      getCharsFromUtf8(offsetBytes, utf8LengthBytes, (Appendable) dst);
+      return getCharsFromUtf8(offsetBytes, utf8LengthBytes, (Appendable) dst);
     } catch (final IOException e) {
       throw new RuntimeException("Should not happen", e);
     }

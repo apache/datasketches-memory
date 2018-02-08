@@ -271,8 +271,8 @@ final class ResourceState {
     return nativeBaseOffset_ > 0L;
   }
 
+  //Must already have checked that for null.
   boolean isSameResource(final ResourceState that) {
-    if (that == null) { return false; }
     if (this == that) { return true; }
 
     return (getCumBaseOffset() == that.getCumBaseOffset())

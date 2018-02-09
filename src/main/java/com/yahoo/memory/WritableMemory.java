@@ -68,7 +68,6 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemoryMapHandler for managing this map
    * @throws Exception file not found or RuntimeException, etc.
    */
-  //Developer notes: WritableMapHandle does not extend MapHandle. There is only one get().
   public static WritableMapHandle writableMap(final File file, final long fileOffset,
           final long capacityBytes, final ByteOrder byteOrder) throws Exception {
     zeroCheck(capacityBytes, "Capacity");

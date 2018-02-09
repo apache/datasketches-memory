@@ -57,18 +57,18 @@ public abstract class Memory {
    * (including those &gt; 2GB).
    * @param file the given file to map. It may not be null.
    * @param fileOffset the position in the given file. It may not be negative.
-   * @param capacity the size of the allocated direct memory. It may not be negative or zero.
+   * @param capacityBytes the size of the allocated direct memory. It may not be negative or zero.
    * @param byteOrder the endianness of the given file. It may not be null.
    * @return MemoryMapHandler for managing this map
    * @throws Exception file not found or RuntimeException, etc.
    */
-  public static MapHandle map(final File file, final long fileOffset, final long capacity,
+  public static MapHandle map(final File file, final long fileOffset, final long capacityBytes,
       final ByteOrder byteOrder) throws Exception {
-    zeroCheck(capacity, "Capacity");
+    zeroCheck(capacityBytes, "Capacity");
     final ResourceState state = new ResourceState();
     state.putFile(file);
     state.putFileOffset(fileOffset);
-    state.putCapacity(capacity);
+    state.putCapacity(capacityBytes);
     state.order(byteOrder);
     return MapHandle.map(state);
   }

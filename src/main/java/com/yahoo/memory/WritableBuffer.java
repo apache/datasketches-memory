@@ -5,7 +5,7 @@
 
 package com.yahoo.memory;
 
-import static com.yahoo.memory.WritableBufferImpl.DEGENERATE_BUFFER;
+import static com.yahoo.memory.WritableBufferImpl.ZERO_SIZE_BUFFER;
 
 import java.nio.ByteBuffer;
 
@@ -36,7 +36,7 @@ public abstract class WritableBuffer extends Buffer {
   }
 
   static WritableBuffer wrapBB(final ByteBuffer byteBuf) {
-    if (byteBuf.capacity() == 0) { return DEGENERATE_BUFFER; }
+    if (byteBuf.capacity() == 0) { return ZERO_SIZE_BUFFER; }
     final ResourceState state = new ResourceState();
     state.putByteBuffer(byteBuf);
     AccessByteBuffer.wrap(state);

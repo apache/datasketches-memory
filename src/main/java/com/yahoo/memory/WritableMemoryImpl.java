@@ -62,10 +62,10 @@ class WritableMemoryImpl extends WritableMemory {
   final long cumBaseOffset; //Holds the cumulative offset to the start of data.
 
   //Static variable for cases where byteBuf/array/direct sizes are zero
-  final static WritableMemoryImpl DEGENERATE_MEMORY;
+  final static WritableMemoryImpl ZERO_SIZE_MEMORY;
 
   static {
-    DEGENERATE_MEMORY = new WritableMemoryImpl(new ResourceState(new byte[0], Prim.BYTE, 0));
+    ZERO_SIZE_MEMORY = new WritableMemoryImpl(new ResourceState(new byte[0], Prim.BYTE, 0));
   }
 
   WritableMemoryImpl(final ResourceState state) {
@@ -93,7 +93,7 @@ class WritableMemoryImpl extends WritableMemory {
   public WritableMemory writableRegion(final long offsetBytes, final long capacityBytes) {
     state.checkValid();
     checkBounds(offsetBytes, capacityBytes, capacity);
-    if (capacityBytes == 0) { return DEGENERATE_MEMORY; }
+    if (capacityBytes == 0) { return ZERO_SIZE_MEMORY; }
     final ResourceState newState = state.copy();
     newState.putRegionOffset(newState.getRegionOffset() + offsetBytes);
     newState.putCapacity(capacityBytes);
@@ -111,8 +111,8 @@ class WritableMemoryImpl extends WritableMemory {
     state.checkValid();
     final WritableBufferImpl wbuf;
     if (capacity == 0) {
-      wbuf = WritableBufferImpl.DEGENERATE_BUFFER;
-      wbuf.originMemory = DEGENERATE_MEMORY;
+      wbuf = WritableBufferImpl.ZERO_SIZE_BUFFER;
+      wbuf.originMemory = ZERO_SIZE_MEMORY;
     } else {
       wbuf = new WritableBufferImpl(state);
       wbuf.setAndCheckStartPositionEnd(0, 0, capacity);

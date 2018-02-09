@@ -6,7 +6,7 @@
 package com.yahoo.memory;
 
 import static com.yahoo.memory.Util.zeroCheck;
-import static com.yahoo.memory.WritableMemoryImpl.DEGENERATE_MEMORY;
+import static com.yahoo.memory.WritableMemoryImpl.ZERO_SIZE_MEMORY;
 
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -38,7 +38,7 @@ public abstract class WritableMemory extends Memory {
   }
 
   static WritableMemory wrapBB(final ByteBuffer byteBuf) {
-    if (byteBuf.capacity() == 0) { return DEGENERATE_MEMORY; }
+    if (byteBuf.capacity() == 0) { return ZERO_SIZE_MEMORY; }
     final ResourceState state = new ResourceState();
     state.putByteBuffer(byteBuf);
     AccessByteBuffer.wrap(state);
@@ -96,7 +96,7 @@ public abstract class WritableMemory extends Memory {
    */
   public static WritableDirectHandle allocateDirect(final long capacityBytes) {
     if (capacityBytes == 0) {
-      return new WritableDirectHandle(null, DEGENERATE_MEMORY);
+      return new WritableDirectHandle(null, ZERO_SIZE_MEMORY);
     }
     final MemoryManager memMgr = DefaultMemoryManager.getInstance();
     return memMgr.allocateDirect(capacityBytes);
@@ -137,7 +137,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory allocate(final int capacityBytes) {
-    if (capacityBytes == 0) { return DEGENERATE_MEMORY; }
+    if (capacityBytes == 0) { return ZERO_SIZE_MEMORY; }
     final byte[] arr = new byte[capacityBytes];
     return new WritableMemoryImpl(new ResourceState(arr, Prim.BYTE, arr.length));
   }
@@ -151,7 +151,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final boolean[] arr) {
-    if (arr.length == 0) { return DEGENERATE_MEMORY; }
+    if (arr.length == 0) { return ZERO_SIZE_MEMORY; }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.BOOLEAN, arr.length));
   }
 
@@ -163,7 +163,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final byte[] arr) {
-    if (arr.length == 0) { return DEGENERATE_MEMORY; }
+    if (arr.length == 0) { return ZERO_SIZE_MEMORY; }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.BYTE, arr.length));
   }
 
@@ -175,7 +175,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final char[] arr) {
-    if (arr.length == 0) { return DEGENERATE_MEMORY; }
+    if (arr.length == 0) { return ZERO_SIZE_MEMORY; }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.CHAR, arr.length));
   }
 
@@ -187,7 +187,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final short[] arr) {
-    if (arr.length == 0) { return DEGENERATE_MEMORY; }
+    if (arr.length == 0) { return ZERO_SIZE_MEMORY; }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.SHORT, arr.length));
   }
 
@@ -199,7 +199,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final int[] arr) {
-    if (arr.length == 0) { return DEGENERATE_MEMORY; }
+    if (arr.length == 0) { return ZERO_SIZE_MEMORY; }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.INT, arr.length));
   }
 
@@ -211,7 +211,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final long[] arr) {
-    if (arr.length == 0) { return DEGENERATE_MEMORY; }
+    if (arr.length == 0) { return ZERO_SIZE_MEMORY; }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.LONG, arr.length));
   }
 
@@ -223,7 +223,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final float[] arr) {
-    if (arr.length == 0) { return DEGENERATE_MEMORY; }
+    if (arr.length == 0) { return ZERO_SIZE_MEMORY; }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.FLOAT, arr.length));
   }
 
@@ -235,7 +235,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final double[] arr) {
-    if (arr.length == 0) { return DEGENERATE_MEMORY; }
+    if (arr.length == 0) { return ZERO_SIZE_MEMORY; }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.DOUBLE, arr.length));
   }
   //END OF CONSTRUCTOR-TYPE METHODS

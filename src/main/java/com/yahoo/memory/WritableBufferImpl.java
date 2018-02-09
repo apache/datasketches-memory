@@ -61,10 +61,10 @@ class WritableBufferImpl extends WritableBuffer {
   WritableMemoryImpl originMemory = null; //If I came from here ...
 
   //Static variable for cases where byteBuf/array sizes are zero
-  final static WritableBufferImpl DEGENERATE_BUFFER;
+  final static WritableBufferImpl ZERO_SIZE_BUFFER;
 
   static {
-    DEGENERATE_BUFFER = new WritableBufferImpl(new ResourceState(new byte[0], Prim.BYTE, 0));
+    ZERO_SIZE_BUFFER = new WritableBufferImpl(new ResourceState(new byte[0], Prim.BYTE, 0));
   }
 
   WritableBufferImpl(final ResourceState state) {
@@ -104,7 +104,7 @@ class WritableBufferImpl extends WritableBuffer {
   public WritableBuffer writableRegion(final long offsetBytes, final long capacityBytes) {
     state.checkValid();
     checkBounds(offsetBytes, capacityBytes, capacity);
-    if (capacityBytes == 0) { return DEGENERATE_BUFFER; }
+    if (capacityBytes == 0) { return ZERO_SIZE_BUFFER; }
     final ResourceState newState = state.copy();
     newState.putRegionOffset(newState.getRegionOffset() + offsetBytes);
     newState.putCapacity(capacityBytes);

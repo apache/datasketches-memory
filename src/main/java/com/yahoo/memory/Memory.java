@@ -8,7 +8,7 @@ package com.yahoo.memory;
 import static com.yahoo.memory.UnsafeUtil.LS;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 import static com.yahoo.memory.Util.zeroCheck;
-import static com.yahoo.memory.WritableMemoryImpl.DEGENERATE_MEMORY;
+import static com.yahoo.memory.WritableMemoryImpl.ZERO_SIZE_MEMORY;
 
 import java.io.File;
 import java.io.IOException;
@@ -142,7 +142,7 @@ public abstract class Memory {
   public static Memory wrap(final byte[] arr, final int offset, final int length,
           final ByteOrder byteOrder) {
       UnsafeUtil.checkBounds(offset, length, arr.length);
-      if (length == 0) { return DEGENERATE_MEMORY; }
+      if (length == 0) { return ZERO_SIZE_MEMORY; }
       final ResourceState state = new ResourceState(arr, Prim.BYTE, length);
       state.putRegionOffset(offset);
       state.order(byteOrder);

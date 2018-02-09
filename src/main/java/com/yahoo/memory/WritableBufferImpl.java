@@ -104,6 +104,7 @@ class WritableBufferImpl extends WritableBuffer {
   public WritableBuffer writableRegion(final long offsetBytes, final long capacityBytes) {
     state.checkValid();
     checkBounds(offsetBytes, capacityBytes, capacity);
+    if (capacityBytes == 0) { return DEGENERATE_BUFFER; }
     final ResourceState newState = state.copy();
     newState.putRegionOffset(newState.getRegionOffset() + offsetBytes);
     newState.putCapacity(capacityBytes);

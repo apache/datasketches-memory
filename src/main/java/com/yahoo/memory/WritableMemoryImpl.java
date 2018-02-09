@@ -92,8 +92,8 @@ class WritableMemoryImpl extends WritableMemory {
   @Override
   public WritableMemory writableRegion(final long offsetBytes, final long capacityBytes) {
     state.checkValid();
-    if (capacityBytes == 0) { return DEGENERATE_MEMORY; }
     checkBounds(offsetBytes, capacityBytes, capacity);
+    if (capacityBytes == 0) { return DEGENERATE_MEMORY; }
     final ResourceState newState = state.copy();
     newState.putRegionOffset(newState.getRegionOffset() + offsetBytes);
     newState.putCapacity(capacityBytes);
@@ -109,9 +109,15 @@ class WritableMemoryImpl extends WritableMemory {
   @Override
   public WritableBuffer asWritableBuffer() {
     state.checkValid();
-    final WritableBufferImpl wbuf = new WritableBufferImpl(state);
-    wbuf.setAndCheckStartPositionEnd(0, 0, state.getCapacity());
-    wbuf.originMemory = this;
+    final WritableBufferImpl wbuf;
+    if (capacity == 0) {
+      wbuf = WritableBufferImpl.DEGENERATE_BUFFER;
+      wbuf.originMemory = DEGENERATE_MEMORY;
+    } else {
+      wbuf = new WritableBufferImpl(state);
+      wbuf.setAndCheckStartPositionEnd(0, 0, capacity);
+      wbuf.originMemory = this;
+    }
     return wbuf;
   }
 

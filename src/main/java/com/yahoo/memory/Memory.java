@@ -56,18 +56,18 @@ public abstract class Memory {
    * Allocates direct memory used to memory map files for read operations
    * (including those &gt; 2GB).
    * @param file the given file to map. It may not be null.
-   * @param fileOffset the position in the given file. It may not be negative.
+   * @param fileOffsetBytes the position in the given file in bytes. It may not be negative.
    * @param capacityBytes the size of the allocated direct memory. It may not be negative or zero.
    * @param byteOrder the endianness of the given file. It may not be null.
    * @return MemoryMapHandler for managing this map
    * @throws Exception file not found or RuntimeException, etc.
    */
-  public static MapHandle map(final File file, final long fileOffset, final long capacityBytes,
+  public static MapHandle map(final File file, final long fileOffsetBytes, final long capacityBytes,
       final ByteOrder byteOrder) throws Exception {
     zeroCheck(capacityBytes, "Capacity");
     final ResourceState state = new ResourceState();
     state.putFile(file);
-    state.putFileOffset(fileOffset);
+    state.putFileOffset(fileOffsetBytes);
     state.putCapacity(capacityBytes);
     state.order(byteOrder);
     return MapHandle.map(state);
@@ -134,17 +134,17 @@ public abstract class Memory {
    * @param arr the given primitive array.
    * If the array is size zero this method will
    * return a Memory backed by a heap byte array of size zero.
-   * @param offset the byte offset into the given array
-   * @param length the number of bytes to include from the given array
+   * @param offsetBytes the byte offset into the given array
+   * @param lengthBytes the number of bytes to include from the given array
    * @param byteOrder the byte order
    * @return Memory for read operations
    */
-  public static Memory wrap(final byte[] arr, final int offset, final int length,
+  public static Memory wrap(final byte[] arr, final int offsetBytes, final int lengthBytes,
           final ByteOrder byteOrder) {
-      UnsafeUtil.checkBounds(offset, length, arr.length);
-      if (length == 0) { return ZERO_SIZE_MEMORY; }
-      final ResourceState state = new ResourceState(arr, Prim.BYTE, length);
-      state.putRegionOffset(offset);
+      UnsafeUtil.checkBounds(offsetBytes, lengthBytes, arr.length);
+      if (lengthBytes == 0) { return ZERO_SIZE_MEMORY; }
+      final ResourceState state = new ResourceState(arr, Prim.BYTE, lengthBytes);
+      state.putRegionOffset(offsetBytes);
       state.order(byteOrder);
       return new WritableMemoryImpl(state);
   }
@@ -228,10 +228,10 @@ public abstract class Memory {
    * @param offsetBytes offset bytes relative to this Memory start
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
-   * @param length number of array units to transfer
+   * @param lengthBooleans number of array units to transfer
    */
   public abstract void getBooleanArray(long offsetBytes, boolean[] dstArray, int dstOffset,
-      int length);
+      int lengthBooleans);
 
   /**
    * Gets the byte value at the given offset
@@ -245,10 +245,10 @@ public abstract class Memory {
    * @param offsetBytes offset bytes relative to this Memory start
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
-   * @param length number of array units to transfer
+   * @param lengthBytes number of array units to transfer
    */
   public abstract void getByteArray(long offsetBytes, byte[] dstArray, int dstOffset,
-      int length);
+      int lengthBytes);
 
   /**
    * Gets the char value at the given offset
@@ -262,10 +262,10 @@ public abstract class Memory {
    * @param offsetBytes offset bytes relative to this Memory start
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
-   * @param length number of array units to transfer
+   * @param lengthChars number of array units to transfer
    */
   public abstract void getCharArray(long offsetBytes, char[] dstArray, int dstOffset,
-      int length);
+      int lengthChars);
 
   /**
    * Gets UTF-8 encoded bytes from this Memory, starting at offsetBytes to a length of
@@ -324,10 +324,10 @@ public abstract class Memory {
    * @param offsetBytes offset bytes relative to this Memory start
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
-   * @param length number of array units to transfer
+   * @param lengthDoubles number of array units to transfer
    */
   public abstract void getDoubleArray(long offsetBytes, double[] dstArray, int dstOffset,
-      int length);
+      int lengthDoubles);
 
   /**
    * Gets the float value at the given offset
@@ -341,10 +341,10 @@ public abstract class Memory {
    * @param offsetBytes offset bytes relative to this Memory start
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
-   * @param length number of array units to transfer
+   * @param lengthFloats number of array units to transfer
    */
   public abstract void getFloatArray(long offsetBytes, float[] dstArray, int dstOffset,
-      int length);
+      int lengthFloats);
 
   /**
    * Gets the int value at the given offset
@@ -358,10 +358,10 @@ public abstract class Memory {
    * @param offsetBytes offset bytes relative to this Memory start
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
-   * @param length number of array units to transfer
+   * @param lengthInts number of array units to transfer
    */
   public abstract void getIntArray(long offsetBytes, int[] dstArray, int dstOffset,
-      int length);
+      int lengthInts);
 
   /**
    * Gets the long value at the given offset
@@ -375,9 +375,10 @@ public abstract class Memory {
    * @param offsetBytes offset bytes relative to this Memory start
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
-   * @param length number of array units to transfer
+   * @param lengthLongs number of array units to transfer
    */
-  public abstract void getLongArray(long offsetBytes, long[] dstArray, int dstOffset, int length);
+  public abstract void getLongArray(long offsetBytes, long[] dstArray, int dstOffset,
+      int lengthLongs);
 
   /**
    * Gets the short value at the given offset
@@ -391,10 +392,10 @@ public abstract class Memory {
    * @param offsetBytes offset bytes relative to this Memory start
    * @param dstArray The preallocated destination array.
    * @param dstOffset offset in array units
-   * @param length number of array units to transfer
+   * @param lengthShorts number of array units to transfer
    */
   public abstract void getShortArray(long offsetBytes, short[] dstArray, int dstOffset,
-      int length);
+      int lengthShorts);
 
   //OTHER PRIMITIVE READ METHODS: compareTo, copyTo XXX
   /**
@@ -425,7 +426,7 @@ public abstract class Memory {
       long lengthBytes);
 
   //OTHER READ METHODS XXX
-  public abstract void checkValidAndBounds(long offset, long length);
+  public abstract void checkValidAndBounds(long offsetBytes, long lengthBytes);
 
   /**
    * Gets the capacity of this Memory in bytes

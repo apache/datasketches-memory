@@ -302,7 +302,7 @@ public abstract class WritableMemory extends Memory {
    * the responsibility of the caller to provide sufficient capacity in this
    * <i>WritableMemory</i> for the encoded Utf8 bytes. Characters outside the ASCII range can
    * require 2, 3 or 4 bytes per character to encode.
-   * @return offset bytes relative to this WritableMemory start after the last written byte
+   * @return the number of bytes encoded
    */
   public abstract long putCharsToUtf8(long offsetBytes, CharSequence src);
 

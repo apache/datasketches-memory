@@ -277,8 +277,8 @@ public abstract class Memory {
    * caller has the correct number of utf8 bytes required to decode the number of characters
    * to be appended to dst. Characters outside the ASCII range can require 2, 3 or 4 bytes per
    * character to decode.
-   * @param dst the destination Appendable to append decoded characters to
-   * @return the character position in the destination after the last character decoded.
+   * @param dst the destination Appendable to append the decoded characters to.
+   * @return the number of characters decoded
    * @throws IOException if dst.append() throws IOException
    * @throws Utf8CodingException in case of malformed or illegal UTF-8 input
    */

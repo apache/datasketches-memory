@@ -9,11 +9,12 @@ package com.yahoo.memory;
  * A handle for WritableMemory
  * @author Lee Rhodes
  */
-public interface WritableHandle {
+public interface WritableHandle extends Handle {
 
   /**
    * Gets a WritableMemory
    * @return a WritableMemory
    */
+  @Override
   WritableMemory get();
 }

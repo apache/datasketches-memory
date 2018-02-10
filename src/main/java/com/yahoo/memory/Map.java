@@ -14,9 +14,6 @@ package com.yahoo.memory;
  */
 interface Map extends AutoCloseable {
 
-  @Override
-  void close();
-
   /**
    * Loads content into physical memory. This method makes a best effort to ensure that, when it
    * returns, this buffer's content is resident in physical memory. Invoking this method may cause

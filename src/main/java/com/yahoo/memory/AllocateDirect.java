@@ -66,13 +66,11 @@ final class AllocateDirect implements AutoCloseable {
 
     @Override
     public void run() {
-      if (actualNativeBaseOffset == 0) {
-        // Paranoia
-        return;
+      if (actualNativeBaseOffset > 0) {
+        unsafe.freeMemory(actualNativeBaseOffset);
       }
-      unsafe.freeMemory(actualNativeBaseOffset);
       actualNativeBaseOffset = 0L;
-      parentStateRef.setInvalid(); //The only place valid is set invalid.
+      parentStateRef.setInvalid();
     }
   }
 

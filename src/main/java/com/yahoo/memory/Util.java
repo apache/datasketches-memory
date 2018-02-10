@@ -218,13 +218,23 @@ public final class Util {
         }
       }
     }
-
   }
 
+  static final void zeroCheck(final long value, final String arg) {
+    if (value <= 0) {
+      throw new IllegalArgumentException("The argument " + arg + " may not be negative or zero.");
+    }
+  }
 
-  static final void nullCheck(final Object obj) {
+  static final void negativeCheck(final long value, final String arg) {
+    if (value < 0) {
+      throw new IllegalArgumentException("The argument " + arg + " may not be negative.");
+    }
+  }
+
+  static final void nullCheck(final Object obj, final String arg) {
     if (obj == null) {
-      throw new IllegalArgumentException("An input argument is null.");
+      throw new IllegalArgumentException("The argument " + arg + " may not be null.");
     }
   }
 }

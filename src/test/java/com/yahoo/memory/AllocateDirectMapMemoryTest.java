@@ -41,12 +41,6 @@ public class AllocateDirectMapMemoryTest {
     } catch (IllegalArgumentException e) {
       //ok
     }
-
-    try (MapHandle rh = Memory.map(file, Long.MAX_VALUE, 2, ByteOrder.nativeOrder())) {
-      fail("Failed: testIllegalArgumentException: Sum of position + size is negative.");
-    } catch (IllegalArgumentException e) {
-      //ok
-    }
   }
 
   @Test
@@ -112,6 +106,13 @@ public class AllocateDirectMapMemoryTest {
     assertTrue(rh.isLoaded());
     hand = rh;
     //The receiver of the handler must close the resource, in this case it is the class.
+  }
+
+  @Test
+  public void checkRequestClose() {
+    WritableMemory wmem = WritableMemory.allocate(8);
+    MemoryManager mgr = DefaultMemoryManager.getInstance();
+    mgr.requestClose(wmem, null);
   }
 
   @AfterClass

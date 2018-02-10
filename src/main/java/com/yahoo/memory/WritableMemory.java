@@ -5,7 +5,8 @@
 
 package com.yahoo.memory;
 
-import static com.yahoo.memory.Util.nullCheck;
+import static com.yahoo.memory.Util.zeroCheck;
+import static com.yahoo.memory.WritableMemoryImpl.ZERO_SIZE_MEMORY;
 
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -23,6 +24,9 @@ public abstract class WritableMemory extends Memory {
   //BYTE BUFFER XXX
   /**
    * Accesses the given ByteBuffer for write operations.
+   *
+   * <p>Note that if the ByteBuffer capacity is zero this will
+   * return a WritableMemory backed by a heap byte array of size zero.
    * @param byteBuf the given ByteBuffer
    * @return the given ByteBuffer for write operations.
    */
@@ -34,9 +38,7 @@ public abstract class WritableMemory extends Memory {
   }
 
   static WritableMemory wrapBB(final ByteBuffer byteBuf) {
-    if (byteBuf.capacity() == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_ARRAY_MEMORY;
-    }
+    if (byteBuf.capacity() == 0) { return ZERO_SIZE_MEMORY; }
     final ResourceState state = new ResourceState();
     state.putByteBuffer(byteBuf);
     AccessByteBuffer.wrap(state);
@@ -59,20 +61,20 @@ public abstract class WritableMemory extends Memory {
   /**
    * Allocates direct memory used to memory map files for write operations
    * (including those &gt; 2GB).
-   * @param file the given file to map
-   * @param fileOffset the position in the given file
-   * @param capacity the size of the allocated direct memory
-   * @param byteOrder the endianness of the given file.
+   * @param file the given file to map. It may not be null.
+   * @param fileOffsetBytes the position in the given file in bytes. It may not be negative.
+   * @param capacityBytes the size of the allocated direct memory. It may not be negative or zero.
+   * @param byteOrder the endianness of the given file. It may not be null.
    * @return WritableMemoryMapHandler for managing this map
    * @throws Exception file not found or RuntimeException, etc.
    */
-  //Developer notes: WritableMapHandle does not extend MapHandle. There is only one get().
-  public static WritableMapHandle writableMap(final File file, final long fileOffset,
-          final long capacity, final ByteOrder byteOrder) throws Exception {
+  public static WritableMapHandle writableMap(final File file, final long fileOffsetBytes,
+          final long capacityBytes, final ByteOrder byteOrder) throws Exception {
+    zeroCheck(capacityBytes, "Capacity");
     final ResourceState state = new ResourceState();
     state.putFile(file);
-    state.putFileOffset(fileOffset);
-    state.putCapacity(capacity);
+    state.putFileOffset(fileOffsetBytes);
+    state.putCapacity(capacityBytes);
     state.order(byteOrder);
     return WritableMapHandle.map(state);
   }
@@ -87,10 +89,15 @@ public abstract class WritableMemory extends Memory {
    * It is the responsibility of the using class to clear this memory, if required,
    * and to call <i>close()</i> when done.</p>
    *
-   * @param capacityBytes the size of the desired memory in bytes
+   * @param capacityBytes the size of the desired memory in bytes.
+   * If capacityBytes is zero the WritableDirectHandle get() will
+   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemoryMapHandler for this off-heap resource
    */
   public static WritableDirectHandle allocateDirect(final long capacityBytes) {
+    if (capacityBytes == 0) {
+      return new WritableDirectHandle(null, ZERO_SIZE_MEMORY);
+    }
     final MemoryManager memMgr = DefaultMemoryManager.getInstance();
     return memMgr.allocateDirect(capacityBytes);
   }
@@ -105,7 +112,9 @@ public abstract class WritableMemory extends Memory {
   /**
    * Returns a writable region of this WritableMemory
    * @param offsetBytes the starting offset with respect to this WritableMemory
-   * @param capacityBytes the capacity of the region in bytes
+   * @param capacityBytes the capacity of the region in bytes.
+   * If capacityBytes is zero this method will
+   * return a WritableMemory backed by a heap byte array of size zero.
    * @return a writable region of this WritableMemory
    */
   public abstract WritableMemory writableRegion(long offsetBytes, long capacityBytes);
@@ -122,13 +131,13 @@ public abstract class WritableMemory extends Memory {
   //ALLOCATE HEAP VIA AUTOMATIC BYTE ARRAY XXX
   /**
    * Creates on-heap WritableMemory with the given capacity
-   * @param capacityBytes the given capacity in bytes
+   * @param capacityBytes the given capacity in bytes.
+   * If capacityBytes is zero this method will
+   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemory for write operations
    */
   public static WritableMemory allocate(final int capacityBytes) {
-    if (capacityBytes == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_ARRAY_MEMORY;
-    }
+    if (capacityBytes == 0) { return ZERO_SIZE_MEMORY; }
     final byte[] arr = new byte[capacityBytes];
     return new WritableMemoryImpl(new ResourceState(arr, Prim.BYTE, arr.length));
   }
@@ -136,105 +145,97 @@ public abstract class WritableMemory extends Memory {
   //ACCESS PRIMITIVE HEAP ARRAYS for write XXX
   /**
    * Wraps the given primitive array for write operations
-   * @param arr the given primitive array
+   * @param arr the given primitive array.
+   * If the array is size zero this method will
+   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final boolean[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_ARRAY_MEMORY;
-    }
+    if (arr.length == 0) { return ZERO_SIZE_MEMORY; }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.BOOLEAN, arr.length));
   }
 
   /**
    * Wraps the given primitive array for write operations
-   * @param arr the given primitive array
+   * @param arr the given primitive array.
+   * If the array is size zero this method will
+   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final byte[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_ARRAY_MEMORY;
-    }
+    if (arr.length == 0) { return ZERO_SIZE_MEMORY; }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.BYTE, arr.length));
   }
 
   /**
    * Wraps the given primitive array for write operations
-   * @param arr the given primitive array
+   * @param arr the given primitive array.
+   * If the array is size zero this method will
+   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final char[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_ARRAY_MEMORY;
-    }
+    if (arr.length == 0) { return ZERO_SIZE_MEMORY; }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.CHAR, arr.length));
   }
 
   /**
    * Wraps the given primitive array for write operations
-   * @param arr the given primitive array
+   * @param arr the given primitive array.
+   * If the array is size zero this method will
+   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final short[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_ARRAY_MEMORY;
-    }
+    if (arr.length == 0) { return ZERO_SIZE_MEMORY; }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.SHORT, arr.length));
   }
 
   /**
    * Wraps the given primitive array for write operations
-   * @param arr the given primitive array
+   * @param arr the given primitive array.
+   * If the array is size zero this method will
+   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final int[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_ARRAY_MEMORY;
-    }
+    if (arr.length == 0) { return ZERO_SIZE_MEMORY; }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.INT, arr.length));
   }
 
   /**
    * Wraps the given primitive array for write operations
-   * @param arr the given primitive array
+   * @param arr the given primitive array.
+   * If the array is size zero this method will
+   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final long[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_ARRAY_MEMORY;
-    }
+    if (arr.length == 0) { return ZERO_SIZE_MEMORY; }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.LONG, arr.length));
   }
 
   /**
    * Wraps the given primitive array for write operations
-   * @param arr the given primitive array
+   * @param arr the given primitive array.
+   * If the array is size zero this method will
+   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final float[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_ARRAY_MEMORY;
-    }
+    if (arr.length == 0) { return ZERO_SIZE_MEMORY; }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.FLOAT, arr.length));
   }
 
   /**
    * Wraps the given primitive array for write operations
-   * @param arr the given primitive array
+   * @param arr the given primitive array.
+   * If the array is size zero this method will
+   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final double[] arr) {
-    nullCheck(arr);
-    if (arr.length == 0) {
-      return WritableMemoryImpl.ZERO_SIZE_ARRAY_MEMORY;
-    }
+    if (arr.length == 0) { return ZERO_SIZE_MEMORY; }
     return new WritableMemoryImpl(new ResourceState(arr, Prim.DOUBLE, arr.length));
   }
   //END OF CONSTRUCTOR-TYPE METHODS
@@ -252,10 +253,10 @@ public abstract class WritableMemory extends Memory {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param srcArray The source array.
    * @param srcOffset offset in array units
-   * @param length number of array units to transfer
+   * @param lengthBooleans number of array units to transfer
    */
   public abstract void putBooleanArray(long offsetBytes, boolean[] srcArray, int srcOffset,
-          int length);
+          int lengthBooleans);
 
   /**
    * Puts the byte value at the given offset
@@ -269,10 +270,10 @@ public abstract class WritableMemory extends Memory {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param srcArray The source array.
    * @param srcOffset offset in array units
-   * @param length number of array units to transfer
+   * @param lengthBytes number of array units to transfer
    */
   public abstract void putByteArray(long offsetBytes, byte[] srcArray, int srcOffset,
-          int length);
+          int lengthBytes);
 
   /**
    * Puts the char value at the given offset
@@ -286,10 +287,10 @@ public abstract class WritableMemory extends Memory {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param srcArray The source array.
    * @param srcOffset offset in array units
-   * @param length number of array units to transfer
+   * @param lengthChars number of array units to transfer
    */
   public abstract void putCharArray(long offsetBytes, char[] srcArray, int srcOffset,
-          int length);
+          int lengthChars);
 
   /**
    * Encodes characters from the given CharSequence into UTF-8 bytes and puts them into this
@@ -301,7 +302,7 @@ public abstract class WritableMemory extends Memory {
    * the responsibility of the caller to provide sufficient capacity in this
    * <i>WritableMemory</i> for the encoded Utf8 bytes. Characters outside the ASCII range can
    * require 2, 3 or 4 bytes per character to encode.
-   * @return offset bytes relative to this WritableMemory start after the last written byte
+   * @return the number of bytes encoded
    */
   public abstract long putCharsToUtf8(long offsetBytes, CharSequence src);
 
@@ -317,10 +318,10 @@ public abstract class WritableMemory extends Memory {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param srcArray The source array.
    * @param srcOffset offset in array units
-   * @param length number of array units to transfer
+   * @param lengthDoubles number of array units to transfer
    */
   public abstract void putDoubleArray(long offsetBytes, double[] srcArray,
-          final int srcOffset, final int length);
+          final int srcOffset, final int lengthDoubles);
 
   /**
    * Puts the float value at the given offset
@@ -334,10 +335,10 @@ public abstract class WritableMemory extends Memory {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param srcArray The source array.
    * @param srcOffset offset in array units
-   * @param length number of array units to transfer
+   * @param lengthFloats number of array units to transfer
    */
   public abstract void putFloatArray(long offsetBytes, float[] srcArray,
-          final int srcOffset, final int length);
+          final int srcOffset, final int lengthFloats);
 
   /**
    * Puts the int value at the given offset
@@ -351,10 +352,10 @@ public abstract class WritableMemory extends Memory {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param srcArray The source array.
    * @param srcOffset offset in array units
-   * @param length number of array units to transfer
+   * @param lengthInts number of array units to transfer
    */
   public abstract void putIntArray(long offsetBytes, int[] srcArray,
-          final int srcOffset, final int length);
+          final int srcOffset, final int lengthInts);
 
   /**
    * Puts the long value at the given offset
@@ -368,10 +369,10 @@ public abstract class WritableMemory extends Memory {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param srcArray The source array.
    * @param srcOffset offset in array units
-   * @param length number of array units to transfer
+   * @param lengthLongs number of array units to transfer
    */
   public abstract void putLongArray(long offsetBytes, long[] srcArray,
-          final int srcOffset, final int length);
+          final int srcOffset, final int lengthLongs);
 
   /**
    * Puts the short value at the given offset
@@ -385,10 +386,10 @@ public abstract class WritableMemory extends Memory {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param srcArray The source array.
    * @param srcOffset offset in array units
-   * @param length number of array units to transfer
+   * @param lengthShorts number of array units to transfer
    */
   public abstract void putShortArray(long offsetBytes, short[] srcArray,
-          final int srcOffset, final int length);
+          final int srcOffset, final int lengthShorts);
 
   //Atomic Methods XXX
   /**

@@ -148,7 +148,9 @@ public class Utf8Test {
     assertEquals(IsValidUtf8TestUtil.EXPECTED_TWO_BYTE_ROUNDTRIPPABLE_COUNT, valid);
   }
 
-  //@Test  //This test is very long, but should be enabled with any changes to Utf8 class.
+  //@Test
+  //This test is very long, and doesn't cover the 4-byte combinations.
+  // This is replaced by the test following which does cover some 4-byte combinations.
   public void testThreeBytes() {
     // Travis' OOM killer doesn't like this test
     if (System.getenv("TRAVIS") == null) {
@@ -174,6 +176,59 @@ public class Utf8Test {
       assertEquals(IsValidUtf8TestUtil.EXPECTED_THREE_BYTE_ROUNDTRIPPABLE_COUNT, valid);
     }
   }
+
+  /* These code points can be used by the following test to customize different regions of the
+   * Code Point space. This randomized test can replace the exhaustive
+   * combinatorially explosive previous test, which doesn't cover the 4 byte combinations.
+   */
+  static final int min1ByteCP   = 0; //ASCII
+  static final int min2ByteCP   = 0X000080;
+  static final int min3ByteCP   = 0X000800;
+  static final int min4ByteCP   = Character.MIN_SUPPLEMENTARY_CODE_POINT; //0X010000;
+  static final int minPlane2CP  = 0X020000;
+  static final int maxCodePoint = Character.MAX_CODE_POINT;               //0X10FFFF
+  static final int minSurr      = Character.MIN_SURROGATE;                //0X00D800;
+  static final int maxSurr      = Character.MAX_SURROGATE;                //0X00E000;
+
+  @Test
+  //randomly selects CP from a range that include 1, 2, 3 and 4 byte encodings.
+  // with 50% coming from plane 0 and 50% coming from plane 1.
+  public void checkRandomValidCodePoints() {
+    RandomCodePoints rcp = new RandomCodePoints(true);
+    int numCP = 1000;
+    int[] cpArr = new int[numCP];
+    rcp.fillCodePointArray(cpArr, 0, minPlane2CP);
+    String rcpStr = new String(cpArr, 0, numCP);
+    //println(rcpStr);
+    WritableMemory wmem = WritableMemory.allocate(4 * numCP);
+    int utf8Bytes = (int) wmem.putCharsToUtf8(0, rcpStr);
+
+    StringBuilder sb = new StringBuilder();
+    try {
+      wmem.getCharsFromUtf8(0L, utf8Bytes, (Appendable) sb);
+    } catch (IOException | Utf8CodingException e) {
+      throw new RuntimeException(e);
+    }
+    checkStrings(sb.toString(), rcpStr);
+
+    CharBuffer cb = CharBuffer.allocate(rcpStr.length());
+    try {
+      wmem.getCharsFromUtf8(0L, utf8Bytes, cb);
+    } catch (IOException | Utf8CodingException e) {
+      throw new RuntimeException(e);
+    }
+    String cbStr = sb.toString();
+    assertEquals(cbStr.length(), rcpStr.length());
+    checkStrings(cbStr, rcpStr);
+  }
+
+  @Test
+  public void checkRandomValidCodePoints2() {
+    //checks the non-deterministic constructor
+    @SuppressWarnings("unused")
+    RandomCodePoints rcp = new RandomCodePoints(false);
+  }
+
 
   /**
    * Tests that round tripping of a sample of four byte permutations work.
@@ -222,21 +277,32 @@ public class Utf8Test {
   }
 
   @Test
-  public void checkNonEmptyDestination() {
+  public void checkNonEmptyDestinationForDecode() {
     StringBuilder sb = new StringBuilder();
-    sb.append("abc");
-    final int startChars = sb.toString().toCharArray().length;
-    String addStr = "Quizdeltagerne spiste jordb\u00e6r med fl\u00f8de, mens cirkusklovnen";
-    final byte[] addByteArr = addStr.getBytes(UTF_8);
-    final int addBytes = addByteArr.length;
-    WritableMemory addMem = WritableMemory.wrap(addByteArr);
-    final int decodedChars = addMem.getCharsFromUtf8(0, addBytes, sb);
+    sb.append("abc"); //current contents of destination
+    int startChars = sb.toString().toCharArray().length;
+    String refStr = "Quizdeltagerne spiste jordb\u00e6r med fl\u00f8de, mens cirkusklovnen";
+    byte[] refByteArr = refStr.getBytes(UTF_8);
+    int addBytes = refByteArr.length;
+    WritableMemory refMem = WritableMemory.wrap(refByteArr);
+    int decodedChars = refMem.getCharsFromUtf8(0, addBytes, sb);
     String finalStr = sb.toString();
-    final int finalChars = finalStr.toCharArray().length;
+    int finalChars = finalStr.toCharArray().length;
     assertEquals(decodedChars + startChars, finalChars);
     println("Decoded chars: " + decodedChars);
     println("Final chars: " + finalChars);
     println(sb.toString());
+  }
+
+  @Test
+  public void checkNonEmptyDestinationForEncode() {
+    String refStr = "Quizdeltagerne spiste jordb\u00e6r med fl\u00f8de, mens cirkusklovnen";
+    byte[] refByteArr = refStr.getBytes(UTF_8);
+    int refBytes = refByteArr.length;
+    int offset = 100;
+    WritableMemory tgtMem = WritableMemory.allocate(refBytes + offset);
+    long bytesEncoded = tgtMem.putCharsToUtf8(offset, refStr);
+    assertEquals(bytesEncoded, refBytes);
   }
 
   @Test
@@ -293,54 +359,6 @@ public class Utf8Test {
     assertInvalidSlice(bytes, bytes.length + 1, 0);
     assertInvalidSlice(bytes, 0, bytes.length + 1);
   }
-
-  static final int end1ByteCP = 0X000080;
-  static final int end2ByteCP = 0X000800;
-  static final int end3ByteCP = 0X010000;
-  static final int end4ByteCP = 0X110000;
-  static final int startSurr  = 0X00D800;
-  static final int endSurr    = 0X00DFFF;
-
-  @Test
-  //randomly selects CP from a range that include 1, 2, 3 and 4 byte encodings.
-  // with 50% coming from plane 0 and 50% coming from plane 1.
-  public void checkRandomValidCodePoints() {
-    RandomCodePoints rcp = new RandomCodePoints(true);
-    int numCP = 1000;
-    int[] cpArr = new int[numCP];
-    rcp.fillCodePointArray(cpArr, 0, end3ByteCP * 2);
-    String rcpStr = new String(cpArr, 0, numCP);
-    //println(rcpStr);
-    WritableMemory wmem = WritableMemory.allocate(4 * numCP);
-    int utf8Bytes = (int) wmem.putCharsToUtf8(0, rcpStr);
-
-    StringBuilder sb = new StringBuilder();
-    try {
-      wmem.getCharsFromUtf8(0L, utf8Bytes, (Appendable) sb);
-    } catch (IOException | Utf8CodingException e) {
-      throw new RuntimeException(e);
-    }
-    checkStrings(sb.toString(), rcpStr);
-
-    CharBuffer cb = CharBuffer.allocate(rcpStr.length());
-    try {
-      wmem.getCharsFromUtf8(0L, utf8Bytes, cb);
-    } catch (IOException | Utf8CodingException e) {
-      throw new RuntimeException(e);
-    }
-    String cbStr = sb.toString();
-    assertEquals(cbStr.length(), rcpStr.length());
-    checkStrings(cbStr, rcpStr);
-  }
-
-  @Test
-  public void checkRandomValidCodePoints2() {
-    //checks the non-deterministic constructor
-    @SuppressWarnings("unused")
-    RandomCodePoints rcp = new RandomCodePoints(false);
-  }
-
-
 
   private static void assertInvalid(int... bytesAsInt) { //invalid byte sequences
     byte[] bytes = new byte[bytesAsInt.length];

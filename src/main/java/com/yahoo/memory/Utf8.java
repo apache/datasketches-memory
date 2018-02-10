@@ -26,8 +26,6 @@ import java.nio.CharBuffer;
  * @author Lee Rhodes
  * @author Roman Leventov
  */
-// NOTE: If you touch this class you need to enable the exhaustive Utf8Test.testThreeBytes()
-//  method.
 final class Utf8 {
 
   //Decode
@@ -264,49 +262,58 @@ final class Utf8 {
     final Object unsafeObj = state.getUnsafeObject();
     final long cumBaseOffset = state.getCumBaseOffset();
 
-    long j = cumBaseOffset + offsetBytes; //used in unsafe for the index
-    int i = 0; //src character index
+    int cIdx = 0; //src character index
+    long bIdx = cumBaseOffset + offsetBytes; //byte index
+    long bCnt = 0; //bytes inserted
+
     final long byteLimit = cumBaseOffset + state.getCapacity(); //unsafe index limit
 
     final int utf16Length = src.length();
     //Quickly dispatch an ASCII sequence
-    for (char c; (i < utf16Length) && ((i + j) < byteLimit) && ((c = src.charAt(i)) < 0x80); i++) {
-      unsafe.putByte(unsafeObj, j + i, (byte) c);
+    for (char c;
+        (cIdx < utf16Length) && ((cIdx + bIdx) < byteLimit) && ((c = src.charAt(cIdx)) < 0x80);
+        cIdx++, bCnt++) {
+      unsafe.putByte(unsafeObj, bIdx + cIdx, (byte) c);
     }
-    if (i == utf16Length) { //done, return next relative byte index in memory
-      return (j + utf16Length) - cumBaseOffset;
+    //encountered a non-ascii character
+    if (cIdx == utf16Length) { //done.
+      // next relative byte index in memory is (bIdx + utf16Length) - cumBaseOffset.
+      return bCnt;
     }
-    j += i;
+    bIdx += cIdx; //bytes == characters for ascii
 
-    for (char c; i < utf16Length; i++) {
-      c = src.charAt(i);
+    for (char c; cIdx < utf16Length; cIdx++) { //process the remaining characters
+      c = src.charAt(cIdx);
 
-      if ((c < 0x80) && (j < byteLimit)) {
+      if ((c < 0x80) && (bIdx < byteLimit)) {
         //Encode ASCII, 0 through 0x007F.
-        unsafe.putByte(unsafeObj, j++, (byte) c);
+        unsafe.putByte(unsafeObj, bIdx++, (byte) c);
+        bCnt++;
       }
 
       else
       //c MUST BE >= 0x0080 || j >= byteLimit
 
-      if ((c < 0x800) && (j < (byteLimit - 1))) {
+      if ((c < 0x800) && (bIdx < (byteLimit - 1))) {
         //Encode 0x80 through 0x7FF.
         //This is for almost all Latin-script alphabets plus Greek, Cyrillic, Hebrew, Arabic, etc.
         //We must have target space for at least 2 Utf8 bytes.
-        unsafe.putByte(unsafeObj, j++, (byte) ((0xF << 6) | (c >>> 6)));
-        unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & c)));
+        unsafe.putByte(unsafeObj, bIdx++, (byte) ((0xF << 6) | (c >>> 6)));
+        unsafe.putByte(unsafeObj, bIdx++, (byte) (0x80 | (0x3F & c)));
+        bCnt += 2;
       }
 
       else
       //c > 0x800 || j >= byteLimit - 1 || j >= byteLimit
 
-      if ( !isSurrogate(c) && (j < (byteLimit - 2)) ) {
+      if ( !isSurrogate(c) && (bIdx < (byteLimit - 2)) ) {
         //Encode the remainder of the BMP that are not surrogates:
         //  0x0800 thru 0xD7FF; 0xE000 thru 0xFFFF, the max single-char code point
         //We must have target space for at least 3 Utf8 bytes.
-        unsafe.putByte(unsafeObj, j++, (byte) ((0xF << 5) | (c >>> 12)));
-        unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & (c >>> 6))));
-        unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & c)));
+        unsafe.putByte(unsafeObj, bIdx++, (byte) ((0xF << 5) | (c >>> 12)));
+        unsafe.putByte(unsafeObj, bIdx++, (byte) (0x80 | (0x3F & (c >>> 6))));
+        unsafe.putByte(unsafeObj, bIdx++, (byte) (0x80 | (0x3F & c)));
+        bCnt += 3;
       }
 
       else {
@@ -326,15 +333,16 @@ final class Utf8 {
         // We proceed assuming (1). If the following test fails, we move to an exception.
 
         final char low;
-        if ( (i <= (utf16Length - 2))
-            && (j <= (byteLimit - 4))
-            && isSurrogatePair(c, low = src.charAt(i + 1)) ) { //we are good
-          i++; //skip over low surrogate
+        if ( (cIdx <= (utf16Length - 2))
+            && (bIdx <= (byteLimit - 4))
+            && isSurrogatePair(c, low = src.charAt(cIdx + 1)) ) { //we are good
+          cIdx++; //skip over low surrogate
           final int codePoint = toCodePoint(c, low);
-          unsafe.putByte(unsafeObj, j++, (byte) ((0xF << 4) | (codePoint >>> 18)));
-          unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & (codePoint >>> 12))));
-          unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & (codePoint >>> 6))));
-          unsafe.putByte(unsafeObj, j++, (byte) (0x80 | (0x3F & codePoint)));
+          unsafe.putByte(unsafeObj, bIdx++, (byte) ((0xF << 4) | (codePoint >>> 18)));
+          unsafe.putByte(unsafeObj, bIdx++, (byte) (0x80 | (0x3F & (codePoint >>> 12))));
+          unsafe.putByte(unsafeObj, bIdx++, (byte) (0x80 | (0x3F & (codePoint >>> 6))));
+          unsafe.putByte(unsafeObj, bIdx++, (byte) (0x80 | (0x3F & codePoint)));
+          bCnt += 4;
         }
 
         else {
@@ -342,25 +350,25 @@ final class Utf8 {
           // what was wrong and hopefully throw an intelligent message!
 
           //check the BMP code point cases and their required memory limits
-          if (   ((c < 0X0080) && (j >= byteLimit))
-              || ((c < 0x0800) && (j >= (byteLimit - 1)))
-              || ((c < 0xFFFF) && (j >= (byteLimit - 2))) ) {
+          if (   ((c < 0X0080) && (bIdx >= byteLimit))
+              || ((c < 0x0800) && (bIdx >= (byteLimit - 1)))
+              || ((c < 0xFFFF) && (bIdx >= (byteLimit - 2))) ) {
             throw Utf8CodingException.outOfMemory();
           }
 
-          if (i > (utf16Length - 2)) { //the last char is an unpaired surrogate
+          if (cIdx > (utf16Length - 2)) { //the last char is an unpaired surrogate
             throw Utf8CodingException.unpairedSurrogate(c);
           }
 
-          if (j > (byteLimit - 4)) {
+          if (bIdx > (byteLimit - 4)) {
             //4 Memory bytes required to encode a surrogate pair.
-            final int remaining = (int) ((j - byteLimit) + 4L);
+            final int remaining = (int) ((bIdx - byteLimit) + 4L);
             throw Utf8CodingException.shortUtf8EncodeByteLength(remaining);
           }
 
-          if (!isSurrogatePair(c, src.charAt(i + 1)) ) {
+          if (!isSurrogatePair(c, src.charAt(cIdx + 1)) ) {
             //Not a surrogate pair.
-            throw Utf8CodingException.illegalSurrogatePair(c, src.charAt(i + 1));
+            throw Utf8CodingException.illegalSurrogatePair(c, src.charAt(cIdx + 1));
           }
 
           //This should not happen :)
@@ -368,8 +376,8 @@ final class Utf8 {
         }
       }
     }
-    final long localOffsetBytes = j - cumBaseOffset;
-    return localOffsetBytes;
+    //final long localOffsetBytes = bIdx - cumBaseOffset;
+    return bCnt;
   }
 
   /*****************/

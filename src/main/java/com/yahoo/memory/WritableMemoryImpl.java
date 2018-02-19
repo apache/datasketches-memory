@@ -50,7 +50,6 @@ import java.nio.ByteOrder;
  * @author Lee Rhodes
  */
 class WritableMemoryImpl extends BaseWritableMemoryImpl {
-  final long unsafeObjHeader; //Heap ByteBuffer includes the slice() offset here.
 
   //Static variable for cases where byteBuf/array/direct sizes are zero
   final static WritableMemoryImpl ZERO_SIZE_MEMORY;
@@ -61,7 +60,6 @@ class WritableMemoryImpl extends BaseWritableMemoryImpl {
 
   WritableMemoryImpl(final ResourceState state) {
     super(state);
-    unsafeObjHeader = state.getUnsafeObjectHeader();
   }
 
   //DUPLICATES & REGIONS XXX

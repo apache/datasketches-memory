@@ -16,9 +16,9 @@ package com.yahoo.memory;
 public final class WritableMapHandle extends MapHandle implements WritableMap, WritableHandle
 {
   AllocateDirectWritableMap dirWmap;
-  WritableMemoryImpl wMemImpl;
+  BaseWritableMemoryImpl wMemImpl;
 
-  private WritableMapHandle(final AllocateDirectWritableMap dirWmap, final WritableMemoryImpl wMem) {
+  private WritableMapHandle(final AllocateDirectWritableMap dirWmap, final BaseWritableMemoryImpl wMem) {
     super(dirWmap, wMem);
     this.dirWmap = dirWmap;
     wMemImpl = wMem;
@@ -27,7 +27,7 @@ public final class WritableMapHandle extends MapHandle implements WritableMap, W
   @SuppressWarnings("resource") //called from memory
   static WritableMapHandle map(final ResourceState state) throws Exception {
     final AllocateDirectWritableMap dirMap = AllocateDirectWritableMap.map(state);
-    final WritableMemoryImpl wMem = new WritableMemoryImpl(state);
+    final BaseWritableMemoryImpl wMem = new WritableMemoryImpl(state);
     return new WritableMapHandle(dirMap, wMem);
   }
 

@@ -42,7 +42,7 @@ public abstract class WritableMemory extends Memory {
     final ResourceState state = new ResourceState();
     state.putByteBuffer(byteBuf);
     AccessByteBuffer.wrap(state);
-    final WritableMemoryImpl impl = new WritableMemoryImpl(state);
+    final BaseWritableMemoryImpl impl = new WritableMemoryImpl(state);
     return impl;
   }
 

@@ -15,9 +15,9 @@ package com.yahoo.memory;
 //Joins a Read-only Handle with an AutoCloseable Map resource.
 public class MapHandle implements Map, Handle {
   AllocateDirectMap dirMap;
-  WritableMemoryImpl wMem;
+  BaseWritableMemoryImpl wMem;
 
-  MapHandle(final AllocateDirectMap dirMap, final WritableMemoryImpl wMem) {
+  MapHandle(final AllocateDirectMap dirMap, final BaseWritableMemoryImpl wMem) {
     this.dirMap = dirMap;
     this.wMem = wMem;
   }
@@ -25,7 +25,7 @@ public class MapHandle implements Map, Handle {
   @SuppressWarnings("resource") //called from memory
   static MapHandle map(final ResourceState state) throws Exception {
     final AllocateDirectMap dirMap = AllocateDirectMap.map(state);
-    final WritableMemoryImpl wMem = new WritableMemoryImpl(state);
+    final BaseWritableMemoryImpl wMem = new WritableMemoryImpl(state);
     return new MapHandle(dirMap, wMem);
   }
 

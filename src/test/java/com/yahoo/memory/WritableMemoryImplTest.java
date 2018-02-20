@@ -205,11 +205,10 @@ public class WritableMemoryImplTest {
 
   //Copy Within tests
 
-  @Test
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void checkDegenerateCopyTo() {
     WritableMemory wmem = WritableMemory.allocate(64);
     wmem.copyTo(0, wmem, 0, 64);
-    //TODO
   }
 
   @Test

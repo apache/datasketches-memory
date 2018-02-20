@@ -122,7 +122,7 @@ class WritableMemoryImpl extends BaseWritableMemoryImpl {
     final long copyBytes = ((long) lengthChars) << CHAR_SHIFT;
     checkBounds(offsetBytes, copyBytes, capacity);
     checkBounds(dstOffset, lengthChars, dstArray.length);
-    unsafe.copyMemory(
+    copyMemoryCheckingNonOverlapping(
         unsafeObj,
         cumBaseOffset + offsetBytes,
         dstArray,
@@ -152,7 +152,7 @@ class WritableMemoryImpl extends BaseWritableMemoryImpl {
     final long copyBytes = ((long) lengthDoubles) << DOUBLE_SHIFT;
     checkBounds(offsetBytes, copyBytes, capacity);
     checkBounds(dstOffset, lengthDoubles, dstArray.length);
-    unsafe.copyMemory(
+    copyMemoryCheckingNonOverlapping(
         unsafeObj,
         cumBaseOffset + offsetBytes,
         dstArray,
@@ -174,7 +174,7 @@ class WritableMemoryImpl extends BaseWritableMemoryImpl {
     final long copyBytes = ((long) lengthFloats) << FLOAT_SHIFT;
     checkBounds(offsetBytes, copyBytes, capacity);
     checkBounds(dstOffset, lengthFloats, dstArray.length);
-    unsafe.copyMemory(
+    copyMemoryCheckingNonOverlapping(
         unsafeObj,
         cumBaseOffset + offsetBytes,
         dstArray,
@@ -196,7 +196,7 @@ class WritableMemoryImpl extends BaseWritableMemoryImpl {
     final long copyBytes = ((long) lengthInts) << INT_SHIFT;
     checkBounds(offsetBytes, copyBytes, capacity);
     checkBounds(dstOffset, lengthInts, dstArray.length);
-    unsafe.copyMemory(
+    copyMemoryCheckingNonOverlapping(
         unsafeObj,
         cumBaseOffset + offsetBytes,
         dstArray,
@@ -218,7 +218,7 @@ class WritableMemoryImpl extends BaseWritableMemoryImpl {
     final long copyBytes = ((long) lengthLongs) << LONG_SHIFT;
     checkBounds(offsetBytes, copyBytes, capacity);
     checkBounds(dstOffset, lengthLongs, dstArray.length);
-    unsafe.copyMemory(
+    copyMemoryCheckingNonOverlapping(
         unsafeObj,
         cumBaseOffset + offsetBytes,
         dstArray,
@@ -240,7 +240,7 @@ class WritableMemoryImpl extends BaseWritableMemoryImpl {
     final long copyBytes = ((long) lengthShorts) << SHORT_SHIFT;
     checkBounds(offsetBytes, copyBytes, capacity);
     checkBounds(dstOffset, lengthShorts, dstArray.length);
-    unsafe.copyMemory(
+    copyMemoryCheckingNonOverlapping(
         unsafeObj,
         cumBaseOffset + offsetBytes,
         dstArray,
@@ -289,7 +289,7 @@ class WritableMemoryImpl extends BaseWritableMemoryImpl {
     final long copyBytes = ((long) lengthChars) << CHAR_SHIFT;
     checkBounds(srcOffset, lengthChars, srcArray.length);
     checkBounds(offsetBytes, copyBytes, capacity);
-    unsafe.copyMemory(
+    copyMemoryCheckingNonOverlapping(
         srcArray,
         ARRAY_CHAR_BASE_OFFSET + (((long) srcOffset) << CHAR_SHIFT),
         unsafeObj,
@@ -318,7 +318,7 @@ class WritableMemoryImpl extends BaseWritableMemoryImpl {
     final long copyBytes = ((long) lengthDoubles) << DOUBLE_SHIFT;
     checkBounds(srcOffset, lengthDoubles, srcArray.length);
     checkBounds(offsetBytes, copyBytes, capacity);
-    unsafe.copyMemory(
+    copyMemoryCheckingNonOverlapping(
         srcArray,
         ARRAY_DOUBLE_BASE_OFFSET + (((long) srcOffset) << DOUBLE_SHIFT),
         unsafeObj,
@@ -341,7 +341,7 @@ class WritableMemoryImpl extends BaseWritableMemoryImpl {
     final long copyBytes = ((long) lengthFloats) << FLOAT_SHIFT;
     checkBounds(srcOffset, lengthFloats, srcArray.length);
     checkBounds(offsetBytes, copyBytes, capacity);
-    unsafe.copyMemory(
+    copyMemoryCheckingNonOverlapping(
         srcArray,
         ARRAY_FLOAT_BASE_OFFSET + (((long) srcOffset) << FLOAT_SHIFT),
         unsafeObj,
@@ -364,7 +364,7 @@ class WritableMemoryImpl extends BaseWritableMemoryImpl {
     final long copyBytes = ((long) lengthInts) << INT_SHIFT;
     checkBounds(srcOffset, lengthInts, srcArray.length);
     checkBounds(offsetBytes, copyBytes, capacity);
-    unsafe.copyMemory(
+    copyMemoryCheckingNonOverlapping(
         srcArray,
         ARRAY_INT_BASE_OFFSET + (((long) srcOffset) << INT_SHIFT),
         unsafeObj,
@@ -387,7 +387,7 @@ class WritableMemoryImpl extends BaseWritableMemoryImpl {
     final long copyBytes = ((long) lengthLongs) << LONG_SHIFT;
     checkBounds(srcOffset, lengthLongs, srcArray.length);
     checkBounds(offsetBytes, copyBytes, capacity);
-    unsafe.copyMemory(
+    copyMemoryCheckingNonOverlapping(
         srcArray,
         ARRAY_LONG_BASE_OFFSET + (((long) srcOffset) << LONG_SHIFT),
         unsafeObj,
@@ -410,7 +410,7 @@ class WritableMemoryImpl extends BaseWritableMemoryImpl {
     final long copyBytes = ((long) lengthShorts) << SHORT_SHIFT;
     checkBounds(srcOffset, lengthShorts, srcArray.length);
     checkBounds(offsetBytes, copyBytes, capacity);
-    unsafe.copyMemory(
+    copyMemoryCheckingNonOverlapping(
         srcArray,
         ARRAY_SHORT_BASE_OFFSET + (((long) srcOffset) << SHORT_SHIFT),
         unsafeObj,

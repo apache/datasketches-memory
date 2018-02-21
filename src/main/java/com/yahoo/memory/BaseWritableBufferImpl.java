@@ -120,8 +120,8 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
     checkBounds(thatOffsetBytes, thatLengthBytes, that.capacity);
     final long thisAdd = getCumulativeOffset() + thisOffsetBytes;
     final long thatAdd = that.getCumulativeOffset() + thatOffsetBytes;
-    @SuppressWarnings("UnnecessaryLocalVariable") final Object thisObj = this.unsafeObj;
-    @SuppressWarnings("UnnecessaryLocalVariable") final Object thatObj = that.unsafeObj;
+    final Object thisObj = this.unsafeObj;
+    final Object thatObj = that.unsafeObj;
     final long lenBytes = Math.min(thisLengthBytes, thatLengthBytes);
     for (long i = 0; i < lenBytes; i++) {
       final int thisByte = unsafe.getByte(thisObj, thisAdd + i);

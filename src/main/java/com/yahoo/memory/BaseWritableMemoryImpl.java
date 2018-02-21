@@ -34,8 +34,9 @@ import java.nio.ByteBuffer;
  * Contains methods which are agnostic to the byte order.
  */
 abstract class BaseWritableMemoryImpl extends WritableMemory {
+
   /**
-   * Don't use {@link sun.misc.Unsafe#copyMemory to copy blocks of memory larger than this
+   * Don't use {@link sun.misc.Unsafe#copyMemory} to copy blocks of memory larger than this
    * threshold, because internally it doesn't have safepoint polls, that may cause long
    * "Time To Safe Point" pauses in the application. This has been fixed in JDK 9 (see
    * https://bugs.openjdk.java.net/browse/JDK-8149596 and
@@ -132,7 +133,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   @Override
   public void copyTo(final long srcOffsetBytes, final WritableMemory destination,
       final long dstOffsetBytes, final long lengthBytes) {
-    BaseWritableMemoryImpl dst = (BaseWritableMemoryImpl) destination;
+    final BaseWritableMemoryImpl dst = (BaseWritableMemoryImpl) destination;
     state.checkValid();
     checkBounds(srcOffsetBytes, lengthBytes, capacity);
     dst.state.checkValid();
@@ -153,7 +154,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
 
   private static void copyMemorySlowPath(final Object srcUnsafeObj, final long srcAdd,
       final Object dstUnsafeObj, final long dstAdd, final long lengthBytes) {
-    if (srcAdd + lengthBytes <= dstAdd || dstAdd + lengthBytes <= srcAdd) {
+    if (((srcAdd + lengthBytes) <= dstAdd) || ((dstAdd + lengthBytes) <= srcAdd)) {
       copyNonOverlappingMemory(srcUnsafeObj, srcAdd, dstUnsafeObj, dstAdd, lengthBytes);
       return;
     }
@@ -168,21 +169,21 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
 
   static void copyMemoryCheckingNonOverlapping(final Object srcUnsafeObj, final long srcAdd,
       final Object dstUnsafeObj, final long dstAdd, final long lengthBytes) {
-    if (srcUnsafeObj != dstUnsafeObj || srcAdd + lengthBytes <= dstAdd ||
-        dstAdd + lengthBytes <= srcAdd) {
+    if ((srcUnsafeObj != dstUnsafeObj) || ((srcAdd + lengthBytes) <= dstAdd)
+        || ((dstAdd + lengthBytes) <= srcAdd)) {
       copyNonOverlappingMemory(srcUnsafeObj, srcAdd, dstUnsafeObj, dstAdd, lengthBytes);
     } else {
-      throw new IllegalArgumentException("Not expecting memory blocks to overlap: obj=" +
-          srcUnsafeObj + ", srcAddress=" + srcAdd + ", dstAddress=" + dstAdd + ", lengthBytes=" +
-          lengthBytes);
+      throw new IllegalArgumentException("Not expecting memory blocks to overlap: obj="
+          + srcUnsafeObj + ", srcAddress=" + srcAdd + ", dstAddress=" + dstAdd
+          + ", lengthBytes=" + lengthBytes);
     }
   }
 
-  /** @see #UNSAFE_COPY_MEMORY_THRESHOLD */
+  /* @see #UNSAFE_COPY_MEMORY_THRESHOLD */
   private static void copyNonOverlappingMemory(final Object srcUnsafeObj, long srcAdd,
       final Object dstUnsafeObj, long dstAdd, long lengthBytes) {
     while (lengthBytes > 0) {
-      long copy = Math.min(lengthBytes, UNSAFE_COPY_MEMORY_THRESHOLD);
+      final long copy = Math.min(lengthBytes, UNSAFE_COPY_MEMORY_THRESHOLD);
       unsafe.copyMemory(srcUnsafeObj, srcAdd, dstUnsafeObj, dstAdd, copy);
       lengthBytes -= copy;
       srcAdd += copy;

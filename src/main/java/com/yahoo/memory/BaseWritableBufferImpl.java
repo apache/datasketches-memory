@@ -10,11 +10,13 @@ import static com.yahoo.memory.UnsafeUtil.ARRAY_BOOLEAN_BASE_OFFSET;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_BOOLEAN_INDEX_SCALE;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_BYTE_INDEX_SCALE;
+import static com.yahoo.memory.UnsafeUtil.LS;
 import static com.yahoo.memory.UnsafeUtil.assertBounds;
 import static com.yahoo.memory.UnsafeUtil.checkBounds;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 /*
  * Developer notes: The heavier methods, such as put/get arrays, duplicate, region, clear, fill,
@@ -194,6 +196,31 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   @Override
   public boolean isValid() {
     return state.isValid();
+  }
+
+  @Override
+  public ByteOrder getResourceOrder() {
+    state.assertValid();
+    return state.order();
+  }
+
+  @Override
+  public boolean swapBytes() {
+    return state.isSwapBytes();
+  }
+
+  @Override
+  public String toHexString(final String header, final long offsetBytes, final int lengthBytes) {
+    state.checkValid();
+    final String klass = this.getClass().getSimpleName();
+    final String s1 = String.format("(..., %d, %d)", offsetBytes, lengthBytes);
+    final long hcode = hashCode() & 0XFFFFFFFFL;
+    final String call = ".toHexString" + s1 + ", hashCode: " + hcode;
+    final StringBuilder sb = new StringBuilder();
+    sb.append("### ").append(klass).append(" SUMMARY ###").append(LS);
+    sb.append("Header Comment      : ").append(header).append(LS);
+    sb.append("Call Parameters     : ").append(call);
+    return Memory.toHex(sb.toString(), offsetBytes, lengthBytes, state);
   }
 
   //PRIMITIVE putXXX() and putXXXArray() XXX

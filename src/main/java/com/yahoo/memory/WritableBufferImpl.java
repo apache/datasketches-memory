@@ -297,31 +297,6 @@ class WritableBufferImpl extends BaseWritableBufferImpl {
             copyBytes);
   }
 
-  @Override
-  public ByteOrder getResourceOrder() {
-    state.assertValid();
-    return state.order();
-  }
-
-  @Override
-  public boolean swapBytes() {
-    return state.isSwapBytes();
-  }
-
-  @Override
-  public String toHexString(final String header, final long offsetBytes, final int lengthBytes) {
-    state.checkValid();
-    final String klass = this.getClass().getSimpleName();
-    final String s1 = String.format("(..., %d, %d)", offsetBytes, lengthBytes);
-    final long hcode = hashCode() & 0XFFFFFFFFL;
-    final String call = ".toHexString" + s1 + ", hashCode: " + hcode;
-    final StringBuilder sb = new StringBuilder();
-    sb.append("### ").append(klass).append(" SUMMARY ###").append(LS);
-    sb.append("Header Comment      : ").append(header).append(LS);
-    sb.append("Call Parameters     : ").append(call);
-    return Memory.toHex(sb.toString(), offsetBytes, lengthBytes, state);
-  }
-
   //PRIMITIVE putXXX() and putXXXArray() XXX
   @Override
   public void putChar(final char value) {

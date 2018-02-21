@@ -111,16 +111,17 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
 
   //OTHER PRIMITIVE READ METHODS: copyTo, compareTo XXX
   @Override
-  public int compareTo(final long thisOffsetBytes, final long thisLengthBytes, final Buffer that,
+  public int compareTo(final long thisOffsetBytes, final long thisLengthBytes, final Buffer thatBuf,
           final long thatOffsetBytes, final long thatLengthBytes) {
     state.checkValid();
-    that.getResourceState().checkValid();
     checkBounds(thisOffsetBytes, thisLengthBytes, capacity);
+    final BaseWritableBufferImpl that = (BaseWritableBufferImpl) thatBuf;
+    that.state.checkValid();
     checkBounds(thatOffsetBytes, thatLengthBytes, that.capacity);
     final long thisAdd = getCumulativeOffset() + thisOffsetBytes;
     final long thatAdd = that.getCumulativeOffset() + thatOffsetBytes;
-    final Object thisObj = (isDirect()) ? null : unsafeObj;
-    final Object thatObj = (that.isDirect()) ? null : ((WritableBuffer)that).getArray();
+    @SuppressWarnings("UnnecessaryLocalVariable") final Object thisObj = this.unsafeObj;
+    @SuppressWarnings("UnnecessaryLocalVariable") final Object thatObj = that.unsafeObj;
     final long lenBytes = Math.min(thisLengthBytes, thatLengthBytes);
     for (long i = 0; i < lenBytes; i++) {
       final int thisByte = unsafe.getByte(thisObj, thisAdd + i);

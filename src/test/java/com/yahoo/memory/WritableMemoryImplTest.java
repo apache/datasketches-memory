@@ -609,6 +609,14 @@ public class WritableMemoryImplTest {
   }
 
   @Test
+  public void testCompareToSameStart() {
+    Memory mem = WritableMemory.allocate(3);
+    assertEquals(-1, mem.compareTo(0, 1, mem, 0, 2));
+    assertEquals(0, mem.compareTo(1, 1, mem, 1, 1));
+    assertEquals(1, mem.compareTo(1, 2, mem, 1, 1));
+  }
+
+  @Test
   public void checkAsBuffer() {
     WritableMemory wmem = WritableMemory.allocate(64);
     WritableBuffer wbuf = wmem.asWritableBuffer();

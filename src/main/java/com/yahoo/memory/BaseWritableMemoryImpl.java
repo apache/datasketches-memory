@@ -106,28 +106,29 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
 
   //OTHER PRIMITIVE READ METHODS: compareTo, copyTo XXX
   @Override
-  public int compareTo(final long thisOffsetBytes, final long thisLengthBytes, final Memory that,
+  public int compareTo(final long thisOffsetBytes, final long thisLengthBytes, final Memory thatMem,
       final long thatOffsetBytes, final long thatLengthBytes) {
     state.checkValid();
     checkBounds(thisOffsetBytes, thisLengthBytes, capacity);
-    checkBounds(thatOffsetBytes, thatLengthBytes, that.getCapacity());
-    if (isSameResource(that)) {
-      if (thisOffsetBytes == thatOffsetBytes) {
-        return 0;
-      }
-    } else {
-      that.getResourceState().checkValid();
-    }
+    final BaseWritableMemoryImpl that = (BaseWritableMemoryImpl) thatMem;
+    that.state.checkValid();
+    checkBounds(thatOffsetBytes, thatLengthBytes, that.capacity);
     final long thisAdd = getCumulativeOffset(thisOffsetBytes);
     final long thatAdd = that.getCumulativeOffset(thatOffsetBytes);
-    final Object thisObj = (isDirect()) ? null : unsafeObj;
-    final Object thatObj = (that.isDirect()) ? null : ((WritableMemory)that).getArray();
-    final long lenBytes = Math.min(thisLengthBytes, thatLengthBytes);
-    for (long i = 0; i < lenBytes; i++) {
-      final int thisByte = unsafe.getByte(thisObj, thisAdd + i);
-      final int thatByte = unsafe.getByte(thatObj, thatAdd + i);
-      if (thisByte < thatByte) { return -1; }
-      if (thisByte > thatByte) { return  1; }
+    final Object thisObj = this.unsafeObj;
+    final Object thatObj = that.unsafeObj;
+    if (thisObj != thatObj || thisAdd != thatAdd) {
+      final long lenBytes = Math.min(thisLengthBytes, thatLengthBytes);
+      for (long i = 0; i < lenBytes; i++) {
+        final int thisByte = unsafe.getByte(thisObj, thisAdd + i);
+        final int thatByte = unsafe.getByte(thatObj, thatAdd + i);
+        if (thisByte < thatByte) {
+          return -1;
+        }
+        if (thisByte > thatByte) {
+          return 1;
+        }
+      }
     }
     return Long.compare(thisLengthBytes, thatLengthBytes);
   }

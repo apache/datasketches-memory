@@ -31,4 +31,13 @@ public class WritableMemoryTest {
     assertEquals(wbuf.getResourceOrder(), ByteOrder.BIG_ENDIAN);
   }
 
+  @Test
+  public void checkGetArray() {
+    byte[] byteArr = new byte[64];
+    WritableMemory wmem = WritableMemory.wrap(byteArr);
+    assertTrue(wmem.getArray() == byteArr);
+    WritableBuffer wbuf = wmem.asWritableBuffer();
+    assertTrue(wbuf.getArray() == byteArr);
+  }
+
 }

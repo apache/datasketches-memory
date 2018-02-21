@@ -23,13 +23,10 @@ import static com.yahoo.memory.UnsafeUtil.DOUBLE_SHIFT;
 import static com.yahoo.memory.UnsafeUtil.FLOAT_SHIFT;
 import static com.yahoo.memory.UnsafeUtil.INT_SHIFT;
 import static com.yahoo.memory.UnsafeUtil.LONG_SHIFT;
-import static com.yahoo.memory.UnsafeUtil.LS;
 import static com.yahoo.memory.UnsafeUtil.SHORT_SHIFT;
 import static com.yahoo.memory.UnsafeUtil.assertBounds;
 import static com.yahoo.memory.UnsafeUtil.checkBounds;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
-
-import java.nio.ByteOrder;
 
 /*
  * Developer notes: The heavier methods, such as put/get arrays, duplicate, region, clear, fill,

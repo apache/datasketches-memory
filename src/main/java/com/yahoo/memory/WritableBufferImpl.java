@@ -5,7 +5,6 @@
 
 package com.yahoo.memory;
 
-import static com.yahoo.memory.BaseWritableMemoryImpl.copyMemoryCheckingDifferentObject;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_CHAR_BASE_OFFSET;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_CHAR_INDEX_SCALE;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_DOUBLE_BASE_OFFSET;
@@ -135,7 +134,7 @@ class WritableBufferImpl extends BaseWritableBufferImpl {
     final long pos = getPosition();
     final long copyBytes = ((long) lengthChars) << CHAR_SHIFT;
     incrementAndCheckPosition(pos, copyBytes);
-    copyMemoryCheckingDifferentObject(
+    CompareAndCopy.copyMemoryCheckingDifferentObject(
             unsafeObj,
             cumBaseOffset + pos,
             dstArray,
@@ -166,7 +165,7 @@ class WritableBufferImpl extends BaseWritableBufferImpl {
     final long pos = getPosition();
     final long copyBytes = ((long) lengthDoubles) << DOUBLE_SHIFT;
     incrementAndCheckPosition(pos, copyBytes);
-    copyMemoryCheckingDifferentObject(
+    CompareAndCopy.copyMemoryCheckingDifferentObject(
             unsafeObj,
             cumBaseOffset + pos,
             dstArray,
@@ -196,7 +195,7 @@ class WritableBufferImpl extends BaseWritableBufferImpl {
     final long pos = getPosition();
     final long copyBytes = ((long) lengthFloats) << FLOAT_SHIFT;
     incrementAndCheckPosition(pos, copyBytes);
-    copyMemoryCheckingDifferentObject(
+    CompareAndCopy.copyMemoryCheckingDifferentObject(
             unsafeObj,
             cumBaseOffset + pos,
             dstArray,
@@ -226,7 +225,7 @@ class WritableBufferImpl extends BaseWritableBufferImpl {
     final long pos = getPosition();
     final long copyBytes = ((long) lengthInts) << INT_SHIFT;
     incrementAndCheckPosition(pos, copyBytes);
-    copyMemoryCheckingDifferentObject(
+    CompareAndCopy.copyMemoryCheckingDifferentObject(
             unsafeObj,
             cumBaseOffset + pos,
             dstArray,
@@ -256,7 +255,7 @@ class WritableBufferImpl extends BaseWritableBufferImpl {
     final long pos = getPosition();
     final long copyBytes = ((long) lengthLongs) << LONG_SHIFT;
     incrementAndCheckPosition(pos, copyBytes);
-    copyMemoryCheckingDifferentObject(
+    CompareAndCopy.copyMemoryCheckingDifferentObject(
             unsafeObj,
             cumBaseOffset + pos,
             dstArray,
@@ -286,7 +285,7 @@ class WritableBufferImpl extends BaseWritableBufferImpl {
     final long pos = getPosition();
     final long copyBytes = ((long) lengthShorts) << SHORT_SHIFT;
     incrementAndCheckPosition(pos, copyBytes);
-    copyMemoryCheckingDifferentObject(
+    CompareAndCopy.copyMemoryCheckingDifferentObject(
             unsafeObj,
             cumBaseOffset + pos,
             dstArray,
@@ -317,7 +316,7 @@ class WritableBufferImpl extends BaseWritableBufferImpl {
     final long pos = getPosition();
     final long copyBytes = ((long) lengthChars) << CHAR_SHIFT;
     incrementAndCheckPosition(pos, copyBytes);
-    copyMemoryCheckingDifferentObject(
+    CompareAndCopy.copyMemoryCheckingDifferentObject(
             srcArray,
             ARRAY_CHAR_BASE_OFFSET + (((long) srcOffset) << CHAR_SHIFT),
             unsafeObj,
@@ -348,7 +347,7 @@ class WritableBufferImpl extends BaseWritableBufferImpl {
     final long pos = getPosition();
     final long copyBytes = ((long) lengthDoubles) << DOUBLE_SHIFT;
     incrementAndCheckPosition(pos, copyBytes);
-    copyMemoryCheckingDifferentObject(
+    CompareAndCopy.copyMemoryCheckingDifferentObject(
             srcArray,
             ARRAY_DOUBLE_BASE_OFFSET + (((long) srcOffset) << DOUBLE_SHIFT),
             unsafeObj,
@@ -378,7 +377,7 @@ class WritableBufferImpl extends BaseWritableBufferImpl {
     final long pos = getPosition();
     final long copyBytes = ((long) lengthFloats) << FLOAT_SHIFT;
     incrementAndCheckPosition(pos, copyBytes);
-    copyMemoryCheckingDifferentObject(
+    CompareAndCopy.copyMemoryCheckingDifferentObject(
             srcArray,
             ARRAY_FLOAT_BASE_OFFSET + (((long) srcOffset) << FLOAT_SHIFT),
             unsafeObj,
@@ -408,7 +407,7 @@ class WritableBufferImpl extends BaseWritableBufferImpl {
     final long pos = getPosition();
     final long copyBytes = ((long) lengthInts) << INT_SHIFT;
     incrementAndCheckPosition(pos, copyBytes);
-    copyMemoryCheckingDifferentObject(
+    CompareAndCopy.copyMemoryCheckingDifferentObject(
             srcArray,
             ARRAY_INT_BASE_OFFSET + (((long) srcOffset) << INT_SHIFT),
             unsafeObj,
@@ -438,7 +437,7 @@ class WritableBufferImpl extends BaseWritableBufferImpl {
     final long pos = getPosition();
     final long copyBytes = ((long) lengthLongs) << LONG_SHIFT;
     incrementAndCheckPosition(pos, copyBytes);
-    copyMemoryCheckingDifferentObject(
+    CompareAndCopy.copyMemoryCheckingDifferentObject(
             srcArray,
             ARRAY_LONG_BASE_OFFSET + (((long) srcOffset) << LONG_SHIFT),
             unsafeObj,
@@ -468,7 +467,7 @@ class WritableBufferImpl extends BaseWritableBufferImpl {
     final long pos = getPosition();
     final long copyBytes = ((long) lengthShorts) << SHORT_SHIFT;
     incrementAndCheckPosition(pos, copyBytes);
-    copyMemoryCheckingDifferentObject(
+    CompareAndCopy.copyMemoryCheckingDifferentObject(
             srcArray,
             ARRAY_SHORT_BASE_OFFSET + (((long) srcOffset) << SHORT_SHIFT),
             unsafeObj,

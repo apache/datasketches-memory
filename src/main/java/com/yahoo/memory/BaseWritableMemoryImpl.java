@@ -74,7 +74,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     final long copyBytes = lengthBooleans;
     checkBounds(offsetBytes, copyBytes, capacity);
     checkBounds(dstOffset, lengthBooleans, dstArray.length);
-    copyMemoryCheckingDifferentObject(
+    CompareAndCopy.copyMemoryCheckingDifferentObject(
         unsafeObj,
         cumBaseOffset + offsetBytes,
         dstArray,
@@ -96,7 +96,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     final long copyBytes = lengthBytes;
     checkBounds(offsetBytes, copyBytes, capacity);
     checkBounds(dstOffset, lengthBytes, dstArray.length);
-    copyMemoryCheckingDifferentObject(
+    CompareAndCopy.copyMemoryCheckingDifferentObject(
         unsafeObj,
         cumBaseOffset + offsetBytes,
         dstArray,
@@ -106,90 +106,17 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
 
   //OTHER PRIMITIVE READ METHODS: compareTo, copyTo XXX
   @Override
-  public int compareTo(final long thisOffsetBytes, final long thisLengthBytes, final Memory thatMem,
-      final long thatOffsetBytes, final long thatLengthBytes) {
-    state.checkValid();
-    checkBounds(thisOffsetBytes, thisLengthBytes, capacity);
-    final BaseWritableMemoryImpl that = (BaseWritableMemoryImpl) thatMem;
-    that.state.checkValid();
-    checkBounds(thatOffsetBytes, thatLengthBytes, that.capacity);
-    final long thisAdd = getCumulativeOffset(thisOffsetBytes);
-    final long thatAdd = that.getCumulativeOffset(thatOffsetBytes);
-    final Object thisObj = unsafeObj;
-    final Object thatObj = that.unsafeObj;
-    if ((thisObj != thatObj) || (thisAdd != thatAdd)) {
-      final long lenBytes = Math.min(thisLengthBytes, thatLengthBytes);
-      for (long i = 0; i < lenBytes; i++) {
-        final int thisByte = unsafe.getByte(thisObj, thisAdd + i);
-        final int thatByte = unsafe.getByte(thatObj, thatAdd + i);
-        if (thisByte < thatByte) {
-          return -1;
-        }
-        if (thisByte > thatByte) {
-          return 1;
-        }
-      }
-    }
-    return Long.compare(thisLengthBytes, thatLengthBytes);
+  public int compareTo(final long thisOffsetBytes, final long thisLengthBytes,
+      final Memory thatMem, final long thatOffsetBytes, final long thatLengthBytes) {
+    return CompareAndCopy.compare(state, thisOffsetBytes, thisLengthBytes,
+        thatMem.getResourceState(), thatOffsetBytes, thatLengthBytes);
   }
 
   @Override
   public void copyTo(final long srcOffsetBytes, final WritableMemory destination,
       final long dstOffsetBytes, final long lengthBytes) {
-    final BaseWritableMemoryImpl dst = (BaseWritableMemoryImpl) destination;
-    state.checkValid();
-    checkBounds(srcOffsetBytes, lengthBytes, capacity);
-    dst.state.checkValid();
-    checkBounds(dstOffsetBytes, lengthBytes, dst.capacity);
-    final long srcAdd = getCumulativeOffset(srcOffsetBytes);
-    final long dstAdd = destination.getCumulativeOffset(dstOffsetBytes);
-    copyMemory(unsafeObj, srcAdd, dst.unsafeObj, dstAdd, lengthBytes);
-  }
-
-  static void copyMemory(final Object srcUnsafeObj, final long srcAdd,
-      final Object dstUnsafeObj, final long dstAdd, final long lengthBytes) {
-    if (srcUnsafeObj != dstUnsafeObj) {
-      copyNonOverlappingMemory(srcUnsafeObj, srcAdd, dstUnsafeObj, dstAdd, lengthBytes);
-    } else {
-      copyMemorySlowPath(srcUnsafeObj, srcAdd, dstUnsafeObj, dstAdd, lengthBytes);
-    }
-  }
-
-  private static void copyMemorySlowPath(final Object srcUnsafeObj, final long srcAdd,
-      final Object dstUnsafeObj, final long dstAdd, final long lengthBytes) {
-    if (((srcAdd + lengthBytes) <= dstAdd) || ((dstAdd + lengthBytes) <= srcAdd)) {
-      copyNonOverlappingMemory(srcUnsafeObj, srcAdd, dstUnsafeObj, dstAdd, lengthBytes);
-      return;
-    }
-    if (srcAdd == dstAdd) {
-      throw new IllegalArgumentException(
-          "Attempt to copy a block of memory exactly in-place, should be a bug");
-    }
-    // If regions do overlap, fall back to unsafe.copyMemory, tolerating potentially long
-    // Time to Safe Point pauses.
-    unsafe.copyMemory(srcUnsafeObj, srcAdd, dstUnsafeObj, dstAdd, lengthBytes);
-  }
-
-  static void copyMemoryCheckingDifferentObject(final Object srcUnsafeObj, final long srcAdd,
-        final Object dstUnsafeObj, final long dstAdd, final long lengthBytes) {
-    if (srcUnsafeObj != dstUnsafeObj) {
-      copyNonOverlappingMemory(srcUnsafeObj, srcAdd, dstUnsafeObj, dstAdd, lengthBytes);
-    } else {
-      throw new IllegalArgumentException("Not expecting to copy to/from array which is the "
-          + "underlying object of the memory at the same time");
-    }
-  }
-
-  /* @see #UNSAFE_COPY_MEMORY_THRESHOLD */
-  private static void copyNonOverlappingMemory(final Object srcUnsafeObj, long srcAdd,
-      final Object dstUnsafeObj, long dstAdd, long lengthBytes) {
-    while (lengthBytes > 0) {
-      final long copy = Math.min(lengthBytes, UNSAFE_COPY_MEMORY_THRESHOLD);
-      unsafe.copyMemory(srcUnsafeObj, srcAdd, dstUnsafeObj, dstAdd, copy);
-      lengthBytes -= copy;
-      srcAdd += copy;
-      dstAdd += copy;
-    }
+    CompareAndCopy.copy(state, srcOffsetBytes, destination.getResourceState(),
+        dstOffsetBytes, lengthBytes);
   }
 
   //OTHER READ METHODS XXX
@@ -295,7 +222,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     final long copyBytes = lengthBooleans;
     checkBounds(srcOffset, lengthBooleans, srcArray.length);
     checkBounds(offsetBytes, copyBytes, capacity);
-    copyMemoryCheckingDifferentObject(
+    CompareAndCopy.copyMemoryCheckingDifferentObject(
         srcArray,
         ARRAY_BOOLEAN_BASE_OFFSET + srcOffset,
         unsafeObj,
@@ -318,7 +245,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     final long copyBytes = lengthBytes;
     checkBounds(srcOffset, lengthBytes, srcArray.length);
     checkBounds(offsetBytes, copyBytes, capacity);
-    copyMemoryCheckingDifferentObject(
+    CompareAndCopy.copyMemoryCheckingDifferentObject(
         srcArray,
         ARRAY_BYTE_BASE_OFFSET + srcOffset,
         unsafeObj,

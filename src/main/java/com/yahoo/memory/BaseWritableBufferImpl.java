@@ -5,7 +5,6 @@
 
 package com.yahoo.memory;
 
-import static com.yahoo.memory.BaseWritableMemoryImpl.copyMemoryCheckingDifferentObject;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_BOOLEAN_BASE_OFFSET;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_BOOLEAN_INDEX_SCALE;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
@@ -71,7 +70,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
     final long pos = getPosition();
     final long copyBytes = lengthBooleans;
     incrementAndCheckPosition(pos, copyBytes);
-    copyMemoryCheckingDifferentObject(
+    CompareAndCopy.copyMemoryCheckingDifferentObject(
             unsafeObj,
             cumBaseOffset + pos,
             dstArray,
@@ -101,7 +100,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
     final long pos = getPosition();
     final long copyBytes = lengthBytes;
     incrementAndCheckPosition(pos, copyBytes);
-    copyMemoryCheckingDifferentObject(
+    CompareAndCopy.copyMemoryCheckingDifferentObject(
             unsafeObj,
             cumBaseOffset + pos,
             dstArray,
@@ -111,25 +110,10 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
 
   //OTHER PRIMITIVE READ METHODS: copyTo, compareTo XXX
   @Override
-  public int compareTo(final long thisOffsetBytes, final long thisLengthBytes, final Buffer thatBuf,
-          final long thatOffsetBytes, final long thatLengthBytes) {
-    state.checkValid();
-    checkBounds(thisOffsetBytes, thisLengthBytes, capacity);
-    final BaseWritableBufferImpl that = (BaseWritableBufferImpl) thatBuf;
-    that.state.checkValid();
-    checkBounds(thatOffsetBytes, thatLengthBytes, that.capacity);
-    final long thisAdd = getCumulativeOffset() + thisOffsetBytes;
-    final long thatAdd = that.getCumulativeOffset() + thatOffsetBytes;
-    final Object thisObj = this.unsafeObj;
-    final Object thatObj = that.unsafeObj;
-    final long lenBytes = Math.min(thisLengthBytes, thatLengthBytes);
-    for (long i = 0; i < lenBytes; i++) {
-      final int thisByte = unsafe.getByte(thisObj, thisAdd + i);
-      final int thatByte = unsafe.getByte(thatObj, thatAdd + i);
-      if (thisByte < thatByte) { return -1; }
-      if (thisByte > thatByte) { return  1; }
-    }
-    return Long.compare(thisLengthBytes, thatLengthBytes);
+  public int compareTo(final long thisOffsetBytes, final long thisLengthBytes,
+      final Buffer thatBuf, final long thatOffsetBytes, final long thatLengthBytes) {
+    return CompareAndCopy.compare(state, thisOffsetBytes, thisLengthBytes,
+        thatBuf.getResourceState(), thatOffsetBytes, thatLengthBytes);
   }
 
   /*
@@ -248,7 +232,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
     final long pos = getPosition();
     final long copyBytes = lengthBooleans;
     incrementAndCheckPosition(pos, copyBytes);
-    copyMemoryCheckingDifferentObject(
+    CompareAndCopy.copyMemoryCheckingDifferentObject(
             srcArray,
             ARRAY_BOOLEAN_BASE_OFFSET + srcOffset,
             unsafeObj,
@@ -278,7 +262,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
     final long pos = getPosition();
     final long copyBytes = lengthBytes;
     incrementAndCheckPosition(pos, copyBytes);
-    copyMemoryCheckingDifferentObject(
+    CompareAndCopy.copyMemoryCheckingDifferentObject(
             srcArray,
             ARRAY_BYTE_BASE_OFFSET + srcOffset,
             unsafeObj,

@@ -40,4 +40,11 @@ public class WritableMemoryTest {
     assertTrue(wbuf.getArray() == byteArr);
   }
 
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void checkSelfArrayCopy() {
+    byte[] srcAndDst = new byte[128];
+    WritableMemory wmem = WritableMemory.wrap(srcAndDst);
+    wmem.getByteArray(0, srcAndDst, 64, 64);  //non-overlapping
+  }
+
 }

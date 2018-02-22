@@ -115,9 +115,9 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     checkBounds(thatOffsetBytes, thatLengthBytes, that.capacity);
     final long thisAdd = getCumulativeOffset(thisOffsetBytes);
     final long thatAdd = that.getCumulativeOffset(thatOffsetBytes);
-    final Object thisObj = this.unsafeObj;
+    final Object thisObj = unsafeObj;
     final Object thatObj = that.unsafeObj;
-    if (thisObj != thatObj || thisAdd != thatAdd) {
+    if ((thisObj != thatObj) || (thisAdd != thatAdd)) {
       final long lenBytes = Math.min(thisLengthBytes, thatLengthBytes);
       for (long i = 0; i < lenBytes; i++) {
         final int thisByte = unsafe.getByte(thisObj, thisAdd + i);
@@ -175,8 +175,8 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     if (srcUnsafeObj != dstUnsafeObj) {
       copyNonOverlappingMemory(srcUnsafeObj, srcAdd, dstUnsafeObj, dstAdd, lengthBytes);
     } else {
-      throw new IllegalArgumentException("Not expecting to copy to/from array which is the " +
-          "underlying object of the memory at the same time");
+      throw new IllegalArgumentException("Not expecting to copy to/from array which is the "
+          + "underlying object of the memory at the same time");
     }
   }
 

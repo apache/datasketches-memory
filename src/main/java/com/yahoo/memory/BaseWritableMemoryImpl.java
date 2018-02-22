@@ -74,7 +74,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     final long copyBytes = lengthBooleans;
     checkBounds(offsetBytes, copyBytes, capacity);
     checkBounds(dstOffset, lengthBooleans, dstArray.length);
-    copyMemoryCheckingNonOverlapping(
+    copyMemoryCheckingDifferentObject(
         unsafeObj,
         cumBaseOffset + offsetBytes,
         dstArray,
@@ -96,7 +96,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     final long copyBytes = lengthBytes;
     checkBounds(offsetBytes, copyBytes, capacity);
     checkBounds(dstOffset, lengthBytes, dstArray.length);
-    copyMemoryCheckingNonOverlapping(
+    copyMemoryCheckingDifferentObject(
         unsafeObj,
         cumBaseOffset + offsetBytes,
         dstArray,
@@ -170,15 +170,13 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     unsafe.copyMemory(srcUnsafeObj, srcAdd, dstUnsafeObj, dstAdd, lengthBytes);
   }
 
-  static void copyMemoryCheckingNonOverlapping(final Object srcUnsafeObj, final long srcAdd,
-      final Object dstUnsafeObj, final long dstAdd, final long lengthBytes) {
-    if ((srcUnsafeObj != dstUnsafeObj) || ((srcAdd + lengthBytes) <= dstAdd)
-        || ((dstAdd + lengthBytes) <= srcAdd)) {
+  static void copyMemoryCheckingDifferentObject(final Object srcUnsafeObj, final long srcAdd,
+        final Object dstUnsafeObj, final long dstAdd, final long lengthBytes) {
+    if (srcUnsafeObj != dstUnsafeObj) {
       copyNonOverlappingMemory(srcUnsafeObj, srcAdd, dstUnsafeObj, dstAdd, lengthBytes);
     } else {
-      throw new IllegalArgumentException("Not expecting memory blocks to overlap: obj="
-          + srcUnsafeObj + ", srcAddress=" + srcAdd + ", dstAddress=" + dstAdd
-          + ", lengthBytes=" + lengthBytes);
+      throw new IllegalArgumentException("Not expecting to copy to/from array which is the " +
+          "underlying object of the memory at the same time");
     }
   }
 
@@ -297,7 +295,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     final long copyBytes = lengthBooleans;
     checkBounds(srcOffset, lengthBooleans, srcArray.length);
     checkBounds(offsetBytes, copyBytes, capacity);
-    copyMemoryCheckingNonOverlapping(
+    copyMemoryCheckingDifferentObject(
         srcArray,
         ARRAY_BOOLEAN_BASE_OFFSET + srcOffset,
         unsafeObj,
@@ -320,7 +318,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     final long copyBytes = lengthBytes;
     checkBounds(srcOffset, lengthBytes, srcArray.length);
     checkBounds(offsetBytes, copyBytes, capacity);
-    copyMemoryCheckingNonOverlapping(
+    copyMemoryCheckingDifferentObject(
         srcArray,
         ARRAY_BYTE_BASE_OFFSET + srcOffset,
         unsafeObj,

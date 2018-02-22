@@ -5,7 +5,7 @@
 
 package com.yahoo.memory;
 
-import static com.yahoo.memory.BaseWritableMemoryImpl.copyMemoryCheckingNonOverlapping;
+import static com.yahoo.memory.BaseWritableMemoryImpl.copyMemoryCheckingDifferentObject;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_BOOLEAN_BASE_OFFSET;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_BOOLEAN_INDEX_SCALE;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
@@ -71,7 +71,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
     final long pos = getPosition();
     final long copyBytes = lengthBooleans;
     incrementAndCheckPosition(pos, copyBytes);
-    copyMemoryCheckingNonOverlapping(
+    copyMemoryCheckingDifferentObject(
             unsafeObj,
             cumBaseOffset + pos,
             dstArray,
@@ -101,7 +101,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
     final long pos = getPosition();
     final long copyBytes = lengthBytes;
     incrementAndCheckPosition(pos, copyBytes);
-    copyMemoryCheckingNonOverlapping(
+    copyMemoryCheckingDifferentObject(
             unsafeObj,
             cumBaseOffset + pos,
             dstArray,
@@ -248,7 +248,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
     final long pos = getPosition();
     final long copyBytes = lengthBooleans;
     incrementAndCheckPosition(pos, copyBytes);
-    copyMemoryCheckingNonOverlapping(
+    copyMemoryCheckingDifferentObject(
             srcArray,
             ARRAY_BOOLEAN_BASE_OFFSET + srcOffset,
             unsafeObj,
@@ -278,7 +278,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
     final long pos = getPosition();
     final long copyBytes = lengthBytes;
     incrementAndCheckPosition(pos, copyBytes);
-    copyMemoryCheckingNonOverlapping(
+    copyMemoryCheckingDifferentObject(
             srcArray,
             ARRAY_BYTE_BASE_OFFSET + srcOffset,
             unsafeObj,

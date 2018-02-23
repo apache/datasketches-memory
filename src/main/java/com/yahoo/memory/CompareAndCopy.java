@@ -97,7 +97,7 @@ final class CompareAndCopy {
    */
   private static void copyMemoryOverlapAddressCheck(final Object srcUnsafeObj, final long srcAdd,
       final Object dstUnsafeObj, final long dstAdd, final long lengthBytes) {
-    if ((((srcAdd + lengthBytes) - dstAdd) <= 0) || (((dstAdd + lengthBytes) - srcAdd) <= 0)) {
+    if (((srcAdd + lengthBytes) <= dstAdd) || ((dstAdd + lengthBytes) <= srcAdd)) {
       copyNonOverlappingMemoryWithChunking(srcUnsafeObj, srcAdd, dstUnsafeObj, dstAdd,
           lengthBytes);
       return;

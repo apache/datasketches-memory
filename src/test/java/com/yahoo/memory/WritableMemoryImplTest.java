@@ -205,11 +205,10 @@ public class WritableMemoryImplTest {
 
   //Copy Within tests
 
-  @Test
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void checkDegenerateCopyTo() {
     WritableMemory wmem = WritableMemory.allocate(64);
     wmem.copyTo(0, wmem, 0, 64);
-    //TODO
   }
 
   @Test
@@ -607,6 +606,14 @@ public class WritableMemoryImplTest {
       comp = mem3.compareTo(0, 5, mem1, 0, 4);
       assertEquals(comp, 1);
     }
+  }
+
+  @Test
+  public void testCompareToSameStart() {
+    Memory mem = WritableMemory.allocate(3);
+    assertEquals(-1, mem.compareTo(0, 1, mem, 0, 2));
+    assertEquals(0, mem.compareTo(1, 1, mem, 1, 1));
+    assertEquals(1, mem.compareTo(1, 2, mem, 1, 1));
   }
 
   @Test

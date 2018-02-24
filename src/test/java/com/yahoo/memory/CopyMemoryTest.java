@@ -5,10 +5,14 @@
 
 package com.yahoo.memory;
 
+import static com.yahoo.memory.BaseWritableMemoryImpl.UNSAFE_COPY_MEMORY_THRESHOLD;
 import static org.testng.Assert.assertEquals;
 //import static org.testng.Assert.assertTrue;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 
 public class CopyMemoryTest {
@@ -96,6 +100,32 @@ public class CopyMemoryTest {
       srcReg.copyTo(0, dstMem, k1 << 3, (k1/2) << 3);
       check(dstMem, k1, k1/2, k1/2 + 1);
     }
+  }
+
+  @Test
+  public void testOverlappingCopyLeftToRight() {
+    byte[] bytes = new byte[(int) (UNSAFE_COPY_MEMORY_THRESHOLD * 5 / 2 + 1)];
+    ThreadLocalRandom.current().nextBytes(bytes);
+    byte[] referenceBytes = bytes.clone();
+    Memory referenceMem = Memory.wrap(referenceBytes);
+    WritableMemory mem = WritableMemory.wrap(bytes);
+    long copyLen = UNSAFE_COPY_MEMORY_THRESHOLD * 2;
+    mem.copyTo(0, mem, UNSAFE_COPY_MEMORY_THRESHOLD / 2, copyLen);
+    Assert.assertEquals(0, mem.compareTo(UNSAFE_COPY_MEMORY_THRESHOLD / 2, copyLen, referenceMem, 0,
+        copyLen));
+  }
+
+  @Test
+  public void testOverlappingCopyRightToLeft() {
+    byte[] bytes = new byte[(int) (UNSAFE_COPY_MEMORY_THRESHOLD * 5 / 2 + 1)];
+    ThreadLocalRandom.current().nextBytes(bytes);
+    byte[] referenceBytes = bytes.clone();
+    Memory referenceMem = Memory.wrap(referenceBytes);
+    WritableMemory mem = WritableMemory.wrap(bytes);
+    long copyLen = UNSAFE_COPY_MEMORY_THRESHOLD * 2;
+    mem.copyTo(UNSAFE_COPY_MEMORY_THRESHOLD / 2, mem, 0, copyLen);
+    Assert.assertEquals(0, mem.compareTo(0, copyLen, referenceMem, UNSAFE_COPY_MEMORY_THRESHOLD / 2,
+        copyLen));
   }
 
   private static void check(Memory mem, int offsetLongs, int lengthLongs, int startValue) {

@@ -40,7 +40,7 @@ public abstract class WritableBuffer extends Buffer {
     final ResourceState state = new ResourceState();
     state.putByteBuffer(byteBuf);
     AccessByteBuffer.wrap(state);
-    final WritableBufferImpl impl = new WritableBufferImpl(state);
+    final BaseWritableBufferImpl impl = new WritableBufferImpl(state);
     impl.setStartPositionEnd(0, byteBuf.position(), byteBuf.limit());
     return impl;
   }

@@ -400,7 +400,8 @@ public abstract class Memory {
   //OTHER PRIMITIVE READ METHODS: compareTo, copyTo XXX
   /**
    * Compares the bytes of this Memory to <i>that</i> Memory.
-   * Returns <i>(this &lt; that) ? -1 : (this &gt; that) ? 1 : 0;</i>.
+   * Returns <i>(this &lt; that) ? (some negative value) : (this &gt; that) ? (some positive value)
+   * : 0;</i>.
    * If all bytes are equal up to the shorter of the two lengths, the shorter length is considered
    * to be less than the other.
    * @param thisOffsetBytes the starting offset for <i>this Memory</i>
@@ -408,15 +409,19 @@ public abstract class Memory {
    * @param that the other Memory to compare with
    * @param thatOffsetBytes the starting offset for <i>that Memory</i>
    * @param thatLengthBytes the length of the region to compare from <i>that Memory</i>
-   * @return <i>(this &lt; that) ? -1 : (this &gt; that) ? 1 : 0;</i>
+   * @return <i>(this &lt; that) ? (some negative value) : (this &gt; that) ? (some positive value)
+   * : 0;</i>
    */
   public abstract int compareTo(long thisOffsetBytes, long thisLengthBytes, Memory that,
       long thatOffsetBytes, long thatLengthBytes);
 
   /**
    * Copies bytes from a source range of this Memory to a destination range of the given Memory
-   * using the same low-level system copy function as found in
-   * {@link java.lang.System#arraycopy(Object, int, Object, int, int)}.
+   * with the same semantics when copying between overlapping ranges of bytes as method
+   * {@link java.lang.System#arraycopy(Object, int, Object, int, int)} has. However, if the source
+   * and the destination ranges are exactly the same, this method throws {@link
+   * IllegalArgumentException}, because it should never be needed in real-world scenarios and
+   * therefore indicates a bug.
    * @param srcOffsetBytes the source offset for this Memory
    * @param destination the destination Memory, which may not be Read-Only.
    * @param dstOffsetBytes the destination offset
@@ -425,7 +430,33 @@ public abstract class Memory {
   public abstract void copyTo(long srcOffsetBytes, WritableMemory destination, long dstOffsetBytes,
       long lengthBytes);
 
+  /**
+   * Returns true if the given Memory has equal contents to this Memory.
+   * @param that the given Memory
+   * @return true if the given Memory has equal contents to this Memory.
+   */
+  public abstract boolean equalTo(Memory that);
+
+  /**
+   * Returns true if the given Memory has equal contents to this Memory in the given range of
+   * bytes.
+   * @param thisOffsetBytes the starting offset in bytes for this Memory
+   * @param that the given Memory
+   * @param thatOffsetBytes the starting offset in bytes for the given Memory
+   * @param lengthBytes the size of the range of bytes
+   * @return true if the given Memory has equal contents to this Memory in the given range of
+   * bytes.
+   */
+  public abstract boolean equalTo(long thisOffsetBytes, Memory that, long thatOffsetBytes,
+      long lengthBytes);
+
   //OTHER READ METHODS XXX
+  /**
+   * Convenience method to check that this Memory is valid and the given offsetBytes and
+   * lengthBytes are within the capacity of this Memory.
+   * @param offsetBytes the given offset in bytes of this Memory
+   * @param lengthBytes the given length in bytes of this Memory
+   */
   public abstract void checkValidAndBounds(long offsetBytes, long lengthBytes);
 
   /**

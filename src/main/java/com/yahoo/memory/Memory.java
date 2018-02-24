@@ -430,7 +430,33 @@ public abstract class Memory {
   public abstract void copyTo(long srcOffsetBytes, WritableMemory destination, long dstOffsetBytes,
       long lengthBytes);
 
+  /**
+   * Returns true if the given Memory has equal contents to this Memory.
+   * @param that the given Memory
+   * @return true if the given Memory has equal contents to this Memory.
+   */
+  public abstract boolean equalTo(Memory that);
+
+  /**
+   * Returns true if the given Memory has equal contents to this Memory in the given range of
+   * bytes.
+   * @param thisOffsetBytes the starting offset in bytes for this Memory
+   * @param that the given Memory
+   * @param thatOffsetBytes the starting offset in bytes for the given Memory
+   * @param lengthBytes the size of the range of bytes
+   * @return true if the given Memory has equal contents to this Memory in the given range of
+   * bytes.
+   */
+  public abstract boolean equalTo(long thisOffsetBytes, Memory that, long thatOffsetBytes,
+      long lengthBytes);
+
   //OTHER READ METHODS XXX
+  /**
+   * Convenience method to check that this Memory is valid and the given offsetBytes and
+   * lengthBytes are within the capacity of this Memory.
+   * @param offsetBytes the given offset in bytes of this Memory
+   * @param lengthBytes the given length in bytes of this Memory
+   */
   public abstract void checkValidAndBounds(long offsetBytes, long lengthBytes);
 
   /**

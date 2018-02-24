@@ -104,7 +104,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
         copyBytes);
   }
 
-  //OTHER PRIMITIVE READ METHODS: compareTo, copyTo XXX
+  //OTHER PRIMITIVE READ METHODS: compareTo, copyTo, equals XXX
   @Override
   public int compareTo(final long thisOffsetBytes, final long thisLengthBytes,
       final Memory thatMem, final long thatOffsetBytes, final long thatLengthBytes) {
@@ -117,6 +117,18 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
       final long dstOffsetBytes, final long lengthBytes) {
     CompareAndCopy.copy(state, srcOffsetBytes, destination.getResourceState(),
         dstOffsetBytes, lengthBytes);
+  }
+
+  @Override
+  public boolean equalTo(final Memory that) {
+    return CompareAndCopy.equals(state, that.getResourceState());
+  }
+
+  @Override
+  public boolean equalTo(final long thisOffsetBytes, final Memory that,
+      final long thatOffsetBytes, final long lengthBytes) {
+    return CompareAndCopy.equals(state, thisOffsetBytes, that.getResourceState(),
+        thatOffsetBytes, lengthBytes);
   }
 
   //OTHER READ METHODS XXX

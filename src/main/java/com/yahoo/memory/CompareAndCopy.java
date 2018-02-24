@@ -24,26 +24,26 @@ final class CompareAndCopy {
   static final long UNSAFE_COPY_MEMORY_THRESHOLD = 1024 * 1024;
 
   static int compare(
-      final ResourceState thisState, final long thisOffsetBytes, final long thisLengthBytes,
-      final ResourceState thatState, final long thatOffsetBytes, final long thatLengthBytes) {
-    thisState.checkValid();
-    checkBounds(thisOffsetBytes, thisLengthBytes, thisState.getCapacity());
-    thatState.checkValid();
-    checkBounds(thatOffsetBytes, thatLengthBytes, thatState.getCapacity());
-    final long thisAdd = thisState.getCumBaseOffset() + thisOffsetBytes;
-    final long thatAdd = thatState.getCumBaseOffset() + thatOffsetBytes;
-    final Object thisObj = thisState.getUnsafeObject();
-    final Object thatObj = thatState.getUnsafeObject();
-    if ((thisObj != thatObj) || (thisAdd != thatAdd)) {
-      final long lenBytes = Math.min(thisLengthBytes, thatLengthBytes);
+      final ResourceState state1, final long offsetBytes1, final long lengthBytes1,
+      final ResourceState state2, final long offsetBytes2, final long lengthBytes2) {
+    state1.checkValid();
+    checkBounds(offsetBytes1, lengthBytes1, state1.getCapacity());
+    state2.checkValid();
+    checkBounds(offsetBytes2, lengthBytes2, state2.getCapacity());
+    final long add1 = state1.getCumBaseOffset() + offsetBytes1;
+    final long add2 = state2.getCumBaseOffset() + offsetBytes2;
+    final Object arr1 = state1.getUnsafeObject();
+    final Object arr2 = state2.getUnsafeObject();
+    if ((arr1 != arr2) || (add1 != add2)) {
+      final long lenBytes = Math.min(lengthBytes1, lengthBytes2);
       for (long i = 0; i < lenBytes; i++) {
-        final int thisByte = unsafe.getByte(thisObj, thisAdd + i);
-        final int thatByte = unsafe.getByte(thatObj, thatAdd + i);
-        if (thisByte < thatByte) { return -1; }
-        if (thisByte > thatByte) { return  1; }
+        final int byte1 = unsafe.getByte(arr1, add1 + i);
+        final int byte2 = unsafe.getByte(arr2, add2 + i);
+        if (byte1 < byte2) { return -1; }
+        if (byte1 > byte2) { return  1; }
       }
     }
-    return Long.compare(thisLengthBytes, thatLengthBytes);
+    return Long.compare(lengthBytes1, lengthBytes2);
   }
 
   static void copy(final ResourceState srcState, final long srcOffsetBytes,
@@ -68,6 +68,74 @@ final class CompareAndCopy {
       throw new IllegalArgumentException("Not expecting to copy to/from array which is the "
           + "underlying object of the memory at the same time");
     }
+  }
+
+  static boolean equals(final ResourceState state1, final ResourceState state2) {
+    state1.checkValid();
+    state2.checkValid();
+    if (state1 == state2) { return true; }
+    final long cap1 = state1.getCapacity();
+    final long cap2 = state2.getCapacity();
+    if (cap1 != cap2) { return false; }
+    //capacities are equal
+    final Object arr1 = state1.getUnsafeObject(); //could be null
+    final Object arr2 = state2.getUnsafeObject(); //could be null
+    final long cumOff1 = state1.getCumBaseOffset();
+    final long cumOff2 = state2.getCumBaseOffset();
+    if ((arr1 == arr2) && (cumOff1 == cumOff2)) { return true; }
+    //do it the hard way
+    return equals(state1, 0, state2, 0, cap1);
+  }
+
+  static boolean equals(final ResourceState state1, long off1, final ResourceState state2,
+      long off2, final long lenBytes) {
+    state1.checkValid();
+    state2.checkValid();
+    if (state1 == state2) { return true; }
+    final long cap1 = state1.getCapacity();
+    final long cap2 = state2.getCapacity();
+    checkBounds(off1, lenBytes, cap1);
+    checkBounds(off2, lenBytes, cap2);
+    final long cumOff1 = state1.getCumBaseOffset() + off1;
+    final long cumOff2 = state2.getCumBaseOffset() + off2;
+    final Object arr1 = state1.getUnsafeObject(); //could be null
+    final Object arr2 = state2.getUnsafeObject(); //could be null
+    if ((arr1 == arr2) && (cumOff1 == cumOff2)) { return true; }
+
+    if (lenBytes < 8L) {
+      return equalsByBytes(arr1, cumOff1, arr2, cumOff2, lenBytes);
+    }
+    long longs = lenBytes >>> 3;
+    final long longsThresh = UNSAFE_COPY_MEMORY_THRESHOLD >>> 3;
+    while (longs > 0) {
+      final long chunk = Math.min(longs, longsThresh);
+      for (long i = 0L; i < chunk; i++) {
+        final long v1 = unsafe.getLong(arr1, cumOff1 + (i << 3));
+        final long v2 = unsafe.getLong(arr2, cumOff2 + (i << 3));
+        if (v1 == v2) { continue; }
+        else { return false; }
+      }
+      longs -= chunk;
+      off1 += chunk;
+      off2 += chunk;
+    }
+    final long longBytes = lenBytes & ~0X7;
+    final long remBytes = lenBytes - longBytes;
+    //check the remainder bytes, if any
+    return (remBytes == 0) ? true
+        : equalsByBytes(arr1, cumOff1 + longBytes, arr2, cumOff2 + longBytes, remBytes);
+  }
+
+  //use only for short runs
+  private static boolean equalsByBytes(final Object arr1, final long cumOff1, final Object arr2,
+      final long cumOff2, final long lenBytes) {
+    for (long i = 0; i < lenBytes; i++) {
+      final int v1 = unsafe.getByte(arr1, cumOff1 + i);
+      final int v2 = unsafe.getByte(arr2, cumOff2 + i);
+      if (v1 == v2) { continue; }
+      else { return false; }
+    }
+    return true;
   }
 
   //only valid and bounds checks have been performed at this point
@@ -124,11 +192,11 @@ final class CompareAndCopy {
   private static void copyNonOverlappingMemoryWithChunking(final Object srcUnsafeObj,
       long srcAdd, final Object dstUnsafeObj, long dstAdd, long lengthBytes) {
     while (lengthBytes > 0) {
-      final long copy = Math.min(lengthBytes, UNSAFE_COPY_MEMORY_THRESHOLD);
-      unsafe.copyMemory(srcUnsafeObj, srcAdd, dstUnsafeObj, dstAdd, copy);
-      lengthBytes -= copy;
-      srcAdd += copy;
-      dstAdd += copy;
+      final long chunk = Math.min(lengthBytes, UNSAFE_COPY_MEMORY_THRESHOLD);
+      unsafe.copyMemory(srcUnsafeObj, srcAdd, dstUnsafeObj, dstAdd, chunk);
+      lengthBytes -= chunk;
+      srcAdd += chunk;
+      dstAdd += chunk;
     }
   }
 }

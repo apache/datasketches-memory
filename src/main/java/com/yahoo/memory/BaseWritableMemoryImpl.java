@@ -181,7 +181,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   private void writeToWithExtraCopy(long offsetBytes, long lengthBytes,
       final WritableByteChannel out) throws IOException {
     // Keep the bufLen a multiple of 8, to maybe allow getByteArray() to go a faster path.
-    final int bufLen = Ints.checkedCast(Math.max(8, Math.min((capacity / 1024) & ~7, 4096)));
+    final int bufLen = Ints.checkedCast(Math.max(8, Math.min((capacity / 1024) & ~7L, 4096)));
     final byte[] buf = new byte[bufLen];
     final ByteBuffer bufToWrite = ByteBuffer.wrap(buf);
     while (lengthBytes > 0) {

@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.channels.WritableByteChannel;
 
 /**
  * Provides read-only primitive and primitive array methods to any of the four resources
@@ -429,6 +430,16 @@ public abstract class Memory {
    */
   public abstract void copyTo(long srcOffsetBytes, WritableMemory destination, long dstOffsetBytes,
       long lengthBytes);
+
+  /**
+   * Writes bytes from a source range of this Memory to the given {@code WritableByteChannel}.
+   * @param offsetBytes the source offset for this Memory
+   * @param lengthBytes the number of bytes to copy
+   * @param out the destination WritableByteChannel
+   * @throws IOException may occur while writing to the WritableByteChannel
+   */
+  public abstract void writeTo(long offsetBytes, long lengthBytes, WritableByteChannel out)
+      throws IOException;
 
   /**
    * Returns true if the given Memory has equal contents to this Memory.

@@ -21,7 +21,7 @@ final class CompareAndCopy {
    * https://bugs.openjdk.java.net/browse/JDK-8141491), but not in JDK 8, so the Memory library
    * should keep having this boilerplate as long as it supports Java 8.
    */
-  static final long UNSAFE_COPY_MEMORY_THRESHOLD = 1024 * 1024;
+  static final int UNSAFE_COPY_MEMORY_THRESHOLD = 1024 * 1024;
 
   static int compare(
       final ResourceState state1, final long offsetBytes1, final long lengthBytes1,

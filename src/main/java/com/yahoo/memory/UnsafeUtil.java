@@ -5,10 +5,10 @@
 
 package com.yahoo.memory;
 
+import sun.misc.Unsafe;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-
-import sun.misc.Unsafe;
 
 /**
  * Provides access to the sun.misc.Unsafe class and its key static fields.
@@ -127,6 +127,14 @@ public final class UnsafeUtil {
   }
 
   private UnsafeUtil() {}
+
+  static long getFieldOffset(final Class<?> c, final String fieldName) {
+    try {
+      return unsafe.objectFieldOffset(c.getDeclaredField(fieldName));
+    } catch (NoSuchFieldException e) {
+      throw new IllegalStateException(e);
+    }
+  }
 
   /**
    * Assert the requested offset and length against the allocated size.

@@ -5,10 +5,10 @@
 
 package com.yahoo.memory;
 
+import sun.misc.Unsafe;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-
-import sun.misc.Unsafe;
 
 /**
  * Provides access to the sun.misc.Unsafe class and its key static fields.
@@ -72,12 +72,6 @@ public final class UnsafeUtil {
   public static final String LS = System.getProperty("line.separator");
 
   //@formatter:on
-
-  /**
-   * Large memory copies are broken into segments of bytes of this size to allow for safepoint
-   * polling by the JVM.
-   */
-  public static final long UNSAFE_COPY_THRESHOLD = 1L << 20; //2^20
 
   static {
     try {

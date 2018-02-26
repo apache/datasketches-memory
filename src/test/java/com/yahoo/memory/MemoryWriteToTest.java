@@ -23,6 +23,7 @@ public class MemoryWriteToTest {
     testWriteTo(createRandomBytesMemory(1023));
     testWriteTo(createRandomBytesMemory(10_000));
     testWriteTo(createRandomBytesMemory(CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD * 5));
+    testWriteTo(createRandomBytesMemory(CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD * 5 + 10));
   }
 
   @Test
@@ -32,18 +33,20 @@ public class MemoryWriteToTest {
     testWriteTo(createRandomIntsMemory(1023));
     testWriteTo(createRandomIntsMemory(10_000));
     testWriteTo(createRandomIntsMemory(CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD * 5));
+    testWriteTo(createRandomIntsMemory(CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD * 5 + 10));
   }
 
   @Test
   public void testOffHeap() throws IOException {
     try (WritableDirectHandle handle =
-        WritableMemory.allocateDirect(CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD * 5)) {
+        WritableMemory.allocateDirect(CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD * 5 + 10)) {
       WritableMemory mem = handle.get();
       testWriteTo(mem.region(0, 0));
       testOffHeap(mem, 7);
       testOffHeap(mem, 1023);
       testOffHeap(mem, 10_000);
       testOffHeap(mem, CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD * 5);
+      testOffHeap(mem, CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD * 5 + 10);
     }
   }
 

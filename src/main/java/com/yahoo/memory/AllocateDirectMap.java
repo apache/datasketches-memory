@@ -92,15 +92,11 @@ class AllocateDirectMap implements Map {
 
   @Override
   public void close() {
-    try {
-      if (state.isValid()) {
-        ResourceState.currentDirectMemoryMapAllocations_.decrementAndGet();
-        ResourceState.currentDirectMemoryMapAllocated_.addAndGet(-state.getCapacity());
-      }
-      cleaner.clean(); //sets invalid
-    } catch (final Exception e) {
-      throw e;
+    if (state.isValid()) {
+      ResourceState.currentDirectMemoryMapAllocations_.decrementAndGet();
+      ResourceState.currentDirectMemoryMapAllocated_.addAndGet(-state.getCapacity());
     }
+    cleaner.clean(); //sets invalid
   }
 
   // Restricted methods
@@ -147,7 +143,8 @@ class AllocateDirectMap implements Map {
       return mbb;
     } catch (final Exception e) {
       throw new RuntimeException(
-              "Could not create Dummy MappedByteBuffer instance: " + e.getClass());
+              "Could not create Dummy MappedByteBuffer instance: " + e.getClass()
+              + UnsafeUtil.tryIllegalAccessPermit);
     }
   }
 

@@ -31,7 +31,7 @@ public class WritableDirectHandle implements AutoCloseable, WritableHandle {
 
   @Override
   public void close() {
-    if ((direct != null) && (direct.state.isValid())) {
+    if (direct != null) {
       direct.close();
       direct = null;
     }

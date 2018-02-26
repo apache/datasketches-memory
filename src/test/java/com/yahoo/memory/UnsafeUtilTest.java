@@ -53,6 +53,30 @@ public class UnsafeUtilTest {
   }
 
   @Test
+  public void checkJdkString() {
+    String[] jdkStr = {"1.7.0_80", "1.8.0_121", "1.8.0_162", "9.0.4", "10.0.1", "11",
+        "12b", "12_.2"};
+    int len = jdkStr.length;
+    for (int i = 0; i < len; i++) {
+      String jdkVer = jdkStr[i];
+      UnsafeUtil.majorJavaVersion(jdkVer);
+    }
+    try { //valid but < 1.7
+      UnsafeUtil.majorJavaVersion("1.6.0_65");
+      fail();
+    } catch (ExceptionInInitializerError e) {
+      //println("" + e);
+    }
+    try { //invalid;
+      UnsafeUtil.majorJavaVersion("b");
+      fail();
+    } catch (ExceptionInInitializerError e) {
+      //println("" + e);
+    }
+
+  }
+
+  @Test
   public void printlnTest() {
     println("PRINTING: "+this.getClass().getName());
   }

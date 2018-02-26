@@ -305,10 +305,14 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   }
 
   @Override
-  public void fill(final long offsetBytes, final long lengthBytes, final byte value) {
-    state.checkValid();
-    checkBounds(offsetBytes, lengthBytes, capacity);
-    unsafe.setMemory(unsafeObj, cumBaseOffset + offsetBytes, lengthBytes, value);
+  public void fill(long offsetBytes, long lengthBytes, final byte value) {
+    checkValidAndBounds(offsetBytes, lengthBytes);
+    while (lengthBytes > 0) {
+      final long chunk = Math.min(lengthBytes, CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD);
+      unsafe.setMemory(unsafeObj, cumBaseOffset + offsetBytes, chunk, value);
+      offsetBytes += chunk;
+      lengthBytes -= chunk;
+    }
   }
 
   @Override

@@ -5,14 +5,16 @@
 
 package com.yahoo.memory;
 
+import static com.yahoo.memory.CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import org.testng.annotations.Test;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-
-import org.testng.annotations.Test;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class WritableMemoryTest {
 
@@ -107,5 +109,24 @@ public class WritableMemoryTest {
     assertTrue(wmem1.equalTo(1, wmem2, 1, len - 1));
   }
 
+  @Test
+  public void checkLargeEquals() {
+    // Size bigger than UNSAFE_COPY_MEMORY_THRESHOLD; size with "reminder" = 7, to test several
+    // traits of the implementation
+    byte[] bytes1 = new byte[UNSAFE_COPY_MEMORY_THRESHOLD * 2 + 7];
+    ThreadLocalRandom.current().nextBytes(bytes1);
+    byte[] bytes2 = bytes1.clone();
+    Memory mem1 = Memory.wrap(bytes1);
+    Memory mem2 = Memory.wrap(bytes2);
+    assertTrue(mem1.equalTo(mem2));
 
+    bytes2[UNSAFE_COPY_MEMORY_THRESHOLD + 10] =
+        (byte) (bytes1[UNSAFE_COPY_MEMORY_THRESHOLD + 10] + 1);
+    assertFalse(mem1.equalTo(mem2));
+
+    bytes2[UNSAFE_COPY_MEMORY_THRESHOLD + 10] = bytes1[UNSAFE_COPY_MEMORY_THRESHOLD + 10];
+    bytes2[UNSAFE_COPY_MEMORY_THRESHOLD * 2 + 3] =
+        (byte) (bytes1[UNSAFE_COPY_MEMORY_THRESHOLD * 2 + 3] + 1);
+    assertFalse(mem1.equalTo(mem2));
+  }
 }

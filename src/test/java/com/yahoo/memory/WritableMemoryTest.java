@@ -98,8 +98,6 @@ public class WritableMemoryTest {
     WritableMemory wmem2 = WritableMemory.allocate(len + 1);
     assertFalse(wmem1.equalTo(wmem2));
 
-
-
     for (int i = 0; i < len; i++) {
       wmem1.putByte(i, (byte) i);
       wmem2.putByte(i, (byte) i);

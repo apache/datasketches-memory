@@ -13,17 +13,21 @@ import sun.misc.Unsafe;
 /**
  * Provides access to the sun.misc.Unsafe class and its key static fields.
  *
- * <p>The internal static initializer also detects whether the methods unique to the Unsafe class in
- * JDK8 are present; if not, methods that are compatible with JDK7 are substituted using an internal
- * interface.  In order for this to work, this library still needs to be compiled using jdk8
- * and it must be done with both source and target versions of jdk7 specified in pom.xml.
+ * <p>The internal static initializer also detects whether the methods unique to the Unsafe class
+ * in JDK8 are present; if not, methods that are compatible with JDK7 are substituted using an
+ * internal interface.  In order for this to work with jdk7, this library must be compiled using
+ * jdk8 and it must be done with both source and target versions of jdk7 specified in pom.xml.
  * The resultant jar will work on jdk7 and jdk8.</p>
+ *
+ * <p>This may work with jdk9 but might require the JVM arg <i>-permit-illegal-access</i>,
+ * <i>–illegal-access=permit</i> or equivalent. Proper operation with jdk9 or above is not
+ * guaranteed and has not been tested.
  *
  * @author Lee Rhodes
  */
 public final class UnsafeUtil {
   public static final Unsafe unsafe;
-  public static final int JDK;
+  public static final double JDK;
   static final JDKCompatibility compatibilityMethods;
 
   //not an indicator of whether compressed references are used.
@@ -31,8 +35,8 @@ public final class UnsafeUtil {
 
   //For 64-bit JVMs: varies depending on coop: 16 for JVM <= 32GB; 24 for JVM > 32GB
   // Making this constant long-typed, rather than int, to exclude possibility of accidental overflow
-  // in expressions like arrayLength * ARRAY_BYTE_BASE_OFFSET, where arrayLength is int-typed. The
-  // same consideration for constants below: ARRAY_*_INDEX_SCALE, ARRAY_*_INDEX_SHIFT.
+  // in expressions like arrayLength * ARRAY_BYTE_BASE_OFFSET, where arrayLength is int-typed.
+  // The same consideration for constants below: ARRAY_*_INDEX_SCALE, ARRAY_*_INDEX_SHIFT.
   public static final long ARRAY_BOOLEAN_BASE_OFFSET;
   public static final long ARRAY_BYTE_BASE_OFFSET;
   public static final long ARRAY_SHORT_BASE_OFFSET;
@@ -73,6 +77,9 @@ public final class UnsafeUtil {
 
   //@formatter:on
 
+  static String tryIllegalAccessPermit = " Try setting JVM arg -permit-illegal-access, "
+      + "–illegal-access=permit or equivalent.";
+
   static {
     try {
       //should work across JVMs, e.g., with Android:
@@ -88,7 +95,7 @@ public final class UnsafeUtil {
     } catch (final InstantiationException | IllegalAccessException | IllegalArgumentException
         | InvocationTargetException | NoSuchMethodException e) {
       e.printStackTrace();
-      throw new RuntimeException("Unable to acquire Unsafe. ", e);
+      throw new RuntimeException("Unable to acquire Unsafe. " + tryIllegalAccessPermit, e);
     }
 
     //4 on 32-bit systems. 4 on 64-bit systems < 32GB, otherwise 8.
@@ -108,19 +115,39 @@ public final class UnsafeUtil {
     ARRAY_OBJECT_INDEX_SCALE = unsafe.arrayIndexScale(Object[].class);
     OBJECT_SHIFT = ARRAY_OBJECT_INDEX_SCALE == 4 ? 2 : 3;
 
-    final String jdkVer = System.getProperty("java.version");
-    if (jdkVer.startsWith("1.7")) {
-      JDK = 7;
+    JDK = majorJavaVersion(System.getProperty("java.version"));
+    if (JDK == 1.7) {
       compatibilityMethods = new JDK7Compatible(unsafe);
-    } else if (jdkVer.startsWith("1.8")) {
-      JDK = 8;
-      compatibilityMethods = new JDK8Compatible(unsafe);
     } else {
-      throw new ExceptionInInitializerError("JDK must be either 7 or 8");
+      compatibilityMethods = new JDK8Compatible(unsafe);
+    }
+  }
+
+  static double majorJavaVersion(final String jdkVer) { //avail for test
+    //double version = 0;
+    try {
+      final String[] parts = jdkVer.trim().split("[^0-9\\.]")[0].split("\\.");
+      final String num = parts[0] + "." + ((parts.length > 1) ? parts[1] : "0");
+      final double ver = Double.parseDouble(num);
+      if (ver < 1.7) {
+        throw new ExceptionInInitializerError("JDK Major Version must be >= 1.7");
+      }
+      return ver;
+    } catch (final Exception e) {
+      throw new ExceptionInInitializerError("Improper Java -version string: "
+          + jdkVer + "\n" + e);
     }
   }
 
   private UnsafeUtil() {}
+
+  static long getFieldOffset(final Class<?> c, final String fieldName) {
+    try {
+      return unsafe.objectFieldOffset(c.getDeclaredField(fieldName));
+    } catch (final NoSuchFieldException e) {
+      throw new IllegalStateException(e);
+    }
+  }
 
   /**
    * Assert the requested offset and length against the allocated size.

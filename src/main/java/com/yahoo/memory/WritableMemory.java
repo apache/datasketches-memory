@@ -102,13 +102,7 @@ public abstract class WritableMemory extends Memory {
     return memMgr.allocateDirect(capacityBytes);
   }
 
-  //DUPLICATES & REGIONS XXX
-  /**
-   * Returns a writable duplicate view of this Memory.
-   * @return a writable duplicate view of this Memory
-   */
-  public abstract WritableMemory writableDuplicate();
-
+  //REGIONS XXX
   /**
    * Returns a writable region of this WritableMemory
    * @param offsetBytes the starting offset with respect to this WritableMemory

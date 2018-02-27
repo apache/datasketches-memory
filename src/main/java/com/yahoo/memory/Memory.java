@@ -75,7 +75,6 @@ public abstract class Memory {
   }
 
   //REGIONS XXX
-  // duplicates are not needed.
   /**
    * Returns a read only region of this Memory.
    * @param offsetBytes the starting offset with respect to this Memory.

@@ -41,15 +41,11 @@ final class AllocateDirect implements AutoCloseable {
 
   @Override
   public void close() {
-    try {
-      if (state.isValid()) {
-        ResourceState.currentDirectMemoryAllocations_.decrementAndGet();
-        ResourceState.currentDirectMemoryAllocated_.addAndGet(-state.getCapacity());
-      }
-      cleaner.clean(); //sets invalid
-    } catch (final Exception e) {
-      throw e;
+    if (state.isValid()) {
+      ResourceState.currentDirectMemoryAllocations_.decrementAndGet();
+      ResourceState.currentDirectMemoryAllocated_.addAndGet(-state.getCapacity());
     }
+    cleaner.clean(); //sets invalid
   }
 
   private static final class Deallocator implements Runnable {

@@ -48,7 +48,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
    * should keep having this boilerplate as long as it supports Java 8.
    */
   static final long UNSAFE_COPY_MEMORY_THRESHOLD = 1024 * 1024;
-  
+
   private static final ByteBuffer ZERO_DIRECT_BUFFER = ByteBuffer.allocateDirect(0);
   private static final long NIO_BUFFER_ADDRESS_FIELD_OFFSET =
       UnsafeUtil.getFieldOffset(java.nio.Buffer.class, "address");
@@ -145,7 +145,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   private void writeByteArrayTo(final byte[] unsafeObj, final long offsetBytes,
       final long lengthBytes, final WritableByteChannel out) throws IOException {
     final int off =
-        Ints.checkedCast(cumBaseOffset + offsetBytes - UnsafeUtil.ARRAY_BYTE_BASE_OFFSET);
+        Ints.checkedCast((cumBaseOffset + offsetBytes) - UnsafeUtil.ARRAY_BYTE_BASE_OFFSET);
     final int len = Ints.checkedCast(lengthBytes);
     final ByteBuffer bufToWrite = ByteBuffer.wrap(unsafeObj, off, len);
     writeFully(bufToWrite, out);
@@ -158,8 +158,8 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     // or file-backed WritableByteChannel implementations with direct ByteBuffer argument could
     // be subject of the same safepoint problems as in Unsafe.copyMemory and Unsafe.setMemory.
     while (lengthBytes > 0) {
-      int chunk = (int) Math.min(CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD, lengthBytes);
-      ByteBuffer bufToWrite = wrap(addr, chunk);
+      final int chunk = (int) Math.min(CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD, lengthBytes);
+      final ByteBuffer bufToWrite = wrap(addr, chunk);
       writeFully(bufToWrite, out);
       addr += chunk;
       lengthBytes -= chunk;
@@ -171,7 +171,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
    * 27c768cbd28ece949c299f2d437c9a0ebd874500/src/one/nio/mem/DirectMemory.java#L95
    */
   private static ByteBuffer wrap(final long address, final int capacity) {
-    ByteBuffer buf = ZERO_DIRECT_BUFFER.duplicate();
+    final ByteBuffer buf = ZERO_DIRECT_BUFFER.duplicate();
     unsafe.putLong(buf, NIO_BUFFER_ADDRESS_FIELD_OFFSET, address);
     unsafe.putInt(buf, NIO_BUFFER_CAPACITY_FIELD_OFFSET, capacity);
     buf.limit(capacity);
@@ -387,10 +387,14 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   }
 
   @Override
-  public void fill(final long offsetBytes, final long lengthBytes, final byte value) {
-    state.checkValid();
-    checkBounds(offsetBytes, lengthBytes, capacity);
-    unsafe.setMemory(unsafeObj, cumBaseOffset + offsetBytes, lengthBytes, value);
+  public void fill(long offsetBytes, long lengthBytes, final byte value) {
+    checkValidAndBounds(offsetBytes, lengthBytes);
+    while (lengthBytes > 0) {
+      final long chunk = Math.min(lengthBytes, CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD);
+      unsafe.setMemory(unsafeObj, cumBaseOffset + offsetBytes, chunk, value);
+      offsetBytes += chunk;
+      lengthBytes -= chunk;
+    }
   }
 
   @Override

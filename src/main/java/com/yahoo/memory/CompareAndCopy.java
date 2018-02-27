@@ -71,24 +71,13 @@ final class CompareAndCopy {
   }
 
   static boolean equals(final ResourceState state1, final ResourceState state2) {
-    state1.checkValid();
-    state2.checkValid();
-    if (state1 == state2) { return true; }
     final long cap1 = state1.getCapacity();
     final long cap2 = state2.getCapacity();
-    if (cap1 != cap2) { return false; }
-    //capacities are equal
-    final Object arr1 = state1.getUnsafeObject(); //could be null
-    final Object arr2 = state2.getUnsafeObject(); //could be null
-    final long cumOff1 = state1.getCumBaseOffset();
-    final long cumOff2 = state2.getCumBaseOffset();
-    if ((arr1 == arr2) && (cumOff1 == cumOff2)) { return true; }
-    //do it the hard way
-    return equals(state1, 0, state2, 0, cap1);
+    return (cap1 == cap2) && equals(state1, 0, state2, 0, cap1);
   }
 
-  static boolean equals(final ResourceState state1, long off1, final ResourceState state2,
-      long off2, final long lenBytes) {
+  static boolean equals(final ResourceState state1, final long off1, final ResourceState state2,
+      final long off2, long lenBytes) {
     state1.checkValid();
     state2.checkValid();
     if (state1 == state2) { return true; }
@@ -96,40 +85,36 @@ final class CompareAndCopy {
     final long cap2 = state2.getCapacity();
     checkBounds(off1, lenBytes, cap1);
     checkBounds(off2, lenBytes, cap2);
-    final long cumOff1 = state1.getCumBaseOffset() + off1;
-    final long cumOff2 = state2.getCumBaseOffset() + off2;
+    long cumOff1 = state1.getCumBaseOffset() + off1;
+    long cumOff2 = state2.getCumBaseOffset() + off2;
     final Object arr1 = state1.getUnsafeObject(); //could be null
     final Object arr2 = state2.getUnsafeObject(); //could be null
     if ((arr1 == arr2) && (cumOff1 == cumOff2)) { return true; }
 
-    if (lenBytes < 8L) {
-      return equalsByBytes(arr1, cumOff1, arr2, cumOff2, lenBytes);
-    }
-    long longs = lenBytes >>> 3;
-    final long longsThresh = UNSAFE_COPY_MEMORY_THRESHOLD >>> 3;
-    while (longs > 0) {
-      final long chunk = Math.min(longs, longsThresh);
-      for (long i = 0L; i < chunk; i++) {
-        final long v1 = unsafe.getLong(arr1, cumOff1 + (i << 3));
-        final long v2 = unsafe.getLong(arr2, cumOff2 + (i << 3));
+    while (lenBytes >= Long.BYTES) {
+      final int chunk = (int) Math.min(lenBytes, UNSAFE_COPY_MEMORY_THRESHOLD);
+      // int-counted loop to avoid safepoint polls (otherwise why we chunk by
+      // UNSAFE_COPY_MEMORY_THRESHOLD)
+      int i = 0;
+      for (; i <= (chunk - Long.BYTES); i += Long.BYTES) {
+        final long v1 = unsafe.getLong(arr1, cumOff1 + i);
+        final long v2 = unsafe.getLong(arr2, cumOff2 + i);
         if (v1 == v2) { continue; }
         else { return false; }
       }
-      longs -= chunk;
-      off1 += chunk;
-      off2 += chunk;
+      lenBytes -= i;
+      cumOff1 += i;
+      cumOff2 += i;
     }
-    final long longBytes = lenBytes & ~0X7;
-    final long remBytes = lenBytes - longBytes;
     //check the remainder bytes, if any
-    return (remBytes == 0) ? true
-        : equalsByBytes(arr1, cumOff1 + longBytes, arr2, cumOff2 + longBytes, remBytes);
+    return (lenBytes == 0) ? true : equalsByBytes(arr1, cumOff1, arr2, cumOff2, (int) lenBytes);
   }
 
   //use only for short runs
   private static boolean equalsByBytes(final Object arr1, final long cumOff1, final Object arr2,
-      final long cumOff2, final long lenBytes) {
-    for (long i = 0; i < lenBytes; i++) {
+      final long cumOff2, final int lenBytes) {
+    // int-counted loop to avoid safepoint polls
+    for (int i = 0; i < lenBytes; i++) {
       final int v1 = unsafe.getByte(arr1, cumOff1 + i);
       final int v2 = unsafe.getByte(arr2, cumOff2 + i);
       if (v1 == v2) { continue; }

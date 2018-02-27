@@ -8,8 +8,8 @@ package com.yahoo.memory;
 /** Equivalent of Guava's Ints. */
 final class Ints {
 
-  static int checkedCast(long v) {
-    int result = (int) v;
+  static int checkedCast(final long v) {
+    final int result = (int) v;
     if (result != v) {
       throw new IllegalArgumentException("Out of range: " + v);
     } else {

@@ -5,10 +5,10 @@
 
 package com.yahoo.memory;
 
-import sun.misc.Unsafe;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+
+import sun.misc.Unsafe;
 
 /**
  * Provides access to the sun.misc.Unsafe class and its key static fields.
@@ -73,12 +73,6 @@ public final class UnsafeUtil {
 
   //@formatter:on
 
-  /**
-   * Large memory copies are broken into segments of bytes of this size to allow for safepoint
-   * polling by the JVM.
-   */
-  public static final long UNSAFE_COPY_THRESHOLD = 1L << 20; //2^20
-
   static {
     try {
       //should work across JVMs, e.g., with Android:
@@ -131,7 +125,7 @@ public final class UnsafeUtil {
   static long getFieldOffset(final Class<?> c, final String fieldName) {
     try {
       return unsafe.objectFieldOffset(c.getDeclaredField(fieldName));
-    } catch (NoSuchFieldException e) {
+    } catch (final NoSuchFieldException e) {
       throw new IllegalStateException(e);
     }
   }

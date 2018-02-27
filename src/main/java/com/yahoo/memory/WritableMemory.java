@@ -396,7 +396,7 @@ public abstract class WritableMemory extends Memory {
    * Atomically adds the given value to the long located at offsetBytes.
    * @param offsetBytes offset bytes relative to this Memory start
    * @param delta the amount to add
-   * @return the modified value
+   * @return the the previous value
    */
   public abstract long getAndAddLong(long offsetBytes, long delta);
 

@@ -19,6 +19,7 @@ import com.yahoo.memory.UnsafeUtil.JDKCompatibility;
  * @author Lee Rhodes
  */
 public class UnsafeUtilTest {
+  public final long testField = 1;
 
   @Test
   public void checkJDK7methods() {
@@ -34,13 +35,13 @@ public class UnsafeUtilTest {
 
       final byte[] byteArr = new byte[16];
       byteArr[0] = (byte) 1;
-      byteArr[8] = (byte) 2;
       if (jdk7compatible != null) {
-        final long two = jdk7compatible.getAndAddLong(byteArr, 16, 1L);
-        assertEquals(two, 2L);
-
-        final long one = jdk7compatible.getAndSetLong(byteArr,  16, 1L);
+        final long one = jdk7compatible.getAndAddLong(byteArr, 16, 1L);
         assertEquals(one, 1L);
+
+        final long two = jdk7compatible.getAndSetLong(byteArr,  16, 3L);
+        assertEquals(two, 2L);
+        assertEquals(byteArr[0], 3);
       } else {
         fail();
       }
@@ -73,7 +74,23 @@ public class UnsafeUtilTest {
     } catch (ExceptionInInitializerError e) {
       //println("" + e);
     }
+  }
 
+  @Test
+  public void checkFieldOffset() {
+    long offset = UnsafeUtil.getFieldOffset(this.getClass(), "testField");
+    assertEquals(offset, 16);
+    try {
+      offset = UnsafeUtil.getFieldOffset(this.getClass(), "testField2");
+      fail();
+    } catch (IllegalStateException e) {
+      //OK
+    }
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void checkInts() {
+    Ints.checkedCast(1L << 32);
   }
 
   @Test

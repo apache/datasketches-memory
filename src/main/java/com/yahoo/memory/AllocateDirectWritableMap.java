@@ -51,7 +51,8 @@ final class AllocateDirectWritableMap extends AllocateDirectMap implements Writa
       method.invoke(super.state.getMappedByteBuffer(), super.state.getRandomAccessFile().getFD(),
               super.state.getNativeBaseOffset(), super.state.getCapacity());
     } catch (final Exception e) {
-      throw new RuntimeException(String.format("Encountered %s exception in force", e.getClass()));
+      throw new RuntimeException(String.format("Encountered %s exception in force. "
+          + UnsafeUtil.tryIllegalAccessPermit, e.getClass()));
     }
   }
 

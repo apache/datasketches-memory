@@ -21,7 +21,7 @@ import sun.misc.Unsafe;
  *
  * <p>This may work with jdk9 but might require the JVM arg <i>-permit-illegal-access</i>,
  * <i>–illegal-access=permit</i> or equivalent. Proper operation with jdk9 or above is not
- * guaranteed and has not be tested.
+ * guaranteed and has not been tested.
  *
  * @author Lee Rhodes
  */

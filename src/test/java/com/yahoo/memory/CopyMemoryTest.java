@@ -5,14 +5,13 @@
 
 package com.yahoo.memory;
 
-import static com.yahoo.memory.BaseWritableMemoryImpl.UNSAFE_COPY_MEMORY_THRESHOLD;
+import static com.yahoo.memory.CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD;
 import static org.testng.Assert.assertEquals;
-//import static org.testng.Assert.assertTrue;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import java.util.concurrent.ThreadLocalRandom;
 
 
 public class CopyMemoryTest {
@@ -73,7 +72,7 @@ public class CopyMemoryTest {
     WritableMemory dstMem = genMem(2 * k1, true); //empty
     srcReg.copyTo(0, dstMem, k1 << 3, (k1/2) << 3);
     //println(dstMem.toHexString("dstMem: ", k1 << 3, (k1/2) << 3));
-    check(dstMem, k1, k1/2, k1/2 + 1);
+    check(dstMem, k1, k1/2, (k1/2) + 1);
   }
 
   @Test
@@ -85,7 +84,7 @@ public class CopyMemoryTest {
     Memory srcReg = baseMem.region((k1/2) << 3, (k1/2) << 3);
     WritableMemory dstMem = genMem(2 * k1, true); //empty
     srcReg.copyTo(0, dstMem, k1 << 3, (k1/2) << 3);
-    check(dstMem, k1, k1/2, k1/2 + 1);
+    check(dstMem, k1, k1/2, (k1/2) + 1);
   }
 
   @Test
@@ -98,13 +97,13 @@ public class CopyMemoryTest {
       Memory srcReg = baseMem.region((k1/2) << 3, (k1/2) << 3);
       WritableMemory dstMem = genMem(2 * k1, true); //empty
       srcReg.copyTo(0, dstMem, k1 << 3, (k1/2) << 3);
-      check(dstMem, k1, k1/2, k1/2 + 1);
+      check(dstMem, k1, k1/2, (k1/2) + 1);
     }
   }
 
   @Test
   public void testOverlappingCopyLeftToRight() {
-    byte[] bytes = new byte[(int) (UNSAFE_COPY_MEMORY_THRESHOLD * 5 / 2 + 1)];
+    byte[] bytes = new byte[((UNSAFE_COPY_MEMORY_THRESHOLD * 5) / 2) + 1];
     ThreadLocalRandom.current().nextBytes(bytes);
     byte[] referenceBytes = bytes.clone();
     Memory referenceMem = Memory.wrap(referenceBytes);
@@ -117,7 +116,7 @@ public class CopyMemoryTest {
 
   @Test
   public void testOverlappingCopyRightToLeft() {
-    byte[] bytes = new byte[(int) (UNSAFE_COPY_MEMORY_THRESHOLD * 5 / 2 + 1)];
+    byte[] bytes = new byte[((UNSAFE_COPY_MEMORY_THRESHOLD * 5) / 2) + 1];
     ThreadLocalRandom.current().nextBytes(bytes);
     byte[] referenceBytes = bytes.clone();
     Memory referenceMem = Memory.wrap(referenceBytes);

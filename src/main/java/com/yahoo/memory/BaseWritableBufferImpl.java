@@ -291,10 +291,15 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   @Override
   public void fill(final byte value) {
     state.checkValid();
-    final long pos = getPosition();
-    final long len = getEnd() - pos;
+    long pos = getPosition();
+    long len = getEnd() - pos;
     checkInvariants(getStart(), pos + len, getEnd(), getCapacity());
-    unsafe.setMemory(unsafeObj, cumBaseOffset + pos, len, value);
+    while (len > 0) {
+      final long chunk = Math.min(len, CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD);
+      unsafe.setMemory(unsafeObj, cumBaseOffset + pos, chunk, value);
+      pos += chunk;
+      len -= chunk;
+    }
   }
 
   @Override

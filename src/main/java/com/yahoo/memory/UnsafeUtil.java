@@ -77,11 +77,6 @@ public final class UnsafeUtil {
 
   //@formatter:on
 
-  /**
-   * Large memory copies are broken into segments of bytes of this size to allow for safepoint
-   * polling by the JVM.
-   */
-  public static final long UNSAFE_COPY_THRESHOLD = 1L << 20; //2^20
   static String tryIllegalAccessPermit = " Try setting JVM arg -permit-illegal-access, "
       + "–illegal-access=permit or equivalent.";
 

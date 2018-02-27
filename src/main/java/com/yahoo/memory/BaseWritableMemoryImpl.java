@@ -37,16 +37,6 @@ import java.nio.ByteOrder;
  */
 abstract class BaseWritableMemoryImpl extends WritableMemory {
 
-  /**
-   * Don't use {@link sun.misc.Unsafe#copyMemory} to copy blocks of memory larger than this
-   * threshold, because internally it doesn't have safepoint polls, that may cause long
-   * "Time To Safe Point" pauses in the application. This has been fixed in JDK 9 (see
-   * https://bugs.openjdk.java.net/browse/JDK-8149596 and
-   * https://bugs.openjdk.java.net/browse/JDK-8141491), but not in JDK 8, so the Memory library
-   * should keep having this boilerplate as long as it supports Java 8.
-   */
-  static final long UNSAFE_COPY_MEMORY_THRESHOLD = 1024 * 1024;
-
   final ResourceState state;
   final Object unsafeObj; //Array objects are held here.
   final long capacity;
@@ -305,10 +295,14 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   }
 
   @Override
-  public void fill(final long offsetBytes, final long lengthBytes, final byte value) {
-    state.checkValid();
-    checkBounds(offsetBytes, lengthBytes, capacity);
-    unsafe.setMemory(unsafeObj, cumBaseOffset + offsetBytes, lengthBytes, value);
+  public void fill(long offsetBytes, long lengthBytes, final byte value) {
+    checkValidAndBounds(offsetBytes, lengthBytes);
+    while (lengthBytes > 0) {
+      final long chunk = Math.min(lengthBytes, CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD);
+      unsafe.setMemory(unsafeObj, cumBaseOffset + offsetBytes, chunk, value);
+      offsetBytes += chunk;
+      lengthBytes -= chunk;
+    }
   }
 
   @Override

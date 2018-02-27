@@ -5,14 +5,14 @@
 
 package com.yahoo.memory;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 import java.util.concurrent.ThreadLocalRandom;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class MemoryWriteToTest {
 
@@ -23,7 +23,7 @@ public class MemoryWriteToTest {
     testWriteTo(createRandomBytesMemory(1023));
     testWriteTo(createRandomBytesMemory(10_000));
     testWriteTo(createRandomBytesMemory(CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD * 5));
-    testWriteTo(createRandomBytesMemory(CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD * 5 + 10));
+    testWriteTo(createRandomBytesMemory((CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD * 5) + 10));
   }
 
   @Test
@@ -33,44 +33,45 @@ public class MemoryWriteToTest {
     testWriteTo(createRandomIntsMemory(1023));
     testWriteTo(createRandomIntsMemory(10_000));
     testWriteTo(createRandomIntsMemory(CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD * 5));
-    testWriteTo(createRandomIntsMemory(CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD * 5 + 10));
+    testWriteTo(createRandomIntsMemory((CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD * 5) + 10));
   }
 
   @Test
   public void testOffHeap() throws IOException {
     try (WritableDirectHandle handle =
-        WritableMemory.allocateDirect(CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD * 5 + 10)) {
+        WritableMemory.allocateDirect((CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD * 5) + 10)) {
       WritableMemory mem = handle.get();
       testWriteTo(mem.region(0, 0));
       testOffHeap(mem, 7);
       testOffHeap(mem, 1023);
       testOffHeap(mem, 10_000);
       testOffHeap(mem, CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD * 5);
-      testOffHeap(mem, CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD * 5 + 10);
+      testOffHeap(mem, (CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD * 5) + 10);
     }
   }
 
-  private void testOffHeap(WritableMemory mem, int size) throws IOException {
+  private static void testOffHeap(WritableMemory mem, int size) throws IOException {
     createRandomBytesMemory(size).copyTo(0, mem, 0, size);
     testWriteTo(mem.region(0, size));
   }
 
-  private Memory createRandomBytesMemory(int size) {
+  private static Memory createRandomBytesMemory(int size) {
     byte[] bytes = new byte[size];
     ThreadLocalRandom.current().nextBytes(bytes);
     return Memory.wrap(bytes);
   }
 
-  private Memory createRandomIntsMemory(int size) {
+  private static Memory createRandomIntsMemory(int size) {
     int[] ints = ThreadLocalRandom.current().ints(size).toArray();
     return Memory.wrap(ints);
   }
 
-  private void testWriteTo(Memory mem) throws IOException {
+  private static void testWriteTo(Memory mem) throws IOException {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    WritableByteChannel out = Channels.newChannel(baos);
-    mem.writeTo(0, mem.getCapacity(), out);
-    out.close();
+    try (WritableByteChannel out = Channels.newChannel(baos)) {
+      mem.writeTo(0, mem.getCapacity(), out);
+      out.close();
+    }
     byte[] result = baos.toByteArray();
     Assert.assertTrue(mem.equalTo(Memory.wrap(result)));
   }

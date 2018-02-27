@@ -77,12 +77,12 @@ public final class UnsafeUtil {
 
   //@formatter:on
 
-  static String tryIllegalAccessPermit = " Try setting JVM arg -permit-illegal-access, "
+  static String tryIllegalAccessPermit =
+      " If using JDK 9+ try setting JVM arg -permit-illegal-access, "
       + "–illegal-access=permit or equivalent.";
 
   static {
     try {
-      //should work across JVMs, e.g., with Android:
       final Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
       unsafeConstructor.setAccessible(true);
       unsafe = unsafeConstructor.newInstance();
@@ -219,7 +219,7 @@ public final class UnsafeUtil {
         retVal = myUnsafe.getLongVolatile(obj, address);
       } while (!myUnsafe.compareAndSwapLong(obj, address, retVal, retVal + increment));
 
-      return myUnsafe.getLongVolatile(obj, address);
+      return retVal;
     }
 
     @Override
@@ -229,7 +229,7 @@ public final class UnsafeUtil {
         retVal = myUnsafe.getLongVolatile(obj, address);
       } while (!myUnsafe.compareAndSwapLong(obj, address, retVal, value));
 
-      return myUnsafe.getLongVolatile(obj, address);
+      return retVal;
     }
   }
 

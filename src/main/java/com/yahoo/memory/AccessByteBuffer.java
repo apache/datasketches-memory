@@ -70,7 +70,8 @@ final class AccessByteBuffer {
       }
       catch (final IllegalAccessException e) {
         throw new RuntimeException(
-                "Could not get offset/byteArray from OnHeap ByteBuffer instance: " + e.getClass());
+            "Could not get offset and byteArray fields from ByteBuffer class: " + e.getClass()
+            + UnsafeUtil.tryIllegalAccessPermit);
       }
       state.putUnsafeObjectHeader(ARRAY_BYTE_BASE_OFFSET);
       state.putUnsafeObject(unsafeObj);

@@ -59,15 +59,7 @@ class WritableMemoryImpl extends BaseWritableMemoryImpl {
     super(state);
   }
 
-  //DUPLICATES & REGIONS XXX
-  @Override
-  public WritableMemory writableDuplicate() {
-    checkValid();
-    if (capacity == 0) { return ZERO_SIZE_MEMORY; }
-    final WritableMemoryImpl wMemImpl = new WritableMemoryImpl(state);
-    return wMemImpl;
-  }
-
+  //REGIONS XXX
   @Override
   public Memory region(final long offsetBytes, final long capacityBytes) {
     final Memory region = writableRegion(offsetBytes, capacityBytes);

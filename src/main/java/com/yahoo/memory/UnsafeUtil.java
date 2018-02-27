@@ -141,6 +141,14 @@ public final class UnsafeUtil {
 
   private UnsafeUtil() {}
 
+  static long getFieldOffset(final Class<?> c, final String fieldName) {
+    try {
+      return unsafe.objectFieldOffset(c.getDeclaredField(fieldName));
+    } catch (final NoSuchFieldException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
   /**
    * Assert the requested offset and length against the allocated size.
    * The invariants equation is: {@code 0 <= reqOff <= reqLen <= reqOff + reqLen <= allocSize}.

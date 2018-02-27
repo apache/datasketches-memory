@@ -5,10 +5,10 @@
 
 package com.yahoo.memory;
 
+import sun.misc.Unsafe;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-
-import sun.misc.Unsafe;
 
 /**
  * Provides access to the sun.misc.Unsafe class and its key static fields.
@@ -28,7 +28,7 @@ import sun.misc.Unsafe;
 public final class UnsafeUtil {
   public static final Unsafe unsafe;
   public static final double JDK;
-  static final JDKCompatibility compatibilityMethods;
+  static final boolean JDK8_OR_ABOVE;
 
   //not an indicator of whether compressed references are used.
   public static final int ADDRESS_SIZE;
@@ -117,9 +117,9 @@ public final class UnsafeUtil {
 
     JDK = majorJavaVersion(System.getProperty("java.version"));
     if (JDK == 1.7) {
-      compatibilityMethods = new JDK7Compatible(unsafe);
+      JDK8_OR_ABOVE = false;
     } else {
-      compatibilityMethods = new JDK8Compatible(unsafe);
+      JDK8_OR_ABOVE = true;
     }
   }
 
@@ -179,58 +179,4 @@ public final class UnsafeUtil {
               + ", (reqOff + reqLen): " + (reqOff + reqLen) + ", allocSize: " + allocSize);
     }
   }
-
-  interface JDKCompatibility {
-
-    long getAndAddLong(Object obj, long address, long increment);
-
-    long getAndSetLong(Object obj, long address, long value);
-  }
-
-  private static class JDK8Compatible implements JDKCompatibility {
-    private final Unsafe myUnsafe;
-
-    JDK8Compatible(final Unsafe unsafe) {
-      myUnsafe = unsafe;
-    }
-
-    @Override
-    public long getAndAddLong(final Object obj, final long address, final long increment) {
-      return myUnsafe.getAndAddLong(obj, address, increment);
-    }
-
-    @Override
-    public long getAndSetLong(final Object obj, final long address, final long value) {
-      return myUnsafe.getAndSetLong(obj, address, value);
-    }
-  }
-
-  private static class JDK7Compatible implements JDKCompatibility {
-    private final Unsafe myUnsafe;
-
-    JDK7Compatible(final Unsafe unsafe) {
-      myUnsafe = unsafe;
-    }
-
-    @Override
-    public synchronized long getAndAddLong(final Object obj, final long address, final long increment) {
-      long retVal;
-      do {
-        retVal = myUnsafe.getLongVolatile(obj, address);
-      } while (!myUnsafe.compareAndSwapLong(obj, address, retVal, retVal + increment));
-
-      return retVal;
-    }
-
-    @Override
-    public synchronized long getAndSetLong(final Object obj, final long address, final long value) {
-      long retVal;
-      do {
-        retVal = myUnsafe.getLongVolatile(obj, address);
-      } while (!myUnsafe.compareAndSwapLong(obj, address, retVal, value));
-
-      return retVal;
-    }
-  }
-
 }

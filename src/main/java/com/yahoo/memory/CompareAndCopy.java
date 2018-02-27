@@ -73,11 +73,11 @@ final class CompareAndCopy {
   static boolean equals(final ResourceState state1, final ResourceState state2) {
     final long cap1 = state1.getCapacity();
     final long cap2 = state2.getCapacity();
-    return cap1 == cap2 && equals(state1, 0, state2, 0, cap1);
+    return (cap1 == cap2) && equals(state1, 0, state2, 0, cap1);
   }
 
-  static boolean equals(final ResourceState state1, long off1, final ResourceState state2,
-      long off2, long lenBytes) {
+  static boolean equals(final ResourceState state1, final long off1, final ResourceState state2,
+      final long off2, long lenBytes) {
     state1.checkValid();
     state2.checkValid();
     if (state1 == state2) { return true; }
@@ -96,7 +96,7 @@ final class CompareAndCopy {
       // int-counted loop to avoid safepoint polls (otherwise why we chunk by
       // UNSAFE_COPY_MEMORY_THRESHOLD)
       int i = 0;
-      for (; i <= chunk - Long.BYTES; i += Long.BYTES) {
+      for (; i <= (chunk - Long.BYTES); i += Long.BYTES) {
         final long v1 = unsafe.getLong(arr1, cumOff1 + i);
         final long v2 = unsafe.getLong(arr2, cumOff2 + i);
         if (v1 == v2) { continue; }

@@ -33,7 +33,9 @@ public abstract class Buffer extends BaseBuffer {
    * @return the given ByteBuffer for read-only operations.
    */
   public static Buffer wrap(final ByteBuffer byteBuf) {
-    return WritableBuffer.wrapBB(byteBuf);
+    final Buffer buffer = WritableBuffer.wrapBB(byteBuf);
+    buffer.getResourceState().setResourceReadOnly();
+    return buffer;
   }
 
   //MAP XXX

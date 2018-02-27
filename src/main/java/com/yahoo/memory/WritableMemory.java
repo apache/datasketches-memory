@@ -9,6 +9,7 @@ import static com.yahoo.memory.Util.zeroCheck;
 import static com.yahoo.memory.WritableMemoryImpl.ZERO_SIZE_MEMORY;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -52,9 +53,9 @@ public abstract class WritableMemory extends Memory {
    * (including those &gt; 2GB). This assumes that the file was written using native byte ordering.
    * @param file the given file to map
    * @return WritableMemoryMapHandler for managing this map
-   * @throws Exception file not found or RuntimeException, etc.
+   * @throws IOException file not found or RuntimeException, etc.
    */
-  public static WritableMapHandle writableMap(final File file) throws Exception {
+  public static WritableMapHandle writableMap(final File file) throws IOException {
     return writableMap(file, 0, file.length(), ByteOrder.nativeOrder());
   }
 
@@ -66,10 +67,10 @@ public abstract class WritableMemory extends Memory {
    * @param capacityBytes the size of the allocated direct memory. It may not be negative or zero.
    * @param byteOrder the endianness of the given file. It may not be null.
    * @return WritableMemoryMapHandler for managing this map
-   * @throws Exception file not found or RuntimeException, etc.
+   * @throws IOException file not found or RuntimeException, etc.
    */
   public static WritableMapHandle writableMap(final File file, final long fileOffsetBytes,
-          final long capacityBytes, final ByteOrder byteOrder) throws Exception {
+          final long capacityBytes, final ByteOrder byteOrder) throws IOException {
     zeroCheck(capacityBytes, "Capacity");
     final ResourceState state = new ResourceState();
     state.putFile(file);

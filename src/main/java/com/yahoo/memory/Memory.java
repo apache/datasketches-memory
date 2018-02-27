@@ -37,7 +37,9 @@ public abstract class Memory {
    * @return the given ByteBuffer for read-only operations.
    */
   public static Memory wrap(final ByteBuffer byteBuf) {
-    return WritableMemory.wrapBB(byteBuf);
+    final Memory memory = WritableMemory.wrapBB(byteBuf);
+    memory.getResourceState().setResourceReadOnly();
+    return memory;
   }
 
   //MAP XXX
@@ -47,9 +49,9 @@ public abstract class Memory {
    * ordering.
    * @param file the given file to map
    * @return MapHandle for managing this map
-   * @throws Exception if file not found or internal RuntimeException is thrown.
+   * @throws IOException if file not found or internal RuntimeException is thrown.
    */
-  public static MapHandle map(final File file) throws Exception {
+  public static MapHandle map(final File file) throws IOException {
     return map(file, 0, file.length(), ByteOrder.nativeOrder());
   }
 
@@ -61,16 +63,17 @@ public abstract class Memory {
    * @param capacityBytes the size of the allocated direct memory. It may not be negative or zero.
    * @param byteOrder the endianness of the given file. It may not be null.
    * @return MemoryMapHandler for managing this map
-   * @throws Exception file not found or RuntimeException, etc.
+   * @throws IOException file not found or RuntimeException, etc.
    */
   public static MapHandle map(final File file, final long fileOffsetBytes, final long capacityBytes,
-      final ByteOrder byteOrder) throws Exception {
+      final ByteOrder byteOrder) throws IOException {
     zeroCheck(capacityBytes, "Capacity");
     final ResourceState state = new ResourceState();
     state.putFile(file);
     state.putFileOffset(fileOffsetBytes);
     state.putCapacity(capacityBytes);
     state.order(byteOrder);
+    state.setResourceReadOnly();
     return MapHandle.map(state);
   }
 
@@ -104,7 +107,9 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final boolean[] arr) {
-    return WritableMemory.wrap(arr);
+    final Memory memory = WritableMemory.wrap(arr);
+    memory.getResourceState().setResourceReadOnly();
+    return memory;
   }
 
   /**
@@ -147,6 +152,7 @@ public abstract class Memory {
       final ResourceState state = new ResourceState(arr, Prim.BYTE, lengthBytes);
       state.putRegionOffset(offsetBytes);
       state.order(byteOrder);
+      state.setResourceReadOnly();
       return new WritableMemoryImpl(state);
   }
 
@@ -158,7 +164,9 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final char[] arr) {
-    return WritableMemory.wrap(arr);
+    final Memory memory = WritableMemory.wrap(arr);
+    memory.getResourceState().setResourceReadOnly();
+    return memory;
   }
 
   /**
@@ -169,7 +177,9 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final short[] arr) {
-    return WritableMemory.wrap(arr);
+    final Memory memory = WritableMemory.wrap(arr);
+    memory.getResourceState().setResourceReadOnly();
+    return memory;
   }
 
   /**
@@ -180,7 +190,9 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final int[] arr) {
-    return WritableMemory.wrap(arr);
+    final Memory memory = WritableMemory.wrap(arr);
+    memory.getResourceState().setResourceReadOnly();
+    return memory;
   }
 
   /**
@@ -191,7 +203,9 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final long[] arr) {
-    return WritableMemory.wrap(arr);
+    final Memory memory = WritableMemory.wrap(arr);
+    memory.getResourceState().setResourceReadOnly();
+    return memory;
   }
 
   /**
@@ -202,7 +216,9 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final float[] arr) {
-    return WritableMemory.wrap(arr);
+    final Memory memory = WritableMemory.wrap(arr);
+    memory.getResourceState().setResourceReadOnly();
+    return memory;
   }
 
   /**
@@ -213,7 +229,9 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final double[] arr) {
-    return WritableMemory.wrap(arr);
+    final Memory memory = WritableMemory.wrap(arr);
+    memory.getResourceState().setResourceReadOnly();
+    return memory;
   }
 
   //PRIMITIVE getXXX() and getXXXArray() XXX

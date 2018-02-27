@@ -7,11 +7,15 @@ package com.yahoo.memory;
 
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 
+import sun.misc.Cleaner;
+import sun.nio.ch.FileChannelImpl;
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -23,9 +27,6 @@ import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.Set;
 
-import sun.misc.Cleaner;
-import sun.nio.ch.FileChannelImpl;
-
 /**
  * Allocates direct memory used to memory map files for read operations.
  * (including those &gt; 2GB).
@@ -35,6 +36,9 @@ import sun.nio.ch.FileChannelImpl;
  * @author Praveenkumar Venkatesan
  */
 class AllocateDirectMap implements Map {
+  private static final int MAP_RO = 0;
+  private static final int MAP_RW = 1;
+
   final ResourceState state;
   final Cleaner cleaner;
 
@@ -53,9 +57,9 @@ class AllocateDirectMap implements Map {
    *
    * @param state the ResourceState
    * @return A new AllocateDirectMap
-   * @throws Exception file not found or RuntimeException, etc.
+   * @throws IOException file not found or RuntimeException, etc.
    */
-  static AllocateDirectMap map(final ResourceState state) throws Exception {
+  static AllocateDirectMap map(final ResourceState state) throws IOException {
     return new AllocateDirectMap(mapper(state));
   }
 
@@ -103,25 +107,35 @@ class AllocateDirectMap implements Map {
 
   //Does the actual mapping work
   @SuppressWarnings("resource")
-  static final ResourceState mapper(final ResourceState state) throws Exception {
+  static final ResourceState mapper(final ResourceState state) throws IOException {
     final long fileOffset = state.getFileOffset();
     final long capacity = state.getCapacity();
 
     final File file = state.getFile();
 
     if (isFileReadOnly(file)) {
-      state.setResourceReadOnly(); //The file itself could be writable
+      if (!state.isResourceReadOnly()) {
+        throw new IllegalStateException("Cannot map read-only file into writable memory.");
+      }
     }
 
-    final String mode = "rw"; //we can't map it unless we use rw mode
+    final String mode = state.isResourceReadOnly() ? "r" : "rw";
     final RandomAccessFile raf = new RandomAccessFile(file, mode);
     state.putRandomAccessFile(raf);
+    if (fileOffset + capacity > raf.length()) {
+      if (state.isResourceReadOnly()) {
+        throw new IllegalStateException(
+            "File is shorter than the region that is requested to be mapped: file length=" +
+                raf.length() + ", mapping offset=" + fileOffset + ", mapping size=" + capacity);
+      } else {
+        raf.setLength(fileOffset + capacity);
+      }
+    }
     final FileChannel fc = raf.getChannel();
-    final long nativeBaseOffset = map(fc, fileOffset, capacity);
+    final int mapMode = state.isResourceReadOnly() ? MAP_RO : MAP_RW;
+    final long nativeBaseOffset = map(fc, mapMode, fileOffset, capacity);
     state.putNativeBaseOffset(nativeBaseOffset);
 
-    // length can be set more than the file.length
-    raf.setLength(capacity);
     final MappedByteBuffer mbb = createDummyMbbInstance(nativeBaseOffset);
     state.putMappedByteBuffer(mbb);
     return state;
@@ -173,7 +187,7 @@ class AllocateDirectMap implements Map {
    * @return the native base offset address
    * @throws RuntimeException Encountered an exception while mapping
    */
-  private static final long map(final FileChannel fileChannel, final long position,
+  private static final long map(final FileChannel fileChannel, final int mode, final long position,
       final long lengthBytes) throws RuntimeException {
     final int pagePosition = (int) (position % unsafe.pageSize());
     final long mapPosition = position - pagePosition;
@@ -181,13 +195,14 @@ class AllocateDirectMap implements Map {
 
     try {
       final Method method =
-              FileChannelImpl.class.getDeclaredMethod("map0", int.class, long.class, long.class);
+          FileChannelImpl.class.getDeclaredMethod("map0", int.class, long.class, long.class);
       method.setAccessible(true);
-      final long nativeBaseOffset = (long) method.invoke(fileChannel, 1, mapPosition, mapSize);
+      final long nativeBaseOffset = (long) method.invoke(fileChannel, mode, mapPosition, mapSize);
       return nativeBaseOffset;
-    } catch (final Exception e) {
-      throw new RuntimeException(
-              String.format("Encountered %s exception while mapping", e.getClass()));
+    } catch (final InvocationTargetException e) {
+      throw new RuntimeException("Exception while mapping", e.getTargetException());
+    } catch (final NoSuchMethodException | IllegalAccessException e) {
+      throw new RuntimeException("Exception while mapping", e);
     }
   }
 

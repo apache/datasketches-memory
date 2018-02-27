@@ -320,6 +320,9 @@ final class ResourceState {
     byteBuf_ = byteBuf;
     resourceOrder_ = byteBuf_.order();
     swapBytes_ = (resourceOrder_ != nativeOrder_);
+    if (byteBuf.isReadOnly()) {
+      setResourceReadOnly();
+    }
   }
 
   //MEMORY MAPPED FILES

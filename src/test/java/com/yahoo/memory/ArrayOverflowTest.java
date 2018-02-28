@@ -7,10 +7,9 @@ package com.yahoo.memory;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
-@Ignore("Test causes OutOfMemoryError in Travis CI, run only locally")
+//@Ignore("Test causes OutOfMemoryError in Travis CI, run only locally")
 public class ArrayOverflowTest {
 
   private WritableDirectHandle h;

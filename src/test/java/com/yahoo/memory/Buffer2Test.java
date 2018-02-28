@@ -7,7 +7,7 @@ import java.nio.ByteOrder;
 
 import org.testng.annotations.Test;
 
-public class BufferTest2 {
+public class Buffer2Test {
   @Test
   public void testWrapByteBuf() {
     ByteBuffer bb = ByteBuffer.allocate(64).order(ByteOrder.nativeOrder());

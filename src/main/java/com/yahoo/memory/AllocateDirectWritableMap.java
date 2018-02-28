@@ -6,6 +6,7 @@
 package com.yahoo.memory;
 
 import java.io.FileDescriptor;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.MappedByteBuffer;
 
@@ -32,10 +33,10 @@ final class AllocateDirectWritableMap extends AllocateDirectMap implements Writa
    *
    * @param state the ResourceState
    * @return A new AllocateDirectWritableMap
-   * @throws Exception file not found or RuntimeException, etc.
+   * @throws IOException file not found or RuntimeException, etc.
    */
   //@SuppressWarnings("resource")
-  static AllocateDirectWritableMap map(final ResourceState state) throws Exception {
+  static AllocateDirectWritableMap map(final ResourceState state) throws IOException {
     if (isFileReadOnly(state.getFile())) {
       throw new ReadOnlyException("File is read-only.");
     }

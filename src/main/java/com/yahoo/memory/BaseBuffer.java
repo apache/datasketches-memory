@@ -21,7 +21,7 @@ package com.yahoo.memory;
  *
  * @author Lee Rhodes
  */
-public class BaseBuffer {
+public abstract class BaseBuffer {
   final long capacity;
   private long start = 0;
   private long pos = 0;
@@ -42,7 +42,7 @@ public class BaseBuffer {
    * @return BaseBuffer
    */
   public BaseBuffer incrementPosition(final long increment) {
-    incrementAndAssertPosition(pos, increment);
+    incrementAndAssertPositionForRead(pos, increment);
     return this;
   }
 
@@ -54,7 +54,7 @@ public class BaseBuffer {
    * @return BaseBuffer
    */
   public BaseBuffer incrementAndCheckPosition(final long increment) {
-    incrementAndCheckPosition(pos, increment);
+    incrementAndCheckPositionForRead(pos, increment);
     return this;
   }
 
@@ -171,13 +171,33 @@ public class BaseBuffer {
   }
 
   //RESTRICTED XXX
-  void incrementAndAssertPosition(final long position, final long increment) {
+  void incrementAndAssertPositionForRead(final long position, final long increment) {
+    assertValid();
     final long newPos = position + increment;
     assertInvariants(start, newPos, end, capacity);
     pos = newPos;
   }
 
-  void incrementAndCheckPosition(final long pos, final long increment) {
+  void incrementAndAssertPositionForWrite(final long position, final long increment) {
+    assertValid();
+    assert !isResourceReadOnly() : "Buffer is read-only.";
+    final long newPos = position + increment;
+    assertInvariants(start, newPos, end, capacity);
+    pos = newPos;
+  }
+
+  void incrementAndCheckPositionForRead(final long pos, final long increment) {
+    checkValid();
+    final long newPos = pos + increment;
+    checkInvariants(start, newPos, end, capacity);
+    this.pos = newPos;
+  }
+
+  void incrementAndCheckPositionForWrite(final long pos, final long increment) {
+    checkValid();
+    if (isResourceReadOnly()) {
+      throw new ReadOnlyException("Buffer is read-only.");
+    }
     final long newPos = pos + increment;
     checkInvariants(start, newPos, end, capacity);
     this.pos = newPos;
@@ -228,4 +248,10 @@ public class BaseBuffer {
       );
     }
   }
+
+  abstract void assertValid();
+
+  abstract void checkValid();
+
+  abstract boolean isResourceReadOnly();
 }

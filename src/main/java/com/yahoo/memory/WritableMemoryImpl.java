@@ -376,14 +376,22 @@ class WritableMemoryImpl extends BaseWritableMemoryImpl {
   public long getAndAddLong(final long offsetBytes, final long delta) { //JDK 8+
     assertValidAndBoundsForWrite(offsetBytes, ARRAY_LONG_INDEX_SCALE);
     final long addr = cumBaseOffset + offsetBytes;
-    return UnsafeUtil.compatibilityMethods.getAndAddLong(unsafeObj, addr, delta) + delta;
+    if (UnsafeUtil.JDK8_OR_ABOVE) {
+      return unsafe.getAndAddLong(unsafeObj, addr, delta);
+    } else {
+      return JDK7Compatible.getAndAddLong(unsafeObj, addr, delta);
+    }
   }
 
   @Override
   public long getAndSetLong(final long offsetBytes, final long newValue) { //JDK 8+
     assertValidAndBoundsForWrite(offsetBytes, ARRAY_LONG_INDEX_SCALE);
     final long addr = cumBaseOffset + offsetBytes;
-    return UnsafeUtil.compatibilityMethods.getAndSetLong(unsafeObj, addr, newValue);
+    if (UnsafeUtil.JDK8_OR_ABOVE) {
+      return unsafe.getAndSetLong(unsafeObj, addr, newValue);
+    } else {
+      return JDK7Compatible.getAndSetLong(unsafeObj, addr, newValue);
+    }
   }
 
   @Override

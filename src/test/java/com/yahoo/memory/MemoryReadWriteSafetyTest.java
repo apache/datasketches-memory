@@ -5,13 +5,13 @@
 
 package com.yahoo.memory;
 
-import org.testng.annotations.Test;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+
+import org.testng.annotations.Test;
 
 public class MemoryReadWriteSafetyTest {
 
@@ -173,6 +173,7 @@ public class MemoryReadWriteSafetyTest {
     mem.putInt(0, 1);
   }
 
+  @SuppressWarnings("resource")
   @Test(expectedExceptions = AssertionError.class)
   public void testMapFile() throws IOException {
     File tempFile = File.createTempFile("test", "test");
@@ -183,6 +184,7 @@ public class MemoryReadWriteSafetyTest {
     }
   }
 
+  @SuppressWarnings("resource")
   @Test(expectedExceptions = AssertionError.class)
   public void testMapFileWithOffsetsAndBO() throws IOException {
     File tempFile = File.createTempFile("test", "test");
@@ -193,6 +195,7 @@ public class MemoryReadWriteSafetyTest {
     }
   }
 
+  @SuppressWarnings("resource")
   @Test(expectedExceptions = IllegalStateException.class)
   public void testMapFileBeyondTheFileSize() throws IOException {
     File tempFile = File.createTempFile("test", "test");

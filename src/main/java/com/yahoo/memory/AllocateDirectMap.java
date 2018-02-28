@@ -7,9 +7,6 @@ package com.yahoo.memory;
 
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 
-import sun.misc.Cleaner;
-import sun.nio.ch.FileChannelImpl;
-
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -26,6 +23,9 @@ import java.nio.file.attribute.PosixFileAttributeView;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.Set;
+
+import sun.misc.Cleaner;
+import sun.nio.ch.FileChannelImpl;
 
 /**
  * Allocates direct memory used to memory map files for read operations.
@@ -122,11 +122,11 @@ class AllocateDirectMap implements Map {
     final String mode = state.isResourceReadOnly() ? "r" : "rw";
     final RandomAccessFile raf = new RandomAccessFile(file, mode);
     state.putRandomAccessFile(raf);
-    if (fileOffset + capacity > raf.length()) {
+    if ((fileOffset + capacity) > raf.length()) {
       if (state.isResourceReadOnly()) {
         throw new IllegalStateException(
-            "File is shorter than the region that is requested to be mapped: file length=" +
-                raf.length() + ", mapping offset=" + fileOffset + ", mapping size=" + capacity);
+            "File is shorter than the region that is requested to be mapped: file length="
+           + raf.length() + ", mapping offset=" + fileOffset + ", mapping size=" + capacity);
       } else {
         raf.setLength(fileOffset + capacity);
       }

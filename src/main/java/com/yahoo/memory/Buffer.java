@@ -333,6 +333,7 @@ public abstract class Buffer extends BaseBuffer {
    * Returns true if the backing resource is read only
    * @return true if the backing resource is read only
    */
+  @Override
   public abstract boolean isResourceReadOnly();
 
   /**

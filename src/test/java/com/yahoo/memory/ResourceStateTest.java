@@ -13,9 +13,9 @@ import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
-import java.nio.ByteOrder;
-
 import org.testng.annotations.Test;
+
+import java.nio.ByteOrder;
 
 public class ResourceStateTest {
 
@@ -24,7 +24,7 @@ public class ResourceStateTest {
     ResourceState state = new ResourceState();
     state.putCapacity(1 << 20);
     assertNull(state.getBaseBuffer());
-    BaseBuffer baseBuf = new BaseBuffer(state);
+    BaseBuffer baseBuf = new WritableBufferImpl(state);
     assertNotNull(state.getBaseBuffer());
     assertEquals(baseBuf.getEnd(), 1 << 20);
     try {

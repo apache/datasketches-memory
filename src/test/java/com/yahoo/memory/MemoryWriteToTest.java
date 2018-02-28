@@ -38,7 +38,7 @@ public class MemoryWriteToTest {
 
   @Test
   public void testOffHeap() throws IOException {
-    try (WritableDirectHandle handle =
+    try (WritableHandle handle =
         WritableMemory.allocateDirect((CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD * 5) + 10)) {
       WritableMemory mem = handle.get();
       testWriteTo(mem.region(0, 0));

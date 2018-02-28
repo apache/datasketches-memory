@@ -29,10 +29,9 @@ public abstract class Memory {
 
   //BYTE BUFFER XXX
   /**
-   * Accesses the given ByteBuffer for read-only operations.
-   *
-   * <p>Note that if the ByteBuffer capacity is zero this will
-   * return a Memory backed by a heap byte array of size zero.
+   * Accesses the given ByteBuffer for read-only operations. The returned Memory object has the same
+   * byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is zero, then
+   * endianness of the returned Memory object (as well as backing storage) is unspecified.
    * @param byteBuf the given ByteBuffer, must not be null
    * @return the given ByteBuffer for read-only operations.
    */
@@ -79,10 +78,9 @@ public abstract class Memory {
 
   //REGIONS XXX
   /**
-   * Returns a read only region of this Memory.
+   * Returns a read only region of this Memory. If the given capacityBytes is zero, backing storage
+   * and endianness of the returned Memory object are unspecified.
    * @param offsetBytes the starting offset with respect to this Memory.
-   * If the capacityBytes is zero this method will
-   * return a Memory backed by a heap byte array of size zero.
    * @param capacityBytes the capacity of the region in bytes
    * @return a read only region of this Memory
    */
@@ -90,19 +88,19 @@ public abstract class Memory {
 
   //BUFFER XXX
   /**
-   * Convert this Memory to a Buffer.
-   * The <i>start</i>, <i>position</i> and <i>end</i> are set to zero, zero, and <i>capacity</i>,
-   * respectively.
+   * Creates and returns a new Buffer, backed by this Memory, however, if the capacity of this
+   * Memory object is zero, this method is allowed to return a cached Buffer object, which is
+   * effectively unmodifiable. The <i>start</i>, <i>position</i> and <i>end</i> are set to zero,
+   * zero, and <i>capacity</i>, respectively.
    * @return Buffer
    */
   public abstract Buffer asBuffer();
 
   //ACCESS PRIMITIVE HEAP ARRAYS for readOnly XXX
   /**
-   * Wraps the given primitive array for read operations assuming native byte order.
+   * Wraps the given primitive array for read operations assuming native byte order. If the array
+   * size is zero, backing storage and endianness of the returned Memory object are unspecified.
    * @param arr the given primitive array.
-   * If the array is size zero this method will
-   * return a Memory backed by a heap byte array of size zero.
    * @return Memory for read operations
    */
   public static Memory wrap(final boolean[] arr) {
@@ -112,10 +110,9 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations assuming native byte order.
+   * Wraps the given primitive array for read operations assuming native byte order. If the array
+   * size is zero, backing storage and endianness of the returned Memory object are unspecified.
    * @param arr the given primitive array.
-   * If the array is size zero this method will
-   * return a Memory backed by a heap byte array of size zero.
    * @return Memory for read operations
    */
   public static Memory wrap(final byte[] arr) {
@@ -123,43 +120,41 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations assuming the given byte order.
+   * Wraps the given primitive array for read operations with the given byte order. If the array
+   * size is zero, backing storage and endianness of the returned Memory object are unspecified.
    * @param arr the given primitive array.
-   * If the array is size zero this method will
-   * return a Memory backed by a heap byte array of size zero.
    * @param byteOrder the byte order
    * @return Memory for read operations
    */
   public static Memory wrap(final byte[] arr, final ByteOrder byteOrder) {
-      return wrap(arr, 0, arr.length, byteOrder);
+    return wrap(arr, 0, arr.length, byteOrder);
   }
 
   /**
-   * Wraps the given primitive array for read operations assuming the given byte order.
+   * Wraps the given primitive array for read operations with the given byte order. If the given
+   * lengthBytes is zero, backing storage and endianness of the returned Memory object are
+   * unspecified.
    * @param arr the given primitive array.
-   * If the array is size zero this method will
-   * return a Memory backed by a heap byte array of size zero.
    * @param offsetBytes the byte offset into the given array
    * @param lengthBytes the number of bytes to include from the given array
    * @param byteOrder the byte order
    * @return Memory for read operations
    */
   public static Memory wrap(final byte[] arr, final int offsetBytes, final int lengthBytes,
-          final ByteOrder byteOrder) {
-      UnsafeUtil.checkBounds(offsetBytes, lengthBytes, arr.length);
-      if (lengthBytes == 0) { return ZERO_SIZE_MEMORY; }
-      final ResourceState state = new ResourceState(arr, Prim.BYTE, lengthBytes);
-      state.putRegionOffset(offsetBytes);
-      state.order(byteOrder);
-      state.setResourceReadOnly();
-      return new WritableMemoryImpl(state);
+      final ByteOrder byteOrder) {
+    UnsafeUtil.checkBounds(offsetBytes, lengthBytes, arr.length);
+    if (lengthBytes == 0) { return ZERO_SIZE_MEMORY; }
+    final ResourceState state = new ResourceState(arr, Prim.BYTE, lengthBytes);
+    state.putRegionOffset(offsetBytes);
+    state.order(byteOrder);
+    state.setResourceReadOnly();
+    return new WritableMemoryImpl(state);
   }
 
   /**
-   * Wraps the given primitive array for read operations assuming native byte order.
+   * Wraps the given primitive array for read operations assuming native byte order. If the array
+   * size is zero, backing storage and endianness of the returned Memory object are unspecified.
    * @param arr the given primitive array.
-   * If the array is size zero this method will
-   * return a Memory backed by a heap byte array of size zero.
    * @return Memory for read operations
    */
   public static Memory wrap(final char[] arr) {
@@ -169,10 +164,9 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations assuming native byte order.
+   * Wraps the given primitive array for read operations assuming native byte order. If the array
+   * size is zero, backing storage and endianness of the returned Memory object are unspecified.
    * @param arr the given primitive array.
-   * If the array is size zero this method will
-   * return a Memory backed by a heap byte array of size zero.
    * @return Memory for read operations
    */
   public static Memory wrap(final short[] arr) {
@@ -182,10 +176,9 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations assuming native byte order.
+   * Wraps the given primitive array for read operations assuming native byte order. If the array
+   * size is zero, backing storage and endianness of the returned Memory object are unspecified.
    * @param arr the given primitive array.
-   * If the array is size zero this method will
-   * return a Memory backed by a heap byte array of size zero.
    * @return Memory for read operations
    */
   public static Memory wrap(final int[] arr) {
@@ -195,10 +188,9 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations assuming native byte order.
+   * Wraps the given primitive array for read operations assuming native byte order. If the array
+   * size is zero, backing storage and endianness of the returned Memory object are unspecified.
    * @param arr the given primitive array.
-   * If the array is size zero this method will
-   * return a Memory backed by a heap byte array of size zero.
    * @return Memory for read operations
    */
   public static Memory wrap(final long[] arr) {
@@ -208,10 +200,9 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations assuming native byte order.
+   * Wraps the given primitive array for read operations assuming native byte order. If the array
+   * size is zero, backing storage and endianness of the returned Memory object are unspecified.
    * @param arr the given primitive array.
-   * If the array is size zero this method will
-   * return a Memory backed by a heap byte array of size zero.
    * @return Memory for read operations
    */
   public static Memory wrap(final float[] arr) {
@@ -221,10 +212,9 @@ public abstract class Memory {
   }
 
   /**
-   * Wraps the given primitive array for read operations assuming native byte order.
+   * Wraps the given primitive array for read operations assuming native byte order. If the array
+   * size is zero, backing storage and endianness of the returned Memory object are unspecified.
    * @param arr the given primitive array.
-   * If the array is size zero this method will
-   * return a Memory backed by a heap byte array of size zero.
    * @return Memory for read operations
    */
   public static Memory wrap(final double[] arr) {

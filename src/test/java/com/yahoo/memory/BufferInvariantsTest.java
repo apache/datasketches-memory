@@ -143,7 +143,7 @@ public class BufferInvariantsTest {
 
   @Test
   public void checkLimitsDirect() {
-    try (WritableDirectHandle hand = WritableMemory.allocateDirect(100)) {
+    try (WritableHandle hand = WritableMemory.allocateDirect(100)) {
       WritableMemory wmem = hand.get();
       Buffer buf = wmem.asBuffer();
       buf.setStartPositionEnd(40, 45, 50);
@@ -214,7 +214,7 @@ public class BufferInvariantsTest {
   @Test
   public void testBufDirect() {
     int n = 25;
-    try (WritableDirectHandle whand = WritableMemory.allocateDirect(n)) {
+    try (WritableHandle whand = WritableMemory.allocateDirect(n)) {
     WritableMemory wmem = whand.get();
     WritableBuffer buf = wmem.asWritableBuffer();
     for (byte i = 0; i < n; i++) { buf.putByte(i); }

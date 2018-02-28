@@ -77,7 +77,7 @@ final class ResourceState {
   /**
    * Only relevant when user allocated direct memory is the backing resource.
    */
-  private WritableDirectHandle handle_;
+  private WritableHandle handle_;
 
   //FLAGS
   /**
@@ -250,11 +250,11 @@ final class ResourceState {
     memReqSvr_ = memReqSvr; //may be null
   }
 
-  WritableDirectHandle getHandle() {
+  WritableHandle getHandle() {
     return handle_;
   }
 
-  void setHandle(final WritableDirectHandle handle) {
+  void setHandle(final WritableHandle handle) {
     handle_ = handle; //may be set null
   }
 

@@ -398,13 +398,13 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   }
 
   @Override
-  public WritableDirectHandle getHandle() {
+  public WritableHandle getHandle() {
     assertValid();
     return state.getHandle();
   }
 
   @Override
-  public void setHandle(final WritableDirectHandle handle) {
+  public void setHandle(final WritableHandle handle) {
     assertValid();
     state.setHandle(handle);
   }

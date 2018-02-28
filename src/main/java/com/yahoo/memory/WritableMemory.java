@@ -24,10 +24,10 @@ public abstract class WritableMemory extends Memory {
 
   //BYTE BUFFER XXX
   /**
-   * Accesses the given ByteBuffer for write operations.
-   *
-   * <p>Note that if the ByteBuffer capacity is zero this will
-   * return a WritableMemory backed by a heap byte array of size zero.
+   * Accesses the given ByteBuffer for write operations. The returned WritableMemory object has the
+   * same byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is zero,
+   * then endianness of the returned WritableMemory object, as well as backing storage and read-only
+   * status are unspecified.
    * @param byteBuf the given ByteBuffer
    * @return the given ByteBuffer for write operations.
    */
@@ -84,18 +84,17 @@ public abstract class WritableMemory extends Memory {
   /**
    * Allocates and provides access to capacityBytes directly in native (off-heap) memory
    * leveraging the WritableMemory API. The allocated memory will be 8-byte aligned, but may not
-   * be page aligned.
+   * be page aligned. If capacityBytes is zero, endianness, backing storage and read-only status of
+   * the WritableMemory object, returned from {@link WritableHandle#get()} are unspecified.
    *
    * <p><b>NOTE:</b> Native/Direct memory acquired using Unsafe may have garbage in it.
    * It is the responsibility of the using class to clear this memory, if required,
    * and to call <i>close()</i> when done.</p>
    *
    * @param capacityBytes the size of the desired memory in bytes.
-   * If capacityBytes is zero the WritableDirectHandle get() will
-   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemoryMapHandler for this off-heap resource
    */
-  public static WritableDirectHandle allocateDirect(final long capacityBytes) {
+  public static WritableHandle allocateDirect(final long capacityBytes) {
     if (capacityBytes == 0) {
       return new WritableDirectHandle(null, ZERO_SIZE_MEMORY);
     }
@@ -105,30 +104,30 @@ public abstract class WritableMemory extends Memory {
 
   //REGIONS XXX
   /**
-   * Returns a writable region of this WritableMemory
+   * Returns a writable region of this WritableMemory. If the given capacityBytes is zero, backing
+   * storage, endianness and read-only status of the returned WritableMemory object are unspecified.
    * @param offsetBytes the starting offset with respect to this WritableMemory
    * @param capacityBytes the capacity of the region in bytes.
-   * If capacityBytes is zero this method will
-   * return a WritableMemory backed by a heap byte array of size zero.
    * @return a writable region of this WritableMemory
    */
   public abstract WritableMemory writableRegion(long offsetBytes, long capacityBytes);
 
   //BUFFER XXX
   /**
-   * Convert this WritableMemory to a WritableBuffer.
-   * The <i>start</i>, <i>position</i> and <i>end</i> are set to zero, zero, and <i>capacity</i>,
-   * respectively.
+   * Creates and returns a new WritableBuffer, backed by this WritableMemory, however, if the
+   * capacity of this WritableMemory object is zero, this method is allowed to return a cached
+   * WritableBuffer object, which is effectively unmodifiable. The <i>start</i>, <i>position</i> and
+   * <i>end</i> are set to zero, zero, and <i>capacity</i>, respectively.
    * @return WritableBuffer
    */
   public abstract WritableBuffer asWritableBuffer();
 
   //ALLOCATE HEAP VIA AUTOMATIC BYTE ARRAY XXX
   /**
-   * Creates on-heap WritableMemory with the given capacity
+   * Creates on-heap WritableMemory with the given capacity. If the given capacityBytes is zero,
+   * backing storage, endianness and read-only status of the returned WritableMemory object are
+   * unspecified.
    * @param capacityBytes the given capacity in bytes.
-   * If capacityBytes is zero this method will
-   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemory for write operations
    */
   public static WritableMemory allocate(final int capacityBytes) {
@@ -139,10 +138,10 @@ public abstract class WritableMemory extends Memory {
 
   //ACCESS PRIMITIVE HEAP ARRAYS for write XXX
   /**
-   * Wraps the given primitive array for write operations
+   * Wraps the given primitive array for write operations assuming native byte order. If the array
+   * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
+   * object are unspecified.
    * @param arr the given primitive array.
-   * If the array is size zero this method will
-   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final boolean[] arr) {
@@ -151,10 +150,10 @@ public abstract class WritableMemory extends Memory {
   }
 
   /**
-   * Wraps the given primitive array for write operations
+   * Wraps the given primitive array for write operations assuming native byte order. If the array
+   * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
+   * object are unspecified.
    * @param arr the given primitive array.
-   * If the array is size zero this method will
-   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final byte[] arr) {
@@ -163,10 +162,42 @@ public abstract class WritableMemory extends Memory {
   }
 
   /**
-   * Wraps the given primitive array for write operations
+   * Wraps the given primitive array for write operations with the given byte order. If the array
+   * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
+   * object are unspecified.
    * @param arr the given primitive array.
-   * If the array is size zero this method will
-   * return a WritableMemory backed by a heap byte array of size zero.
+   * @param byteOrder the byte order
+   * @return WritableMemory for write operations
+   */
+  public static WritableMemory wrap(final byte[] arr, final ByteOrder byteOrder) {
+    return wrap(arr, 0, arr.length, byteOrder);
+  }
+
+  /**
+   * Wraps the given primitive array for write operations with the given byte order. If the given
+   * lengthBytes is zero, backing storage, endianness and read-only status of the returned
+   * WritableMemory object are unspecified.
+   * @param arr the given primitive array.
+   * @param offsetBytes the byte offset into the given array
+   * @param lengthBytes the number of bytes to include from the given array
+   * @param byteOrder the byte order
+   * @return WritableMemory for write operations
+   */
+  public static WritableMemory wrap(final byte[] arr, final int offsetBytes, final int lengthBytes,
+      final ByteOrder byteOrder) {
+    UnsafeUtil.checkBounds(offsetBytes, lengthBytes, arr.length);
+    if (lengthBytes == 0) { return ZERO_SIZE_MEMORY; }
+    final ResourceState state = new ResourceState(arr, Prim.BYTE, lengthBytes);
+    state.putRegionOffset(offsetBytes);
+    state.order(byteOrder);
+    return new WritableMemoryImpl(state);
+  }
+
+  /**
+   * Wraps the given primitive array for write operations assuming native byte order. If the array
+   * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
+   * object are unspecified.
+   * @param arr the given primitive array.
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final char[] arr) {
@@ -175,10 +206,10 @@ public abstract class WritableMemory extends Memory {
   }
 
   /**
-   * Wraps the given primitive array for write operations
+   * Wraps the given primitive array for write operations assuming native byte order. If the array
+   * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
+   * object are unspecified.
    * @param arr the given primitive array.
-   * If the array is size zero this method will
-   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final short[] arr) {
@@ -187,10 +218,10 @@ public abstract class WritableMemory extends Memory {
   }
 
   /**
-   * Wraps the given primitive array for write operations
+   * Wraps the given primitive array for write operations assuming native byte order. If the array
+   * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
+   * object are unspecified.
    * @param arr the given primitive array.
-   * If the array is size zero this method will
-   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final int[] arr) {
@@ -199,10 +230,10 @@ public abstract class WritableMemory extends Memory {
   }
 
   /**
-   * Wraps the given primitive array for write operations
+   * Wraps the given primitive array for write operations assuming native byte order. If the array
+   * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
+   * object are unspecified.
    * @param arr the given primitive array.
-   * If the array is size zero this method will
-   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final long[] arr) {
@@ -211,10 +242,10 @@ public abstract class WritableMemory extends Memory {
   }
 
   /**
-   * Wraps the given primitive array for write operations
+   * Wraps the given primitive array for write operations assuming native byte order. If the array
+   * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
+   * object are unspecified.
    * @param arr the given primitive array.
-   * If the array is size zero this method will
-   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final float[] arr) {
@@ -223,10 +254,10 @@ public abstract class WritableMemory extends Memory {
   }
 
   /**
-   * Wraps the given primitive array for write operations
+   * Wraps the given primitive array for write operations assuming native byte order. If the array
+   * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
+   * object are unspecified.
    * @param arr the given primitive array.
-   * If the array is size zero this method will
-   * return a WritableMemory backed by a heap byte array of size zero.
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final double[] arr) {
@@ -489,8 +520,8 @@ public abstract class WritableMemory extends Memory {
    */
   public abstract void setMemoryRequest(MemoryRequestServer memReqSvr);
 
-  public abstract WritableDirectHandle getHandle();
+  public abstract WritableHandle getHandle();
 
-  public abstract void setHandle(WritableDirectHandle handle);
+  public abstract void setHandle(WritableHandle handle);
 
 }

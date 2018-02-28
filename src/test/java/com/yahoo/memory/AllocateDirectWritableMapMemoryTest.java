@@ -46,7 +46,7 @@ public class AllocateDirectWritableMapMemoryTest {
     try (
         WritableMapHandle dstHandle
           = WritableMemory.writableMap(file, 0, bytes, ByteOrder.nativeOrder());
-        WritableDirectHandle srcHandle = WritableMemory.allocateDirect(bytes)) {
+        WritableHandle srcHandle = WritableMemory.allocateDirect(bytes)) {
 
       WritableMemory dstMem = dstHandle.get();
       WritableMemory srcMem = srcHandle.get();

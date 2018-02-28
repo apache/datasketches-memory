@@ -28,7 +28,7 @@ public class ZeroCapacityTest {
     Memory mem2 = Memory.wrap(ByteBuffer.allocate(0));
     Memory mem3 = Memory.wrap(ByteBuffer.allocateDirect(0));
     Memory reg = mem3.region(0, 0);
-    try (WritableDirectHandle wmem = WritableMemory.allocateDirect(0)) {
+    try (WritableHandle wmem = WritableMemory.allocateDirect(0)) {
 
     }
   }

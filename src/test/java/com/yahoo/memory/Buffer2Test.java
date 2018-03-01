@@ -339,9 +339,18 @@ public class Buffer2Test {
   public void testROByteBuffer() {
     byte[] arr = new byte[64];
     ByteBuffer roBB = ByteBuffer.wrap(arr).asReadOnlyBuffer();
-    Memory mem = Memory.wrap(roBB);
-    WritableMemory wmem = (WritableMemory) mem;
-    wmem.putByte(0, (byte) 1);
+    Buffer buf = Buffer.wrap(roBB);
+    WritableBuffer wbuf = (WritableBuffer) buf;
+    wbuf.putByte(0, (byte) 1);
+  }
+
+  @Test(expectedExceptions = ReadOnlyException.class)
+  public void testROByteBuffer2() {
+    byte[] arr = new byte[64];
+    ByteBuffer roBB = ByteBuffer.wrap(arr).asReadOnlyBuffer();
+    Buffer buf = Buffer.wrap(roBB);
+    WritableBuffer wbuf = (WritableBuffer) buf;
+    wbuf.putByteArray(arr, 0, 64);
   }
 
   @Test

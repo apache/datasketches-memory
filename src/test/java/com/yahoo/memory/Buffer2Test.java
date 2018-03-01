@@ -335,6 +335,15 @@ public class Buffer2Test {
     }
   }
 
+  @Test(expectedExceptions = AssertionError.class)
+  public void testROByteBuffer() {
+    byte[] arr = new byte[64];
+    ByteBuffer roBB = ByteBuffer.wrap(arr).asReadOnlyBuffer();
+    Memory mem = Memory.wrap(roBB);
+    WritableMemory wmem = (WritableMemory) mem;
+    wmem.putByte(0, (byte) 1);
+  }
+
   @Test
   public void printlnTest() {
     println("PRINTING: "+this.getClass().getName());

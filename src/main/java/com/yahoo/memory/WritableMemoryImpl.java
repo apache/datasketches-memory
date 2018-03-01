@@ -81,15 +81,14 @@ class WritableMemoryImpl extends BaseWritableMemoryImpl {
   @Override
   public Buffer asBuffer() {
     if (state.isResourceReadOnly()) {
-      return asWritableBuffer();
+      return asWritableBuffer(); //no need to copy state
     }
     checkValid();
     final WritableBufferImpl wbuf;
     if (capacity == 0) {
       wbuf = WritableBufferImpl.ZERO_SIZE_BUFFER;
     } else {
-      wbuf = new WritableBufferImpl(state.copy());
-      wbuf.getResourceState().setResourceReadOnly();
+      wbuf = new WritableBufferImpl(state.copy()); //because of new BaseBuffer
       wbuf.setAndCheckStartPositionEnd(0, 0, capacity);
       wbuf.originMemory = this;
     }
@@ -103,7 +102,7 @@ class WritableMemoryImpl extends BaseWritableMemoryImpl {
     if (capacity == 0) {
       wbuf = WritableBufferImpl.ZERO_SIZE_BUFFER;
     } else {
-      wbuf = new WritableBufferImpl(state);
+      wbuf = new WritableBufferImpl(state.copy());
       wbuf.setAndCheckStartPositionEnd(0, 0, capacity);
       wbuf.originMemory = this;
     }

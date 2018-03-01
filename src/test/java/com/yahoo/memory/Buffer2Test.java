@@ -210,7 +210,9 @@ public class Buffer2Test {
     buffer.setPosition(0);
     boolean[] copyBooleanArray = new boolean[64];
     buffer.getBooleanArray(copyBooleanArray, 0, 64);
-    assertEquals(booleanArray, copyBooleanArray);
+    for (int j = 0; j < copyBooleanArray.length; j++) {
+      assertEquals(booleanArray[j], copyBooleanArray[j]);
+    }
   }
 
   @Test

@@ -88,8 +88,7 @@ class WritableMemoryImpl extends BaseWritableMemoryImpl {
     if (capacity == 0) {
       wbuf = WritableBufferImpl.ZERO_SIZE_BUFFER;
     } else {
-      wbuf = new WritableBufferImpl(state.copy());
-      wbuf.getResourceState().setResourceReadOnly();
+      wbuf = new WritableBufferImpl(state);
       wbuf.setAndCheckStartPositionEnd(0, 0, capacity);
       wbuf.originMemory = this;
     }

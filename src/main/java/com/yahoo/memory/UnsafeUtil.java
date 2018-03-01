@@ -27,7 +27,7 @@ import sun.misc.Unsafe;
  */
 public final class UnsafeUtil {
   public static final Unsafe unsafe;
-  public static final double JDK;
+  public static final String JDK;
   static final boolean JDK8_OR_ABOVE;
 
   //not an indicator of whether compressed references are used.
@@ -115,31 +115,36 @@ public final class UnsafeUtil {
     ARRAY_OBJECT_INDEX_SCALE = unsafe.arrayIndexScale(Object[].class);
     OBJECT_SHIFT = ARRAY_OBJECT_INDEX_SCALE == 4 ? 2 : 3;
 
-    JDK = majorJavaVersion(System.getProperty("java.version"));
-    if (JDK == 1.7) {
-      JDK8_OR_ABOVE = false;
-    } else {
-      JDK8_OR_ABOVE = true;
-    }
+    final String jdkVer = System.getProperty("java.version");
+    final int[] p = parseJavaVersion(jdkVer);
+    JDK = p[0] + "." + p[1];
+    JDK8_OR_ABOVE = checkJavaVersion(JDK, p[0], p[1]);
   }
 
-  static double majorJavaVersion(final String jdkVer) { //avail for test
-    //double version = 0;
+  private UnsafeUtil() {}
+
+  static int[] parseJavaVersion(final String jdkVer) {
     try {
-      final String[] parts = jdkVer.trim().split("[^0-9\\.]")[0].split("\\.");
-      final String num = parts[0] + "." + ((parts.length > 1) ? parts[1] : "0");
-      final double ver = Double.parseDouble(num);
-      if (ver < 1.7) {
-        throw new ExceptionInInitializerError("JDK Major Version must be >= 1.7");
+      String[] parts = jdkVer.trim().split("[^0-9\\.]");
+      if (parts.length == 0) {
+        throw new ExceptionInInitializerError("Improper Java -version string: " + jdkVer);
       }
-      return ver;
+      parts = parts[0].split("\\.");
+      final int p0 = Integer.parseInt(parts[0]);
+      final int p1 = (parts.length > 1) ? Integer.parseInt(parts[1]) : 0;
+      return new int[] {p0, p1};
     } catch (final Exception e) {
       throw new ExceptionInInitializerError("Improper Java -version string: "
           + jdkVer + "\n" + e);
     }
   }
 
-  private UnsafeUtil() {}
+  static boolean checkJavaVersion(final String jdk, final int p0, final int p1) {
+    if ( (p0 < 1) || ((p0 == 1) && (p1 < 7)) ) {
+      throw new ExceptionInInitializerError("JDK Major Version must be >= 1.7: " + jdk);
+    }
+    return  !( (p0 == 1) && (p1 == 7) );
+  }
 
   static long getFieldOffset(final Class<?> c, final String fieldName) {
     try {

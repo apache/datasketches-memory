@@ -36,7 +36,7 @@ public class ArrayOverflowTest {
     memory.asWritableBuffer().putCharArray(array, 0, size);
   }
 
-  //@Test
+  @Test
   public void testShortArray() {
     int size = (int) (memory.getCapacity() / 2);
     short[] array = new short[size];
@@ -46,7 +46,7 @@ public class ArrayOverflowTest {
     memory.asWritableBuffer().putShortArray(array, 0, size);
   }
 
-  //@Test
+  @Test
   public void testIntArray() {
     int size = (int) (memory.getCapacity() / 4);
     int[] array = new int[size];
@@ -56,7 +56,7 @@ public class ArrayOverflowTest {
     memory.asWritableBuffer().putIntArray(array, 0, size);
   }
 
-  //@Test
+  @Test
   public void testFloatArray() {
     int size = (int) (memory.getCapacity() / 4);
     float[] array = new float[size];
@@ -66,7 +66,7 @@ public class ArrayOverflowTest {
     memory.asWritableBuffer().putFloatArray(array, 0, size);
   }
 
-  //@Test
+  @Test
   public void testLongArray() {
     int size = (int) (memory.getCapacity() / 8);
     long[] array = new long[size];
@@ -76,7 +76,7 @@ public class ArrayOverflowTest {
     memory.asWritableBuffer().putLongArray(array, 0, size);
   }
 
-  //@Test
+  @Test
   public void testDoubleArray() {
     int size = (int) (memory.getCapacity() / 8);
     double[] array = new double[size];

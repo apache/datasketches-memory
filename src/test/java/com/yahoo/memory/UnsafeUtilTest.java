@@ -6,6 +6,8 @@
 package com.yahoo.memory;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 import org.testng.annotations.Test;
@@ -36,24 +38,33 @@ public class UnsafeUtilTest {
 
   @Test
   public void checkJdkString() {
-    String[] jdkStr = {"1.7.0_80", "1.8.0_121", "1.8.0_162", "9.0.4", "10.0.1", "11",
-        "12b", "12_.2"};
-    int len = jdkStr.length;
+    String jdkVer;
+    int[] p = new int[2];
+    String[] good1_8Strings = {"1.8.0_121", "1.8.0_162", "9.0.4", "10.0.1", "11", "12b", "12_.2"};
+    int len = good1_8Strings.length;
     for (int i = 0; i < len; i++) {
-      String jdkVer = jdkStr[i];
-      UnsafeUtil.majorJavaVersion(jdkVer);
+      jdkVer = good1_8Strings[i];
+      p = UnsafeUtil.parseJavaVersion(jdkVer);
+      assertTrue(UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]));
     }
-    try { //valid but < 1.7
-      UnsafeUtil.majorJavaVersion("1.6.0_65");
+    jdkVer = "1.7.0_80";
+    p = UnsafeUtil.parseJavaVersion(jdkVer);
+    assertFalse(UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]));
+    try { //valid string but < 1.7
+      jdkVer = "1.6.0_65";
+      p = UnsafeUtil.parseJavaVersion(jdkVer);
+      UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]); //throws
       fail();
-    } catch (ExceptionInInitializerError e) {
-      //println("" + e);
+    } catch (Error e) {
+      println("" + e);
     }
-    try { //invalid;
-      UnsafeUtil.majorJavaVersion("b");
+    try { //invalid string
+      jdkVer = "b";
+      p = UnsafeUtil.parseJavaVersion(jdkVer);
+      UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]); //throws
       fail();
-    } catch (ExceptionInInitializerError e) {
-      //println("" + e);
+    } catch (Exception | Error e) {
+      println("" + e);
     }
   }
 

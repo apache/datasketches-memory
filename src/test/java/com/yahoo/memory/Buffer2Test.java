@@ -7,7 +7,7 @@ import java.nio.ByteOrder;
 
 import org.testng.annotations.Test;
 
-public class BufferTest2 {
+public class Buffer2Test {
   @Test
   public void testWrapByteBuf() {
     ByteBuffer bb = ByteBuffer.allocate(64).order(ByteOrder.nativeOrder());
@@ -210,7 +210,9 @@ public class BufferTest2 {
     buffer.setPosition(0);
     boolean[] copyBooleanArray = new boolean[64];
     buffer.getBooleanArray(copyBooleanArray, 0, 64);
-    assertEquals(booleanArray, copyBooleanArray);
+    for (int j = 0; j < copyBooleanArray.length; j++) {
+      assertEquals(booleanArray[j], copyBooleanArray[j]);
+    }
   }
 
   @Test
@@ -331,6 +333,24 @@ public class BufferTest2 {
     while(buffer.hasRemaining()){
       assertEquals(memory.getByte(buffer.getPosition()), buffer.getByte());
     }
+  }
+
+  @Test(expectedExceptions = AssertionError.class)
+  public void testROByteBuffer() {
+    byte[] arr = new byte[64];
+    ByteBuffer roBB = ByteBuffer.wrap(arr).asReadOnlyBuffer();
+    Buffer buf = Buffer.wrap(roBB);
+    WritableBuffer wbuf = (WritableBuffer) buf;
+    wbuf.putByte(0, (byte) 1);
+  }
+
+  @Test(expectedExceptions = ReadOnlyException.class)
+  public void testROByteBuffer2() {
+    byte[] arr = new byte[64];
+    ByteBuffer roBB = ByteBuffer.wrap(arr).asReadOnlyBuffer();
+    Buffer buf = Buffer.wrap(roBB);
+    WritableBuffer wbuf = (WritableBuffer) buf;
+    wbuf.putByteArray(arr, 0, 64);
   }
 
   @Test

@@ -52,11 +52,11 @@ public abstract class WritableMemory extends Memory {
    * Allocates direct memory used to memory map files for write operations
    * (including those &gt; 2GB). This assumes that the file was written using native byte ordering.
    * @param file the given file to map
-   * @return WritableMemoryMapHandler for managing this map
+   * @return WritableMapHandle for managing this map
    * @throws IOException file not found or RuntimeException, etc.
    */
-  public static WritableMapHandle writableMap(final File file) throws IOException {
-    return writableMap(file, 0, file.length(), ByteOrder.nativeOrder());
+  public static WritableMapHandle map(final File file) throws IOException {
+    return map(file, 0, file.length(), ByteOrder.nativeOrder());
   }
 
   /**
@@ -66,10 +66,10 @@ public abstract class WritableMemory extends Memory {
    * @param fileOffsetBytes the position in the given file in bytes. It may not be negative.
    * @param capacityBytes the size of the allocated direct memory. It may not be negative or zero.
    * @param byteOrder the endianness of the given file. It may not be null.
-   * @return WritableMemoryMapHandler for managing this map
+   * @return WritableMapHandle for managing this map
    * @throws IOException file not found or RuntimeException, etc.
    */
-  public static WritableMapHandle writableMap(final File file, final long fileOffsetBytes,
+  public static WritableMapHandle map(final File file, final long fileOffsetBytes,
           final long capacityBytes, final ByteOrder byteOrder) throws IOException {
     zeroCheck(capacityBytes, "Capacity");
     final ResourceState state = new ResourceState();
@@ -92,7 +92,7 @@ public abstract class WritableMemory extends Memory {
    * and to call <i>close()</i> when done.</p>
    *
    * @param capacityBytes the size of the desired memory in bytes.
-   * @return WritableMemoryMapHandler for this off-heap resource
+   * @return WritableHandler for this off-heap resource
    */
   public static WritableHandle allocateDirect(final long capacityBytes) {
     if (capacityBytes == 0) {

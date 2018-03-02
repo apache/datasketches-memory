@@ -47,19 +47,27 @@ public class UnsafeUtilTest {
       p = UnsafeUtil.parseJavaVersion(jdkVer);
       assertTrue(UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]));
     }
-    jdkVer = "1.7.0_80";
+    jdkVer = "1.7.0_80"; //1.7 string
     p = UnsafeUtil.parseJavaVersion(jdkVer);
     assertFalse(UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]));
-    try { //valid string but < 1.7
-      jdkVer = "1.6.0_65";
+    try {
+      jdkVer = "1.6.0_65"; //valid string but < 1.7
       p = UnsafeUtil.parseJavaVersion(jdkVer);
       UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]); //throws
       fail();
     } catch (Error e) {
       println("" + e);
     }
-    try { //invalid string
-      jdkVer = "b";
+    try {
+      jdkVer = "b"; //invalid string
+      p = UnsafeUtil.parseJavaVersion(jdkVer);
+      UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]); //throws
+      fail();
+    } catch (Exception | Error e) {
+      println("" + e);
+    }
+    try {
+      jdkVer = ""; //invalid string
       p = UnsafeUtil.parseJavaVersion(jdkVer);
       UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]); //throws
       fail();

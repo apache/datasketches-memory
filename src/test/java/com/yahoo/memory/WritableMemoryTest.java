@@ -126,4 +126,15 @@ public class WritableMemoryTest {
     bytes2[(thresh * 2) + 3] = (byte) (bytes1[(thresh * 2) + 3] + 1);
     assertFalse(mem1.equalTo(mem2));
   }
+
+  //@Test  //TODO This is just a scenario. Not a valid test.
+  @SuppressWarnings("unused")
+  public void checkOwnerClientCase() {
+    WritableMemory owner = WritableMemory.allocate(64);
+    Memory client1 = owner; //Client1 cannot write (no API)
+    owner.putInt(0, 1); //But owner can write
+    ((WritableMemory)client1).putInt(0, 2); //Client1 can write, but with explicit effort.
+    Memory client2 = owner.region(0, owner.getCapacity()); //client2 cannot write (no API)
+    owner.putInt(0,  3); //But Owner should be able to  write! Fails!
+  }
 }

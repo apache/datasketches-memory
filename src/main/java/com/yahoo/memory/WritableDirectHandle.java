@@ -13,11 +13,11 @@ package com.yahoo.memory;
  * @author Lee Rhodes
  */
 //Joins a WritableHandle with writable, AutoCloseable AllocateDirect resource
-public class WritableDirectHandle implements AutoCloseable, WritableHandle {
-  AllocateDirect direct = null;
-  WritableMemory wMem = null;
+final class WritableDirectHandle implements WritableHandle {
+  AllocateDirect direct;
+  WritableMemory wMem;
 
-  public WritableDirectHandle(final AllocateDirect direct, final WritableMemory wMem) {
+  WritableDirectHandle(final AllocateDirect direct, final WritableMemory wMem) {
     this.direct = direct;
     this.wMem = wMem;
   }

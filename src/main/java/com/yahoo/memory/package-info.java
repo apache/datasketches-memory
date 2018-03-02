@@ -68,7 +68,7 @@
  *
  * <ul><li>{@link com.yahoo.memory.MapHandle} for read-only access to a memory-mapped file</li>
  * <li>{@link com.yahoo.memory.WritableMapHandle} for writable access to a memory-mapped file</li>
- * <li>{@link com.yahoo.memory.WritableDirectHandle} for writable access to off-heap memory.</li>
+ * <li>{@link com.yahoo.memory.WritableHandle} for writable access to off-heap memory.</li>
  * </ul>
  *
  * <p>As long as the implementation handle is valid the JVM will not attempt to close the resource.

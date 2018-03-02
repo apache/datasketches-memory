@@ -13,7 +13,7 @@ import org.testng.annotations.Test;
 @Ignore("Test causes OutOfMemoryError in Travis CI, run only locally")
 public class ArrayOverflowTest {
 
-  private WritableDirectHandle h;
+  private WritableHandle h;
   private WritableMemory memory;
 
   @BeforeClass

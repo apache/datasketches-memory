@@ -23,7 +23,7 @@ public class WritableMemoryImplTest {
   public void checkNativeCapacityAndClose() {
     int memCapacity = 64;
     @SuppressWarnings("resource") //intentionally not using try-with-resouces here
-    WritableDirectHandle wmh = WritableMemory.allocateDirect(memCapacity);
+    WritableHandle wmh = WritableMemory.allocateDirect(memCapacity);
     WritableMemory mem = wmh.get();
     assertEquals(memCapacity, mem.getCapacity());
 
@@ -183,7 +183,7 @@ public class WritableMemoryImplTest {
   @Test
   public void checkNativeBaseBound() {
     int memCapacity = 64;
-    try (WritableDirectHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh.get();
       mem.toHexString("Force Assertion Error", memCapacity, 8);
     } catch (IllegalArgumentException e) {
@@ -194,7 +194,7 @@ public class WritableMemoryImplTest {
   @Test
   public void checkNativeSrcArrayBound() {
     long memCapacity = 64;
-    try (WritableDirectHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh.get();
       byte[] srcArray = { 1, -2, 3, -4 };
       mem.putByteArray(0L, srcArray, 0, 5);
@@ -215,7 +215,7 @@ public class WritableMemoryImplTest {
   public void checkCopyWithinNativeSmall() {
     int memCapacity = 64;
     int half = memCapacity/2;
-    try (WritableDirectHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh.get();
       mem.clear();
 
@@ -237,7 +237,7 @@ public class WritableMemoryImplTest {
     int memCapLongs = memCapacity / 8;
     int halfBytes = memCapacity / 2;
     int halfLongs = memCapLongs / 2;
-    try (WritableDirectHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh.get();
       mem.clear();
 
@@ -256,7 +256,7 @@ public class WritableMemoryImplTest {
   @Test
   public void checkCopyWithinNativeSrcBound() {
     int memCapacity = 64;
-    try (WritableDirectHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh.get();
       mem.copyTo(32, mem, 32, 33);  //hit source bound check
       fail("Did Not Catch Assertion Error: source bound");
@@ -269,7 +269,7 @@ public class WritableMemoryImplTest {
   @Test
   public void checkCopyWithinNativeDstBound() {
     int memCapacity = 64;
-    try (WritableDirectHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh.get();
       mem.copyTo(0, mem, 32, 33);  //hit dst bound check
       fail("Did Not Catch Assertion Error: dst bound");
@@ -283,8 +283,8 @@ public class WritableMemoryImplTest {
   public void checkCopyCrossNativeSmall() {
     int memCapacity = 64;
 
-    try (WritableDirectHandle wrh1 = WritableMemory.allocateDirect(memCapacity);
-        WritableDirectHandle wrh2 = WritableMemory.allocateDirect(memCapacity))
+    try (WritableHandle wrh1 = WritableMemory.allocateDirect(memCapacity);
+        WritableHandle wrh2 = WritableMemory.allocateDirect(memCapacity))
     {
       WritableMemory mem1 = wrh1.get();
       WritableMemory mem2 = wrh2.get();
@@ -308,8 +308,8 @@ public class WritableMemoryImplTest {
     int memCapacity = (2<<20) + 64;
     int memCapLongs = memCapacity / 8;
 
-    try (WritableDirectHandle wrh1 = WritableMemory.allocateDirect(memCapacity);
-        WritableDirectHandle wrh2 = WritableMemory.allocateDirect(memCapacity))
+    try (WritableHandle wrh1 = WritableMemory.allocateDirect(memCapacity);
+        WritableHandle wrh2 = WritableMemory.allocateDirect(memCapacity))
     {
       WritableMemory mem1 = wrh1.get();
       WritableMemory mem2 = wrh2.get();
@@ -330,7 +330,7 @@ public class WritableMemoryImplTest {
   @Test
   public void checkCopyCrossNativeAndByteArray() {
     int memCapacity = 64;
-    try (WritableDirectHandle wrh1 = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableHandle wrh1 = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem1 = wrh1.get();
 
       for (int i= 0; i < mem1.getCapacity(); i++) {
@@ -351,7 +351,7 @@ public class WritableMemoryImplTest {
   public void checkCopyCrossRegionsSameNative() {
     int memCapacity = 128;
 
-    try (WritableDirectHandle wrh1 = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableHandle wrh1 = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem1 = wrh1.get();
 
       for (int i= 0; i < mem1.getCapacity(); i++) {
@@ -377,7 +377,7 @@ public class WritableMemoryImplTest {
   @Test
   public void checkCopyCrossNativeArrayAndHierarchicalRegions() {
     int memCapacity = 64;
-    try (WritableDirectHandle wrh1 = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableHandle wrh1 = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem1 = wrh1.get();
 
       for (int i= 0; i < mem1.getCapacity(); i++) { //fill with numbers
@@ -407,7 +407,7 @@ public class WritableMemoryImplTest {
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void checkRegionBounds() {
     int memCapacity = 64;
-    try (WritableDirectHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh.get();
       mem.writableRegion(1, 64);
     }
@@ -519,7 +519,7 @@ public class WritableMemoryImplTest {
     int memCapacity = 64;
     WritableMemory mem = WritableMemory.allocate(memCapacity);
     assertFalse(mem.isDirect());
-    try (WritableDirectHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
       mem = wrh.get();
       assertTrue(mem.isDirect());
       wrh.close();
@@ -581,9 +581,9 @@ public class WritableMemoryImplTest {
     byte[] arr2 = new byte[] {0, 1, 2, 4};
     byte[] arr3 = new byte[] {0, 1, 2, 3, 4};
 
-    try (WritableDirectHandle h1 = WritableMemory.allocateDirect(4);
-        WritableDirectHandle h2 = WritableMemory.allocateDirect(4);
-        WritableDirectHandle h3 = WritableMemory.allocateDirect(5))
+    try (WritableHandle h1 = WritableMemory.allocateDirect(4);
+        WritableHandle h2 = WritableMemory.allocateDirect(4);
+        WritableHandle h3 = WritableMemory.allocateDirect(5))
     {
       WritableMemory mem1 = h1.get();
       mem1.putByteArray(0, arr1, 0, 4);

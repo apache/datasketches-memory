@@ -14,7 +14,7 @@ public class AllocateDirectMemoryTest {
   @Test
   public void simpleAllocateDirect() {
     int longs = 32;
-    try (WritableDirectHandle wh = WritableMemory.allocateDirect(longs << 3)) {
+    try (WritableHandle wh = WritableMemory.allocateDirect(longs << 3)) {
       WritableMemory wMem1 = wh.get();
       for (int i = 0; i<longs; i++) {
         wMem1.putLong(i << 3, i);
@@ -27,7 +27,7 @@ public class AllocateDirectMemoryTest {
   public void simpleMemoryRequestServer() {
     int longs = 32;
     int bytes = longs << 3;
-    try (WritableDirectHandle wh = WritableMemory.allocateDirect(bytes)) {
+    try (WritableHandle wh = WritableMemory.allocateDirect(bytes)) {
       WritableMemory wMem1 = wh.get();
       for (int i = 0; i<longs; i++) {
         wMem1.putLong(i << 3, i);
@@ -49,7 +49,7 @@ public class AllocateDirectMemoryTest {
 
   @Test
   public void checkClose() {
-    try (WritableDirectHandle wdh = WritableMemory.allocateDirect(128)) {
+    try (WritableHandle wdh = WritableMemory.allocateDirect(128)) {
       WritableMemory wmem = wdh.get();
       ResourceState state = wmem.getResourceState();
       state.setInvalid();//intentional before end of scope

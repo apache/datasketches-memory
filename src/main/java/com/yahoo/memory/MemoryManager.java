@@ -14,6 +14,6 @@ package com.yahoo.memory;
  */
 public interface MemoryManager extends MemoryRequestServer {
 
-  WritableDirectHandle allocateDirect(long capacityBytes);
+  WritableHandle allocateDirect(long capacityBytes);
 
 }

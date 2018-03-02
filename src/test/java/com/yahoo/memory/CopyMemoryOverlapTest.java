@@ -75,7 +75,7 @@ public class CopyMemoryOverlapTest {
     println("CopyUp       : " + copyUp);
     println("Backing longs: " + backingLongs + "\t bytes: " + backingBytes);
 
-    try (WritableDirectHandle backHandle = WritableMemory.allocateDirect(backingBytes)) {
+    try (WritableHandle backHandle = WritableMemory.allocateDirect(backingBytes)) {
       WritableMemory backingMem = backHandle.get();
       fill(backingMem); //fill mem with 0 thru copyLongs -1
       //listMem(backingMem, "Original");
@@ -115,7 +115,7 @@ public class CopyMemoryOverlapTest {
     println("CopyUp       : " + copyUp);
     println("Backing longs: " + backingLongs + "\t bytes: " + backingBytes);
 
-    try (WritableDirectHandle backHandle = WritableMemory.allocateDirect(backingBytes)) {
+    try (WritableHandle backHandle = WritableMemory.allocateDirect(backingBytes)) {
       WritableMemory backingMem = backHandle.get();
       fill(backingMem); //fill mem with 0 thru copyLongs -1
       //listMem(backingMem, "Original");

@@ -59,7 +59,7 @@ public class BaseBufferTest {
   public void checkCheckValid() {
     WritableMemory wmem;
     Buffer buf;
-    try (WritableDirectHandle hand = WritableMemory.allocateDirect(100)) {
+    try (WritableHandle hand = WritableMemory.allocateDirect(100)) {
       wmem = hand.get();
       buf = wmem.asBuffer();
     }

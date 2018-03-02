@@ -25,12 +25,12 @@ final class DefaultMemoryManager implements MemoryManager {
    */
   @Override
   @SuppressWarnings("resource")
-  public WritableDirectHandle allocateDirect(final long capacityBytes) {
+  public WritableHandle allocateDirect(final long capacityBytes) {
     final ResourceState state = new ResourceState();
     state.putCapacity(capacityBytes);
     final AllocateDirect direct = AllocateDirect.allocate(state);
     final WritableMemory wMem = new WritableMemoryImpl(state);
-    final WritableDirectHandle handle = new WritableDirectHandle(direct, wMem);
+    final WritableHandle handle = new WritableDirectHandle(direct, wMem);
     state.setMemoryRequestServer(this);
     state.setHandle(handle);
     return handle;

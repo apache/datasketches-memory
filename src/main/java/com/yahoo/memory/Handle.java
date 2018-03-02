@@ -9,11 +9,14 @@ package com.yahoo.memory;
  * A handle for Memory.
  * @author Lee Rhodes
  */
-public interface Handle {
+public interface Handle extends AutoCloseable {
 
   /**
    * Gets a Memory
    * @return a Memory
    */
   Memory get();
+
+  @Override
+  void close();
 }

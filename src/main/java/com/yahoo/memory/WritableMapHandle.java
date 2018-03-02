@@ -15,12 +15,12 @@ import java.io.IOException;
  * @author Lee Rhodes
  */
 //Joins a WritableHandle with an AutoCloseable WritableMap resource
-public final class WritableMapHandle extends MapHandle implements WritableMap, WritableHandle
-{
+public final class WritableMapHandle extends MapHandle implements WritableMap, WritableHandle {
   AllocateDirectWritableMap dirWmap;
   BaseWritableMemoryImpl wMemImpl;
 
-  private WritableMapHandle(final AllocateDirectWritableMap dirWmap, final BaseWritableMemoryImpl wMem) {
+  private WritableMapHandle(final AllocateDirectWritableMap dirWmap,
+      final BaseWritableMemoryImpl wMem) {
     super(dirWmap, wMem);
     this.dirWmap = dirWmap;
     wMemImpl = wMem;

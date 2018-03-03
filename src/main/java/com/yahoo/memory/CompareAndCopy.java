@@ -46,30 +46,6 @@ final class CompareAndCopy {
     return Long.compare(lengthBytes1, lengthBytes2);
   }
 
-  static void copy(final ResourceState srcState, final long srcOffsetBytes,
-      final ResourceState dstState, final long dstOffsetBytes, final long lengthBytes) {
-    srcState.checkValid();
-    checkBounds(srcOffsetBytes, lengthBytes, srcState.getCapacity());
-    dstState.checkValid();
-    checkBounds(dstOffsetBytes, lengthBytes, dstState.getCapacity());
-    final long srcAdd = srcState.getCumBaseOffset() + srcOffsetBytes;
-    final long dstAdd = dstState.getCumBaseOffset() + dstOffsetBytes;
-    copyMemory(srcState.getUnsafeObject(), srcAdd, dstState.getUnsafeObject(), dstAdd,
-        lengthBytes);
-  }
-
-  //Used by all of the get/put array methods in Buffer and Memory classes
-  static final void copyMemoryCheckingDifferentObject(final Object srcUnsafeObj,
-      final long srcAdd, final Object dstUnsafeObj, final long dstAdd, final long lengthBytes) {
-    if (srcUnsafeObj != dstUnsafeObj) {
-      copyNonOverlappingMemoryWithChunking(srcUnsafeObj, srcAdd, dstUnsafeObj, dstAdd,
-          lengthBytes);
-    } else {
-      throw new IllegalArgumentException("Not expecting to copy to/from array which is the "
-          + "underlying object of the memory at the same time");
-    }
-  }
-
   static boolean equals(final ResourceState state1, final ResourceState state2) {
     final long cap1 = state1.getCapacity();
     final long cap2 = state2.getCapacity();
@@ -121,6 +97,60 @@ final class CompareAndCopy {
       else { return false; }
     }
     return true;
+  }
+
+  static int hashCode(final ResourceState state) {
+    state.checkValid();
+    long lenBytes = state.getCapacity();
+    long cumOff = state.getCumBaseOffset();
+    final Object arr = state.getUnsafeObject(); //could be null
+    int result = 1;
+    while (lenBytes >= Long.BYTES) {
+      final int chunk = (int) Math.min(lenBytes, UNSAFE_COPY_MEMORY_THRESHOLD);
+      // int-counted loop to avoid safepoint polls (otherwise why we chunk by
+      // UNSAFE_COPY_MEMORY_THRESHOLD)
+      int i = 0;
+
+      for (; i <= (chunk - Long.BYTES); i += Long.BYTES) {
+        final long v = unsafe.getLong(arr, cumOff + i);
+        final int vHash = (int) (v ^ (v >>> 32));
+        result = (31 * result) + vHash;
+      }
+      lenBytes -= i;
+      cumOff += i;
+    }
+    //hash the remainder bytes, if any, as a long
+    if (lenBytes == 0) { return result; }
+    long v = 0;
+    for (int i = 0; i < lenBytes; i++) {
+      v |= (unsafe.getByte(arr, cumOff + i) & 0XFFL) << (i << 3);
+    }
+    final int vHash = (int) (v ^ (v >>> 32));
+    return (31 * result) + vHash;
+  }
+
+  static void copy(final ResourceState srcState, final long srcOffsetBytes,
+      final ResourceState dstState, final long dstOffsetBytes, final long lengthBytes) {
+    srcState.checkValid();
+    checkBounds(srcOffsetBytes, lengthBytes, srcState.getCapacity());
+    dstState.checkValid();
+    checkBounds(dstOffsetBytes, lengthBytes, dstState.getCapacity());
+    final long srcAdd = srcState.getCumBaseOffset() + srcOffsetBytes;
+    final long dstAdd = dstState.getCumBaseOffset() + dstOffsetBytes;
+    copyMemory(srcState.getUnsafeObject(), srcAdd, dstState.getUnsafeObject(), dstAdd,
+        lengthBytes);
+  }
+
+  //Used by all of the get/put array methods in Buffer and Memory classes
+  static final void copyMemoryCheckingDifferentObject(final Object srcUnsafeObj,
+      final long srcAdd, final Object dstUnsafeObj, final long dstAdd, final long lengthBytes) {
+    if (srcUnsafeObj != dstUnsafeObj) {
+      copyNonOverlappingMemoryWithChunking(srcUnsafeObj, srcAdd, dstUnsafeObj, dstAdd,
+          lengthBytes);
+    } else {
+      throw new IllegalArgumentException("Not expecting to copy to/from array which is the "
+          + "underlying object of the memory at the same time");
+    }
   }
 
   //only valid and bounds checks have been performed at this point

@@ -186,8 +186,10 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   }
 
   @Override
-  public boolean equalTo(final Memory that) {
-    return CompareAndCopy.equals(state, that.getResourceState());
+  public boolean equals(final Object that) {
+    if (this == that) { return true; }
+    return (that instanceof Memory)
+        ? CompareAndCopy.equals(state, ((Memory)that).getResourceState()) : false;
   }
 
   @Override
@@ -195,6 +197,11 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
       final long thatOffsetBytes, final long lengthBytes) {
     return CompareAndCopy.equals(state, thisOffsetBytes, that.getResourceState(),
         thatOffsetBytes, lengthBytes);
+  }
+
+  @Override
+  public int hashCode() {
+    return CompareAndCopy.hashCode(state);
   }
 
   //OTHER READ METHODS XXX

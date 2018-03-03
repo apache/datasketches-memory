@@ -72,6 +72,6 @@ public class MemoryWriteToTest {
       mem.writeTo(0, mem.getCapacity(), out);
     }
     byte[] result = baos.toByteArray();
-    Assert.assertTrue(mem.equalTo(Memory.wrap(result)));
+    Assert.assertTrue(mem.equals(Memory.wrap(result)));
   }
 }

@@ -54,20 +54,20 @@ public class WritableMemoryTest {
   public void checkEquals() {
     int len = 7;
     WritableMemory wmem1 = WritableMemory.allocate(len);
-    assertTrue(wmem1.equalTo(wmem1));
+    assertTrue(wmem1.equals(wmem1));
 
     WritableMemory wmem2 = WritableMemory.allocate(len + 1);
-    assertFalse(wmem1.equalTo(wmem2));
+    assertFalse(wmem1.equals(wmem2));
 
     WritableMemory reg1 = wmem1.writableRegion(0, wmem1.getCapacity());
-    assertTrue(wmem1.equalTo(reg1));
+    assertTrue(wmem1.equals(reg1));
 
     wmem2 = WritableMemory.allocate(len);
     for (int i = 0; i < len; i++) {
       wmem1.putByte(i, (byte) i);
       wmem2.putByte(i, (byte) i);
     }
-    assertTrue(wmem1.equalTo(wmem2));
+    assertTrue(wmem1.equals(wmem2));
     assertTrue(wmem1.equalTo(0, wmem1, 0, len));
 
     reg1 = wmem1.writableRegion(0, wmem1.getCapacity());
@@ -93,10 +93,10 @@ public class WritableMemoryTest {
   public void checkEquals2() {
     int len = 23;
     WritableMemory wmem1 = WritableMemory.allocate(len);
-    assertTrue(wmem1.equalTo(wmem1));
+    assertTrue(wmem1.equals(wmem1));
 
     WritableMemory wmem2 = WritableMemory.allocate(len + 1);
-    assertFalse(wmem1.equalTo(wmem2));
+    assertFalse(wmem1.equals(wmem2));
 
     for (int i = 0; i < len; i++) {
       wmem1.putByte(i, (byte) i);
@@ -117,14 +117,14 @@ public class WritableMemoryTest {
     byte[] bytes2 = bytes1.clone();
     Memory mem1 = Memory.wrap(bytes1);
     Memory mem2 = Memory.wrap(bytes2);
-    assertTrue(mem1.equalTo(mem2));
+    assertTrue(mem1.equals(mem2));
 
     bytes2[thresh + 10] = (byte) (bytes1[thresh + 10] + 1);
-    assertFalse(mem1.equalTo(mem2));
+    assertFalse(mem1.equals(mem2));
 
     bytes2[thresh + 10] = bytes1[thresh + 10];
     bytes2[(thresh * 2) + 3] = (byte) (bytes1[(thresh * 2) + 3] + 1);
-    assertFalse(mem1.equalTo(mem2));
+    assertFalse(mem1.equals(mem2));
   }
 
   //@Test  //TODO This is just a scenario. Not a valid test.

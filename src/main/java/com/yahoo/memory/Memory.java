@@ -449,11 +449,14 @@ public abstract class Memory {
       throws IOException;
 
   /**
-   * Returns true if the given Memory has equal contents to this Memory.
-   * @param that the given Memory
-   * @return true if the given Memory has equal contents to this Memory.
+   * Returns true if the given Object is an instance of Memory and has equal contents to this
+   * Memory.
+   * @param that the given Memory object
+   * @return true if the given Object is an instance of Memory and has equal contents to this
+   * Memory.
    */
-  public abstract boolean equalTo(Memory that);
+  @Override
+  public abstract boolean equals(Object that);
 
   /**
    * Returns true if the given Memory has equal contents to this Memory in the given range of
@@ -467,6 +470,21 @@ public abstract class Memory {
    */
   public abstract boolean equalTo(long thisOffsetBytes, Memory that, long thatOffsetBytes,
       long lengthBytes);
+
+  /**
+   * Returns the hashCode of this Memory.
+   *
+   * <p>The hash code of this Memory depends upon all of its contents.
+   * Because of this, it is inadvisable to use Memory objects as keys in hash maps
+   * or similar data structures unless it is known that their contents will not change.</p>
+   *
+   * <p>If it is desirable to use Memory objects in a hash map depending only on object identity,
+   * than the {@link java.util.IdentityHashMap} can be used.</p>
+   *
+   * @return the hashCode of this Memory.
+   */
+  @Override
+  public abstract int hashCode();
 
   //OTHER READ METHODS XXX
   /**

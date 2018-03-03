@@ -6,6 +6,7 @@
 package com.yahoo.memory;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.io.File;
@@ -321,6 +322,17 @@ public class MemoryTest {
     WritableMemory wmem = WritableMemory.allocate(32 + 7);
     int hc = wmem.hashCode();
     assertEquals(hc, 28629151);
+  }
+
+  @Test
+  public void checkSelfEqualsToAndCompareTo() {
+    int len = 64;
+    WritableMemory wmem = WritableMemory.allocate(len);
+    for (int i = 0; i < len; i++) { wmem.putByte(i, (byte) i); }
+    assertTrue(wmem.equalTo(0, wmem, 0, len));
+    assertFalse(wmem.equalTo(0, wmem, len/2, len/2));
+    assertEquals(wmem.compareTo(0, len, wmem, 0, len), 0);
+    assertTrue(wmem.compareTo(0, 0, wmem, len/2, len/2) < 0);
   }
 
   @Test

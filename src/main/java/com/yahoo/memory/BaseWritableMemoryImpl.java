@@ -126,65 +126,6 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     }
   }
 
-  private void writeByteArrayTo(final byte[] unsafeObj, final long offsetBytes,
-      final long lengthBytes, final WritableByteChannel out) throws IOException {
-    final int off =
-        Ints.checkedCast((cumBaseOffset + offsetBytes) - UnsafeUtil.ARRAY_BYTE_BASE_OFFSET);
-    final int len = Ints.checkedCast(lengthBytes);
-    final ByteBuffer bufToWrite = ByteBuffer.wrap(unsafeObj, off, len);
-    writeFully(bufToWrite, out);
-  }
-
-  private void writeDirectMemoryTo(final long offsetBytes, long lengthBytes,
-      final WritableByteChannel out) throws IOException {
-    long addr = getCumulativeOffset(offsetBytes);
-    // Do chunking, because it's likely that WritableByteChannel.write(ByteBuffer) in some network-
-    // or file-backed WritableByteChannel implementations with direct ByteBuffer argument could
-    // be subject of the same safepoint problems as in Unsafe.copyMemory and Unsafe.setMemory.
-    while (lengthBytes > 0) {
-      final int chunk = (int) Math.min(CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD, lengthBytes);
-      final ByteBuffer bufToWrite = wrap(addr, chunk);
-      writeFully(bufToWrite, out);
-      addr += chunk;
-      lengthBytes -= chunk;
-    }
-  }
-
-  /**
-   * This method is copied from https://github.com/odnoklassniki/one-nio/blob/
-   * 27c768cbd28ece949c299f2d437c9a0ebd874500/src/one/nio/mem/DirectMemory.java#L95
-   */
-  private static ByteBuffer wrap(final long address, final int capacity) {
-    final ByteBuffer buf = ZERO_DIRECT_BUFFER.duplicate();
-    unsafe.putLong(buf, NIO_BUFFER_ADDRESS_FIELD_OFFSET, address);
-    unsafe.putInt(buf, NIO_BUFFER_CAPACITY_FIELD_OFFSET, capacity);
-    buf.limit(capacity);
-    return buf;
-  }
-
-  private void writeToWithExtraCopy(long offsetBytes, long lengthBytes,
-      final WritableByteChannel out) throws IOException {
-    // Keep the bufLen a multiple of 8, to maybe allow getByteArray() to go a faster path.
-    final int bufLen = Ints.checkedCast(Math.max(8, Math.min((capacity / 1024) & ~7L, 4096)));
-    final byte[] buf = new byte[bufLen];
-    final ByteBuffer bufToWrite = ByteBuffer.wrap(buf);
-    while (lengthBytes > 0) {
-      final int chunk = (int) Math.min(buf.length, lengthBytes);
-      getByteArray(offsetBytes, buf, 0, chunk);
-      bufToWrite.clear().limit(chunk);
-      writeFully(bufToWrite, out);
-      offsetBytes += chunk;
-      lengthBytes -= chunk;
-    }
-  }
-
-  private static void writeFully(final ByteBuffer bufToWrite, final WritableByteChannel out)
-      throws IOException {
-    while (bufToWrite.remaining() > 0) {
-      out.write(bufToWrite);
-    }
-  }
-
   @Override
   public boolean equals(final Object that) {
     if (this == that) { return true; }
@@ -230,6 +171,12 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   }
 
   @Override
+  public ByteOrder getResourceOrder() {
+    assertValid();
+    return state.order();
+  }
+
+  @Override
   public boolean hasArray() {
     assertValid();
     return unsafeObj != null;
@@ -264,12 +211,6 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   @Override
   public boolean isValid() {
     return state.isValid();
-  }
-
-  @Override
-  public ByteOrder getResourceOrder() {
-    assertValid();
-    return state.order();
   }
 
   @Override
@@ -417,6 +358,65 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   }
 
   //RESTRICTED XXX
+  private void writeByteArrayTo(final byte[] unsafeObj, final long offsetBytes,
+      final long lengthBytes, final WritableByteChannel out) throws IOException {
+    final int off =
+        Ints.checkedCast((cumBaseOffset + offsetBytes) - UnsafeUtil.ARRAY_BYTE_BASE_OFFSET);
+    final int len = Ints.checkedCast(lengthBytes);
+    final ByteBuffer bufToWrite = ByteBuffer.wrap(unsafeObj, off, len);
+    writeFully(bufToWrite, out);
+  }
+
+  private void writeDirectMemoryTo(final long offsetBytes, long lengthBytes,
+      final WritableByteChannel out) throws IOException {
+    long addr = getCumulativeOffset(offsetBytes);
+    // Do chunking, because it's likely that WritableByteChannel.write(ByteBuffer) in some network-
+    // or file-backed WritableByteChannel implementations with direct ByteBuffer argument could
+    // be subject of the same safepoint problems as in Unsafe.copyMemory and Unsafe.setMemory.
+    while (lengthBytes > 0) {
+      final int chunk = (int) Math.min(CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD, lengthBytes);
+      final ByteBuffer bufToWrite = wrap(addr, chunk);
+      writeFully(bufToWrite, out);
+      addr += chunk;
+      lengthBytes -= chunk;
+    }
+  }
+
+  /**
+   * This method is copied from https://github.com/odnoklassniki/one-nio/blob/
+   * 27c768cbd28ece949c299f2d437c9a0ebd874500/src/one/nio/mem/DirectMemory.java#L95
+   */
+  private static ByteBuffer wrap(final long address, final int capacity) {
+    final ByteBuffer buf = ZERO_DIRECT_BUFFER.duplicate();
+    unsafe.putLong(buf, NIO_BUFFER_ADDRESS_FIELD_OFFSET, address);
+    unsafe.putInt(buf, NIO_BUFFER_CAPACITY_FIELD_OFFSET, capacity);
+    buf.limit(capacity);
+    return buf;
+  }
+
+  private void writeToWithExtraCopy(long offsetBytes, long lengthBytes,
+      final WritableByteChannel out) throws IOException {
+    // Keep the bufLen a multiple of 8, to maybe allow getByteArray() to go a faster path.
+    final int bufLen = Ints.checkedCast(Math.max(8, Math.min((capacity / 1024) & ~7L, 4096)));
+    final byte[] buf = new byte[bufLen];
+    final ByteBuffer bufToWrite = ByteBuffer.wrap(buf);
+    while (lengthBytes > 0) {
+      final int chunk = (int) Math.min(buf.length, lengthBytes);
+      getByteArray(offsetBytes, buf, 0, chunk);
+      bufToWrite.clear().limit(chunk);
+      writeFully(bufToWrite, out);
+      offsetBytes += chunk;
+      lengthBytes -= chunk;
+    }
+  }
+
+  private static void writeFully(final ByteBuffer bufToWrite, final WritableByteChannel out)
+      throws IOException {
+    while (bufToWrite.remaining() > 0) {
+      out.write(bufToWrite);
+    }
+  }
+
   @Override
   ResourceState getResourceState() {
     return state;

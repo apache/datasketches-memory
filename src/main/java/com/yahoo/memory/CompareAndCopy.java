@@ -30,15 +30,15 @@ final class CompareAndCopy {
     checkBounds(offsetBytes1, lengthBytes1, state1.getCapacity());
     state2.checkValid();
     checkBounds(offsetBytes2, lengthBytes2, state2.getCapacity());
-    final long add1 = state1.getCumBaseOffset() + offsetBytes1;
-    final long add2 = state2.getCumBaseOffset() + offsetBytes2;
+    final long cumOff1 = state1.getCumBaseOffset() + offsetBytes1;
+    final long cumOff2 = state2.getCumBaseOffset() + offsetBytes2;
     final Object arr1 = state1.getUnsafeObject();
     final Object arr2 = state2.getUnsafeObject();
-    if ((arr1 != arr2) || (add1 != add2)) {
+    if ((arr1 != arr2) || (cumOff1 != cumOff2)) {
       final long lenBytes = Math.min(lengthBytes1, lengthBytes2);
       for (long i = 0; i < lenBytes; i++) {
-        final int byte1 = unsafe.getByte(arr1, add1 + i);
-        final int byte2 = unsafe.getByte(arr2, add2 + i);
+        final int byte1 = unsafe.getByte(arr1, cumOff1 + i);
+        final int byte2 = unsafe.getByte(arr2, cumOff2 + i);
         if (byte1 < byte2) { return -1; }
         if (byte1 > byte2) { return  1; }
       }
@@ -52,23 +52,24 @@ final class CompareAndCopy {
     return (cap1 == cap2) && equals(state1, 0, state2, 0, cap1);
   }
 
-  static boolean equals(final ResourceState state1, final long off1, final ResourceState state2,
-      final long off2, long lenBytes) {
+  //Developer notes: this is subtlely different from (campare == 0) in that this has an early
+  // stop if the arrays and offsets are the same as there is only one length.  Also this can take
+  // advantage of chunking with longs, while compare cannot.
+  static boolean equals(
+      final ResourceState state1, final long offsetBytes1,
+      final ResourceState state2, final long offsetBytes2, long lengthBytes) {
     state1.checkValid();
+    checkBounds(offsetBytes1, lengthBytes, state1.getCapacity());
     state2.checkValid();
-    if (state1 == state2) { return true; }
-    final long cap1 = state1.getCapacity();
-    final long cap2 = state2.getCapacity();
-    checkBounds(off1, lenBytes, cap1);
-    checkBounds(off2, lenBytes, cap2);
-    long cumOff1 = state1.getCumBaseOffset() + off1;
-    long cumOff2 = state2.getCumBaseOffset() + off2;
+    checkBounds(offsetBytes2, lengthBytes, state2.getCapacity());
+    long cumOff1 = state1.getCumBaseOffset() + offsetBytes1;
+    long cumOff2 = state2.getCumBaseOffset() + offsetBytes2;
     final Object arr1 = state1.getUnsafeObject(); //could be null
     final Object arr2 = state2.getUnsafeObject(); //could be null
     if ((arr1 == arr2) && (cumOff1 == cumOff2)) { return true; }
 
-    while (lenBytes >= Long.BYTES) {
-      final int chunk = (int) Math.min(lenBytes, UNSAFE_COPY_MEMORY_THRESHOLD);
+    while (lengthBytes >= Long.BYTES) {
+      final int chunk = (int) Math.min(lengthBytes, UNSAFE_COPY_MEMORY_THRESHOLD);
       // int-counted loop to avoid safepoint polls (otherwise why we chunk by
       // UNSAFE_COPY_MEMORY_THRESHOLD)
       int i = 0;
@@ -78,12 +79,13 @@ final class CompareAndCopy {
         if (v1 == v2) { continue; }
         else { return false; }
       }
-      lenBytes -= i;
+      lengthBytes -= i;
       cumOff1 += i;
       cumOff2 += i;
     }
     //check the remainder bytes, if any
-    return (lenBytes == 0) ? true : equalsByBytes(arr1, cumOff1, arr2, cumOff2, (int) lenBytes);
+    return (lengthBytes == 0)
+        ? true : equalsByBytes(arr1, cumOff1, arr2, cumOff2, (int) lengthBytes);
   }
 
   //use only for short runs

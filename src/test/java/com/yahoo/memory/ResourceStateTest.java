@@ -8,32 +8,14 @@ package com.yahoo.memory;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_DOUBLE_INDEX_SCALE;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
-import org.testng.annotations.Test;
-
 import java.nio.ByteOrder;
 
-public class ResourceStateTest {
+import org.testng.annotations.Test;
 
-  @Test
-  public void checkBaseBufferAndState() {
-    ResourceState state = new ResourceState();
-    state.putCapacity(1 << 20);
-    assertNull(state.getBaseBuffer());
-    BaseBuffer baseBuf = new WritableBufferImpl(state);
-    assertNotNull(state.getBaseBuffer());
-    assertEquals(baseBuf.getEnd(), 1 << 20);
-    try {
-      state.putCapacity(-1);
-      fail();
-    } catch (IllegalArgumentException e) {
-      // ok
-    }
-  }
+public class ResourceStateTest {
 
   @Test
   public void checkByteOrder() {

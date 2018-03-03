@@ -129,17 +129,12 @@ final class ResourceState {
    */
   private MappedByteBuffer mbb_;
 
-  //POSITIONAL
-  /**
-   * BaseBuffer.
-   */
-  private BaseBuffer baseBuf_;
-
-  //ENDIANNESS PROPERTIES
+  //RESOURCE ENDIANNESS PROPERTIES
   private ByteOrder resourceOrder_ = nativeOrder_;
 
   private boolean swapBytes_; //true if resourceOrder != nativeOrder_
 
+  //CONSTRUCTORS
   ResourceState() {
     resourceIsReadOnly_ = new StepBoolean(false);
     valid_ = new StepBoolean(true);
@@ -188,6 +183,7 @@ final class ResourceState {
     compute();
   }
 
+  //METHODS
   ResourceState copy() {
     return new ResourceState(this);
   }
@@ -356,16 +352,6 @@ final class ResourceState {
   void putMappedByteBuffer(final MappedByteBuffer mbb) {
     nullCheck(mbb, "MappedByteBuffer");
     mbb_ = mbb;
-  }
-
-  //POSITIONAL BASE BUFFER
-  BaseBuffer getBaseBuffer() {
-    return baseBuf_;
-  }
-
-  void putBaseBuffer(final BaseBuffer baseBuf) {
-    nullCheck(baseBuf, "BaseBuffer");
-    baseBuf_ = baseBuf;
   }
 
   //ENDIANNESS

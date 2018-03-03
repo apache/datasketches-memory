@@ -40,7 +40,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   final long cumBaseOffset; //Holds the cumulative offset to the start of data.
 
   BaseWritableBufferImpl(final ResourceState state) {
-    super(state);
+    super(state.getCapacity());
     this.state = state;
     unsafeObj = state.getUnsafeObject();
     cumBaseOffset = state.getCumBaseOffset();

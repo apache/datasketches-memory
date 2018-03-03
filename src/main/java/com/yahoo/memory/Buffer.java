@@ -19,8 +19,8 @@ import java.nio.ByteOrder;
  */
 public abstract class Buffer extends BaseBuffer {
 
-  Buffer(final ResourceState state) {
-    super(state);
+  Buffer(final long capacity) {
+    super(capacity);
   }
 
   //BYTE BUFFER XXX

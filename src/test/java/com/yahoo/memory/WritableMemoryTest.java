@@ -157,7 +157,7 @@ public class WritableMemoryTest {
    * @param s value to print
    */
   static void println(final String s) {
-    System.out.println(s);
+    //System.out.println(s);
   }
 
 }

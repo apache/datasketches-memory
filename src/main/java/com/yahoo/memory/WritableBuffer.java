@@ -18,8 +18,8 @@ import java.nio.ByteBuffer;
  */
 public abstract class WritableBuffer extends Buffer {
 
-  WritableBuffer(final ResourceState state) {
-    super(state);
+  WritableBuffer(final long capacity) {
+    super(capacity);
   }
 
   //BYTE BUFFER XXX

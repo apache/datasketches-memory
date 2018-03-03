@@ -28,10 +28,9 @@ public abstract class BaseBuffer {
   private long end;
 
 
-  BaseBuffer(final ResourceState state) {
-    capacity = state.getCapacity();
+  BaseBuffer(final long capacity) {
+    this.capacity = capacity;
     end = capacity;
-    state.putBaseBuffer(this);
   }
 
   /**

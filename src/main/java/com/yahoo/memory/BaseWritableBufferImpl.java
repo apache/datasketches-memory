@@ -309,7 +309,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   void checkValidForWrite() {
     checkValid();
     if (isResourceReadOnly()) {
-      throw new IllegalStateException("Buffer is read-only.");
+      throw new ReadOnlyException("Buffer is read-only.");
     }
   }
 

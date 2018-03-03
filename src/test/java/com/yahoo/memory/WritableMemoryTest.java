@@ -93,6 +93,7 @@ public class WritableMemoryTest {
   public void checkEquals2() {
     int len = 23;
     WritableMemory wmem1 = WritableMemory.allocate(len);
+    assertFalse(wmem1.equals(null));
     assertTrue(wmem1.equals(wmem1));
 
     WritableMemory wmem2 = WritableMemory.allocate(len + 1);
@@ -102,7 +103,6 @@ public class WritableMemoryTest {
       wmem1.putByte(i, (byte) i);
       wmem2.putByte(i, (byte) i);
     }
-
     assertTrue(wmem1.equalTo(0, wmem2, 0, len));
     assertTrue(wmem1.equalTo(1, wmem2, 1, len - 1));
   }
@@ -127,6 +127,16 @@ public class WritableMemoryTest {
     assertFalse(mem1.equals(mem2));
   }
 
+  @Test
+  public void checkWrapWithBO() {
+    WritableMemory wmem = WritableMemory.wrap(new byte[0], ByteOrder.BIG_ENDIAN);
+    assertFalse(wmem.swapBytes());
+    println("" + wmem.swapBytes());
+    wmem = WritableMemory.wrap(new byte[8], ByteOrder.BIG_ENDIAN);
+    assertTrue(wmem.swapBytes());
+    println("" + wmem.swapBytes());
+  }
+
   //@Test  //TODO This is just a scenario. Not a valid test.
   @SuppressWarnings("unused")
   public void checkOwnerClientCase() {
@@ -137,4 +147,17 @@ public class WritableMemoryTest {
     Memory client2 = owner.region(0, owner.getCapacity()); //client2 cannot write (no API)
     owner.putInt(0,  3); //But Owner should be able to  write! Fails!
   }
+
+  @Test
+  public void printlnTest() {
+    println("PRINTING: "+this.getClass().getName());
+  }
+
+  /**
+   * @param s value to print
+   */
+  static void println(final String s) {
+    System.out.println(s);
+  }
+
 }

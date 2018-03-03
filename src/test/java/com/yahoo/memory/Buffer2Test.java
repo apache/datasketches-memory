@@ -353,6 +353,25 @@ public class Buffer2Test {
     wbuf.putByteArray(arr, 0, 64);
   }
 
+  @Test(expectedExceptions = ReadOnlyException.class)
+  public void testIllegalFill() {
+    byte[] arr = new byte[64];
+    ByteBuffer roBB = ByteBuffer.wrap(arr).asReadOnlyBuffer();
+    Buffer buf = Buffer.wrap(roBB);
+    WritableBuffer wbuf = (WritableBuffer) buf;
+    wbuf.fill((byte)0);
+  }
+
+  @Test
+  public void testWritableDuplicate() {
+    WritableMemory wmem = WritableMemory.wrap(new byte[0]);
+    WritableBuffer wbuf = wmem.asWritableBuffer();
+    WritableBuffer wbuf2 = wbuf.writableDuplicate();
+    assertEquals(wbuf2.capacity, 0);
+    Buffer buf = wmem.asBuffer();
+    assertEquals(buf.capacity, 0);
+  }
+
   @Test
   public void printlnTest() {
     println("PRINTING: "+this.getClass().getName());

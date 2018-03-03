@@ -289,10 +289,6 @@ final class ResourceState {
     valid_.change();
   }
 
-  final void assertValid() {
-    assert valid_.get() : "Memory not valid.";
-  }
-
   final void checkValid() {
     if (!valid_.get()) {
       throw new IllegalStateException("Memory not valid.");

@@ -317,6 +317,13 @@ public class MemoryTest {
   }
 
   @Test
+  public void checkHashCode() {
+    WritableMemory wmem = WritableMemory.allocate(32 + 7);
+    int hc = wmem.hashCode();
+    assertEquals(hc, 28629151);
+  }
+
+  @Test
   public void printlnTest() {
     println("PRINTING: "+this.getClass().getName());
   }

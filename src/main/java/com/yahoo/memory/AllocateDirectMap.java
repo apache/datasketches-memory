@@ -42,6 +42,7 @@ class AllocateDirectMap implements Map {
   final ResourceState state;
   final Cleaner cleaner;
 
+  //called from map below and from AllocateDirectWritableMap constructor
   AllocateDirectMap(final ResourceState state) {
     this.state = state;
     cleaner = Cleaner.create(this, new Deallocator(state));
@@ -60,6 +61,9 @@ class AllocateDirectMap implements Map {
    * @throws IOException file not found or RuntimeException, etc.
    */
   static AllocateDirectMap map(final ResourceState state) throws IOException {
+    if (isFileReadOnly(state.getFile())) {
+      state.setResourceReadOnly();
+    }
     return new AllocateDirectMap(mapper(state));
   }
 
@@ -105,25 +109,19 @@ class AllocateDirectMap implements Map {
 
   // Restricted methods
 
-  //Does the actual mapping work
+  //Does the actual mapping work, resourceReadOnly must already be set
   @SuppressWarnings("resource")
   static final ResourceState mapper(final ResourceState state) throws IOException {
     final long fileOffset = state.getFileOffset();
     final long capacity = state.getCapacity();
-
     final File file = state.getFile();
+    final boolean readOnlyFile = state.isResourceReadOnly(); //set by map above
+    final String mode = readOnlyFile ? "r" : "rw";
 
-    if (isFileReadOnly(file)) {
-      if (!state.isResourceReadOnly()) {
-        throw new IllegalStateException("Cannot map read-only file into writable memory.");
-      }
-    }
-
-    final String mode = state.isResourceReadOnly() ? "r" : "rw";
     final RandomAccessFile raf = new RandomAccessFile(file, mode);
     state.putRandomAccessFile(raf);
     if ((fileOffset + capacity) > raf.length()) {
-      if (state.isResourceReadOnly()) {
+      if (readOnlyFile) {
         throw new IllegalStateException(
             "File is shorter than the region that is requested to be mapped: file length="
            + raf.length() + ", mapping offset=" + fileOffset + ", mapping size=" + capacity);
@@ -132,7 +130,7 @@ class AllocateDirectMap implements Map {
       }
     }
     final FileChannel fc = raf.getChannel();
-    final int mapMode = state.isResourceReadOnly() ? MAP_RO : MAP_RW;
+    final int mapMode = readOnlyFile ? MAP_RO : MAP_RW;
     final long nativeBaseOffset = map(fc, mapMode, fileOffset, capacity);
     state.putNativeBaseOffset(nativeBaseOffset);
 

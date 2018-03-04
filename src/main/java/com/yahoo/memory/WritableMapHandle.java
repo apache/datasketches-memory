@@ -29,7 +29,7 @@ public final class WritableMapHandle extends MapHandle implements WritableMap, W
   @SuppressWarnings("resource") //called from memory
   static WritableMapHandle map(final ResourceState state) throws IOException {
     final AllocateDirectWritableMap dirMap = AllocateDirectWritableMap.map(state);
-    final BaseWritableMemoryImpl wMem = new WritableMemoryImpl(state);
+    final BaseWritableMemoryImpl wMem = new WritableMemoryImpl(state, false);
     return new WritableMapHandle(dirMap, wMem);
   }
 

@@ -179,7 +179,7 @@ public abstract class BaseBuffer {
 
   void incrementAndAssertPositionForWrite(final long position, final long increment) {
     assertValid();
-    assert !isResourceReadOnly() : "Buffer is read-only.";
+    assert !isLocalReadOnly() : "Buffer is read-only.";
     final long newPos = position + increment;
     assertInvariants(start, newPos, end, capacity);
     pos = newPos;
@@ -194,7 +194,7 @@ public abstract class BaseBuffer {
 
   void incrementAndCheckPositionForWrite(final long pos, final long increment) {
     checkValid();
-    if (isResourceReadOnly()) {
+    if (isLocalReadOnly()) {
       throw new ReadOnlyException("Buffer is read-only.");
     }
     final long newPos = pos + increment;
@@ -252,5 +252,5 @@ public abstract class BaseBuffer {
 
   abstract void checkValid();
 
-  abstract boolean isResourceReadOnly();
+  abstract boolean isLocalReadOnly();
 }

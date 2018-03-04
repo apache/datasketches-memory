@@ -38,12 +38,14 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   final ResourceState state;
   final Object unsafeObj; //Array objects are held here.
   final long cumBaseOffset; //Holds the cumulative offset to the start of data.
+  final boolean localReadOnly;
 
-  BaseWritableBufferImpl(final ResourceState state) {
+  BaseWritableBufferImpl(final ResourceState state, final boolean localReadOnly) {
     super(state.getCapacity());
     this.state = state;
     unsafeObj = state.getUnsafeObject();
     cumBaseOffset = state.getCumBaseOffset();
+    this.localReadOnly = localReadOnly;
   }
 
   //PRIMITIVE getXXX() and getXXXArray() XXX
@@ -165,6 +167,12 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   }
 
   @Override
+  boolean isLocalReadOnly() {
+    assertValid();
+    return localReadOnly;
+  }
+
+  @Override
   public boolean isSameResource(final Buffer that) {
     if (that == null) { return false; }
     checkValid();
@@ -199,7 +207,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
     sb.append("### ").append(klass).append(" SUMMARY ###").append(LS);
     sb.append("Header Comment      : ").append(header).append(LS);
     sb.append("Call Parameters     : ").append(call);
-    return Memory.toHex(sb.toString(), offsetBytes, lengthBytes, state);
+    return Memory.toHex(sb.toString(), offsetBytes, lengthBytes, state, localReadOnly);
   }
 
   //PRIMITIVE putXXX() and putXXXArray() XXX
@@ -321,6 +329,6 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   void assertValidAndBoundsForWrite(final long offsetBytes, final long lengthBytes) {
     assertValid();
     assertBounds(offsetBytes, lengthBytes, capacity);
-    assert !state.isResourceReadOnly() : "Buffer is read-only.";
+    assert !localReadOnly : "Buffer is read-only.";
   }
 }

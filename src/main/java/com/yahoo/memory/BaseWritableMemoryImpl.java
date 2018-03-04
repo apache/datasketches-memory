@@ -47,12 +47,15 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   final Object unsafeObj; //Array objects are held here.
   final long capacity;
   final long cumBaseOffset; //Holds the cumulative offset to the start of data.
+  final boolean localReadOnly;
 
-  BaseWritableMemoryImpl(final ResourceState state) {
+  BaseWritableMemoryImpl(final ResourceState state, final boolean localReadOnly) {
     unsafeObj = state.getUnsafeObject();
     this.state = state;
     capacity = state.getCapacity();
     cumBaseOffset = state.getCumBaseOffset();
+    this.localReadOnly = localReadOnly;
+
   }
 
   ///PRIMITIVE getXXX() and getXXXArray() XXX
@@ -230,7 +233,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     sb.append("### ").append(klass).append(" SUMMARY ###").append(LS);
     sb.append("Header Comment      : ").append(header).append(LS);
     sb.append("Call Parameters     : ").append(call);
-    return Memory.toHex(sb.toString(), offsetBytes, lengthBytes, state);
+    return Memory.toHex(sb.toString(), offsetBytes, lengthBytes, state, localReadOnly);
   }
 
   //PRIMITIVE putXXX() and putXXXArray() implementations XXX
@@ -438,13 +441,13 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   void assertValidAndBoundsForWrite(final long offsetBytes, final long lengthBytes) {
     assertValid();
     assertBounds(offsetBytes, lengthBytes, capacity);
-    assert !state.isResourceReadOnly() : "Memory is read-only.";
+    assert !localReadOnly : "Memory is read-only.";
   }
 
   void checkValidAndBoundsForWrite(final long offsetBytes, final long lengthBytes) {
     checkValid();
     checkBounds(offsetBytes, lengthBytes, capacity);
-    if (state.isResourceReadOnly()) {
+    if (localReadOnly) {
       throw new ReadOnlyException("Memory is read-only.");
     }
   }

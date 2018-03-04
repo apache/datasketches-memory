@@ -32,15 +32,16 @@ public abstract class WritableBuffer extends Buffer {
     if (byteBuf.isReadOnly()) {
       throw new ReadOnlyException("ByteBuffer is read-only.");
     }
-    return wrapBB(byteBuf);
+    return wrapBB(byteBuf, false);
   }
 
-  static WritableBuffer wrapBB(final ByteBuffer byteBuf) {
+  static WritableBuffer wrapBB(final ByteBuffer byteBuf, final boolean localReadOnly) {
     if (byteBuf.capacity() == 0) { return ZERO_SIZE_BUFFER; }
     final ResourceState state = new ResourceState();
-    state.putByteBuffer(byteBuf);
+    state.putByteBuffer(byteBuf); //sets ResourceReadOnly
     AccessByteBuffer.wrap(state);
-    final BaseWritableBufferImpl impl = new WritableBufferImpl(state);
+    final boolean ro = state.isResourceReadOnly() || localReadOnly;
+    final BaseWritableBufferImpl impl = new WritableBufferImpl(state, ro);
     impl.setStartPositionEnd(0, byteBuf.position(), byteBuf.limit());
     return impl;
   }

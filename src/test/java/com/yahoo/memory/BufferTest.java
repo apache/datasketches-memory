@@ -8,12 +8,12 @@ package com.yahoo.memory;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-import org.testng.annotations.Test;
-import org.testng.collections.Lists;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
+
+import org.testng.annotations.Test;
+import org.testng.collections.Lists;
 
 public class BufferTest {
 
@@ -299,8 +299,8 @@ public class BufferTest {
 
   @Test(expectedExceptions = AssertionError.class)
   public void checkBaseBufferInvariants() {
-    BaseBuffer bb = new WritableBufferImpl(new ResourceState());
-    bb.setStartPositionEnd(1, 0, 2);
+    WritableBuffer wbuf = WritableMemory.allocate(64).asWritableBuffer();
+    wbuf.setStartPositionEnd(1, 0, 2); //out of order
   }
 
 

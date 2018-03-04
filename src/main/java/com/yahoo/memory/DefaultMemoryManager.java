@@ -29,7 +29,7 @@ final class DefaultMemoryManager implements MemoryManager {
     final ResourceState state = new ResourceState();
     state.putCapacity(capacityBytes);
     final AllocateDirect direct = AllocateDirect.allocate(state);
-    final WritableMemory wMem = new WritableMemoryImpl(state);
+    final WritableMemory wMem = new WritableMemoryImpl(state, false);
     final WritableHandle handle = new WritableDirectHandle(direct, wMem);
     state.setMemoryRequestServer(this);
     state.setHandle(handle);

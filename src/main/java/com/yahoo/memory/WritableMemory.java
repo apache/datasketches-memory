@@ -40,7 +40,7 @@ public abstract class WritableMemory extends Memory {
 
   static WritableMemory wrapBB(final ByteBuffer byteBuf, final boolean localReadOnly) {
     if (byteBuf.capacity() == 0) { return ZERO_SIZE_MEMORY; }
-    final ResourceState state = new ResourceState();
+    final ResourceState state = new ResourceState(byteBuf.isReadOnly());
     state.putByteBuffer(byteBuf); //sets ResourceReadOnly
     AccessByteBuffer.wrap(state);
     final boolean ro = state.isResourceReadOnly() || localReadOnly;
@@ -73,7 +73,7 @@ public abstract class WritableMemory extends Memory {
   public static WritableMapHandle map(final File file, final long fileOffsetBytes,
           final long capacityBytes, final ByteOrder byteOrder) throws IOException {
     zeroCheck(capacityBytes, "Capacity");
-    final ResourceState state = new ResourceState();
+    final ResourceState state = new ResourceState(AllocateDirectMap.isFileReadOnly(file));
     state.putFile(file);
     state.putFileOffset(fileOffsetBytes);
     state.putCapacity(capacityBytes);

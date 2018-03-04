@@ -64,7 +64,7 @@ public abstract class Memory {
   public static MapHandle map(final File file, final long fileOffsetBytes, final long capacityBytes,
       final ByteOrder byteOrder) throws IOException {
     zeroCheck(capacityBytes, "Capacity");
-    final ResourceState state = new ResourceState();
+    final ResourceState state = new ResourceState(AllocateDirectMap.isFileReadOnly(file));
     state.putFile(file);
     state.putFileOffset(fileOffsetBytes);
     state.putCapacity(capacityBytes);

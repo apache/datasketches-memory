@@ -55,7 +55,6 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     capacity = state.getCapacity();
     cumBaseOffset = state.getCumBaseOffset();
     this.localReadOnly = localReadOnly;
-
   }
 
   ///PRIMITIVE getXXX() and getXXXArray() XXX

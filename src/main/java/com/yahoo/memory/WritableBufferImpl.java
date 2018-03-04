@@ -59,11 +59,6 @@ class WritableBufferImpl extends BaseWritableBufferImpl {
     super(state, localReadOnly);
   }
 
-  //  static WritableBufferImpl newInstance(final ResourceState state, final boolean localReadOnly) {
-  //    if (state.getCapacity() == 0) { return ZERO_SIZE_BUFFER; }
-  //    return new WritableBufferImpl(state, localReadOnly);
-  //  }
-
   //DUPLICATES & REGIONS XXX
   @Override
   public Buffer duplicate() {
@@ -109,7 +104,6 @@ class WritableBufferImpl extends BaseWritableBufferImpl {
     final WritableBufferImpl wBufImpl = new WritableBufferImpl(newState, localReadOnly);
     wBufImpl.setStartPositionEnd(0L, 0L, capacityBytes);
     return wBufImpl;
-
   }
 
   //MEMORY XXX
@@ -125,9 +119,10 @@ class WritableBufferImpl extends BaseWritableBufferImpl {
 
   private WritableMemory asWritableMemoryImpl(final boolean localReadOnly) {
     checkValid();
-    if (originMemory != null) { return originMemory; }
-    originMemory = new WritableMemoryImpl(state, localReadOnly);
-    return originMemory;
+    if ((originMemory != null) && (originMemory.localReadOnly == localReadOnly)) {
+      return originMemory;
+    }
+    return new WritableMemoryImpl(state, localReadOnly);
   }
 
   //PRIMITIVE getXXX() and getXXXArray() XXX

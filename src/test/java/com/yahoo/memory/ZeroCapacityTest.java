@@ -20,7 +20,7 @@ public class ZeroCapacityTest {
   @Test
   public void checkZeroCapacity() {
 
-    ResourceState state = new ResourceState();
+    ResourceState state = new ResourceState(false);
     state.putCapacity(0);
     assertEquals(state.getCapacity(), 0);
 

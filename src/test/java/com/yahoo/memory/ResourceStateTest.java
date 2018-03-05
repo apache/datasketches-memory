@@ -19,7 +19,7 @@ public class ResourceStateTest {
 
   @Test
   public void checkByteOrder() {
-    ResourceState state = new ResourceState();
+    ResourceState state = new ResourceState(false);
     assertEquals(state.order(), ByteOrder.nativeOrder());
     if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
       state.order(ByteOrder.BIG_ENDIAN);
@@ -32,7 +32,7 @@ public class ResourceStateTest {
 
   @Test
   public void checkExceptions() {
-    ResourceState state = new ResourceState();
+    ResourceState state = new ResourceState(false);
 
     try {
       state.putUnsafeObject(null);

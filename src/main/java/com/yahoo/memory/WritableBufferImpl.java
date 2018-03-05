@@ -51,51 +51,57 @@ class WritableBufferImpl extends BaseWritableBufferImpl {
   final static WritableBufferImpl ZERO_SIZE_BUFFER;
 
   static {
-    ZERO_SIZE_BUFFER = new WritableBufferImpl(new ResourceState(new byte[0], Prim.BYTE, 0));
+    ZERO_SIZE_BUFFER = new WritableBufferImpl(new ResourceState(new byte[0], Prim.BYTE, 0), true);
     ZERO_SIZE_BUFFER.originMemory = WritableMemoryImpl.ZERO_SIZE_MEMORY;
   }
 
-  WritableBufferImpl(final ResourceState state) {
-    super(state);
+  WritableBufferImpl(final ResourceState state, final boolean localReadOnly) {
+    super(state, localReadOnly);
   }
 
   //DUPLICATES & REGIONS XXX
   @Override
   public Buffer duplicate() {
-    final Buffer duplicate = writableDuplicate();
-    duplicate.getResourceState().setResourceReadOnly();
-    return duplicate;
+    return writableDuplicateImpl(false);
   }
 
   @Override
   public WritableBuffer writableDuplicate() {
+    return writableDuplicateImpl(localReadOnly);
+  }
+
+  private WritableBuffer writableDuplicateImpl(final boolean localReadOnly) {
     checkValid();
     if (capacity == 0) { return ZERO_SIZE_BUFFER; }
-    final WritableBufferImpl wBufImpl = new WritableBufferImpl(state);
+    final WritableBufferImpl wBufImpl = new WritableBufferImpl(state, localReadOnly);
     wBufImpl.setStartPositionEnd(getStart(), getPosition(), getEnd());
     return wBufImpl;
   }
 
   @Override
   public Buffer region() {
-    final Buffer region = writableRegion(getPosition(), getEnd() - getPosition());
-    region.getResourceState().setResourceReadOnly();
-    return region;
+    return writableRegionImpl(getPosition(), getEnd() - getPosition(), true);
+
   }
 
   @Override
   public WritableBuffer writableRegion() {
-    return writableRegion(getPosition(), getEnd() - getPosition());
+    return writableRegionImpl(getPosition(), getEnd() - getPosition(), false);
   }
 
   @Override
   public WritableBuffer writableRegion(final long offsetBytes, final long capacityBytes) {
+    return writableRegionImpl(offsetBytes, capacityBytes, localReadOnly);
+  }
+
+  private WritableBuffer writableRegionImpl(final long offsetBytes, final long capacityBytes,
+      final boolean localReadOnly) {
     checkValidAndBounds(offsetBytes, capacityBytes);
     if (capacityBytes == 0) { return ZERO_SIZE_BUFFER; }
     final ResourceState newState = state.copy();
     newState.putRegionOffset(newState.getRegionOffset() + offsetBytes);
     newState.putCapacity(capacityBytes);
-    final WritableBufferImpl wBufImpl = new WritableBufferImpl(newState);
+    final WritableBufferImpl wBufImpl = new WritableBufferImpl(newState, localReadOnly);
     wBufImpl.setStartPositionEnd(0L, 0L, capacityBytes);
     return wBufImpl;
   }
@@ -103,15 +109,20 @@ class WritableBufferImpl extends BaseWritableBufferImpl {
   //MEMORY XXX
   @Override
   public Memory asMemory() {
-    return asWritableMemory();
+    return asWritableMemoryImpl(true);
   }
 
   @Override
   public WritableMemory asWritableMemory() {
+    return asWritableMemoryImpl(localReadOnly);
+  }
+
+  private WritableMemory asWritableMemoryImpl(final boolean localReadOnly) {
     checkValid();
-    if (originMemory != null) { return originMemory; }
-    originMemory = new WritableMemoryImpl(state);
-    return originMemory;
+    if ((originMemory != null) && (originMemory.localReadOnly == localReadOnly)) {
+      return originMemory;
+    }
+    return new WritableMemoryImpl(state, localReadOnly);
   }
 
   //PRIMITIVE getXXX() and getXXXArray() XXX
@@ -441,5 +452,4 @@ class WritableBufferImpl extends BaseWritableBufferImpl {
             cumBaseOffset + pos,
             copyBytes);
   }
-
 }

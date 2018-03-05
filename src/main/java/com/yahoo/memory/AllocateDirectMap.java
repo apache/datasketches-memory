@@ -42,6 +42,7 @@ class AllocateDirectMap implements Map {
   final ResourceState state;
   final Cleaner cleaner;
 
+  //called from map below and from AllocateDirectWritableMap constructor
   AllocateDirectMap(final ResourceState state) {
     this.state = state;
     cleaner = Cleaner.create(this, new Deallocator(state));
@@ -55,7 +56,7 @@ class AllocateDirectMap implements Map {
    * <p>Memory maps a file directly in off heap leveraging native map0 method used in
    * FileChannelImpl.c. The owner will have read access to that address space.</p>
    *
-   * @param state the ResourceState
+   * @param state the ResourceState that already has the file read-only state set.
    * @return A new AllocateDirectMap
    * @throws IOException file not found or RuntimeException, etc.
    */
@@ -105,25 +106,19 @@ class AllocateDirectMap implements Map {
 
   // Restricted methods
 
-  //Does the actual mapping work
+  //Does the actual mapping work, resourceReadOnly must already be set
   @SuppressWarnings("resource")
   static final ResourceState mapper(final ResourceState state) throws IOException {
     final long fileOffset = state.getFileOffset();
     final long capacity = state.getCapacity();
-
     final File file = state.getFile();
+    final boolean readOnlyFile = state.isResourceReadOnly(); //set by map above
+    final String mode = readOnlyFile ? "r" : "rw";
 
-    if (isFileReadOnly(file)) {
-      if (!state.isResourceReadOnly()) {
-        throw new IllegalStateException("Cannot map read-only file into writable memory.");
-      }
-    }
-
-    final String mode = state.isResourceReadOnly() ? "r" : "rw";
     final RandomAccessFile raf = new RandomAccessFile(file, mode);
     state.putRandomAccessFile(raf);
     if ((fileOffset + capacity) > raf.length()) {
-      if (state.isResourceReadOnly()) {
+      if (readOnlyFile) {
         throw new IllegalStateException(
             "File is shorter than the region that is requested to be mapped: file length="
            + raf.length() + ", mapping offset=" + fileOffset + ", mapping size=" + capacity);
@@ -132,7 +127,7 @@ class AllocateDirectMap implements Map {
       }
     }
     final FileChannel fc = raf.getChannel();
-    final int mapMode = state.isResourceReadOnly() ? MAP_RO : MAP_RW;
+    final int mapMode = readOnlyFile ? MAP_RO : MAP_RW;
     final long nativeBaseOffset = map(fc, mapMode, fileOffset, capacity);
     state.putNativeBaseOffset(nativeBaseOffset);
 
@@ -150,15 +145,15 @@ class AllocateDirectMap implements Map {
     try {
       final Class<?> cl = Class.forName("java.nio.DirectByteBuffer");
       final Constructor<?> ctor =
-              cl.getDeclaredConstructor(int.class, long.class, FileDescriptor.class, Runnable.class);
+          cl.getDeclaredConstructor(int.class, long.class, FileDescriptor.class, Runnable.class);
       ctor.setAccessible(true);
       final MappedByteBuffer mbb = (MappedByteBuffer) ctor.newInstance(0, // some junk capacity
-              nativeBaseAddress, null, null);
+          nativeBaseAddress, null, null);
       return mbb;
     } catch (final Exception e) {
       throw new RuntimeException(
-              "Could not create Dummy MappedByteBuffer instance: " + e.getClass()
-              + UnsafeUtil.tryIllegalAccessPermit);
+          "Could not create Dummy MappedByteBuffer instance: " + e.getClass()
+          + UnsafeUtil.tryIllegalAccessPermit);
     }
   }
 
@@ -167,13 +162,14 @@ class AllocateDirectMap implements Map {
    */
   void madvise() throws RuntimeException {
     try {
-      final Method method = MappedByteBuffer.class.getDeclaredMethod("load0", long.class, long.class);
+      final Method method =
+          MappedByteBuffer.class.getDeclaredMethod("load0", long.class, long.class);
       method.setAccessible(true);
       method.invoke(state.getMappedByteBuffer(), state.getNativeBaseOffset(),
-              state.getCapacity());
+          state.getCapacity());
     } catch (final Exception e) {
       throw new RuntimeException(
-              String.format("Encountered %s exception while loading", e.getClass()));
+          String.format("Encountered %s exception while loading", e.getClass()));
     }
   }
 
@@ -247,7 +243,7 @@ class AllocateDirectMap implements Map {
         myRaf.close();
       } catch (final Exception e) {
         throw new RuntimeException(
-                String.format("Encountered %s exception while freeing memory", e.getClass()));
+            String.format("Encountered %s exception while freeing memory", e.getClass()));
       }
     }
   } //End of class Deallocator

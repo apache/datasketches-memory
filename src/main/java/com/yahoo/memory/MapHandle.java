@@ -27,7 +27,7 @@ public class MapHandle implements Map, Handle {
   @SuppressWarnings("resource") //called from memory
   static MapHandle map(final ResourceState state) throws IOException {
     final AllocateDirectMap dirMap = AllocateDirectMap.map(state);
-    final BaseWritableMemoryImpl wMem = new WritableMemoryImpl(state);
+    final BaseWritableMemoryImpl wMem = new WritableMemoryImpl(state, true);
     return new MapHandle(dirMap, wMem);
   }
 

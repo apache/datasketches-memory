@@ -51,58 +51,57 @@ class WritableMemoryImpl extends BaseWritableMemoryImpl {
   final static WritableMemoryImpl ZERO_SIZE_MEMORY;
 
   static {
-    ZERO_SIZE_MEMORY = new WritableMemoryImpl(new ResourceState(new byte[0], Prim.BYTE, 0));
-    ZERO_SIZE_MEMORY.getResourceState().setResourceReadOnly();
+    ZERO_SIZE_MEMORY = new WritableMemoryImpl(new ResourceState(new byte[0], Prim.BYTE, 0), true);
   }
 
-  WritableMemoryImpl(final ResourceState state) {
-    super(state);
+  WritableMemoryImpl(final ResourceState state, final boolean localReadOnly) {
+    super(state, localReadOnly);
+  }
+
+  static WritableMemoryImpl newInstance(final ResourceState state, final boolean localReadOnly) {
+    if (state.getCapacity() == 0) { return ZERO_SIZE_MEMORY; }
+    return new WritableMemoryImpl(state, localReadOnly);
   }
 
   //REGIONS XXX
   @Override
   public Memory region(final long offsetBytes, final long capacityBytes) {
-    final Memory region = writableRegion(offsetBytes, capacityBytes);
-    region.getResourceState().setResourceReadOnly();
-    return region;
+    return writableRegionImpl(offsetBytes, capacityBytes, true);
   }
 
   @Override
   public WritableMemory writableRegion(final long offsetBytes, final long capacityBytes) {
+    return writableRegionImpl(offsetBytes, capacityBytes, localReadOnly);
+  }
+
+  private WritableMemory writableRegionImpl(final long offsetBytes, final long capacityBytes,
+      final boolean localReadOnly) {
     checkValidAndBounds(offsetBytes, capacityBytes);
     if (capacityBytes == 0) { return ZERO_SIZE_MEMORY; }
     final ResourceState newState = state.copy();
     newState.putRegionOffset(newState.getRegionOffset() + offsetBytes);
     newState.putCapacity(capacityBytes);
-    return new WritableMemoryImpl(newState);
+    return new WritableMemoryImpl(newState, localReadOnly);
   }
 
   //BUFFER XXX
   @Override
   public Buffer asBuffer() {
-    if (state.isResourceReadOnly()) {
-      return asWritableBuffer();
-    }
-    checkValid();
-    final WritableBufferImpl wbuf;
-    if (capacity == 0) {
-      wbuf = WritableBufferImpl.ZERO_SIZE_BUFFER;
-    } else {
-      wbuf = new WritableBufferImpl(state);
-      wbuf.setAndCheckStartPositionEnd(0, 0, capacity);
-      wbuf.originMemory = this;
-    }
-    return wbuf;
+    return asWritableBufferImpl(true);
   }
 
   @Override
   public WritableBuffer asWritableBuffer() {
+    return asWritableBufferImpl(localReadOnly);
+  }
+
+  private WritableBuffer asWritableBufferImpl(final boolean localReadOnly) {
     checkValid();
     final WritableBufferImpl wbuf;
     if (capacity == 0) {
       wbuf = WritableBufferImpl.ZERO_SIZE_BUFFER;
     } else {
-      wbuf = new WritableBufferImpl(state);
+      wbuf = new WritableBufferImpl(state, localReadOnly);
       wbuf.setAndCheckStartPositionEnd(0, 0, capacity);
       wbuf.originMemory = this;
     }

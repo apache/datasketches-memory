@@ -82,10 +82,9 @@ final class ResourceState {
   //FLAGS
   /**
    * Only set true if the backing resource has an independent read-only state and is, in fact,
-   * read-only. This can only be changed from writable (false) to read-only (true) once. The
-   * initial state is writable (false).
+   * read-only.
    */
-  private StepBoolean resourceIsReadOnly_;
+  private final boolean resourceIsReadOnly_;
 
   /**
    * Only the backing resources that uses AutoCloseable can set this to false.  It can only be
@@ -135,14 +134,14 @@ final class ResourceState {
   private boolean swapBytes_; //true if resourceOrder != nativeOrder_
 
   //CONSTRUCTORS
-  ResourceState() {
-    resourceIsReadOnly_ = new StepBoolean(false);
+  ResourceState(final boolean resourceReadOnly) {
+    resourceIsReadOnly_ = resourceReadOnly;
     valid_ = new StepBoolean(true);
   }
 
   //Constructor for heap primitive arrays
   ResourceState(final Object obj, final Prim prim, final long arrLen) {
-    this(); //writable, valid
+    this(false); //writable, valid
     nullCheck(obj, "Array Object");
     Util.negativeCheck(arrLen, "Capacity");
     unsafeObj_ = obj;
@@ -256,11 +255,7 @@ final class ResourceState {
 
   //FLAGS
   boolean isResourceReadOnly() {
-    return resourceIsReadOnly_.get();
-  }
-
-  void setResourceReadOnly() {
-    resourceIsReadOnly_.change();
+    return resourceIsReadOnly_;
   }
 
   boolean isDirect() {
@@ -312,9 +307,6 @@ final class ResourceState {
     byteBuf_ = byteBuf;
     resourceOrder_ = byteBuf_.order();
     swapBytes_ = (resourceOrder_ != nativeOrder_);
-    if (byteBuf.isReadOnly()) {
-      setResourceReadOnly();
-    }
   }
 
   //MEMORY MAPPED FILES

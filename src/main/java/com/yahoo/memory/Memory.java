@@ -8,7 +8,6 @@ package com.yahoo.memory;
 import static com.yahoo.memory.UnsafeUtil.LS;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 import static com.yahoo.memory.Util.zeroCheck;
-import static com.yahoo.memory.WritableMemoryImpl.ZERO_SIZE_MEMORY;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,9 +35,7 @@ public abstract class Memory {
    * @return the given ByteBuffer for read-only operations.
    */
   public static Memory wrap(final ByteBuffer byteBuf) {
-    final Memory memory = WritableMemory.wrapBB(byteBuf);
-    memory.getResourceState().setResourceReadOnly();
-    return memory;
+    return WritableMemory.wrapBB(byteBuf, true);
   }
 
   //MAP XXX
@@ -67,12 +64,11 @@ public abstract class Memory {
   public static MapHandle map(final File file, final long fileOffsetBytes, final long capacityBytes,
       final ByteOrder byteOrder) throws IOException {
     zeroCheck(capacityBytes, "Capacity");
-    final ResourceState state = new ResourceState();
+    final ResourceState state = new ResourceState(AllocateDirectMap.isFileReadOnly(file));
     state.putFile(file);
     state.putFileOffset(fileOffsetBytes);
     state.putCapacity(capacityBytes);
     state.order(byteOrder);
-    state.setResourceReadOnly();
     return MapHandle.map(state);
   }
 
@@ -104,9 +100,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final boolean[] arr) {
-    final Memory memory = WritableMemory.wrap(arr);
-    memory.getResourceState().setResourceReadOnly();
-    return memory;
+    return WritableMemoryImpl.newInstance(new ResourceState(arr, Prim.BOOLEAN, arr.length), true);
   }
 
   /**
@@ -116,7 +110,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final byte[] arr) {
-    return wrap(arr, 0, arr.length, ByteOrder.nativeOrder());
+    return Memory.wrap(arr, 0, arr.length, ByteOrder.nativeOrder());
   }
 
   /**
@@ -127,7 +121,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final byte[] arr, final ByteOrder byteOrder) {
-    return wrap(arr, 0, arr.length, byteOrder);
+    return Memory.wrap(arr, 0, arr.length, byteOrder);
   }
 
   /**
@@ -143,12 +137,10 @@ public abstract class Memory {
   public static Memory wrap(final byte[] arr, final int offsetBytes, final int lengthBytes,
       final ByteOrder byteOrder) {
     UnsafeUtil.checkBounds(offsetBytes, lengthBytes, arr.length);
-    if (lengthBytes == 0) { return ZERO_SIZE_MEMORY; }
     final ResourceState state = new ResourceState(arr, Prim.BYTE, lengthBytes);
     state.putRegionOffset(offsetBytes);
     state.order(byteOrder);
-    state.setResourceReadOnly();
-    return new WritableMemoryImpl(state);
+    return WritableMemoryImpl.newInstance(state, true);
   }
 
   /**
@@ -158,9 +150,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final char[] arr) {
-    final Memory memory = WritableMemory.wrap(arr);
-    memory.getResourceState().setResourceReadOnly();
-    return memory;
+    return WritableMemoryImpl.newInstance(new ResourceState(arr, Prim.CHAR, arr.length), true);
   }
 
   /**
@@ -170,9 +160,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final short[] arr) {
-    final Memory memory = WritableMemory.wrap(arr);
-    memory.getResourceState().setResourceReadOnly();
-    return memory;
+    return WritableMemoryImpl.newInstance(new ResourceState(arr, Prim.SHORT, arr.length), true);
   }
 
   /**
@@ -182,9 +170,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final int[] arr) {
-    final Memory memory = WritableMemory.wrap(arr);
-    memory.getResourceState().setResourceReadOnly();
-    return memory;
+    return WritableMemoryImpl.newInstance(new ResourceState(arr, Prim.INT, arr.length), true);
   }
 
   /**
@@ -194,9 +180,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final long[] arr) {
-    final Memory memory = WritableMemory.wrap(arr);
-    memory.getResourceState().setResourceReadOnly();
-    return memory;
+    return WritableMemoryImpl.newInstance(new ResourceState(arr, Prim.LONG, arr.length), true);
   }
 
   /**
@@ -206,9 +190,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final float[] arr) {
-    final Memory memory = WritableMemory.wrap(arr);
-    memory.getResourceState().setResourceReadOnly();
-    return memory;
+    return WritableMemoryImpl.newInstance(new ResourceState(arr, Prim.FLOAT, arr.length), true);
   }
 
   /**
@@ -218,9 +200,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final double[] arr) {
-    final Memory memory = WritableMemory.wrap(arr);
-    memory.getResourceState().setResourceReadOnly();
-    return memory;
+    return WritableMemoryImpl.newInstance(new ResourceState(arr, Prim.DOUBLE, arr.length), true);
   }
 
   //PRIMITIVE getXXX() and getXXXArray() XXX
@@ -535,8 +515,8 @@ public abstract class Memory {
   public abstract boolean isDirect();
 
   /**
-   * Returns true if the backing resource is read only
-   * @return true if the backing resource is read only
+   * Returns true if the backing resource is read-only
+   * @return true if the backing resource is read-only
    */
   public abstract boolean isResourceReadOnly();
 
@@ -582,7 +562,7 @@ public abstract class Memory {
    * @return a formatted hex string in a human readable array
    */
   static String toHex(final String preamble, final long offsetBytes, final int lengthBytes,
-      final ResourceState state) {
+      final ResourceState state, final boolean localReadOnly) {
     UnsafeUtil.checkBounds(offsetBytes, lengthBytes, state.getCapacity());
     final StringBuilder sb = new StringBuilder();
     final Object uObj = state.getUnsafeObject();
@@ -605,6 +585,7 @@ public abstract class Memory {
     sb.append("CumBaseOffset       : ").append(cumBaseOffset).append(LS);
     sb.append("MemReq, hashCode    : ").append(memReqStr).append(LS);
     sb.append("Valid               : ").append(state.isValid()).append(LS);
+    sb.append("Local Read Only     : ").append(localReadOnly).append(LS);
     sb.append("Resource Read Only  : ").append(state.isResourceReadOnly()).append(LS);
     sb.append("Resource Endianness : ").append(state.order().toString()).append(LS);
     sb.append("JDK Major Version   : ").append(UnsafeUtil.JDK).append(LS);

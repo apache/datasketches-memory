@@ -64,20 +64,22 @@ final class ResourceState {
   private long capacity_;
 
   /**
-   * This becomes the base offset used by all Unsafe calls.
+   * This becomes the base offset used by all Unsafe calls. It is cumulative in that in includes
+   * all offsets from regions, user-defined offsets when creating Memory, and the array object
+   * header offset when creating Memory from primitive arrays.
    */
-  private long cumBaseOffset_; //Holds the cumulative offset to the start of data.
+  private long cumBaseOffset_;
 
   /**
    * Only relevant when user allocated direct memory is the backing resource. It is a callback
    * mechanism for the client of a resource to request more memory from the owner of the resource.
    */
-  private MemoryRequestServer memReqSvr_ = DefaultMemoryManager.getInstance();
+  private MemoryRequestServer memReqSvr_;
 
   /**
    * Only relevant when user allocated direct memory is the backing resource.
    */
-  private WritableHandle handle_;
+  private WritableDirectHandle handle_;
 
   //FLAGS
   /**
@@ -157,7 +159,7 @@ final class ResourceState {
     unsafeObj_ = src.unsafeObj_;
     unsafeObjHeader_ = src.unsafeObjHeader_;
     capacity_ = src.capacity_;
-    //cumBaseOffset is computed
+
     memReqSvr_ = src.memReqSvr_; //retains memReqSvr reference
 
     //FLAGS
@@ -245,11 +247,11 @@ final class ResourceState {
     memReqSvr_ = memReqSvr; //may be null
   }
 
-  WritableHandle getHandle() {
+  WritableDirectHandle getHandle() {
     return handle_;
   }
 
-  void setHandle(final WritableHandle handle) {
+  void setHandle(final WritableDirectHandle handle) {
     handle_ = handle; //may be set null
   }
 

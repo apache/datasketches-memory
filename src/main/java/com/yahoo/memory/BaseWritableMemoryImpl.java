@@ -341,24 +341,6 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     return state.getMemoryRequestServer();
   }
 
-  @Override
-  public void setMemoryRequest(final MemoryRequestServer memReqSvr) {
-    assertValid();
-    state.setMemoryRequestServer(memReqSvr);
-  }
-
-  @Override
-  public WritableHandle getHandle() {
-    assertValid();
-    return state.getHandle();
-  }
-
-  @Override
-  public void setHandle(final WritableHandle handle) {
-    assertValid();
-    state.setHandle(handle);
-  }
-
   //RESTRICTED XXX
   private void writeByteArrayTo(final byte[] unsafeObj, final long offsetBytes,
       final long lengthBytes, final WritableByteChannel out) throws IOException {

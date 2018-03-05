@@ -23,9 +23,7 @@ public interface MemoryRequestServer {
   /**
    * Request to close the AutoCloseable resource.
    * This may be ignored depending on the implementation.
-   * @param memoryToClose the relevant WritbleMemory to be considered for closing.
-   * @param newMemory the newly allocated WritableMemory
    */
-  void requestClose(WritableMemory memoryToClose, WritableMemory newMemory);
+  void requestClose();
 
 }

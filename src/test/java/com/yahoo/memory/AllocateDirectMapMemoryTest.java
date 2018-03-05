@@ -108,20 +108,15 @@ public class AllocateDirectMapMemoryTest {
     //The receiver of the handler must close the resource, in this case it is the class.
   }
 
-  @Test
-  public void checkRequestClose() {
-    WritableMemory wmem = WritableMemory.allocate(8);
-    MemoryManager mgr = DefaultMemoryManager.getInstance();
-    mgr.requestClose(wmem, null);
-  }
-
   @AfterClass
   public void afterAllTests() {
-    Memory mem = hand.get();
-    if (mem.isValid()) {
-      hand.close();
+      if (hand != null) {
+      Memory mem = hand.get();
+      if ((mem != null) && mem.isValid()) {
+        hand.close();
+        assertFalse(mem.isValid());
+      }
     }
-    assertFalse(mem.isValid());
   }
 
   @Test

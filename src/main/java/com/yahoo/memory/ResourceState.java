@@ -45,7 +45,6 @@ final class ResourceState {
   /**
    * The object used in most Unsafe calls. This is effectively the array object if on-heap and
    * null for direct memory and determines how cumBaseOffset is computed.
-   * This is effectively supplied by the user.
    */
   private Object unsafeObj_;
 
@@ -126,11 +125,9 @@ final class ResourceState {
   private MappedByteBuffer mbb_;
 
   //RESOURCE ENDIANNESS PROPERTIES
-  private ByteOrder resourceOrder_ = nativeOrder_;
+  private ByteOrder resourceOrder_ = nativeOrder_; //default
 
-  private boolean swapBytes_; //true if resourceOrder != nativeOrder_
-
-  //CONSTRUCTORS
+  //****CONSTRUCTORS****
   ResourceState(final boolean resourceReadOnly) {
     resourceIsReadOnly_ = resourceReadOnly;
     valid_ = new StepBoolean(true);
@@ -138,7 +135,7 @@ final class ResourceState {
 
   //Constructor for heap primitive arrays
   ResourceState(final Object obj, final Prim prim, final long arrLen) {
-    this(false); //writable, valid
+    this(false); //set resourceIsReadOnly=false, valid
     nullCheck(obj, "Array Object");
     Util.negativeCheck(arrLen, "Capacity");
     unsafeObj_ = obj;
@@ -175,11 +172,10 @@ final class ResourceState {
 
     //ENDIANNESS
     resourceOrder_ = src.resourceOrder_; //retains resourseOrder
-    swapBytes_ = src.swapBytes_;
     compute();
   }
+  //****END CONSTRUCTORS****
 
-  //METHODS
   ResourceState copy() {
     return new ResourceState(this);
   }
@@ -295,7 +291,6 @@ final class ResourceState {
     nullCheck(byteBuf, "ByteBuffer");
     byteBuf_ = byteBuf;
     resourceOrder_ = byteBuf_.order();
-    swapBytes_ = (resourceOrder_ != nativeOrder_);
   }
 
   //MEMORY MAPPED FILES
@@ -343,11 +338,10 @@ final class ResourceState {
   void order(final ByteOrder resourceOrder) {
     nullCheck(resourceOrder, "ByteOrder");
     resourceOrder_ = resourceOrder;
-    swapBytes_ = (resourceOrder_ != nativeOrder_);
   }
 
   boolean isSwapBytes() {
-    return swapBytes_;
+    return (resourceOrder_ != nativeOrder_);
   }
 
 }

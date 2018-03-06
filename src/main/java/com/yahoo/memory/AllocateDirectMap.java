@@ -34,6 +34,10 @@ import sun.nio.ch.FileChannelImpl;
  * @author Roman Leventov
  * @author Lee Rhodes
  * @author Praveenkumar Venkatesan
+ * @see <a href="http://hg.openjdk.java.net/jdk8u/jdk8u/jdk/file/f940e7a48b72/src/solaris/native/sun/nio/ch/FileChannelImpl.c">
+ * FileChannelImpl.c</a>
+ * @see <a href="http://hg.openjdk.java.net/jdk8u/jdk8u/jdk/file/f940e7a48b72/src/solaris/native/java/nio/MappedByteBuffer.c">
+ * MappedByteBuffer.c</a>
  */
 class AllocateDirectMap implements Map {
   private static final int MAP_RO = 0;
@@ -54,7 +58,8 @@ class AllocateDirectMap implements Map {
    * Factory method for memory mapping a file for read-only access.
    *
    * <p>Memory maps a file directly in off heap leveraging native map0 method used in
-   * FileChannelImpl.c. The owner will have read access to that address space.</p>
+   * FileChannelImpl.c. (see reference at top of class)
+   * The owner will have read access to that address space.</p>
    *
    * @param state the ResourceState that already has the file read-only state set.
    * @return A new AllocateDirectMap
@@ -84,6 +89,7 @@ class AllocateDirectMap implements Map {
     try {
 
       final int pageCount = pageCount(ps, state.getCapacity());
+      //for isLoaded0 see MappedByteBuffer.c referenced at top of class
       final Method method =
               MappedByteBuffer.class.getDeclaredMethod("isLoaded0", long.class, long.class, int.class);
       method.setAccessible(true);
@@ -94,6 +100,8 @@ class AllocateDirectMap implements Map {
               String.format("Encountered %s exception while loading", e.getClass()));
     }
   }
+
+
 
   @Override
   public void close() {
@@ -140,7 +148,7 @@ class AllocateDirectMap implements Map {
     return (int) ( (capacity == 0) ? 0 : ((capacity - 1L) / ps) + 1L);
   }
 
-  static final MappedByteBuffer createDummyMbbInstance(final long nativeBaseAddress)
+  private static final MappedByteBuffer createDummyMbbInstance(final long nativeBaseAddress)
           throws RuntimeException {
     try {
       final Class<?> cl = Class.forName("java.nio.DirectByteBuffer");
@@ -158,7 +166,8 @@ class AllocateDirectMap implements Map {
   }
 
   /**
-   * madvise is a system call made by load0 native method
+   * Note: madvise() is a system call made by load0 native method in MappedByteBuffer.c.
+   * See reference at top of class.
    */
   void madvise() throws RuntimeException {
     try {
@@ -177,6 +186,9 @@ class AllocateDirectMap implements Map {
    * Creates a mapping of the FileChannel starting at position and of size length to pages
    * in the OS. This may throw OutOfMemory error if you have exhausted memory.
    * You can try to force garbage collection and re-attempt.
+   *
+   * <p>map0 is a native method in FileChannelImpl.c. See reference at top of class.</p>
+   *
    * @param fileChannel the FileChannel
    * @param position the offset in bytes into the FileChannel
    * @param lengthBytes the length in bytes
@@ -202,51 +214,6 @@ class AllocateDirectMap implements Map {
     }
   }
 
-  private static final class Deallocator implements Runnable {
-    private final RandomAccessFile myRaf;
-    private final FileChannel myFc;
-    //This is the only place the actual native offset is kept for use by unsafe.freeMemory();
-    //It can never be modified until it is deallocated.
-    private long actualNativeBaseOffset;
-    private final long myCapacity;
-    private final ResourceState parentStateRef;
-
-    private Deallocator(final ResourceState state) {
-      myRaf = state.getRandomAccessFile();
-      assert (myRaf != null);
-      myFc = myRaf.getChannel();
-      actualNativeBaseOffset = state.getNativeBaseOffset();
-      assert (actualNativeBaseOffset != 0);
-      myCapacity = state.getCapacity();
-      assert (myCapacity != 0);
-      parentStateRef = state;
-    }
-
-    @Override
-    public void run() {
-      if (myFc != null) {
-        unmap();
-      }
-      actualNativeBaseOffset = 0L;
-      parentStateRef.setInvalid();
-    }
-
-    /**
-     * Removes existing mapping
-     */
-    private void unmap() throws RuntimeException {
-      try {
-        final Method method = FileChannelImpl.class.getDeclaredMethod("unmap0", long.class,
-            long.class);
-        method.setAccessible(true);
-        method.invoke(myFc, actualNativeBaseOffset, myCapacity);
-        myRaf.close();
-      } catch (final Exception e) {
-        throw new RuntimeException(
-            String.format("Encountered %s exception while freeing memory", e.getClass()));
-      }
-    }
-  } //End of class Deallocator
 
   static final boolean isFileReadOnly(final File file) {
     if (System.getProperty("os.name").startsWith("Windows")) {
@@ -280,5 +247,52 @@ class AllocateDirectMap implements Map {
     // Here we are going to ignore the Owner Write & Execute bits to allow root/owner testing.
     return ((bits & 0477) == 0444);
   }
+
+  private static final class Deallocator implements Runnable {
+    private final RandomAccessFile myRaf;
+    private final FileChannel myFc;
+    //This is the only place the actual native offset is kept for use by unsafe.freeMemory();
+    //It can never be modified until it is deallocated.
+    private long actualNativeBaseOffset;
+    private final long myCapacity;
+    private final ResourceState parentStateRef;
+
+    private Deallocator(final ResourceState state) {
+      myRaf = state.getRandomAccessFile();
+      assert (myRaf != null);
+      myFc = myRaf.getChannel();
+      actualNativeBaseOffset = state.getNativeBaseOffset();
+      assert (actualNativeBaseOffset != 0);
+      myCapacity = state.getCapacity();
+      assert (myCapacity != 0);
+      parentStateRef = state;
+    }
+
+    @Override
+    public void run() {
+      if (myFc != null) {
+        unmap();
+      }
+      actualNativeBaseOffset = 0L;
+      parentStateRef.setInvalid();
+    }
+
+    /**
+     * Removes existing mapping.  <i>unmap0</i> is a native method in FileChannelImpl.c. See
+     * reference at top of class.
+     */
+    private void unmap() throws RuntimeException {
+      try {
+        final Method method = FileChannelImpl.class.getDeclaredMethod("unmap0", long.class,
+            long.class);
+        method.setAccessible(true);
+        method.invoke(myFc, actualNativeBaseOffset, myCapacity);
+        myRaf.close();
+      } catch (final Exception e) {
+        throw new RuntimeException(
+            String.format("Encountered %s exception while freeing memory", e.getClass()));
+      }
+    }
+  } //End of class Deallocator
 
 }

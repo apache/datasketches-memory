@@ -216,7 +216,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   }
 
   @Override
-  public boolean swapBytes() {
+  public boolean isSwapBytes() {
     assertValid();
     return state.isSwapBytes();
   }

@@ -356,7 +356,7 @@ public abstract class Buffer extends BaseBuffer {
    * if necessary.
    * @return true if bytes need to be swapped based on resource ByteOrder.
    */
-  public abstract boolean swapBytes();
+  public abstract boolean isSwapBytes();
 
   /**
    * Returns a formatted hex string of a range of this Buffer.

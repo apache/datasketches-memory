@@ -192,7 +192,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   }
 
   @Override
-  public boolean swapBytes() {
+  public boolean isSwapBytes() {
     return state.isSwapBytes();
   }
 

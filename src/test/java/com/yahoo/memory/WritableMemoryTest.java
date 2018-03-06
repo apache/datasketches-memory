@@ -22,7 +22,7 @@ public class WritableMemoryTest {
   public void wrapBigEndian() {
     ByteBuffer bb = ByteBuffer.allocate(64); //big endian
     WritableMemory wmem = WritableMemory.wrap(bb);
-    assertTrue(wmem.swapBytes());
+    assertTrue(wmem.isSwapBytes());
     assertEquals(wmem.getResourceOrder(), ByteOrder.BIG_ENDIAN);
   }
 
@@ -30,7 +30,7 @@ public class WritableMemoryTest {
   public void wrapBigEndian2() {
     ByteBuffer bb = ByteBuffer.allocate(64);
     WritableBuffer wbuf = WritableBuffer.wrap(bb);
-    assertTrue(wbuf.swapBytes());
+    assertTrue(wbuf.isSwapBytes());
     assertEquals(wbuf.getResourceOrder(), ByteOrder.BIG_ENDIAN);
   }
 
@@ -130,11 +130,11 @@ public class WritableMemoryTest {
   @Test
   public void checkWrapWithBO() {
     WritableMemory wmem = WritableMemory.wrap(new byte[0], ByteOrder.BIG_ENDIAN);
-    assertFalse(wmem.swapBytes());
-    println("" + wmem.swapBytes());
+    assertFalse(wmem.isSwapBytes());
+    println("" + wmem.isSwapBytes());
     wmem = WritableMemory.wrap(new byte[8], ByteOrder.BIG_ENDIAN);
-    assertTrue(wmem.swapBytes());
-    println("" + wmem.swapBytes());
+    assertTrue(wmem.isSwapBytes());
+    println("" + wmem.isSwapBytes());
   }
 
   //@Test  //TODO This is just a scenario. Not a valid test.

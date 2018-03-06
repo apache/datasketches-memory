@@ -25,7 +25,7 @@ public class AllocateDirectMemoryTest {
   }
 
   @Test
-  public void simpleMemoryRequestServer() {
+  public void checkDefaultMemoryRequestServer() {
     int longs1 = 32;
     int bytes1 = longs1 << 3;
     try (WritableHandle wh = WritableMemory.allocateDirect(bytes1)) {
@@ -45,7 +45,9 @@ public class AllocateDirectMemoryTest {
           wMem2.putLong(i << 3, i);
           assertEquals(wMem2.getLong(i << 3), i);
       }
-      memReqSvr.requestClose();
+      memReqSvr.release(wMem1);
+      //The default MRS doesn't actually realease because it could be misused.
+      // so we let the TWR release it.
     }
   }
 
@@ -73,6 +75,4 @@ public class AllocateDirectMemoryTest {
   static void println(String s) {
     //System.out.println(s); //disable here
   }
-
-
 }

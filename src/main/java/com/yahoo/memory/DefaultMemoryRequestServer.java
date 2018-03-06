@@ -9,28 +9,17 @@ package com.yahoo.memory;
  * @author Lee Rhodes
  */
 final class DefaultMemoryRequestServer implements MemoryRequestServer {
-  private WritableDirectHandle handle;
-
-  DefaultMemoryRequestServer(final WritableDirectHandle handle) {
-    this.handle = handle;
-  }
 
   @Override
+  //By default this allocates new memory requests on the Java heap.
   public WritableMemory request(final long capacityBytes) {
-    final WritableMemory mem = WritableMemory.allocate((int)capacityBytes);
-    handle = null;
-    return mem;
-  }
-
-  public WritableMemory requestDirect(final long capacityBytes) {
-    handle = WritableMemory.allocateDirect(capacityBytes, this);
-    return handle.get();
+    final WritableMemory wmem = WritableMemory.allocate((int)capacityBytes);
+    return wmem;
   }
 
   @Override
-  public void requestClose() {
-    if (handle != null) {
-      handle.close();
-    }
+  public void release(final WritableMemory memToRelease) {
+    //Because the new allocations are on the heap, we can ignore this
   }
+
 }

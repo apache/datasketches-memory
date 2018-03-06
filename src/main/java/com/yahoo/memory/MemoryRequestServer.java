@@ -6,24 +6,27 @@
 package com.yahoo.memory;
 
 /**
- * The MemoryRequestServer is a callback interface provides a means for a WritableMemory object to
- * request more memory. This mechanism is only used with directly allocated native memory.
+ * The MemoryRequestServer is a callback interface to provide a means for a WritableMemory
+ * object to request more memory. This mechanism is primarily used with directly allocated
+ * native memory.
  *
  * @author Lee Rhodes
  */
 public interface MemoryRequestServer {
 
   /**
-   * Request new WritableMemory with the given capacity.
+   * Request new WritableMemory with the given capacity via a WritableDirectHandle.
    * @param capacityBytes The capacity being requested
-   * @return new WritableMemory with the given capacity.
+   * @return new WritableDirectHandle with the reference to new WritableMemory of the
+   * given capacity.
    */
   WritableMemory request(long capacityBytes);
 
   /**
-   * Request to close the AutoCloseable resource.
+   * Request to release (perhaps to close) the backing memory for the given WritableMemory.
    * This may be ignored depending on the implementation.
+   * @param memToRelease the memory to release
    */
-  void requestClose();
+  void release(final WritableMemory memToRelease);
 
 }

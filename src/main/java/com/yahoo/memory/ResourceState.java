@@ -76,11 +76,6 @@ final class ResourceState {
    */
   private MemoryRequestServer memReqSvr_;
 
-  /**
-   * Only relevant when user allocated direct memory is the backing resource.
-   */
-  private WritableDirectHandle handle_;
-
   //FLAGS
   /**
    * Only set true if the backing resource has an independent read-only state and is, in fact,
@@ -245,14 +240,6 @@ final class ResourceState {
 
   void setMemoryRequestServer(final MemoryRequestServer memReqSvr) {
     memReqSvr_ = memReqSvr; //may be null
-  }
-
-  WritableDirectHandle getHandle() {
-    return handle_;
-  }
-
-  void setHandle(final WritableDirectHandle handle) {
-    handle_ = handle; //may be set null
   }
 
   //FLAGS

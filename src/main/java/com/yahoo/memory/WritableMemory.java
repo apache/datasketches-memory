@@ -98,13 +98,13 @@ public abstract class WritableMemory extends Memory {
    * @param capacityBytes the size of the desired memory in bytes.
    * @return WritableHandler for this off-heap resource
    */
-  public static WritableDirectHandle allocateDirect(final long capacityBytes) {
+  public static WritableHandle allocateDirect(final long capacityBytes) {
     if (capacityBytes == 0) {
       return new WritableDirectHandle(null, ZERO_SIZE_MEMORY);
     }
     final ResourceState state = new ResourceState(false);
     state.putCapacity(capacityBytes);
-    final WritableDirectHandle handle = WritableDirectHandle.allocateDirect(state);
+    final WritableHandle handle = WritableDirectHandle.allocateDirect(state);
     final MemoryRequestServer server = new DefaultMemoryRequestServer();
     state.setMemoryRequestServer(server);
     return handle;
@@ -124,14 +124,14 @@ public abstract class WritableMemory extends Memory {
    * @param server A user-specified MemoryRequestServer.
    * @return WritableHandler for this off-heap resource
    */
-  public static WritableDirectHandle allocateDirect(final long capacityBytes,
+  public static WritableHandle allocateDirect(final long capacityBytes,
       final MemoryRequestServer server) {
     if (capacityBytes == 0) {
       return new WritableDirectHandle(null, ZERO_SIZE_MEMORY);
     }
     final ResourceState state = new ResourceState(false);
     state.putCapacity(capacityBytes);
-    final WritableDirectHandle handle = WritableDirectHandle.allocateDirect(state);
+    final WritableHandle handle = WritableDirectHandle.allocateDirect(state);
     state.setMemoryRequestServer(server);
     return handle;
   }

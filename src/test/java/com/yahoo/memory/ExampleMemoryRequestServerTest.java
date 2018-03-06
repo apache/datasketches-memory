@@ -42,7 +42,7 @@ public class ExampleMemoryRequestServerTest {
   public void checkExampleMemoryRequestServer2() {
     int bytes = 8;
     ExampleMemoryRequestServer svr = new ExampleMemoryRequestServer();
-    try (WritableDirectHandle handle = WritableMemory.allocateDirect(bytes, svr)) {
+    try (WritableHandle handle = WritableMemory.allocateDirect(bytes, svr)) {
       WritableMemory wMem = handle.get();
       MemoryClient client = new MemoryClient(wMem);
       client.process();
@@ -95,12 +95,12 @@ public class ExampleMemoryRequestServerTest {
    * possibly manage the continuous requests for larger memory.
    */
   public class ExampleMemoryRequestServer implements MemoryRequestServer {
-    IdentityHashMap<WritableMemory, WritableDirectHandle> map = new IdentityHashMap<>();
+    IdentityHashMap<WritableMemory, WritableHandle> map = new IdentityHashMap<>();
 
     @SuppressWarnings("resource")
     @Override
     public WritableMemory request(long capacityBytes) {
-     WritableDirectHandle handle = WritableMemory.allocateDirect(capacityBytes, this);
+     WritableHandle handle = WritableMemory.allocateDirect(capacityBytes, this);
      WritableMemory wmem = handle.get();
      map.put(wmem, handle); //We track the newly allocated memory and its handle.
      return wmem;
@@ -111,7 +111,7 @@ public class ExampleMemoryRequestServerTest {
     //here we actually release it, in reality it might be a lot more complex.
     public void release(WritableMemory memToRelease) {
       if (memToRelease != null) {
-        WritableDirectHandle handle = map.get(memToRelease);
+        WritableHandle handle = map.get(memToRelease);
         if ((handle != null) && (handle.get() == memToRelease)) {
           handle.close();
         }
@@ -120,7 +120,7 @@ public class ExampleMemoryRequestServerTest {
 
     public void cleanup() {
       map.forEach((k,v) -> {
-        assertFalse(k.isValid()); //all in the map should be invalid
+        assertFalse(k.isValid()); //all entries in the map should be invalid
         v.close(); //harmless
       });
     }

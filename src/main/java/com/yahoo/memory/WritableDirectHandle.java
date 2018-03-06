@@ -13,7 +13,7 @@ package com.yahoo.memory;
  * @author Lee Rhodes
  */
 //Joins a WritableHandle with writable, AutoCloseable AllocateDirect resource
-public final class WritableDirectHandle implements WritableHandle {
+final class WritableDirectHandle implements WritableHandle {
   AllocateDirect direct;
   WritableMemory wMem;
 
@@ -23,10 +23,10 @@ public final class WritableDirectHandle implements WritableHandle {
   }
 
   @SuppressWarnings("resource")
-  static WritableDirectHandle allocateDirect(final ResourceState state) {
+  static WritableHandle allocateDirect(final ResourceState state) {
     final AllocateDirect direct = AllocateDirect.allocate(state);
     final WritableMemory wMem = new WritableMemoryImpl(state, false);
-    final WritableDirectHandle handle = new WritableDirectHandle(direct, wMem);
+    final WritableHandle handle = new WritableDirectHandle(direct, wMem);
     return handle;
   }
 

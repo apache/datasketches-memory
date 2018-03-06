@@ -68,7 +68,7 @@ public abstract class Memory {
     state.putFile(file);
     state.putFileOffset(fileOffsetBytes);
     state.putCapacity(capacityBytes);
-    state.order(byteOrder);
+    state.putResourceOrder(byteOrder);
     return MapHandle.map(state);
   }
 
@@ -139,7 +139,7 @@ public abstract class Memory {
     UnsafeUtil.checkBounds(offsetBytes, lengthBytes, arr.length);
     final ResourceState state = new ResourceState(arr, Prim.BYTE, lengthBytes);
     state.putRegionOffset(offsetBytes);
-    state.order(byteOrder);
+    state.putResourceOrder(byteOrder);
     return WritableMemoryImpl.newInstance(state, true);
   }
 
@@ -587,7 +587,7 @@ public abstract class Memory {
     sb.append("Valid               : ").append(state.isValid()).append(LS);
     sb.append("Local Read Only     : ").append(localReadOnly).append(LS);
     sb.append("Resource Read Only  : ").append(state.isResourceReadOnly()).append(LS);
-    sb.append("Resource Endianness : ").append(state.order().toString()).append(LS);
+    sb.append("Resource Endianness : ").append(state.getResourceOrder().toString()).append(LS);
     sb.append("JDK Major Version   : ").append(UnsafeUtil.JDK).append(LS);
     //Data detail
     sb.append("Data, littleEndian  :  0  1  2  3  4  5  6  7");

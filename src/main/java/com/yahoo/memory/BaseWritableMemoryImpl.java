@@ -175,7 +175,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   @Override
   public ByteOrder getResourceOrder() {
     assertValid();
-    return state.order();
+    return state.getResourceOrder();
   }
 
   @Override

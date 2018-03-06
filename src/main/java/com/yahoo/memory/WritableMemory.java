@@ -77,7 +77,7 @@ public abstract class WritableMemory extends Memory {
     state.putFile(file);
     state.putFileOffset(fileOffsetBytes);
     state.putCapacity(capacityBytes);
-    state.order(byteOrder);
+    state.putResourceOrder(byteOrder);
     return WritableMapHandle.map(state);
   }
 
@@ -106,7 +106,7 @@ public abstract class WritableMemory extends Memory {
     state.putCapacity(capacityBytes);
     final WritableHandle handle = WritableDirectHandle.allocateDirect(state);
     final MemoryRequestServer server = new DefaultMemoryRequestServer();
-    state.setMemoryRequestServer(server);
+    state.putMemoryRequestServer(server);
     return handle;
   }
 
@@ -132,7 +132,7 @@ public abstract class WritableMemory extends Memory {
     final ResourceState state = new ResourceState(false);
     state.putCapacity(capacityBytes);
     final WritableHandle handle = WritableDirectHandle.allocateDirect(state);
-    state.setMemoryRequestServer(server);
+    state.putMemoryRequestServer(server);
     return handle;
   }
 
@@ -219,7 +219,7 @@ public abstract class WritableMemory extends Memory {
     UnsafeUtil.checkBounds(offsetBytes, lengthBytes, arr.length);
     final ResourceState state = new ResourceState(arr, Prim.BYTE, lengthBytes);
     state.putRegionOffset(offsetBytes);
-    state.order(byteOrder);
+    state.putResourceOrder(byteOrder);
     return WritableMemoryImpl.newInstance(state, false);
   }
 

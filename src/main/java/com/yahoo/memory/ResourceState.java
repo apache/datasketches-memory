@@ -234,7 +234,7 @@ final class ResourceState {
     return memReqSvr_;
   }
 
-  void setMemoryRequestServer(final MemoryRequestServer memReqSvr) {
+  void putMemoryRequestServer(final MemoryRequestServer memReqSvr) {
     memReqSvr_ = memReqSvr; //may be null
   }
 
@@ -331,11 +331,11 @@ final class ResourceState {
   }
 
   //ENDIANNESS
-  ByteOrder order() {
+  ByteOrder getResourceOrder() {
     return resourceOrder_;
   }
 
-  void order(final ByteOrder resourceOrder) {
+  void putResourceOrder(final ByteOrder resourceOrder) {
     nullCheck(resourceOrder, "ByteOrder");
     resourceOrder_ = resourceOrder;
   }

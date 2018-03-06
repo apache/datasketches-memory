@@ -188,7 +188,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   @Override
   public ByteOrder getResourceOrder() {
     assertValid();
-    return state.order();
+    return state.getResourceOrder();
   }
 
   @Override

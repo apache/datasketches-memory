@@ -188,11 +188,11 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   @Override
   public ByteOrder getResourceOrder() {
     assertValid();
-    return state.order();
+    return state.getResourceOrder();
   }
 
   @Override
-  public boolean swapBytes() {
+  public boolean isSwapBytes() {
     return state.isSwapBytes();
   }
 

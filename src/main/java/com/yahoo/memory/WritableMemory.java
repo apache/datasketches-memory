@@ -40,8 +40,8 @@ public abstract class WritableMemory extends Memory {
 
   static WritableMemory wrapBB(final ByteBuffer byteBuf, final boolean localReadOnly) {
     if (byteBuf.capacity() == 0) { return ZERO_SIZE_MEMORY; }
-    final ResourceState state = new ResourceState(byteBuf.isReadOnly());
-    state.putByteBuffer(byteBuf); //sets ResourceReadOnly
+    final ResourceState state = new ResourceState(byteBuf.isReadOnly());//sets resourceIsReadOnly
+    state.putByteBuffer(byteBuf); //sets resourceOrder
     AccessByteBuffer.wrap(state);
     final boolean ro = state.isResourceReadOnly() || localReadOnly;
     final BaseWritableMemoryImpl impl = new WritableMemoryImpl(state, ro);
@@ -77,7 +77,7 @@ public abstract class WritableMemory extends Memory {
     state.putFile(file);
     state.putFileOffset(fileOffsetBytes);
     state.putCapacity(capacityBytes);
-    state.order(byteOrder);
+    state.putResourceOrder(byteOrder);
     return WritableMapHandle.map(state);
   }
 
@@ -85,8 +85,11 @@ public abstract class WritableMemory extends Memory {
   /**
    * Allocates and provides access to capacityBytes directly in native (off-heap) memory
    * leveraging the WritableMemory API. The allocated memory will be 8-byte aligned, but may not
-   * be page aligned. If capacityBytes is zero, endianness, backing storage and read-only status of
-   * the WritableMemory object, returned from {@link WritableHandle#get()} are unspecified.
+   * be page aligned. If capacityBytes is zero, endianness, backing storage and read-only status
+   * of the WritableMemory object, returned from {@link WritableHandle#get()} are unspecified.
+   *
+   * <p>The default MemoryRequestServer, which allocates any request for memory onto the heap,
+   * will be used.</p>
    *
    * <p><b>NOTE:</b> Native/Direct memory acquired using Unsafe may have garbage in it.
    * It is the responsibility of the using class to clear this memory, if required,
@@ -99,8 +102,38 @@ public abstract class WritableMemory extends Memory {
     if (capacityBytes == 0) {
       return new WritableDirectHandle(null, ZERO_SIZE_MEMORY);
     }
-    final MemoryManager memMgr = DefaultMemoryManager.getInstance();
-    return memMgr.allocateDirect(capacityBytes);
+    final ResourceState state = new ResourceState(false);
+    state.putCapacity(capacityBytes);
+    final WritableHandle handle = WritableDirectHandle.allocateDirect(state);
+    final MemoryRequestServer server = new DefaultMemoryRequestServer();
+    state.putMemoryRequestServer(server);
+    return handle;
+  }
+
+  /**
+   * Allocates and provides access to capacityBytes directly in native (off-heap) memory
+   * leveraging the WritableMemory API. The allocated memory will be 8-byte aligned, but may not
+   * be page aligned. If capacityBytes is zero, endianness, backing storage and read-only status
+   * of the WritableMemory object, returned from {@link WritableHandle#get()} are unspecified.
+   *
+   * <p><b>NOTE:</b> Native/Direct memory acquired using Unsafe may have garbage in it.
+   * It is the responsibility of the using class to clear this memory, if required,
+   * and to call <i>close()</i> when done.</p>
+   *
+   * @param capacityBytes the size of the desired memory in bytes.
+   * @param server A user-specified MemoryRequestServer.
+   * @return WritableHandler for this off-heap resource
+   */
+  public static WritableHandle allocateDirect(final long capacityBytes,
+      final MemoryRequestServer server) {
+    if (capacityBytes == 0) {
+      return new WritableDirectHandle(null, ZERO_SIZE_MEMORY);
+    }
+    final ResourceState state = new ResourceState(false);
+    state.putCapacity(capacityBytes);
+    final WritableHandle handle = WritableDirectHandle.allocateDirect(state);
+    state.putMemoryRequestServer(server);
+    return handle;
   }
 
   //REGIONS XXX
@@ -186,7 +219,7 @@ public abstract class WritableMemory extends Memory {
     UnsafeUtil.checkBounds(offsetBytes, lengthBytes, arr.length);
     final ResourceState state = new ResourceState(arr, Prim.BYTE, lengthBytes);
     state.putRegionOffset(offsetBytes);
-    state.order(byteOrder);
+    state.putResourceOrder(byteOrder);
     return WritableMemoryImpl.newInstance(state, false);
   }
 
@@ -491,8 +524,8 @@ public abstract class WritableMemory extends Memory {
 
   //OTHER XXX
   /**
-   * Returns a MemoryRequest or null
-   * @return a MemoryRequest or null
+   * Returns a MemoryRequestServer or null
+   * @return a MemoryRequestServer or null
    */
   public abstract MemoryRequestServer getMemoryRequestServer();
 
@@ -504,15 +537,5 @@ public abstract class WritableMemory extends Memory {
    * @return the offset of the start of this WritableMemory from the backing resource.
    */
   public abstract long getRegionOffset(long offsetBytes);
-
-  /**
-   * Sets a MemoryRequest for this WritableMemory
-   * @param memReqSvr the given MemoryRequest
-   */
-  public abstract void setMemoryRequest(MemoryRequestServer memReqSvr);
-
-  public abstract WritableHandle getHandle();
-
-  public abstract void setHandle(WritableHandle handle);
 
 }

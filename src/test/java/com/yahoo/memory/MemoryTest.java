@@ -176,7 +176,7 @@ public class MemoryTest {
     ByteBuffer bb = ByteBuffer.allocate(n * 8);
     bb.order(ByteOrder.BIG_ENDIAN);
     Memory mem = Memory.wrap(bb);
-    assertTrue(mem.swapBytes());
+    assertTrue(mem.isSwapBytes());
     assertEquals(mem.getResourceOrder(), ByteOrder.BIG_ENDIAN);
   }
 
@@ -313,7 +313,7 @@ public class MemoryTest {
   public void checkNullMemReqSvr() {
     Memory mem = Memory.wrap(new byte[16]);
     ResourceState state = mem.getResourceState();
-    state.setMemoryRequestServer(null);
+    state.putMemoryRequestServer(null);
     println(mem.toHexString("Test", 0, 16));
   }
 

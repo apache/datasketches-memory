@@ -135,4 +135,17 @@ public class BufferReadWriteSafetyTest {
     buf.putDoubleArray(new double[] {1}, 0, 1);
   }
 
+  // Now, test that various ways to obtain a read-only buffer produce a read-only buffer indeed
+
+  @Test(expectedExceptions = AssertionError.class)
+  public void testWritableMemoryAsBuffer() {
+    WritableBuffer buf = (WritableBuffer) WritableMemory.allocate(8).asBuffer();
+    buf.putInt(1);
+  }
+
+  @Test(expectedExceptions = AssertionError.class)
+  public void testWritableBufferRegion() {
+    WritableBuffer buf = (WritableBuffer) WritableMemory.allocate(8).asWritableBuffer().region();
+    buf.putInt(1);
+  }
 }

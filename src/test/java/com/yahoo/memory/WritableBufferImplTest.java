@@ -18,10 +18,10 @@ public class WritableBufferImplTest {
 
   //Simple Native direct
 
+  @SuppressWarnings("resource")
   @Test
   public void checkNativeCapacityAndClose() {
     int memCapacity = 64;
-    @SuppressWarnings("resource") //intentionally not using try-with-resouces here
     WritableHandle wmh = WritableMemory.allocateDirect(memCapacity);
     WritableMemory wmem = wmh.get();
     WritableBuffer wbuf = wmem.asWritableBuffer();
@@ -471,6 +471,13 @@ public class WritableBufferImplTest {
     Buffer buf = mem.asBuffer();
     Buffer reg = buf.region();
     assertEquals(reg.getCapacity(), 0);
+  }
+
+  @Test
+  public void checkAsWritableMemory() {
+    WritableMemory wmem = WritableMemory.allocate(8);
+    WritableBuffer wbuf = wmem.asWritableBuffer();
+    WritableMemory wmem2 = wbuf.asWritableMemory();
   }
 
   @Test

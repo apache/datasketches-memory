@@ -45,7 +45,6 @@ final class ResourceState {
   /**
    * The object used in most Unsafe calls. This is effectively the array object if on-heap and
    * null for direct memory and determines how cumBaseOffset is computed.
-   * This is effectively supplied by the user.
    */
   private Object unsafeObj_;
 
@@ -64,20 +63,17 @@ final class ResourceState {
   private long capacity_;
 
   /**
-   * This becomes the base offset used by all Unsafe calls.
+   * This becomes the base offset used by all Unsafe calls. It is cumulative in that in includes
+   * all offsets from regions, user-defined offsets when creating Memory, and the array object
+   * header offset when creating Memory from primitive arrays.
    */
-  private long cumBaseOffset_; //Holds the cumulative offset to the start of data.
+  private long cumBaseOffset_;
 
   /**
    * Only relevant when user allocated direct memory is the backing resource. It is a callback
    * mechanism for the client of a resource to request more memory from the owner of the resource.
    */
-  private MemoryRequestServer memReqSvr_ = DefaultMemoryManager.getInstance();
-
-  /**
-   * Only relevant when user allocated direct memory is the backing resource.
-   */
-  private WritableHandle handle_;
+  private MemoryRequestServer memReqSvr_;
 
   //FLAGS
   /**
@@ -129,11 +125,9 @@ final class ResourceState {
   private MappedByteBuffer mbb_;
 
   //RESOURCE ENDIANNESS PROPERTIES
-  private ByteOrder resourceOrder_ = nativeOrder_;
+  private ByteOrder resourceOrder_ = nativeOrder_; //default
 
-  private boolean swapBytes_; //true if resourceOrder != nativeOrder_
-
-  //CONSTRUCTORS
+  //****CONSTRUCTORS****
   ResourceState(final boolean resourceReadOnly) {
     resourceIsReadOnly_ = resourceReadOnly;
     valid_ = new StepBoolean(true);
@@ -141,7 +135,7 @@ final class ResourceState {
 
   //Constructor for heap primitive arrays
   ResourceState(final Object obj, final Prim prim, final long arrLen) {
-    this(false); //writable, valid
+    this(false); //set resourceIsReadOnly=false, valid
     nullCheck(obj, "Array Object");
     Util.negativeCheck(arrLen, "Capacity");
     unsafeObj_ = obj;
@@ -157,7 +151,7 @@ final class ResourceState {
     unsafeObj_ = src.unsafeObj_;
     unsafeObjHeader_ = src.unsafeObjHeader_;
     capacity_ = src.capacity_;
-    //cumBaseOffset is computed
+
     memReqSvr_ = src.memReqSvr_; //retains memReqSvr reference
 
     //FLAGS
@@ -178,11 +172,10 @@ final class ResourceState {
 
     //ENDIANNESS
     resourceOrder_ = src.resourceOrder_; //retains resourseOrder
-    swapBytes_ = src.swapBytes_;
     compute();
   }
+  //****END CONSTRUCTORS****
 
-  //METHODS
   ResourceState copy() {
     return new ResourceState(this);
   }
@@ -241,16 +234,8 @@ final class ResourceState {
     return memReqSvr_;
   }
 
-  void setMemoryRequestServer(final MemoryRequestServer memReqSvr) {
+  void putMemoryRequestServer(final MemoryRequestServer memReqSvr) {
     memReqSvr_ = memReqSvr; //may be null
-  }
-
-  WritableHandle getHandle() {
-    return handle_;
-  }
-
-  void setHandle(final WritableHandle handle) {
-    handle_ = handle; //may be set null
   }
 
   //FLAGS
@@ -306,7 +291,6 @@ final class ResourceState {
     nullCheck(byteBuf, "ByteBuffer");
     byteBuf_ = byteBuf;
     resourceOrder_ = byteBuf_.order();
-    swapBytes_ = (resourceOrder_ != nativeOrder_);
   }
 
   //MEMORY MAPPED FILES
@@ -347,18 +331,17 @@ final class ResourceState {
   }
 
   //ENDIANNESS
-  ByteOrder order() {
+  ByteOrder getResourceOrder() {
     return resourceOrder_;
   }
 
-  void order(final ByteOrder resourceOrder) {
+  void putResourceOrder(final ByteOrder resourceOrder) {
     nullCheck(resourceOrder, "ByteOrder");
     resourceOrder_ = resourceOrder;
-    swapBytes_ = (resourceOrder_ != nativeOrder_);
   }
 
   boolean isSwapBytes() {
-    return swapBytes_;
+    return (resourceOrder_ != nativeOrder_);
   }
 
 }

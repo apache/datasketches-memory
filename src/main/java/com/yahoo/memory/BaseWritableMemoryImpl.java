@@ -175,7 +175,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   @Override
   public ByteOrder getResourceOrder() {
     assertValid();
-    return state.order();
+    return state.getResourceOrder();
   }
 
   @Override
@@ -216,7 +216,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   }
 
   @Override
-  public boolean swapBytes() {
+  public boolean isSwapBytes() {
     assertValid();
     return state.isSwapBytes();
   }
@@ -339,24 +339,6 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   public MemoryRequestServer getMemoryRequestServer() { //only applicable to writable
     assertValid();
     return state.getMemoryRequestServer();
-  }
-
-  @Override
-  public void setMemoryRequest(final MemoryRequestServer memReqSvr) {
-    assertValid();
-    state.setMemoryRequestServer(memReqSvr);
-  }
-
-  @Override
-  public WritableHandle getHandle() {
-    assertValid();
-    return state.getHandle();
-  }
-
-  @Override
-  public void setHandle(final WritableHandle handle) {
-    assertValid();
-    state.setHandle(handle);
   }
 
   //RESTRICTED XXX

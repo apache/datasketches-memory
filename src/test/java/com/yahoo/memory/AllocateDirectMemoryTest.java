@@ -6,6 +6,7 @@
 package com.yahoo.memory;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 
 import org.testng.annotations.Test;
 
@@ -24,26 +25,29 @@ public class AllocateDirectMemoryTest {
   }
 
   @Test
-  public void simpleMemoryRequestServer() {
-    int longs = 32;
-    int bytes = longs << 3;
-    try (WritableHandle wh = WritableMemory.allocateDirect(bytes)) {
+  public void checkDefaultMemoryRequestServer() {
+    int longs1 = 32;
+    int bytes1 = longs1 << 3;
+    try (WritableHandle wh = WritableMemory.allocateDirect(bytes1)) {
       WritableMemory wMem1 = wh.get();
-      for (int i = 0; i<longs; i++) {
+      for (int i = 0; i<longs1; i++) { //puts data in wMem1
         wMem1.putLong(i << 3, i);
         assertEquals(wMem1.getLong(i << 3), i);
       }
-      wMem1.toHexString("Test", 0, 32 * 8);
+      println(wMem1.toHexString("Test", 0, 32 * 8));
 
       int longs2 = 64;
       int bytes2 = longs2 << 3;
       MemoryRequestServer memReqSvr = wMem1.getMemoryRequestServer();
-      WritableMemory wMem2 = memReqSvr.request(bytes2); //on heap
+      WritableMemory wMem2 = memReqSvr.request(bytes2);
+      assertFalse(wMem2.isDirect()); //on heap by default
       for (int i = 0; i < longs2; i++) {
           wMem2.putLong(i << 3, i);
           assertEquals(wMem2.getLong(i << 3), i);
       }
-      memReqSvr.requestClose(wMem1, wMem2);
+      memReqSvr.release(wMem1);
+      //The default MRS doesn't actually realease because it could be misused.
+      // so we let the TWR release it.
     }
   }
 
@@ -71,6 +75,4 @@ public class AllocateDirectMemoryTest {
   static void println(String s) {
     //System.out.println(s); //disable here
   }
-
-
 }

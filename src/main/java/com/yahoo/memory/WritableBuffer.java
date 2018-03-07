@@ -37,8 +37,8 @@ public abstract class WritableBuffer extends Buffer {
 
   static WritableBuffer wrapBB(final ByteBuffer byteBuf, final boolean localReadOnly) {
     if (byteBuf.capacity() == 0) { return ZERO_SIZE_BUFFER; }
-    final ResourceState state = new ResourceState(byteBuf.isReadOnly());
-    state.putByteBuffer(byteBuf); //sets ResourceReadOnly
+    final ResourceState state = new ResourceState(byteBuf.isReadOnly());//sets resourceIsReadOnly
+    state.putByteBuffer(byteBuf); //sets resourceOrder
     AccessByteBuffer.wrap(state);
     final boolean ro = state.isResourceReadOnly() || localReadOnly;
     final BaseWritableBufferImpl impl = new WritableBufferImpl(state, ro);

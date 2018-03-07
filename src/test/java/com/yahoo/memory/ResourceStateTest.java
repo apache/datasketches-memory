@@ -20,13 +20,13 @@ public class ResourceStateTest {
   @Test
   public void checkByteOrder() {
     ResourceState state = new ResourceState(false);
-    assertEquals(state.order(), ByteOrder.nativeOrder());
+    assertEquals(state.getResourceOrder(), ByteOrder.nativeOrder());
     if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
-      state.order(ByteOrder.BIG_ENDIAN);
+      state.putResourceOrder(ByteOrder.BIG_ENDIAN);
     } else {
-      state.order(ByteOrder.LITTLE_ENDIAN);
+      state.putResourceOrder(ByteOrder.LITTLE_ENDIAN);
     }
-    assertTrue(state.order() != ByteOrder.nativeOrder());
+    assertTrue(state.getResourceOrder() != ByteOrder.nativeOrder());
     assertTrue(state.isSwapBytes());
   }
 

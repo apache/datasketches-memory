@@ -193,7 +193,7 @@ public class BufferTest {
     ByteBuffer bb = ByteBuffer.allocate(n * 8);
     bb.order(ByteOrder.BIG_ENDIAN);
     Buffer buf = Buffer.wrap(bb);
-    assertTrue(buf.swapBytes());
+    assertTrue(buf.isSwapBytes());
     assertEquals(buf.getResourceOrder(), ByteOrder.BIG_ENDIAN);
   }
 
@@ -283,10 +283,10 @@ public class BufferTest {
     wbuf.getLong();
   }
 
+  @SuppressWarnings("resource")
   @Test(expectedExceptions = AssertionError.class)
   public void checkRegionUseAfterFree() {
     int bytes = 64;
-    @SuppressWarnings("resource") //intentionally not using try-with-resources here
     WritableHandle wh = WritableMemory.allocateDirect(bytes);
     Memory wmem = wh.get();
 

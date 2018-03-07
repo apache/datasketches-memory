@@ -39,26 +39,42 @@ public abstract class Buffer extends BaseBuffer {
   //MAP XXX
   //Use Memory for mapping files and the asBuffer()
 
-  //DUPLICATES & REGIONS XXX
+  //DUPLICATES XXX
   /**
-   * Returns a read only duplicate view of this Buffer with the same but independent values of
-   * start, position, and end.
-   * @return a read only duplicate view of this Buffer with the same but independent values of
-   * start, position, and end.
+   * Returns a read-only duplicate view of this Buffer with the same but independent values of
+   * <i>start</i>, <i>position</i> and <i>end</i>.
+   * If this object's capacity is zero, the returned object is effectively immutable and
+   * the backing storage and endianness are unspecified.
+   * @return a read-only duplicate view of this Buffer with the same but independent values of
+   * <i>start</i>, <i>position</i> and <i>end</i>.
    */
   public abstract Buffer duplicate();
 
+  //REGIONS XXX
   /**
-   * Returns a read only region of this Buffer starting at position ending at end.
-   * The region start and position will be zero, the region end and capacity will be this
-   * buffer's end minus position.
-   * @return a read only region of this Buffer.
+   * A region is a read-only view of the backing store of this object.
+   * This returns a new <i>Buffer</i> representing the defined region.
+   * <ul>
+   * <li>Returned object's origin = this object's <i>position</i></li>
+   * <li>Returned object's <i>start</i> = 0</li>
+   * <li>Returned object's <i>position</i> = 0</li>
+   * <li>Returned object's <i>end</i> = this object's (<i>end</i> - <i>position</i>)</li>
+   * <li>Returned object's <i>capacity</i> = this object's (<i>end</i> - <i>position</i>)</li>
+   * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable and
+   * independent of this object's <i>start</i>, <i>position</i> and <i>end</i></li>
+   * </ul>
+   * If this object's capacity is zero, the returned object is effectively immutable and
+   * the backing storage and endianness are unspecified.
+   * @return a new <i>Buffer</i> representing the defined region.
    */
   public abstract Buffer region();
 
   //MEMORY XXX
   /**
-   * Convert this Buffer to a Memory. The current start, position and end are ignored.
+   * Convert this Buffer to a Memory. The current <i>start</i>, <i>position</i> and <i>end</i>
+   * are ignored.
+   * If this object's capacity is zero, the returned object is effectively immutable and
+   * the backing storage and endianness are unspecified.
    * @return Memory
    */
   public abstract Memory asMemory();

@@ -86,7 +86,7 @@ class WritableBufferImpl extends BaseWritableBufferImpl {
 
   @Override
   public WritableBuffer writableRegion() {
-    return writableRegionImpl(getPosition(), getEnd() - getPosition(), false);
+    return writableRegionImpl(getPosition(), getEnd() - getPosition(),  localReadOnly);
   }
 
   @Override

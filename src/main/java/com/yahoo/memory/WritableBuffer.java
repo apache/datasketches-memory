@@ -52,35 +52,61 @@ public abstract class WritableBuffer extends Buffer {
   //ALLOCATE DIRECT XXX
   //Use WritableMemory to allocate direct memory and then asWritableBuffer().
 
-  //DUPLICATES & REGIONS XXX
+  //DUPLICATES XXX
   /**
-   * Returns a writable duplicate view of this Buffer with the same but independent values of
-   * start, position, end and capacity.
-   * @return a writable duplicate view of this Buffer with the same but independent values of
-   * start, position, end and capacity.
+   * Returns a duplicate writable view of this Buffer with the same but independent values of
+   * <i>start</i>, <i>position</i> and <i>end</i>.
+   * If this object's capacity is zero, the returned object is effectively immutable and
+   * the backing storage and endianness are unspecified.
+   * @return a duplicate writable view of this Buffer with the same but independent values of
+   * <i>start</i>, <i>position</i> and <i>end</i>.
    */
   public abstract WritableBuffer writableDuplicate();
 
+  //REGIONS XXX
   /**
-   * Returns a writable region of this WritableBuffer defined by the current position and end.
-   * This is equivalent to {@code writableRegion(getPosition(), getEnd() - getPosition());}.
-   * The new independent start and position will be zero and the end and capacity will be
-   * {@code getEnd() - getPosition()}.
-   * @return a writable region of this WritableBuffer defined by the current position and end.
+   * A writable region is a writable view of the backing store of this object.
+   * This returns a new <i>WritableBuffer</i> representing the defined writable region.
+   * <ul>
+   * <li>Returned object's origin = this object's <i>position</i></li>
+   * <li>Returned object's <i>start</i> = 0</li>
+   * <li>Returned object's <i>position</i> = 0</li>
+   * <li>Returned object's <i>end</i> = this object's (<i>end</i> - <i>position</i>)</li>
+   * <li>Returned object's <i>capacity</i> = this object's (<i>end</i> - <i>position</i>)</li>
+   * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable and
+   * independent of this object's <i>start</i>, <i>position</i> and <i>end</i></li>
+   * </ul>
+   * If this object's capacity is zero, the returned object is effectively immutable and
+   * the backing storage and endianness are unspecified.
+   * @return a new <i>WritableBuffer</i> representing the defined writable region.
    */
   public abstract WritableBuffer writableRegion();
 
   /**
-   * Returns a writable region of this WritableBuffer
-   * @param offsetBytes the starting offset with respect to this WritableBuffer
-   * @param capacityBytes the capacity of the region in bytes
-   * @return a writable region of this WritableBuffer
+   * A writable region is a writable view of the backing store of this object.
+   * This returns a new <i>WritableBuffer</i> representing the defined writable region.
+   * <ul>
+   * <li>Returned object's origin = this objects' origin + <i>offsetBytes</i></li>
+   * <li>Returned object's <i>start</i> = 0</li>
+   * <li>Returned object's <i>position</i> = 0</li>
+   * <li>Returned object's <i>end</i> = <i>capacityBytes</i></li>
+   * <li>Returned object's <i>capacity</i> = <i>capacityBytes</i></li>
+   * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable and
+   * independent of this object's <i>start</i>, <i>position</i> and <i>end</i></li>
+   * </ul>
+   * If this object's capacity is zero, the returned object is effectively immutable and
+   * the backing storage and endianness are unspecified.
+   * @param offsetBytes the starting offset with respect to the origin of this <i>WritableBuffer</i>
+   * @param capacityBytes the <i>capacity</i> of the returned region in bytes
+   * @return a new <i>WritableBuffer</i> representing the defined writable region.
    */
   public abstract WritableBuffer writableRegion(long offsetBytes, long capacityBytes);
 
-  //MEMORY XXX
+  //AS MEMORY XXX
   /**
-   * Convert this WritableBuffer to a WritableMemory
+   * Convert this WritableBuffer to a WritableMemory.
+   * If this object's capacity is zero, the returned object is effectively immutable and
+   * the backing storage and endianness are unspecified.
    * @return WritableMemory
    */
   public abstract WritableMemory asWritableMemory();

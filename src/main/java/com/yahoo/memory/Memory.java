@@ -74,21 +74,34 @@ public abstract class Memory {
 
   //REGIONS XXX
   /**
-   * Returns a read only region of this Memory. If the given capacityBytes is zero, backing storage
-   * and endianness of the returned Memory object are unspecified.
-   * @param offsetBytes the starting offset with respect to this Memory.
+   * A region is a read-only view of the backing store of this object.
+   * This returns a new <i>Memory</i> representing the defined region.
+   * <ul>
+   * <li>Returned object's origin = this object's origin + offsetBytes</li>
+   * <li>Returned object's capacity = capacityBytes</li>
+   * </ul>
+   * If the given capacityBytes is zero, the returned object is effectively immutable and
+   * the backing storage and endianness are unspecified.
+   * @param offsetBytes the starting offset with respect to the origin of this Memory.
    * @param capacityBytes the capacity of the region in bytes
-   * @return a read only region of this Memory
+   * @return a new <i>Memory</i> representing the defined region.
    */
   public abstract Memory region(long offsetBytes, long capacityBytes);
 
-  //BUFFER XXX
+  //AS BUFFER XXX
   /**
-   * Creates and returns a new Buffer, backed by this Memory, however, if the capacity of this
-   * Memory object is zero, this method is allowed to return a cached Buffer object, which is
-   * effectively unmodifiable. The <i>start</i>, <i>position</i> and <i>end</i> are set to zero,
-   * zero, and <i>capacity</i>, respectively.
-   * @return Buffer
+   * Returns a new <i>Buffer</i> view of the backing store of this object..
+   * <ul>
+   * <li>Returned object's origin = this object's origin</li>
+   * <li>Returned object's <i>start</i> = 0</li>
+   * <li>Returned object's <i>position</i> = 0</li>
+   * <li>Returned object's <i>end</i> = this object's capacity</li>
+   * <li>Returned object's <i>capacity</i> = this object's capacity</li>
+   * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable</li>
+   * </ul>
+   * If this object's capacity is zero, the returned object is effectively immutable and
+   * the backing storage and endianness are unspecified.
+   * @return a new <i>Buffer</i>
    */
   public abstract Buffer asBuffer();
 

@@ -1,6 +1,8 @@
 package com.yahoo.memory;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -370,6 +372,24 @@ public class Buffer2Test {
     assertEquals(wbuf2.capacity, 0);
     Buffer buf = wmem.asBuffer();
     assertEquals(buf.capacity, 0);
+  }
+
+  @Test
+  public void checkIndependence() {
+    int cap = 64;
+    WritableMemory wmem = WritableMemory.allocate(cap);
+    WritableBuffer wbuf1 = wmem.asWritableBuffer();
+    WritableBuffer wbuf2 = wmem.asWritableBuffer();
+    assertFalse(wbuf1 == wbuf2);
+    assertTrue(wbuf1.getResourceState() == wbuf2.getResourceState());
+
+    WritableMemory reg1 = wmem.writableRegion(0, cap);
+    WritableMemory reg2 = wmem.writableRegion(0, cap);
+    assertFalse(reg1.getResourceState() == reg2.getResourceState());
+
+    WritableBuffer wbuf3 = wbuf1.writableRegion();
+    WritableBuffer wbuf4 = wbuf1.writableRegion();
+    assertFalse(wbuf3.getResourceState() == wbuf4.getResourceState());
   }
 
   @Test

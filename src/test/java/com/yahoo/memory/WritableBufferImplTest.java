@@ -473,6 +473,7 @@ public class WritableBufferImplTest {
     assertEquals(reg.getCapacity(), 0);
   }
 
+  @SuppressWarnings("unused")
   @Test
   public void checkAsWritableMemory() {
     WritableMemory wmem = WritableMemory.allocate(8);

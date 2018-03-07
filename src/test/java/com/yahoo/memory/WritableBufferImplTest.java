@@ -474,6 +474,13 @@ public class WritableBufferImplTest {
   }
 
   @Test
+  public void checkAsWritableMemory() {
+    WritableMemory wmem = WritableMemory.allocate(8);
+    WritableBuffer wbuf = wmem.asWritableBuffer();
+    WritableMemory wmem2 = wbuf.asWritableMemory();
+  }
+
+  @Test
   public void printlnTest() {
     println("PRINTING: "+this.getClass().getName());
   }

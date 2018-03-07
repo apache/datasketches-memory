@@ -85,16 +85,15 @@ class AllocateDirectMap implements Map {
   @Override
   public boolean isLoaded() {
     final int ps = unsafe.pageSize();
-    final long nativeBaseOffset = state.getNativeBaseOffset();
     try {
-
-      final int pageCount = pageCount(ps, state.getCapacity());
+      final long capacity = state.getCapacity();
+      final int pageCount = pageCount(ps, capacity);
       //for isLoaded0 see MappedByteBuffer.c referenced at top of class
       final Method method =
               MappedByteBuffer.class.getDeclaredMethod("isLoaded0", long.class, long.class, int.class);
       method.setAccessible(true);
-      return (boolean) method.invoke(state.getMappedByteBuffer(), nativeBaseOffset,
-              state.getCapacity(), pageCount);
+      return (boolean) method.invoke(state.getMappedByteBuffer(), state.getNativeBaseOffset(),
+          capacity, pageCount);
     } catch (final Exception e) {
       throw new RuntimeException(
               String.format("Encountered %s exception while loading", e.getClass()));

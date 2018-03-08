@@ -100,8 +100,6 @@ class AllocateDirectMap implements Map {
     }
   }
 
-
-
   @Override
   public void close() {
     if (state.isValid()) {
@@ -147,15 +145,16 @@ class AllocateDirectMap implements Map {
     return (int) ( (capacity == 0) ? 0 : ((capacity - 1L) / ps) + 1L);
   }
 
+  //Note: DirectByteBuffer extends MappedByteBuffer, which extends ByteBuffer
   private static final MappedByteBuffer createDummyMbbInstance(final long nativeBaseAddress)
           throws RuntimeException {
     try {
-      final Class<?> cl = Class.forName("java.nio.DirectByteBuffer");
-      final Constructor<?> ctor =
-          cl.getDeclaredConstructor(int.class, long.class, FileDescriptor.class, Runnable.class);
-      ctor.setAccessible(true);
-      final MappedByteBuffer mbb = (MappedByteBuffer) ctor.newInstance(0, // some junk capacity
-          nativeBaseAddress, null, null);
+      final Class<?> dbbClazz = Class.forName("java.nio.DirectByteBuffer");
+      final Constructor<?> dbbCtor =
+          dbbClazz.getDeclaredConstructor(int.class, long.class, FileDescriptor.class, Runnable.class);
+      dbbCtor.setAccessible(true);
+      final MappedByteBuffer mbb = (MappedByteBuffer) dbbCtor.newInstance(0, // some junk capacity
+          nativeBaseAddress, null, null); //null FileDescriptor, null Runnable unmapper
       return mbb;
     } catch (final Exception e) {
       throw new RuntimeException(
@@ -165,8 +164,7 @@ class AllocateDirectMap implements Map {
   }
 
   /**
-   * Note: madvise() is a system call made by load0 native method in MappedByteBuffer.c.
-   * See reference at top of class.
+   * called by load(). Calls the native method load0 in MappedByteBuffer.java.
    */
   void madvise() throws RuntimeException {
     try {

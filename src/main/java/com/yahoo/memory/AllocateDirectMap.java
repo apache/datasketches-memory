@@ -153,6 +153,7 @@ class AllocateDirectMap implements Map {
       final Constructor<?> dbbCtor =
           dbbClazz.getDeclaredConstructor(int.class, long.class, FileDescriptor.class, Runnable.class);
       dbbCtor.setAccessible(true);
+      //note no Cleaner object is created because the Runnable unmapper is null.
       final MappedByteBuffer mbb = (MappedByteBuffer) dbbCtor.newInstance(0, // some junk capacity
           nativeBaseAddress, null, null); //null FileDescriptor, null Runnable unmapper
       return mbb;

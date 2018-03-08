@@ -9,10 +9,8 @@ import static com.yahoo.memory.Util.negativeCheck;
 import static com.yahoo.memory.Util.nullCheck;
 
 import java.io.File;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.MappedByteBuffer;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -114,16 +112,6 @@ final class ResourceState {
    */
   private long fileOffset_;
 
-  /**
-   * This is used by the mapping class as a passing parameter.
-   */
-  private RandomAccessFile raf_;
-
-  /**
-   * This is used by the mapping class as a passing parameter.
-   */
-  private MappedByteBuffer mbb_;
-
   //RESOURCE ENDIANNESS PROPERTIES
   private ByteOrder resourceOrder_ = nativeOrder_; //default
 
@@ -167,8 +155,6 @@ final class ResourceState {
     //MEMORY MAPPED FILES
     file_ = src.file_; //retains file reference
     fileOffset_ = src.fileOffset_;
-    raf_ = src.raf_;
-    mbb_ = src.mbb_;
 
     //ENDIANNESS
     resourceOrder_ = src.resourceOrder_; //retains resourseOrder
@@ -312,23 +298,23 @@ final class ResourceState {
     fileOffset_ = fileOffset;
   }
 
-  RandomAccessFile getRandomAccessFile() {
-    return raf_;
-  }
+  //  RandomAccessFile getRandomAccessFile() {
+  //    return raf_;
+  //  }
 
-  void putRandomAccessFile(final RandomAccessFile raf) {
-    nullCheck(raf, "RandomAccessFile");
-    raf_ = raf;
-  }
+  //  void putRandomAccessFile(final RandomAccessFile raf) {
+  //    nullCheck(raf, "RandomAccessFile");
+  //    raf_ = raf;
+  //  }
 
-  MappedByteBuffer getMappedByteBuffer() {
-    return mbb_;
-  }
-
-  void putMappedByteBuffer(final MappedByteBuffer mbb) {
-    nullCheck(mbb, "MappedByteBuffer");
-    mbb_ = mbb;
-  }
+  //  MappedByteBuffer getMappedByteBuffer() {
+  //    return mbb_;
+  //  }
+  //
+  //  void putMappedByteBuffer(final MappedByteBuffer mbb) {
+  //    nullCheck(mbb, "MappedByteBuffer");
+  //    mbb_ = mbb;
+  //  }
 
   //ENDIANNESS
   ByteOrder getResourceOrder() {

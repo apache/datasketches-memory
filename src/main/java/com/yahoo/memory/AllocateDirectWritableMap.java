@@ -28,19 +28,18 @@ final class AllocateDirectWritableMap extends AllocateDirectMap implements Writa
   /**
    * Factory method for memory mapping a file for write access.
    *
-   * <p>Memory maps a file directly in off heap leveraging native map0 method used in
+   * <p>Memory maps a file directly in off heap leveraging native map0 method implemented in
    * FileChannelImpl.c. The owner will have read and write access to that address space.</p>
    *
    * @param state the ResourceState
    * @return A new AllocateDirectWritableMap
    * @throws IOException file not found or RuntimeException, etc.
    */
-  //@SuppressWarnings("resource")
-  static AllocateDirectWritableMap map(final ResourceState state) throws IOException {
+  static AllocateDirectWritableMap map(final ResourceState state) {
     if (state.isResourceReadOnly()) {
       throw new ReadOnlyException("Cannot map a read-only file into Writable Memory.");
     }
-    return new AllocateDirectWritableMap(AllocateDirectMap.mapper(state));
+    return new AllocateDirectWritableMap(state);
   }
 
   @Override
@@ -49,12 +48,11 @@ final class AllocateDirectWritableMap extends AllocateDirectMap implements Writa
       final Method method = MappedByteBuffer.class.getDeclaredMethod("force0",
               FileDescriptor.class, long.class, long.class);
       method.setAccessible(true);
-      method.invoke(super.state.getMappedByteBuffer(), super.state.getRandomAccessFile().getFD(),
+      method.invoke(super.mbb, super.raf.getFD(),
               super.state.getNativeBaseOffset(), super.state.getCapacity());
     } catch (final Exception e) {
       throw new RuntimeException(String.format("Encountered %s exception in force. "
           + UnsafeUtil.tryIllegalAccessPermit, e.getClass()));
     }
   }
-
 }

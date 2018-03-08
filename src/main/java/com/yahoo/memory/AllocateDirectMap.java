@@ -50,10 +50,15 @@ class AllocateDirectMap implements Map {
   final ResourceState state;
   final Cleaner cleaner;
 
+  final RandomAccessFile raf;
+  final MappedByteBuffer mbb;
+
   //called from map below and from AllocateDirectWritableMap constructor
   AllocateDirectMap(final ResourceState state) {
     this.state = state;
-    cleaner = Cleaner.create(this, new Deallocator(state));
+    raf = mapper(state);
+    mbb = createDummyMbbInstance(state.getNativeBaseOffset());
+    cleaner = Cleaner.create(this, new Deallocator(state, raf));
     ResourceState.currentDirectMemoryMapAllocations_.incrementAndGet();
     ResourceState.currentDirectMemoryMapAllocated_.addAndGet(state.getCapacity());
   }
@@ -69,8 +74,8 @@ class AllocateDirectMap implements Map {
    * @return A new AllocateDirectMap
    * @throws IOException file not found or RuntimeException, etc.
    */
-  static AllocateDirectMap map(final ResourceState state) throws IOException {
-    return new AllocateDirectMap(mapper(state)); //file, fileOffset, cap, BO
+  static AllocateDirectMap map(final ResourceState state)  {
+    return new AllocateDirectMap(state); //file, fileOffset, cap, BO
   }
 
   @Override
@@ -92,11 +97,10 @@ class AllocateDirectMap implements Map {
     try {
       final long capacity = state.getCapacity();
       final int pageCount = pageCount(ps, capacity);
-      //for isLoaded0 see MappedByteBuffer.c referenced at top of class
       final Method method =
               MappedByteBuffer.class.getDeclaredMethod("isLoaded0", long.class, long.class, int.class);
       method.setAccessible(true);
-      return (boolean) method.invoke(state.getMappedByteBuffer(), state.getNativeBaseOffset(),
+      return (boolean) method.invoke(mbb, state.getNativeBaseOffset(),
           capacity, pageCount);
     } catch (final Exception e) {
       throw new RuntimeException(
@@ -116,36 +120,37 @@ class AllocateDirectMap implements Map {
   // Restricted methods
 
   //Does the actual mapping work, resourceReadOnly must already be set
+  //state enters with file, fileOffset, capacity, RRO. Exits with nativeBaseOffset
   @SuppressWarnings("resource")
-  static final ResourceState mapper(final ResourceState state) throws IOException {
+  static final RandomAccessFile mapper(final ResourceState state)  {
     final long fileOffset = state.getFileOffset();
     final long capacity = state.getCapacity();
     final File file = state.getFile();
     final boolean readOnlyFile = state.isResourceReadOnly(); //set by map above
     final String mode = readOnlyFile ? "r" : "rw";
-
-    final RandomAccessFile raf = new RandomAccessFile(file, mode);
-    state.putRandomAccessFile(raf);
-    if ((fileOffset + capacity) > raf.length()) {
-      if (readOnlyFile) {
-        throw new IllegalStateException(
-            "File is shorter than the region that is requested to be mapped: file length="
-           + raf.length() + ", mapping offset=" + fileOffset + ", mapping size=" + capacity);
-      } else {
-        raf.setLength(fileOffset + capacity);
+    final RandomAccessFile raf;
+    try {
+      raf = new RandomAccessFile(file, mode);
+      if ((fileOffset + capacity) > raf.length()) {
+        if (readOnlyFile) {
+          throw new IllegalStateException(
+              "File is shorter than the region that is requested to be mapped: file length="
+             + raf.length() + ", mapping offset=" + fileOffset + ", mapping size=" + capacity);
+        } else {
+          raf.setLength(fileOffset + capacity);
+        }
       }
+    } catch (final IOException e) {
+      throw new RuntimeException(e);
     }
     final FileChannel fc = raf.getChannel();
     final int mapMode = readOnlyFile ? MAP_RO : MAP_RW;
     final long nativeBaseOffset = map(fc, mapMode, fileOffset, capacity);
     state.putNativeBaseOffset(nativeBaseOffset);
-
-    final MappedByteBuffer mbb = createDummyMbbInstance(nativeBaseOffset);
-    state.putMappedByteBuffer(mbb);
-    return state;
+    return raf;
   }
 
-  static final int pageCount(final int ps, final long capacity) {
+  static final int pageCount(final int ps, final long capacity) { //avail for test
     return (int) ( (capacity == 0) ? 0 : ((capacity - 1L) / ps) + 1L);
   }
 
@@ -172,12 +177,12 @@ class AllocateDirectMap implements Map {
    * called by load(). Calls the native method load0 in MappedByteBuffer.java, implemented
    * in MappedByteBuffer.c. See reference at top of class.
    */
-  void madvise() throws RuntimeException {
+  void madvise() {
     try {
       final Method method =
           MappedByteBuffer.class.getDeclaredMethod("load0", long.class, long.class);
       method.setAccessible(true);
-      method.invoke(state.getMappedByteBuffer(), state.getNativeBaseOffset(),
+      method.invoke(mbb, state.getNativeBaseOffset(),
           state.getCapacity());
     } catch (final Exception e) {
       throw new RuntimeException(
@@ -259,8 +264,8 @@ class AllocateDirectMap implements Map {
     private final long myCapacity;
     private final ResourceState parentStateRef;
 
-    private Deallocator(final ResourceState state) {
-      myRaf = state.getRandomAccessFile();
+    private Deallocator(final ResourceState state, final RandomAccessFile raf) {
+      myRaf = raf;
       assert (myRaf != null);
       myFc = myRaf.getChannel();
       actualNativeBaseOffset = state.getNativeBaseOffset();

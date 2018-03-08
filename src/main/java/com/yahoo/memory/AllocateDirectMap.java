@@ -31,13 +31,17 @@ import sun.nio.ch.FileChannelImpl;
  * Allocates direct memory used to memory map files for read operations.
  * (including those &gt; 2GB).
  *
+ * <p>Reference code for map0:
+ * <a href="http://hg.openjdk.java.net/jdk8u/jdk8u/jdk/file/f940e7a48b72/src/solaris/native/sun/nio/ch/FileChannelImpl.c">
+ * FileChannelImpl.c</a></p>
+ *
+ * <p>Reference code for load0(), isLoaded0(), and force0():
+ * <a href="http://hg.openjdk.java.net/jdk8u/jdk8u/jdk/file/f940e7a48b72/src/solaris/native/java/nio/MappedByteBuffer.c">
+ * MappedByteBuffer.c</a></p>
+ *
  * @author Roman Leventov
  * @author Lee Rhodes
  * @author Praveenkumar Venkatesan
- * @see <a href="http://hg.openjdk.java.net/jdk8u/jdk8u/jdk/file/f940e7a48b72/src/solaris/native/sun/nio/ch/FileChannelImpl.c">
- * FileChannelImpl.c</a>
- * @see <a href="http://hg.openjdk.java.net/jdk8u/jdk8u/jdk/file/f940e7a48b72/src/solaris/native/java/nio/MappedByteBuffer.c">
- * MappedByteBuffer.c</a>
  */
 class AllocateDirectMap implements Map {
   private static final int MAP_RO = 0;
@@ -66,7 +70,7 @@ class AllocateDirectMap implements Map {
    * @throws IOException file not found or RuntimeException, etc.
    */
   static AllocateDirectMap map(final ResourceState state) throws IOException {
-    return new AllocateDirectMap(mapper(state));
+    return new AllocateDirectMap(mapper(state)); //file, fileOffset, cap, BO
   }
 
   @Override
@@ -165,7 +169,8 @@ class AllocateDirectMap implements Map {
   }
 
   /**
-   * called by load(). Calls the native method load0 in MappedByteBuffer.java.
+   * called by load(). Calls the native method load0 in MappedByteBuffer.java, implemented
+   * in MappedByteBuffer.c. See reference at top of class.
    */
   void madvise() throws RuntimeException {
     try {
@@ -185,7 +190,8 @@ class AllocateDirectMap implements Map {
    * in the OS. This may throw OutOfMemory error if you have exhausted memory.
    * You can try to force garbage collection and re-attempt.
    *
-   * <p>map0 is a native method in FileChannelImpl.c. See reference at top of class.</p>
+   * <p>map0 is a native method of FileChannelImpl.java implemented in FileChannelImpl.c.
+   * See reference at top of class.</p>
    *
    * @param fileChannel the FileChannel
    * @param position the offset in bytes into the FileChannel
@@ -240,8 +246,6 @@ class AllocateDirectMap implements Map {
     bits |= ((permissions.contains(PosixFilePermission.OTHERS_READ))    ? 1 << 2 : 0);
     bits |= ((permissions.contains(PosixFilePermission.OTHERS_WRITE))   ? 1 << 1 : 0);
     bits |= ((permissions.contains(PosixFilePermission.OTHERS_EXECUTE)) ? 1      : 0);
-    //System.out.println(Util.zeroPad(Integer.toBinaryString(bits), 32));
-    //System.out.println(Util.zeroPad(Integer.toOctalString(bits), 4));
     // Here we are going to ignore the Owner Write & Execute bits to allow root/owner testing.
     return ((bits & 0477) == 0444);
   }

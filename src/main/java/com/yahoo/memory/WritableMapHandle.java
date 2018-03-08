@@ -16,14 +16,10 @@ import java.io.IOException;
  */
 //Joins a WritableHandle with an AutoCloseable WritableMap resource
 public final class WritableMapHandle extends MapHandle implements WritableMap, WritableHandle {
-  AllocateDirectWritableMap dirWmap;
-  BaseWritableMemoryImpl wMemImpl;
 
   private WritableMapHandle(final AllocateDirectWritableMap dirWmap,
       final BaseWritableMemoryImpl wMem) {
     super(dirWmap, wMem);
-    this.dirWmap = dirWmap;
-    wMemImpl = wMem;
   }
 
   @SuppressWarnings("resource") //called from memory
@@ -35,27 +31,11 @@ public final class WritableMapHandle extends MapHandle implements WritableMap, W
 
   @Override
   public WritableMemory get() {
-    return wMemImpl;
-  }
-
-  @Override
-  public void close() {
-    dirWmap.close();
-  }
-
-  @Override
-  public void load() {
-    dirWmap.load();
-  }
-
-  @Override
-  public boolean isLoaded() {
-    return dirWmap.isLoaded();
+    return wMem;
   }
 
   @Override
   public void force() {
-    dirWmap.force();
+    ((AllocateDirectWritableMap)dirMap).force();
   }
-
 }

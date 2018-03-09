@@ -6,10 +6,7 @@
 package com.yahoo.memory;
 
 import java.io.File;
-import java.io.FileDescriptor;
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.nio.MappedByteBuffer;
 
 /**
  * Allocates direct memory used to memory map files for write operations
@@ -48,9 +45,6 @@ final class AllocateDirectWritableMap extends AllocateDirectMap implements Writa
   @Override
   public void force() {
     try {
-      final Method method = MappedByteBuffer.class.getDeclaredMethod("force0",
-              FileDescriptor.class, long.class, long.class);
-      method.setAccessible(true);
       MAPPED_BYTE_BUFFER_FORCE0_METHOD.invoke(super.mbb, super.raf.getFD(),
               super.state.getNativeBaseOffset(), super.state.getCapacity());
     } catch (final Exception e) {

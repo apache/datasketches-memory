@@ -31,11 +31,11 @@ import sun.nio.ch.FileChannelImpl;
  * Allocates direct memory used to memory map files for read operations.
  * (including those &gt; 2GB).
  *
- * <p>Reference code for map0, unmap0:
+ * <p>Reference native code for map0, unmap0:
  * <a href="http://hg.openjdk.java.net/jdk8u/jdk8u/jdk/file/f940e7a48b72/src/solaris/native/sun/nio/ch/FileChannelImpl.c">
  * FileChannelImpl.c</a></p>
  *
- * <p>Reference code for load0(), isLoaded0(), and force0():
+ * <p>Reference native code for load0(), isLoaded0(), and force0():
  * <a href="http://hg.openjdk.java.net/jdk8u/jdk8u/jdk/file/f940e7a48b72/src/solaris/native/java/nio/MappedByteBuffer.c">
  * MappedByteBuffer.c</a></p>
  *
@@ -156,7 +156,7 @@ class AllocateDirectMap implements Map {
   // Restricted methods
 
   //Does the actual mapping work, resourceReadOnly must already be set
-  //state enters with file, fileOffset, capacity, RRO. Exits with nativeBaseOffset
+  //state enters with capacity, RRO. adds nativeBaseOffset
   @SuppressWarnings("resource")
   static final RandomAccessFile mapper(final ResourceState state, final File file,
       final long fileOffset)  {

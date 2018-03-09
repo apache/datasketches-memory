@@ -31,7 +31,7 @@ import sun.nio.ch.FileChannelImpl;
  * Allocates direct memory used to memory map files for read operations.
  * (including those &gt; 2GB).
  *
- * <p>Reference code for map0:
+ * <p>Reference code for map0, unmap0:
  * <a href="http://hg.openjdk.java.net/jdk8u/jdk8u/jdk/file/f940e7a48b72/src/solaris/native/sun/nio/ch/FileChannelImpl.c">
  * FileChannelImpl.c</a></p>
  *
@@ -47,11 +47,50 @@ class AllocateDirectMap implements Map {
   private static final int MAP_RO = 0;
   private static final int MAP_RW = 1;
 
+  private static final Constructor<?> DIRECT_BYTE_BUFFER_CTOR;
+
+  private static final Method FILE_CHANNEL_IMPL_MAP0_METHOD;
+  private static final Method FILE_CHANNEL_IMPL_UNMAP0_METHOD;
+
+  private static final Method MAPPED_BYTE_BUFFER_LOAD0_METHOD;
+  private static final Method MAPPED_BYTE_BUFFER_ISLOADED0_METHOD;
+  static final Method MAPPED_BYTE_BUFFER_FORCE0_METHOD;
+
   final ResourceState state;
   final Cleaner cleaner;
 
   final RandomAccessFile raf;
   final MappedByteBuffer mbb;
+
+  static {
+    try {
+      DIRECT_BYTE_BUFFER_CTOR = Class.forName("java.nio.DirectByteBuffer")
+          .getDeclaredConstructor(int.class, long.class, FileDescriptor.class, Runnable.class);
+      DIRECT_BYTE_BUFFER_CTOR.setAccessible(true);
+
+      FILE_CHANNEL_IMPL_MAP0_METHOD = FileChannelImpl.class
+          .getDeclaredMethod("map0", int.class, long.class, long.class);
+      FILE_CHANNEL_IMPL_MAP0_METHOD.setAccessible(true);
+
+      FILE_CHANNEL_IMPL_UNMAP0_METHOD = FileChannelImpl.class
+          .getDeclaredMethod("unmap0", long.class, long.class);
+      FILE_CHANNEL_IMPL_UNMAP0_METHOD.setAccessible(true);
+
+      MAPPED_BYTE_BUFFER_LOAD0_METHOD = MappedByteBuffer.class
+          .getDeclaredMethod("load0", long.class, long.class);
+      MAPPED_BYTE_BUFFER_LOAD0_METHOD.setAccessible(true);
+
+      MAPPED_BYTE_BUFFER_ISLOADED0_METHOD = MappedByteBuffer.class
+          .getDeclaredMethod("isLoaded0", long.class, long.class, int.class);
+      MAPPED_BYTE_BUFFER_ISLOADED0_METHOD.setAccessible(true);
+
+      MAPPED_BYTE_BUFFER_FORCE0_METHOD = MappedByteBuffer.class
+          .getDeclaredMethod("force0", FileDescriptor.class, long.class, long.class);
+      MAPPED_BYTE_BUFFER_FORCE0_METHOD.setAccessible(true);
+    } catch (final Exception e) {
+      throw new RuntimeException("Could not reflect static methods: " + e);
+    }
+  }
 
   //called from map below and from AllocateDirectWritableMap constructor
   AllocateDirectMap(final ResourceState state, final File file, final long fileOffset) {
@@ -97,10 +136,7 @@ class AllocateDirectMap implements Map {
     try {
       final long capacity = state.getCapacity();
       final int pageCount = pageCount(ps, capacity);
-      final Method method =
-              MappedByteBuffer.class.getDeclaredMethod("isLoaded0", long.class, long.class, int.class);
-      method.setAccessible(true);
-      return (boolean) method.invoke(mbb, state.getNativeBaseOffset(),
+      return (boolean) MAPPED_BYTE_BUFFER_ISLOADED0_METHOD.invoke(mbb, state.getNativeBaseOffset(),
           capacity, pageCount);
     } catch (final Exception e) {
       throw new RuntimeException(
@@ -157,13 +193,10 @@ class AllocateDirectMap implements Map {
   private static final MappedByteBuffer createDummyMbbInstance(final long nativeBaseAddress)
           throws RuntimeException {
     try {
-      final Class<?> dbbClazz = Class.forName("java.nio.DirectByteBuffer");
-      final Constructor<?> dbbCtor =
-          dbbClazz.getDeclaredConstructor(int.class, long.class, FileDescriptor.class, Runnable.class);
-      dbbCtor.setAccessible(true);
-      //note no Cleaner object is created because the Runnable unmapper is null.
-      final MappedByteBuffer mbb = (MappedByteBuffer) dbbCtor.newInstance(0, // some junk capacity
-          nativeBaseAddress, null, null); //null FileDescriptor, null Runnable unmapper
+      final MappedByteBuffer mbb = (MappedByteBuffer) DIRECT_BYTE_BUFFER_CTOR //Dummy
+          .newInstance(0,          /* some junk capacity */
+          nativeBaseAddress, null, /* null FileDescriptor */
+          null);                   /* null Runnable unmapper, no Cleaner created */
       return mbb;
     } catch (final Exception e) {
       throw new RuntimeException(
@@ -178,10 +211,7 @@ class AllocateDirectMap implements Map {
    */
   void madvise() {
     try {
-      final Method method =
-          MappedByteBuffer.class.getDeclaredMethod("load0", long.class, long.class);
-      method.setAccessible(true);
-      method.invoke(mbb, state.getNativeBaseOffset(),
+      MAPPED_BYTE_BUFFER_LOAD0_METHOD.invoke(mbb, state.getNativeBaseOffset(),
           state.getCapacity());
     } catch (final Exception e) {
       throw new RuntimeException(
@@ -203,21 +233,19 @@ class AllocateDirectMap implements Map {
    * @return the native base offset address
    * @throws RuntimeException Encountered an exception while mapping
    */
-  private static final long map(final FileChannel fileChannel, final int mode, final long position,
-      final long lengthBytes) {
+  private static final long map(final FileChannel fileChannel, final int mode,
+      final long position, final long lengthBytes) {
     final int pagePosition = (int) (position % unsafe.pageSize());
     final long mapPosition = position - pagePosition;
     final long mapSize = lengthBytes + pagePosition;
 
     try {
-      final Method method =
-          FileChannelImpl.class.getDeclaredMethod("map0", int.class, long.class, long.class);
-      method.setAccessible(true);
-      final long nativeBaseOffset = (long) method.invoke(fileChannel, mode, mapPosition, mapSize);
+      final long nativeBaseOffset =
+          (long) FILE_CHANNEL_IMPL_MAP0_METHOD.invoke(fileChannel, mode, mapPosition, mapSize);
       return nativeBaseOffset;
     } catch (final InvocationTargetException e) {
       throw new RuntimeException("Exception while mapping", e.getTargetException());
-    } catch (final NoSuchMethodException | IllegalAccessException e) {
+    } catch (final IllegalAccessException e) {
       throw new RuntimeException("Exception while mapping", e);
     }
   }
@@ -289,10 +317,7 @@ class AllocateDirectMap implements Map {
      */
     private void unmap() throws RuntimeException {
       try {
-        final Method method = FileChannelImpl.class.getDeclaredMethod("unmap0", long.class,
-            long.class);
-        method.setAccessible(true);
-        method.invoke(myFc, actualNativeBaseOffset, myCapacity);
+        FILE_CHANNEL_IMPL_UNMAP0_METHOD.invoke(myFc, actualNativeBaseOffset, myCapacity);
         myRaf.close();
       } catch (final Exception e) {
         throw new RuntimeException(

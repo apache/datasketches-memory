@@ -37,7 +37,8 @@ final class AllocateDirectWritableMap extends AllocateDirectMap implements Writa
    * @return A new AllocateDirectWritableMap
    * @throws IOException file not found or RuntimeException, etc.
    */
-  static AllocateDirectWritableMap map(final ResourceState state, final File file, final long fileOffset) {
+  static AllocateDirectWritableMap map(final ResourceState state, final File file,
+      final long fileOffset) {
     if (state.isResourceReadOnly()) {
       throw new ReadOnlyException("Cannot map a read-only file into Writable Memory.");
     }
@@ -50,7 +51,7 @@ final class AllocateDirectWritableMap extends AllocateDirectMap implements Writa
       final Method method = MappedByteBuffer.class.getDeclaredMethod("force0",
               FileDescriptor.class, long.class, long.class);
       method.setAccessible(true);
-      method.invoke(super.mbb, super.raf.getFD(),
+      MAPPED_BYTE_BUFFER_FORCE0_METHOD.invoke(super.mbb, super.raf.getFD(),
               super.state.getNativeBaseOffset(), super.state.getCapacity());
     } catch (final Exception e) {
       throw new RuntimeException(String.format("Encountered %s exception in force. "

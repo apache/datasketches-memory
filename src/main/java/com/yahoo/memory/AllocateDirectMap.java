@@ -54,9 +54,9 @@ class AllocateDirectMap implements Map {
   final MappedByteBuffer mbb;
 
   //called from map below and from AllocateDirectWritableMap constructor
-  AllocateDirectMap(final ResourceState state) {
+  AllocateDirectMap(final ResourceState state, final File file, final long fileOffset) {
     this.state = state;
-    raf = mapper(state);
+    raf = mapper(state, file, fileOffset);
     mbb = createDummyMbbInstance(state.getNativeBaseOffset());
     cleaner = Cleaner.create(this, new Deallocator(state, raf));
     ResourceState.currentDirectMemoryMapAllocations_.incrementAndGet();
@@ -74,8 +74,8 @@ class AllocateDirectMap implements Map {
    * @return A new AllocateDirectMap
    * @throws IOException file not found or RuntimeException, etc.
    */
-  static AllocateDirectMap map(final ResourceState state)  {
-    return new AllocateDirectMap(state); //file, fileOffset, cap, BO
+  static AllocateDirectMap map(final ResourceState state, final File file, final long fileOffset)  {
+    return new AllocateDirectMap(state, file, fileOffset); //capacity, BO
   }
 
   @Override
@@ -122,11 +122,10 @@ class AllocateDirectMap implements Map {
   //Does the actual mapping work, resourceReadOnly must already be set
   //state enters with file, fileOffset, capacity, RRO. Exits with nativeBaseOffset
   @SuppressWarnings("resource")
-  static final RandomAccessFile mapper(final ResourceState state)  {
-    final long fileOffset = state.getFileOffset();
+  static final RandomAccessFile mapper(final ResourceState state, final File file,
+      final long fileOffset)  {
     final long capacity = state.getCapacity();
-    final File file = state.getFile();
-    final boolean readOnlyFile = state.isResourceReadOnly(); //set by map above
+    final boolean readOnlyFile = state.isResourceReadOnly();
     final String mode = readOnlyFile ? "r" : "rw";
     final RandomAccessFile raf;
     try {
@@ -205,7 +204,7 @@ class AllocateDirectMap implements Map {
    * @throws RuntimeException Encountered an exception while mapping
    */
   private static final long map(final FileChannel fileChannel, final int mode, final long position,
-      final long lengthBytes) throws RuntimeException {
+      final long lengthBytes) {
     final int pagePosition = (int) (position % unsafe.pageSize());
     final long mapPosition = position - pagePosition;
     final long mapSize = lengthBytes + pagePosition;

@@ -8,7 +8,6 @@ package com.yahoo.memory;
 import static com.yahoo.memory.Util.negativeCheck;
 import static com.yahoo.memory.Util.nullCheck;
 
-import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicLong;
@@ -56,16 +55,22 @@ final class ResourceState {
   private long unsafeObjHeader_;
 
   /**
-   * The size of the backing resource in bytes. Used by all methods when checking bounds.
+   * This is the offset that defines the start of a sub-region of the backing resource. It is
+   * used to compute cumBaseOffset. If this changes, cumBaseOffset is recomputed.
    */
-  private long capacity_;
+  private long regionOffset_;
 
   /**
    * This becomes the base offset used by all Unsafe calls. It is cumulative in that in includes
    * all offsets from regions, user-defined offsets when creating Memory, and the array object
    * header offset when creating Memory from primitive arrays.
    */
-  private long cumBaseOffset_;
+  private long cumBaseOffset_; //= f(regionOffset, unsafeObj, nativeBaseOffset, unsafeObjHeader)
+
+  /**
+   * The size of the backing resource in bytes. Used by all methods when checking bounds.
+   */
+  private long capacity_;
 
   /**
    * Only relevant when user allocated direct memory is the backing resource. It is a callback
@@ -86,31 +91,12 @@ final class ResourceState {
    */
   private StepBoolean valid_;
 
-  //REGIONS
-  /**
-   * This is the offset that defines the start of a sub-region of the backing resource. It is
-   * used to compute cumBaseOffset. If this changes, cumBaseOffset is recomputed.
-   */
-  private long regionOffset_;
-
   //BYTE BUFFER RESOURCE
   /**
    * This holds a reference to a ByteBuffer until we are done with it.
    * This is also a user supplied parameter passed to AccessByteBuffer.
    */
   private ByteBuffer byteBuf_;
-
-  //MEMORY MAPPED FILE RESOURCES
-  /**
-   * This is user supplied parameter that is passed to the mapping class..
-   */
-  private File file_;
-
-  /**
-   * The position or offset of a file that defines the starting region for the memory map. This is
-   * a user supplied parameter that is passed to the mapping class.
-   */
-  private long fileOffset_;
 
   //RESOURCE ENDIANNESS PROPERTIES
   private ByteOrder resourceOrder_ = nativeOrder_; //default
@@ -151,10 +137,6 @@ final class ResourceState {
 
     //BYTE BUFFER
     byteBuf_ = src.byteBuf_; //retains ByteBuffer reference
-
-    //MEMORY MAPPED FILES
-    file_ = src.file_; //retains file reference
-    fileOffset_ = src.fileOffset_;
 
     //ENDIANNESS
     resourceOrder_ = src.resourceOrder_; //retains resourseOrder
@@ -278,43 +260,6 @@ final class ResourceState {
     byteBuf_ = byteBuf;
     resourceOrder_ = byteBuf_.order();
   }
-
-  //MEMORY MAPPED FILES
-  File getFile() {
-    return file_;
-  }
-
-  void putFile(final File file) {
-    nullCheck(file, "File");
-    file_ = file;
-  }
-
-  long getFileOffset() {
-    return fileOffset_;
-  }
-
-  void putFileOffset(final long fileOffset) {
-    negativeCheck(fileOffset, "File Offset");
-    fileOffset_ = fileOffset;
-  }
-
-  //  RandomAccessFile getRandomAccessFile() {
-  //    return raf_;
-  //  }
-
-  //  void putRandomAccessFile(final RandomAccessFile raf) {
-  //    nullCheck(raf, "RandomAccessFile");
-  //    raf_ = raf;
-  //  }
-
-  //  MappedByteBuffer getMappedByteBuffer() {
-  //    return mbb_;
-  //  }
-  //
-  //  void putMappedByteBuffer(final MappedByteBuffer mbb) {
-  //    nullCheck(mbb, "MappedByteBuffer");
-  //    mbb_ = mbb;
-  //  }
 
   //ENDIANNESS
   ByteOrder getResourceOrder() {

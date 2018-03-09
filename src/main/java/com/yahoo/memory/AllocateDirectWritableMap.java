@@ -5,6 +5,7 @@
 
 package com.yahoo.memory;
 
+import java.io.File;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -21,8 +22,9 @@ import java.nio.MappedByteBuffer;
 //Called from WritableMemory, implements combo of WritableMemory with WritableMap resource
 final class AllocateDirectWritableMap extends AllocateDirectMap implements WritableMap {
 
-  private AllocateDirectWritableMap(final ResourceState state) {
-    super(state);
+  private AllocateDirectWritableMap(final ResourceState state, final File file,
+      final long fileOffset) {
+    super(state, file, fileOffset);
   }
 
   /**
@@ -35,11 +37,11 @@ final class AllocateDirectWritableMap extends AllocateDirectMap implements Writa
    * @return A new AllocateDirectWritableMap
    * @throws IOException file not found or RuntimeException, etc.
    */
-  static AllocateDirectWritableMap map(final ResourceState state) {
+  static AllocateDirectWritableMap map(final ResourceState state, final File file, final long fileOffset) {
     if (state.isResourceReadOnly()) {
       throw new ReadOnlyException("Cannot map a read-only file into Writable Memory.");
     }
-    return new AllocateDirectWritableMap(state);
+    return new AllocateDirectWritableMap(state, file, fileOffset);
   }
 
   @Override

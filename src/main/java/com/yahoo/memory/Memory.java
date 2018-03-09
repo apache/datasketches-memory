@@ -7,6 +7,8 @@ package com.yahoo.memory;
 
 import static com.yahoo.memory.UnsafeUtil.LS;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
+import static com.yahoo.memory.Util.negativeCheck;
+import static com.yahoo.memory.Util.nullCheck;
 import static com.yahoo.memory.Util.zeroCheck;
 
 import java.io.File;
@@ -64,12 +66,12 @@ public abstract class Memory {
   public static MapHandle map(final File file, final long fileOffsetBytes, final long capacityBytes,
       final ByteOrder byteOrder) throws IOException {
     zeroCheck(capacityBytes, "Capacity");
+    nullCheck(file, "file is null");
+    negativeCheck(fileOffsetBytes, "File offset is negative");
     final ResourceState state = new ResourceState(AllocateDirectMap.isFileReadOnly(file));
-    state.putFile(file);
-    state.putFileOffset(fileOffsetBytes);
     state.putCapacity(capacityBytes);
     state.putResourceOrder(byteOrder);
-    return MapHandle.map(state);
+    return MapHandle.map(state, file, fileOffsetBytes);
   }
 
   //REGIONS XXX
@@ -589,7 +591,6 @@ public abstract class Memory {
             : memReqSvr.getClass().getSimpleName() + ", " + (memReqSvr.hashCode() & 0XFFFFFFFFL);
     final long cumBaseOffset = state.getCumBaseOffset();
     sb.append(preamble).append(LS);
-    sb.append("NativeBaseOffset    : ").append(state.getNativeBaseOffset()).append(LS);
     sb.append("UnsafeObj, hashCode : ").append(uObjStr).append(LS);
     sb.append("UnsafeObjHeader     : ").append(state.getUnsafeObjectHeader()).append(LS);
     sb.append("ByteBuf, hashCode   : ").append(bbStr).append(LS);

@@ -5,6 +5,8 @@
 
 package com.yahoo.memory;
 
+import static com.yahoo.memory.Util.negativeCheck;
+import static com.yahoo.memory.Util.nullCheck;
 import static com.yahoo.memory.Util.zeroCheck;
 import static com.yahoo.memory.WritableMemoryImpl.ZERO_SIZE_MEMORY;
 
@@ -73,12 +75,12 @@ public abstract class WritableMemory extends Memory {
   public static WritableMapHandle map(final File file, final long fileOffsetBytes,
           final long capacityBytes, final ByteOrder byteOrder) throws IOException {
     zeroCheck(capacityBytes, "Capacity");
+    nullCheck(file, "file is null");
+    negativeCheck(fileOffsetBytes, "File offset is negative");
     final ResourceState state = new ResourceState(AllocateDirectMap.isFileReadOnly(file));
-    state.putFile(file);
-    state.putFileOffset(fileOffsetBytes);
     state.putCapacity(capacityBytes);
     state.putResourceOrder(byteOrder);
-    return WritableMapHandle.map(state);
+    return WritableMapHandle.map(state, file, fileOffsetBytes);
   }
 
   //ALLOCATE DIRECT XXX

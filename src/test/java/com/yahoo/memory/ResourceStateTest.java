@@ -56,13 +56,6 @@ public class ResourceStateTest {
     }
 
     try {
-      state.putFile(null);
-      fail();
-    } catch (IllegalArgumentException e) {
-      //ok
-    }
-
-    try {
       state.putRegionOffset( -16L);
       fail();
     } catch (IllegalArgumentException e) {

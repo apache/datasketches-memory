@@ -5,6 +5,8 @@
 
 package com.yahoo.memory;
 
+import java.io.File;
+
 /**
  * Gets a Memory for a memory-mapped, read-only file resource, It is highly recommended that this
  * be created inside a <i>try-with-resources</i> statement.
@@ -23,8 +25,8 @@ public class MapHandle implements Map, Handle {
   }
 
   @SuppressWarnings("resource") //called from memory
-  static MapHandle map(final ResourceState state) {
-    final AllocateDirectMap dirMap = AllocateDirectMap.map(state);
+  static MapHandle map(final ResourceState state, final File file, final long fileOffset) {
+    final AllocateDirectMap dirMap = AllocateDirectMap.map(state, file, fileOffset);
     final BaseWritableMemoryImpl wMem = new WritableMemoryImpl(state, true);
     return new MapHandle(dirMap, wMem);
   }

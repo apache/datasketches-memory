@@ -20,8 +20,10 @@ final class CompareAndCopy {
    * https://bugs.openjdk.java.net/browse/JDK-8149596 and
    * https://bugs.openjdk.java.net/browse/JDK-8141491), but not in JDK 8, so the Memory library
    * should keep having this boilerplate as long as it supports Java 8.
+   *
+   * <p>A reference to this can be found in <i>java.nio.Bits.java</i>.</p>
    */
-  static final int UNSAFE_COPY_MEMORY_THRESHOLD = 1024 * 1024;
+  static final int UNSAFE_COPY_THRESHOLD = 1024 * 1024;
 
   static int compare(
       final ResourceState state1, final long offsetBytes1, final long lengthBytes1,
@@ -69,7 +71,7 @@ final class CompareAndCopy {
     if ((arr1 == arr2) && (cumOff1 == cumOff2)) { return true; }
 
     while (lengthBytes >= Long.BYTES) {
-      final int chunk = (int) Math.min(lengthBytes, UNSAFE_COPY_MEMORY_THRESHOLD);
+      final int chunk = (int) Math.min(lengthBytes, UNSAFE_COPY_THRESHOLD);
       // int-counted loop to avoid safepoint polls (otherwise why we chunk by
       // UNSAFE_COPY_MEMORY_THRESHOLD)
       int i = 0;
@@ -108,7 +110,7 @@ final class CompareAndCopy {
     final Object arr = state.getUnsafeObject(); //could be null
     int result = 1;
     while (lenBytes >= Long.BYTES) {
-      final int chunk = (int) Math.min(lenBytes, UNSAFE_COPY_MEMORY_THRESHOLD);
+      final int chunk = (int) Math.min(lenBytes, UNSAFE_COPY_THRESHOLD);
       // int-counted loop to avoid safepoint polls (otherwise why we chunk by
       // UNSAFE_COPY_MEMORY_THRESHOLD)
       int i = 0;
@@ -204,12 +206,12 @@ final class CompareAndCopy {
    * @param dstUnsafeObj The destination array object, it may be null
    * @param dstAdd The cumulative destination offset
    * @param lengthBytes The length to be copied in bytes
-   * @see #UNSAFE_COPY_MEMORY_THRESHOLD
+   * @see #UNSAFE_COPY_THRESHOLD
    */
   private static void copyNonOverlappingMemoryWithChunking(final Object srcUnsafeObj,
       long srcAdd, final Object dstUnsafeObj, long dstAdd, long lengthBytes) {
     while (lengthBytes > 0) {
-      final long chunk = Math.min(lengthBytes, UNSAFE_COPY_MEMORY_THRESHOLD);
+      final long chunk = Math.min(lengthBytes, UNSAFE_COPY_THRESHOLD);
       unsafe.copyMemory(srcUnsafeObj, srcAdd, dstUnsafeObj, dstAdd, chunk);
       lengthBytes -= chunk;
       srcAdd += chunk;

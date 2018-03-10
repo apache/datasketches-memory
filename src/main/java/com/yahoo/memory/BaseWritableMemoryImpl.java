@@ -319,7 +319,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   public void fill(long offsetBytes, long lengthBytes, final byte value) {
     checkValidAndBoundsForWrite(offsetBytes, lengthBytes);
     while (lengthBytes > 0) {
-      final long chunk = Math.min(lengthBytes, CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD);
+      final long chunk = Math.min(lengthBytes, CompareAndCopy.UNSAFE_COPY_THRESHOLD);
       unsafe.setMemory(unsafeObj, cumBaseOffset + offsetBytes, chunk, value);
       offsetBytes += chunk;
       lengthBytes -= chunk;
@@ -358,7 +358,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     // or file-backed WritableByteChannel implementations with direct ByteBuffer argument could
     // be subject of the same safepoint problems as in Unsafe.copyMemory and Unsafe.setMemory.
     while (lengthBytes > 0) {
-      final int chunk = (int) Math.min(CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD, lengthBytes);
+      final int chunk = (int) Math.min(CompareAndCopy.UNSAFE_COPY_THRESHOLD, lengthBytes);
       final ByteBuffer bufToWrite = wrap(addr, chunk);
       writeFully(bufToWrite, out);
       addr += chunk;

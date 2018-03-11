@@ -37,11 +37,7 @@ import java.nio.channels.WritableByteChannel;
  */
 abstract class BaseWritableMemoryImpl extends WritableMemory {
 
-  private static final ByteBuffer ZERO_DIRECT_BUFFER = ByteBuffer.allocateDirect(0);
-  private static final long NIO_BUFFER_ADDRESS_FIELD_OFFSET =
-      UnsafeUtil.getFieldOffset(java.nio.Buffer.class, "address");
-  private static final long NIO_BUFFER_CAPACITY_FIELD_OFFSET =
-      UnsafeUtil.getFieldOffset(java.nio.Buffer.class, "capacity");
+
 
   final ResourceState state;
   final Object unsafeObj; //Array objects are held here.
@@ -359,23 +355,11 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     // be subject of the same safepoint problems as in Unsafe.copyMemory and Unsafe.setMemory.
     while (lengthBytes > 0) {
       final int chunk = (int) Math.min(CompareAndCopy.UNSAFE_COPY_THRESHOLD, lengthBytes);
-      final ByteBuffer bufToWrite = wrap(addr, chunk);
+      final ByteBuffer bufToWrite = AccessByteBuffer.getDummyByteBuffer(addr, chunk);
       writeFully(bufToWrite, out);
       addr += chunk;
       lengthBytes -= chunk;
     }
-  }
-
-  /**
-   * This method is copied from https://github.com/odnoklassniki/one-nio/blob/
-   * 27c768cbd28ece949c299f2d437c9a0ebd874500/src/one/nio/mem/DirectMemory.java#L95
-   */
-  private static ByteBuffer wrap(final long address, final int capacity) {
-    final ByteBuffer buf = ZERO_DIRECT_BUFFER.duplicate();
-    unsafe.putLong(buf, NIO_BUFFER_ADDRESS_FIELD_OFFSET, address);
-    unsafe.putInt(buf, NIO_BUFFER_CAPACITY_FIELD_OFFSET, capacity);
-    buf.limit(capacity);
-    return buf;
   }
 
   private void writeToWithExtraCopy(long offsetBytes, long lengthBytes,

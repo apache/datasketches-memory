@@ -56,7 +56,6 @@ public class AllocateDirectMapMemoryTest {
     } catch (AssertionError e) {
       //OK
     }
-    assertEquals(AllocateDirectMap.pageCount(1, 16), 16); //check pageCounter
   }
 
   @Test

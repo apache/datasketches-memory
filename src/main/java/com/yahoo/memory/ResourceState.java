@@ -47,9 +47,7 @@ final class ResourceState {
 
   /**
    * If unsafeObj_ is non-null, this is the object header space for the specific array type,
-   * typically either 16 or 24 bytes.  However, a slice of a Heap ByteBuffer adds the array-offset
-   * to this value. This is computed based on the type of unsafeObj_ or extracted from a sliced
-   * heap ByteBuffer. This is used to compute cumBaseOffset for heap resources.
+   * typically either 16 or 24 bytes. This is used to compute cumBaseOffset.
    * If this changes, cumBaseOffset is recomputed.
    */
   private long unsafeObjHeader_;
@@ -57,6 +55,8 @@ final class ResourceState {
   /**
    * This is the offset that defines the start of a sub-region of the backing resource. It is
    * used to compute cumBaseOffset. If this changes, cumBaseOffset is recomputed.
+   * This will be loaded from heap ByteBuffers as they have a similar field used for slices.
+   * It is used by region() and writableRegion().
    */
   private long regionOffset_;
 
@@ -140,7 +140,7 @@ final class ResourceState {
 
     //ENDIANNESS
     resourceOrder_ = src.resourceOrder_; //retains resourseOrder
-    compute();
+    compute(); //for sanity
   }
   //****END CONSTRUCTORS****
 

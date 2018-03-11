@@ -114,15 +114,15 @@ class AllocateDirectMap implements Map {
    * @throws IOException file not found or RuntimeException, etc.
    */
   static AllocateDirectMap map(final ResourceState state, final File file, final long fileOffset)  {
-    return new AllocateDirectMap(state, file, fileOffset); //capacity, BO
+    return new AllocateDirectMap(state, file, fileOffset); //state: RRO, capacity, BO
   }
 
   @Override
   public void load() {
     madvise();
     // Read a byte from each page to bring it into memory.
-    final int ps = unsafe.pageSize();
-    final int count = pageCount(ps, state.getCapacity());
+    final int ps = Bits.pageSize();
+    final int count = Bits.pageCount(state.getCapacity());
     long nativeBaseOffset = state.getNativeBaseOffset();
     for (int i = 0; i < count; i++) {
       unsafe.getByte(nativeBaseOffset);
@@ -132,10 +132,9 @@ class AllocateDirectMap implements Map {
 
   @Override
   public boolean isLoaded() {
-    final int ps = unsafe.pageSize();
     try {
       final long capacity = state.getCapacity();
-      final int pageCount = pageCount(ps, capacity);
+      final int pageCount = Bits.pageCount(capacity);
       return (boolean) MAPPED_BYTE_BUFFER_ISLOADED0_METHOD.invoke(mbb, state.getNativeBaseOffset(),
           capacity, pageCount);
     } catch (final Exception e) {
@@ -154,6 +153,20 @@ class AllocateDirectMap implements Map {
   }
 
   // Restricted methods
+  /**
+   * called by load(). Calls the native method load0 in MappedByteBuffer.java, implemented
+   * in MappedByteBuffer.c. See reference at top of class. load0 allows setting a mapping length
+   * of greater than 2GB.
+   */
+  void madvise() {
+    try {
+      MAPPED_BYTE_BUFFER_LOAD0_METHOD.invoke(mbb, state.getNativeBaseOffset(),
+          state.getCapacity());
+    } catch (final Exception e) {
+      throw new RuntimeException(
+          String.format("Encountered %s exception while loading", e.getClass()));
+    }
+  }
 
   //Does the actual mapping work, resourceReadOnly must already be set
   //state enters with capacity, RRO. adds nativeBaseOffset
@@ -183,40 +196,6 @@ class AllocateDirectMap implements Map {
     final long nativeBaseOffset = map(fc, mapMode, fileOffset, capacity);
     state.putNativeBaseOffset(nativeBaseOffset);
     return raf;
-  }
-
-  static final int pageCount(final int ps, final long capacity) { //avail for test
-    return (int) ( (capacity == 0) ? 0 : ((capacity - 1L) / ps) + 1L);
-  }
-
-  //Note: DirectByteBuffer extends MappedByteBuffer, which extends ByteBuffer
-  private static final MappedByteBuffer createDummyMbbInstance(final long nativeBaseAddress)
-          throws RuntimeException {
-    try {
-      final MappedByteBuffer mbb = (MappedByteBuffer) DIRECT_BYTE_BUFFER_CTOR //Dummy
-          .newInstance(0,          /* some junk capacity */
-          nativeBaseAddress, null, /* null FileDescriptor */
-          null);                   /* null Runnable unmapper, no Cleaner created */
-      return mbb;
-    } catch (final Exception e) {
-      throw new RuntimeException(
-          "Could not create Dummy MappedByteBuffer instance: " + e.getClass()
-          + UnsafeUtil.tryIllegalAccessPermit);
-    }
-  }
-
-  /**
-   * called by load(). Calls the native method load0 in MappedByteBuffer.java, implemented
-   * in MappedByteBuffer.c. See reference at top of class.
-   */
-  void madvise() {
-    try {
-      MAPPED_BYTE_BUFFER_LOAD0_METHOD.invoke(mbb, state.getNativeBaseOffset(),
-          state.getCapacity());
-    } catch (final Exception e) {
-      throw new RuntimeException(
-          String.format("Encountered %s exception while loading", e.getClass()));
-    }
   }
 
   /**
@@ -250,6 +229,23 @@ class AllocateDirectMap implements Map {
     }
   }
 
+  //Note: DirectByteBuffer extends MappedByteBuffer, which extends ByteBuffer
+  private static final MappedByteBuffer createDummyMbbInstance(final long nativeBaseAddress)
+          throws RuntimeException {
+    try {
+      final MappedByteBuffer mbb = (MappedByteBuffer) DIRECT_BYTE_BUFFER_CTOR //Dummy
+          .newInstance(
+              0,    /* some junk capacity */
+              nativeBaseAddress,
+              null, /* null FileDescriptor */
+              null);/* null Runnable unmapper, no Cleaner created */
+      return mbb;
+    } catch (final Exception e) {
+      throw new RuntimeException(
+          "Could not create Dummy MappedByteBuffer instance: " + e.getClass()
+          + UnsafeUtil.tryIllegalAccessPermit);
+    }
+  }
 
   static final boolean isFileReadOnly(final File file) {
     if (System.getProperty("os.name").startsWith("Windows")) {

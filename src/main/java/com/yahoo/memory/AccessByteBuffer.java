@@ -7,6 +7,7 @@ package com.yahoo.memory;
 
 import static com.yahoo.memory.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_BYTE_INDEX_SCALE;
+import static com.yahoo.memory.UnsafeUtil.unsafe;
 
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
@@ -19,16 +20,16 @@ import java.nio.ByteBuffer;
  */
 final class AccessByteBuffer {
 
-  private static final Field BYTE_BUFFER_OFFSET_FIELD;
   private static final Field BYTE_BUFFER_HB_FIELD;
+  private static final long BYTE_BUFFER_OFFSET_FIELD_OFFSET;
 
   static {
     try {
-      BYTE_BUFFER_OFFSET_FIELD = ByteBuffer.class.getDeclaredField("offset");
-      BYTE_BUFFER_OFFSET_FIELD.setAccessible(true);
-
       BYTE_BUFFER_HB_FIELD = ByteBuffer.class.getDeclaredField("hb");
       BYTE_BUFFER_HB_FIELD.setAccessible(true);
+
+      BYTE_BUFFER_OFFSET_FIELD_OFFSET =
+          UnsafeUtil.getFieldOffset(java.nio.ByteBuffer.class, "offset");
     }
     catch (final NoSuchFieldException e) {
       throw new RuntimeException(
@@ -61,11 +62,9 @@ final class AccessByteBuffer {
       //The messy acquisition of arrayOffset() and array() created from a RO slice()
       final Object unsafeObj;
       final long regionOffset;
+      //includes the slice() offset for heap.
+      regionOffset = unsafe.getInt(byteBuf, BYTE_BUFFER_OFFSET_FIELD_OFFSET);
       try {
-        //includes the slice() offset for heap.
-        regionOffset = ((Integer)BYTE_BUFFER_OFFSET_FIELD.get(byteBuf)).longValue()
-                * ARRAY_BYTE_INDEX_SCALE;
-
         unsafeObj = BYTE_BUFFER_HB_FIELD.get(byteBuf); //the backing byte[] from HeapByteBuffer
       }
       catch (final IllegalAccessException e) {

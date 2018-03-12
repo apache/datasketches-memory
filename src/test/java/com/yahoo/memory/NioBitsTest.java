@@ -23,9 +23,9 @@ public class NioBitsTest {
 
   @Test
   //testing this beyond 2GB may not work on JVMs < 8GB.
-  //This must be checked manually, because the test framework is multi-threaded.
+  //This must be checked manually
   public void checkGetAtomicFields() {
-    long cap = 1024L + Integer.MAX_VALUE;
+    long cap = 1024L;// + Integer.MAX_VALUE;
     printStats();
     NioBits.reserveMemory(cap);
     printStats();

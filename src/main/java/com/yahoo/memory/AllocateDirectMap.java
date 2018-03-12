@@ -115,8 +115,8 @@ class AllocateDirectMap implements Map {
   public void load() {
     madvise();
     // Read a byte from each page to bring it into memory.
-    final int ps = Bits.pageSize();
-    final int count = Bits.pageCount(state.getCapacity());
+    final int ps = NioBits.pageSize();
+    final int count = NioBits.pageCount(state.getCapacity());
     long nativeBaseOffset = state.getNativeBaseOffset();
     for (int i = 0; i < count; i++) {
       unsafe.getByte(nativeBaseOffset);
@@ -128,7 +128,7 @@ class AllocateDirectMap implements Map {
   public boolean isLoaded() {
     try {
       final long capacity = state.getCapacity();
-      final int pageCount = Bits.pageCount(capacity);
+      final int pageCount = NioBits.pageCount(capacity);
       return (boolean) MAPPED_BYTE_BUFFER_ISLOADED0_METHOD.invoke(mbb, state.getNativeBaseOffset(),
           capacity, pageCount);
     } catch (final Exception e) {

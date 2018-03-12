@@ -35,7 +35,9 @@ final class AllocateDirect implements AutoCloseable {
   }
 
   static AllocateDirect allocate(final ResourceState state) {
-    state.putNativeBaseOffset(unsafe.allocateMemory(state.getCapacity()));
+    final long capacity = state.getCapacity();
+    state.putNativeBaseOffset(unsafe.allocateMemory(capacity));
+    NioBits.reserveMemory(capacity);
     return new AllocateDirect(state);
   }
 
@@ -51,22 +53,25 @@ final class AllocateDirect implements AutoCloseable {
   private static final class Deallocator implements Runnable {
     //This is the only place the actual native offset is kept for use by unsafe.freeMemory();
     //It can never be modified until it is deallocated.
-    private long actualNativeBaseOffset; //
-    private final ResourceState parentStateRef;
+    private long actualNativeBaseOffset; //set to 0 when deallocated
+    private final long capacity;
+    private final ResourceState myState;
 
     private Deallocator(final ResourceState state) {
       actualNativeBaseOffset = state.getNativeBaseOffset();
+      capacity = state.getCapacity();
       assert (actualNativeBaseOffset != 0);
-      parentStateRef = state;
+      myState = state;
     }
 
     @Override
     public void run() {
       if (actualNativeBaseOffset > 0) {
         unsafe.freeMemory(actualNativeBaseOffset);
+        NioBits.unreserveMemory(capacity);
       }
       actualNativeBaseOffset = 0L;
-      parentStateRef.setInvalid();
+      myState.setInvalid();
     }
   }
 

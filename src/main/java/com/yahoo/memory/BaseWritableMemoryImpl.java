@@ -355,7 +355,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     // be subject of the same safepoint problems as in Unsafe.copyMemory and Unsafe.setMemory.
     while (lengthBytes > 0) {
       final int chunk = (int) Math.min(CompareAndCopy.UNSAFE_COPY_THRESHOLD, lengthBytes);
-      final ByteBuffer bufToWrite = AccessByteBuffer.getDummyByteBuffer(addr, chunk);
+      final ByteBuffer bufToWrite = AccessByteBuffer.getDummyDirectByteBuffer(addr, chunk);
       writeFully(bufToWrite, out);
       addr += chunk;
       lengthBytes -= chunk;

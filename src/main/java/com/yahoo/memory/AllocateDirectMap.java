@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.MappedByteBuffer;
@@ -47,8 +46,6 @@ class AllocateDirectMap implements Map {
   private static final int MAP_RO = 0;
   private static final int MAP_RW = 1;
 
-  private static final Constructor<?> DIRECT_BYTE_BUFFER_CTOR;
-
   private static final Method FILE_CHANNEL_IMPL_MAP0_METHOD;
   private static final Method FILE_CHANNEL_IMPL_UNMAP0_METHOD;
 
@@ -64,10 +61,6 @@ class AllocateDirectMap implements Map {
 
   static {
     try {
-      DIRECT_BYTE_BUFFER_CTOR = Class.forName("java.nio.DirectByteBuffer")
-          .getDeclaredConstructor(int.class, long.class, FileDescriptor.class, Runnable.class);
-      DIRECT_BYTE_BUFFER_CTOR.setAccessible(true);
-
       FILE_CHANNEL_IMPL_MAP0_METHOD = FileChannelImpl.class
           .getDeclaredMethod("map0", int.class, long.class, long.class);
       FILE_CHANNEL_IMPL_MAP0_METHOD.setAccessible(true);
@@ -96,7 +89,8 @@ class AllocateDirectMap implements Map {
   AllocateDirectMap(final ResourceState state, final File file, final long fileOffset) {
     this.state = state;
     raf = mapper(state, file, fileOffset);
-    mbb = createDummyMbbInstance(state.getNativeBaseOffset());
+    //Note: DirectByteBuffer extends MappedByteBuffer, which extends ByteBuffer
+    mbb = (MappedByteBuffer) AccessByteBuffer.ZERO_DIRECT_BUFFER;
     cleaner = Cleaner.create(this, new Deallocator(state, raf));
     ResourceState.currentDirectMemoryMapAllocations_.incrementAndGet();
     ResourceState.currentDirectMemoryMapAllocated_.addAndGet(state.getCapacity());
@@ -226,24 +220,6 @@ class AllocateDirectMap implements Map {
       throw new RuntimeException("Exception while mapping", e.getTargetException());
     } catch (final IllegalAccessException e) {
       throw new RuntimeException("Exception while mapping", e);
-    }
-  }
-
-  //Note: DirectByteBuffer extends MappedByteBuffer, which extends ByteBuffer
-  private static final MappedByteBuffer createDummyMbbInstance(final long nativeBaseAddress)
-          throws RuntimeException {
-    try {
-      final MappedByteBuffer mbb = (MappedByteBuffer) DIRECT_BYTE_BUFFER_CTOR //Dummy
-          .newInstance(
-              0,    /* some junk capacity */
-              nativeBaseAddress,
-              null, /* null FileDescriptor */
-              null);/* null Runnable unmapper, no Cleaner created */
-      return mbb;
-    } catch (final Exception e) {
-      throw new RuntimeException(
-          "Could not create Dummy MappedByteBuffer instance: " + e.getClass()
-          + UnsafeUtil.tryIllegalAccessPermit);
     }
   }
 

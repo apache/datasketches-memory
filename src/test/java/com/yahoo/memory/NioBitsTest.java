@@ -40,7 +40,7 @@ public class NioBitsTest {
   }
 
   private static void printStats() {
-    long count = NioBits.getCount();
+    long count = NioBits.getDirectAllocationsCount();
     long resMem = NioBits.getReservedMemory();
     long totCap = NioBits.getTotalCapacity();
     long maxDBBmem = NioBits.getMaxDirectByteBufferMemory();

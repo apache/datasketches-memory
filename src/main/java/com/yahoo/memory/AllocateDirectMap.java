@@ -53,12 +53,6 @@ class AllocateDirectMap implements Map {
   private static final Method MAPPED_BYTE_BUFFER_ISLOADED0_METHOD;
   static final Method MAPPED_BYTE_BUFFER_FORCE0_METHOD;
 
-  final ResourceState state;
-  final Cleaner cleaner;
-
-  final RandomAccessFile raf;
-  final MappedByteBuffer mbb;
-
   static {
     try {
       FILE_CHANNEL_IMPL_MAP0_METHOD = FileChannelImpl.class
@@ -85,12 +79,14 @@ class AllocateDirectMap implements Map {
     }
   }
 
+  final ResourceState state;
+  final Cleaner cleaner;
+  final RandomAccessFile raf;
+
   //called from map below and from AllocateDirectWritableMap constructor
   AllocateDirectMap(final ResourceState state, final File file, final long fileOffset) {
     this.state = state;
     raf = mapper(state, file, fileOffset);
-    //Note: DirectByteBuffer extends MappedByteBuffer, which extends ByteBuffer
-    mbb = (MappedByteBuffer) AccessByteBuffer.ZERO_DIRECT_BUFFER;
     cleaner = Cleaner.create(this, new Deallocator(state, raf));
     ResourceState.currentDirectMemoryMapAllocations_.incrementAndGet();
     ResourceState.currentDirectMemoryMapAllocated_.addAndGet(state.getCapacity());
@@ -108,7 +104,7 @@ class AllocateDirectMap implements Map {
    * @throws IOException file not found or RuntimeException, etc.
    */
   static AllocateDirectMap map(final ResourceState state, final File file, final long fileOffset)  {
-    return new AllocateDirectMap(state, file, fileOffset); //state: RRO, capacity, BO
+    return new AllocateDirectMap(state, file, fileOffset); //state: ResReadOnly, capacity, BO
   }
 
   @Override
@@ -129,8 +125,11 @@ class AllocateDirectMap implements Map {
     try {
       final long capacity = state.getCapacity();
       final int pageCount = NioBits.pageCount(capacity);
-      return (boolean) MAPPED_BYTE_BUFFER_ISLOADED0_METHOD.invoke(mbb, state.getNativeBaseOffset(),
-          capacity, pageCount);
+      return (boolean) MAPPED_BYTE_BUFFER_ISLOADED0_METHOD //isLoaded0 is effectively static
+          .invoke(AccessByteBuffer.ZERO_DIRECT_BUFFER,     // so this is not modified
+              state.getNativeBaseOffset(),
+              capacity,
+              pageCount);
     } catch (final Exception e) {
       throw new RuntimeException(
               String.format("Encountered %s exception while loading", e.getClass()));
@@ -154,8 +153,10 @@ class AllocateDirectMap implements Map {
    */
   void madvise() {
     try {
-      MAPPED_BYTE_BUFFER_LOAD0_METHOD.invoke(mbb, state.getNativeBaseOffset(),
-          state.getCapacity());
+      MAPPED_BYTE_BUFFER_LOAD0_METHOD                //load0 is effectively static
+        .invoke(AccessByteBuffer.ZERO_DIRECT_BUFFER, // so this is not modified
+            state.getNativeBaseOffset(),
+            state.getCapacity());
     } catch (final Exception e) {
       throw new RuntimeException(
           String.format("Encountered %s exception while loading", e.getClass()));

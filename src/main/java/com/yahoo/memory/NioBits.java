@@ -17,19 +17,19 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author Lee Rhodes
  */
 class NioBits {
-  static final Class<?> VM_CLASS;
-  static final Method VM_MAX_DIRECT_MEMORY_METHOD;
-  static final Method VM_IS_DIRECT_MEMORY_PAGE_ALIGNED_METHOD;
+  private static final Class<?> VM_CLASS;
+  private static final Method VM_MAX_DIRECT_MEMORY_METHOD;
+  private static final Method VM_IS_DIRECT_MEMORY_PAGE_ALIGNED_METHOD;
 
-  static final Class<?> NIO_BITS_CLASS;
-  static final Method NIO_BITS_RESERVE_MEMORY_METHOD;
-  static final Method NIO_BITS_UNRESERVE_MEMORY_METHOD;
-  static final Field NIO_BITS_COUNT_FIELD;
-  static final Field NIO_BITS_RESERVED_MEMORY_FIELD;
-  static final Field NIO_BITS_TOTAL_CAPACITY_FIELD;
+  private static final Class<?> NIO_BITS_CLASS;
+  private static final Method NIO_BITS_RESERVE_MEMORY_METHOD;
+  private static final Method NIO_BITS_UNRESERVE_MEMORY_METHOD;
 
+  private static final AtomicLong nioBitsCount;
+  private static final AtomicLong nioBitsReservedMemory;
+  private static final AtomicLong nioBitsTotalCapacity;
 
-  private static int pageSize = -1;
+  private static int pageSize = unsafe.pageSize();
   private static final long maxDBBMemory;
   private static final boolean isPageAligned;
 
@@ -58,14 +58,17 @@ class NioBits {
           .getDeclaredMethod("unreserveMemory", long.class, int.class);
       NIO_BITS_UNRESERVE_MEMORY_METHOD.setAccessible(true);
 
-      NIO_BITS_COUNT_FIELD = NIO_BITS_CLASS.getDeclaredField("count");
-      NIO_BITS_COUNT_FIELD.setAccessible(true);
+      final Field countField = NIO_BITS_CLASS.getDeclaredField("count");
+      countField.setAccessible(true);
+      nioBitsCount = (AtomicLong) (countField.get(null));
 
-      NIO_BITS_RESERVED_MEMORY_FIELD = NIO_BITS_CLASS.getDeclaredField("reservedMemory");
-      NIO_BITS_RESERVED_MEMORY_FIELD.setAccessible(true);
+      final Field reservedMemoryField = NIO_BITS_CLASS.getDeclaredField("reservedMemory");
+      reservedMemoryField.setAccessible(true);
+      nioBitsReservedMemory = (AtomicLong) (reservedMemoryField.get(null));
 
-      NIO_BITS_TOTAL_CAPACITY_FIELD = NIO_BITS_CLASS.getDeclaredField("totalCapacity");
-      NIO_BITS_TOTAL_CAPACITY_FIELD.setAccessible(true);
+      final Field totalCapacityField = NIO_BITS_CLASS.getDeclaredField("totalCapacity");
+      totalCapacityField.setAccessible(true);
+      nioBitsTotalCapacity = (AtomicLong) (totalCapacityField.get(null));
 
     } catch (final Exception e) {
       throw new RuntimeException("Could not acquire java.nio.Bits class: " + e.getClass()
@@ -73,9 +76,9 @@ class NioBits {
     }
   }
 
-  static long getCount() {
+  static long getDirectAllocationsCount() {
     try {
-      final long count = ((AtomicLong)(NIO_BITS_COUNT_FIELD.get(null))).get();
+      final long count = nioBitsCount.get();
       return count;
     } catch (final Exception e) {
       throw new RuntimeException("Cannot read Bits.count " + e);
@@ -84,7 +87,7 @@ class NioBits {
 
   static long getReservedMemory() {
     try {
-      final long resMem = ((AtomicLong)(NIO_BITS_RESERVED_MEMORY_FIELD.get(null))).get();
+      final long resMem = nioBitsReservedMemory.get();
       return resMem;
     } catch (final Exception e) {
       throw new RuntimeException("Cannot read Bits.reservedMemory " + e);
@@ -93,7 +96,7 @@ class NioBits {
 
   static long getTotalCapacity() {
     try {
-      final long resMem = ((AtomicLong)(NIO_BITS_TOTAL_CAPACITY_FIELD.get(null))).get();
+      final long resMem = nioBitsTotalCapacity.get();
       return resMem;
     } catch (final Exception e) {
       throw new RuntimeException("Cannot read Bits.totalCapacity " + e);
@@ -121,19 +124,20 @@ class NioBits {
 
   //RESERVE & UNRESERVE BITS MEMORY TRACKING COUNTERS
   static void reserveMemory(long capacity) {
-    final long pageAdj = isPageAligned ? pageSize : 0;
+    Util.zeroCheck(capacity, "capacity");
     try {
-      //if pageAligned, and if capacity > 2GB, this inflates the reserved size by 1 page per 2GB
-      // or about 2ppm.
-      while (capacity > Integer.MAX_VALUE) {
-        final int chunk = (int) Math.min(capacity, Integer.MAX_VALUE); //(2GB-1) chunks
-        final long size = Math.max(1L,  chunk + pageAdj);
-        NIO_BITS_RESERVE_MEMORY_METHOD.invoke(null, size, chunk);
+      while (capacity > (1L << 30)) {
+        final long chunk = Math.min(capacity, (1L << 30)); // 1GB chunks
+        NIO_BITS_RESERVE_MEMORY_METHOD.invoke(null, chunk, (int) chunk);
         capacity -= chunk;
       }
+
       if (capacity > 0) {
-        final long size = Math.max(1L, capacity + pageAdj);
-        NIO_BITS_RESERVE_MEMORY_METHOD.invoke(null, size, (int) capacity);
+        NIO_BITS_RESERVE_MEMORY_METHOD.invoke(null, capacity, (int) capacity);
+      }
+
+      if (isPageAligned) {
+        NIO_BITS_RESERVE_MEMORY_METHOD.invoke(null, pageSize, 0);
       }
     } catch (final Exception e) {
       throw new RuntimeException("Could not invoke java.nio.Bits.reserveMemory(...)" + e);
@@ -141,18 +145,21 @@ class NioBits {
   }
 
   static void unreserveMemory(long capacity) {
-    final long pageAdj = isPageAligned ? pageSize : 0;
+    Util.zeroCheck(capacity, "capacity");
     try {
-      while (capacity > Integer.MAX_VALUE) {
-        final int chunk = (int) Math.min(capacity, Integer.MAX_VALUE); //(2GB-1) chunks
-        final long size = Math.max(1L,  chunk + pageAdj);
-        NIO_BITS_UNRESERVE_MEMORY_METHOD.invoke(null, size, chunk);
+      while (capacity > (1L << 30)) {
+        final long chunk = Math.min(capacity, (1L << 30)); // 1GB chunks
+        NIO_BITS_UNRESERVE_MEMORY_METHOD.invoke(null, chunk, (int) chunk);
         capacity -= chunk;
       }
       if (capacity > 0) {
-        final long size = Math.max(1L, capacity + pageAdj);
-        NIO_BITS_UNRESERVE_MEMORY_METHOD.invoke(null, size, (int) capacity);
+        NIO_BITS_UNRESERVE_MEMORY_METHOD.invoke(null, capacity, (int) capacity);
       }
+
+      if (isPageAligned) {
+        NIO_BITS_UNRESERVE_MEMORY_METHOD.invoke(null, pageSize, 0);
+      }
+
     } catch (final Exception e) {
       throw new RuntimeException("Could not invoke java.nio.Bits.unreserveMemory(...)" + e);
     }

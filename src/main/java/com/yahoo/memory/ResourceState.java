@@ -5,6 +5,7 @@
 
 package com.yahoo.memory;
 
+import static com.yahoo.memory.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
 import static com.yahoo.memory.Util.negativeCheck;
 import static com.yahoo.memory.Util.nullCheck;
 
@@ -113,7 +114,7 @@ final class ResourceState {
     nullCheck(obj, "Array Object");
     Util.negativeCheck(arrLen, "Capacity");
     unsafeObj_ = obj;
-    unsafeObjHeader_ = prim.off();
+    //    unsafeObjHeader_ = prim.off();
     capacity_ = arrLen << prim.shift();
     compute();
   }
@@ -123,7 +124,7 @@ final class ResourceState {
     //FOUNDATION PARAMETERS
     nativeBaseOffset_ = src.nativeBaseOffset_;
     unsafeObj_ = src.unsafeObj_;
-    unsafeObjHeader_ = src.unsafeObjHeader_;
+    //    unsafeObjHeader_ = src.unsafeObjHeader_;
     capacity_ = src.capacity_;
 
     memReqSvr_ = src.memReqSvr_; //retains memReqSvr reference
@@ -150,7 +151,7 @@ final class ResourceState {
 
   private void compute() {
     cumBaseOffset_ = regionOffset_
-        + ((unsafeObj_ == null) ? nativeBaseOffset_ : unsafeObjHeader_);
+        + ((unsafeObj_ == null) ? nativeBaseOffset_ : ARRAY_BYTE_BASE_OFFSET);
   }
 
   //FOUNDATION PARAMETERS
@@ -172,16 +173,6 @@ final class ResourceState {
   void putUnsafeObject(final Object unsafeObj) {
     nullCheck(unsafeObj, "Array Object");
     unsafeObj_ = unsafeObj;
-    compute();
-  }
-
-  long getUnsafeObjectHeader() {
-    return unsafeObjHeader_;
-  }
-
-  void putUnsafeObjectHeader(final long unsafeObjHeader) {
-    negativeCheck(unsafeObjHeader, "Object Header");
-    unsafeObjHeader_ = unsafeObjHeader;
     compute();
   }
 

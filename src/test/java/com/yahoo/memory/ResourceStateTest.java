@@ -41,12 +41,12 @@ public class ResourceStateTest {
       //ok
     }
 
-    try {
-      state.putUnsafeObjectHeader( -16L);
-      fail();
-    } catch (IllegalArgumentException e) {
-      //ok
-    }
+    //    try {
+    //      state.putUnsafeObjectHeader( -16L);
+    //      fail();
+    //    } catch (IllegalArgumentException e) {
+    //      //ok
+    //    }
 
     try {
       state.putByteBuffer(null);

@@ -5,6 +5,7 @@
 
 package com.yahoo.memory;
 
+import static com.yahoo.memory.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
 import static com.yahoo.memory.UnsafeUtil.LS;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 import static com.yahoo.memory.Util.negativeCheck;
@@ -581,8 +582,15 @@ public abstract class Memory {
     UnsafeUtil.checkBounds(offsetBytes, lengthBytes, state.getCapacity());
     final StringBuilder sb = new StringBuilder();
     final Object uObj = state.getUnsafeObject();
-    final String uObjStr = (uObj == null) ? "null"
-            : uObj.getClass().getSimpleName() + ", " + (uObj.hashCode() & 0XFFFFFFFFL);
+    final String uObjStr;
+    final long uObjHeader;
+    if (uObj == null) {
+      uObjStr = "null";
+      uObjHeader = 0;
+    } else {
+      uObjStr =  uObj.getClass().getSimpleName() + ", " + (uObj.hashCode() & 0XFFFFFFFFL);
+      uObjHeader = ARRAY_BYTE_BASE_OFFSET;
+    }
     final ByteBuffer bb = state.getByteBuffer();
     final String bbStr = (bb == null) ? "null"
             : bb.getClass().getSimpleName() + ", " + (bb.hashCode() & 0XFFFFFFFFL);
@@ -592,7 +600,7 @@ public abstract class Memory {
     final long cumBaseOffset = state.getCumBaseOffset();
     sb.append(preamble).append(LS);
     sb.append("UnsafeObj, hashCode : ").append(uObjStr).append(LS);
-    sb.append("UnsafeObjHeader     : ").append(state.getUnsafeObjectHeader()).append(LS);
+    sb.append("UnsafeObjHeader     : ").append(uObjHeader).append(LS);
     sb.append("ByteBuf, hashCode   : ").append(bbStr).append(LS);
     sb.append("RegionOffset        : ").append(state.getRegionOffset()).append(LS);
     sb.append("Capacity            : ").append(state.getCapacity()).append(LS);

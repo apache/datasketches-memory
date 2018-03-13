@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author Lee Rhodes
  */
-class NioBits {
+final class NioBits {
   private static final Class<?> VM_CLASS;
   private static final Method VM_MAX_DIRECT_MEMORY_METHOD;
   private static final Method VM_IS_DIRECT_MEMORY_PAGE_ALIGNED_METHOD;
@@ -104,9 +104,6 @@ class NioBits {
   }
 
   static int pageSize() {
-    if (pageSize == -1) {
-      pageSize = unsafe.pageSize();
-    }
     return pageSize;
   }
 
@@ -123,46 +120,38 @@ class NioBits {
   }
 
   //RESERVE & UNRESERVE BITS MEMORY TRACKING COUNTERS
-  static void reserveMemory(long capacity) {
-    Util.zeroCheck(capacity, "capacity");
+  static void reserveMemory(final long capacity) {
     try {
-      while (capacity > (1L << 30)) {
-        final long chunk = Math.min(capacity, (1L << 30)); // 1GB chunks
-        NIO_BITS_RESERVE_MEMORY_METHOD.invoke(null, chunk, (int) chunk);
-        capacity -= chunk;
-      }
-
-      if (capacity > 0) {
-        NIO_BITS_RESERVE_MEMORY_METHOD.invoke(null, capacity, (int) capacity);
-      }
-
-      if (isPageAligned) {
-        NIO_BITS_RESERVE_MEMORY_METHOD.invoke(null, pageSize, 0);
-      }
+      reserveUnreserve(capacity, NIO_BITS_RESERVE_MEMORY_METHOD);
     } catch (final Exception e) {
-      throw new RuntimeException("Could not invoke java.nio.Bits.reserveMemory(...)" + e);
+      throw new RuntimeException("Could not invoke java.nio.Bits.reserveMemory(...): "
+          + "capacity = " + capacity + "\n" + e);
     }
   }
 
-  static void unreserveMemory(long capacity) {
-    Util.zeroCheck(capacity, "capacity");
+  static void unreserveMemory(final long capacity) {
     try {
-      while (capacity > (1L << 30)) {
-        final long chunk = Math.min(capacity, (1L << 30)); // 1GB chunks
-        NIO_BITS_UNRESERVE_MEMORY_METHOD.invoke(null, chunk, (int) chunk);
-        capacity -= chunk;
-      }
-      if (capacity > 0) {
-        NIO_BITS_UNRESERVE_MEMORY_METHOD.invoke(null, capacity, (int) capacity);
-      }
-
-      if (isPageAligned) {
-        NIO_BITS_UNRESERVE_MEMORY_METHOD.invoke(null, pageSize, 0);
-      }
-
+      reserveUnreserve(capacity, NIO_BITS_UNRESERVE_MEMORY_METHOD);
     } catch (final Exception e) {
-      throw new RuntimeException("Could not invoke java.nio.Bits.unreserveMemory(...)" + e);
+      throw new RuntimeException("Could not invoke java.nio.Bits.unreserveMemory(...): "
+          + "capacity = " + capacity + "\n" + e);
     }
   }
 
+  private static void reserveUnreserve(long capacity, final Method method) throws Exception {
+    Util.zeroCheck(capacity, "capacity");
+    while (capacity > (1L << 30)) {
+      final long chunk = Math.min(capacity, (1L << 30)); // 1GB chunks
+      method.invoke(null, chunk, (int) chunk);
+      capacity -= chunk;
+    }
+
+    if (capacity > 0) {
+      method.invoke(null, capacity, (int) capacity);
+    }
+
+    if (isPageAligned) {
+      method.invoke(null, pageSize, 0);
+    }
+  }
 }

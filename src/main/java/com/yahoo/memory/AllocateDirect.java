@@ -34,10 +34,10 @@ final class AllocateDirect implements AutoCloseable {
     ResourceState.currentDirectMemoryAllocated_.addAndGet(state.getCapacity());
   }
 
-  static AllocateDirect allocate(final ResourceState state) {
+  static AllocateDirect allocateDirect(final ResourceState state) {
     final long capacity = state.getCapacity();
-    state.putNativeBaseOffset(unsafe.allocateMemory(capacity));
     NioBits.reserveMemory(capacity);
+    state.putNativeBaseOffset(unsafe.allocateMemory(capacity));
     return new AllocateDirect(state);
   }
 
@@ -66,12 +66,12 @@ final class AllocateDirect implements AutoCloseable {
 
     @Override
     public void run() {
+      myState.setInvalid();
       if (actualNativeBaseOffset > 0) {
         unsafe.freeMemory(actualNativeBaseOffset);
         NioBits.unreserveMemory(capacity);
       }
       actualNativeBaseOffset = 0L;
-      myState.setInvalid();
     }
   }
 

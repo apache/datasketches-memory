@@ -42,8 +42,11 @@ final class AllocateDirectWritableMap extends AllocateDirectMap implements Writa
   @Override
   public void force() {
     try {
-      MAPPED_BYTE_BUFFER_FORCE0_METHOD.invoke(super.mbb, super.raf.getFD(),
-              super.state.getNativeBaseOffset(), super.state.getCapacity());
+      MAPPED_BYTE_BUFFER_FORCE0_METHOD                 //force0 is effectively static
+          .invoke(AccessByteBuffer.ZERO_DIRECT_BUFFER, // so this is not modified
+              super.raf.getFD(),
+              super.state.getNativeBaseOffset(),
+              super.state.getCapacity());
     } catch (final Exception e) {
       throw new RuntimeException(String.format("Encountered %s exception in force. "
           + UnsafeUtil.tryIllegalAccessPermit, e.getClass()));

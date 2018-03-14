@@ -5,7 +5,7 @@
 
 package com.yahoo.memory;
 
-import static com.yahoo.memory.CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD;
+import static com.yahoo.memory.CompareAndCopy.UNSAFE_COPY_THRESHOLD;
 import static org.testng.Assert.assertEquals;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -103,27 +103,27 @@ public class CopyMemoryTest {
 
   @Test
   public void testOverlappingCopyLeftToRight() {
-    byte[] bytes = new byte[((UNSAFE_COPY_MEMORY_THRESHOLD * 5) / 2) + 1];
+    byte[] bytes = new byte[((UNSAFE_COPY_THRESHOLD * 5) / 2) + 1];
     ThreadLocalRandom.current().nextBytes(bytes);
     byte[] referenceBytes = bytes.clone();
     Memory referenceMem = Memory.wrap(referenceBytes);
     WritableMemory mem = WritableMemory.wrap(bytes);
-    long copyLen = UNSAFE_COPY_MEMORY_THRESHOLD * 2;
-    mem.copyTo(0, mem, UNSAFE_COPY_MEMORY_THRESHOLD / 2, copyLen);
-    Assert.assertEquals(0, mem.compareTo(UNSAFE_COPY_MEMORY_THRESHOLD / 2, copyLen, referenceMem, 0,
+    long copyLen = UNSAFE_COPY_THRESHOLD * 2;
+    mem.copyTo(0, mem, UNSAFE_COPY_THRESHOLD / 2, copyLen);
+    Assert.assertEquals(0, mem.compareTo(UNSAFE_COPY_THRESHOLD / 2, copyLen, referenceMem, 0,
         copyLen));
   }
 
   @Test
   public void testOverlappingCopyRightToLeft() {
-    byte[] bytes = new byte[((UNSAFE_COPY_MEMORY_THRESHOLD * 5) / 2) + 1];
+    byte[] bytes = new byte[((UNSAFE_COPY_THRESHOLD * 5) / 2) + 1];
     ThreadLocalRandom.current().nextBytes(bytes);
     byte[] referenceBytes = bytes.clone();
     Memory referenceMem = Memory.wrap(referenceBytes);
     WritableMemory mem = WritableMemory.wrap(bytes);
-    long copyLen = UNSAFE_COPY_MEMORY_THRESHOLD * 2;
-    mem.copyTo(UNSAFE_COPY_MEMORY_THRESHOLD / 2, mem, 0, copyLen);
-    Assert.assertEquals(0, mem.compareTo(0, copyLen, referenceMem, UNSAFE_COPY_MEMORY_THRESHOLD / 2,
+    long copyLen = UNSAFE_COPY_THRESHOLD * 2;
+    mem.copyTo(UNSAFE_COPY_THRESHOLD / 2, mem, 0, copyLen);
+    Assert.assertEquals(0, mem.compareTo(0, copyLen, referenceMem, UNSAFE_COPY_THRESHOLD / 2,
         copyLen));
   }
 

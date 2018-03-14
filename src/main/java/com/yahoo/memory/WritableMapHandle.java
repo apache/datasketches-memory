@@ -22,7 +22,7 @@ public final class WritableMapHandle extends MapHandle implements WritableMap, W
     super(dirWmap, wMem);
   }
 
-  @SuppressWarnings("resource") //called from memory
+  @SuppressWarnings("resource") //called from memory. state: RRO, cap, BO
   static WritableMapHandle map(final ResourceState state, final File file, final long fileOffset) {
     final AllocateDirectWritableMap dirMap = AllocateDirectWritableMap.map(state, file, fileOffset);
     final BaseWritableMemoryImpl wMem = new WritableMemoryImpl(state, false);

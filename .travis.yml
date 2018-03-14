@@ -8,6 +8,9 @@ jdk:
 install:
  - mvn install -Dmaven.javadoc.skip=true -Dsource.skip=true -DskipTests=true -Dgpg.skip=true
 
+before_script:
+ - _JAVA_OPTIONS="-Xmx4g -Xms1g" 
+
 script:
  - mvn clean compile test -Dgpg.skip=true
 

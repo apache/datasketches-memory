@@ -291,7 +291,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
     long len = getEnd() - pos;
     checkInvariants(getStart(), pos + len, getEnd(), getCapacity());
     while (len > 0) {
-      final long chunk = Math.min(len, CompareAndCopy.UNSAFE_COPY_MEMORY_THRESHOLD);
+      final long chunk = Math.min(len, CompareAndCopy.UNSAFE_COPY_THRESHOLD);
       unsafe.setMemory(unsafeObj, cumBaseOffset + pos, chunk, value);
       pos += chunk;
       len -= chunk;

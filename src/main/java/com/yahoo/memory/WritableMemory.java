@@ -77,7 +77,11 @@ public abstract class WritableMemory extends Memory {
     zeroCheck(capacityBytes, "Capacity");
     nullCheck(file, "file is null");
     negativeCheck(fileOffsetBytes, "File offset is negative");
-    final ResourceState state = new ResourceState(AllocateDirectMap.isFileReadOnly(file));
+    final boolean rro = AllocateDirectMap.isFileReadOnly(file);
+    if (rro) {
+      throw new ReadOnlyException("Cannot map a read-only file into Writable Memory.");
+    }
+    final ResourceState state = new ResourceState(rro);
     state.putCapacity(capacityBytes);
     state.putResourceOrder(byteOrder);
     return WritableMapHandle.map(state, file, fileOffsetBytes);

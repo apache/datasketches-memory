@@ -7,8 +7,8 @@ package com.yahoo.memory;
 
 import static com.yahoo.memory.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_BYTE_INDEX_SCALE;
+import static com.yahoo.memory.UnsafeUtil.unsafe;
 
-import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 
 /**
@@ -19,23 +19,16 @@ import java.nio.ByteBuffer;
  */
 final class AccessByteBuffer {
 
-  private static final Field BYTE_BUFFER_OFFSET_FIELD;
-  private static final Field BYTE_BUFFER_HB_FIELD;
+  static final ByteBuffer ZERO_DIRECT_BUFFER = ByteBuffer.allocateDirect(0);
 
-  static {
-    try {
-      BYTE_BUFFER_OFFSET_FIELD = ByteBuffer.class.getDeclaredField("offset");
-      BYTE_BUFFER_OFFSET_FIELD.setAccessible(true);
-
-      BYTE_BUFFER_HB_FIELD = ByteBuffer.class.getDeclaredField("hb");
-      BYTE_BUFFER_HB_FIELD.setAccessible(true);
-    }
-    catch (final NoSuchFieldException e) {
-      throw new RuntimeException(
-          "Could not get offset and byteArray fields from ByteBuffer class: " + e.getClass()
-          + UnsafeUtil.tryIllegalAccessPermit);
-    }
-  }
+  private static final long NIO_BUFFER_ADDRESS_FIELD_OFFSET =
+      UnsafeUtil.getFieldOffset(java.nio.Buffer.class, "address");
+  private static final long NIO_BUFFER_CAPACITY_FIELD_OFFSET =
+      UnsafeUtil.getFieldOffset(java.nio.Buffer.class, "capacity");
+  private static final long BYTE_BUFFER_HB_FIELD_OFFSET =
+      UnsafeUtil.getFieldOffset(java.nio.ByteBuffer.class, "hb");
+  private static final long BYTE_BUFFER_OFFSET_FIELD_OFFSET =
+      UnsafeUtil.getFieldOffset(java.nio.ByteBuffer.class, "offset");
 
   private AccessByteBuffer() { }
 
@@ -61,18 +54,9 @@ final class AccessByteBuffer {
       //The messy acquisition of arrayOffset() and array() created from a RO slice()
       final Object unsafeObj;
       final long regionOffset;
-      try {
-        //includes the slice() offset for heap.
-        regionOffset = ((Integer)BYTE_BUFFER_OFFSET_FIELD.get(byteBuf)).longValue()
-                * ARRAY_BYTE_INDEX_SCALE;
-
-        unsafeObj = BYTE_BUFFER_HB_FIELD.get(byteBuf); //the backing byte[] from HeapByteBuffer
-      }
-      catch (final IllegalAccessException e) {
-        throw new RuntimeException(
-            "Could not get offset and byteArray fields from ByteBuffer class: " + e.getClass()
-            + UnsafeUtil.tryIllegalAccessPermit);
-      }
+      //includes the slice() offset for heap.
+      regionOffset = unsafe.getInt(byteBuf, BYTE_BUFFER_OFFSET_FIELD_OFFSET);
+      unsafeObj = unsafe.getObject(byteBuf, BYTE_BUFFER_HB_FIELD_OFFSET);
       state.putUnsafeObjectHeader(ARRAY_BYTE_BASE_OFFSET);
       state.putUnsafeObject(unsafeObj);
       state.putRegionOffset(regionOffset);
@@ -91,4 +75,17 @@ final class AccessByteBuffer {
     state.putUnsafeObjectHeader(ARRAY_BYTE_BASE_OFFSET);
     state.putRegionOffset(byteBuf.arrayOffset() * ARRAY_BYTE_INDEX_SCALE);
   }
+
+  /**
+   * This method is copied from https://github.com/odnoklassniki/one-nio/blob/
+   * 27c768cbd28ece949c299f2d437c9a0ebd874500/src/one/nio/mem/DirectMemory.java#L95
+   */
+  static ByteBuffer getDummyDirectByteBuffer(final long address, final int capacity) {
+    final ByteBuffer buf = ZERO_DIRECT_BUFFER.duplicate();
+    unsafe.putLong(buf, NIO_BUFFER_ADDRESS_FIELD_OFFSET, address);
+    unsafe.putInt(buf, NIO_BUFFER_CAPACITY_FIELD_OFFSET, capacity);
+    buf.limit(capacity);
+    return buf;
+  }
+
 }

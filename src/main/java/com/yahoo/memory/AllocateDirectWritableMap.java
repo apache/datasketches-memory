@@ -36,17 +36,17 @@ final class AllocateDirectWritableMap extends AllocateDirectMap implements Writa
    */
   static AllocateDirectWritableMap map(final ResourceState state, final File file,
       final long fileOffset) {
-    if (state.isResourceReadOnly()) {
-      throw new ReadOnlyException("Cannot map a read-only file into Writable Memory.");
-    }
-    return new AllocateDirectWritableMap(state, file, fileOffset);
+    return new AllocateDirectWritableMap(state, file, fileOffset); //state: RRO, capacity, BO
   }
 
   @Override
   public void force() {
     try {
-      MAPPED_BYTE_BUFFER_FORCE0_METHOD.invoke(super.mbb, super.raf.getFD(),
-              super.state.getNativeBaseOffset(), super.state.getCapacity());
+      MAPPED_BYTE_BUFFER_FORCE0_METHOD                 //force0 is effectively static
+          .invoke(AccessByteBuffer.ZERO_DIRECT_BUFFER, // so this is not modified
+              super.raf.getFD(),
+              super.state.getNativeBaseOffset(),
+              super.state.getCapacity());
     } catch (final Exception e) {
       throw new RuntimeException(String.format("Encountered %s exception in force. "
           + UnsafeUtil.tryIllegalAccessPermit, e.getClass()));

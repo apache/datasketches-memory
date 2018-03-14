@@ -42,13 +42,6 @@ public class ResourceStateTest {
     }
 
     try {
-      state.putUnsafeObjectHeader( -16L);
-      fail();
-    } catch (IllegalArgumentException e) {
-      //ok
-    }
-
-    try {
       state.putByteBuffer(null);
       fail();
     } catch (IllegalArgumentException e) {
@@ -61,6 +54,12 @@ public class ResourceStateTest {
     } catch (IllegalArgumentException e) {
       //ok
     }
+  }
+
+  @Test
+  public void checkPrimOffset() {
+    int off = (int)Prim.BYTE.off();
+    assertTrue(off > 0);
   }
 
   @Test

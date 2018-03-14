@@ -5,6 +5,7 @@
 
 package com.yahoo.memory;
 
+import static com.yahoo.memory.UnsafeUtil.unsafe;
 import static com.yahoo.memory.Util.negativeCheck;
 import static com.yahoo.memory.Util.nullCheck;
 
@@ -44,13 +45,6 @@ final class ResourceState {
    * null for direct memory and determines how cumBaseOffset is computed.
    */
   private Object unsafeObj_;
-
-  /**
-   * If unsafeObj_ is non-null, this is the object header space for the specific array type,
-   * typically either 16 or 24 bytes. This is used to compute cumBaseOffset.
-   * If this changes, cumBaseOffset is recomputed.
-   */
-  private long unsafeObjHeader_;
 
   /**
    * This is the offset that defines the start of a sub-region of the backing resource. It is
@@ -113,7 +107,6 @@ final class ResourceState {
     nullCheck(obj, "Array Object");
     Util.negativeCheck(arrLen, "Capacity");
     unsafeObj_ = obj;
-    unsafeObjHeader_ = prim.off();
     capacity_ = arrLen << prim.shift();
     compute();
   }
@@ -123,7 +116,6 @@ final class ResourceState {
     //FOUNDATION PARAMETERS
     nativeBaseOffset_ = src.nativeBaseOffset_;
     unsafeObj_ = src.unsafeObj_;
-    unsafeObjHeader_ = src.unsafeObjHeader_;
     capacity_ = src.capacity_;
 
     memReqSvr_ = src.memReqSvr_; //retains memReqSvr reference
@@ -150,7 +142,8 @@ final class ResourceState {
 
   private void compute() {
     cumBaseOffset_ = regionOffset_
-        + ((unsafeObj_ == null) ? nativeBaseOffset_ : unsafeObjHeader_);
+        + ((unsafeObj_ == null) ? nativeBaseOffset_
+            : unsafe.arrayBaseOffset(unsafeObj_.getClass()));
   }
 
   //FOUNDATION PARAMETERS
@@ -172,16 +165,6 @@ final class ResourceState {
   void putUnsafeObject(final Object unsafeObj) {
     nullCheck(unsafeObj, "Array Object");
     unsafeObj_ = unsafeObj;
-    compute();
-  }
-
-  long getUnsafeObjectHeader() {
-    return unsafeObjHeader_;
-  }
-
-  void putUnsafeObjectHeader(final long unsafeObjHeader) {
-    negativeCheck(unsafeObjHeader, "Object Header");
-    unsafeObjHeader_ = unsafeObjHeader;
     compute();
   }
 

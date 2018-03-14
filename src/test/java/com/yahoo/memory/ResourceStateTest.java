@@ -57,6 +57,12 @@ public class ResourceStateTest {
   }
 
   @Test
+  public void checkPrimOffset() {
+    int off = (int)Prim.BYTE.off();
+    assertTrue(off > 0);
+  }
+
+  @Test
   public void checkIsSameResource() {
     WritableMemory wmem = WritableMemory.allocate(16);
     Memory mem = wmem;

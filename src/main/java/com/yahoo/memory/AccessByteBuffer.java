@@ -56,7 +56,6 @@ final class AccessByteBuffer {
       //includes the slice() offset for heap.
       regionOffset = unsafe.getInt(byteBuf, BYTE_BUFFER_OFFSET_FIELD_OFFSET);
       unsafeObj = unsafe.getObject(byteBuf, BYTE_BUFFER_HB_FIELD_OFFSET);
-      //state.putUnsafeObjectHeader(ARRAY_BYTE_BASE_OFFSET);
       state.putUnsafeObject(unsafeObj);
       state.putRegionOffset(regionOffset);
       return;
@@ -71,7 +70,6 @@ final class AccessByteBuffer {
 
     //BB is WRITABLE-HEAP  //unsafeObj, unsafeObjHeader, bytBuf, regionOffset, capacity
     state.putUnsafeObject(byteBuf.array());
-    //state.putUnsafeObjectHeader(ARRAY_BYTE_BASE_OFFSET);
     state.putRegionOffset(byteBuf.arrayOffset() * ARRAY_BYTE_INDEX_SCALE);
   }
 

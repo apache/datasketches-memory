@@ -5,7 +5,6 @@
 
 package com.yahoo.memory;
 
-import static com.yahoo.memory.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
 import static com.yahoo.memory.UnsafeUtil.LS;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 import static com.yahoo.memory.Util.negativeCheck;
@@ -589,7 +588,7 @@ public abstract class Memory {
       uObjHeader = 0;
     } else {
       uObjStr =  uObj.getClass().getSimpleName() + ", " + (uObj.hashCode() & 0XFFFFFFFFL);
-      uObjHeader = ARRAY_BYTE_BASE_OFFSET;
+      uObjHeader = unsafe.arrayBaseOffset(uObj.getClass());
     }
     final ByteBuffer bb = state.getByteBuffer();
     final String bbStr = (bb == null) ? "null"

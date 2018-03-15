@@ -22,7 +22,7 @@ public class ResourceStateTest {
     ResourceState state = new ResourceState(false);
     assertEquals(state.getResourceOrder(), ByteOrder.nativeOrder());
     if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
-      state.putResourceOrder(ByteOrder.BIG_ENDIAN);
+      state.putResourceOrder(ByteOrder.BIG_ENDIAN); //set to opposite
     } else {
       state.putResourceOrder(ByteOrder.LITTLE_ENDIAN);
     }
@@ -112,6 +112,17 @@ public class ResourceStateTest {
     boolean same = state.isSameResource(state);
     assertTrue(same);
   }
+
+  @Test(expectedExceptions = IllegalStateException.class)
+  public void checkValid() {
+    try (WritableHandle wh = WritableMemory.allocateDirect(1024)) {
+      WritableMemory wmem = wh.get();
+      wh.close();
+      ResourceState state = wmem.getResourceState();
+      state.checkValid();
+    }
+  }
+
 
   @Test
   public void printlnTest() {

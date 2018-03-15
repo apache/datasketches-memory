@@ -28,6 +28,8 @@ import java.nio.CharBuffer;
  */
 final class Utf8 {
 
+  private Utf8() { }
+
   //Decode
   static final int getCharsFromUtf8(final long offsetBytes, final int utf8LengthBytes,
       final Appendable dst, final ResourceState state)

@@ -40,23 +40,15 @@ import static com.yahoo.memory.UnsafeUtil.unsafe;
  */
 
 /**
- * Implementation of WritableBuffer
+ * Implementation of WritableBuffer for Native Endian ByteOrder.
  * @author Roman Leventov
  * @author Lee Rhodes
  */
 class WritableBufferImpl extends BaseWritableBufferImpl {
-  BaseWritableMemoryImpl originMemory = null; //If I came from here ...
 
-  //Static variable for cases where byteBuf/array sizes are zero
-  final static WritableBufferImpl ZERO_SIZE_BUFFER;
-
-  static {
-    ZERO_SIZE_BUFFER = new WritableBufferImpl(new ResourceState(new byte[0], Prim.BYTE, 0), true);
-    ZERO_SIZE_BUFFER.originMemory = WritableMemoryImpl.ZERO_SIZE_MEMORY;
-  }
-
-  WritableBufferImpl(final ResourceState state, final boolean localReadOnly) {
-    super(state, localReadOnly);
+  WritableBufferImpl(final ResourceState state, final boolean localReadOnly,
+      final BaseWritableMemoryImpl originMemory) {
+    super(state, localReadOnly, originMemory);
   }
 
   //DUPLICATES & REGIONS XXX
@@ -73,7 +65,8 @@ class WritableBufferImpl extends BaseWritableBufferImpl {
   private WritableBuffer writableDuplicateImpl(final boolean localReadOnly) {
     checkValid();
     if (capacity == 0) { return ZERO_SIZE_BUFFER; }
-    final WritableBufferImpl wBufImpl = new WritableBufferImpl(state, localReadOnly);
+    final WritableBufferImpl wBufImpl =
+        new WritableBufferImpl(state, localReadOnly, originMemory);
     wBufImpl.setStartPositionEnd(getStart(), getPosition(), getEnd());
     return wBufImpl;
   }
@@ -81,7 +74,6 @@ class WritableBufferImpl extends BaseWritableBufferImpl {
   @Override
   public Buffer region() {
     return writableRegionImpl(getPosition(), getEnd() - getPosition(), true);
-
   }
 
   @Override
@@ -101,7 +93,8 @@ class WritableBufferImpl extends BaseWritableBufferImpl {
     final ResourceState newState = state.copy();
     newState.putRegionOffset(newState.getRegionOffset() + offsetBytes);
     newState.putCapacity(capacityBytes);
-    final WritableBufferImpl wBufImpl = new WritableBufferImpl(newState, localReadOnly);
+    final WritableBufferImpl wBufImpl =
+        new WritableBufferImpl(newState, localReadOnly, originMemory);
     wBufImpl.setStartPositionEnd(0L, 0L, capacityBytes);
     return wBufImpl;
   }
@@ -109,20 +102,15 @@ class WritableBufferImpl extends BaseWritableBufferImpl {
   //MEMORY XXX
   @Override
   public Memory asMemory() {
-    return asWritableMemoryImpl(true);
+    return originMemory;
   }
 
   @Override
   public WritableMemory asWritableMemory() {
-    return asWritableMemoryImpl(localReadOnly);
-  }
-
-  private WritableMemory asWritableMemoryImpl(final boolean localReadOnly) {
-    checkValid();
-    if ((originMemory != null) && (originMemory.localReadOnly == localReadOnly)) {
-      return originMemory;
+    if (localReadOnly) {
+      throw new ReadOnlyException("This Buffer is Read-Only.");
     }
-    return new WritableMemoryImpl(state, localReadOnly);
+    return originMemory;
   }
 
   //PRIMITIVE getXXX() and getXXXArray() XXX

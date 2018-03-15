@@ -25,6 +25,8 @@ final class CompareAndCopy {
    */
   static final int UNSAFE_COPY_THRESHOLD = 1024 * 1024;
 
+  private CompareAndCopy() { }
+
   static int compare(
       final ResourceState state1, final long offsetBytes1, final long lengthBytes1,
       final ResourceState state2, final long offsetBytes2, final long lengthBytes2) {

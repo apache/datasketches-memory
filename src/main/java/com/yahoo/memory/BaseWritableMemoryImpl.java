@@ -36,14 +36,19 @@ import java.nio.channels.WritableByteChannel;
  * Contains methods which are agnostic to the byte order.
  */
 abstract class BaseWritableMemoryImpl extends WritableMemory {
-
-
-
   final ResourceState state;
   final Object unsafeObj; //Array objects are held here.
   final long capacity;
   final long cumBaseOffset; //Holds the cumulative offset to the start of data.
   final boolean localReadOnly;
+
+  //Static variable for cases where byteBuf/array/direct sizes are zero
+  final static WritableMemoryImpl ZERO_SIZE_MEMORY;
+
+  static {
+    final ResourceState state = new ResourceState(new byte[0], Prim.BYTE, 0);
+    ZERO_SIZE_MEMORY = new WritableMemoryImpl(state, true);
+  }
 
   BaseWritableMemoryImpl(final ResourceState state, final boolean localReadOnly) {
     unsafeObj = state.getUnsafeObject();

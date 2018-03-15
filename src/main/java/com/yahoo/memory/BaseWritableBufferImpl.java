@@ -39,13 +39,25 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   final Object unsafeObj; //Array objects are held here.
   final long cumBaseOffset; //Holds the cumulative offset to the start of data.
   final boolean localReadOnly;
+  final BaseWritableMemoryImpl originMemory;
 
-  BaseWritableBufferImpl(final ResourceState state, final boolean localReadOnly) {
+  //Static variable for cases where byteBuf/array sizes are zero
+  final static WritableBufferImpl ZERO_SIZE_BUFFER;
+
+  static {
+    final ResourceState state = new ResourceState(new byte[0], Prim.BYTE, 0);
+    ZERO_SIZE_BUFFER = new WritableBufferImpl(state, true, null);
+  }
+
+  //called from one of the Endian-sensitive WritableBufferImpls
+  BaseWritableBufferImpl(final ResourceState state, final boolean localReadOnly,
+      final BaseWritableMemoryImpl originMemory) {
     super(state.getCapacity());
     this.state = state;
     unsafeObj = state.getUnsafeObject();
     cumBaseOffset = state.getCumBaseOffset();
     this.localReadOnly = localReadOnly;
+    this.originMemory = originMemory;
   }
 
   //PRIMITIVE getXXX() and getXXXArray() XXX

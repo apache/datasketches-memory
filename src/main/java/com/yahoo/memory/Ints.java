@@ -8,6 +8,8 @@ package com.yahoo.memory;
 /** Equivalent of Guava's Ints. */
 final class Ints {
 
+  private Ints() {}
+
   static int checkedCast(final long v) {
     final int result = (int) v;
     if (result != v) {
@@ -16,6 +18,4 @@ final class Ints {
       return result;
     }
   }
-
-  private Ints() {}
 }

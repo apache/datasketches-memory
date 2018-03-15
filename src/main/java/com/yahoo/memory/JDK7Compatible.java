@@ -7,6 +7,8 @@ package com.yahoo.memory;
 
 final class JDK7Compatible {
 
+  private JDK7Compatible() {}
+
   public static long getAndAddLong(final Object obj, final long address, final long increment) {
     long retVal;
     do {
@@ -24,6 +26,4 @@ final class JDK7Compatible {
 
     return retVal;
   }
-
-  private JDK7Compatible() {}
 }

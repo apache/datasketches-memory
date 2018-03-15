@@ -474,11 +474,12 @@ public class WritableBufferImplTest {
   }
 
   @SuppressWarnings("unused")
-  @Test
-  public void checkAsWritableMemory() {
-    WritableMemory wmem = WritableMemory.allocate(8);
-    WritableBuffer wbuf = wmem.asWritableBuffer();
-    WritableMemory wmem2 = wbuf.asWritableMemory();
+  @Test(expectedExceptions = ReadOnlyException.class)
+  public void checkAsWritableMemoryRO() {
+    ByteBuffer bb = ByteBuffer.allocate(64);
+    Buffer buf = Buffer.wrap(bb);
+    WritableBuffer wbuf = (WritableBuffer) buf;
+    WritableMemory wmem = wbuf.asWritableMemory();
   }
 
   @Test

@@ -41,18 +41,11 @@ import java.io.IOException;
  */
 
 /**
- * Implementation of WritableMemory
+ * Implementation of WritableMemory for Native Endian ByteOrder.
  * @author Roman Leventov
  * @author Lee Rhodes
  */
 class WritableMemoryImpl extends BaseWritableMemoryImpl {
-
-  //Static variable for cases where byteBuf/array/direct sizes are zero
-  final static WritableMemoryImpl ZERO_SIZE_MEMORY;
-
-  static {
-    ZERO_SIZE_MEMORY = new WritableMemoryImpl(new ResourceState(new byte[0], Prim.BYTE, 0), true);
-  }
 
   WritableMemoryImpl(final ResourceState state, final boolean localReadOnly) {
     super(state, localReadOnly);
@@ -99,11 +92,10 @@ class WritableMemoryImpl extends BaseWritableMemoryImpl {
     checkValid();
     final WritableBufferImpl wbuf;
     if (capacity == 0) {
-      wbuf = WritableBufferImpl.ZERO_SIZE_BUFFER;
+      wbuf = BaseWritableBufferImpl.ZERO_SIZE_BUFFER;
     } else {
-      wbuf = new WritableBufferImpl(state, localReadOnly);
+      wbuf = new WritableBufferImpl(state, localReadOnly, this);
       wbuf.setAndCheckStartPositionEnd(0, 0, capacity);
-      wbuf.originMemory = this;
     }
     return wbuf;
   }

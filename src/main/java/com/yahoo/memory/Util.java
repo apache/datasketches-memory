@@ -14,6 +14,8 @@ import java.util.Random;
  */
 public final class Util {
 
+  private Util() { }
+
   /**
    * Searches a range of the specified array of longs for the specified value using the binary
    * search algorithm. The range must be sorted method) prior to making this call.

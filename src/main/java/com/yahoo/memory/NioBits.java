@@ -76,6 +76,8 @@ final class NioBits {
     }
   }
 
+  private NioBits() { }
+
   static long getDirectAllocationsCount() {
     try {
       final long count = nioBitsCount.get();

@@ -63,12 +63,7 @@ public class BaseBufferTest {
       wmem = hand.get();
       buf = wmem.asBuffer();
     }
-    try {
-      @SuppressWarnings("unused")
-      Memory mem = buf.asMemory();
-      fail();
-    } catch (IllegalStateException e) {
-      //ok
-    }
+    @SuppressWarnings("unused")
+    Memory mem = buf.asMemory();
   }
 }

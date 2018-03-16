@@ -137,7 +137,7 @@ public class WritableMemoryTest {
     println("" + wmem.isSwapBytes());
   }
 
-  //@Test  //TODO This is just a scenario. Not a valid test.
+  @Test
   @SuppressWarnings("unused")
   public void checkOwnerClientCase() {
     WritableMemory owner = WritableMemory.allocate(64);
@@ -145,7 +145,7 @@ public class WritableMemoryTest {
     owner.putInt(0, 1); //But owner can write
     ((WritableMemory)client1).putInt(0, 2); //Client1 can write, but with explicit effort.
     Memory client2 = owner.region(0, owner.getCapacity()); //client2 cannot write (no API)
-    owner.putInt(0,  3); //But Owner should be able to  write! Fails!
+    owner.putInt(0,  3); //But Owner should be able to write
   }
 
   @Test

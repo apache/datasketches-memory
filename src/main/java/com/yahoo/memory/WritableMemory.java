@@ -5,10 +5,10 @@
 
 package com.yahoo.memory;
 
+import static com.yahoo.memory.BaseWritableMemoryImpl.ZERO_SIZE_MEMORY;
 import static com.yahoo.memory.Util.negativeCheck;
 import static com.yahoo.memory.Util.nullCheck;
 import static com.yahoo.memory.Util.zeroCheck;
-import static com.yahoo.memory.WritableMemoryImpl.ZERO_SIZE_MEMORY;
 
 import java.io.File;
 import java.io.IOException;
@@ -102,8 +102,9 @@ public abstract class WritableMemory extends Memory {
    * and to call <i>close()</i> when done.</p>
    *
    * @param capacityBytes the size of the desired memory in bytes.
-   * @return WritableHandler for this off-heap resource
+   * @return WritableHandle for this off-heap resource
    */
+  @SuppressWarnings("deprecation")
   public static WritableHandle allocateDirect(final long capacityBytes) {
     if (capacityBytes == 0) {
       return new WritableDirectHandle(null, ZERO_SIZE_MEMORY);
@@ -130,6 +131,7 @@ public abstract class WritableMemory extends Memory {
    * @param server A user-specified MemoryRequestServer.
    * @return WritableHandler for this off-heap resource
    */
+  @SuppressWarnings("deprecation")
   public static WritableHandle allocateDirect(final long capacityBytes,
       final MemoryRequestServer server) {
     if (capacityBytes == 0) {

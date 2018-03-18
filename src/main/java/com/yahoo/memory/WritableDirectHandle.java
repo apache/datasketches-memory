@@ -11,9 +11,11 @@ package com.yahoo.memory;
  *
  * @author Roman Leventov
  * @author Lee Rhodes
+ * @deprecated as public. Use WritableHandle.
  */
 //Joins a WritableHandle with writable, AutoCloseable AllocateDirect resource
-final class WritableDirectHandle implements WritableHandle {
+@Deprecated //as public
+public final class WritableDirectHandle implements WritableHandle {
   AllocateDirect direct;
   WritableMemory wMem;
 

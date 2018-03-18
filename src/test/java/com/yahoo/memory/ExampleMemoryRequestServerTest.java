@@ -84,7 +84,7 @@ public class ExampleMemoryRequestServerTest {
       WritableMemory bigMem = svr.request(2 * cap1); //get bigger mem
       long cap2 = bigMem.getCapacity();
       smallMem.copyTo(0, bigMem, 0, cap1);    //copy data from small to big
-      svr.release(smallMem);                  //done with smallMem, release it
+      svr.requestClose(smallMem, bigMem);                  //done with smallMem, release it
 
       bigMem.fill(cap1, cap1, (byte) 2);      //fill the rest of bigMem, still not big enough
       println(bigMem.toHexString("Big", 0, (int)cap2));
@@ -92,11 +92,11 @@ public class ExampleMemoryRequestServerTest {
       WritableMemory giantMem = svr.request(2 * cap2); //get giant mem
       long cap3 = giantMem.getCapacity();
       bigMem.copyTo(0, giantMem, 0, cap2);    //copy data from small to big
-      svr.release(bigMem);                    //done with bigMem, release it
+      svr.requestClose(bigMem, giantMem);                    //done with bigMem, release it
 
       giantMem.fill(cap2, cap2, (byte) 3);    //fill the rest of giantMem
       println(giantMem.toHexString("Giant", 0, (int)cap3));
-      svr.release(giantMem);                 //done with giantMem, release it
+      svr.requestClose(giantMem, null);                 //done with giantMem, release it
     }
   }
 
@@ -119,7 +119,7 @@ public class ExampleMemoryRequestServerTest {
     @SuppressWarnings("resource")
     @Override
     //here we actually release it, in reality it might be a lot more complex.
-    public void release(WritableMemory memToRelease) {
+    public void requestClose(WritableMemory memToRelease, WritableMemory newMemory) {
       if (memToRelease != null) {
         WritableHandle handle = map.get(memToRelease);
         if ((handle != null) && (handle.get() == memToRelease)) {

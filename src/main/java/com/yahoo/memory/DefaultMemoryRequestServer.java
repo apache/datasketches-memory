@@ -18,7 +18,7 @@ final class DefaultMemoryRequestServer implements MemoryRequestServer {
   }
 
   @Override
-  public void release(final WritableMemory memToRelease) {
+  public void requestClose(final WritableMemory memToRelease, final WritableMemory newMemory) {
     //Because the new allocations are on the heap, we can ignore this
   }
 

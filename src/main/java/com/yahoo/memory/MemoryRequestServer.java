@@ -15,18 +15,19 @@ package com.yahoo.memory;
 public interface MemoryRequestServer {
 
   /**
-   * Request new WritableMemory with the given capacity via a WritableDirectHandle.
-   * @param capacityBytes The capacity being requested
-   * @return new WritableDirectHandle with the reference to new WritableMemory of the
-   * given capacity.
+   * Request new WritableMemory with the given capacity.
+   * @param capacityBytes The capacity being requested.
+   * @return new WritableMemory with the given capacity.
    */
   WritableMemory request(long capacityBytes);
 
   /**
-   * Request to release (perhaps to close) the backing memory for the given WritableMemory.
+   * Request close the AutoCloseable resource.
    * This may be ignored depending on the implementation.
-   * @param memToRelease the memory to release
+   * @param memToClose the relevant WritbleMemory to be considered for closing.
+   * @param newMemory the newly allocated WritableMemory. This is returned from the client
+   * for the convenience of the resource owner. It is optional and may be null.
    */
-  void release(final WritableMemory memToRelease);
+  void requestClose(final WritableMemory memToClose, WritableMemory newMemory);
 
 }

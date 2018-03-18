@@ -29,23 +29,23 @@ public class AllocateDirectMemoryTest {
     int longs1 = 32;
     int bytes1 = longs1 << 3;
     try (WritableHandle wh = WritableMemory.allocateDirect(bytes1)) {
-      WritableMemory wMem1 = wh.get();
+      WritableMemory origWmem = wh.get();
       for (int i = 0; i<longs1; i++) { //puts data in wMem1
-        wMem1.putLong(i << 3, i);
-        assertEquals(wMem1.getLong(i << 3), i);
+        origWmem.putLong(i << 3, i);
+        assertEquals(origWmem.getLong(i << 3), i);
       }
-      println(wMem1.toHexString("Test", 0, 32 * 8));
+      println(origWmem.toHexString("Test", 0, 32 * 8));
 
       int longs2 = 64;
       int bytes2 = longs2 << 3;
-      MemoryRequestServer memReqSvr = wMem1.getMemoryRequestServer();
-      WritableMemory wMem2 = memReqSvr.request(bytes2);
-      assertFalse(wMem2.isDirect()); //on heap by default
+      MemoryRequestServer memReqSvr = origWmem.getMemoryRequestServer();
+      WritableMemory newWmem = memReqSvr.request(bytes2);
+      assertFalse(newWmem.isDirect()); //on heap by default
       for (int i = 0; i < longs2; i++) {
-          wMem2.putLong(i << 3, i);
-          assertEquals(wMem2.getLong(i << 3), i);
+          newWmem.putLong(i << 3, i);
+          assertEquals(newWmem.getLong(i << 3), i);
       }
-      memReqSvr.release(wMem1);
+      memReqSvr.requestClose(origWmem, newWmem);
       //The default MRS doesn't actually realease because it could be misused.
       // so we let the TWR release it.
     }

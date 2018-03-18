@@ -104,7 +104,6 @@ public abstract class WritableMemory extends Memory {
    * @param capacityBytes the size of the desired memory in bytes.
    * @return WritableHandle for this off-heap resource
    */
-  @SuppressWarnings("deprecation")
   public static WritableHandle allocateDirect(final long capacityBytes) {
     if (capacityBytes == 0) {
       return new WritableDirectHandle(null, ZERO_SIZE_MEMORY);
@@ -131,7 +130,6 @@ public abstract class WritableMemory extends Memory {
    * @param server A user-specified MemoryRequestServer.
    * @return WritableHandler for this off-heap resource
    */
-  @SuppressWarnings("deprecation")
   public static WritableHandle allocateDirect(final long capacityBytes,
       final MemoryRequestServer server) {
     if (capacityBytes == 0) {

@@ -67,10 +67,11 @@ final class ResourceState {
   private long capacity_;
 
   /**
-   * Only relevant when user allocated direct memory is the backing resource. It is a callback
-   * mechanism for the client of a resource to request more memory from the owner of the resource.
+   * Primarily used for when the user allocated direct memory is the backing resource.
+   * It is a callback mechanism for the client of a resource to request more memory from the
+   * owner of the memory resource.
    */
-  private MemoryRequestServer memReqSvr_;
+  private MemoryRequestServer memReqSvr_ = new DefaultMemoryRequestServer();
 
   //FLAGS
   /**

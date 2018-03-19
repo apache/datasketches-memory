@@ -17,16 +17,16 @@ public final class WritableDirectHandle implements WritableHandle {
   AllocateDirect direct;
   WritableMemory wMem;
 
-  WritableDirectHandle(final AllocateDirect direct, final WritableMemory wMem) {
-    this.direct = direct;
+  WritableDirectHandle(final AllocateDirect allocatedDirect, final WritableMemory wMem) {
+    direct = allocatedDirect;
     this.wMem = wMem;
   }
 
   @SuppressWarnings("resource")
   static WritableDirectHandle allocateDirect(final ResourceState state) {
-    final AllocateDirect direct = AllocateDirect.allocateDirect(state);
+    final AllocateDirect allocatedDirect = AllocateDirect.allocateDirect(state.getCapacity(), state);
     final WritableMemory wMem = new WritableMemoryImpl(state, false);
-    final WritableDirectHandle handle = new WritableDirectHandle(direct, wMem);
+    final WritableDirectHandle handle = new WritableDirectHandle(allocatedDirect, wMem);
     return handle;
   }
 

@@ -213,6 +213,10 @@ final class ResourceState {
     return valid_.get();
   }
 
+  StepBoolean getValid() {
+    return valid_;
+  }
+
   void setInvalid() {
     valid_.change();
   }

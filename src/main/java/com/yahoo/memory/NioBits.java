@@ -122,38 +122,32 @@ final class NioBits {
   }
 
   //RESERVE & UNRESERVE BITS MEMORY TRACKING COUNTERS
-  static void reserveMemory(final long capacity) {
+  static void reserveMemory(final long allocationSize) {
     try {
-      reserveUnreserve(capacity, NIO_BITS_RESERVE_MEMORY_METHOD);
+      reserveUnreserve(allocationSize, NIO_BITS_RESERVE_MEMORY_METHOD);
     } catch (final Exception e) {
       throw new RuntimeException("Could not invoke java.nio.Bits.reserveMemory(...): "
-          + "capacity = " + capacity + "\n" + e);
+          + "allocationSize = " + allocationSize + "\n" + e);
     }
   }
 
-  static void unreserveMemory(final long capacity) {
+  static void unreserveMemory(final long allocationSize) {
     try {
-      reserveUnreserve(capacity, NIO_BITS_UNRESERVE_MEMORY_METHOD);
+      reserveUnreserve(allocationSize, NIO_BITS_UNRESERVE_MEMORY_METHOD);
     } catch (final Exception e) {
       throw new RuntimeException("Could not invoke java.nio.Bits.unreserveMemory(...): "
-          + "capacity = " + capacity + "\n" + e);
+          + "allocationSize = " + allocationSize + "\n" + e);
     }
   }
 
-  private static void reserveUnreserve(long capacity, final Method method) throws Exception {
-    Util.zeroCheck(capacity, "capacity");
-    boolean pageAdj = isPageAligned;
-    while (capacity > (1L << 30)) {
-      final long chunk = Math.min(capacity, (1L << 30)); // 1GB chunks
-      final long size = pageAdj ? chunk + pageSize : chunk;
-      method.invoke(null, size, (int) chunk);
-      capacity -= chunk;
-      pageAdj = false;
-    }
-
-    if (capacity > 0) {
-      final long size = pageAdj ? capacity + pageSize : capacity;
-      method.invoke(null, size, (int) capacity);
+  private static void reserveUnreserve(long allocationSize, final Method method) throws Exception {
+    Util.zeroCheck(allocationSize, "allocationSize");
+    // 1GB is a pretty "safe" limit.
+    final long chunkSizeLimit = 1L << 30;
+    while (allocationSize > 0) {
+      final long chunk = Math.min(allocationSize, chunkSizeLimit);
+      method.invoke(null, chunk, (int) chunk);
+      allocationSize -= chunk;
     }
   }
 }

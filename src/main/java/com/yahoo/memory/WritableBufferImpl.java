@@ -68,8 +68,7 @@ final class WritableBufferImpl extends BaseWritableBufferImpl {
   private WritableBuffer writableDuplicateImpl(final boolean localReadOnly) {
     checkValid();
     if (capacity == 0) { return ZERO_SIZE_BUFFER; }
-    final WritableBufferImpl wBufImpl =
-        new WritableBufferImpl(state, localReadOnly, originMemory);
+    final WritableBufferImpl wBufImpl = new WritableBufferImpl(state, localReadOnly, originMemory);
     wBufImpl.setStartPositionEnd(getStart(), getPosition(), getEnd());
     return wBufImpl;
   }

@@ -6,17 +6,14 @@
 package com.yahoo.memory;
 
 import static com.yahoo.memory.UnsafeUtil.ARRAY_CHAR_BASE_OFFSET;
-import static com.yahoo.memory.UnsafeUtil.ARRAY_CHAR_INDEX_SCALE;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_DOUBLE_BASE_OFFSET;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_DOUBLE_INDEX_SCALE;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_FLOAT_BASE_OFFSET;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_FLOAT_INDEX_SCALE;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_INT_BASE_OFFSET;
-import static com.yahoo.memory.UnsafeUtil.ARRAY_INT_INDEX_SCALE;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_LONG_BASE_OFFSET;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_LONG_INDEX_SCALE;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_SHORT_BASE_OFFSET;
-import static com.yahoo.memory.UnsafeUtil.ARRAY_SHORT_INDEX_SCALE;
 import static com.yahoo.memory.UnsafeUtil.CHAR_SHIFT;
 import static com.yahoo.memory.UnsafeUtil.DOUBLE_SHIFT;
 import static com.yahoo.memory.UnsafeUtil.FLOAT_SHIFT;
@@ -27,7 +24,6 @@ import static com.yahoo.memory.UnsafeUtil.checkBounds;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 
 import java.nio.ByteOrder;
-import java.time.OffsetDateTime;
 
 /*
  * Developer notes: The heavier methods, such as put/get arrays, duplicate, region, clear, fill,

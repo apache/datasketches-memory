@@ -27,7 +27,7 @@ public class MapHandle implements Map, Handle {
   @SuppressWarnings("resource") //called from memory. state: RRO, cap, BO
   static MapHandle map(final ResourceState state, final File file, final long fileOffset) {
     final AllocateDirectMap dirMap = AllocateDirectMap.map(state, file, fileOffset);
-    final BaseWritableMemoryImpl wMem = new WritableMemoryImpl(state, true);
+    final BaseWritableMemoryImpl wMem = BaseWritableMemoryImpl.newInstance(state, true);
     return new MapHandle(dirMap, wMem);
   }
 

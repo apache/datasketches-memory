@@ -46,8 +46,7 @@ public abstract class WritableMemory extends Memory {
     state.putByteBuffer(byteBuf); //sets resourceOrder
     AccessByteBuffer.wrap(state);
     final boolean ro = state.isResourceReadOnly() || localReadOnly;
-    final BaseWritableMemoryImpl impl = new WritableMemoryImpl(state, ro);
-    return impl;
+    return BaseWritableMemoryImpl.newInstance(state, ro);
   }
 
   //MAP XXX

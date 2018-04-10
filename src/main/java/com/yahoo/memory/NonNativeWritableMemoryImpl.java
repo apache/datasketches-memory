@@ -5,12 +5,9 @@
 
 package com.yahoo.memory;
 
-import static com.yahoo.memory.UnsafeUtil.ARRAY_CHAR_INDEX_SCALE;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_DOUBLE_INDEX_SCALE;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_FLOAT_INDEX_SCALE;
-import static com.yahoo.memory.UnsafeUtil.ARRAY_INT_INDEX_SCALE;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_LONG_INDEX_SCALE;
-import static com.yahoo.memory.UnsafeUtil.ARRAY_SHORT_INDEX_SCALE;
 import static com.yahoo.memory.UnsafeUtil.CHAR_SHIFT;
 import static com.yahoo.memory.UnsafeUtil.DOUBLE_SHIFT;
 import static com.yahoo.memory.UnsafeUtil.FLOAT_SHIFT;

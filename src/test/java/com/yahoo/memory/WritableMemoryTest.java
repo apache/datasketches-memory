@@ -5,7 +5,7 @@
 
 package com.yahoo.memory;
 
-import static com.yahoo.memory.CompareAndCopy.UNSAFE_COPY_THRESHOLD;
+import static com.yahoo.memory.CompareAndCopy.UNSAFE_COPY_THRESHOLD_BYTES;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -111,7 +111,7 @@ public class WritableMemoryTest {
   public void checkLargeEquals() {
     // Size bigger than UNSAFE_COPY_MEMORY_THRESHOLD; size with "reminder" = 7, to test several
     // traits of the implementation
-    final int thresh = UNSAFE_COPY_THRESHOLD;
+    final int thresh = UNSAFE_COPY_THRESHOLD_BYTES;
     byte[] bytes1 = new byte[(thresh * 2) + 7];
     ThreadLocalRandom.current().nextBytes(bytes1);
     byte[] bytes2 = bytes1.clone();

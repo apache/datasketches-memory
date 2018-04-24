@@ -46,7 +46,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
 
   static {
     final ResourceState state = new ResourceState(new byte[0], Prim.BYTE, 0);
-    ZERO_SIZE_BUFFER = new WritableBufferImpl(state, true, null);
+    ZERO_SIZE_BUFFER = new WritableBufferImpl(state, true, BaseWritableMemoryImpl.ZERO_SIZE_MEMORY);
   }
 
   //called from one of the Endian-sensitive WritableBufferImpls

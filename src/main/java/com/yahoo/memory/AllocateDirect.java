@@ -35,20 +35,20 @@ final class AllocateDirect implements AutoCloseable {
 
     final boolean pageAligned = NioBits.isPageAligned();
     final long pageSize = NioBits.pageSize();
-    final long size = capacity + (pageAligned ? pageSize : 0);
+    final long allocationSize = capacity + (pageAligned ? pageSize : 0);
     NioBits.reserveMemory(capacity);
     final long nativeBaseOffset;
 
-    long nativeAddress = 0;
+    final long nativeAddress;
     try {
-      nativeAddress = unsafe.allocateMemory(size);
+      nativeAddress = unsafe.allocateMemory(allocationSize);
     } catch (final OutOfMemoryError err) {
       NioBits.unreserveMemory(capacity);
       throw err;
     }
     if (pageAligned && ((nativeAddress % pageSize) != 0)) {
       //Round up to page boundary
-      nativeBaseOffset = (nativeAddress + pageSize) - (nativeAddress & (pageSize - 1L));
+      nativeBaseOffset = (nativeAddress & ~(pageSize - 1L)) + pageSize;
     } else {
       nativeBaseOffset = nativeAddress;
     }

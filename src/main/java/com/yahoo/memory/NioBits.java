@@ -122,6 +122,9 @@ final class NioBits {
   }
 
   //RESERVE & UNRESERVE BITS MEMORY TRACKING COUNTERS
+  // Comment from java.nio.Bits.java ~ line 705:
+  // -XX:MaxDirectMemorySize limits the total capacity rather than the
+  // actual memory usage, which will differ when buffers are page aligned.
   static void reserveMemory(final long capacity) {
     try {
       reserveUnreserve(capacity, NIO_BITS_RESERVE_MEMORY_METHOD);
@@ -142,18 +145,12 @@ final class NioBits {
 
   private static void reserveUnreserve(long capacity, final Method method) throws Exception {
     Util.zeroCheck(capacity, "capacity");
-    boolean pageAdj = isPageAligned;
-    while (capacity > (1L << 30)) {
-      final long chunk = Math.min(capacity, (1L << 30)); // 1GB chunks
-      final long size = pageAdj ? chunk + pageSize : chunk;
-      method.invoke(null, size, (int) chunk);
+    // 1GB is a pretty "safe" limit.
+    final long chunkSizeLimit = 1L << 30;
+    while (capacity > 0) {
+      final long chunk = Math.min(capacity, chunkSizeLimit);
+      method.invoke(null, chunk, (int) chunk);
       capacity -= chunk;
-      pageAdj = false;
-    }
-
-    if (capacity > 0) {
-      final long size = pageAdj ? capacity + pageSize : capacity;
-      method.invoke(null, size, (int) capacity);
     }
   }
 }

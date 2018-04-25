@@ -112,7 +112,7 @@ public abstract class WritableBuffer extends Buffer {
   //PRIMITIVE putXXX() and putXXXArray() XXX
   /**
    * Puts the boolean value at the current position.
-   * Increments the position by <i>Boolean.BYTES</i>.
+   * Increments the position by 1.
    * @param value the value to put
    */
   public abstract void putBoolean(boolean value);
@@ -127,12 +127,13 @@ public abstract class WritableBuffer extends Buffer {
 
   /**
    * Puts the boolean array at the current position.
-   * Increments the position by <i>Boolean.BYTES * (lengthBooleans - srcOffset)</i>.
+   * Increments the position by <i>lengthBooleans - srcOffsetBooleans</i>.
    * @param srcArray The source array.
-   * @param srcOffset offset in array units
+   * @param srcOffsetBooleans offset in array units
    * @param lengthBooleans number of array units to transfer
    */
-  public abstract void putBooleanArray(boolean[] srcArray, int srcOffset, int lengthBooleans);
+  public abstract void putBooleanArray(boolean[] srcArray, int srcOffsetBooleans,
+      int lengthBooleans);
 
   /**
    * Puts the byte value at the current position.
@@ -151,16 +152,16 @@ public abstract class WritableBuffer extends Buffer {
 
   /**
    * Puts the byte array at the current position.
-   * Increments the position by <i>Byte.BYTES * (lengthBytes - srcOffset)</i>.
+   * Increments the position by <i>Byte.BYTES * (lengthBytes - srcOffsetBytes)</i>.
    * @param srcArray The source array.
-   * @param srcOffset offset in array units
+   * @param srcOffsetBytes offset in array units
    * @param lengthBytes number of array units to transfer
    */
-  public abstract void putByteArray(byte[] srcArray, int srcOffset, int lengthBytes);
+  public abstract void putByteArray(byte[] srcArray, int srcOffsetBytes, int lengthBytes);
 
   /**
    * Puts the char value at the current position.
-   * Increments the position by <i>Char.BYTES</i>.
+   * Increments the position by <i>Character.BYTES</i>.
    * @param value the value to put
    */
   public abstract void putChar(char value);
@@ -175,12 +176,12 @@ public abstract class WritableBuffer extends Buffer {
 
   /**
    * Puts the char array at the current position.
-   * Increments the position by <i>Char.BYTES * (lengthChars - srcOffset)</i>.
+   * Increments the position by <i>Character.BYTES * (lengthChars - srcOffsetChars)</i>.
    * @param srcArray The source array.
-   * @param srcOffset offset in array units
+   * @param srcOffsetChars offset in array units
    * @param lengthChars number of array units to transfer
    */
-  public abstract void putCharArray(char[] srcArray, int srcOffset, int lengthChars);
+  public abstract void putCharArray(char[] srcArray, int srcOffsetChars, int lengthChars);
 
   /**
    * Puts the double value at the current position.
@@ -199,12 +200,12 @@ public abstract class WritableBuffer extends Buffer {
 
   /**
    * Puts the double array at the current position.
-   * Increments the position by <i>Double.BYTES * (lengthDoubles - srcOffset)</i>.
+   * Increments the position by <i>Double.BYTES * (lengthDoubles - srcOffsetDoubles)</i>.
    * @param srcArray The source array.
-   * @param srcOffset offset in array units
+   * @param srcOffsetDoubles offset in array units
    * @param lengthDoubles number of array units to transfer
    */
-  public abstract void putDoubleArray(double[] srcArray, int srcOffset, int lengthDoubles);
+  public abstract void putDoubleArray(double[] srcArray, int srcOffsetDoubles, int lengthDoubles);
 
   /**
    * Puts the float value at the current position.
@@ -223,16 +224,16 @@ public abstract class WritableBuffer extends Buffer {
 
   /**
    * Puts the float array at the current position.
-   * Increments the position by <i>Float.BYTES * (lengthFloats - srcOffset)</i>.
+   * Increments the position by <i>Float.BYTES * (lengthFloats - srcOffsetFloats)</i>.
    * @param srcArray The source array.
-   * @param srcOffset offset in array units
+   * @param srcOffsetFloats offset in array units
    * @param lengthFloats number of array units to transfer
    */
-  public abstract void putFloatArray(float[] srcArray, int srcOffset, int lengthFloats);
+  public abstract void putFloatArray(float[] srcArray, int srcOffsetFloats, int lengthFloats);
 
   /**
    * Puts the int value at the current position.
-   * Increments the position by <i>Int.BYTES</i>.
+   * Increments the position by <i>Integer.BYTES</i>.
    * @param value the value to put
    */
   public abstract void putInt(int value);
@@ -247,12 +248,12 @@ public abstract class WritableBuffer extends Buffer {
 
   /**
    * Puts the int array at the current position.
-   * Increments the position by <i>Int.BYTES * (lengthInts - srcOffset)</i>.
+   * Increments the position by <i>Integer.BYTES * (lengthInts - srcOffsetInts)</i>.
    * @param srcArray The source array.
-   * @param srcOffset offset in array units
+   * @param srcOffsetInts offset in array units
    * @param lengthInts number of array units to transfer
    */
-  public abstract void putIntArray(int[] srcArray, int srcOffset, int lengthInts);
+  public abstract void putIntArray(int[] srcArray, int srcOffsetInts, int lengthInts);
 
   /**
    * Puts the long value at the current position.
@@ -271,12 +272,12 @@ public abstract class WritableBuffer extends Buffer {
 
   /**
    * Puts the long array at the current position.
-   * Increments the position by <i>Long.BYTES * (lengthLongs - srcOffset)</i>.
+   * Increments the position by <i>Long.BYTES * (lengthLongs - srcOffsetLongs)</i>.
    * @param srcArray The source array.
-   * @param srcOffset offset in array units
+   * @param srcOffsetLongs offset in array units
    * @param lengthLongs number of array units to transfer
    */
-  public abstract void putLongArray(long[] srcArray, int srcOffset, int lengthLongs);
+  public abstract void putLongArray(long[] srcArray, int srcOffsetLongs, int lengthLongs);
 
   /**
    * Puts the short value at the current position.
@@ -295,12 +296,12 @@ public abstract class WritableBuffer extends Buffer {
 
   /**
    * Puts the short array at the current position.
-   * Increments the position by <i>Short.BYTES * (lengthShorts - srcOffset)</i>.
+   * Increments the position by <i>Short.BYTES * (lengthShorts - srcOffsetShorts)</i>.
    * @param srcArray The source array.
-   * @param srcOffset offset in array units
+   * @param srcOffsetShorts offset in array units
    * @param lengthShorts number of array units to transfer
    */
-  public abstract void putShortArray(short[] srcArray, int srcOffset, int lengthShorts);
+  public abstract void putShortArray(short[] srcArray, int srcOffsetShorts, int lengthShorts);
 
   //OTHER WRITE METHODS XXX
   /**
@@ -321,7 +322,8 @@ public abstract class WritableBuffer extends Buffer {
   public abstract void clear();
 
   /**
-   * Fills this Buffer from position to end with the given byte value. The position will be set to end.
+   * Fills this Buffer from position to end with the given byte value. The position will be set to
+   * end.
    * @param value the given byte value
    */
   public abstract void fill(byte value);

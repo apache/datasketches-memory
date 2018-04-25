@@ -115,7 +115,8 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final boolean[] arr) {
-    return WritableMemoryImpl.newInstance(new ResourceState(arr, Prim.BOOLEAN, arr.length), true);
+    return BaseWritableMemoryImpl.newInstance(new ResourceState(arr, Prim.BOOLEAN, arr.length),
+        true);
   }
 
   /**
@@ -155,7 +156,7 @@ public abstract class Memory {
     final ResourceState state = new ResourceState(arr, Prim.BYTE, lengthBytes);
     state.putRegionOffset(offsetBytes);
     state.putResourceOrder(byteOrder);
-    return WritableMemoryImpl.newInstance(state, true);
+    return BaseWritableMemoryImpl.newInstance(state, true);
   }
 
   /**
@@ -165,7 +166,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final char[] arr) {
-    return WritableMemoryImpl.newInstance(new ResourceState(arr, Prim.CHAR, arr.length), true);
+    return BaseWritableMemoryImpl.newInstance(new ResourceState(arr, Prim.CHAR, arr.length), true);
   }
 
   /**
@@ -175,7 +176,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final short[] arr) {
-    return WritableMemoryImpl.newInstance(new ResourceState(arr, Prim.SHORT, arr.length), true);
+    return BaseWritableMemoryImpl.newInstance(new ResourceState(arr, Prim.SHORT, arr.length), true);
   }
 
   /**
@@ -185,7 +186,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final int[] arr) {
-    return WritableMemoryImpl.newInstance(new ResourceState(arr, Prim.INT, arr.length), true);
+    return BaseWritableMemoryImpl.newInstance(new ResourceState(arr, Prim.INT, arr.length), true);
   }
 
   /**
@@ -195,7 +196,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final long[] arr) {
-    return WritableMemoryImpl.newInstance(new ResourceState(arr, Prim.LONG, arr.length), true);
+    return BaseWritableMemoryImpl.newInstance(new ResourceState(arr, Prim.LONG, arr.length), true);
   }
 
   /**
@@ -205,7 +206,7 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final float[] arr) {
-    return WritableMemoryImpl.newInstance(new ResourceState(arr, Prim.FLOAT, arr.length), true);
+    return BaseWritableMemoryImpl.newInstance(new ResourceState(arr, Prim.FLOAT, arr.length), true);
   }
 
   /**
@@ -215,7 +216,8 @@ public abstract class Memory {
    * @return Memory for read operations
    */
   public static Memory wrap(final double[] arr) {
-    return WritableMemoryImpl.newInstance(new ResourceState(arr, Prim.DOUBLE, arr.length), true);
+    return BaseWritableMemoryImpl.newInstance(new ResourceState(arr, Prim.DOUBLE, arr.length),
+        true);
   }
 
   //PRIMITIVE getXXX() and getXXXArray() XXX
@@ -230,10 +232,10 @@ public abstract class Memory {
    * Gets the boolean array at the given offset
    * @param offsetBytes offset bytes relative to this Memory start
    * @param dstArray The preallocated destination array.
-   * @param dstOffset offset in array units
+   * @param dstOffsetBooleans offset in array units
    * @param lengthBooleans number of array units to transfer
    */
-  public abstract void getBooleanArray(long offsetBytes, boolean[] dstArray, int dstOffset,
+  public abstract void getBooleanArray(long offsetBytes, boolean[] dstArray, int dstOffsetBooleans,
       int lengthBooleans);
 
   /**
@@ -247,10 +249,10 @@ public abstract class Memory {
    * Gets the byte array at the given offset
    * @param offsetBytes offset bytes relative to this Memory start
    * @param dstArray The preallocated destination array.
-   * @param dstOffset offset in array units
+   * @param dstOffsetBytes offset in array units
    * @param lengthBytes number of array units to transfer
    */
-  public abstract void getByteArray(long offsetBytes, byte[] dstArray, int dstOffset,
+  public abstract void getByteArray(long offsetBytes, byte[] dstArray, int dstOffsetBytes,
       int lengthBytes);
 
   /**
@@ -264,10 +266,10 @@ public abstract class Memory {
    * Gets the char array at the given offset
    * @param offsetBytes offset bytes relative to this Memory start
    * @param dstArray The preallocated destination array.
-   * @param dstOffset offset in array units
+   * @param dstOffsetChars offset in array units
    * @param lengthChars number of array units to transfer
    */
-  public abstract void getCharArray(long offsetBytes, char[] dstArray, int dstOffset,
+  public abstract void getCharArray(long offsetBytes, char[] dstArray, int dstOffsetChars,
       int lengthChars);
 
   /**
@@ -304,7 +306,7 @@ public abstract class Memory {
    * @return the number of characters decoded.
    * @throws Utf8CodingException in case of malformed or illegal UTF-8 input
    */
-  public int getCharsFromUtf8(final long offsetBytes, final int utf8LengthBytes,
+  public final int getCharsFromUtf8(final long offsetBytes, final int utf8LengthBytes,
       final StringBuilder dst) throws Utf8CodingException {
     try {
       // Ensure that we do at most one resize of internal StringBuilder's char array
@@ -326,10 +328,10 @@ public abstract class Memory {
    * Gets the double array at the given offset
    * @param offsetBytes offset bytes relative to this Memory start
    * @param dstArray The preallocated destination array.
-   * @param dstOffset offset in array units
+   * @param dstOffsetDoubles offset in array units
    * @param lengthDoubles number of array units to transfer
    */
-  public abstract void getDoubleArray(long offsetBytes, double[] dstArray, int dstOffset,
+  public abstract void getDoubleArray(long offsetBytes, double[] dstArray, int dstOffsetDoubles,
       int lengthDoubles);
 
   /**
@@ -343,10 +345,10 @@ public abstract class Memory {
    * Gets the float array at the given offset
    * @param offsetBytes offset bytes relative to this Memory start
    * @param dstArray The preallocated destination array.
-   * @param dstOffset offset in array units
+   * @param dstOffsetFloats offset in array units
    * @param lengthFloats number of array units to transfer
    */
-  public abstract void getFloatArray(long offsetBytes, float[] dstArray, int dstOffset,
+  public abstract void getFloatArray(long offsetBytes, float[] dstArray, int dstOffsetFloats,
       int lengthFloats);
 
   /**
@@ -360,10 +362,10 @@ public abstract class Memory {
    * Gets the int array at the given offset
    * @param offsetBytes offset bytes relative to this Memory start
    * @param dstArray The preallocated destination array.
-   * @param dstOffset offset in array units
+   * @param dstOffsetInts offset in array units
    * @param lengthInts number of array units to transfer
    */
-  public abstract void getIntArray(long offsetBytes, int[] dstArray, int dstOffset,
+  public abstract void getIntArray(long offsetBytes, int[] dstArray, int dstOffsetInts,
       int lengthInts);
 
   /**
@@ -377,10 +379,10 @@ public abstract class Memory {
    * Gets the long array at the given offset
    * @param offsetBytes offset bytes relative to this Memory start
    * @param dstArray The preallocated destination array.
-   * @param dstOffset offset in array units
+   * @param dstOffsetLongs offset in array units
    * @param lengthLongs number of array units to transfer
    */
-  public abstract void getLongArray(long offsetBytes, long[] dstArray, int dstOffset,
+  public abstract void getLongArray(long offsetBytes, long[] dstArray, int dstOffsetLongs,
       int lengthLongs);
 
   /**
@@ -394,10 +396,10 @@ public abstract class Memory {
    * Gets the short array at the given offset
    * @param offsetBytes offset bytes relative to this Memory start
    * @param dstArray The preallocated destination array.
-   * @param dstOffset offset in array units
+   * @param dstOffsetShorts offset in array units
    * @param lengthShorts number of array units to transfer
    */
-  public abstract void getShortArray(long offsetBytes, short[] dstArray, int dstOffset,
+  public abstract void getShortArray(long offsetBytes, short[] dstArray, int dstOffsetShorts,
       int lengthShorts);
 
   //OTHER PRIMITIVE READ METHODS: compareTo, copyTo XXX

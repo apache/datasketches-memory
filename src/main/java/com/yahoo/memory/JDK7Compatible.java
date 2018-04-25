@@ -9,7 +9,7 @@ final class JDK7Compatible {
 
   private JDK7Compatible() {}
 
-  public static long getAndAddLong(final Object obj, final long address, final long increment) {
+  static long getAndAddLong(final Object obj, final long address, final long increment) {
     long retVal;
     do {
       retVal = UnsafeUtil.unsafe.getLongVolatile(obj, address);
@@ -18,7 +18,7 @@ final class JDK7Compatible {
     return retVal;
   }
 
-  public static long getAndSetLong(final Object obj, final long address, final long value) {
+  static long getAndSetLong(final Object obj, final long address, final long value) {
     long retVal;
     do {
       retVal = UnsafeUtil.unsafe.getLongVolatile(obj, address);

@@ -40,7 +40,7 @@ public abstract class BaseBuffer {
    * @param increment the given increment
    * @return BaseBuffer
    */
-  public BaseBuffer incrementPosition(final long increment) {
+  public final BaseBuffer incrementPosition(final long increment) {
     incrementAndAssertPositionForRead(pos, increment);
     return this;
   }
@@ -52,7 +52,7 @@ public abstract class BaseBuffer {
    * @param increment the given increment
    * @return BaseBuffer
    */
-  public BaseBuffer incrementAndCheckPosition(final long increment) {
+  public final BaseBuffer incrementAndCheckPosition(final long increment) {
     incrementAndCheckPositionForRead(pos, increment);
     return this;
   }
@@ -61,7 +61,7 @@ public abstract class BaseBuffer {
    * Gets the end position
    * @return the end position
    */
-  public long getEnd() {
+  public final long getEnd() {
     return end;
   }
 
@@ -69,7 +69,7 @@ public abstract class BaseBuffer {
    * Gets the current position
    * @return the current position
    */
-  public long getPosition() {
+  public final long getPosition() {
     return pos;
   }
 
@@ -77,7 +77,7 @@ public abstract class BaseBuffer {
    * Gets start position
    * @return start position
    */
-  public long getStart() {
+  public final long getStart() {
     return start;
   }
 
@@ -85,7 +85,7 @@ public abstract class BaseBuffer {
    * The number of elements remaining between the current position and the end position
    * @return {@code (end - position)}
    */
-  public long getRemaining()  {
+  public final long getRemaining()  {
     return end - pos;
   }
 
@@ -93,7 +93,7 @@ public abstract class BaseBuffer {
    * Returns true if there are elements remaining between the current position and the end position
    * @return {@code (end - position) > 0}
    */
-  public boolean hasRemaining() {
+  public final boolean hasRemaining() {
     return (end - pos) > 0;
   }
 
@@ -102,7 +102,7 @@ public abstract class BaseBuffer {
    * This does not modify any data.
    * @return BaseBuffer
    */
-  public BaseBuffer resetPosition() {
+  public final BaseBuffer resetPosition() {
     pos = start;
     return this;
   }
@@ -114,7 +114,7 @@ public abstract class BaseBuffer {
    * @param position the given current position.
    * @return BaseBuffer
    */
-  public BaseBuffer setPosition(final long position) {
+  public final BaseBuffer setPosition(final long position) {
     assertInvariants(start, position, end, capacity);
     pos = position;
     return this;
@@ -127,7 +127,7 @@ public abstract class BaseBuffer {
    * @param position the given current position.
    * @return BaseBuffer
    */
-  public BaseBuffer setAndCheckPosition(final long position) {
+  public final BaseBuffer setAndCheckPosition(final long position) {
     checkInvariants(start, position, end, capacity);
     pos = position;
     return this;
@@ -143,7 +143,7 @@ public abstract class BaseBuffer {
    * @return BaseBuffer
    */
   public final BaseBuffer setStartPositionEnd(final long start, final long position,
-        final long end) {
+      final long end) {
     assertInvariants(start, position, end, capacity);
     this.start = start;
     this.end = end;
@@ -161,7 +161,7 @@ public abstract class BaseBuffer {
    * @return BaseBuffer
    */
   public final BaseBuffer setAndCheckStartPositionEnd(final long start, final long position,
-        final long end) {
+      final long end) {
     checkInvariants(start, position, end, capacity);
     this.start = start;
     this.end = end;
@@ -170,14 +170,14 @@ public abstract class BaseBuffer {
   }
 
   //RESTRICTED XXX
-  void incrementAndAssertPositionForRead(final long position, final long increment) {
+  final void incrementAndAssertPositionForRead(final long position, final long increment) {
     assertValid();
     final long newPos = position + increment;
     assertInvariants(start, newPos, end, capacity);
     pos = newPos;
   }
 
-  void incrementAndAssertPositionForWrite(final long position, final long increment) {
+  final void incrementAndAssertPositionForWrite(final long position, final long increment) {
     assertValid();
     assert !isLocalReadOnly() : "Buffer is read-only.";
     final long newPos = position + increment;
@@ -185,21 +185,25 @@ public abstract class BaseBuffer {
     pos = newPos;
   }
 
-  void incrementAndCheckPositionForRead(final long pos, final long increment) {
+  final void incrementAndCheckPositionForRead(final long pos, final long increment) {
     checkValid();
     final long newPos = pos + increment;
     checkInvariants(start, newPos, end, capacity);
     this.pos = newPos;
   }
 
-  void incrementAndCheckPositionForWrite(final long pos, final long increment) {
+  final void incrementAndCheckPositionForWrite(final long pos, final long increment) {
+    checkValidForWrite();
+    final long newPos = pos + increment;
+    checkInvariants(start, newPos, end, capacity);
+    this.pos = newPos;
+  }
+
+  final void checkValidForWrite() {
     checkValid();
     if (isLocalReadOnly()) {
       throw new ReadOnlyException("Buffer is read-only.");
     }
-    final long newPos = pos + increment;
-    checkInvariants(start, newPos, end, capacity);
-    this.pos = newPos;
   }
 
   /**

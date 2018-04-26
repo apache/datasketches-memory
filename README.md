@@ -30,4 +30,4 @@
 [versioneye img]:https://www.versioneye.com/user/projects/59486c720fb24f004421522d/badge.svg?style=flat
 
 [coveralls]:https://coveralls.io/github/DataSketches/memory?branch=master
-[coveralls img]:https://coveralls.io/repos/github/DataSketches/memory/badge.svg?branch=master
+[coveralls img]:https://coveralls.io/repos/github/DataSketches/memory/badge.svg?branch=master&service=github

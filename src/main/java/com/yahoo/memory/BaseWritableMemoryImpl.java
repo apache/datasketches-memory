@@ -72,7 +72,33 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     }
   }
 
-  ///PRIMITIVE getXXX() and getXXXArray() XXX
+  //REGIONS XXX
+  @Override
+  public Memory region(final long offsetBytes, final long capacityBytes) {
+    return writableRegionImpl(offsetBytes, capacityBytes, true);
+  }
+
+  @Override
+  public WritableMemory writableRegion(final long offsetBytes, final long capacityBytes) {
+    return writableRegionImpl(offsetBytes, capacityBytes, localReadOnly);
+  }
+
+  abstract WritableMemory writableRegionImpl(long offsetBytes, long capacity, boolean localReadOnly);
+
+  //BUFFER XXX
+  @Override
+  public Buffer asBuffer() {
+    return asWritableBufferImpl(true);
+  }
+
+  @Override
+  public WritableBuffer asWritableBuffer() {
+    return asWritableBufferImpl(localReadOnly);
+  }
+
+  abstract WritableBuffer asWritableBufferImpl(boolean localReadOnly);
+
+  //PRIMITIVE getXXX() and getXXXArray() ENDIAN INDEPENDENT XXX
   @Override
   public final boolean getBoolean(final long offsetBytes) {
     assertValidAndBoundsForRead(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE);
@@ -120,6 +146,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     return Utf8.getCharsFromUtf8(offsetBytes, utf8LengthBytes, dst, state);
   }
 
+  //PRIMITIVE getXXXArray() Native Endian (used by both endians) XXX
   final char getNativeOrderedChar(final long offsetBytes) {
     assertValidAndBoundsForRead(offsetBytes, ARRAY_CHAR_INDEX_SCALE);
     return unsafe.getChar(unsafeObj, cumBaseOffset + offsetBytes);

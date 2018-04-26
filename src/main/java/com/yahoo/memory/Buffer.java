@@ -30,7 +30,7 @@ public abstract class Buffer extends BaseBuffer {
    * <p>Note that if the ByteBuffer capacity is zero this will
    * return a Buffer backed by a heap byte array of size zero.
    * @param byteBuf the given ByteBuffer, must not be null.
-   * @return the given ByteBuffer for read-only operations.
+   * @return the given Buffer for read-only operations.
    */
   public static Buffer wrap(final ByteBuffer byteBuf) {
     return WritableBuffer.wrapBB(byteBuf, true);

@@ -42,7 +42,7 @@ final class NonNativeWritableMemoryImpl extends BaseWritableMemoryImpl {
     super(state, localReadOnly);
     if (state.getResourceOrder() == ByteOrder.nativeOrder()) {
       throw new IllegalStateException(
-          "Expected non-native ordered state. This should be a bug in the Memory library.");
+          "Expected non-native ordered state. This may be a bug in the Memory library.");
     }
   }
 
@@ -51,7 +51,7 @@ final class NonNativeWritableMemoryImpl extends BaseWritableMemoryImpl {
   WritableMemory writableRegionImpl(final long offsetBytes, final long capacityBytes,
       final boolean localReadOnly) {
     checkValidAndBounds(offsetBytes, capacityBytes);
-    if (capacityBytes == 0) { return BaseWritableMemoryImpl.ZERO_SIZE_MEMORY; }
+    //if (capacityBytes == 0) { return BaseWritableMemoryImpl.ZERO_SIZE_MEMORY; } //cannot be 0
     final ResourceState newState = state.copy();
     newState.putRegionOffset(newState.getRegionOffset() + offsetBytes);
     newState.putCapacity(capacityBytes);
@@ -63,12 +63,9 @@ final class NonNativeWritableMemoryImpl extends BaseWritableMemoryImpl {
   WritableBuffer asWritableBufferImpl(final boolean localReadOnly) {
     checkValid();
     final BaseWritableBufferImpl wbuf;
-    if (capacity == 0) {
-      wbuf = BaseWritableBufferImpl.ZERO_SIZE_BUFFER;
-    } else {
-      wbuf = new NonNativeWritableBufferImpl(state, localReadOnly, this);
-      wbuf.setAndCheckStartPositionEnd(0, 0, capacity);
-    }
+    //cannot be 0 capacity here
+    wbuf = new NonNativeWritableBufferImpl(state, localReadOnly, this);
+    wbuf.setAndCheckStartPositionEnd(0, 0, capacity);
     return wbuf;
   }
 

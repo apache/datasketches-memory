@@ -49,7 +49,7 @@ final class WritableMemoryImpl extends BaseWritableMemoryImpl {
     super(state, localReadOnly);
     if (state.getResourceOrder() != ByteOrder.nativeOrder()) {
       throw new IllegalStateException(
-          "Expected native ordered state. This should be a bug in the Memory library.");
+          "Expected native ordered state. This may be a bug in the Memory library.");
     }
   }
 

@@ -532,10 +532,10 @@ public abstract class Memory {
   public abstract boolean isDirect();
 
   /**
-   * Returns true if the backing resource is read-only
-   * @return true if the backing resource is read-only
+   * Returns true if this or the backing resource is read-only
+   * @return true if this or backing resource is read-only
    */
-  public abstract boolean isResourceReadOnly();
+  public abstract boolean isReadOnly();
 
   /**
    * Returns true if the backing resource of <i>this</i> is identical with the backing resource

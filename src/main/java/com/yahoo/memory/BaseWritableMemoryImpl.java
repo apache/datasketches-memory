@@ -266,9 +266,9 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   }
 
   @Override
-  public final boolean isResourceReadOnly() {
+  public final boolean isReadOnly() {
     assertValid();
-    return state.isResourceReadOnly();
+    return state.isResourceReadOnly() || localReadOnly;
   }
 
   @Override

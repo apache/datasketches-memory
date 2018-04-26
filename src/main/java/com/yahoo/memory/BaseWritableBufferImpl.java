@@ -267,15 +267,9 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   }
 
   @Override
-  public final boolean isResourceReadOnly() {
+  public final boolean isReadOnly() {
     assertValid();
-    return state.isResourceReadOnly();
-  }
-
-  @Override
-  final boolean isLocalReadOnly() {
-    assertValid();
-    return localReadOnly;
+    return state.isResourceReadOnly() || localReadOnly;
   }
 
   @Override

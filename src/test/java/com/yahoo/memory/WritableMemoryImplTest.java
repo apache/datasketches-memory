@@ -531,10 +531,10 @@ public class WritableMemoryImplTest {
     long[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
 
     WritableMemory wmem = WritableMemory.wrap(srcArray);
-    assertFalse(wmem.isResourceReadOnly());
+    assertFalse(wmem.isReadOnly());
 
     Memory memRO = wmem;
-    assertFalse(memRO.isResourceReadOnly());
+    assertFalse(memRO.isReadOnly());
 
     for (int i = 0; i < wmem.getCapacity(); i++) {
       assertEquals(wmem.getByte(i), memRO.getByte(i));

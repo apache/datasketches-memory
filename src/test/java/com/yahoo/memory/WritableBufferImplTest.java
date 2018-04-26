@@ -335,10 +335,10 @@ public class WritableBufferImplTest {
     long[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
 
     WritableBuffer wbuf = WritableMemory.wrap(srcArray).asWritableBuffer();
-    assertFalse(wbuf.isResourceReadOnly());
+    assertFalse(wbuf.isReadOnly());
 
     Buffer buf = wbuf;
-    assertFalse(buf.isResourceReadOnly());
+    assertFalse(buf.isReadOnly());
 
     for (int i = 0; i < srcArray.length; i++) {
       assertEquals(buf.getLong(), srcArray[i]);

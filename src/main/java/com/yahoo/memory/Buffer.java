@@ -345,12 +345,6 @@ public abstract class Buffer extends BaseBuffer {
   public abstract boolean isDirect();
 
   /**
-   * Returns true if the backing resource is read only
-   * @return true if the backing resource is read only
-   */
-  public abstract boolean isResourceReadOnly();
-
-  /**
    * Returns true if the backing resource of <i>this</i> is identical with the backing resource
    * of <i>that</i>. If the backing resource is a heap array or ByteBuffer, the offset and
    * capacity must also be identical.

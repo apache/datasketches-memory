@@ -24,7 +24,7 @@ public abstract class WritableBuffer extends Buffer {
   /**
    * Accesses the given ByteBuffer for write operations.
    * @param byteBuf the given ByteBuffer
-   * @return the given ByteBuffer for write operations.
+   * @return the given WritableBuffer for write operations.
    */
   public static WritableBuffer wrap(final ByteBuffer byteBuf) {
     if (byteBuf.isReadOnly()) {
@@ -33,6 +33,7 @@ public abstract class WritableBuffer extends Buffer {
     return wrapBB(byteBuf, false);
   }
 
+  //First creates a WritableMemory so that it can be cached into the target buffer.
   static WritableBuffer wrapBB(final ByteBuffer byteBuf, final boolean localReadOnly) {
     final WritableMemory wmem = WritableMemory.wrapBB(byteBuf, localReadOnly);
     final WritableBuffer wbuf = wmem.asWritableBuffer();

@@ -50,22 +50,13 @@ final class WritableBufferImpl extends BaseWritableBufferImpl {
     super(state, localReadOnly, originMemory);
     if (state.getResourceOrder() != ByteOrder.nativeOrder()) {
       throw new IllegalStateException(
-          "Expected native ordered state. This should be a bug in the Memory library.");
+          "Expected native ordered state. This may be a bug in the Memory library.");
     }
   }
 
-  //DUPLICATES & REGIONS XXX
+  //DUPLICATES XXX
   @Override
-  public Buffer duplicate() {
-    return writableDuplicateImpl(false);
-  }
-
-  @Override
-  public WritableBuffer writableDuplicate() {
-    return writableDuplicateImpl(localReadOnly);
-  }
-
-  private WritableBuffer writableDuplicateImpl(final boolean localReadOnly) {
+  WritableBuffer writableDuplicateImpl(final boolean localReadOnly) {
     checkValid();
     if (capacity == 0) { return ZERO_SIZE_BUFFER; }
     final WritableBufferImpl wBufImpl = new WritableBufferImpl(state, localReadOnly, originMemory);
@@ -73,22 +64,9 @@ final class WritableBufferImpl extends BaseWritableBufferImpl {
     return wBufImpl;
   }
 
+  //REGIONS XXX
   @Override
-  public Buffer region() {
-    return writableRegionImpl(getPosition(), getEnd() - getPosition(), true);
-  }
-
-  @Override
-  public WritableBuffer writableRegion() {
-    return writableRegionImpl(getPosition(), getEnd() - getPosition(),  localReadOnly);
-  }
-
-  @Override
-  public WritableBuffer writableRegion(final long offsetBytes, final long capacityBytes) {
-    return writableRegionImpl(offsetBytes, capacityBytes, localReadOnly);
-  }
-
-  private WritableBuffer writableRegionImpl(final long offsetBytes, final long capacityBytes,
+  WritableBuffer writableRegionImpl(final long offsetBytes, final long capacityBytes,
       final boolean localReadOnly) {
     checkValidAndBounds(offsetBytes, capacityBytes);
     if (capacityBytes == 0) { return ZERO_SIZE_BUFFER; }
@@ -99,12 +77,6 @@ final class WritableBufferImpl extends BaseWritableBufferImpl {
         new WritableBufferImpl(newState, localReadOnly, originMemory);
     wBufImpl.setStartPositionEnd(0L, 0L, capacityBytes);
     return wBufImpl;
-  }
-
-  //MEMORY XXX
-  @Override
-  public Memory asMemory() {
-    return originMemory;
   }
 
   @Override

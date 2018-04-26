@@ -43,49 +43,27 @@ final class NonNativeWritableBufferImpl extends BaseWritableBufferImpl {
     super(state, localReadOnly, originMemory);
     if (state.getResourceOrder() == ByteOrder.nativeOrder()) {
       throw new IllegalStateException(
-          "Expected non-native ordered state. This should be a bug in the Memory library.");
+          "Expected non-native ordered state. This may be a bug in the Memory library.");
     }
   }
 
-  //DUPLICATES & REGIONS XXX
+  //DUPLICATES XXX
   @Override
-  public Buffer duplicate() {
-    return writableDuplicateImpl(false);
-  }
-
-  @Override
-  public WritableBuffer writableDuplicate() {
-    return writableDuplicateImpl(localReadOnly);
-  }
-
-  private WritableBuffer writableDuplicateImpl(final boolean localReadOnly) {
+  WritableBuffer writableDuplicateImpl(final boolean localReadOnly) {
     checkValid();
-    if (capacity == 0) { return ZERO_SIZE_BUFFER; }
+    //if (capacity == 0) { return ZERO_SIZE_BUFFER; } //cannot be zero here
     final NonNativeWritableBufferImpl wBufImpl =
         new NonNativeWritableBufferImpl(state, localReadOnly, originMemory);
     wBufImpl.setStartPositionEnd(getStart(), getPosition(), getEnd());
     return wBufImpl;
   }
 
+  //REGIONS XXX
   @Override
-  public Buffer region() {
-    return writableRegionImpl(getPosition(), getEnd() - getPosition(), true);
-  }
-
-  @Override
-  public WritableBuffer writableRegion() {
-    return writableRegionImpl(getPosition(), getEnd() - getPosition(),  localReadOnly);
-  }
-
-  @Override
-  public WritableBuffer writableRegion(final long offsetBytes, final long capacityBytes) {
-    return writableRegionImpl(offsetBytes, capacityBytes, localReadOnly);
-  }
-
-  private WritableBuffer writableRegionImpl(final long offsetBytes, final long capacityBytes,
+  WritableBuffer writableRegionImpl(final long offsetBytes, final long capacityBytes,
       final boolean localReadOnly) {
     checkValidAndBounds(offsetBytes, capacityBytes);
-    if (capacityBytes == 0) { return ZERO_SIZE_BUFFER; }
+    //if (capacityBytes == 0) { return ZERO_SIZE_BUFFER; } //cannot be zero here
     final ResourceState newState = state.copy();
     newState.putRegionOffset(newState.getRegionOffset() + offsetBytes);
     newState.putCapacity(capacityBytes);
@@ -93,20 +71,6 @@ final class NonNativeWritableBufferImpl extends BaseWritableBufferImpl {
         new NonNativeWritableBufferImpl(newState, localReadOnly, originMemory);
     wBufImpl.setStartPositionEnd(0L, 0L, capacityBytes);
     return wBufImpl;
-  }
-
-  //MEMORY XXX
-  @Override
-  public Memory asMemory() {
-    return originMemory;
-  }
-
-  @Override
-  public WritableMemory asWritableMemory() {
-    if (localReadOnly) {
-      throw new ReadOnlyException("This Buffer is Read-Only.");
-    }
-    return originMemory;
   }
 
   //PRIMITIVE getXXX() and getXXXArray() XXX

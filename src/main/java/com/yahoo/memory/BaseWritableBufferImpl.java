@@ -64,6 +64,51 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
     this.originMemory = originMemory;
   }
 
+  //DUPLICATES XXX
+  @Override
+  public Buffer duplicate() {
+    return writableDuplicateImpl(false);
+  }
+
+  @Override
+  public WritableBuffer writableDuplicate() {
+    return writableDuplicateImpl(localReadOnly);
+  }
+
+  abstract WritableBuffer writableDuplicateImpl(boolean localReadOnly);
+
+  //REGIONS XXX
+  @Override
+  public Buffer region() {
+    return writableRegionImpl(getPosition(), getEnd() - getPosition(), true);
+  }
+
+  @Override
+  public WritableBuffer writableRegion() {
+    return writableRegionImpl(getPosition(), getEnd() - getPosition(),  localReadOnly);
+  }
+
+  @Override
+  public WritableBuffer writableRegion(final long offsetBytes, final long capacityBytes) {
+    return writableRegionImpl(offsetBytes, capacityBytes, localReadOnly);
+  }
+
+  abstract WritableBuffer writableRegionImpl(long offsetBytes, long capacityBytes, boolean localReadOnly);
+
+  //MEMORY XXX
+  @Override
+  public Memory asMemory() {
+    return originMemory;
+  }
+
+  @Override
+  public WritableMemory asWritableMemory() {
+    if (localReadOnly) {
+      throw new ReadOnlyException("This Buffer is Read-Only.");
+    }
+    return originMemory;
+  }
+
   //PRIMITIVE getXXX() and getXXXArray() XXX
   @Override
   public final boolean getBoolean() {

@@ -49,22 +49,13 @@ final class WritableMemoryImpl extends BaseWritableMemoryImpl {
     super(state, localReadOnly);
     if (state.getResourceOrder() != ByteOrder.nativeOrder()) {
       throw new IllegalStateException(
-          "Expected native ordered state. This should be a bug in the Memory library.");
+          "Expected native ordered state. This may be a bug in the Memory library.");
     }
   }
 
   //REGIONS XXX
   @Override
-  public Memory region(final long offsetBytes, final long capacityBytes) {
-    return writableRegionImpl(offsetBytes, capacityBytes, true);
-  }
-
-  @Override
-  public WritableMemory writableRegion(final long offsetBytes, final long capacityBytes) {
-    return writableRegionImpl(offsetBytes, capacityBytes, localReadOnly);
-  }
-
-  private WritableMemory writableRegionImpl(final long offsetBytes, final long capacityBytes,
+  WritableMemory writableRegionImpl(final long offsetBytes, final long capacityBytes,
       final boolean localReadOnly) {
     checkValidAndBounds(offsetBytes, capacityBytes);
     if (capacityBytes == 0) { return ZERO_SIZE_MEMORY; }
@@ -76,18 +67,9 @@ final class WritableMemoryImpl extends BaseWritableMemoryImpl {
 
   //BUFFER XXX
   @Override
-  public Buffer asBuffer() {
-    return asWritableBufferImpl(true);
-  }
-
-  @Override
-  public WritableBuffer asWritableBuffer() {
-    return asWritableBufferImpl(localReadOnly);
-  }
-
-  private WritableBuffer asWritableBufferImpl(final boolean localReadOnly) {
+  WritableBuffer asWritableBufferImpl(final boolean localReadOnly) {
     checkValid();
-    final WritableBufferImpl wbuf;
+    final BaseWritableBufferImpl wbuf;
     if (capacity == 0) {
       wbuf = BaseWritableBufferImpl.ZERO_SIZE_BUFFER;
     } else {

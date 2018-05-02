@@ -146,7 +146,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     return Utf8.getCharsFromUtf8(offsetBytes, utf8LengthBytes, dst, state);
   }
 
-  //PRIMITIVE getXXXArray() Native Endian (used by both endians) XXX
+  //PRIMITIVE getXXX() Native Endian (used by both endians) XXX
   final char getNativeOrderedChar(final long offsetBytes) {
     assertValidAndBoundsForRead(offsetBytes, ARRAY_CHAR_INDEX_SCALE);
     return unsafe.getChar(unsafeObj, cumBaseOffset + offsetBytes);
@@ -354,6 +354,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     return Utf8.putCharsToUtf8(offsetBytes, src, state);
   }
 
+  //PRIMITIVE putXXX() Native Endian (used by both endians) XXX
   final void putNativeOrderedChar(final long offsetBytes, final char value) {
     assertValidAndBoundsForWrite(offsetBytes, ARRAY_CHAR_INDEX_SCALE);
     unsafe.putChar(unsafeObj, cumBaseOffset + offsetBytes, value);
@@ -490,7 +491,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     return state;
   }
 
-  private void assertValid() {
+  final void assertValid() {
     assert state.isValid() : "Memory not valid.";
   }
 

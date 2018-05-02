@@ -166,6 +166,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
             copyBytes);
   }
 
+  //PRIMITIVE getXXX() Native Endian (used by both endians) XXX
   final char getNativeOrderedChar() {
     final long pos = getPosition();
     incrementAndAssertPositionForRead(pos, ARRAY_CHAR_INDEX_SCALE);
@@ -368,6 +369,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
             copyBytes);
   }
 
+  //PRIMITIVE putXXX() Native Endian (used by both endians) XXX
   final void putNativeOrderedChar(final char value) {
     final long pos = getPosition();
     incrementAndAssertPositionForWrite(pos, ARRAY_CHAR_INDEX_SCALE);

@@ -67,7 +67,7 @@ public class ExampleMemoryRequestServerTest {
    *
    * <p>In reality, these memory requests should be quite rare.</p>
    */
-  class MemoryClient {
+  static class MemoryClient {
     WritableMemory smallMem;
     MemoryRequestServer svr;
 
@@ -104,7 +104,7 @@ public class ExampleMemoryRequestServerTest {
    * This example MemoryRequestServer is simplistic but demonstrates one of many ways to
    * possibly manage the continuous requests for larger memory.
    */
-  public class ExampleMemoryRequestServer implements MemoryRequestServer {
+  public static class ExampleMemoryRequestServer implements MemoryRequestServer {
     IdentityHashMap<WritableMemory, WritableHandle> map = new IdentityHashMap<>();
 
     @SuppressWarnings("resource")

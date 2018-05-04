@@ -17,7 +17,7 @@ import org.testng.annotations.Test;
  * @author Lee Rhodes
  */
 public class UnsafeUtilTest {
-  public final long testField = 1;
+  long testField = 1; //Do not remove & cannot be static. Used in reflection check.
 
   @Test
   public void checkJDK7methods() {
@@ -78,6 +78,7 @@ public class UnsafeUtilTest {
 
   @Test
   public void checkFieldOffset() {
+    assertEquals(testField, 1);
     long offset = UnsafeUtil.getFieldOffset(this.getClass(), "testField");
     assertEquals(offset, 16);
     try {

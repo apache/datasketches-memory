@@ -11,6 +11,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteOrder;
@@ -37,7 +38,13 @@ public class AllocateDirectWritableMapMemoryTest {
     long longs = bytes >>> 3;
 
     File file = new File("TestFile.bin");
-    if (file.exists()) { file.delete(); }
+    if (file.exists()) {
+      try {
+        java.nio.file.Files.delete(file.toPath());
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
     assert file.createNewFile();
     assert file.setWritable(true, false);
     assert file.isFile();

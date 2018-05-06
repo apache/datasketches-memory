@@ -242,7 +242,7 @@ public class WritableMemoryImplTest {
       mem.clear();
 
       for (int i=0; i < halfLongs; i++) {
-        mem.putLong(i*8,  i);
+        mem.putLong(i*8, i);
       }
 
       mem.copyTo(0, mem, halfBytes, halfBytes);
@@ -568,7 +568,7 @@ public class WritableMemoryImplTest {
     assertEquals(comp, -1);
     comp = mem3.compareTo(0, 5, mem1, 0, 4);
     assertEquals(comp, 1);
-    comp = mem3.compareTo(0,  5, mem4, 0, 5);
+    comp = mem3.compareTo(0, 5, mem4, 0, 5);
     assertEquals(comp, 0);
     comp = mem3.compareTo(0, 4, mem4, 1, 4);
     assertEquals(comp, -1);

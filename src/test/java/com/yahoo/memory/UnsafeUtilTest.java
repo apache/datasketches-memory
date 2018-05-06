@@ -27,7 +27,7 @@ public class UnsafeUtilTest {
       final long one = JDK7Compatible.getAndAddLong(byteArr, 16, 1L);
       assertEquals(one, 1L);
 
-      final long two = JDK7Compatible.getAndSetLong(byteArr,  16, 3L);
+      final long two = JDK7Compatible.getAndSetLong(byteArr, 16, 3L);
       assertEquals(two, 2L);
       assertEquals(byteArr[0], 3);
 

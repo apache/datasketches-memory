@@ -67,7 +67,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   //DUPLICATES XXX
   @Override
   public Buffer duplicate() {
-    return writableDuplicateImpl(false);
+    return writableDuplicateImpl(true);
   }
 
   @Override

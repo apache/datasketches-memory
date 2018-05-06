@@ -40,8 +40,8 @@ final class AccessByteBuffer {
       //address() is already adjusted for direct slices, so regionOffset = 0
       state.putNativeBaseOffset(((sun.nio.ch.DirectBuffer) byteBuf).address());
     } else {
-      // arrayOffset() and array() couldn't be called because they throw ReadOnlyBufferException
-      // if the ByteBuffer is read-only.
+      // ByteBuffer.arrayOffset() and ByteBuffer.array() throw ReadOnlyBufferException if
+      // ByteBuffer is read-only. This uses reflection for both writable and read-only cases.
       final Object unsafeObj;
       final long regionOffset;
       //includes the slice() offset for heap.

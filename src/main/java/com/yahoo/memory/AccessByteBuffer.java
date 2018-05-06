@@ -14,6 +14,7 @@ import java.nio.ByteBuffer;
  *
  * @author Lee Rhodes
  * @author Praveenkumar Venkatesan
+ * @author Roman Leventov
  */
 final class AccessByteBuffer {
 

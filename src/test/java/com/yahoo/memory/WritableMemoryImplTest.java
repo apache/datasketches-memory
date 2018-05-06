@@ -659,6 +659,20 @@ public class WritableMemoryImplTest {
     assertEquals(wbuf.getEnd(), 64);
   }
 
+  @Test(expectedExceptions = ReadOnlyException.class)
+  public void checkAsWritableRegionRO() {
+    ByteBuffer byteBuf = ByteBuffer.allocate(64);
+    WritableMemory wmem = (WritableMemory) Memory.wrap(byteBuf);
+    wmem.writableRegion(0, 1);
+  }
+
+  @Test(expectedExceptions = ReadOnlyException.class)
+  public void checkAsWritableBufferRO() {
+    ByteBuffer byteBuf = ByteBuffer.allocate(64);
+    WritableMemory wmem = (WritableMemory) Memory.wrap(byteBuf);
+    wmem.asWritableBuffer();
+  }
+
   @Test
   public void printlnTest() {
     println("PRINTING: "+this.getClass().getName());

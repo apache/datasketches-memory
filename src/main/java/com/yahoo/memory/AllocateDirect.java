@@ -36,14 +36,14 @@ final class AllocateDirect implements AutoCloseable {
     final boolean pageAligned = NioBits.isPageAligned();
     final long pageSize = NioBits.pageSize();
     final long allocationSize = capacity + (pageAligned ? pageSize : 0);
-    NioBits.reserveMemory(capacity);
+    NioBits.reserveMemory(allocationSize, capacity);
     final long nativeBaseOffset;
 
     final long nativeAddress;
     try {
       nativeAddress = unsafe.allocateMemory(allocationSize);
     } catch (final OutOfMemoryError err) {
-      NioBits.unreserveMemory(capacity);
+      NioBits.unreserveMemory(allocationSize, capacity);
       throw err;
     }
     if (pageAligned && ((nativeAddress % pageSize) != 0)) {
@@ -52,7 +52,7 @@ final class AllocateDirect implements AutoCloseable {
     } else {
       nativeBaseOffset = nativeAddress;
     }
-    cleaner = Cleaner.create(this, new Deallocator(nativeAddress, capacity, valid));
+    cleaner = Cleaner.create(this, new Deallocator(nativeAddress, allocationSize, capacity, valid));
     state.putNativeBaseOffset(nativeBaseOffset); //computes the cumBaseOffset
     ResourceState.currentDirectMemoryAllocations_.incrementAndGet();
     ResourceState.currentDirectMemoryAllocated_.addAndGet(state.getCapacity());
@@ -75,11 +75,14 @@ final class AllocateDirect implements AutoCloseable {
     //This is the only place the actual native address is kept for use by unsafe.freeMemory();
     //It can never be modified until it is deallocated.
     private long nativeAddress; //set to 0 when deallocated
+    private final long allocationSize;
     private final long capacity;
     private StepBoolean valid;
 
-    private Deallocator(final long nativeAddress, final long capacity, final StepBoolean valid) {
+    private Deallocator(final long nativeAddress, final long allocationSize, final long capacity,
+        final StepBoolean valid) {
       this.nativeAddress = nativeAddress;
+      this.allocationSize = allocationSize;
       this.capacity = capacity;
       this.valid = valid;
       assert (nativeAddress != 0);
@@ -90,7 +93,7 @@ final class AllocateDirect implements AutoCloseable {
       valid.change(); //sets invalid here
       if (nativeAddress > 0) {
         unsafe.freeMemory(nativeAddress);
-        NioBits.unreserveMemory(capacity);
+        NioBits.unreserveMemory(allocationSize, capacity);
       }
       nativeAddress = 0L;
     }

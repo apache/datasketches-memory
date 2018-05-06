@@ -125,32 +125,38 @@ final class NioBits {
   // Comment from java.nio.Bits.java ~ line 705:
   // -XX:MaxDirectMemorySize limits the total capacity rather than the
   // actual memory usage, which will differ when buffers are page aligned.
-  static void reserveMemory(final long capacity) {
+  static void reserveMemory(final long allocationSize, final long capacity) {
     try {
-      reserveUnreserve(capacity, NIO_BITS_RESERVE_MEMORY_METHOD);
+      reserveUnreserve(allocationSize, capacity, NIO_BITS_RESERVE_MEMORY_METHOD);
     } catch (final Exception e) {
       throw new RuntimeException("Could not invoke java.nio.Bits.reserveMemory(...): "
-          + "capacity = " + capacity + "\n" + e);
+          + "allocationSize = " + allocationSize + ", capacity = " + capacity, e);
     }
   }
 
-  static void unreserveMemory(final long capacity) {
+  static void unreserveMemory(final long allocationSize, final long capacity) {
     try {
-      reserveUnreserve(capacity, NIO_BITS_UNRESERVE_MEMORY_METHOD);
+      reserveUnreserve(allocationSize, capacity, NIO_BITS_UNRESERVE_MEMORY_METHOD);
     } catch (final Exception e) {
       throw new RuntimeException("Could not invoke java.nio.Bits.unreserveMemory(...): "
-          + "capacity = " + capacity + "\n" + e);
+          + "allocationSize = " + allocationSize + ", capacity = " + capacity, e);
     }
   }
 
-  private static void reserveUnreserve(long capacity, final Method method) throws Exception {
+  private static void reserveUnreserve(long allocationSize, long capacity, final Method method)
+      throws Exception {
     Util.zeroCheck(capacity, "capacity");
     // 1GB is a pretty "safe" limit.
     final long chunkSizeLimit = 1L << 30;
     while (capacity > 0) {
       final long chunk = Math.min(capacity, chunkSizeLimit);
-      method.invoke(null, chunk, (int) chunk);
+      if (capacity == chunk) {
+        method.invoke(null, allocationSize, (int) capacity);
+      } else {
+        method.invoke(null, chunk, (int) chunk);
+      }
       capacity -= chunk;
+      allocationSize -= chunk;
     }
   }
 }

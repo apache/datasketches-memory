@@ -5,7 +5,6 @@
 
 package com.yahoo.memory;
 
-import static com.yahoo.memory.UnsafeUtil.ARRAY_BYTE_INDEX_SCALE;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 
 import java.nio.ByteBuffer;
@@ -15,6 +14,7 @@ import java.nio.ByteBuffer;
  *
  * @author Lee Rhodes
  * @author Praveenkumar Venkatesan
+ * @author Roman Leventov
  */
 final class AccessByteBuffer {
 
@@ -36,21 +36,13 @@ final class AccessByteBuffer {
   static void wrap(final ResourceState state) {
     final ByteBuffer byteBuf = state.getByteBuffer();
     state.putCapacity(byteBuf.capacity());
-    final boolean readOnlyBB = state.isResourceReadOnly(); //set by putByteBuffer
-
     final boolean direct = byteBuf.isDirect();
-
-    if (readOnlyBB) {
-
-      //READ-ONLY DIRECT
-      if (direct) {
-        //address() is already adjusted for direct slices, so regionOffset = 0
-        state.putNativeBaseOffset(((sun.nio.ch.DirectBuffer) byteBuf).address());
-        return;
-      }
-
-      //READ-ONLY HEAP
-      //The messy acquisition of arrayOffset() and array() created from a RO slice()
+    if (direct) {
+      //address() is already adjusted for direct slices, so regionOffset = 0
+      state.putNativeBaseOffset(((sun.nio.ch.DirectBuffer) byteBuf).address());
+    } else {
+      // ByteBuffer.arrayOffset() and ByteBuffer.array() throw ReadOnlyBufferException if
+      // ByteBuffer is read-only. This uses reflection for both writable and read-only cases.
       final Object unsafeObj;
       final long regionOffset;
       //includes the slice() offset for heap.
@@ -58,19 +50,7 @@ final class AccessByteBuffer {
       unsafeObj = unsafe.getObject(byteBuf, BYTE_BUFFER_HB_FIELD_OFFSET);
       state.putUnsafeObject(unsafeObj);
       state.putRegionOffset(regionOffset);
-      return;
     }
-
-    //BB is WRITABLE-DIRECT  //nativeBaseAddress, byteBuf, capacity
-    if (direct) {
-      //address() is already adjusted for direct slices, so regionOffset = 0
-      state.putNativeBaseOffset(((sun.nio.ch.DirectBuffer) byteBuf).address());
-      return;
-    }
-
-    //BB is WRITABLE-HEAP  //unsafeObj, unsafeObjHeader, bytBuf, regionOffset, capacity
-    state.putUnsafeObject(byteBuf.array());
-    state.putRegionOffset(byteBuf.arrayOffset() * ARRAY_BYTE_INDEX_SCALE);
   }
 
   /**

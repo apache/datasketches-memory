@@ -35,8 +35,8 @@ public abstract class WritableBuffer extends Buffer {
 
   //First creates a WritableMemory so that it can be cached into the target buffer.
   static WritableBuffer wrapBB(final ByteBuffer byteBuf, final boolean localReadOnly) {
-    final WritableMemory wmem = WritableMemory.wrapBB(byteBuf, localReadOnly);
-    final WritableBuffer wbuf = wmem.asWritableBuffer();
+    final BaseWritableMemoryImpl wmem = WritableMemory.wrapBB(byteBuf, localReadOnly);
+    final WritableBuffer wbuf = wmem.asWritableBufferImpl(localReadOnly);
     wbuf.setStartPositionEnd(0, byteBuf.position(), byteBuf.limit());
     return wbuf;
   }

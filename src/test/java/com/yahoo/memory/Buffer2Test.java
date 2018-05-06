@@ -366,12 +366,12 @@ public class Buffer2Test {
 
   @Test
   public void testWritableDuplicate() {
-    WritableMemory wmem = WritableMemory.wrap(new byte[0]);
+    WritableMemory wmem = WritableMemory.wrap(new byte[1]);
     WritableBuffer wbuf = wmem.asWritableBuffer();
     WritableBuffer wbuf2 = wbuf.writableDuplicate();
-    assertEquals(wbuf2.capacity, 0);
+    assertEquals(wbuf2.capacity, 1);
     Buffer buf = wmem.asBuffer();
-    assertEquals(buf.capacity, 0);
+    assertEquals(buf.capacity, 1);
   }
 
   @Test

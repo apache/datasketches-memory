@@ -195,8 +195,8 @@ public class NonNativeWritableMemoryImplTest {
   public void checkRegionZeros() {
     byte[] bArr = new byte[0];
     WritableMemory wmem = WritableMemory.wrap(bArr, ByteOrder.BIG_ENDIAN);
-    WritableMemory wreg = wmem.writableRegion(0, wmem.getCapacity());
-    assertEquals(wreg.getResourceOrder(), ByteOrder.LITTLE_ENDIAN);
+    Memory reg = wmem.region(0, wmem.getCapacity());
+    assertEquals(reg.getResourceOrder(), ByteOrder.LITTLE_ENDIAN);
   }
 
 }

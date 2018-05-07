@@ -73,7 +73,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   @Override
   public WritableBuffer writableDuplicate() {
     if (localReadOnly) {
-      throw new ReadOnlyException("Couldn't make a writable duplicate of a read-only Buffer");
+      throw new ReadOnlyException("Writable duplicate of a read-only Buffer is not allowed.");
     }
     return writableDuplicateImpl(false);
   }
@@ -89,7 +89,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   @Override
   public WritableBuffer writableRegion() {
     if (localReadOnly) {
-      throw new ReadOnlyException("Couldn't create a writable region of a read-only Buffer");
+      throw new ReadOnlyException("Writable region of a read-only Buffer is not allowed.");
     }
     return writableRegionImpl(getPosition(), getEnd() - getPosition(), false);
   }
@@ -97,7 +97,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   @Override
   public WritableBuffer writableRegion(final long offsetBytes, final long capacityBytes) {
     if (localReadOnly) {
-      throw new ReadOnlyException("Couldn't create a writable region of a read-only Buffer");
+      throw new ReadOnlyException("Writable region of a read-only Buffer is not allowed.");
     }
     return writableRegionImpl(offsetBytes, capacityBytes, false);
   }

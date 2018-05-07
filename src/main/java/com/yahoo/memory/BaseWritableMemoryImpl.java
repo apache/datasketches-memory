@@ -81,7 +81,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   @Override
   public WritableMemory writableRegion(final long offsetBytes, final long capacityBytes) {
     if (localReadOnly) {
-      throw new ReadOnlyException("Couldn't create a writable region of a read-only Memory");
+      throw new ReadOnlyException("Writable region of a read-only Memory is not allowed.");
     }
     return writableRegionImpl(offsetBytes, capacityBytes, false);
   }
@@ -98,7 +98,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   @Override
   public WritableBuffer asWritableBuffer() {
     if (localReadOnly) {
-      throw new ReadOnlyException("Couldn't wrap a read-only Memory as a writable Buffer");
+      throw new ReadOnlyException("Wrapping a read-only Memory as a writable Buffer is not allowed.");
     }
     return asWritableBufferImpl(false);
   }

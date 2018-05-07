@@ -50,13 +50,14 @@ public class WritableMemoryTest {
     wmem.getByteArray(0, srcAndDst, 64, 64);  //non-overlapping
   }
 
-  @SuppressWarnings({"EqualsWithItself", "SelfEquals"})
-  //SelfEquals for Plexus, EqualsWithItself for IntelliJ
   @Test
   public void checkEquals() {
     int len = 7;
     WritableMemory wmem1 = WritableMemory.allocate(len);
-    assertTrue(wmem1.equals(wmem1));
+    @SuppressWarnings({"EqualsWithItself", "SelfEquals"})
+    //SelfEquals for Plexus, EqualsWithItself for IntelliJ
+    boolean eq1 = wmem1.equals(wmem1);
+    assertTrue(eq1);
 
     WritableMemory wmem2 = WritableMemory.allocate(len + 1);
     assertFalse(wmem1.equals(wmem2));

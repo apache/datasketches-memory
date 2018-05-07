@@ -50,11 +50,13 @@ public class WritableMemoryTest {
     wmem.getByteArray(0, srcAndDst, 64, 64);  //non-overlapping
   }
 
+  @SuppressWarnings({"EqualsWithItself", "SelfEquals"})
+  //SelfEquals for Plexus, EqualsWithItself for IntelliJ
   @Test
   public void checkEquals() {
     int len = 7;
     WritableMemory wmem1 = WritableMemory.allocate(len);
-    //assertTrue(wmem1.equals(wmem1)); //intentionally ignoring this check
+    assertTrue(wmem1.equals(wmem1));
 
     WritableMemory wmem2 = WritableMemory.allocate(len + 1);
     assertFalse(wmem1.equals(wmem2));
@@ -84,7 +86,7 @@ public class WritableMemoryTest {
     assertTrue(wmem1.equalTo(0, wmem2, 0, len));
     wmem2.putByte(0, (byte) 10);
     assertFalse(wmem1.equalTo(0, wmem2, 0, len));
-    wmem2.putByte(0,  (byte) 0);
+    wmem2.putByte(0, (byte) 0);
     wmem2.putByte(len - 2, (byte) 0);
     assertFalse(wmem1.equalTo(0, wmem2, 0, len - 1));
   }
@@ -145,7 +147,7 @@ public class WritableMemoryTest {
     owner.putInt(0, 1); //But owner can write
     ((WritableMemory)client1).putInt(0, 2); //Client1 can write, but with explicit effort.
     Memory client2 = owner.region(0, owner.getCapacity()); //client2 cannot write (no API)
-    owner.putInt(0,  3); //But Owner should be able to write
+    owner.putInt(0, 3); //But Owner should be able to write
   }
 
   @Test

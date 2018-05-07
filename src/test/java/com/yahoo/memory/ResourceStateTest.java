@@ -15,6 +15,8 @@ import java.nio.ByteOrder;
 
 import org.testng.annotations.Test;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 public class ResourceStateTest {
 
   @Test
@@ -30,6 +32,7 @@ public class ResourceStateTest {
     assertTrue(state.isSwapBytes());
   }
 
+  @SuppressFBWarnings(value="NP_NULL_PARAM_DEREF_ALL_TARGETS_DANGEROUS", justification="Test")
   @Test
   public void checkExceptions() {
     ResourceState state = new ResourceState(false);
@@ -41,12 +44,12 @@ public class ResourceStateTest {
       //ok
     }
 
-    //    try {
-    //      state.putByteBuffer(null); //FindBugs does not like this
-    //      fail();
-    //    } catch (IllegalArgumentException e) {
-    //      //ok
-    //    }
+    try {
+      state.putByteBuffer(null);
+      fail();
+    } catch (IllegalArgumentException e) {
+      //ok
+    }
 
     try {
       state.putRegionOffset( -16L);

@@ -27,9 +27,9 @@ public class NioBitsTest {
   public void checkGetAtomicFields() {
     long cap = 1024L + Integer.MAX_VALUE;
     printStats();
-    NioBits.reserveMemory(cap);
+    NioBits.reserveMemory(cap, cap);
     printStats();
-    NioBits.unreserveMemory(cap);
+    NioBits.unreserveMemory(cap, cap);
     printStats();
   }
 

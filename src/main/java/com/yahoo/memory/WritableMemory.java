@@ -40,7 +40,7 @@ public abstract class WritableMemory extends Memory {
     return wrapBB(byteBuf, false);
   }
 
-  static WritableMemory wrapBB(final ByteBuffer byteBuf, final boolean localReadOnly) {
+  static BaseWritableMemoryImpl wrapBB(final ByteBuffer byteBuf, final boolean localReadOnly) {
     if (byteBuf.capacity() == 0) { return ZERO_SIZE_MEMORY; }
     final ResourceState state = new ResourceState(byteBuf.isReadOnly());//sets resourceIsReadOnly
     state.putByteBuffer(byteBuf); //sets resourceOrder

@@ -148,4 +148,10 @@ public class BufferReadWriteSafetyTest {
     WritableBuffer buf = (WritableBuffer) WritableMemory.allocate(8).asWritableBuffer().region();
     buf.putInt(1);
   }
+
+  @Test(expectedExceptions = AssertionError.class)
+  public void testWritableBufferDuplicate() {
+    WritableBuffer buf = (WritableBuffer) WritableMemory.allocate(8).asWritableBuffer().duplicate();
+    buf.putInt(1);
+  }
 }

@@ -242,7 +242,7 @@ public class WritableMemoryImplTest {
       mem.clear();
 
       for (int i=0; i < halfLongs; i++) {
-        mem.putLong(i*8,  i);
+        mem.putLong(i*8, i);
       }
 
       mem.copyTo(0, mem, halfBytes, halfBytes);
@@ -568,7 +568,7 @@ public class WritableMemoryImplTest {
     assertEquals(comp, -1);
     comp = mem3.compareTo(0, 5, mem1, 0, 4);
     assertEquals(comp, 1);
-    comp = mem3.compareTo(0,  5, mem4, 0, 5);
+    comp = mem3.compareTo(0, 5, mem4, 0, 5);
     assertEquals(comp, 0);
     comp = mem3.compareTo(0, 4, mem4, 1, 4);
     assertEquals(comp, -1);
@@ -657,6 +657,20 @@ public class WritableMemoryImplTest {
     assertEquals(wbuf.getCapacity(), 64);
     assertEquals(wbuf.getPosition(), 0);
     assertEquals(wbuf.getEnd(), 64);
+  }
+
+  @Test(expectedExceptions = ReadOnlyException.class)
+  public void checkAsWritableRegionRO() {
+    ByteBuffer byteBuf = ByteBuffer.allocate(64);
+    WritableMemory wmem = (WritableMemory) Memory.wrap(byteBuf);
+    wmem.writableRegion(0, 1);
+  }
+
+  @Test(expectedExceptions = ReadOnlyException.class)
+  public void checkAsWritableBufferRO() {
+    ByteBuffer byteBuf = ByteBuffer.allocate(64);
+    WritableMemory wmem = (WritableMemory) Memory.wrap(byteBuf);
+    wmem.asWritableBuffer();
   }
 
   @Test

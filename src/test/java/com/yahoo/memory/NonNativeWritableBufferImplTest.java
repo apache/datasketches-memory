@@ -232,12 +232,12 @@ public class NonNativeWritableBufferImplTest {
   public void checkDuplicateZeros() {
     byte[] bArr = new byte[0];
     WritableMemory wmem = WritableMemory.wrap(bArr, ByteOrder.BIG_ENDIAN);
-    WritableBuffer wbuf = wmem.asWritableBuffer();
-    WritableBuffer wdup = wbuf.writableDuplicate();
-    assertEquals(wdup.getResourceOrder(), ByteOrder.LITTLE_ENDIAN);
+    Buffer buf = wmem.asBuffer();
+    Buffer dup = buf.duplicate();
+    assertEquals(dup.getResourceOrder(), ByteOrder.LITTLE_ENDIAN);
 
-    WritableBuffer wreg = wbuf.writableRegion();
-    assertEquals(wreg.getResourceOrder(), ByteOrder.LITTLE_ENDIAN);
+    Buffer reg = buf.region();
+    assertEquals(reg.getResourceOrder(), ByteOrder.LITTLE_ENDIAN);
   }
 
 }

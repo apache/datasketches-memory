@@ -12,6 +12,7 @@ import static org.testng.Assert.assertTrue;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class WritableBufferImplTest {
@@ -473,19 +474,75 @@ public class WritableBufferImplTest {
     assertEquals(reg.getCapacity(), 0);
   }
 
-  @SuppressWarnings("unused")
   @Test
   public void checkAsWritableMemoryRO() {
     ByteBuffer bb = ByteBuffer.allocate(64);
     WritableBuffer wbuf = WritableBuffer.wrap(bb);
+    @SuppressWarnings("unused")
     WritableMemory wmem = wbuf.asWritableMemory();
 
     try {
       Buffer buf = Buffer.wrap(bb);
       wbuf = (WritableBuffer) buf;
-      wmem = wbuf.asWritableMemory();
-    } catch (ReadOnlyException e) {
-      //OK
+      @SuppressWarnings("unused")
+      WritableMemory wmem2 = wbuf.asWritableMemory();
+      Assert.fail();
+    } catch (ReadOnlyException expected) {
+      // expected
+    }
+  }
+
+  @Test
+  public void checkWritableDuplicateRO() {
+    ByteBuffer bb = ByteBuffer.allocate(64);
+    WritableBuffer wbuf = WritableBuffer.wrap(bb);
+    @SuppressWarnings("unused")
+    WritableBuffer wdup = wbuf.writableDuplicate();
+
+    try {
+      Buffer buf = Buffer.wrap(bb);
+      wbuf = (WritableBuffer) buf;
+      @SuppressWarnings("unused")
+      WritableBuffer wdup2 = wbuf.writableDuplicate();
+      Assert.fail();
+    } catch (ReadOnlyException expected) {
+      // ignore
+    }
+  }
+
+  @Test
+  public void checkWritableRegionRO() {
+    ByteBuffer bb = ByteBuffer.allocate(64);
+    WritableBuffer wbuf = WritableBuffer.wrap(bb);
+    @SuppressWarnings("unused")
+    WritableBuffer wreg = wbuf.writableRegion();
+
+    try {
+      Buffer buf = Buffer.wrap(bb);
+      wbuf = (WritableBuffer) buf;
+      @SuppressWarnings("unused")
+      WritableBuffer wreg2 = wbuf.writableRegion();
+      Assert.fail();
+    } catch (ReadOnlyException expected) {
+      // ignore
+    }
+  }
+
+  @Test
+  public void checkWritableRegionWithParamsRO() {
+    ByteBuffer bb = ByteBuffer.allocate(64);
+    WritableBuffer wbuf = WritableBuffer.wrap(bb);
+    @SuppressWarnings("unused")
+    WritableBuffer wreg = wbuf.writableRegion(0, 1);
+
+    try {
+      Buffer buf = Buffer.wrap(bb);
+      wbuf = (WritableBuffer) buf;
+      @SuppressWarnings("unused")
+      WritableBuffer wreg2 = wbuf.writableRegion(0, 1);
+      Assert.fail();
+    } catch (ReadOnlyException expected) {
+      // ignore
     }
   }
 

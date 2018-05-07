@@ -73,16 +73,8 @@ public class BufferTest {
     assertEquals(buffZeroLengthArrayWrap.getCapacity(), 0);
     // check 0 length array wraps
     List<Buffer> buffersToCheck = Lists.newArrayList();
-    buffersToCheck.add(WritableMemory.allocate(0).asWritableBuffer());
+    buffersToCheck.add(WritableMemory.allocate(0).asBuffer());
     buffersToCheck.add(WritableBuffer.wrap(ByteBuffer.allocate(0)));
-    buffersToCheck.add(WritableMemory.wrap(new boolean[0]).asWritableBuffer());
-    buffersToCheck.add(WritableMemory.wrap(new byte[0]).asWritableBuffer());
-    buffersToCheck.add(WritableMemory.wrap(new char[0]).asWritableBuffer());
-    buffersToCheck.add(WritableMemory.wrap(new short[0]).asWritableBuffer());
-    buffersToCheck.add(WritableMemory.wrap(new int[0]).asWritableBuffer());
-    buffersToCheck.add(WritableMemory.wrap(new long[0]).asWritableBuffer());
-    buffersToCheck.add(WritableMemory.wrap(new float[0]).asWritableBuffer());
-    buffersToCheck.add(WritableMemory.wrap(new double[0]).asWritableBuffer());
     buffersToCheck.add(Buffer.wrap(ByteBuffer.allocate(0)));
     buffersToCheck.add(Memory.wrap(new boolean[0]).asBuffer());
     buffersToCheck.add(Memory.wrap(new byte[0]).asBuffer());

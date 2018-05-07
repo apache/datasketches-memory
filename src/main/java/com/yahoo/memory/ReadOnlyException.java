@@ -10,7 +10,7 @@ package com.yahoo.memory;
  *
  * @author Praveenkumar Venkatesan
  */
-public class ReadOnlyException extends RuntimeException {
+public class ReadOnlyException extends UnsupportedOperationException {
     private static final long serialVersionUID = 1L;
 
     public ReadOnlyException(final String message) {

@@ -7,7 +7,7 @@ package com.yahoo.memory;
 
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 
-import sun.misc.Cleaner;
+import jdk.internal.ref.Cleaner;
 
 /**
  * Provides access to direct (native) memory.

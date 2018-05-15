@@ -6,16 +6,16 @@ jdk:
  - oraclejdk9
 
 install:
- - mvn install -Dmaven.javadoc.skip=true -Dsource.skip=true -DskipTests=true -Dgpg.skip=true -Pstrict
+ - mvn install -Dmaven.compiler.fork=true -Dmaven.javadoc.skip=true -Dsource.skip=true -DskipTests=true -Dgpg.skip=true -Pstrict
 
 before_script:
  - _JAVA_OPTIONS="-Xmx4g -Xms1g"
 
 script:
- - mvn clean compile test -Dgpg.skip=true -Pstrict
+ - mvn clean compile test -Dgpg.skip=true -Pstrict -Dmaven.compiler.fork=true
 
 after_success:
-  - mvn clean test jacoco:report coveralls:report -DrepoToken=$coveralls_token -Pstrict
+  - mvn clean test jacoco:report coveralls:report -DrepoToken=$coveralls_token -Pstrict -Dmaven.compiler.fork=true
 
 notifications:
   email: false

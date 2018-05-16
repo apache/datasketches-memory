@@ -51,24 +51,25 @@ public abstract class WritableMemory extends Memory {
 
   //MAP XXX
   /**
-   * Allocates direct memory used to memory map files for write operations
-   * (including those &gt; 2GB). This assumes that the file was written using native byte ordering.
+   * Maps the entire given file into native-ordered Memory for write operations (including those
+   * &gt; 2GB). Calling this method is equivalent to calling {@link
+   * #map(File, long, long, ByteOrder) map(file, 0, file.length(), ByteOrder.nativeOrder())}.
    * @param file the given file to map
-   * @return WritableMapHandle for managing this map
-   * @throws IOException file not found or RuntimeException, etc.
+   * @return MapHandle for managing the mapped Memory
+   * @throws IOException if file not found or RuntimeException is thrown.
    */
   public static WritableMapHandle map(final File file) throws IOException {
     return map(file, 0, file.length(), ByteOrder.nativeOrder());
   }
 
   /**
-   * Allocates direct memory used to memory map files for write operations
-   * (including those &gt; 2GB).
+   * Maps the specified portion of the given file into Memory for write operations (including those
+   * &gt; 2GB).
    * @param file the given file to map. It may not be null.
    * @param fileOffsetBytes the position in the given file in bytes. It may not be negative.
-   * @param capacityBytes the size of the allocated direct memory. It may not be negative or zero.
-   * @param byteOrder the endianness of the given file. It may not be null.
-   * @return WritableMapHandle for managing this map
+   * @param capacityBytes the size of the mapped Memory. It may not be negative or zero.
+   * @param byteOrder the endianness of the returned mapped Memory. It may not be null.
+   * @return MemoryMapHandler for managing the mapped Memory
    * @throws IOException file not found or RuntimeException, etc.
    */
   public static WritableMapHandle map(final File file, final long fileOffsetBytes,

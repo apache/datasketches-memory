@@ -24,6 +24,45 @@ import java.nio.ByteOrder;
  */
 public abstract class WritableMemory extends Memory {
 
+  //Pass-through ctor for heap primitive arrays
+  WritableMemory(
+      final Object unsafeObj, final Prim prim, final long arrLen, final boolean localReadOnly,
+      final ByteOrder byteOrder) {
+    super(unsafeObj, prim, arrLen, localReadOnly, byteOrder);
+  }
+
+  //Pass-through ctor for copy and regions
+  WritableMemory(
+      final ResourceState src, final long offsetBytes, final long capacityBytes,
+      final boolean localReadOnly, final ByteOrder byteOrder) {
+    super(src, offsetBytes, capacityBytes, localReadOnly, byteOrder);
+  }
+
+  //Pass-through ctor for Direct Memory
+  WritableMemory(
+      final long nativeBaseOffset, final long capacityBytes, final ByteOrder byteOrder,
+      final MemoryRequestServer memReqSvr) {
+    super(nativeBaseOffset, capacityBytes, byteOrder, memReqSvr);
+  }
+
+  //Pass-through ctor for Memory Mapped Files
+  WritableMemory(
+      final long nativeBaseOffset, final long regionOffset, final long capacityBytes,
+      final boolean resourceReadOnly, final boolean localReadOnly, final ByteOrder byteOrder) {
+    super(nativeBaseOffset, regionOffset, capacityBytes, resourceReadOnly, localReadOnly,
+        byteOrder);
+  }
+
+  //Pass-through ctor for ByteBuffers
+  WritableMemory(
+      final ByteBuffer byteBuf, final Object unsafeObj, final long nativeBaseOffset,
+      final long regionOffset, final long capacityBytes, final boolean resourceReadOnly,
+      final boolean localReadOnly, final ByteOrder byteOrder) {
+    super(byteBuf, unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, resourceReadOnly,
+        localReadOnly, byteOrder);
+  }
+
+
   //BYTE BUFFER XXX
   /**
    * Accesses the given ByteBuffer for write operations. The returned WritableMemory object has the
@@ -503,6 +542,7 @@ public abstract class WritableMemory extends Memory {
    * Returns the backing ByteBuffer if it exists, otherwise returns null.
    * @return the backing ByteBuffer if it exists, otherwise returns null.
    */
+  @Override
   public abstract ByteBuffer getByteBuffer();
 
   /**
@@ -550,6 +590,7 @@ public abstract class WritableMemory extends Memory {
    * Returns a MemoryRequestServer or null
    * @return a MemoryRequestServer or null
    */
+  @Override
   public abstract MemoryRequestServer getMemoryRequestServer();
 
   /**

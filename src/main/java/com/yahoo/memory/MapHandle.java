@@ -6,6 +6,7 @@
 package com.yahoo.memory;
 
 import java.io.File;
+import java.nio.ByteOrder;
 
 /**
  * Gets a Memory for a memory-mapped, read-only file resource, It is highly recommended that this
@@ -24,10 +25,21 @@ public class MapHandle implements Map, Handle {
     this.wMem = wMem;
   }
 
-  @SuppressWarnings("resource") //called from memory. state: RRO, cap, BO
-  static MapHandle map(final ResourceState state, final File file, final long fileOffset) {
-    final AllocateDirectMap dirMap = AllocateDirectMap.map(state, file, fileOffset);
+  @SuppressWarnings("resource") //called from memory
+  static MapHandle map(final File file, final long fileOffset, final long capacityBytes,
+      final ByteOrder byteOrder) {
+    final boolean resourceReadOnly = AllocateDirectMap.isFileReadOnly(file);
+    final AllocateDirectMap dirMap = AllocateDirectMap.map(file, fileOffset, capacityBytes);
+    if (byteOrder == ByteOrder.nativeOrder()) {
+      wMem = new WritableMemoryImpl(nativeBaseOffset, capacityBytes, localReadOnly,
+          resourceReadOnly);
+    } else {
+      wMem = new NonNativeWritableMemoryImpl(nativeBaseOffset, capacityBytes, localReadOnly,
+          resourceReadOnly);
+    }
+
     final BaseWritableMemoryImpl wMem = BaseWritableMemoryImpl.newInstance(state, true);
+    dirMap.setStepBoolean(wMem.getValid());
     return new MapHandle(dirMap, wMem);
   }
 
@@ -38,6 +50,10 @@ public class MapHandle implements Map, Handle {
 
   @Override
   public void close() {
+    if (wMem.isValid()) {
+      ResourceState.currentDirectMemoryMapAllocations_.decrementAndGet();
+      ResourceState.currentDirectMemoryMapAllocated_.addAndGet(-wMem.capacity);
+    }
     dirMap.close();
   }
 

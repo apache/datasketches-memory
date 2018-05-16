@@ -26,7 +26,45 @@ import java.nio.channels.WritableByteChannel;
  *
  * @see com.yahoo.memory
  */
-public abstract class Memory {
+public abstract class Memory extends ResourceState {
+
+  //Pass-through ctor for heap primitive arrays
+  Memory(
+      final Object unsafeObj, final Prim prim, final long arrLen, final boolean localReadOnly,
+      final ByteOrder byteOrder) {
+    super(unsafeObj, prim, arrLen, localReadOnly, byteOrder);
+  }
+
+  //Pass-through ctor for copy and regions
+  Memory(
+      final ResourceState src, final long offsetBytes, final long capacityBytes,
+      final boolean localReadOnly, final ByteOrder byteOrder) {
+    super(src, offsetBytes, capacityBytes, localReadOnly, byteOrder);
+  }
+
+  //Pass-through ctor for Direct Memory
+  Memory(
+      final long nativeBaseOffset, final long capacityBytes, final ByteOrder byteOrder,
+      final MemoryRequestServer memReqSvr) {
+    super(nativeBaseOffset, capacityBytes, byteOrder, memReqSvr);
+  }
+
+  //Pass-through ctor for Memory Mapped Files
+  Memory(
+      final long nativeBaseOffset, final long regionOffset, final long capacityBytes,
+      final boolean resourceReadOnly, final boolean localReadOnly, final ByteOrder byteOrder) {
+    super(nativeBaseOffset, regionOffset, capacityBytes, resourceReadOnly, localReadOnly,
+        byteOrder);
+  }
+
+  //Pass-through ctor for ByteBuffers
+  Memory(
+      final ByteBuffer byteBuf, final Object unsafeObj, final long nativeBaseOffset,
+      final long regionOffset, final long capacityBytes, final boolean resourceReadOnly,
+      final boolean localReadOnly, final ByteOrder byteOrder) {
+    super(byteBuf, unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, resourceReadOnly,
+        localReadOnly, byteOrder);
+  }
 
   //BYTE BUFFER XXX
   /**
@@ -68,10 +106,7 @@ public abstract class Memory {
     zeroCheck(capacityBytes, "Capacity");
     nullCheck(file, "file is null");
     negativeCheck(fileOffsetBytes, "File offset is negative");
-    final ResourceState state = new ResourceState(AllocateDirectMap.isFileReadOnly(file));
-    state.putCapacity(capacityBytes);
-    state.putResourceOrder(byteOrder);
-    return MapHandle.map(state, file, fileOffsetBytes);
+    return MapHandle.map(file, fileOffsetBytes, capacityBytes, byteOrder);
   }
 
   //REGIONS XXX
@@ -496,6 +531,7 @@ public abstract class Memory {
    * Gets the capacity of this Memory in bytes
    * @return the capacity of this Memory in bytes
    */
+  @Override
   public abstract long getCapacity();
 
   /**
@@ -511,6 +547,7 @@ public abstract class Memory {
    * Returns the ByteOrder for the backing resource.
    * @return the ByteOrder for the backing resource.
    */
+  @Override
   public abstract ByteOrder getResourceOrder();
 
   /**
@@ -529,12 +566,14 @@ public abstract class Memory {
    * Returns true if the backing memory is direct (off-heap) memory.
    * @return true if the backing memory is direct (off-heap) memory.
    */
+  @Override
   public abstract boolean isDirect();
 
   /**
    * Returns true if this or the backing resource is read-only
    * @return true if this or backing resource is read-only
    */
+  @Override
   public abstract boolean isReadOnly();
 
   /**
@@ -551,12 +590,14 @@ public abstract class Memory {
    * Returns true if this Memory is valid() and has not been closed.
    * @return true if this Memory is valid() and has not been closed.
    */
+  @Override
   public abstract boolean isValid();
 
   /**
    * Return true if bytes need to be swapped based on resource ByteOrder.
    * @return true if bytes need to be swapped based on resource ByteOrder.
    */
+  @Override
   public abstract boolean isSwapBytes();
 
   /**

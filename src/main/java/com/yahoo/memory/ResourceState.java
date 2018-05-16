@@ -14,11 +14,11 @@ import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Keeps the configuration state primarily for Resources.
+ * Keeps the configuration state for Resources.
  *
  * @author Lee Rhodes
  */
-final class ResourceState {
+class ResourceState {
 
   /**
    * Native Endianness
@@ -38,13 +38,13 @@ final class ResourceState {
    * A slice() of a Direct ByteBuffer includes the array_offset here.  It is originally computed
    * either from the Unsafe.allocateMemory() call or from the mapping class.
    */
-  private long nativeBaseOffset_;
+  private long nativeBaseOffset_; //cannot be final; set to 0 when valid -> false
 
   /**
    * The object used in most Unsafe calls. This is effectively the array object if on-heap and
    * null for direct memory and determines how cumBaseOffset is computed.
    */
-  private Object unsafeObj_;
+  private final Object unsafeObj_;
 
   /**
    * This is the offset that defines the start of a sub-region of the backing resource. It is
@@ -52,19 +52,19 @@ final class ResourceState {
    * This will be loaded from heap ByteBuffers as they have a similar field used for slices.
    * It is used by region() and writableRegion().
    */
-  private long regionOffset_;
+  private final long regionOffset_;
 
   /**
    * This becomes the base offset used by all Unsafe calls. It is cumulative in that in includes
    * all offsets from regions, user-defined offsets when creating Memory, and the array object
    * header offset when creating Memory from primitive arrays.
    */
-  private long cumBaseOffset_; //= f(regionOffset, unsafeObj, nativeBaseOffset, unsafeObjHeader)
+  private final long cumBaseOffset_; //= f(regionOffset, unsafeObj, nativeBaseOffset, unsafeObjHeader)
 
   /**
    * The size of the backing resource in bytes. Used by all methods when checking bounds.
    */
-  private long capacity_;
+  private final long capacity_;
 
   /**
    * Primarily used for when the user allocated direct memory is the backing resource.
@@ -81,68 +81,143 @@ final class ResourceState {
   private final boolean resourceIsReadOnly_;
 
   /**
+   * Can be set true anytime. If true, it cannot be set false. If resourceIsReadOnly is true,
+   * this is automatically true.
+   */
+  private boolean localReadOnly_;
+
+  /**
    * Only the backing resources that uses AutoCloseable can set this to false.  It can only be
    * changed from true to false once. The initial state is valid (true).
    */
-  private StepBoolean valid_;
+  private final StepBoolean valid_ = new StepBoolean(true);
 
   //BYTE BUFFER RESOURCE
   /**
    * This holds a reference to a ByteBuffer until we are done with it.
    * This is also a user supplied parameter passed to AccessByteBuffer.
    */
-  private ByteBuffer byteBuf_;
+  private final ByteBuffer byteBuf_;
 
   //RESOURCE ENDIANNESS PROPERTIES
-  private ByteOrder resourceOrder_ = nativeOrder_; //default
+  private final ByteOrder resourceOrder_;
 
   //****CONSTRUCTORS****
-  ResourceState(final boolean resourceReadOnly) {
-    resourceIsReadOnly_ = resourceReadOnly;
-    valid_ = new StepBoolean(true);
-  }
+  //Raw constructor
+
 
   //Constructor for heap primitive arrays
-  ResourceState(final Object obj, final Prim prim, final long arrLen) {
-    this(false); //set resourceIsReadOnly=false, valid
-    nullCheck(obj, "Array Object");
-    Util.negativeCheck(arrLen, "Capacity");
-    unsafeObj_ = obj;
+  ResourceState(
+      final Object unsafeObj,
+      final Prim prim,
+      final long arrLen,
+      final boolean localReadOnly,
+      final ByteOrder byteOrder) {
+    nullCheck(unsafeObj, "Array Object");
+    negativeCheck(arrLen, "Capacity");
+    nativeBaseOffset_ = 0;
+    unsafeObj_ = unsafeObj;
+    regionOffset_ = 0;
     capacity_ = arrLen << prim.shift();
-    compute();
+    //memReqSvr ignore
+    resourceIsReadOnly_ = false;
+    localReadOnly_ = localReadOnly;
+    //valid ignore
+    byteBuf_ = null;
+    resourceOrder_ = byteOrder;
+    cumBaseOffset_ = compute();
   }
 
-  //copy construtor
-  private ResourceState(final ResourceState src) {
-    //FOUNDATION PARAMETERS
+  //copy & region construtor
+  ResourceState(
+      final ResourceState src,
+      final long offsetBytes,
+      final long capacityBytes,
+      final boolean localReadOnly,
+      final ByteOrder byteOrder) {
+    negativeCheck(offsetBytes, "Offset");
     nativeBaseOffset_ = src.nativeBaseOffset_;
     unsafeObj_ = src.unsafeObj_;
-    capacity_ = src.capacity_;
-
-    memReqSvr_ = src.memReqSvr_; //retains memReqSvr reference
-
-    //FLAGS
+    regionOffset_ = src.regionOffset_ + offsetBytes;
+    capacity_ = capacityBytes;
+    memReqSvr_ = src.memReqSvr_;
     resourceIsReadOnly_ = src.resourceIsReadOnly_;
-    valid_ = src.valid_; //retains valid reference
-
-    //REGIONS
-    regionOffset_ = src.regionOffset_;
-
-    //BYTE BUFFER
-    byteBuf_ = src.byteBuf_; //retains ByteBuffer reference
-
-    //ENDIANNESS
-    resourceOrder_ = src.resourceOrder_; //retains resourseOrder
-    compute(); //for sanity
+    localReadOnly_ = localReadOnly || resourceIsReadOnly_;
+    byteBuf_ = src.byteBuf_;
+    resourceOrder_ = byteOrder;
+    cumBaseOffset_ = compute();
   }
+
+  //Direct Memory constructor
+  ResourceState(
+      final long nativeBaseOffset,
+      final long capacityBytes,
+      final ByteOrder byteOrder,
+      final MemoryRequestServer memReqSvr) {
+    negativeCheck(capacityBytes, "Capacity");
+    negativeCheck(nativeBaseOffset, "NativeBaseOffset");
+    nativeBaseOffset_ = nativeBaseOffset;
+    unsafeObj_ = null;
+    regionOffset_ = 0;
+    capacity_ = capacityBytes;
+    memReqSvr_ = memReqSvr;
+    resourceIsReadOnly_ = false;
+    localReadOnly_ = false;
+    byteBuf_ = null;
+    resourceOrder_ = byteOrder;
+    cumBaseOffset_ = compute();
+  }
+
+  //Memory Mapped File constructor
+  ResourceState(
+      final long nativeBaseOffset,
+      final long regionOffset,
+      final long capacityBytes,
+      final boolean resourceReadOnly,
+      final boolean localReadOnly,
+      final ByteOrder byteOrder) {
+    negativeCheck(nativeBaseOffset, "NativeBaseOffset");
+    negativeCheck(regionOffset, "RegionOffset");
+    negativeCheck(capacityBytes, "Capacity");
+    nativeBaseOffset_ = nativeBaseOffset;
+    unsafeObj_ = null;
+    regionOffset_ = regionOffset;
+    capacity_ = capacityBytes;
+    resourceIsReadOnly_ = resourceReadOnly;
+    localReadOnly_ = localReadOnly || resourceReadOnly;
+    byteBuf_ = null;
+    resourceOrder_ = byteOrder;
+    cumBaseOffset_ = compute();
+  }
+
+  //ByteBuffer constructor
+  ResourceState(
+      final ByteBuffer byteBuf,
+      final Object unsafeObj,
+      final long nativeBaseOffset,
+      final long regionOffset,
+      final long capacityBytes,
+      final boolean resourceReadOnly,
+      final boolean localReadOnly,
+      final ByteOrder byteOrder) {
+    negativeCheck(nativeBaseOffset, "NativeBaseOffset");
+    negativeCheck(regionOffset, "RegionOffset");
+    negativeCheck(capacityBytes, "Capacity");
+    nativeBaseOffset_ = nativeBaseOffset;
+    unsafeObj_ = unsafeObj;
+    regionOffset_ = regionOffset;
+    capacity_ = capacityBytes;
+    resourceIsReadOnly_ = resourceReadOnly;
+    localReadOnly_ = localReadOnly || resourceReadOnly;
+    byteBuf_ = byteBuf;
+    resourceOrder_ = byteOrder;
+    cumBaseOffset_ = compute();
+  }
+
   //****END CONSTRUCTORS****
 
-  ResourceState copy() {
-    return new ResourceState(this);
-  }
-
-  private void compute() {
-    cumBaseOffset_ = regionOffset_
+  private final long compute() {
+    return regionOffset_
         + ((unsafeObj_ == null) ? nativeBaseOffset_
             : unsafe.arrayBaseOffset(unsafeObj_.getClass()));
   }
@@ -152,30 +227,12 @@ final class ResourceState {
     return nativeBaseOffset_;
   }
 
-  void putNativeBaseOffset(final long nativeBaseOffset) {
-    negativeCheck(nativeBaseOffset, "nativeBaseOffset");
-    nativeBaseOffset_ = nativeBaseOffset;
-    compute();
-  }
-
   Object getUnsafeObject() {
     return unsafeObj_;
   }
 
-  //starts null, then only changed once to non-null array object
-  void putUnsafeObject(final Object unsafeObj) {
-    nullCheck(unsafeObj, "Array Object");
-    unsafeObj_ = unsafeObj;
-    compute();
-  }
-
   long getCapacity() {
     return capacity_;
-  }
-
-  void putCapacity(final long capacity) {
-    Util.negativeCheck(capacity, "Capacity");
-    capacity_ = capacity;
   }
 
   long getCumBaseOffset() {
@@ -186,13 +243,9 @@ final class ResourceState {
     return memReqSvr_;
   }
 
-  void putMemoryRequestServer(final MemoryRequestServer memReqSvr) {
-    memReqSvr_ = memReqSvr; //may be null
-  }
-
   //FLAGS
-  boolean isResourceReadOnly() {
-    return resourceIsReadOnly_;
+  boolean isReadOnly() {
+    return localReadOnly_ || resourceIsReadOnly_;
   }
 
   boolean isDirect() {
@@ -221,6 +274,10 @@ final class ResourceState {
     valid_.change();
   }
 
+  final void assertValid() {
+    assert valid_.get() : "Memory not valid.";
+  }
+
   final void checkValid() {
     if (!valid_.get()) {
       throw new IllegalStateException("Memory not valid.");
@@ -232,31 +289,14 @@ final class ResourceState {
     return regionOffset_;
   }
 
-  void putRegionOffset(final long regionOffset) {
-    negativeCheck(regionOffset, "Region Offset");
-    regionOffset_ = regionOffset;
-    compute();
-  }
-
   //BYTE BUFFER
   ByteBuffer getByteBuffer() {
     return byteBuf_;
   }
 
-  void putByteBuffer(final ByteBuffer byteBuf) {
-    nullCheck(byteBuf, "ByteBuffer");
-    byteBuf_ = byteBuf;
-    resourceOrder_ = byteBuf_.order();
-  }
-
   //ENDIANNESS
   ByteOrder getResourceOrder() {
     return resourceOrder_;
-  }
-
-  void putResourceOrder(final ByteOrder resourceOrder) {
-    nullCheck(resourceOrder, "ByteOrder");
-    resourceOrder_ = resourceOrder;
   }
 
   boolean isSwapBytes() {

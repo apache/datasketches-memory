@@ -79,17 +79,24 @@ class AllocateDirectMap implements Map {
     }
   }
 
-  final ResourceState state;
+  final long capacityBytes; //in
+
   final Cleaner cleaner;
+  private final Deallocator deallocator;
   final RandomAccessFile raf;
+  final long nativeBaseOffset;
+  final boolean resourceReadOnly;
 
   //called from map below and from AllocateDirectWritableMap constructor
-  AllocateDirectMap(final ResourceState state, final File file, final long fileOffset) {
-    this.state = state;
-    raf = mapper(state, file, fileOffset);
-    cleaner = Cleaner.create(this, new Deallocator(state, raf));
+  AllocateDirectMap(final File file, final long fileOffset, final long capacityBytes) {
+    this.capacityBytes = capacityBytes;
+    resourceReadOnly = isFileReadOnly(file);
+    raf = mapper(file, fileOffset, capacityBytes, resourceReadOnly);
+    nativeBaseOffset = map(raf.getChannel(), resourceReadOnly, fileOffset, capacityBytes);
+    deallocator = new Deallocator(nativeBaseOffset, capacityBytes, raf);
+    cleaner = Cleaner.create(this, deallocator);
     ResourceState.currentDirectMemoryMapAllocations_.incrementAndGet();
-    ResourceState.currentDirectMemoryMapAllocated_.addAndGet(state.getCapacity());
+    ResourceState.currentDirectMemoryMapAllocated_.addAndGet(capacityBytes);
   }
 
   /**
@@ -99,12 +106,13 @@ class AllocateDirectMap implements Map {
    * FileChannelImpl.c. (see reference at top of class)
    * The owner will have read access to that address space.</p>
    *
-   * @param state the ResourceState that already has the file read-only state set.
+   * @param file the file to map to native memory
+   * @param fileOffset the starting byte offset into the file
+   * @param capacityBytes the capacity of the memory mapped region
    * @return A new AllocateDirectMap
-   * @throws IOException file not found or RuntimeException, etc.
    */
-  static AllocateDirectMap map(final ResourceState state, final File file, final long fileOffset)  {
-    return new AllocateDirectMap(state, file, fileOffset); //state: ResReadOnly, capacity, BO
+  static AllocateDirectMap map(final File file, final long fileOffset, final long capacityBytes)  {
+    return new AllocateDirectMap(file, fileOffset, capacityBytes);
   }
 
   @Override
@@ -112,23 +120,22 @@ class AllocateDirectMap implements Map {
     madvise();
     // Read a byte from each page to bring it into memory.
     final int ps = NioBits.pageSize();
-    final int count = NioBits.pageCount(state.getCapacity());
-    long nativeBaseOffset = state.getNativeBaseOffset();
+    final int count = NioBits.pageCount(capacityBytes);
+    long offset = nativeBaseOffset;
     for (int i = 0; i < count; i++) {
-      unsafe.getByte(nativeBaseOffset);
-      nativeBaseOffset += ps;
+      unsafe.getByte(offset);
+      offset += ps;
     }
   }
 
   @Override
   public boolean isLoaded() {
     try {
-      final long capacity = state.getCapacity();
-      final int pageCount = NioBits.pageCount(capacity);
+      final int pageCount = NioBits.pageCount(capacityBytes);
       return (boolean) MAPPED_BYTE_BUFFER_ISLOADED0_METHOD //isLoaded0 is effectively static
           .invoke(AccessByteBuffer.ZERO_DIRECT_BUFFER,     // so this is not modified
-              state.getNativeBaseOffset(),
-              capacity,
+              nativeBaseOffset,
+              capacityBytes,
               pageCount);
     } catch (final Exception e) {
       throw new RuntimeException(
@@ -138,10 +145,6 @@ class AllocateDirectMap implements Map {
 
   @Override
   public void close() {
-    if (state.isValid()) {
-      ResourceState.currentDirectMemoryMapAllocations_.decrementAndGet();
-      ResourceState.currentDirectMemoryMapAllocated_.addAndGet(-state.getCapacity());
-    }
     cleaner.clean(); //sets invalid
   }
 
@@ -155,8 +158,8 @@ class AllocateDirectMap implements Map {
     try {
       MAPPED_BYTE_BUFFER_LOAD0_METHOD                //load0 is effectively static
         .invoke(AccessByteBuffer.ZERO_DIRECT_BUFFER, // so this is not modified
-            state.getNativeBaseOffset(),
-            state.getCapacity());
+            nativeBaseOffset,
+            capacityBytes);
     } catch (final Exception e) {
       throw new RuntimeException(
           String.format("Encountered %s exception while loading", e.getClass()));
@@ -164,32 +167,25 @@ class AllocateDirectMap implements Map {
   }
 
   //Does the actual mapping work, resourceReadOnly must already be set
-  //state enters with capacity, RRO. adds nativeBaseOffset
-  @SuppressWarnings("resource")
-  static final RandomAccessFile mapper(final ResourceState state, final File file,
-      final long fileOffset)  {
-    final long capacity = state.getCapacity();
-    final boolean readOnlyFile = state.isResourceReadOnly();
-    final String mode = readOnlyFile ? "r" : "rw";
+  static final RandomAccessFile mapper(final File file, final long fileOffset,
+      final long capacityBytes, final boolean resourceReadOnly)  {
+
+    final String mode = resourceReadOnly ? "r" : "rw";
     final RandomAccessFile raf;
     try {
       raf = new RandomAccessFile(file, mode);
-      if ((fileOffset + capacity) > raf.length()) {
-        if (readOnlyFile) {
+      if ((fileOffset + capacityBytes) > raf.length()) {
+        if (resourceReadOnly) {
           throw new IllegalStateException(
               "File is shorter than the region that is requested to be mapped: file length="
-             + raf.length() + ", mapping offset=" + fileOffset + ", mapping size=" + capacity);
+             + raf.length() + ", mapping offset=" + fileOffset + ", mapping size=" + capacityBytes);
         } else {
-          raf.setLength(fileOffset + capacity);
+          raf.setLength(fileOffset + capacityBytes);
         }
       }
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }
-    final FileChannel fc = raf.getChannel();
-    final int mapMode = readOnlyFile ? MAP_RO : MAP_RW;
-    final long nativeBaseOffset = map(fc, mapMode, fileOffset, capacity);
-    state.putNativeBaseOffset(nativeBaseOffset);
     return raf;
   }
 
@@ -207,15 +203,15 @@ class AllocateDirectMap implements Map {
    * @return the native base offset address
    * @throws RuntimeException Encountered an exception while mapping
    */
-  private static final long map(final FileChannel fileChannel, final int mode,
+  private static final long map(final FileChannel fileChannel, final boolean resourceReadOnly,
       final long position, final long lengthBytes) {
     final int pagePosition = (int) (position % unsafe.pageSize());
     final long mapPosition = position - pagePosition;
     final long mapSize = lengthBytes + pagePosition;
-
+    final int mapMode = resourceReadOnly ? MAP_RO : MAP_RW;
     try {
       final long nativeBaseOffset =
-          (long) FILE_CHANNEL_IMPL_MAP0_METHOD.invoke(fileChannel, mode, mapPosition, mapSize);
+          (long) FILE_CHANNEL_IMPL_MAP0_METHOD.invoke(fileChannel, mapMode, mapPosition, mapSize);
       return nativeBaseOffset;
     } catch (final InvocationTargetException e) {
       throw new RuntimeException("Exception while mapping", e.getTargetException());
@@ -255,6 +251,10 @@ class AllocateDirectMap implements Map {
     return ((bits & 0477) == 0444);
   }
 
+  void setStepBoolean(final StepBoolean valid) {
+    deallocator.setStepBoolean(valid);
+  }
+
   private static final class Deallocator implements Runnable {
     private final RandomAccessFile myRaf;
     private final FileChannel myFc;
@@ -262,17 +262,21 @@ class AllocateDirectMap implements Map {
     //It can never be modified until it is deallocated.
     private long actualNativeBaseOffset;
     private final long myCapacity;
-    private final ResourceState parentStateRef;
+    private StepBoolean valid;
 
-    private Deallocator(final ResourceState state, final RandomAccessFile raf) {
+    private Deallocator(final long nativeBaseOffset, final long capacityBytes,
+        final RandomAccessFile raf) {
       myRaf = raf;
       assert (myRaf != null);
       myFc = myRaf.getChannel();
-      actualNativeBaseOffset = state.getNativeBaseOffset();
+      actualNativeBaseOffset = nativeBaseOffset;
       assert (actualNativeBaseOffset != 0);
-      myCapacity = state.getCapacity();
+      myCapacity = capacityBytes;
       assert (myCapacity != 0);
-      parentStateRef = state;
+    }
+
+    void setStepBoolean(final StepBoolean valid) {
+      this.valid = valid;
     }
 
     @Override
@@ -281,7 +285,7 @@ class AllocateDirectMap implements Map {
         unmap();
       }
       actualNativeBaseOffset = 0L;
-      parentStateRef.setInvalid();
+      valid.change(); //set invalid
     }
 
     /**

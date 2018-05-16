@@ -42,8 +42,9 @@ final class AllocateDirectWritableMap extends AllocateDirectMap implements Writa
   @Override
   public void force() {
     try {
-      MAPPED_BYTE_BUFFER_FORCE0_METHOD                 //force0 is effectively static
-          .invoke(AccessByteBuffer.ZERO_DIRECT_BUFFER, // so this is not modified
+      MAPPED_BYTE_BUFFER_FORCE0_METHOD
+          //force0 is effectively static, so ZERO_READ_ONLY_DIRECT_BUFFER is not modified
+          .invoke(AccessByteBuffer.ZERO_READ_ONLY_DIRECT_BUFFER,
               super.raf.getFD(),
               super.state.getNativeBaseOffset(),
               super.state.getCapacity());

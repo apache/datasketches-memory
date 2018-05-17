@@ -23,7 +23,7 @@ public class WritableMemoryTest {
     ByteBuffer bb = ByteBuffer.allocate(64); //big endian
     WritableMemory wmem = WritableMemory.wrap(bb);
     assertTrue(wmem.isSwapBytes());
-    assertEquals(wmem.getResourceOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(wmem.getResourceByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test

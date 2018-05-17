@@ -7,12 +7,15 @@ package com.yahoo.memory;
 
 import static com.yahoo.memory.UnsafeUtil.checkBounds;
 
+import java.nio.ByteOrder;
 import java.util.Random;
 
 /**
  * @author Lee Rhodes
  */
 public final class Util {
+  static final ByteOrder nativeOrder = ByteOrder.nativeOrder();
+
 
   private Util() { }
 
@@ -238,5 +241,9 @@ public final class Util {
     if (obj == null) {
       throw new IllegalArgumentException("The argument " + arg + " may not be null.");
     }
+  }
+
+  static boolean isNativeOrder(final ByteOrder dataByteOrder) {
+    return (nativeOrder == dataByteOrder);
   }
 }

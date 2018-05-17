@@ -8,6 +8,7 @@ package com.yahoo.memory;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 /**
  * Acquires access to a ByteBuffer.
@@ -18,7 +19,7 @@ import java.nio.ByteBuffer;
  */
 final class AccessByteBuffer {
 
-  static final ByteBuffer ZERO_DIRECT_BUFFER = ByteBuffer.allocateDirect(0);
+  static final ByteBuffer ZERO_DIRECT_NIO_BUFFER = ByteBuffer.allocateDirect(0);
 
   private static final long NIO_BUFFER_ADDRESS_FIELD_OFFSET =
       UnsafeUtil.getFieldOffset(java.nio.Buffer.class, "address");
@@ -29,27 +30,33 @@ final class AccessByteBuffer {
   private static final long BYTE_BUFFER_OFFSET_FIELD_OFFSET =
       UnsafeUtil.getFieldOffset(java.nio.ByteBuffer.class, "offset");
 
-  private AccessByteBuffer() { }
+  final long nativeBaseOffset;
+  final long capacityBytes;
+  final long regionOffset;
+  final Object unsafeObj;
+  final boolean readOnly;
+  final ByteOrder byteOrder;
 
-  //The provided ByteBuffer may be either readOnly or writable
-  // The resourceReadOnly is already set by the caller
-  static void wrap(final ResourceState state) {
-    final ByteBuffer byteBuf = state.getByteBuffer();
-    state.putCapacity(byteBuf.capacity());
+  /**
+   * The given ByteBuffer may be either readOnly or writable
+   * @param byteBuf the given ByteBuffer
+   */
+  AccessByteBuffer(final ByteBuffer byteBuf) {
+    capacityBytes = byteBuf.capacity();
+    readOnly = byteBuf.isReadOnly();
+    byteOrder = byteBuf.order();
     final boolean direct = byteBuf.isDirect();
     if (direct) {
-      //address() is already adjusted for direct slices, so regionOffset = 0
-      state.putNativeBaseOffset(((sun.nio.ch.DirectBuffer) byteBuf).address());
+      nativeBaseOffset = ((sun.nio.ch.DirectBuffer) byteBuf).address();
+      unsafeObj = null;
+      regionOffset = 0L; //address() is already adjusted for direct slices, so regionOffset = 0
     } else {
+      nativeBaseOffset = 0L;
       // ByteBuffer.arrayOffset() and ByteBuffer.array() throw ReadOnlyBufferException if
       // ByteBuffer is read-only. This uses reflection for both writable and read-only cases.
-      final Object unsafeObj;
-      final long regionOffset;
-      //includes the slice() offset for heap.
+      // Includes the slice() offset for heap.
       regionOffset = unsafe.getInt(byteBuf, BYTE_BUFFER_OFFSET_FIELD_OFFSET);
       unsafeObj = unsafe.getObject(byteBuf, BYTE_BUFFER_HB_FIELD_OFFSET);
-      state.putUnsafeObject(unsafeObj);
-      state.putRegionOffset(regionOffset);
     }
   }
 
@@ -58,7 +65,7 @@ final class AccessByteBuffer {
    * 27c768cbd28ece949c299f2d437c9a0ebd874500/src/one/nio/mem/DirectMemory.java#L95
    */
   static ByteBuffer getDummyDirectByteBuffer(final long address, final int capacity) {
-    final ByteBuffer buf = ZERO_DIRECT_BUFFER.duplicate();
+    final ByteBuffer buf = ZERO_DIRECT_NIO_BUFFER.duplicate();
     unsafe.putLong(buf, NIO_BUFFER_ADDRESS_FIELD_OFFSET, address);
     unsafe.putInt(buf, NIO_BUFFER_CAPACITY_FIELD_OFFSET, capacity);
     buf.limit(capacity);

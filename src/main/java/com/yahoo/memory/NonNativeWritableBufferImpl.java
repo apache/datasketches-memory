@@ -41,7 +41,7 @@ final class NonNativeWritableBufferImpl extends BaseWritableBufferImpl {
   NonNativeWritableBufferImpl(final ResourceState state, final boolean localReadOnly,
       final BaseWritableMemoryImpl originMemory) {
     super(state, localReadOnly, originMemory);
-    if (state.getResourceOrder() == ByteOrder.nativeOrder()) {
+    if (state.getResourceByteOrder() == ByteOrder.nativeOrder()) {
       throw new IllegalStateException(
           "Expected non-native ordered state. This may be a bug in the Memory library.");
     }

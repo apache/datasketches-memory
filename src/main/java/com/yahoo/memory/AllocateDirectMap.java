@@ -133,7 +133,7 @@ class AllocateDirectMap implements Map {
     try {
       final int pageCount = NioBits.pageCount(capacityBytes);
       return (boolean) MAPPED_BYTE_BUFFER_ISLOADED0_METHOD //isLoaded0 is effectively static
-          .invoke(AccessByteBuffer.ZERO_DIRECT_BUFFER,     // so this is not modified
+          .invoke(AccessByteBuffer.ZERO_DIRECT_NIO_BUFFER,     // so this is not modified
               nativeBaseOffset,
               capacityBytes,
               pageCount);
@@ -157,7 +157,7 @@ class AllocateDirectMap implements Map {
   void madvise() {
     try {
       MAPPED_BYTE_BUFFER_LOAD0_METHOD                //load0 is effectively static
-        .invoke(AccessByteBuffer.ZERO_DIRECT_BUFFER, // so this is not modified
+        .invoke(AccessByteBuffer.ZERO_DIRECT_NIO_BUFFER, // so this is not modified
             nativeBaseOffset,
             capacityBytes);
     } catch (final Exception e) {

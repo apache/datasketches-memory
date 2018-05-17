@@ -7,6 +7,7 @@ package com.yahoo.memory;
 
 import static com.yahoo.memory.UnsafeUtil.LS;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
+import static com.yahoo.memory.Util.nativeOrder;
 import static com.yahoo.memory.Util.negativeCheck;
 import static com.yahoo.memory.Util.nullCheck;
 import static com.yahoo.memory.Util.zeroCheck;
@@ -28,54 +29,68 @@ import java.nio.channels.WritableByteChannel;
  */
 public abstract class Memory extends ResourceState {
 
+  //Pass-through ctor for all parameters & ByteBuffer
+  Memory(
+      final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
+      final long capacityBytes, final boolean resourceReadOnly, final boolean localReadOnly,
+      final ByteOrder dataByteOrder, final ByteBuffer byteBuf) {
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, resourceReadOnly,
+        localReadOnly, dataByteOrder, byteBuf);
+  }
+
   //Pass-through ctor for heap primitive arrays
   Memory(
       final Object unsafeObj, final Prim prim, final long arrLen, final boolean localReadOnly,
-      final ByteOrder byteOrder) {
-    super(unsafeObj, prim, arrLen, localReadOnly, byteOrder);
+      final ByteOrder dataByteOrder) {
+    super(unsafeObj, prim, arrLen, localReadOnly, dataByteOrder);
   }
 
   //Pass-through ctor for copy and regions
   Memory(
       final ResourceState src, final long offsetBytes, final long capacityBytes,
-      final boolean localReadOnly, final ByteOrder byteOrder) {
-    super(src, offsetBytes, capacityBytes, localReadOnly, byteOrder);
+      final boolean localReadOnly, final ByteOrder dataByteOrder) {
+    super(src, offsetBytes, capacityBytes, localReadOnly, dataByteOrder);
   }
 
   //Pass-through ctor for Direct Memory
   Memory(
-      final long nativeBaseOffset, final long capacityBytes, final ByteOrder byteOrder,
+      final long nativeBaseOffset, final long capacityBytes, final ByteOrder dataByteOrder,
       final MemoryRequestServer memReqSvr) {
-    super(nativeBaseOffset, capacityBytes, byteOrder, memReqSvr);
+    super(nativeBaseOffset, capacityBytes, dataByteOrder, memReqSvr);
   }
 
   //Pass-through ctor for Memory Mapped Files
   Memory(
       final long nativeBaseOffset, final long regionOffset, final long capacityBytes,
-      final boolean resourceReadOnly, final boolean localReadOnly, final ByteOrder byteOrder) {
+      final boolean resourceReadOnly, final boolean localReadOnly, final ByteOrder dataByteOrder) {
     super(nativeBaseOffset, regionOffset, capacityBytes, resourceReadOnly, localReadOnly,
-        byteOrder);
-  }
-
-  //Pass-through ctor for ByteBuffers
-  Memory(
-      final ByteBuffer byteBuf, final Object unsafeObj, final long nativeBaseOffset,
-      final long regionOffset, final long capacityBytes, final boolean resourceReadOnly,
-      final boolean localReadOnly, final ByteOrder byteOrder) {
-    super(byteBuf, unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, resourceReadOnly,
-        localReadOnly, byteOrder);
+        dataByteOrder);
   }
 
   //BYTE BUFFER XXX
   /**
-   * Accesses the given ByteBuffer for read-only operations. The returned Memory object has the same
-   * byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is zero, then
-   * endianness of the returned Memory object (as well as backing storage) is unspecified.
+   * Accesses the given ByteBuffer for read-only operations. The returned Memory object has the
+   * same byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is zero,
+   * then endianness of the returned Memory object (as well as backing storage) is unspecified.
    * @param byteBuf the given ByteBuffer, must not be null
    * @return the given ByteBuffer for read-only operations.
    */
   public static Memory wrap(final ByteBuffer byteBuf) {
-    return WritableMemory.wrapBB(byteBuf, true);
+    return BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, true, byteBuf.order());
+  }
+
+  /**
+   * Accesses the given ByteBuffer for read-only operations. The returned Memory object has the
+   * given byte order, ignoring the byte order of the given ByteBuffer.  If the capacity of the
+   * given ByteBuffer is zero the endianness of the returned Memory object (as well as backing
+   * storage) is unspecified.
+   * @param byteBuf the given ByteBuffer, must not be null
+   * @param dataByteOrder the byte order of the uderlying data independent of the byte order
+   * state of the given ByteBuffer
+   * @return the given ByteBuffer for read-only operations.
+   */
+  public static Memory wrap(final ByteBuffer byteBuf, final ByteOrder dataByteOrder) {
+    return BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, true, dataByteOrder);
   }
 
   //MAP XXX
@@ -97,16 +112,16 @@ public abstract class Memory extends ResourceState {
    * @param file the given file to map. It may not be null.
    * @param fileOffsetBytes the position in the given file in bytes. It may not be negative.
    * @param capacityBytes the size of the allocated direct memory. It may not be negative or zero.
-   * @param byteOrder the endianness of the given file. It may not be null.
+   * @param dataByteOrder the endianness of the given file. It may not be null.
    * @return MemoryMapHandler for managing this map
    * @throws IOException file not found or RuntimeException, etc.
    */
   public static MapHandle map(final File file, final long fileOffsetBytes, final long capacityBytes,
-      final ByteOrder byteOrder) throws IOException {
+      final ByteOrder dataByteOrder) throws IOException {
     zeroCheck(capacityBytes, "Capacity");
     nullCheck(file, "file is null");
     negativeCheck(fileOffsetBytes, "File offset is negative");
-    return MapHandle.map(file, fileOffsetBytes, capacityBytes, byteOrder);
+    return MapHandle.map(file, fileOffsetBytes, capacityBytes, dataByteOrder);
   }
 
   //REGIONS XXX
@@ -150,8 +165,8 @@ public abstract class Memory extends ResourceState {
    * @return Memory for read operations
    */
   public static Memory wrap(final boolean[] arr) {
-    return BaseWritableMemoryImpl.newInstance(new ResourceState(arr, Prim.BOOLEAN, arr.length),
-        true);
+    final long lengthBytes = arr.length << Prim.BOOLEAN.shift();
+    return BaseWritableMemoryImpl.newArrayInstance(arr, 0L, lengthBytes, true, nativeOrder);
   }
 
   /**
@@ -161,18 +176,18 @@ public abstract class Memory extends ResourceState {
    * @return Memory for read operations
    */
   public static Memory wrap(final byte[] arr) {
-    return Memory.wrap(arr, 0, arr.length, ByteOrder.nativeOrder());
+    return Memory.wrap(arr, 0, arr.length, nativeOrder);
   }
 
   /**
    * Wraps the given primitive array for read operations with the given byte order. If the array
    * size is zero, backing storage and endianness of the returned Memory object are unspecified.
    * @param arr the given primitive array.
-   * @param byteOrder the byte order
+   * @param dataByteOrder the byte order
    * @return Memory for read operations
    */
-  public static Memory wrap(final byte[] arr, final ByteOrder byteOrder) {
-    return Memory.wrap(arr, 0, arr.length, byteOrder);
+  public static Memory wrap(final byte[] arr, final ByteOrder dataByteOrder) {
+    return Memory.wrap(arr, 0, arr.length, dataByteOrder);
   }
 
   /**
@@ -182,16 +197,13 @@ public abstract class Memory extends ResourceState {
    * @param arr the given primitive array.
    * @param offsetBytes the byte offset into the given array
    * @param lengthBytes the number of bytes to include from the given array
-   * @param byteOrder the byte order
+   * @param dataByteOrder the byte order
    * @return Memory for read operations
    */
   public static Memory wrap(final byte[] arr, final int offsetBytes, final int lengthBytes,
-      final ByteOrder byteOrder) {
+      final ByteOrder dataByteOrder) {
     UnsafeUtil.checkBounds(offsetBytes, lengthBytes, arr.length);
-    final ResourceState state = new ResourceState(arr, Prim.BYTE, lengthBytes);
-    state.putRegionOffset(offsetBytes);
-    state.putResourceOrder(byteOrder);
-    return BaseWritableMemoryImpl.newInstance(state, true);
+    return BaseWritableMemoryImpl.newArrayInstance(arr, 0L, lengthBytes, true, dataByteOrder);
   }
 
   /**
@@ -201,7 +213,8 @@ public abstract class Memory extends ResourceState {
    * @return Memory for read operations
    */
   public static Memory wrap(final char[] arr) {
-    return BaseWritableMemoryImpl.newInstance(new ResourceState(arr, Prim.CHAR, arr.length), true);
+    final long lengthBytes = arr.length << Prim.CHAR.shift();
+    return BaseWritableMemoryImpl.newArrayInstance(arr, 0L, lengthBytes, true, nativeOrder);
   }
 
   /**
@@ -211,7 +224,8 @@ public abstract class Memory extends ResourceState {
    * @return Memory for read operations
    */
   public static Memory wrap(final short[] arr) {
-    return BaseWritableMemoryImpl.newInstance(new ResourceState(arr, Prim.SHORT, arr.length), true);
+    final long lengthBytes = arr.length << Prim.SHORT.shift();
+    return BaseWritableMemoryImpl.newArrayInstance(arr, 0L, lengthBytes, true, nativeOrder);
   }
 
   /**
@@ -221,7 +235,8 @@ public abstract class Memory extends ResourceState {
    * @return Memory for read operations
    */
   public static Memory wrap(final int[] arr) {
-    return BaseWritableMemoryImpl.newInstance(new ResourceState(arr, Prim.INT, arr.length), true);
+    final long lengthBytes = arr.length << Prim.INT.shift();
+    return BaseWritableMemoryImpl.newArrayInstance(arr, 0L, lengthBytes, true, nativeOrder);
   }
 
   /**
@@ -231,7 +246,8 @@ public abstract class Memory extends ResourceState {
    * @return Memory for read operations
    */
   public static Memory wrap(final long[] arr) {
-    return BaseWritableMemoryImpl.newInstance(new ResourceState(arr, Prim.LONG, arr.length), true);
+    final long lengthBytes = arr.length << Prim.LONG.shift();
+    return BaseWritableMemoryImpl.newArrayInstance(arr, 0L, lengthBytes, true, nativeOrder);
   }
 
   /**
@@ -241,7 +257,8 @@ public abstract class Memory extends ResourceState {
    * @return Memory for read operations
    */
   public static Memory wrap(final float[] arr) {
-    return BaseWritableMemoryImpl.newInstance(new ResourceState(arr, Prim.FLOAT, arr.length), true);
+    final long lengthBytes = arr.length << Prim.FLOAT.shift();
+    return BaseWritableMemoryImpl.newArrayInstance(arr, 0L, lengthBytes, true, nativeOrder);
   }
 
   /**
@@ -251,8 +268,8 @@ public abstract class Memory extends ResourceState {
    * @return Memory for read operations
    */
   public static Memory wrap(final double[] arr) {
-    return BaseWritableMemoryImpl.newInstance(new ResourceState(arr, Prim.DOUBLE, arr.length),
-        true);
+    final long lengthBytes = arr.length << Prim.DOUBLE.shift();
+    return BaseWritableMemoryImpl.newArrayInstance(arr, 0L, lengthBytes, true, nativeOrder);
   }
 
   //PRIMITIVE getXXX() and getXXXArray() XXX
@@ -548,7 +565,7 @@ public abstract class Memory extends ResourceState {
    * @return the ByteOrder for the backing resource.
    */
   @Override
-  public abstract ByteOrder getResourceOrder();
+  public abstract ByteOrder getDataByteOrder();
 
   /**
    * Returns true if this Memory is backed by an on-heap primitive array
@@ -594,13 +611,6 @@ public abstract class Memory extends ResourceState {
   public abstract boolean isValid();
 
   /**
-   * Return true if bytes need to be swapped based on resource ByteOrder.
-   * @return true if bytes need to be swapped based on resource ByteOrder.
-   */
-  @Override
-  public abstract boolean isSwapBytes();
-
-  /**
    * Returns a formatted hex string of a range of this Memory.
    * Used primarily for testing.
    * @param header descriptive header
@@ -613,14 +623,14 @@ public abstract class Memory extends ResourceState {
   /**
    * Returns a formatted hex string of an area of this Memory.
    * Used primarily for testing.
+   * @param state the ResourceState
    * @param preamble a descriptive header
    * @param offsetBytes offset bytes relative to the Memory start
    * @param lengthBytes number of bytes to convert to a hex string
-   * @param state the ResourceState
    * @return a formatted hex string in a human readable array
    */
-  static String toHex(final String preamble, final long offsetBytes, final int lengthBytes,
-      final ResourceState state, final boolean localReadOnly) {
+  static String toHex(final ResourceState state, final String preamble, final long offsetBytes,
+      final int lengthBytes) {
     UnsafeUtil.checkBounds(offsetBytes, lengthBytes, state.getCapacity());
     final StringBuilder sb = new StringBuilder();
     final Object uObj = state.getUnsafeObject();
@@ -649,9 +659,8 @@ public abstract class Memory extends ResourceState {
     sb.append("CumBaseOffset       : ").append(cumBaseOffset).append(LS);
     sb.append("MemReq, hashCode    : ").append(memReqStr).append(LS);
     sb.append("Valid               : ").append(state.isValid()).append(LS);
-    sb.append("Local Read Only     : ").append(localReadOnly).append(LS);
-    sb.append("Resource Read Only  : ").append(state.isResourceReadOnly()).append(LS);
-    sb.append("Resource Endianness : ").append(state.getResourceOrder().toString()).append(LS);
+    sb.append("Read Only           : ").append(state.isReadOnly()).append(LS);
+    sb.append("Data Endianness     : ").append(state.getDataByteOrder().toString()).append(LS);
     sb.append("JDK Major Version   : ").append(UnsafeUtil.JDK).append(LS);
     //Data detail
     sb.append("Data, littleEndian  :  0  1  2  3  4  5  6  7");

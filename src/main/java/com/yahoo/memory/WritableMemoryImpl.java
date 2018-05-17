@@ -46,6 +46,15 @@ import java.nio.ByteOrder;
  */
 final class WritableMemoryImpl extends BaseWritableMemoryImpl {
 
+  //ctor for all parameters & ByteBuffer
+  WritableMemoryImpl(
+      final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
+      final long capacityBytes, final boolean resourceReadOnly, final boolean localReadOnly,
+      final ByteBuffer byteBuf) {
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, resourceReadOnly,
+        localReadOnly, ByteOrder.nativeOrder(), byteBuf);
+  }
+
   //ctor for heap primitive arrays
   WritableMemoryImpl(
       final Object unsafeObj, final Prim prim, final long arrLen, final boolean localReadOnly) {

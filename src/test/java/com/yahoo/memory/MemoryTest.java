@@ -177,7 +177,7 @@ public class MemoryTest {
     bb.order(ByteOrder.BIG_ENDIAN);
     Memory mem = Memory.wrap(bb);
     assertTrue(mem.isSwapBytes());
-    assertEquals(mem.getResourceOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(mem.getResourceByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test

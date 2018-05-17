@@ -299,7 +299,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   @Override
   public final ByteOrder getResourceOrder() {
     assertValid();
-    return state.getResourceOrder();
+    return state.getResourceByteOrder();
   }
 
   @Override
@@ -319,7 +319,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
     sb.append("### ").append(klass).append(" SUMMARY ###").append(LS);
     sb.append("Header Comment      : ").append(header).append(LS);
     sb.append("Call Parameters     : ").append(call);
-    return Memory.toHex(sb.toString(), offsetBytes, lengthBytes, state, localReadOnly);
+    return Memory.toHex((state, sb.toString(), offsetBytes, lengthBytes);
   }
 
   //PRIMITIVE putXXX() and putXXXArray() XXX

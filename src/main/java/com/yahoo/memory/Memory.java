@@ -29,42 +29,13 @@ import java.nio.channels.WritableByteChannel;
  */
 public abstract class Memory extends ResourceState {
 
-  //Pass-through ctor for all parameters & ByteBuffer
+  //Pass-through ctor for all parameters
   Memory(
       final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
       final long capacityBytes, final boolean resourceReadOnly, final boolean localReadOnly,
       final ByteOrder dataByteOrder, final ByteBuffer byteBuf) {
     super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, resourceReadOnly,
         localReadOnly, dataByteOrder, byteBuf);
-  }
-
-  //Pass-through ctor for heap primitive arrays
-  Memory(
-      final Object unsafeObj, final Prim prim, final long arrLen, final boolean localReadOnly,
-      final ByteOrder dataByteOrder) {
-    super(unsafeObj, prim, arrLen, localReadOnly, dataByteOrder);
-  }
-
-  //Pass-through ctor for copy and regions
-  Memory(
-      final ResourceState src, final long offsetBytes, final long capacityBytes,
-      final boolean localReadOnly, final ByteOrder dataByteOrder) {
-    super(src, offsetBytes, capacityBytes, localReadOnly, dataByteOrder);
-  }
-
-  //Pass-through ctor for Direct Memory
-  Memory(
-      final long nativeBaseOffset, final long capacityBytes, final ByteOrder dataByteOrder,
-      final MemoryRequestServer memReqSvr) {
-    super(nativeBaseOffset, capacityBytes, dataByteOrder, memReqSvr);
-  }
-
-  //Pass-through ctor for Memory Mapped Files
-  Memory(
-      final long nativeBaseOffset, final long regionOffset, final long capacityBytes,
-      final boolean resourceReadOnly, final boolean localReadOnly, final ByteOrder dataByteOrder) {
-    super(nativeBaseOffset, regionOffset, capacityBytes, resourceReadOnly, localReadOnly,
-        dataByteOrder);
   }
 
   //BYTE BUFFER XXX
@@ -121,7 +92,8 @@ public abstract class Memory extends ResourceState {
     zeroCheck(capacityBytes, "Capacity");
     nullCheck(file, "file is null");
     negativeCheck(fileOffsetBytes, "File offset is negative");
-    return MapHandle.map(file, fileOffsetBytes, capacityBytes, dataByteOrder);
+    return BaseWritableMemoryImpl
+        .wrapMap(file, fileOffsetBytes, capacityBytes, true, dataByteOrder);
   }
 
   //REGIONS XXX
@@ -166,7 +138,7 @@ public abstract class Memory extends ResourceState {
    */
   public static Memory wrap(final boolean[] arr) {
     final long lengthBytes = arr.length << Prim.BOOLEAN.shift();
-    return BaseWritableMemoryImpl.newArrayInstance(arr, 0L, lengthBytes, true, nativeOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, true, nativeOrder);
   }
 
   /**
@@ -203,7 +175,7 @@ public abstract class Memory extends ResourceState {
   public static Memory wrap(final byte[] arr, final int offsetBytes, final int lengthBytes,
       final ByteOrder dataByteOrder) {
     UnsafeUtil.checkBounds(offsetBytes, lengthBytes, arr.length);
-    return BaseWritableMemoryImpl.newArrayInstance(arr, 0L, lengthBytes, true, dataByteOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, true, dataByteOrder);
   }
 
   /**
@@ -214,7 +186,7 @@ public abstract class Memory extends ResourceState {
    */
   public static Memory wrap(final char[] arr) {
     final long lengthBytes = arr.length << Prim.CHAR.shift();
-    return BaseWritableMemoryImpl.newArrayInstance(arr, 0L, lengthBytes, true, nativeOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, true, nativeOrder);
   }
 
   /**
@@ -225,7 +197,7 @@ public abstract class Memory extends ResourceState {
    */
   public static Memory wrap(final short[] arr) {
     final long lengthBytes = arr.length << Prim.SHORT.shift();
-    return BaseWritableMemoryImpl.newArrayInstance(arr, 0L, lengthBytes, true, nativeOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, true, nativeOrder);
   }
 
   /**
@@ -236,7 +208,7 @@ public abstract class Memory extends ResourceState {
    */
   public static Memory wrap(final int[] arr) {
     final long lengthBytes = arr.length << Prim.INT.shift();
-    return BaseWritableMemoryImpl.newArrayInstance(arr, 0L, lengthBytes, true, nativeOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, true, nativeOrder);
   }
 
   /**
@@ -247,7 +219,7 @@ public abstract class Memory extends ResourceState {
    */
   public static Memory wrap(final long[] arr) {
     final long lengthBytes = arr.length << Prim.LONG.shift();
-    return BaseWritableMemoryImpl.newArrayInstance(arr, 0L, lengthBytes, true, nativeOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, true, nativeOrder);
   }
 
   /**
@@ -258,7 +230,7 @@ public abstract class Memory extends ResourceState {
    */
   public static Memory wrap(final float[] arr) {
     final long lengthBytes = arr.length << Prim.FLOAT.shift();
-    return BaseWritableMemoryImpl.newArrayInstance(arr, 0L, lengthBytes, true, nativeOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, true, nativeOrder);
   }
 
   /**
@@ -269,7 +241,7 @@ public abstract class Memory extends ResourceState {
    */
   public static Memory wrap(final double[] arr) {
     final long lengthBytes = arr.length << Prim.DOUBLE.shift();
-    return BaseWritableMemoryImpl.newArrayInstance(arr, 0L, lengthBytes, true, nativeOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, true, nativeOrder);
   }
 
   //PRIMITIVE getXXX() and getXXXArray() XXX
@@ -505,20 +477,25 @@ public abstract class Memory extends ResourceState {
    * Memory.
    */
   @Override
-  public abstract boolean equals(Object that);
+  public final boolean equals(final Object that) {
+    return super.equalTo(that);
+  }
 
   /**
    * Returns true if the given Memory has equal contents to this Memory in the given range of
    * bytes.
    * @param thisOffsetBytes the starting offset in bytes for this Memory
-   * @param that the given Memory
+   * @param that the given ResourceState
    * @param thatOffsetBytes the starting offset in bytes for the given Memory
    * @param lengthBytes the size of the range of bytes
    * @return true if the given Memory has equal contents to this Memory in the given range of
    * bytes.
    */
-  public abstract boolean equalTo(long thisOffsetBytes, Memory that, long thatOffsetBytes,
-      long lengthBytes);
+  @Override
+  public final boolean equalTo(final long thisOffsetBytes, final ResourceState that,
+      final long thatOffsetBytes, final long lengthBytes) {
+    return super.equalTo(thisOffsetBytes, that, thatOffsetBytes, lengthBytes);
+  }
 
   /**
    * Returns the hashCode of this Memory.
@@ -533,7 +510,9 @@ public abstract class Memory extends ResourceState {
    * @return the hashCode of this Memory.
    */
   @Override
-  public abstract int hashCode();
+  public final int hashCode() {
+    return super.theHashCode();
+  }
 
   //OTHER READ METHODS XXX
   /**
@@ -549,49 +528,64 @@ public abstract class Memory extends ResourceState {
    * @return the capacity of this Memory in bytes
    */
   @Override
-  public abstract long getCapacity();
+  public final long getCapacity() {
+    return super.getCapacity();
+  }
 
   /**
    * Returns the cumulative offset in bytes of this Memory from the backing resource
-   * including the given offsetBytes and including the Java object header, if any.
+   * including the Java object header, if any.
    *
-   * @param offsetBytes the given offset in bytes
-   * @return the cumulative offset in bytes of this Memory including the given offsetBytes.
+   * @return the cumulative offset in bytes of this Memory
    */
-  public abstract long getCumulativeOffset(final long offsetBytes);
+  public final long getCumulativeOffset() {
+    return super.getCumBaseOffset();
+  }
 
   /**
    * Returns the ByteOrder for the backing resource.
    * @return the ByteOrder for the backing resource.
    */
   @Override
-  public abstract ByteOrder getDataByteOrder();
+  public final ByteOrder getDataByteOrder() {
+    return super.getDataByteOrder();
+  }
 
   /**
    * Returns true if this Memory is backed by an on-heap primitive array
    * @return true if this Memory is backed by an on-heap primitive array
    */
-  public abstract boolean hasArray();
+  @Override
+  public final boolean hasArray() {
+    return super.hasArray();
+  }
 
   /**
    * Returns true if this Memory is backed by a ByteBuffer
    * @return true if this Memory is backed by a ByteBuffer
    */
-  public abstract boolean hasByteBuffer();
+  @Override
+  public final boolean hasByteBuffer() {
+    return super.getByteBuffer() != null;
+  }
 
   /**
    * Returns true if the backing memory is direct (off-heap) memory.
    * @return true if the backing memory is direct (off-heap) memory.
    */
   @Override
-  public abstract boolean isDirect();
+  public final boolean isDirect() {
+    return super.isDirect();
+  }
 
   /**
    * Returns true if this or the backing resource is read-only
    * @return true if this or backing resource is read-only
    */
   @Override
-  public abstract boolean isReadOnly();
+  public final boolean isReadOnly() {
+    return super.isReadOnly();
+  }
 
   /**
    * Returns true if the backing resource of <i>this</i> is identical with the backing resource
@@ -601,14 +595,18 @@ public abstract class Memory extends ResourceState {
    * @return true if the backing resource of <i>this</i> is identical with the backing resource
    * of <i>that</i>.
    */
-  public abstract boolean isSameResource(Memory that);
+  public final boolean isSameResource(final Memory that) {
+    return super.isSameResource(that);
+  }
 
   /**
    * Returns true if this Memory is valid() and has not been closed.
    * @return true if this Memory is valid() and has not been closed.
    */
   @Override
-  public abstract boolean isValid();
+  public final boolean isValid() {
+    return super.isValid();
+  }
 
   /**
    * Returns a formatted hex string of a range of this Memory.
@@ -709,7 +707,5 @@ public abstract class Memory extends ResourceState {
   public static long getCurrentDirectMemoryMapAllocated() {
     return ResourceState.currentDirectMemoryMapAllocated_.get();
   }
-
-  abstract ResourceState getResourceState();
 
 }

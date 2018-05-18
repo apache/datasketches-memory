@@ -16,9 +16,9 @@ import sun.misc.Cleaner;
  * @author Lee Rhodes
  */
 final class AllocateDirect implements AutoCloseable {
-  private final StepBoolean valid;
-  private final long capacity;
+  private final Deallocator deallocator;
   private final Cleaner cleaner;
+  final long nativeBaseOffset;
 
   /**
    * Base Constructor for allocate native memory.
@@ -26,24 +26,20 @@ final class AllocateDirect implements AutoCloseable {
    * <p>Allocates and provides access to capacityBytes directly in native (off-heap) memory
    * leveraging the Memory interface.
    * The allocated memory will be 8-byte aligned, but may not be page aligned.
-   * @param capacity the the requested capacity of off-heap memory. Cannot be zero.
+   * @param capacityBytes the the requested capacity of off-heap memory. Cannot be zero.
    * @param state contains valid, capacity at this point
    */
-  private AllocateDirect(final long capacity, final ResourceState state) {
-    valid = state.getValid();
-    this.capacity = capacity;
-
+  AllocateDirect(final long capacityBytes) {
     final boolean pageAligned = NioBits.isPageAligned();
     final long pageSize = NioBits.pageSize();
-    final long allocationSize = capacity + (pageAligned ? pageSize : 0);
-    NioBits.reserveMemory(allocationSize, capacity);
-    final long nativeBaseOffset;
+    final long allocationSize = capacityBytes + (pageAligned ? pageSize : 0);
+    NioBits.reserveMemory(allocationSize, capacityBytes);
 
     final long nativeAddress;
     try {
       nativeAddress = unsafe.allocateMemory(allocationSize);
     } catch (final OutOfMemoryError err) {
-      NioBits.unreserveMemory(allocationSize, capacity);
+      NioBits.unreserveMemory(allocationSize, capacityBytes);
       throw err;
     }
     if (pageAligned && ((nativeAddress % pageSize) != 0)) {
@@ -52,40 +48,38 @@ final class AllocateDirect implements AutoCloseable {
     } else {
       nativeBaseOffset = nativeAddress;
     }
-    cleaner = Cleaner.create(this, new Deallocator(nativeAddress, allocationSize, capacity, valid));
-    state.putNativeBaseOffset(nativeBaseOffset); //computes the cumBaseOffset
+    deallocator = new Deallocator(nativeAddress, allocationSize, capacityBytes);
+    cleaner = Cleaner.create(this, deallocator);
     ResourceState.currentDirectMemoryAllocations_.incrementAndGet();
-    ResourceState.currentDirectMemoryAllocated_.addAndGet(state.getCapacity());
-  }
-
-  static AllocateDirect allocateDirect(final long capacity, final ResourceState state) {
-    return new AllocateDirect(capacity, state);
+    ResourceState.currentDirectMemoryAllocated_.addAndGet(capacityBytes);
   }
 
   @Override
   public void close() {
-    if (valid.get()) { //is valid
-      ResourceState.currentDirectMemoryAllocations_.decrementAndGet();
-      ResourceState.currentDirectMemoryAllocated_.addAndGet(-capacity);
-    }
     cleaner.clean(); //sets invalid
+  }
+
+  void setValid(final StepBoolean valid) {
+    deallocator.setStepBoolean(valid);
   }
 
   private static final class Deallocator implements Runnable {
     //This is the only place the actual native address is kept for use by unsafe.freeMemory();
     //It can never be modified until it is deallocated.
-    private long nativeAddress; //set to 0 when deallocated
+    private long nativeAddress; //set to 0 when deallocated. Different from nativeBaseOffset
     private final long allocationSize;
     private final long capacity;
     private StepBoolean valid;
 
-    private Deallocator(final long nativeAddress, final long allocationSize, final long capacity,
-        final StepBoolean valid) {
+    private Deallocator(final long nativeAddress, final long allocationSize, final long capacity) {
       this.nativeAddress = nativeAddress;
       this.allocationSize = allocationSize;
       this.capacity = capacity;
-      this.valid = valid;
       assert (nativeAddress != 0);
+    }
+
+    void setStepBoolean(final StepBoolean valid) {
+      this.valid = valid;
     }
 
     @Override

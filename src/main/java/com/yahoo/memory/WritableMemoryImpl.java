@@ -22,9 +22,9 @@ import static com.yahoo.memory.UnsafeUtil.LONG_SHIFT;
 import static com.yahoo.memory.UnsafeUtil.SHORT_SHIFT;
 import static com.yahoo.memory.UnsafeUtil.checkBounds;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
+import static com.yahoo.memory.Util.nativeOrder;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 /*
  * Developer notes: The heavier methods, such as put/get arrays, duplicate, region, clear, fill,
@@ -46,70 +46,36 @@ import java.nio.ByteOrder;
  */
 final class WritableMemoryImpl extends BaseWritableMemoryImpl {
 
-  //ctor for all parameters & ByteBuffer
+  //ctor for all parameters
   WritableMemoryImpl(
       final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
       final long capacityBytes, final boolean resourceReadOnly, final boolean localReadOnly,
       final ByteBuffer byteBuf) {
     super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, resourceReadOnly,
-        localReadOnly, ByteOrder.nativeOrder(), byteBuf);
-  }
-
-  //ctor for heap primitive arrays
-  WritableMemoryImpl(
-      final Object unsafeObj, final Prim prim, final long arrLen, final boolean localReadOnly) {
-    super(unsafeObj, prim, arrLen, localReadOnly, ByteOrder.nativeOrder());
-  }
-
-  //ctor for copy and regions
-  WritableMemoryImpl(
-      final ResourceState src, final long offset, final long capacityBytes,
-      final boolean localReadOnly) {
-    super(src, offset, capacityBytes, localReadOnly, ByteOrder.nativeOrder());
-  }
-
-  //ctor for Direct Memory
-  WritableMemoryImpl(
-      final long nativeBaseOffset, final long capacityBytes, final MemoryRequestServer memReqSvr) {
-    super(nativeBaseOffset, capacityBytes, ByteOrder.nativeOrder(), memReqSvr);
-  }
-
-  //ctor for Memory Mapped Files
-  WritableMemoryImpl(
-      final long nativeBaseOffset, final long regionOffset, final long capacityBytes,
-      final boolean resourceReadOnly, final boolean localReadOnly) {
-    super(nativeBaseOffset, regionOffset, capacityBytes, resourceReadOnly, localReadOnly,
-        ByteOrder.nativeOrder());
-  }
-
-  //ctor for ByteBuffers
-  WritableMemoryImpl(
-      final ByteBuffer byteBuf, final Object unsafeObj, final long nativeBaseOffset,
-      final long regionOffset, final long capacityBytes, final boolean resourceReadOnly,
-      final boolean localReadOnly) {
-    super(byteBuf, unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, resourceReadOnly,
-        localReadOnly, ByteOrder.nativeOrder());
+        localReadOnly, nativeOrder, byteBuf);
   }
 
   //REGIONS XXX
   @Override
-  WritableMemory writableRegionImpl(final long offsetBytes, final long capacityBytes,
-      final boolean localReadOnly) {
+  BaseWritableMemoryImpl writableRegionImpl(
+      final long offsetBytes, final long capacityBytes, final boolean localReadOnly) {
     checkValidAndBounds(offsetBytes, capacityBytes);
     if (capacityBytes == 0) { return ZERO_SIZE_MEMORY; }
-    return new WritableMemoryImpl(this, offsetBytes, capacityBytes, localReadOnly);
+    return new WritableMemoryImpl(getUnsafeObject(), getNativeBaseOffset(),
+        getRegionOffset() + offsetBytes, capacityBytes, isResourceReadOnly(),
+        localReadOnly, getByteBuffer());
   }
 
   //BUFFER XXX
   @Override
-  WritableBuffer asWritableBufferImpl(final boolean localReadOnly) {
+  BaseWritableBufferImpl asWritableBufferImpl(final boolean localReadOnly) {
     checkValid();
     final BaseWritableBufferImpl wbuf;
     if (getCapacity() == 0) {
       wbuf = BaseWritableBufferImpl.ZERO_SIZE_BUFFER;
     } else {
-      wbuf = new WritableBufferImpl(state, localReadOnly, this);
-      wbuf.setAndCheckStartPositionEnd(0, 0, capacity);
+      wbuf = new WritableBufferImpl(this, localReadOnly, this);
+      wbuf.setAndCheckStartPositionEnd(0, 0, getCapacity());
     }
     return wbuf;
   }
@@ -383,4 +349,5 @@ final class WritableMemoryImpl extends BaseWritableMemoryImpl {
     return unsafe.compareAndSwapLong(
         getUnsafeObject(), getCumBaseOffset() + offsetBytes, expect, update);
   }
+
 }

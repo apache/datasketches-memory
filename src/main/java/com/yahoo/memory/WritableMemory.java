@@ -5,7 +5,6 @@
 
 package com.yahoo.memory;
 
-import static com.yahoo.memory.BaseWritableMemoryImpl.ZERO_SIZE_MEMORY;
 import static com.yahoo.memory.Util.nativeOrder;
 import static com.yahoo.memory.Util.negativeCheck;
 import static com.yahoo.memory.Util.nullCheck;
@@ -32,36 +31,6 @@ public abstract class WritableMemory extends Memory {
       final ByteOrder dataByteOrder, final ByteBuffer byteBuf) {
     super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, resourceReadOnly,
         localReadOnly, dataByteOrder, byteBuf);
-  }
-
-
-  //Pass-through ctor for heap primitive arrays
-  WritableMemory(
-      final Object unsafeObj, final Prim prim, final long arrLen, final boolean localReadOnly,
-      final ByteOrder dataByteOrder) {
-    super(unsafeObj, prim, arrLen, localReadOnly, dataByteOrder);
-  }
-
-  //Pass-through ctor for copy and regions
-  WritableMemory(
-      final ResourceState src, final long offsetBytes, final long capacityBytes,
-      final boolean localReadOnly, final ByteOrder dataByteOrder) {
-    super(src, offsetBytes, capacityBytes, localReadOnly, dataByteOrder);
-  }
-
-  //Pass-through ctor for Direct Memory
-  WritableMemory(
-      final long nativeBaseOffset, final long capacityBytes, final ByteOrder dataByteOrder,
-      final MemoryRequestServer memReqSvr) {
-    super(nativeBaseOffset, capacityBytes, dataByteOrder, memReqSvr);
-  }
-
-  //Pass-through ctor for Memory Mapped Files
-  WritableMemory(
-      final long nativeBaseOffset, final long regionOffset, final long capacityBytes,
-      final boolean resourceReadOnly, final boolean localReadOnly, final ByteOrder dataByteOrder) {
-    super(nativeBaseOffset, regionOffset, capacityBytes, resourceReadOnly, localReadOnly,
-        dataByteOrder);
   }
 
   //BYTE BUFFER XXX
@@ -106,7 +75,7 @@ public abstract class WritableMemory extends Memory {
    * @throws IOException file not found or RuntimeException, etc.
    */
   public static WritableMapHandle map(final File file) throws IOException {
-    return map(file, 0, file.length(), ByteOrder.nativeOrder());
+    return map(file, 0, file.length(), nativeOrder);
   }
 
   /**
@@ -124,14 +93,8 @@ public abstract class WritableMemory extends Memory {
     zeroCheck(capacityBytes, "Capacity");
     nullCheck(file, "file is null");
     negativeCheck(fileOffsetBytes, "File offset is negative");
-    final boolean rro = AllocateDirectMap.isFileReadOnly(file);
-    if (rro) {
-      throw new ReadOnlyException("Cannot map a read-only file into Writable Memory.");
-    }
-    final ResourceState state = new ResourceState(rro);
-    state.putCapacity(capacityBytes);
-    state.putResourceOrder(dataByteOrder);
-    return WritableMapHandle.map(state, file, fileOffsetBytes);
+    return BaseWritableMemoryImpl
+        .wrapMap(file, fileOffsetBytes, capacityBytes, false, dataByteOrder);
   }
 
   //ALLOCATE DIRECT XXX
@@ -142,7 +105,7 @@ public abstract class WritableMemory extends Memory {
    * of the WritableMemory object, returned from {@link WritableHandle#get()} are unspecified.
    *
    * <p>The default MemoryRequestServer, which allocates any request for memory onto the heap,
-   * will be used.</p>
+   * will be used and native byte order will be assumed.</p>
    *
    * <p><b>NOTE:</b> Native/Direct memory acquired using Unsafe may have garbage in it.
    * It is the responsibility of the using class to clear this memory, if required,
@@ -151,16 +114,8 @@ public abstract class WritableMemory extends Memory {
    * @param capacityBytes the size of the desired memory in bytes.
    * @return WritableDirectHandle for this off-heap resource
    */
-  public static WritableDirectHandle allocateDirect(final long capacityBytes) {
-    if (capacityBytes == 0) {
-      return new WritableDirectHandle(null, ZERO_SIZE_MEMORY);
-    }
-    final ResourceState state = new ResourceState(false);
-    state.putCapacity(capacityBytes);
-    final WritableDirectHandle handle = WritableDirectHandle.allocateDirect(state);
-    final MemoryRequestServer server = new DefaultMemoryRequestServer();
-    state.putMemoryRequestServer(server);
-    return handle;
+  public static WritableHandle allocateDirect(final long capacityBytes) {
+    return allocateDirect(capacityBytes, nativeOrder, null);
   }
 
   /**
@@ -174,20 +129,13 @@ public abstract class WritableMemory extends Memory {
    * and to call <i>close()</i> when done.</p>
    *
    * @param capacityBytes the size of the desired memory in bytes.
-   * @param server A user-specified MemoryRequestServer.
+   * @param dataByteOrder the endianness of the given file. It may not be null.
+   * @param memReqSvr A user-specified MemoryRequestServer.
    * @return WritableHandle for this off-heap resource
    */
   public static WritableHandle allocateDirect(final long capacityBytes,
-      final MemoryRequestServer server) {
-    if (capacityBytes == 0) {
-      return new WritableDirectHandle(null, ZERO_SIZE_MEMORY);
-    }
-    final ResourceState state = new ResourceState(false);
-    state.putCapacity(capacityBytes);
-    state.putMemoryRequestServer(server);
-    final WritableHandle handle = WritableDirectHandle.allocateDirect(state);
-
-    return handle;
+      final ByteOrder dataByteOrder, final MemoryRequestServer memReqSvr) {
+    return BaseWritableMemoryImpl.wrapDirect(capacityBytes, dataByteOrder, memReqSvr);
   }
 
   //REGIONS XXX
@@ -233,7 +181,7 @@ public abstract class WritableMemory extends Memory {
    */
   public static WritableMemory allocate(final int capacityBytes) {
     final byte[] arr = new byte[capacityBytes];
-    return BaseWritableMemoryImpl.newInstance(new ResourceState(arr, Prim.BYTE, arr.length), false);
+    return wrap(arr, nativeOrder);
   }
 
   //ACCESS PRIMITIVE HEAP ARRAYS for write XXX
@@ -246,7 +194,7 @@ public abstract class WritableMemory extends Memory {
    */
   public static WritableMemory wrap(final boolean[] arr) {
     final long lengthBytes = arr.length << Prim.BOOLEAN.shift();
-    return BaseWritableMemoryImpl.newArrayInstance(arr, 0L, lengthBytes, false, nativeOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, nativeOrder);
   }
 
   /**
@@ -257,7 +205,7 @@ public abstract class WritableMemory extends Memory {
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final byte[] arr) {
-    return WritableMemory.wrap(arr, 0, arr.length, ByteOrder.nativeOrder());
+    return WritableMemory.wrap(arr, 0, arr.length, nativeOrder);
   }
 
   /**
@@ -285,7 +233,7 @@ public abstract class WritableMemory extends Memory {
   public static WritableMemory wrap(final byte[] arr, final int offsetBytes, final int lengthBytes,
       final ByteOrder dataByteOrder) {
     UnsafeUtil.checkBounds(offsetBytes, lengthBytes, arr.length);
-    return BaseWritableMemoryImpl.newArrayInstance(arr, 0L, lengthBytes, false, dataByteOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, dataByteOrder);
   }
 
   /**
@@ -297,7 +245,7 @@ public abstract class WritableMemory extends Memory {
    */
   public static WritableMemory wrap(final char[] arr) {
     final long lengthBytes = arr.length << Prim.CHAR.shift();
-    return BaseWritableMemoryImpl.newArrayInstance(arr, 0L, lengthBytes, false, nativeOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, nativeOrder);
   }
 
   /**
@@ -309,7 +257,7 @@ public abstract class WritableMemory extends Memory {
    */
   public static WritableMemory wrap(final short[] arr) {
     final long lengthBytes = arr.length << Prim.SHORT.shift();
-    return BaseWritableMemoryImpl.newArrayInstance(arr, 0L, lengthBytes, false, nativeOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, nativeOrder);
   }
 
   /**
@@ -321,7 +269,7 @@ public abstract class WritableMemory extends Memory {
    */
   public static WritableMemory wrap(final int[] arr) {
     final long lengthBytes = arr.length << Prim.INT.shift();
-    return BaseWritableMemoryImpl.newArrayInstance(arr, 0L, lengthBytes, false, nativeOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, nativeOrder);
   }
 
   /**
@@ -333,7 +281,7 @@ public abstract class WritableMemory extends Memory {
    */
   public static WritableMemory wrap(final long[] arr) {
     final long lengthBytes = arr.length << Prim.LONG.shift();
-    return BaseWritableMemoryImpl.newArrayInstance(arr, 0L, lengthBytes, false, nativeOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, nativeOrder);
   }
 
   /**
@@ -345,7 +293,7 @@ public abstract class WritableMemory extends Memory {
    */
   public static WritableMemory wrap(final float[] arr) {
     final long lengthBytes = arr.length << Prim.FLOAT.shift();
-    return BaseWritableMemoryImpl.newArrayInstance(arr, 0L, lengthBytes, false, nativeOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, nativeOrder);
   }
 
   /**
@@ -357,7 +305,7 @@ public abstract class WritableMemory extends Memory {
    */
   public static WritableMemory wrap(final double[] arr) {
     final long lengthBytes = arr.length << Prim.DOUBLE.shift();
-    return BaseWritableMemoryImpl.newArrayInstance(arr, 0L, lengthBytes, false, nativeOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, nativeOrder);
   }
   //END OF CONSTRUCTOR-TYPE METHODS
 
@@ -552,7 +500,9 @@ public abstract class WritableMemory extends Memory {
    * @return the backing ByteBuffer if it exists, otherwise returns null.
    */
   @Override
-  public abstract ByteBuffer getByteBuffer();
+  public ByteBuffer getByteBuffer() {
+    return super.getByteBuffer();
+  }
 
   /**
    * Clears all bytes of this Memory to zero
@@ -600,15 +550,19 @@ public abstract class WritableMemory extends Memory {
    * @return a MemoryRequestServer or null
    */
   @Override
-  public abstract MemoryRequestServer getMemoryRequestServer();
+  public MemoryRequestServer getMemoryRequestServer() {
+    return super.getMemoryRequestServer();
+  }
 
   /**
-   * Returns the offset of the start of this WritableMemory from the backing resource
-   * including the given offsetBytes, but not including any Java object header.
+   * Returns the offset of the start of this WritableMemory from the backing resource,
+   * but not including any Java object header.
    *
-   * @param offsetBytes the given offset in bytes
    * @return the offset of the start of this WritableMemory from the backing resource.
    */
-  public abstract long getRegionOffset(long offsetBytes);
+  @Override
+  public long getRegionOffset() {
+    return super.getRegionOffset();
+  }
 
 }

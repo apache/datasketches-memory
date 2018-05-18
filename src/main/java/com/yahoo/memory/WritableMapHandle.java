@@ -5,8 +5,6 @@
 
 package com.yahoo.memory;
 
-import java.io.File;
-
 /**
  * Gets a WritableMemory for a writable memory-mapped file resource. It is highly recommended
  * that this be created inside a <i>try-with-resources</i> statement.
@@ -17,16 +15,9 @@ import java.io.File;
 //Joins a WritableHandle with an AutoCloseable WritableMap resource
 public final class WritableMapHandle extends MapHandle implements WritableMap, WritableHandle {
 
-  private WritableMapHandle(final AllocateDirectWritableMap dirWmap,
+  WritableMapHandle(final AllocateDirectWritableMap dirWmap,
       final BaseWritableMemoryImpl wMem) {
     super(dirWmap, wMem);
-  }
-
-  @SuppressWarnings("resource") //called from memory. state: RRO, cap, BO
-  static WritableMapHandle map(final ResourceState state, final File file, final long fileOffset) {
-    final AllocateDirectWritableMap dirMap = AllocateDirectWritableMap.map(state, file, fileOffset);
-    final BaseWritableMemoryImpl wMem = BaseWritableMemoryImpl.newInstance(state, false);
-    return new WritableMapHandle(dirMap, wMem);
   }
 
   @Override

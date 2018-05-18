@@ -32,19 +32,17 @@ final class Utf8 {
 
   //Decode
   static final int getCharsFromUtf8(final long offsetBytes, final int utf8LengthBytes,
-      final Appendable dst, final ResourceState state)
+      final Appendable dst, final long cumBaseOffset, final Object unsafeObj)
           throws IOException, Utf8CodingException {
-    final long cumBaseOffset = state.getCumBaseOffset();
 
     if ((dst instanceof CharBuffer) && ((CharBuffer) dst).hasArray()) {
       return getCharBufferCharsFromUtf8(offsetBytes, ((CharBuffer) dst), utf8LengthBytes,
-          cumBaseOffset, state);
+          cumBaseOffset, unsafeObj);
     }
 
     //Decode Direct CharBuffers and all other Appendables
 
     final long address = cumBaseOffset + offsetBytes;
-    final Object unsafeObj = state.getUnsafeObject();
 
     // Optimize for 100% ASCII (Hotspot loves small simple top-level loops like this).
     // This simple loop stops when we encounter a byte >= 0x80 (i.e. non-ASCII).
@@ -70,14 +68,13 @@ final class Utf8 {
    * abstraction well (doesn't hoist array bound checks, etc.)
    */
   private static int getCharBufferCharsFromUtf8(final long offsetBytes, final CharBuffer cbuf,
-        final int utf8LengthBytes, final long cumBaseOffset, final ResourceState state) {
+        final int utf8LengthBytes, final long cumBaseOffset, final Object unsafeObj) {
     final char[] carr = cbuf.array();
     final int startCpos = cbuf.position() + cbuf.arrayOffset();
     int cpos = startCpos;
     final int clim = cbuf.arrayOffset() + cbuf.limit();
-    final long address = state.getCumBaseOffset() + offsetBytes;
+    final long address = cumBaseOffset + offsetBytes;
     int i = 0; //byte index
-    final Object unsafeObj = state.getUnsafeObject();
 
     // Optimize for 100% ASCII (Hotspot loves small simple top-level loops like this).
     // This simple loop stops when we encounter a byte >= 0x80 (i.e. non-ASCII).
@@ -260,15 +257,14 @@ final class Utf8 {
   /******************/
   //Encode
   static long putCharsToUtf8(final long offsetBytes, final CharSequence src,
-        final ResourceState state) {
-    final Object unsafeObj = state.getUnsafeObject();
-    final long cumBaseOffset = state.getCumBaseOffset();
+        final long capacityBytes, final long cumBaseOffset, final Object unsafeObj) {
+
 
     int cIdx = 0; //src character index
     long bIdx = cumBaseOffset + offsetBytes; //byte index
     long bCnt = 0; //bytes inserted
 
-    final long byteLimit = cumBaseOffset + state.getCapacity(); //unsafe index limit
+    final long byteLimit = cumBaseOffset + capacityBytes; //unsafe index limit
 
     final int utf16Length = src.length();
     //Quickly dispatch an ASCII sequence

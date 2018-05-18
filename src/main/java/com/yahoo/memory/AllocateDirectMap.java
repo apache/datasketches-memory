@@ -79,40 +79,24 @@ class AllocateDirectMap implements Map {
     }
   }
 
-  final long capacityBytes; //in
-
-  final Cleaner cleaner;
   private final Deallocator deallocator;
+  private final Cleaner cleaner;
+
+  final long capacityBytes;
   final RandomAccessFile raf;
   final long nativeBaseOffset;
   final boolean resourceReadOnly;
 
-  //called from map below and from AllocateDirectWritableMap constructor
-  AllocateDirectMap(final File file, final long fileOffset, final long capacityBytes) {
+  //called from AllocateDirectWritableMap constructor
+  AllocateDirectMap(final File file, final long fileOffsetBytes, final long capacityBytes) {
     this.capacityBytes = capacityBytes;
     resourceReadOnly = isFileReadOnly(file);
-    raf = mapper(file, fileOffset, capacityBytes, resourceReadOnly);
-    nativeBaseOffset = map(raf.getChannel(), resourceReadOnly, fileOffset, capacityBytes);
+    raf = mapper(file, fileOffsetBytes, capacityBytes, resourceReadOnly);
+    nativeBaseOffset = map(raf.getChannel(), resourceReadOnly, fileOffsetBytes, capacityBytes);
     deallocator = new Deallocator(nativeBaseOffset, capacityBytes, raf);
     cleaner = Cleaner.create(this, deallocator);
     ResourceState.currentDirectMemoryMapAllocations_.incrementAndGet();
     ResourceState.currentDirectMemoryMapAllocated_.addAndGet(capacityBytes);
-  }
-
-  /**
-   * Factory method for memory mapping a file for read-only access.
-   *
-   * <p>Memory maps a file directly in off heap leveraging native map0 method used in
-   * FileChannelImpl.c. (see reference at top of class)
-   * The owner will have read access to that address space.</p>
-   *
-   * @param file the file to map to native memory
-   * @param fileOffset the starting byte offset into the file
-   * @param capacityBytes the capacity of the memory mapped region
-   * @return A new AllocateDirectMap
-   */
-  static AllocateDirectMap map(final File file, final long fileOffset, final long capacityBytes)  {
-    return new AllocateDirectMap(file, fileOffset, capacityBytes);
   }
 
   @Override
@@ -148,13 +132,17 @@ class AllocateDirectMap implements Map {
     cleaner.clean(); //sets invalid
   }
 
-  // Restricted methods
+  void setValid(final StepBoolean valid) {
+    deallocator.setStepBoolean(valid);
+  }
+
+  // Private methods
   /**
    * called by load(). Calls the native method load0 in MappedByteBuffer.java, implemented
    * in MappedByteBuffer.c. See reference at top of class. load0 allows setting a mapping length
    * of greater than 2GB.
    */
-  void madvise() {
+  private void madvise() {
     try {
       MAPPED_BYTE_BUFFER_LOAD0_METHOD                //load0 is effectively static
         .invoke(AccessByteBuffer.ZERO_DIRECT_NIO_BUFFER, // so this is not modified
@@ -167,7 +155,7 @@ class AllocateDirectMap implements Map {
   }
 
   //Does the actual mapping work, resourceReadOnly must already be set
-  static final RandomAccessFile mapper(final File file, final long fileOffset,
+  private static final RandomAccessFile mapper(final File file, final long fileOffset,
       final long capacityBytes, final boolean resourceReadOnly)  {
 
     final String mode = resourceReadOnly ? "r" : "rw";
@@ -220,7 +208,7 @@ class AllocateDirectMap implements Map {
     }
   }
 
-  static final boolean isFileReadOnly(final File file) {
+  private static final boolean isFileReadOnly(final File file) {
     if (System.getProperty("os.name").startsWith("Windows")) {
       return !file.canWrite();
     }
@@ -251,10 +239,6 @@ class AllocateDirectMap implements Map {
     return ((bits & 0477) == 0444);
   }
 
-  void setStepBoolean(final StepBoolean valid) {
-    deallocator.setStepBoolean(valid);
-  }
-
   private static final class Deallocator implements Runnable {
     private final RandomAccessFile myRaf;
     private final FileChannel myFc;
@@ -264,7 +248,7 @@ class AllocateDirectMap implements Map {
     private final long myCapacity;
     private StepBoolean valid;
 
-    private Deallocator(final long nativeBaseOffset, final long capacityBytes,
+    Deallocator(final long nativeBaseOffset, final long capacityBytes,
         final RandomAccessFile raf) {
       myRaf = raf;
       assert (myRaf != null);

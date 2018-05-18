@@ -34,7 +34,7 @@ final class AccessByteBuffer {
   final long capacityBytes;
   final long regionOffset;
   final Object unsafeObj;
-  final boolean readOnly;
+  final boolean resourceReadOnly;
   final ByteOrder byteOrder;
 
   /**
@@ -43,7 +43,7 @@ final class AccessByteBuffer {
    */
   AccessByteBuffer(final ByteBuffer byteBuf) {
     capacityBytes = byteBuf.capacity();
-    readOnly = byteBuf.isReadOnly();
+    resourceReadOnly = byteBuf.isReadOnly();
     byteOrder = byteBuf.order();
     final boolean direct = byteBuf.isDirect();
     if (direct) {

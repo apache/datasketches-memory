@@ -22,14 +22,6 @@ public final class WritableDirectHandle implements WritableHandle {
     this.wMem = wMem;
   }
 
-  @SuppressWarnings("resource")
-  static WritableDirectHandle allocateDirect(final ResourceState state) {
-    final AllocateDirect allocatedDirect = AllocateDirect.allocateDirect(state.getCapacity(), state);
-    final WritableMemory wMem = BaseWritableMemoryImpl.newInstance(state, false);
-    final WritableDirectHandle handle = new WritableDirectHandle(allocatedDirect, wMem);
-    return handle;
-  }
-
   @Override
   public WritableMemory get() {
     return wMem;
@@ -39,9 +31,12 @@ public final class WritableDirectHandle implements WritableHandle {
 
   @Override
   public void close() {
-    if (direct != null) {
+    if ((direct != null) && wMem.isValid()) {
+      ResourceState.currentDirectMemoryAllocations_.decrementAndGet();
+      ResourceState.currentDirectMemoryAllocated_.addAndGet(-wMem.getCapacity());
       direct.close();
       direct = null;
+      wMem.zeroNativeBaseOffset();
     }
   }
 }

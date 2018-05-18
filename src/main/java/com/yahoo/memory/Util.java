@@ -15,6 +15,8 @@ import java.util.Random;
  */
 public final class Util {
   static final ByteOrder nativeOrder = ByteOrder.nativeOrder();
+  static final ByteOrder nonNativeOrder = (nativeOrder == ByteOrder.LITTLE_ENDIAN)
+      ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
 
 
   private Util() { }

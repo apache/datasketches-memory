@@ -22,7 +22,7 @@ public final class WritableMapHandle extends MapHandle implements WritableMap, W
 
   @Override
   public WritableMemory get() {
-    return wMem;
+    return (WritableMemory) super.get();
   }
 
   @Override

@@ -34,6 +34,14 @@ public class WritableMemoryTest {
   }
 
   @Test
+  public void wrapBigEndianAsLittle() {
+    ByteBuffer bb = ByteBuffer.allocate(64);
+    bb.putChar(0, (char)1); //as BE
+    WritableMemory wmem = WritableMemory.wrap(bb, ByteOrder.LITTLE_ENDIAN);
+    assertEquals(wmem.getChar(0), 256);
+  }
+
+  @Test
   public void checkGetArray() {
     byte[] byteArr = new byte[64];
     WritableMemory wmem = WritableMemory.wrap(byteArr);

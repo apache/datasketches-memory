@@ -673,6 +673,12 @@ public class WritableMemoryImplTest {
     wmem.asWritableBuffer();
   }
 
+  @Test void checkZeroMemory() {
+    WritableMemory wmem = WritableMemory.allocate(8);
+    WritableMemory reg = wmem.writableRegion(0, 0);
+    assertEquals(reg.getCapacity(), 0);
+  }
+
   @Test
   public void printlnTest() {
     println("PRINTING: "+this.getClass().getName());

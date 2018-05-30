@@ -372,7 +372,7 @@ public abstract class Buffer extends BaseBuffer {
    */
   @Override
   public final boolean hasByteBuffer() {
-    return super.getByteBuffer() != null;
+    return super.hasByteBuffer();
   }
 
   /**

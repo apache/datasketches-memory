@@ -455,7 +455,7 @@ public class WritableBufferImplTest {
     WritableMemory reg = wmem.writableRegion(32, 32);
     WritableBuffer buf = reg.asWritableBuffer();
     assertEquals(buf.getRegionOffset(), 32);
-    assertEquals(buf.getCumulativeOffset(), 32 + 16);
+    assertEquals(buf.getCumulativeOffset(0), 32 + 16);
   }
 
   @Test
@@ -544,6 +544,13 @@ public class WritableBufferImplTest {
     } catch (ReadOnlyException expected) {
       // ignore
     }
+  }
+
+  @Test void checkZeroBuffer() {
+    WritableMemory wmem = WritableMemory.allocate(8);
+    WritableBuffer wbuf = wmem.asWritableBuffer();
+    WritableBuffer reg = wbuf.writableRegion(0, 0);
+    assertEquals(reg.getCapacity(), 0);
   }
 
   @Test

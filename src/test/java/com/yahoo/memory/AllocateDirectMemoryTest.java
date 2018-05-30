@@ -7,6 +7,7 @@ package com.yahoo.memory;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.fail;
 
 import org.testng.annotations.Test;
 
@@ -15,12 +16,19 @@ public class AllocateDirectMemoryTest {
   @Test
   public void simpleAllocateDirect() {
     int longs = 32;
+    WritableMemory wMem1;
     try (WritableHandle wh = WritableMemory.allocateDirect(longs << 3)) {
-      WritableMemory wMem1 = wh.get();
+      wMem1 = wh.get();
       for (int i = 0; i<longs; i++) {
         wMem1.putLong(i << 3, i);
         assertEquals(wMem1.getLong(i << 3), i);
       }
+    }
+    try {
+      wMem1.checkValid();
+      fail();
+    } catch (IllegalStateException e) {
+      //ok
     }
   }
 

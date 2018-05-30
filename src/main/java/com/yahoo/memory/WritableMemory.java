@@ -27,10 +27,10 @@ public abstract class WritableMemory extends Memory {
   //Pass-through ctor for all parameters & ByteBuffer
   WritableMemory(
       final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
-      final long capacityBytes, final boolean resourceReadOnly, final boolean localReadOnly,
-      final ByteOrder dataByteOrder, final ByteBuffer byteBuf) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, resourceReadOnly,
-        localReadOnly, dataByteOrder, byteBuf);
+      final long capacityBytes, final boolean readOnly, final ByteOrder dataByteOrder,
+      final ByteBuffer byteBuf, final StepBoolean valid) {
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, dataByteOrder,
+        byteBuf, valid);
   }
 
   //BYTE BUFFER XXX
@@ -40,29 +40,23 @@ public abstract class WritableMemory extends Memory {
    * zero, then endianness of the returned WritableMemory object, as well as backing storage and
    * read-only status are unspecified.
    * @param byteBuf the given ByteBuffer
-   * @return the given ByteBuffer for write operations.
+   * @return a new WritableMemory for write operations on the given ByteBuffer.
    */
   public static WritableMemory wrap(final ByteBuffer byteBuf) {
-    if (byteBuf.isReadOnly()) {
-      throw new ReadOnlyException("ByteBuffer is read-only.");
-    }
     return BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, false, byteBuf.order());
   }
 
   /**
-   * Accesses the given ByteBuffer for write operations. The returned Memory object has the
-   * given byte order, ignoring the byte order of the given ByteBuffer.  If the capacity of the
-   * given ByteBuffer is zero the endianness of the returned Memory object (as well as backing
-   * storage) is unspecified.
+   * Accesses the given ByteBuffer for write operations. The returned WritableMemory object has
+   * the given byte order, ignoring the byte order of the given ByteBuffer. If the capacity of
+   * the given ByteBuffer is zero the endianness of the returned WritableMemory object
+   * (as well as backing storage) is unspecified.
    * @param byteBuf the given ByteBuffer, must not be null
    * @param dataByteOrder the byte order of the uderlying data independent of the byte order
    * state of the given ByteBuffer
-   * @return the given ByteBuffer for write operations.
+   * @return a new WritableMemory for write operations on the given ByteBuffer.
    */
   public static WritableMemory wrap(final ByteBuffer byteBuf, final ByteOrder dataByteOrder) {
-    if (byteBuf.isReadOnly()) {
-      throw new ReadOnlyException("ByteBuffer is read-only.");
-    }
     return BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, false, dataByteOrder);
   }
 
@@ -114,8 +108,8 @@ public abstract class WritableMemory extends Memory {
    * @param capacityBytes the size of the desired memory in bytes.
    * @return WritableDirectHandle for this off-heap resource
    */
-  public static WritableHandle allocateDirect(final long capacityBytes) {
-    return allocateDirect(capacityBytes, nativeOrder, null);
+  public static WritableDirectHandle allocateDirect(final long capacityBytes) {
+    return allocateDirect(capacityBytes, null);
   }
 
   /**
@@ -129,13 +123,12 @@ public abstract class WritableMemory extends Memory {
    * and to call <i>close()</i> when done.</p>
    *
    * @param capacityBytes the size of the desired memory in bytes.
-   * @param dataByteOrder the endianness of the given file. It may not be null.
    * @param memReqSvr A user-specified MemoryRequestServer.
    * @return WritableHandle for this off-heap resource
    */
-  public static WritableHandle allocateDirect(final long capacityBytes,
-      final ByteOrder dataByteOrder, final MemoryRequestServer memReqSvr) {
-    return BaseWritableMemoryImpl.wrapDirect(capacityBytes, dataByteOrder, memReqSvr);
+  public static WritableDirectHandle allocateDirect(final long capacityBytes,
+      final MemoryRequestServer memReqSvr) {
+    return BaseWritableMemoryImpl.wrapDirect(capacityBytes, nativeOrder, memReqSvr);
   }
 
   //REGIONS XXX
@@ -167,7 +160,7 @@ public abstract class WritableMemory extends Memory {
    * </ul>
    * If this object's capacity is zero, the returned object is effectively immutable and
    * the backing storage and endianness are unspecified.
-   * @return a new <i>WritableBuffer</i>
+   * @return a new <i>WritableBuffer</i> with a view of this WritableMemory
    */
   public abstract WritableBuffer asWritableBuffer();
 
@@ -177,7 +170,7 @@ public abstract class WritableMemory extends Memory {
    * backing storage, endianness and read-only status of the returned WritableMemory object are
    * unspecified.
    * @param capacityBytes the given capacity in bytes.
-   * @return WritableMemory for write operations
+   * @return a new WritableMemory for write operations on a new byte array.
    */
   public static WritableMemory allocate(final int capacityBytes) {
     final byte[] arr = new byte[capacityBytes];
@@ -190,7 +183,7 @@ public abstract class WritableMemory extends Memory {
    * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
    * object are unspecified.
    * @param arr the given primitive array.
-   * @return WritableMemory for write operations
+   * @return a new WritableMemory for write operations on the given primitive array.
    */
   public static WritableMemory wrap(final boolean[] arr) {
     final long lengthBytes = arr.length << Prim.BOOLEAN.shift();
@@ -202,7 +195,7 @@ public abstract class WritableMemory extends Memory {
    * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
    * object are unspecified.
    * @param arr the given primitive array.
-   * @return WritableMemory for write operations
+   * @return a new WritableMemory for write operations on the given primitive array.
    */
   public static WritableMemory wrap(final byte[] arr) {
     return WritableMemory.wrap(arr, 0, arr.length, nativeOrder);
@@ -214,7 +207,7 @@ public abstract class WritableMemory extends Memory {
    * object are unspecified.
    * @param arr the given primitive array.
    * @param dataByteOrder the byte order
-   * @return WritableMemory for write operations
+   * @return a new WritableMemory for write operations on the given primitive array.
    */
   public static WritableMemory wrap(final byte[] arr, final ByteOrder dataByteOrder) {
     return WritableMemory.wrap(arr, 0, arr.length, dataByteOrder);
@@ -228,7 +221,7 @@ public abstract class WritableMemory extends Memory {
    * @param offsetBytes the byte offset into the given array
    * @param lengthBytes the number of bytes to include from the given array
    * @param dataByteOrder the byte order
-   * @return WritableMemory for write operations
+   * @return a new WritableMemory for write operations on the given primitive array.
    */
   public static WritableMemory wrap(final byte[] arr, final int offsetBytes, final int lengthBytes,
       final ByteOrder dataByteOrder) {
@@ -241,7 +234,7 @@ public abstract class WritableMemory extends Memory {
    * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
    * object are unspecified.
    * @param arr the given primitive array.
-   * @return WritableMemory for write operations
+   * @return a new WritableMemory for write operations on the given primitive array.
    */
   public static WritableMemory wrap(final char[] arr) {
     final long lengthBytes = arr.length << Prim.CHAR.shift();
@@ -253,7 +246,7 @@ public abstract class WritableMemory extends Memory {
    * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
    * object are unspecified.
    * @param arr the given primitive array.
-   * @return WritableMemory for write operations
+   * @return a new WritableMemory for write operations on the given primitive array.
    */
   public static WritableMemory wrap(final short[] arr) {
     final long lengthBytes = arr.length << Prim.SHORT.shift();
@@ -265,7 +258,7 @@ public abstract class WritableMemory extends Memory {
    * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
    * object are unspecified.
    * @param arr the given primitive array.
-   * @return WritableMemory for write operations
+   * @return a new WritableMemory for write operations on the given primitive array.
    */
   public static WritableMemory wrap(final int[] arr) {
     final long lengthBytes = arr.length << Prim.INT.shift();
@@ -277,7 +270,7 @@ public abstract class WritableMemory extends Memory {
    * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
    * object are unspecified.
    * @param arr the given primitive array.
-   * @return WritableMemory for write operations
+   * @return a new WritableMemory for write operations on the given primitive array.
    */
   public static WritableMemory wrap(final long[] arr) {
     final long lengthBytes = arr.length << Prim.LONG.shift();
@@ -289,7 +282,7 @@ public abstract class WritableMemory extends Memory {
    * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
    * object are unspecified.
    * @param arr the given primitive array.
-   * @return WritableMemory for write operations
+   * @return a new WritableMemory for write operations on the given primitive array.
    */
   public static WritableMemory wrap(final float[] arr) {
     final long lengthBytes = arr.length << Prim.FLOAT.shift();
@@ -301,7 +294,7 @@ public abstract class WritableMemory extends Memory {
    * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
    * object are unspecified.
    * @param arr the given primitive array.
-   * @return WritableMemory for write operations
+   * @return a new WritableMemory for write operations on the given primitive array.
    */
   public static WritableMemory wrap(final double[] arr) {
     final long lengthBytes = arr.length << Prim.DOUBLE.shift();

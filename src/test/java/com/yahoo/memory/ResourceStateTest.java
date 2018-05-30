@@ -9,55 +9,10 @@ import static com.yahoo.memory.UnsafeUtil.ARRAY_DOUBLE_INDEX_SCALE;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
-
-import java.nio.ByteOrder;
 
 import org.testng.annotations.Test;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 public class ResourceStateTest {
-
-  @Test
-  public void checkByteOrder() {
-    ResourceState state = new ResourceState(false);
-    assertEquals(state.getResourceByteOrder(), ByteOrder.nativeOrder());
-    if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
-      state.putResourceOrder(ByteOrder.BIG_ENDIAN); //set to opposite
-    } else {
-      state.putResourceOrder(ByteOrder.LITTLE_ENDIAN);
-    }
-    assertTrue(state.getResourceByteOrder() != ByteOrder.nativeOrder());
-    assertTrue(state.isSwapBytes());
-  }
-
-  @SuppressFBWarnings(value="NP_NULL_PARAM_DEREF_ALL_TARGETS_DANGEROUS", justification="Test")
-  @Test
-  public void checkExceptions() {
-    ResourceState state = new ResourceState(false);
-
-    try {
-      state.putUnsafeObject(null);
-      fail();
-    } catch (IllegalArgumentException e) {
-      //ok
-    }
-
-    try {
-      state.putByteBuffer(null);
-      fail();
-    } catch (IllegalArgumentException e) {
-      //ok
-    }
-
-    try {
-      state.putRegionOffset( -16L);
-      fail();
-    } catch (IllegalArgumentException e) {
-      //ok
-    }
-  }
 
   @Test
   public void checkPrimOffset() {
@@ -99,31 +54,6 @@ public class ResourceStateTest {
   @Test
   public void checkPrim() {
     assertEquals(Prim.DOUBLE.scale(), ARRAY_DOUBLE_INDEX_SCALE);
-  }
-
-  @SuppressWarnings("unused")
-  @Test(expectedExceptions = IllegalArgumentException.class)
-  public void checkArrLen() {
-    byte[] arr = new byte[64];
-    ResourceState state = new ResourceState(arr, Prim.BYTE, -1);
-  }
-
-  @Test
-  public void checkIdentity() {
-    byte[] arr = new byte[64];
-    ResourceState state = new ResourceState(arr, Prim.BYTE, 64);
-    boolean same = state.isSameResource(state);
-    assertTrue(same);
-  }
-
-  @Test(expectedExceptions = IllegalStateException.class)
-  public void checkValid() {
-    try (WritableHandle wh = WritableMemory.allocateDirect(1024)) {
-      WritableMemory wmem = wh.get();
-      wh.close();
-      ResourceState state = wmem.getResourceState();
-      state.checkValid();
-    }
   }
 
 

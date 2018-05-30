@@ -132,8 +132,8 @@ class AllocateDirectMap implements Map {
     cleaner.clean(); //sets invalid
   }
 
-  void setValid(final StepBoolean valid) {
-    deallocator.setStepBoolean(valid);
+  StepBoolean getValid() {
+    return deallocator.getValid();
   }
 
   // Private methods
@@ -246,7 +246,7 @@ class AllocateDirectMap implements Map {
     //It can never be modified until it is deallocated.
     private long actualNativeBaseOffset;
     private final long myCapacity;
-    private StepBoolean valid;
+    private StepBoolean valid = new StepBoolean(true); //only place for this
 
     Deallocator(final long nativeBaseOffset, final long capacityBytes,
         final RandomAccessFile raf) {
@@ -259,8 +259,8 @@ class AllocateDirectMap implements Map {
       assert (myCapacity != 0);
     }
 
-    void setStepBoolean(final StepBoolean valid) {
-      this.valid = valid;
+    StepBoolean getValid() {
+      return valid;
     }
 
     @Override
@@ -269,7 +269,12 @@ class AllocateDirectMap implements Map {
         unmap();
       }
       actualNativeBaseOffset = 0L;
+      if (valid == null) {
+        throw new IllegalStateException("valid state not properly initialized.");
+      }
       valid.change(); //set invalid
+      ResourceState.currentDirectMemoryMapAllocations_.decrementAndGet();
+      ResourceState.currentDirectMemoryMapAllocated_.addAndGet(-myCapacity);
     }
 
     /**

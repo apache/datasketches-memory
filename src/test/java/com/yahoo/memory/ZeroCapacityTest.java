@@ -19,15 +19,14 @@ public class ZeroCapacityTest {
   @SuppressWarnings("unused")
   @Test
   public void checkZeroCapacity() {
-    ResourceState state = new ResourceState(false);
-    state.putCapacity(0);
-    assertEquals(state.getCapacity(), 0);
+    WritableMemory wmem = WritableMemory.allocate(0);
+    assertEquals(wmem.getCapacity(), 0);
 
     Memory mem1 = Memory.wrap(new byte[0]);
     Memory mem2 = Memory.wrap(ByteBuffer.allocate(0));
     Memory mem3 = Memory.wrap(ByteBuffer.allocateDirect(0));
     Memory reg = mem3.region(0, 0);
-    try (WritableHandle wmem = WritableMemory.allocateDirect(0)) {
+    try (WritableHandle wmem1 = WritableMemory.allocateDirect(0)) {
       //empty
     }
   }

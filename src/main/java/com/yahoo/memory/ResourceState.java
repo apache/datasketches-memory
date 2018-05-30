@@ -24,8 +24,6 @@ class ResourceState {
   static final AtomicLong currentDirectMemoryMapAllocations_ = new AtomicLong();
   static final AtomicLong currentDirectMemoryMapAllocated_ = new AtomicLong();
 
-  private static final MemoryRequestServer defaultMemReqSvr = new DefaultMemoryRequestServer();
-
   /**
    * The object used in most Unsafe calls. This is effectively the array object if on-heap and
    * null for direct memory and determines how cumBaseOffset is computed.
@@ -50,20 +48,17 @@ class ResourceState {
   /**
    * The size of the backing resource in bytes. Used by all methods when checking bounds.
    */
-  private final long capacityBytes_;
+  final long capacityBytes_;
 
   //FLAGS
   /**
-   * Only set true if the backing resource has an independent read-only state and is, in fact,
-   * read-only.
-   */
-  private final boolean resourceReadOnly_;
-
-  /**
    * Only the backing resources that uses AutoCloseable can set this to false.  It can only be
    * changed from true to false once. The initial state is valid (true).
+   *
+   * <p>There is one and only one valid object and it only resides here. Everywhere else it is
+   * used is just a reference to this object.
    */
-  private final StepBoolean valid_ = new StepBoolean(true);
+  private StepBoolean valid_ = null;
 
   /**
    * This holds a reference to a ByteBuffer until we are done with it.
@@ -82,49 +77,49 @@ class ResourceState {
   private long nativeBaseOffset_; //cannot be final; set to 0 when valid -> false
 
   /**
-   * Primarily used for when the user allocated direct memory is the backing resource.
+   * Only used when user allocated direct memory is the backing resource.
    * It is a callback mechanism for the client of a resource to request more memory from the
-   * owner of the memory resource. Should not be null.
+   * owner of the memory resource.
    */
-  private MemoryRequestServer memReqSvr_ = defaultMemReqSvr;
+  private MemoryRequestServer memReqSvr_ = null;
 
   /**
    * Can be set true anytime. If true, it cannot be set false. If resourceIsReadOnly is true,
    * this is automatically true.
    */
-  private boolean localReadOnly_;
+  private boolean readOnly_;
 
   //****CONSTRUCTORS****
 
-  //All fields constructor and ByteBuffer
+  //All fields constructor except for memReqSvr and cumBaseOffset
   ResourceState(
       final Object unsafeObj,
       final long nativeBaseOffset,
       final long regionOffset,
       final long capacityBytes,
-      final boolean resourceReadOnly,
-      final boolean localReadOnly,
+      final boolean readOnly,
       final ByteOrder dataByteOrder,
-      final ByteBuffer byteBuf) //not valid, memReqSvr, cumBaseOffset
+      final ByteBuffer byteBuf,
+      final StepBoolean valid)
   {
     unsafeObj_ = unsafeObj;
     nativeBaseOffset_ = nativeBaseOffset;
     regionOffset_ = regionOffset;
     capacityBytes_ = capacityBytes;
-    resourceReadOnly_ = resourceReadOnly;
-    localReadOnly_ = localReadOnly || resourceReadOnly;
+    readOnly_ = readOnly;
     dataByteOrder_ = dataByteOrder;
     byteBuf_ = byteBuf;
     cumBaseOffset_ = compute();
-    //not valid, memReqSvr
+    valid_ = (valid == null) ? new StepBoolean(true) : valid;
+    //not memReqSvr
   }
 
   //****END CONSTRUCTORS****
 
   private final long compute() {
-    return regionOffset_
-        + ((unsafeObj_ == null) ? nativeBaseOffset_
-            : unsafe.arrayBaseOffset(unsafeObj_.getClass()));
+    return regionOffset_ + ((unsafeObj_ == null)
+        ? nativeBaseOffset_
+        : unsafe.arrayBaseOffset(unsafeObj_.getClass()));
   }
 
   boolean equalTo(final Object that) {
@@ -148,7 +143,7 @@ class ResourceState {
     return capacityBytes_;
   }
 
-  long getCumBaseOffset() {
+  long getCumulativeOffset() {
     return cumBaseOffset_;
   }
 
@@ -198,22 +193,23 @@ class ResourceState {
     return nativeBaseOffset_ > 0L;
   }
 
-  boolean isReadOnly() {
-    assertValid();
-    return localReadOnly_ || resourceReadOnly_;
+  boolean isNativeOrder() {
+    return Util.isNativeOrder(dataByteOrder_);
   }
 
-  boolean isResourceReadOnly() {
-    return resourceReadOnly_;
+  boolean isReadOnly() {
+    assertValid();
+    return readOnly_;
   }
 
   //Must already have checked that for null.
   boolean isSameResource(final ResourceState that) {
     checkValid();
+    if (that == null) { return false; }
     that.checkValid();
     if (this == that) { return true; }
 
-    return (getCumBaseOffset() == that.getCumBaseOffset())
+    return (getCumulativeOffset() == that.getCumulativeOffset())
             && (getCapacity() == that.getCapacity())
             && (getUnsafeObject() == that.getUnsafeObject())
             && (getByteBuffer() == that.getByteBuffer());
@@ -223,12 +219,12 @@ class ResourceState {
     return valid_.get();
   }
 
-  void setInvalid() {
+  void setInvalid() { //only used in test
     valid_.change();
   }
 
   void setMemoryRequestServer(final MemoryRequestServer svr) {
-    memReqSvr_ = (svr == null) ? defaultMemReqSvr : svr;
+    memReqSvr_ = svr;
   }
 
   void zeroNativeBaseOffset() {
@@ -244,6 +240,39 @@ class ResourceState {
     if (!valid_.get()) {
       throw new IllegalStateException("Memory not valid.");
     }
+  }
+
+  //MONITORING
+  /**
+   * Gets the current number of active direct memory allocations.
+   * @return the current number of active direct memory allocations.
+   */
+  public static long getCurrentDirectMemoryAllocations() {
+    return ResourceState.currentDirectMemoryAllocations_.get();
+  }
+
+  /**
+   * Gets the current size of active direct memory allocated.
+   * @return the current size of active direct memory allocated.
+   */
+  public static long getCurrentDirectMemoryAllocated() {
+    return ResourceState.currentDirectMemoryAllocated_.get();
+  }
+
+  /**
+   * Gets the current number of active direct memory map allocations.
+   * @return the current number of active direct memory map allocations.
+   */
+  public static long getCurrentDirectMemoryMapAllocations() {
+    return ResourceState.currentDirectMemoryMapAllocations_.get();
+  }
+
+  /**
+   * Gets the current size of active direct memory map allocated.
+   * @return the current size of active direct memory map allocated.
+   */
+  public static long getCurrentDirectMemoryMapAllocated() {
+    return ResourceState.currentDirectMemoryMapAllocated_.get();
   }
 
 }

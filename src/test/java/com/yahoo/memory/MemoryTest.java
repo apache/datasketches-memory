@@ -7,6 +7,7 @@ package com.yahoo.memory;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
 import java.io.File;
@@ -176,8 +177,8 @@ public class MemoryTest {
     ByteBuffer bb = ByteBuffer.allocate(n * 8);
     bb.order(ByteOrder.BIG_ENDIAN);
     Memory mem = Memory.wrap(bb);
-    assertTrue(mem.isSwapBytes());
-    assertEquals(mem.getResourceByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertFalse(mem.isNativeOrder());
+    assertEquals(mem.getDataByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test
@@ -274,17 +275,17 @@ public class MemoryTest {
     int bytes = 1024;
     WritableHandle wh1 = WritableMemory.allocateDirect(bytes);
     WritableHandle wh2 = WritableMemory.allocateDirect(bytes);
-    assertEquals(Memory.getCurrentDirectMemoryAllocations(), 2L);
-    assertEquals(Memory.getCurrentDirectMemoryAllocated(), 2 * bytes);
+    assertEquals(ResourceState.getCurrentDirectMemoryAllocations(), 2L);
+    assertEquals(ResourceState.getCurrentDirectMemoryAllocated(), 2 * bytes);
 
     wh1.close();
-    assertEquals(Memory.getCurrentDirectMemoryAllocations(), 1L);
-    assertEquals(Memory.getCurrentDirectMemoryAllocated(), bytes);
+    assertEquals(ResourceState.getCurrentDirectMemoryAllocations(), 1L);
+    assertEquals(ResourceState.getCurrentDirectMemoryAllocated(), bytes);
 
     wh2.close();
     wh2.close(); //check that it doesn't go negative.
-    assertEquals(Memory.getCurrentDirectMemoryAllocations(), 0L);
-    assertEquals(Memory.getCurrentDirectMemoryAllocated(), 0L);
+    assertEquals(ResourceState.getCurrentDirectMemoryAllocations(), 0L);
+    assertEquals(ResourceState.getCurrentDirectMemoryAllocated(), 0L);
   }
 
   @SuppressWarnings("resource")
@@ -296,24 +297,23 @@ public class MemoryTest {
     MapHandle mmh1 = Memory.map(file);
     MapHandle mmh2 = Memory.map(file);
 
-    assertEquals(Memory.getCurrentDirectMemoryMapAllocations(), 2L);
-    assertEquals(Memory.getCurrentDirectMemoryMapAllocated(), 2 * bytes);
+    assertEquals(ResourceState.getCurrentDirectMemoryMapAllocations(), 2L);
+    assertEquals(ResourceState.getCurrentDirectMemoryMapAllocated(), 2 * bytes);
 
     mmh1.close();
-    assertEquals(Memory.getCurrentDirectMemoryMapAllocations(), 1L);
-    assertEquals(Memory.getCurrentDirectMemoryMapAllocated(), bytes);
+    assertEquals(ResourceState.getCurrentDirectMemoryMapAllocations(), 1L);
+    assertEquals(ResourceState.getCurrentDirectMemoryMapAllocated(), bytes);
 
     mmh2.close();
     mmh2.close(); //check that it doesn't go negative.
-    assertEquals(Memory.getCurrentDirectMemoryMapAllocations(), 0L);
-    assertEquals(Memory.getCurrentDirectMemoryMapAllocated(), 0L);
+    assertEquals(ResourceState.getCurrentDirectMemoryMapAllocations(), 0L);
+    assertEquals(ResourceState.getCurrentDirectMemoryMapAllocated(), 0L);
   }
 
   @Test
   public void checkNullMemReqSvr() {
     Memory mem = Memory.wrap(new byte[16]);
-    ResourceState state = mem.getResourceState();
-    state.putMemoryRequestServer(null);
+    assertNull(mem.getMemoryRequestServer());
     println(mem.toHexString("Test", 0, 16));
   }
 

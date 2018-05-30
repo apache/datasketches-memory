@@ -369,9 +369,9 @@ public class Buffer2Test {
     WritableMemory wmem = WritableMemory.wrap(new byte[1]);
     WritableBuffer wbuf = wmem.asWritableBuffer();
     WritableBuffer wbuf2 = wbuf.writableDuplicate();
-    assertEquals(wbuf2.capacity, 1);
+    assertEquals(wbuf2.getCapacity(), 1);
     Buffer buf = wmem.asBuffer();
-    assertEquals(buf.capacity, 1);
+    assertEquals(buf.getCapacity(), 1);
   }
 
   @Test
@@ -381,15 +381,18 @@ public class Buffer2Test {
     WritableBuffer wbuf1 = wmem.asWritableBuffer();
     WritableBuffer wbuf2 = wmem.asWritableBuffer();
     assertFalse(wbuf1 == wbuf2);
-    assertTrue(wbuf1.getResourceState() == wbuf2.getResourceState());
+    assertTrue(wbuf1.isSameResource(wbuf2));
 
     WritableMemory reg1 = wmem.writableRegion(0, cap);
     WritableMemory reg2 = wmem.writableRegion(0, cap);
-    assertFalse(reg1.getResourceState() == reg2.getResourceState());
+    assertFalse(reg1 == reg2);
+    assertTrue(reg1.isSameResource(reg2));
+
 
     WritableBuffer wbuf3 = wbuf1.writableRegion();
     WritableBuffer wbuf4 = wbuf1.writableRegion();
-    assertFalse(wbuf3.getResourceState() == wbuf4.getResourceState());
+    assertFalse(wbuf3 == wbuf4);
+    assertTrue(wbuf3.isSameResource(wbuf4));
   }
 
   @Test

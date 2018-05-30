@@ -22,16 +22,15 @@ public class WritableMemoryTest {
   public void wrapBigEndian() {
     ByteBuffer bb = ByteBuffer.allocate(64); //big endian
     WritableMemory wmem = WritableMemory.wrap(bb);
-    assertTrue(wmem.isSwapBytes());
-    assertEquals(wmem.getResourceByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(wmem.getDataByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test
   public void wrapBigEndian2() {
     ByteBuffer bb = ByteBuffer.allocate(64);
     WritableBuffer wbuf = WritableBuffer.wrap(bb);
-    assertTrue(wbuf.isSwapBytes());
-    assertEquals(wbuf.getResourceOrder(), ByteOrder.BIG_ENDIAN);
+    assertFalse(wbuf.isNativeOrder());
+    assertEquals(wbuf.getDataByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test
@@ -136,11 +135,11 @@ public class WritableMemoryTest {
   @Test
   public void checkWrapWithBO() {
     WritableMemory wmem = WritableMemory.wrap(new byte[0], ByteOrder.BIG_ENDIAN);
-    assertFalse(wmem.isSwapBytes());
-    println("" + wmem.isSwapBytes());
+    assertTrue(wmem.isNativeOrder()); //for ZeroSizeMemory
+    println("" + wmem.isNativeOrder());
     wmem = WritableMemory.wrap(new byte[8], ByteOrder.BIG_ENDIAN);
-    assertTrue(wmem.isSwapBytes());
-    println("" + wmem.isSwapBytes());
+    assertFalse(wmem.isNativeOrder());
+    println("" + wmem.isNativeOrder());
   }
 
   @Test

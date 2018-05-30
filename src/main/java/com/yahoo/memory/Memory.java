@@ -32,33 +32,33 @@ public abstract class Memory extends ResourceState {
   //Pass-through ctor for all parameters
   Memory(
       final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
-      final long capacityBytes, final boolean resourceReadOnly, final boolean localReadOnly,
-      final ByteOrder dataByteOrder, final ByteBuffer byteBuf) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, resourceReadOnly,
-        localReadOnly, dataByteOrder, byteBuf);
+      final long capacityBytes, final boolean readOnly, final ByteOrder dataByteOrder,
+      final ByteBuffer byteBuf, final StepBoolean valid) {
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, dataByteOrder,
+        byteBuf, valid);
   }
 
   //BYTE BUFFER XXX
   /**
-   * Accesses the given ByteBuffer for read-only operations. The returned Memory object has the
+   * Accesses the given ByteBuffer for read-only operations. The returned <i>Memory</i> object has the
    * same byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is zero,
-   * then endianness of the returned Memory object (as well as backing storage) is unspecified.
+   * then endianness of the returned <i>Memory</i> object (as well as backing storage) is unspecified.
    * @param byteBuf the given ByteBuffer, must not be null
-   * @return the given ByteBuffer for read-only operations.
+   * @return a new <i>Memory</i> for read-only operations on the given ByteBuffer.
    */
   public static Memory wrap(final ByteBuffer byteBuf) {
     return BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, true, byteBuf.order());
   }
 
   /**
-   * Accesses the given ByteBuffer for read-only operations. The returned Memory object has the
+   * Accesses the given ByteBuffer for read-only operations. The returned <i>Memory</i> object has the
    * given byte order, ignoring the byte order of the given ByteBuffer.  If the capacity of the
-   * given ByteBuffer is zero the endianness of the returned Memory object (as well as backing
+   * given ByteBuffer is zero the endianness of the returned <i>Memory</i> object (as well as backing
    * storage) is unspecified.
    * @param byteBuf the given ByteBuffer, must not be null
    * @param dataByteOrder the byte order of the uderlying data independent of the byte order
    * state of the given ByteBuffer
-   * @return the given ByteBuffer for read-only operations.
+   * @return a new <i>Memory</i> for read-only operations on the given ByteBuffer.
    */
   public static Memory wrap(final ByteBuffer byteBuf, final ByteOrder dataByteOrder) {
     return BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, true, dataByteOrder);
@@ -70,7 +70,7 @@ public abstract class Memory extends ResourceState {
    * (including those &gt; 2GB). This assumes that the file was written using native byte
    * ordering.
    * @param file the given file to map
-   * @return MapHandle for managing this map
+   * @return <i>MapHandle</i> for managing this map
    * @throws IOException if file not found or internal RuntimeException is thrown.
    */
   public static MapHandle map(final File file) throws IOException {
@@ -84,8 +84,8 @@ public abstract class Memory extends ResourceState {
    * @param fileOffsetBytes the position in the given file in bytes. It may not be negative.
    * @param capacityBytes the size of the allocated direct memory. It may not be negative or zero.
    * @param dataByteOrder the endianness of the given file. It may not be null.
-   * @return MemoryMapHandler for managing this map
-   * @throws IOException file not found or RuntimeException, etc.
+   * @return <i>MapHandle</i> for managing this map
+   * @throws IOException if file not found or internal RuntimeException is thrown.
    */
   public static MapHandle map(final File file, final long fileOffsetBytes, final long capacityBytes,
       final ByteOrder dataByteOrder) throws IOException {
@@ -132,9 +132,9 @@ public abstract class Memory extends ResourceState {
   //ACCESS PRIMITIVE HEAP ARRAYS for readOnly XXX
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and endianness of the returned Memory object are unspecified.
+   * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
    * @param arr the given primitive array.
-   * @return Memory for read operations
+   * @return a new <i>Memory</i> for read operations
    */
   public static Memory wrap(final boolean[] arr) {
     final long lengthBytes = arr.length << Prim.BOOLEAN.shift();
@@ -143,9 +143,9 @@ public abstract class Memory extends ResourceState {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and endianness of the returned Memory object are unspecified.
+   * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
    * @param arr the given primitive array.
-   * @return Memory for read operations
+   * @return a new <i>Memory</i> for read operations
    */
   public static Memory wrap(final byte[] arr) {
     return Memory.wrap(arr, 0, arr.length, nativeOrder);
@@ -153,10 +153,10 @@ public abstract class Memory extends ResourceState {
 
   /**
    * Wraps the given primitive array for read operations with the given byte order. If the array
-   * size is zero, backing storage and endianness of the returned Memory object are unspecified.
+   * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
    * @param arr the given primitive array.
    * @param dataByteOrder the byte order
-   * @return Memory for read operations
+   * @return a new <i>Memory</i> for read operations
    */
   public static Memory wrap(final byte[] arr, final ByteOrder dataByteOrder) {
     return Memory.wrap(arr, 0, arr.length, dataByteOrder);
@@ -164,13 +164,13 @@ public abstract class Memory extends ResourceState {
 
   /**
    * Wraps the given primitive array for read operations with the given byte order. If the given
-   * lengthBytes is zero, backing storage and endianness of the returned Memory object are
+   * lengthBytes is zero, backing storage and endianness of the returned <i>Memory</i> object are
    * unspecified.
    * @param arr the given primitive array.
    * @param offsetBytes the byte offset into the given array
    * @param lengthBytes the number of bytes to include from the given array
    * @param dataByteOrder the byte order
-   * @return Memory for read operations
+   * @return a new <i>Memory</i> for read operations
    */
   public static Memory wrap(final byte[] arr, final int offsetBytes, final int lengthBytes,
       final ByteOrder dataByteOrder) {
@@ -180,9 +180,9 @@ public abstract class Memory extends ResourceState {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and endianness of the returned Memory object are unspecified.
+   * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
    * @param arr the given primitive array.
-   * @return Memory for read operations
+   * @return a new <i>Memory</i> for read operations
    */
   public static Memory wrap(final char[] arr) {
     final long lengthBytes = arr.length << Prim.CHAR.shift();
@@ -191,9 +191,9 @@ public abstract class Memory extends ResourceState {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and endianness of the returned Memory object are unspecified.
+   * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
    * @param arr the given primitive array.
-   * @return Memory for read operations
+   * @return a new <i>Memory</i> for read operations
    */
   public static Memory wrap(final short[] arr) {
     final long lengthBytes = arr.length << Prim.SHORT.shift();
@@ -202,9 +202,9 @@ public abstract class Memory extends ResourceState {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and endianness of the returned Memory object are unspecified.
+   * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
    * @param arr the given primitive array.
-   * @return Memory for read operations
+   * @return a new <i>Memory</i> for read operations
    */
   public static Memory wrap(final int[] arr) {
     final long lengthBytes = arr.length << Prim.INT.shift();
@@ -213,9 +213,9 @@ public abstract class Memory extends ResourceState {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and endianness of the returned Memory object are unspecified.
+   * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
    * @param arr the given primitive array.
-   * @return Memory for read operations
+   * @return a new <i>Memory</i> for read operations
    */
   public static Memory wrap(final long[] arr) {
     final long lengthBytes = arr.length << Prim.LONG.shift();
@@ -224,9 +224,9 @@ public abstract class Memory extends ResourceState {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and endianness of the returned Memory object are unspecified.
+   * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
    * @param arr the given primitive array.
-   * @return Memory for read operations
+   * @return a new <i>Memory</i> for read operations
    */
   public static Memory wrap(final float[] arr) {
     final long lengthBytes = arr.length << Prim.FLOAT.shift();
@@ -235,9 +235,9 @@ public abstract class Memory extends ResourceState {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and endianness of the returned Memory object are unspecified.
+   * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
    * @param arr the given primitive array.
-   * @return Memory for read operations
+   * @return a new <i>Memory</i> for read operations
    */
   public static Memory wrap(final double[] arr) {
     final long lengthBytes = arr.length << Prim.DOUBLE.shift();
@@ -516,8 +516,9 @@ public abstract class Memory extends ResourceState {
 
   //OTHER READ METHODS XXX
   /**
-   * Convenience method to check that this Memory is valid and the given offsetBytes and
-   * lengthBytes are within the capacity of this Memory.
+   * Checks that the specified range of bytes is within bounds of this Memory object, throws
+   * {@link IllegalArgumentException} if it's not: i. e. if offsetBytes &lt; 0, or length &lt; 0,
+   * or offsetBytes + length &gt; {@link #getCapacity()}.
    * @param offsetBytes the given offset in bytes of this Memory
    * @param lengthBytes the given length in bytes of this Memory
    */
@@ -536,10 +537,11 @@ public abstract class Memory extends ResourceState {
    * Returns the cumulative offset in bytes of this Memory from the backing resource
    * including the Java object header, if any.
    *
+   * @param offsetBytes offset to be added to the base cumulative offset.
    * @return the cumulative offset in bytes of this Memory
    */
-  public final long getCumulativeOffset() {
-    return super.getCumBaseOffset();
+  public final long getCumulativeOffset(final long offsetBytes) {
+    return super.getCumulativeOffset() + offsetBytes;
   }
 
   /**
@@ -595,7 +597,8 @@ public abstract class Memory extends ResourceState {
    * @return true if the backing resource of <i>this</i> is identical with the backing resource
    * of <i>that</i>.
    */
-  public final boolean isSameResource(final Memory that) {
+  @Override
+  public final boolean isSameResource(final ResourceState that) {
     return super.isSameResource(that);
   }
 
@@ -646,8 +649,9 @@ public abstract class Memory extends ResourceState {
             : bb.getClass().getSimpleName() + ", " + (bb.hashCode() & 0XFFFFFFFFL);
     final MemoryRequestServer memReqSvr = state.getMemoryRequestServer();
     final String memReqStr = (memReqSvr == null) ? "null"
-            : memReqSvr.getClass().getSimpleName() + ", " + (memReqSvr.hashCode() & 0XFFFFFFFFL);
-    final long cumBaseOffset = state.getCumBaseOffset();
+        : memReqSvr.getClass().getSimpleName() + ", " + (memReqSvr.hashCode() & 0XFFFFFFFFL);
+
+    final long cumBaseOffset = state.getCumulativeOffset();
     sb.append(preamble).append(LS);
     sb.append("UnsafeObj, hashCode : ").append(uObjStr).append(LS);
     sb.append("UnsafeObjHeader     : ").append(uObjHeader).append(LS);
@@ -673,39 +677,6 @@ public abstract class Memory extends ResourceState {
     sb.append(LS);
 
     return sb.toString();
-  }
-
-  //MONITORING
-  /**
-   * Gets the current number of active direct memory allocations.
-   * @return the current number of active direct memory allocations.
-   */
-  public static long getCurrentDirectMemoryAllocations() {
-    return ResourceState.currentDirectMemoryAllocations_.get();
-  }
-
-  /**
-   * Gets the current size of active direct memory allocated.
-   * @return the current size of active direct memory allocated.
-   */
-  public static long getCurrentDirectMemoryAllocated() {
-    return ResourceState.currentDirectMemoryAllocated_.get();
-  }
-
-  /**
-   * Gets the current number of active direct memory map allocations.
-   * @return the current number of active direct memory map allocations.
-   */
-  public static long getCurrentDirectMemoryMapAllocations() {
-    return ResourceState.currentDirectMemoryMapAllocations_.get();
-  }
-
-  /**
-   * Gets the current size of active direct memory map allocated.
-   * @return the current size of active direct memory map allocated.
-   */
-  public static long getCurrentDirectMemoryMapAllocated() {
-    return ResourceState.currentDirectMemoryMapAllocated_.get();
   }
 
 }

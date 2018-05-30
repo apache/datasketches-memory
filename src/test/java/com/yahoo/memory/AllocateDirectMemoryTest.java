@@ -53,14 +53,12 @@ public class AllocateDirectMemoryTest {
 
   @Test
   public void checkClose() {
-    try (WritableHandle wdh = WritableMemory.allocateDirect(128)) {
+    final long cap = 128;
+    try (WritableHandle wdh = WritableMemory.allocateDirect(cap)) {
       WritableMemory wmem = wdh.get();
-      ResourceState state = wmem.getResourceState();
-      state.setInvalid();//intentional before end of scope
+
+      wmem.setInvalid();//intentional before end of scope
       wdh.close(); //checks that AllocateDirect.close is called even when invalid.
-      //Adjust the metric tracking
-      ResourceState.currentDirectMemoryAllocations_.decrementAndGet();
-      ResourceState.currentDirectMemoryAllocated_.addAndGet(-state.getCapacity());
     }
   }
 

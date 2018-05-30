@@ -29,13 +29,14 @@ public class MapHandle implements Map, Handle {
 
   @Override
   public void close() {
-    if (wMem.isValid()) {
-      ResourceState.currentDirectMemoryMapAllocations_.decrementAndGet();
-      ResourceState.currentDirectMemoryMapAllocated_.addAndGet(-wMem.getCapacity());
+    if (dirMap != null) {
+      dirMap.close();
+      dirMap = null;
     }
-    dirMap.close();
-    wMem.zeroNativeBaseOffset();
-    dirMap = null;
+    if (wMem != null) {
+      wMem.zeroNativeBaseOffset();
+      wMem = null;
+    }
   }
 
   @Override

@@ -5,6 +5,9 @@
 
 package com.yahoo.memory;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 /**
  * A new positional API. This is different from and simpler than Java Buffer positional approach.
  * <ul><li>All based on longs instead of ints.</li>
@@ -21,16 +24,19 @@ package com.yahoo.memory;
  *
  * @author Lee Rhodes
  */
-public abstract class BaseBuffer {
-  final long capacity;
+public abstract class BaseBuffer extends ResourceState {
   private long start = 0;
   private long pos = 0;
   private long end;
 
-
-  BaseBuffer(final long capacity) {
-    this.capacity = capacity;
-    end = capacity;
+  //Pass-through ctor for all parameters
+  BaseBuffer(
+      final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
+      final long capacityBytes, final boolean readOnly, final ByteOrder dataByteOrder,
+      final ByteBuffer byteBuf, final StepBoolean valid) {
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, dataByteOrder,
+        byteBuf, valid);
+    end = capacityBytes;
   }
 
   /**
@@ -115,7 +121,7 @@ public abstract class BaseBuffer {
    * @return BaseBuffer
    */
   public final BaseBuffer setPosition(final long position) {
-    assertInvariants(start, position, end, capacity);
+    assertInvariants(start, position, end, capacityBytes_);
     pos = position;
     return this;
   }
@@ -128,7 +134,7 @@ public abstract class BaseBuffer {
    * @return BaseBuffer
    */
   public final BaseBuffer setAndCheckPosition(final long position) {
-    checkInvariants(start, position, end, capacity);
+    checkInvariants(start, position, end, capacityBytes_);
     pos = position;
     return this;
   }
@@ -144,7 +150,7 @@ public abstract class BaseBuffer {
    */
   public final BaseBuffer setStartPositionEnd(final long start, final long position,
       final long end) {
-    assertInvariants(start, position, end, capacity);
+    assertInvariants(start, position, end, capacityBytes_);
     this.start = start;
     this.end = end;
     pos = position;
@@ -162,7 +168,7 @@ public abstract class BaseBuffer {
    */
   public final BaseBuffer setAndCheckStartPositionEnd(final long start, final long position,
       final long end) {
-    checkInvariants(start, position, end, capacity);
+    checkInvariants(start, position, end, capacityBytes_);
     this.start = start;
     this.end = end;
     pos = position;
@@ -173,7 +179,7 @@ public abstract class BaseBuffer {
   final void incrementAndAssertPositionForRead(final long position, final long increment) {
     assertValid();
     final long newPos = position + increment;
-    assertInvariants(start, newPos, end, capacity);
+    assertInvariants(start, newPos, end, capacityBytes_);
     pos = newPos;
   }
 
@@ -181,21 +187,21 @@ public abstract class BaseBuffer {
     assertValid();
     assert !isReadOnly() : "Buffer is read-only.";
     final long newPos = position + increment;
-    assertInvariants(start, newPos, end, capacity);
+    assertInvariants(start, newPos, end, capacityBytes_);
     pos = newPos;
   }
 
   final void incrementAndCheckPositionForRead(final long pos, final long increment) {
     checkValid();
     final long newPos = pos + increment;
-    checkInvariants(start, newPos, end, capacity);
+    checkInvariants(start, newPos, end, capacityBytes_);
     this.pos = newPos;
   }
 
   final void incrementAndCheckPositionForWrite(final long pos, final long increment) {
     checkValidForWrite();
     final long newPos = pos + increment;
-    checkInvariants(start, newPos, end, capacity);
+    checkInvariants(start, newPos, end, capacityBytes_);
     this.pos = newPos;
   }
 
@@ -252,13 +258,4 @@ public abstract class BaseBuffer {
     }
   }
 
-  abstract void assertValid();
-
-  abstract void checkValid();
-
-  /**
-   * Returns true if this or the backing resource is read only
-   * @return true if this or the backing resource is read only
-   */
-  public abstract boolean isReadOnly();
 }

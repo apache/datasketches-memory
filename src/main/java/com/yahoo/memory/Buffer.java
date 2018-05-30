@@ -19,21 +19,43 @@ import java.nio.ByteOrder;
  */
 public abstract class Buffer extends BaseBuffer {
 
-  Buffer(final long capacity) {
-    super(capacity);
+  //Pass-through ctor for all parameters
+  Buffer(
+      final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
+      final long capacityBytes, final boolean readOnly, final ByteOrder dataByteOrder,
+      final ByteBuffer byteBuf, final StepBoolean valid) {
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, dataByteOrder,
+        byteBuf, valid);
   }
 
   //BYTE BUFFER XXX
   /**
-   * Accesses the given ByteBuffer for read-only operations.
-   *
-   * <p>Note that if the ByteBuffer capacity is zero this will
-   * return a Buffer backed by a heap byte array of size zero.
+   * Accesses the given ByteBuffer for read-only operations. The returned Buffer object has the
+   * same byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is zero,
+   * then endianness of the returned Buffer object (as well as backing storage) is unspecified.
    * @param byteBuf the given ByteBuffer, must not be null.
-   * @return the given Buffer for read-only operations.
+   * @return a new Buffer for read-only operations on the given ByteBuffer.
    */
   public static Buffer wrap(final ByteBuffer byteBuf) {
-    return WritableBuffer.wrapBB(byteBuf, true);
+    return wrap(byteBuf, byteBuf.order());
+  }
+
+  /**
+   * Accesses the given ByteBuffer for read-only operations. The returned Buffer object has
+   * the given byte order, ignoring the byte order of the given ByteBuffer. If the capacity of
+   * the given ByteBuffer is zero the endianness of the returned Buffer object
+   * (as well as backing storage) is unspecified.
+   * @param byteBuf the given ByteBuffer, must not be null
+   * @param dataByteOrder the byte order of the uderlying data independent of the byte order
+   * state of the given ByteBuffer
+   * @return a new Buffer for read-only operations on the given ByteBuffer.
+   */
+  public static Buffer wrap(final ByteBuffer byteBuf, final ByteOrder dataByteOrder) {
+    final BaseWritableMemoryImpl wmem =
+        BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, true, dataByteOrder);
+    final WritableBuffer wbuf = wmem.asWritableBufferImpl(true);
+    wbuf.setStartPositionEnd(0, byteBuf.position(), byteBuf.limit());
+    return wbuf;
   }
 
   //MAP XXX
@@ -310,39 +332,66 @@ public abstract class Buffer extends BaseBuffer {
    * Gets the capacity of this Buffer in bytes
    * @return the capacity of this Buffer in bytes
    */
-  public abstract long getCapacity();
+  @Override
+  public final long getCapacity() {
+    return super.getCapacity();
+  }
 
   /**
    * Returns the cumulative offset in bytes of this Buffer from the backing resource
    * including the Java object header, if any.
    *
+   * @param offsetBytes offset to be added to the base cumulative offset.
    * @return the cumulative offset in bytes of this Buffer.
    */
-  public abstract long getCumulativeOffset();
+  public final long getCumulativeOffset(final long offsetBytes) {
+    return super.getCumulativeOffset() + offsetBytes;
+  }
 
   /**
    * Returns the ByteOrder for the backing resource.
    * @return the ByteOrder for the backing resource.
    */
-  public abstract ByteOrder getResourceOrder();
+  @Override
+  public final ByteOrder getDataByteOrder() {
+    return super.getDataByteOrder();
+  }
 
   /**
    * Returns true if this Buffer is backed by an on-heap primitive array
    * @return true if this Buffer is backed by an on-heap primitive array
    */
-  public abstract boolean hasArray();
+  @Override
+  public final boolean hasArray() {
+    return super.hasArray();
+  }
 
   /**
    * Returns true if this Buffer is backed by a ByteBuffer
    * @return true if this Buffer is backed by a ByteBuffer
    */
-  public abstract boolean hasByteBuffer();
+  @Override
+  public final boolean hasByteBuffer() {
+    return super.getByteBuffer() != null;
+  }
 
   /**
    * Returns true if the backing memory is direct (off-heap) memory.
    * @return true if the backing memory is direct (off-heap) memory.
    */
-  public abstract boolean isDirect();
+  @Override
+  public final boolean isDirect() {
+    return super.isDirect();
+  }
+
+  /**
+   * Returns true if this or the backing resource is read-only
+   * @return true if this or backing resource is read-only
+   */
+  @Override
+  public final boolean isReadOnly() {
+    return super.isReadOnly();
+  }
 
   /**
    * Returns true if the backing resource of <i>this</i> is identical with the backing resource
@@ -352,22 +401,19 @@ public abstract class Buffer extends BaseBuffer {
    * @return true if the backing resource of <i>this</i> is identical with the backing resource
    * of <i>that</i>.
    */
-  public abstract boolean isSameResource(Buffer that);
+  @Override
+  public final boolean isSameResource(final ResourceState that) {
+    return super.isSameResource(that);
+  }
 
   /**
    * Returns true if this Buffer is valid() and has not been closed.
    * @return true if this Buffer is valid() and has not been closed.
    */
-  public abstract boolean isValid();
-
-  /**
-   * Return true if bytes <b>need</b> to be swapped based on resource ByteOrder.
-   * This is a convenience method to indicate that the wrapped ByteBuffer has a Byte Order that
-   * is different from the native Byte Order. It is up to the user to perform the byte swapping
-   * if necessary.
-   * @return true if bytes need to be swapped based on resource ByteOrder.
-   */
-  public abstract boolean isSwapBytes();
+  @Override
+  public final boolean isValid() {
+    return super.isValid();
+  }
 
   /**
    * Returns a formatted hex string of a range of this Buffer.
@@ -379,5 +425,4 @@ public abstract class Buffer extends BaseBuffer {
    */
   public abstract String toHexString(String header, long offsetBytes, int lengthBytes);
 
-  abstract ResourceState getResourceState();
 }

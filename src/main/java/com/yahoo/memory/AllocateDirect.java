@@ -18,7 +18,9 @@ import sun.misc.Cleaner;
 final class AllocateDirect implements AutoCloseable {
   private final Deallocator deallocator;
   private final Cleaner cleaner;
-  final long nativeBaseOffset;
+  private final long nativeBaseOffset;
+
+
 
   /**
    * Base Constructor for allocate native memory.
@@ -59,8 +61,12 @@ final class AllocateDirect implements AutoCloseable {
     cleaner.clean(); //sets invalid
   }
 
-  void setValid(final StepBoolean valid) {
-    deallocator.setStepBoolean(valid);
+  long getNativeBaseOffset() {
+    return nativeBaseOffset;
+  }
+
+  StepBoolean getValid() {
+    return deallocator.getValid();
   }
 
   private static final class Deallocator implements Runnable {
@@ -69,7 +75,7 @@ final class AllocateDirect implements AutoCloseable {
     private long nativeAddress; //set to 0 when deallocated. Different from nativeBaseOffset
     private final long allocationSize;
     private final long capacity;
-    private StepBoolean valid;
+    private StepBoolean valid = new StepBoolean(true); //only place for this
 
     private Deallocator(final long nativeAddress, final long allocationSize, final long capacity) {
       this.nativeAddress = nativeAddress;
@@ -78,18 +84,23 @@ final class AllocateDirect implements AutoCloseable {
       assert (nativeAddress != 0);
     }
 
-    void setStepBoolean(final StepBoolean valid) {
-      this.valid = valid;
+    StepBoolean getValid() {
+      return valid;
     }
 
     @Override
     public void run() {
-      valid.change(); //sets invalid here
       if (nativeAddress > 0) {
         unsafe.freeMemory(nativeAddress);
         NioBits.unreserveMemory(allocationSize, capacity);
       }
       nativeAddress = 0L;
+      if (valid == null) {
+        throw new IllegalStateException("valid state not properly initialized.");
+      }
+      valid.change(); //sets invalid here
+      ResourceState.currentDirectMemoryAllocations_.decrementAndGet();
+      ResourceState.currentDirectMemoryAllocated_.addAndGet(-capacity);
     }
   }
 

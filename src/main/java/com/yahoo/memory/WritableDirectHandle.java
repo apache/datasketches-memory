@@ -14,12 +14,17 @@ package com.yahoo.memory;
  */
 //Joins a WritableMemory with a writable, AutoCloseable AllocateDirect resource
 public final class WritableDirectHandle implements WritableHandle {
+  private static final MemoryRequestServer defaultMemReqSvr = new DefaultMemoryRequestServer();
+
   AllocateDirect direct;
   WritableMemory wMem;
+  MemoryRequestServer memReqSvr = defaultMemReqSvr;
 
-  WritableDirectHandle(final AllocateDirect allocatedDirect, final WritableMemory wMem) {
+  WritableDirectHandle(final AllocateDirect allocatedDirect, final WritableMemory wMem,
+      final MemoryRequestServer memReqSvr) {
     direct = allocatedDirect;
     this.wMem = wMem;
+    this.memReqSvr = (memReqSvr != null) ? memReqSvr : defaultMemReqSvr;
   }
 
   @Override
@@ -31,9 +36,7 @@ public final class WritableDirectHandle implements WritableHandle {
 
   @Override
   public void close() {
-    if ((direct != null) && wMem.isValid()) {
-      ResourceState.currentDirectMemoryAllocations_.decrementAndGet();
-      ResourceState.currentDirectMemoryAllocated_.addAndGet(-wMem.getCapacity());
+    if (direct != null) { //may already be invalid
       direct.close();
       direct = null;
       wMem.zeroNativeBaseOffset();

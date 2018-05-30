@@ -40,8 +40,8 @@ final class CompareAndCopy {
     checkBounds(offsetBytes1, lengthBytes1, state1.getCapacity());
     state2.checkValid();
     checkBounds(offsetBytes2, lengthBytes2, state2.getCapacity());
-    final long cumOff1 = state1.getCumBaseOffset() + offsetBytes1;
-    final long cumOff2 = state2.getCumBaseOffset() + offsetBytes2;
+    final long cumOff1 = state1.getCumulativeOffset() + offsetBytes1;
+    final long cumOff2 = state2.getCumulativeOffset() + offsetBytes2;
     final Object arr1 = state1.getUnsafeObject();
     final Object arr2 = state2.getUnsafeObject();
     if ((arr1 != arr2) || (cumOff1 != cumOff2)) {
@@ -72,8 +72,8 @@ final class CompareAndCopy {
     checkBounds(offsetBytes1, lengthBytes, state1.getCapacity());
     state2.checkValid();
     checkBounds(offsetBytes2, lengthBytes, state2.getCapacity());
-    long cumOff1 = state1.getCumBaseOffset() + offsetBytes1;
-    long cumOff2 = state2.getCumBaseOffset() + offsetBytes2;
+    long cumOff1 = state1.getCumulativeOffset() + offsetBytes1;
+    long cumOff2 = state2.getCumulativeOffset() + offsetBytes2;
     final Object arr1 = state1.getUnsafeObject(); //could be null
     final Object arr2 = state2.getUnsafeObject(); //could be null
     if ((arr1 == arr2) && (cumOff1 == cumOff2)) { return true; }
@@ -111,7 +111,7 @@ final class CompareAndCopy {
   static int hashCode(final ResourceState state) {
     state.checkValid();
     long lenBytes = state.getCapacity();
-    long cumOff = state.getCumBaseOffset();
+    long cumOff = state.getCumulativeOffset();
     final Object arr = state.getUnsafeObject(); //could be null
     int result = 1;
     while (lenBytes >= Long.BYTES) {
@@ -144,8 +144,8 @@ final class CompareAndCopy {
     checkBounds(srcOffsetBytes, lengthBytes, srcState.getCapacity());
     dstState.checkValid();
     checkBounds(dstOffsetBytes, lengthBytes, dstState.getCapacity());
-    final long srcAdd = srcState.getCumBaseOffset() + srcOffsetBytes;
-    final long dstAdd = dstState.getCumBaseOffset() + dstOffsetBytes;
+    final long srcAdd = srcState.getCumulativeOffset() + srcOffsetBytes;
+    final long dstAdd = dstState.getCumulativeOffset() + dstOffsetBytes;
     copyMemory(srcState.getUnsafeObject(), srcAdd, dstState.getUnsafeObject(), dstAdd,
         lengthBytes);
   }

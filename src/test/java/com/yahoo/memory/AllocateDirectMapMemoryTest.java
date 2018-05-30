@@ -86,12 +86,13 @@ public class AllocateDirectMapMemoryTest {
   public void testHandlerHandoffWithTWR() throws Exception {
     File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
     long memCapacity = file.length();
+    Memory mem;
     try (MapHandle rh = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
       rh.load();
       assertTrue(rh.isLoaded());
       hand = rh;
+      mem = rh.get();
     } //TWR closes
-    Memory mem = hand.get();
     assertFalse(mem.isValid());
     //println(""+mem.isValid());
   }

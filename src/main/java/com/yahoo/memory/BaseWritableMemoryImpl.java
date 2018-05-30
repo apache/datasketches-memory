@@ -17,7 +17,6 @@ import static com.yahoo.memory.UnsafeUtil.LS;
 import static com.yahoo.memory.UnsafeUtil.assertBounds;
 import static com.yahoo.memory.UnsafeUtil.checkBounds;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
-import static com.yahoo.memory.Util.isNativeOrder;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,25 +47,25 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   final static BaseWritableMemoryImpl ZERO_SIZE_MEMORY;
 
   static {
-    ZERO_SIZE_MEMORY = new WritableMemoryImpl(new byte[0], 0L, 0L, 0L, true, true, null);
+    ZERO_SIZE_MEMORY = new WritableMemoryImpl(new byte[0], 0L, 0L, 0L, true, null, null);
   }
 
   //Pass-through ctor for all parameters
+  //called from one of the Endian-sensitive WritableMemoryImpls
   BaseWritableMemoryImpl(
       final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
-      final long capacityBytes, final boolean resourceReadOnly, final boolean localReadOnly,
-      final ByteOrder dataByteOrder, final ByteBuffer byteBuf) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, resourceReadOnly,
-        localReadOnly, dataByteOrder, byteBuf);
+      final long capacityBytes, final boolean readOnly, final ByteOrder dataByteOrder,
+      final ByteBuffer byteBuf, final StepBoolean valid) {
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, dataByteOrder,
+        byteBuf, valid);
   }
 
   static BaseWritableMemoryImpl wrapHeapArray(final Object arr, final long offsetBytes,
       final long lengthBytes, final boolean readOnly, final ByteOrder dataByteOrder) {
     if (lengthBytes == 0) { return BaseWritableMemoryImpl.ZERO_SIZE_MEMORY; }
-    final boolean rRO = false;
-    return (isNativeOrder(dataByteOrder))
-        ? new WritableMemoryImpl(arr, 0L, offsetBytes, lengthBytes, rRO, readOnly, null)
-        : new NonNativeWritableMemoryImpl(arr, 0L, offsetBytes, lengthBytes, rRO, readOnly, null);
+    return Util.isNativeOrder(dataByteOrder)
+        ? new WritableMemoryImpl(arr, 0L, offsetBytes, lengthBytes, readOnly, null, null)
+        : new NonNativeWritableMemoryImpl(arr, 0L, offsetBytes, lengthBytes, readOnly, null, null);
   }
 
   static BaseWritableMemoryImpl wrapByteBuffer(
@@ -75,11 +74,13 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     if (abb.resourceReadOnly && !localReadOnly) {
       throw new ReadOnlyException("ByteBuffer is Read Only");
     }
-    return (isNativeOrder(dataByteOrder))
+    return Util.isNativeOrder(dataByteOrder)
         ? new WritableMemoryImpl(abb.unsafeObj, abb.nativeBaseOffset,
-            abb.regionOffset, abb.capacityBytes, abb.resourceReadOnly, localReadOnly, byteBuf)
+            abb.regionOffset, abb.capacityBytes, abb.resourceReadOnly || localReadOnly,
+            byteBuf, null)
         : new NonNativeWritableMemoryImpl(abb.unsafeObj, abb.nativeBaseOffset,
-            abb.regionOffset, abb.capacityBytes, abb.resourceReadOnly, localReadOnly, byteBuf);
+            abb.regionOffset, abb.capacityBytes,  abb.resourceReadOnly || localReadOnly,
+            byteBuf, null);
   }
 
   @SuppressWarnings("resource")
@@ -91,12 +92,11 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
       dirWMap.close();
       throw new ReadOnlyException("File is Read Only");
     }
-    final BaseWritableMemoryImpl impl = (isNativeOrder(dataByteOrder))
-        ? new WritableMemoryImpl(null, dirWMap.nativeBaseOffset,
-            0L, capacityBytes, dirWMap.resourceReadOnly, localReadOnly, null)
-        : new NonNativeWritableMemoryImpl(null, dirWMap.nativeBaseOffset,
-            0L, capacityBytes, dirWMap.resourceReadOnly, localReadOnly, null);
-    dirWMap.setValid(impl.getValid());
+    final BaseWritableMemoryImpl impl = Util.isNativeOrder(dataByteOrder)
+        ? new WritableMemoryImpl(null, dirWMap.nativeBaseOffset, 0L, capacityBytes,
+            dirWMap.resourceReadOnly || localReadOnly, null, dirWMap.getValid())
+        : new NonNativeWritableMemoryImpl(null, dirWMap.nativeBaseOffset, 0L, capacityBytes,
+            dirWMap.resourceReadOnly || localReadOnly, null, dirWMap.getValid());
     return new WritableMapHandle(dirWMap, impl);
   }
 
@@ -104,17 +104,18 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   static WritableDirectHandle wrapDirect(final long capacityBytes,
       final ByteOrder dataByteOrder, final MemoryRequestServer memReqSvr) {
     if (capacityBytes == 0) {
-      return new WritableDirectHandle(null, ZERO_SIZE_MEMORY);
+      return new WritableDirectHandle(null, ZERO_SIZE_MEMORY, null);
     }
     final AllocateDirect direct = new AllocateDirect(capacityBytes);
-    final BaseWritableMemoryImpl impl = (isNativeOrder(dataByteOrder))
-        ? new WritableMemoryImpl(null, direct.nativeBaseOffset,
-            0L, capacityBytes, false, false, null)
-        : new NonNativeWritableMemoryImpl(null, direct.nativeBaseOffset,
-            0L, capacityBytes, false, false, null);
-    direct.setValid(impl.getValid());
-    impl.setMemoryRequestServer(memReqSvr);
-    return new WritableDirectHandle(direct, impl);
+    final BaseWritableMemoryImpl impl = Util.isNativeOrder(dataByteOrder)
+        ? new WritableMemoryImpl(null, direct.getNativeBaseOffset(),
+            0L, capacityBytes, false, null, direct.getValid())
+        : new NonNativeWritableMemoryImpl(null, direct.getNativeBaseOffset(),
+            0L, capacityBytes, false, null, direct.getValid());
+
+    final WritableDirectHandle handle = new WritableDirectHandle(direct, impl, memReqSvr);
+    impl.setMemoryRequestServer(handle.memReqSvr);
+    return handle;
   }
 
   //REGIONS XXX
@@ -125,6 +126,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
 
   @Override
   public WritableMemory writableRegion(final long offsetBytes, final long capacityBytes) {
+    if (capacityBytes == 0) { return ZERO_SIZE_MEMORY; }
     if (isReadOnly()) {
       throw new ReadOnlyException("Writable region of a read-only Memory is not allowed.");
     }
@@ -143,7 +145,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   @Override
   public WritableBuffer asWritableBuffer() {
     if (isReadOnly()) {
-      throw new ReadOnlyException("Wrapping a read-only Memory as a writable Buffer is not allowed.");
+      throw new ReadOnlyException("Converting a read-only Memory to a writable Buffer is not allowed.");
     }
     return asWritableBufferImpl(false);
   }
@@ -154,7 +156,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   @Override
   public final boolean getBoolean(final long offsetBytes) {
     assertValidAndBoundsForRead(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE);
-    return unsafe.getBoolean(getUnsafeObject(), getCumBaseOffset() + offsetBytes);
+    return unsafe.getBoolean(getUnsafeObject(), getCumulativeOffset() + offsetBytes);
   }
 
   @Override
@@ -165,7 +167,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     checkBounds(dstOffsetBooleans, lengthBooleans, dstArray.length);
     CompareAndCopy.copyMemoryCheckingDifferentObject(
         getUnsafeObject(),
-        getCumBaseOffset() + offsetBytes,
+        getCumulativeOffset() + offsetBytes,
         dstArray,
         ARRAY_BOOLEAN_BASE_OFFSET + dstOffsetBooleans,
         copyBytes);
@@ -174,7 +176,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   @Override
   public final byte getByte(final long offsetBytes) {
     assertValidAndBoundsForRead(offsetBytes, ARRAY_BYTE_INDEX_SCALE);
-    return unsafe.getByte(getUnsafeObject(), getCumBaseOffset() + offsetBytes);
+    return unsafe.getByte(getUnsafeObject(), getCumulativeOffset() + offsetBytes);
   }
 
   @Override
@@ -185,7 +187,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     checkBounds(dstOffsetBytes, lengthBytes, dstArray.length);
     CompareAndCopy.copyMemoryCheckingDifferentObject(
         getUnsafeObject(),
-        getCumBaseOffset() + offsetBytes,
+        getCumulativeOffset() + offsetBytes,
         dstArray,
         ARRAY_BYTE_BASE_OFFSET + dstOffsetBytes,
         copyBytes);
@@ -195,29 +197,29 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   public final int getCharsFromUtf8(final long offsetBytes, final int utf8LengthBytes,
       final Appendable dst) throws IOException, Utf8CodingException {
     checkValidAndBounds(offsetBytes, utf8LengthBytes);
-    return Utf8.getCharsFromUtf8(offsetBytes, utf8LengthBytes, dst, getCumBaseOffset(),
+    return Utf8.getCharsFromUtf8(offsetBytes, utf8LengthBytes, dst, getCumulativeOffset(),
         getUnsafeObject());
   }
 
   //PRIMITIVE getXXX() Native Endian (used by both endians) XXX
   final char getNativeOrderedChar(final long offsetBytes) {
     assertValidAndBoundsForRead(offsetBytes, ARRAY_CHAR_INDEX_SCALE);
-    return unsafe.getChar(getUnsafeObject(), getCumBaseOffset() + offsetBytes);
+    return unsafe.getChar(getUnsafeObject(), getCumulativeOffset() + offsetBytes);
   }
 
   final int getNativeOrderedInt(final long offsetBytes) {
     assertValidAndBoundsForRead(offsetBytes, ARRAY_INT_INDEX_SCALE);
-    return unsafe.getInt(getUnsafeObject(), getCumBaseOffset() + offsetBytes);
+    return unsafe.getInt(getUnsafeObject(), getCumulativeOffset() + offsetBytes);
   }
 
   final long getNativeOrderedLong(final long offsetBytes) {
     assertValidAndBoundsForRead(offsetBytes, ARRAY_LONG_INDEX_SCALE);
-    return unsafe.getLong(getUnsafeObject(), getCumBaseOffset() + offsetBytes);
+    return unsafe.getLong(getUnsafeObject(), getCumulativeOffset() + offsetBytes);
   }
 
   final short getNativeOrderedShort(final long offsetBytes) {
     assertValidAndBoundsForRead(offsetBytes, ARRAY_SHORT_INDEX_SCALE);
-    return unsafe.getShort(getUnsafeObject(), getCumBaseOffset() + offsetBytes);
+    return unsafe.getShort(getUnsafeObject(), getCumulativeOffset() + offsetBytes);
   }
 
   //OTHER PRIMITIVE READ METHODS: compareTo, copyTo, equals XXX
@@ -276,7 +278,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   @Override
   public final void putBoolean(final long offsetBytes, final boolean value) {
     assertValidAndBoundsForWrite(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE);
-    unsafe.putBoolean(getUnsafeObject(), getCumBaseOffset() + offsetBytes, value);
+    unsafe.putBoolean(getUnsafeObject(), getCumulativeOffset() + offsetBytes, value);
   }
 
   @Override
@@ -289,7 +291,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
         srcArray,
         ARRAY_BOOLEAN_BASE_OFFSET + srcOffsetBooleans,
         getUnsafeObject(),
-        getCumBaseOffset() + offsetBytes,
+        getCumulativeOffset() + offsetBytes,
         copyBytes
     );
   }
@@ -297,7 +299,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   @Override
   public final void putByte(final long offsetBytes, final byte value) {
     assertValidAndBoundsForWrite(offsetBytes, ARRAY_BYTE_INDEX_SCALE);
-    unsafe.putByte(getUnsafeObject(), getCumBaseOffset() + offsetBytes, value);
+    unsafe.putByte(getUnsafeObject(), getCumulativeOffset() + offsetBytes, value);
   }
 
   @Override
@@ -310,7 +312,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
         srcArray,
         ARRAY_BYTE_BASE_OFFSET + srcOffsetBytes,
         getUnsafeObject(),
-        getCumBaseOffset() + offsetBytes,
+        getCumulativeOffset() + offsetBytes,
         copyBytes
     );
   }
@@ -318,29 +320,29 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   @Override
   public final long putCharsToUtf8(final long offsetBytes, final CharSequence src) {
     checkValid();
-    return Utf8.putCharsToUtf8(offsetBytes, src, getCapacity(), getCumBaseOffset(),
+    return Utf8.putCharsToUtf8(offsetBytes, src, getCapacity(), getCumulativeOffset(),
         getUnsafeObject());
   }
 
   //PRIMITIVE putXXX() Native Endian (used by both endians) XXX
   final void putNativeOrderedChar(final long offsetBytes, final char value) {
     assertValidAndBoundsForWrite(offsetBytes, ARRAY_CHAR_INDEX_SCALE);
-    unsafe.putChar(getUnsafeObject(), getCumBaseOffset() + offsetBytes, value);
+    unsafe.putChar(getUnsafeObject(), getCumulativeOffset() + offsetBytes, value);
   }
 
   final void putNativeOrderedInt(final long offsetBytes, final int value) {
     assertValidAndBoundsForWrite(offsetBytes, ARRAY_INT_INDEX_SCALE);
-    unsafe.putInt(getUnsafeObject(), getCumBaseOffset() + offsetBytes, value);
+    unsafe.putInt(getUnsafeObject(), getCumulativeOffset() + offsetBytes, value);
   }
 
   final void putNativeOrderedLong(final long offsetBytes, final long value) {
     assertValidAndBoundsForWrite(offsetBytes, ARRAY_LONG_INDEX_SCALE);
-    unsafe.putLong(getUnsafeObject(), getCumBaseOffset() + offsetBytes, value);
+    unsafe.putLong(getUnsafeObject(), getCumulativeOffset() + offsetBytes, value);
   }
 
   final void putNativeOrderedShort(final long offsetBytes, final short value) {
     assertValidAndBoundsForWrite(offsetBytes, ARRAY_SHORT_INDEX_SCALE);
-    unsafe.putShort(getUnsafeObject(), getCumBaseOffset() + offsetBytes, value);
+    unsafe.putShort(getUnsafeObject(), getCumulativeOffset() + offsetBytes, value);
   }
 
   //OTHER WRITE METHODS XXX
@@ -363,7 +365,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   @Override
   public final void clearBits(final long offsetBytes, final byte bitMask) {
     assertValidAndBoundsForWrite(offsetBytes, ARRAY_BYTE_INDEX_SCALE);
-    final long cumBaseOff = getCumBaseOffset() + offsetBytes;
+    final long cumBaseOff = getCumulativeOffset() + offsetBytes;
     int value = unsafe.getByte(getUnsafeObject(), cumBaseOff) & 0XFF;
     value &= ~bitMask;
     unsafe.putByte(getUnsafeObject(), cumBaseOff, (byte)value);
@@ -379,7 +381,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     checkValidAndBoundsForWrite(offsetBytes, lengthBytes);
     while (lengthBytes > 0) {
       final long chunk = Math.min(lengthBytes, CompareAndCopy.UNSAFE_COPY_THRESHOLD_BYTES);
-      unsafe.setMemory(getUnsafeObject(), getCumBaseOffset() + offsetBytes, chunk, value);
+      unsafe.setMemory(getUnsafeObject(), getCumulativeOffset() + offsetBytes, chunk, value);
       offsetBytes += chunk;
       lengthBytes -= chunk;
     }
@@ -388,7 +390,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   @Override
   public final void setBits(final long offsetBytes, final byte bitMask) {
     assertValidAndBoundsForWrite(offsetBytes, ARRAY_BYTE_INDEX_SCALE);
-    final long myOffset = getCumBaseOffset() + offsetBytes;
+    final long myOffset = getCumulativeOffset() + offsetBytes;
     final byte value = unsafe.getByte(getUnsafeObject(), myOffset);
     unsafe.putByte(getUnsafeObject(), myOffset, (byte)(value | bitMask));
   }
@@ -397,7 +399,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   private void writeByteArrayTo(final byte[] unsafeObj, final long offsetBytes,
       final long lengthBytes, final WritableByteChannel out) throws IOException {
     final int off =
-        Ints.checkedCast((getCumBaseOffset() + offsetBytes) - UnsafeUtil.ARRAY_BYTE_BASE_OFFSET);
+        Ints.checkedCast((getCumulativeOffset() + offsetBytes) - UnsafeUtil.ARRAY_BYTE_BASE_OFFSET);
     final int len = Ints.checkedCast(lengthBytes);
     final ByteBuffer bufToWrite = ByteBuffer.wrap(unsafeObj, off, len);
     writeFully(bufToWrite, out);
@@ -440,8 +442,6 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
       out.write(bufToWrite);
     }
   }
-
-
 
   final void assertValidAndBoundsForRead(final long offsetBytes, final long lengthBytes) {
     assertValid();

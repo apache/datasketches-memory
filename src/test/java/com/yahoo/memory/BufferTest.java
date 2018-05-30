@@ -6,7 +6,6 @@
 package com.yahoo.memory;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -185,8 +184,7 @@ public class BufferTest {
     ByteBuffer bb = ByteBuffer.allocate(n * 8);
     bb.order(ByteOrder.BIG_ENDIAN);
     Buffer buf = Buffer.wrap(bb);
-    assertTrue(buf.isSwapBytes());
-    assertEquals(buf.getResourceOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(buf.getDataByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test

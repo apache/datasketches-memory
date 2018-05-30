@@ -6,6 +6,7 @@
 package com.yahoo.memory;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 /**
  * Provides read and write, positional primitive and primitive array access to any of the four
@@ -16,27 +17,42 @@ import java.nio.ByteBuffer;
  */
 public abstract class WritableBuffer extends Buffer {
 
-  WritableBuffer(final long capacity) {
-    super(capacity);
+  //Pass-through ctor for all parameters
+  WritableBuffer(
+      final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
+      final long capacityBytes, final boolean readOnly, final ByteOrder dataByteOrder,
+      final ByteBuffer byteBuf, final StepBoolean valid) {
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, dataByteOrder,
+        byteBuf, valid);
   }
 
   //BYTE BUFFER XXX
   /**
-   * Accesses the given ByteBuffer for write operations.
-   * @param byteBuf the given ByteBuffer
-   * @return the given WritableBuffer for write operations.
+   * Accesses the given ByteBuffer for write operations. The returned WritableBuffer object has
+   * the same byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is
+   * zero, then endianness of the returned WritableBuffer object, as well as backing storage and
+   * read-only status are unspecified.
+   * @param byteBuf the given ByteBuffer, must not be null.
+   * @return a new WritableBuffer for write operations on the given ByteBuffer.
    */
   public static WritableBuffer wrap(final ByteBuffer byteBuf) {
-    if (byteBuf.isReadOnly()) {
-      throw new ReadOnlyException("ByteBuffer is read-only.");
-    }
-    return wrapBB(byteBuf, false);
+    return wrap(byteBuf, byteBuf.order());
   }
 
-  //First creates a WritableMemory so that it can be cached into the target buffer.
-  static WritableBuffer wrapBB(final ByteBuffer byteBuf, final boolean localReadOnly) {
-    final BaseWritableMemoryImpl wmem = WritableMemory.wrapBB(byteBuf, localReadOnly);
-    final WritableBuffer wbuf = wmem.asWritableBufferImpl(localReadOnly);
+  /**
+   * Accesses the given ByteBuffer for write operations. The returned WritableBuffer object has
+   * the given byte order, ignoring the byte order of the given ByteBuffer. If the capacity of
+   * the given ByteBuffer is zero the endianness of the returned WritableBuffer object
+   * (as well as backing storage) is unspecified.
+   * @param byteBuf the given ByteBuffer, must not be null
+   * @param dataByteOrder the byte order of the uderlying data independent of the byte order
+   * state of the given ByteBuffer
+   * @return a new WritableBuffer for write operations on the given ByteBuffer.
+   */
+  public static WritableBuffer wrap(final ByteBuffer byteBuf, final ByteOrder dataByteOrder) {
+    final BaseWritableMemoryImpl wmem =
+        BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, false, dataByteOrder);
+    final WritableBuffer wbuf = wmem.asWritableBufferImpl(false);
     wbuf.setStartPositionEnd(0, byteBuf.position(), byteBuf.limit());
     return wbuf;
   }
@@ -315,7 +331,10 @@ public abstract class WritableBuffer extends Buffer {
    * Returns the backing ByteBuffer if it exists, otherwise returns null.
    * @return the backing ByteBuffer if it exists, otherwise returns null.
    */
-  public abstract ByteBuffer getByteBuffer();
+  @Override
+  public ByteBuffer getByteBuffer() {
+    return super.getByteBuffer();
+  }
 
   /**
    * Clears all bytes of this Buffer from position to end to zero. The position will be set to end.
@@ -336,6 +355,9 @@ public abstract class WritableBuffer extends Buffer {
    *
    * @return the offset of the start of this WritableBuffer from the backing resource.
    */
-  public abstract long getRegionOffset();
+  @Override
+  public long getRegionOffset() {
+    return super.getRegionOffset();
+  }
 
 }

@@ -95,8 +95,8 @@ class AllocateDirectMap implements Map {
     nativeBaseOffset = map(raf.getChannel(), resourceReadOnly, fileOffsetBytes, capacityBytes);
     deallocator = new Deallocator(nativeBaseOffset, capacityBytes, raf);
     cleaner = Cleaner.create(this, deallocator);
-    ResourceState.currentDirectMemoryMapAllocations_.incrementAndGet();
-    ResourceState.currentDirectMemoryMapAllocated_.addAndGet(capacityBytes);
+    BaseState.currentDirectMemoryMapAllocations_.incrementAndGet();
+    BaseState.currentDirectMemoryMapAllocated_.addAndGet(capacityBytes);
   }
 
   @Override
@@ -273,8 +273,8 @@ class AllocateDirectMap implements Map {
         throw new IllegalStateException("valid state not properly initialized.");
       }
       valid.change(); //set invalid
-      ResourceState.currentDirectMemoryMapAllocations_.decrementAndGet();
-      ResourceState.currentDirectMemoryMapAllocated_.addAndGet(-myCapacity);
+      BaseState.currentDirectMemoryMapAllocations_.decrementAndGet();
+      BaseState.currentDirectMemoryMapAllocated_.addAndGet(-myCapacity);
     }
 
     /**

@@ -275,17 +275,17 @@ public class MemoryTest {
     int bytes = 1024;
     WritableHandle wh1 = WritableMemory.allocateDirect(bytes);
     WritableHandle wh2 = WritableMemory.allocateDirect(bytes);
-    assertEquals(ResourceState.getCurrentDirectMemoryAllocations(), 2L);
-    assertEquals(ResourceState.getCurrentDirectMemoryAllocated(), 2 * bytes);
+    assertEquals(BaseState.getCurrentDirectMemoryAllocations(), 2L);
+    assertEquals(BaseState.getCurrentDirectMemoryAllocated(), 2 * bytes);
 
     wh1.close();
-    assertEquals(ResourceState.getCurrentDirectMemoryAllocations(), 1L);
-    assertEquals(ResourceState.getCurrentDirectMemoryAllocated(), bytes);
+    assertEquals(BaseState.getCurrentDirectMemoryAllocations(), 1L);
+    assertEquals(BaseState.getCurrentDirectMemoryAllocated(), bytes);
 
     wh2.close();
     wh2.close(); //check that it doesn't go negative.
-    assertEquals(ResourceState.getCurrentDirectMemoryAllocations(), 0L);
-    assertEquals(ResourceState.getCurrentDirectMemoryAllocated(), 0L);
+    assertEquals(BaseState.getCurrentDirectMemoryAllocations(), 0L);
+    assertEquals(BaseState.getCurrentDirectMemoryAllocated(), 0L);
   }
 
   @SuppressWarnings("resource")
@@ -297,17 +297,17 @@ public class MemoryTest {
     MapHandle mmh1 = Memory.map(file);
     MapHandle mmh2 = Memory.map(file);
 
-    assertEquals(ResourceState.getCurrentDirectMemoryMapAllocations(), 2L);
-    assertEquals(ResourceState.getCurrentDirectMemoryMapAllocated(), 2 * bytes);
+    assertEquals(BaseState.getCurrentDirectMemoryMapAllocations(), 2L);
+    assertEquals(BaseState.getCurrentDirectMemoryMapAllocated(), 2 * bytes);
 
     mmh1.close();
-    assertEquals(ResourceState.getCurrentDirectMemoryMapAllocations(), 1L);
-    assertEquals(ResourceState.getCurrentDirectMemoryMapAllocated(), bytes);
+    assertEquals(BaseState.getCurrentDirectMemoryMapAllocations(), 1L);
+    assertEquals(BaseState.getCurrentDirectMemoryMapAllocated(), bytes);
 
     mmh2.close();
     mmh2.close(); //check that it doesn't go negative.
-    assertEquals(ResourceState.getCurrentDirectMemoryMapAllocations(), 0L);
-    assertEquals(ResourceState.getCurrentDirectMemoryMapAllocated(), 0L);
+    assertEquals(BaseState.getCurrentDirectMemoryMapAllocations(), 0L);
+    assertEquals(BaseState.getCurrentDirectMemoryMapAllocated(), 0L);
   }
 
   @Test

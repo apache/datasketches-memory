@@ -402,7 +402,7 @@ public abstract class Buffer extends BaseBuffer {
    * of <i>that</i>.
    */
   @Override
-  public final boolean isSameResource(final ResourceState that) {
+  public final boolean isSameResource(final BaseState that) {
     return super.isSameResource(that);
   }
 

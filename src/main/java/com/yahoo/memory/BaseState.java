@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author Lee Rhodes
  */
-class ResourceState {
+class BaseState {
 
   //Monitoring
   static final AtomicLong currentDirectMemoryAllocations_ = new AtomicLong();
@@ -92,7 +92,7 @@ class ResourceState {
   //****CONSTRUCTORS****
 
   //All fields constructor except for memReqSvr and cumBaseOffset
-  ResourceState(
+  BaseState(
       final Object unsafeObj,
       final long nativeBaseOffset,
       final long regionOffset,
@@ -124,11 +124,11 @@ class ResourceState {
 
   boolean equalTo(final Object that) {
     if (this == that) { return true; }
-    return (that instanceof ResourceState)
-        ? CompareAndCopy.equals(this, ((ResourceState)that)) : false;
+    return (that instanceof BaseState)
+        ? CompareAndCopy.equals(this, ((BaseState)that)) : false;
   }
 
-  boolean equalTo(final long thisOffsetBytes, final ResourceState that,
+  boolean equalTo(final long thisOffsetBytes, final BaseState that,
       final long thatOffsetBytes, final long lengthBytes) {
     return CompareAndCopy.equals(this, thisOffsetBytes, that, thatOffsetBytes, lengthBytes);
   }
@@ -203,7 +203,7 @@ class ResourceState {
   }
 
   //Must already have checked that for null.
-  boolean isSameResource(final ResourceState that) {
+  boolean isSameResource(final BaseState that) {
     checkValid();
     if (that == null) { return false; }
     that.checkValid();
@@ -248,7 +248,7 @@ class ResourceState {
    * @return the current number of active direct memory allocations.
    */
   public static long getCurrentDirectMemoryAllocations() {
-    return ResourceState.currentDirectMemoryAllocations_.get();
+    return BaseState.currentDirectMemoryAllocations_.get();
   }
 
   /**
@@ -256,7 +256,7 @@ class ResourceState {
    * @return the current size of active direct memory allocated.
    */
   public static long getCurrentDirectMemoryAllocated() {
-    return ResourceState.currentDirectMemoryAllocated_.get();
+    return BaseState.currentDirectMemoryAllocated_.get();
   }
 
   /**
@@ -264,7 +264,7 @@ class ResourceState {
    * @return the current number of active direct memory map allocations.
    */
   public static long getCurrentDirectMemoryMapAllocations() {
-    return ResourceState.currentDirectMemoryMapAllocations_.get();
+    return BaseState.currentDirectMemoryMapAllocations_.get();
   }
 
   /**
@@ -272,7 +272,7 @@ class ResourceState {
    * @return the current size of active direct memory map allocated.
    */
   public static long getCurrentDirectMemoryMapAllocated() {
-    return ResourceState.currentDirectMemoryMapAllocated_.get();
+    return BaseState.currentDirectMemoryMapAllocated_.get();
   }
 
 }

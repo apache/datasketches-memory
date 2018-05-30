@@ -34,8 +34,8 @@ final class CompareAndCopy {
   private CompareAndCopy() { }
 
   static int compare(
-      final ResourceState state1, final long offsetBytes1, final long lengthBytes1,
-      final ResourceState state2, final long offsetBytes2, final long lengthBytes2) {
+      final BaseState state1, final long offsetBytes1, final long lengthBytes1,
+      final BaseState state2, final long offsetBytes2, final long lengthBytes2) {
     state1.checkValid();
     checkBounds(offsetBytes1, lengthBytes1, state1.getCapacity());
     state2.checkValid();
@@ -56,7 +56,7 @@ final class CompareAndCopy {
     return Long.compare(lengthBytes1, lengthBytes2);
   }
 
-  static boolean equals(final ResourceState state1, final ResourceState state2) {
+  static boolean equals(final BaseState state1, final BaseState state2) {
     final long cap1 = state1.getCapacity();
     final long cap2 = state2.getCapacity();
     return (cap1 == cap2) && equals(state1, 0, state2, 0, cap1);
@@ -66,8 +66,8 @@ final class CompareAndCopy {
   // stop if the arrays and offsets are the same as there is only one length.  Also this can take
   // advantage of chunking with longs, while compare cannot.
   static boolean equals(
-      final ResourceState state1, final long offsetBytes1,
-      final ResourceState state2, final long offsetBytes2, long lengthBytes) {
+      final BaseState state1, final long offsetBytes1,
+      final BaseState state2, final long offsetBytes2, long lengthBytes) {
     state1.checkValid();
     checkBounds(offsetBytes1, lengthBytes, state1.getCapacity());
     state2.checkValid();
@@ -108,7 +108,7 @@ final class CompareAndCopy {
     return true;
   }
 
-  static int hashCode(final ResourceState state) {
+  static int hashCode(final BaseState state) {
     state.checkValid();
     long lenBytes = state.getCapacity();
     long cumOff = state.getCumulativeOffset();
@@ -138,8 +138,8 @@ final class CompareAndCopy {
     return (31 * result) + vHash;
   }
 
-  static void copy(final ResourceState srcState, final long srcOffsetBytes,
-      final ResourceState dstState, final long dstOffsetBytes, final long lengthBytes) {
+  static void copy(final BaseState srcState, final long srcOffsetBytes,
+      final BaseState dstState, final long dstOffsetBytes, final long lengthBytes) {
     srcState.checkValid();
     checkBounds(srcOffsetBytes, lengthBytes, srcState.getCapacity());
     dstState.checkValid();

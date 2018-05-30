@@ -12,7 +12,7 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-public class ResourceStateTest {
+public class BaseStateTest {
 
   @Test
   public void checkPrimOffset() {

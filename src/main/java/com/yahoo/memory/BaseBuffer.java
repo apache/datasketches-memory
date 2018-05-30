@@ -24,7 +24,7 @@ import java.nio.ByteOrder;
  *
  * @author Lee Rhodes
  */
-public abstract class BaseBuffer extends ResourceState {
+public abstract class BaseBuffer extends BaseState {
   private long start = 0;
   private long pos = 0;
   private long end;

@@ -52,8 +52,8 @@ final class AllocateDirect implements AutoCloseable {
     }
     deallocator = new Deallocator(nativeAddress, allocationSize, capacityBytes);
     cleaner = Cleaner.create(this, deallocator);
-    ResourceState.currentDirectMemoryAllocations_.incrementAndGet();
-    ResourceState.currentDirectMemoryAllocated_.addAndGet(capacityBytes);
+    BaseState.currentDirectMemoryAllocations_.incrementAndGet();
+    BaseState.currentDirectMemoryAllocated_.addAndGet(capacityBytes);
   }
 
   @Override
@@ -99,8 +99,8 @@ final class AllocateDirect implements AutoCloseable {
         throw new IllegalStateException("valid state not properly initialized.");
       }
       valid.change(); //sets invalid here
-      ResourceState.currentDirectMemoryAllocations_.decrementAndGet();
-      ResourceState.currentDirectMemoryAllocated_.addAndGet(-capacity);
+      BaseState.currentDirectMemoryAllocations_.decrementAndGet();
+      BaseState.currentDirectMemoryAllocated_.addAndGet(-capacity);
     }
   }
 

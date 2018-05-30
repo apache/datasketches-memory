@@ -27,7 +27,7 @@ import java.nio.channels.WritableByteChannel;
  *
  * @see com.yahoo.memory
  */
-public abstract class Memory extends ResourceState {
+public abstract class Memory extends BaseState {
 
   //Pass-through ctor for all parameters
   Memory(
@@ -485,14 +485,14 @@ public abstract class Memory extends ResourceState {
    * Returns true if the given Memory has equal contents to this Memory in the given range of
    * bytes.
    * @param thisOffsetBytes the starting offset in bytes for this Memory
-   * @param that the given ResourceState
+   * @param that the given BaseState
    * @param thatOffsetBytes the starting offset in bytes for the given Memory
    * @param lengthBytes the size of the range of bytes
    * @return true if the given Memory has equal contents to this Memory in the given range of
    * bytes.
    */
   @Override
-  public final boolean equalTo(final long thisOffsetBytes, final ResourceState that,
+  public final boolean equalTo(final long thisOffsetBytes, final BaseState that,
       final long thatOffsetBytes, final long lengthBytes) {
     return super.equalTo(thisOffsetBytes, that, thatOffsetBytes, lengthBytes);
   }
@@ -598,7 +598,7 @@ public abstract class Memory extends ResourceState {
    * of <i>that</i>.
    */
   @Override
-  public final boolean isSameResource(final ResourceState that) {
+  public final boolean isSameResource(final BaseState that) {
     return super.isSameResource(that);
   }
 
@@ -624,13 +624,13 @@ public abstract class Memory extends ResourceState {
   /**
    * Returns a formatted hex string of an area of this Memory.
    * Used primarily for testing.
-   * @param state the ResourceState
+   * @param state the BaseState
    * @param preamble a descriptive header
    * @param offsetBytes offset bytes relative to the Memory start
    * @param lengthBytes number of bytes to convert to a hex string
    * @return a formatted hex string in a human readable array
    */
-  static String toHex(final ResourceState state, final String preamble, final long offsetBytes,
+  static String toHex(final BaseState state, final String preamble, final long offsetBytes,
       final int lengthBytes) {
     UnsafeUtil.checkBounds(offsetBytes, lengthBytes, state.getCapacity());
     final StringBuilder sb = new StringBuilder();

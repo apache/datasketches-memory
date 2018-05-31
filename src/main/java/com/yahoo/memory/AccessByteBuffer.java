@@ -18,7 +18,7 @@ import java.nio.ByteBuffer;
  */
 final class AccessByteBuffer {
 
-  static final ByteBuffer ZERO_READ_ONLY_DIRECT_BUFFER =
+  static final ByteBuffer ZERO_READ_ONLY_DIRECT_BYTE_BUFFER =
       ByteBuffer.allocateDirect(0).asReadOnlyBuffer();
 
   private static final long NIO_BUFFER_ADDRESS_FIELD_OFFSET =
@@ -59,7 +59,7 @@ final class AccessByteBuffer {
    * 27c768cbd28ece949c299f2d437c9a0ebd874500/src/one/nio/mem/DirectMemory.java#L95
    */
   static ByteBuffer getDummyReadOnlyDirectByteBuffer(final long address, final int capacity) {
-    final ByteBuffer buf = ZERO_READ_ONLY_DIRECT_BUFFER.duplicate();
+    final ByteBuffer buf = ZERO_READ_ONLY_DIRECT_BYTE_BUFFER.duplicate();
     unsafe.putLong(buf, NIO_BUFFER_ADDRESS_FIELD_OFFSET, address);
     unsafe.putInt(buf, NIO_BUFFER_CAPACITY_FIELD_OFFSET, capacity);
     buf.limit(capacity);

@@ -92,20 +92,20 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   @Override
   public ByteBuffer unsafeByteBufferView(final long offsetBytes, final int capacityBytes) {
     checkValidAndBounds(offsetBytes, capacityBytes);
-    long cumOffset = getCumulativeOffset(offsetBytes);
-    Object unsafeObj = this.unsafeObj;
-    ByteBuffer result;
+    final long cumOffset = getCumulativeOffset(offsetBytes);
+    final Object unsafeObj = this.unsafeObj;
+    final ByteBuffer result;
     if (unsafeObj == null) {
       result = AccessByteBuffer.getDummyReadOnlyDirectByteBuffer(cumOffset, capacityBytes);
     } else if (unsafeObj instanceof byte[]) {
-      int arrayOffset = (int) (cumOffset - ARRAY_BYTE_BASE_OFFSET);
+      final int arrayOffset = (int) (cumOffset - ARRAY_BYTE_BASE_OFFSET);
       result = ByteBuffer.wrap((byte[]) unsafeObj, arrayOffset, capacityBytes)
           .slice().asReadOnlyBuffer();
     } else {
       throw new UnsupportedOperationException(
-          "This Memory object is the result of wrapping a " +
-              unsafeObj.getClass().getSimpleName() +
-              " array, it could not be viewed as a ByteBuffer.");
+          "This Memory object is the result of wrapping a "
+              + unsafeObj.getClass().getSimpleName()
+              + " array, it could not be viewed as a ByteBuffer.");
     }
     result.order(getResourceOrder());
     return result;

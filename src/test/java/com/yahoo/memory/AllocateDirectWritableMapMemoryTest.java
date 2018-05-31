@@ -8,6 +8,7 @@ package com.yahoo.memory;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,12 +24,18 @@ public class AllocateDirectWritableMapMemoryTest {
   @Test
   public void simpleMap() throws Exception {
     File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
-    try (MapHandle h = Memory.map(file)) {
+    try (MapHandle h = Memory.map(file); WritableMapHandle wh = (WritableMapHandle) h) {
       Memory mem = h.get();
       byte[] bytes = new byte[(int)mem.getCapacity()];
       mem.getByteArray(0, bytes, 0, bytes.length);
       String text = new String(bytes, UTF_8);
       println(text);
+      try {
+        wh.force();
+        fail();
+      } catch (ReadOnlyException e) {
+        //OK
+      }
     }
   }
 
@@ -46,7 +53,7 @@ public class AllocateDirectWritableMapMemoryTest {
       }
     }
     assert file.createNewFile();
-    assert file.setWritable(true, false);
+    assert file.setWritable(true, false); //writable=true, ownerOnly=false
     assert file.isFile();
     file.deleteOnExit();  //comment out if you want to examine the file.
 
@@ -68,6 +75,29 @@ public class AllocateDirectWritableMapMemoryTest {
 
       //check end value
       assertEquals(dstMem.getLong((longs - 1L) << 3), longs - 1L);
+    }
+  }
+
+  @Test
+  public void checkNonNativeFile() throws Exception {
+    File file = new File("TestFile2.bin");
+    if (file.exists()) {
+      try {
+        java.nio.file.Files.delete(file.toPath());
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+    assert file.createNewFile();
+    assert file.setWritable(true, false); //writable=true, ownerOnly=false
+    assert file.isFile();
+    file.deleteOnExit();  //comment out if you want to examine the file.
+
+    final long bytes = 8;
+    try (WritableMapHandle h = WritableMemory.map(file, 0L, bytes, Util.nonNativeOrder)) {
+      WritableMemory wmem = h.get();
+      wmem.putChar(0, (char) 1);
+      assertEquals(wmem.getByte(1), (byte) 1);
     }
   }
 

@@ -33,6 +33,13 @@ public class BaseStateTest {
     assertTrue(wbuf.isSameResource(buf));
   }
 
+  @Test
+  public void checkNotEqualTo() {
+    byte[] arr = new byte[8];
+    Memory mem = Memory.wrap(arr);
+    assertFalse(mem.equalTo(0, arr, 0, 8));
+  }
+
   //StepBoolean checks
   @Test
   public void checkStepBoolean() {

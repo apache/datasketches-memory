@@ -13,8 +13,6 @@ import static com.yahoo.memory.UnsafeUtil.ARRAY_CHAR_INDEX_SCALE;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_INT_INDEX_SCALE;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_LONG_INDEX_SCALE;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_SHORT_INDEX_SCALE;
-import static com.yahoo.memory.UnsafeUtil.LS;
-import static com.yahoo.memory.UnsafeUtil.assertBounds;
 import static com.yahoo.memory.UnsafeUtil.checkBounds;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 
@@ -231,24 +229,8 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
 
   //OTHER READ METHODS XXX
   @Override
-  public final void checkValidAndBounds(final long offsetBytes, final long lengthBytes) {
-    checkValid();
-    checkBounds(offsetBytes, lengthBytes, getCapacity());
-  }
-
-  @Override
-  public final String toHexString(final String header, final long offsetBytes,
-      final int lengthBytes) {
-    checkValid();
-    final String klass = this.getClass().getSimpleName();
-    final String s1 = String.format("(..., %d, %d)", offsetBytes, lengthBytes);
-    final long hcode = hashCode() & 0XFFFFFFFFL;
-    final String call = ".toHexString" + s1 + ", hashCode: " + hcode;
-    final StringBuilder sb = new StringBuilder();
-    sb.append("### ").append(klass).append(" SUMMARY ###").append(LS);
-    sb.append("Header Comment      : ").append(header).append(LS);
-    sb.append("Call Parameters     : ").append(call);
-    return Memory.toHex(this, sb.toString(), offsetBytes, lengthBytes);
+  public final long getRegionOffset() {
+    return super.getRegOffset();
   }
 
   //PRIMITIVE putXXX() and putXXXArray() XXX
@@ -377,17 +359,5 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
       pos += chunk;
       len -= chunk;
     }
-  }
-
-
-  final void assertValidAndBoundsForRead(final long offsetBytes, final long lengthBytes) {
-    assertValid();
-    assertBounds(offsetBytes, lengthBytes, getCapacity());
-  }
-
-  final void assertValidAndBoundsForWrite(final long offsetBytes, final long lengthBytes) {
-    assertValid();
-    assertBounds(offsetBytes, lengthBytes, getCapacity());
-    assert !isReadOnly() : "Buffer is read-only.";
   }
 }

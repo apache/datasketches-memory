@@ -489,15 +489,6 @@ public abstract class WritableMemory extends Memory {
   public abstract Object getArray();
 
   /**
-   * Returns the backing ByteBuffer if it exists, otherwise returns null.
-   * @return the backing ByteBuffer if it exists, otherwise returns null.
-   */
-  @Override
-  public ByteBuffer getByteBuffer() {
-    return super.getByteBuffer();
-  }
-
-  /**
    * Clears all bytes of this Memory to zero
    */
   public abstract void clear();
@@ -539,13 +530,10 @@ public abstract class WritableMemory extends Memory {
 
   //OTHER XXX
   /**
-   * Returns a MemoryRequestServer or null
-   * @return a MemoryRequestServer or null
+   * Gets the MemoryRequestServer object or null.
+   * @return the MemoryRequestServer object or null.
    */
-  @Override
-  public MemoryRequestServer getMemoryRequestServer() {
-    return super.getMemoryRequestServer();
-  }
+  public abstract MemoryRequestServer getMemoryRequestServer();
 
   /**
    * Returns the offset of the start of this WritableMemory from the backing resource,
@@ -553,9 +541,6 @@ public abstract class WritableMemory extends Memory {
    *
    * @return the offset of the start of this WritableMemory from the backing resource.
    */
-  @Override
-  public long getRegionOffset() {
-    return super.getRegionOffset();
-  }
+  public abstract long getRegionOffset();
 
 }

@@ -5,8 +5,6 @@
 
 package com.yahoo.memory;
 
-import static com.yahoo.memory.UnsafeUtil.LS;
-import static com.yahoo.memory.UnsafeUtil.unsafe;
 import static com.yahoo.memory.Util.nativeOrder;
 import static com.yahoo.memory.Util.negativeCheck;
 import static com.yahoo.memory.Util.nullCheck;
@@ -330,16 +328,8 @@ public abstract class Memory extends BaseState {
    * @return the number of characters decoded.
    * @throws Utf8CodingException in case of malformed or illegal UTF-8 input
    */
-  public final int getCharsFromUtf8(final long offsetBytes, final int utf8LengthBytes,
-      final StringBuilder dst) throws Utf8CodingException {
-    try {
-      // Ensure that we do at most one resize of internal StringBuilder's char array
-      dst.ensureCapacity(dst.length() + utf8LengthBytes);
-      return getCharsFromUtf8(offsetBytes, utf8LengthBytes, (Appendable) dst);
-    } catch (final IOException e) {
-      throw new RuntimeException("Should not happen", e);
-    }
-  }
+  public abstract int getCharsFromUtf8(final long offsetBytes, final int utf8LengthBytes,
+      final StringBuilder dst) throws Utf8CodingException;
 
   /**
    * Gets the double value at the given offset
@@ -426,7 +416,7 @@ public abstract class Memory extends BaseState {
   public abstract void getShortArray(long offsetBytes, short[] dstArray, int dstOffsetShorts,
       int lengthShorts);
 
-  //OTHER PRIMITIVE READ METHODS: compareTo, copyTo XXX
+  //SPECIAL PRIMITIVE READ METHODS: compareTo, copyTo, writeTo XXX
   /**
    * Compares the bytes of this Memory to <i>that</i> Memory.
    * Returns <i>(this &lt; that) ? (some negative value) : (this &gt; that) ? (some positive value)
@@ -468,215 +458,5 @@ public abstract class Memory extends BaseState {
    */
   public abstract void writeTo(long offsetBytes, long lengthBytes, WritableByteChannel out)
       throws IOException;
-
-  /**
-   * Returns true if the given Object is an instance of Memory and has equal contents to this
-   * Memory.
-   * @param that the given Memory object
-   * @return true if the given Object is an instance of Memory and has equal contents to this
-   * Memory.
-   */
-  @Override
-  public final boolean equals(final Object that) {
-    return super.equalTo(that);
-  }
-
-  /**
-   * Returns true if the given Memory has equal contents to this Memory in the given range of
-   * bytes.
-   * @param thisOffsetBytes the starting offset in bytes for this Memory
-   * @param that the given BaseState
-   * @param thatOffsetBytes the starting offset in bytes for the given Memory
-   * @param lengthBytes the size of the range of bytes
-   * @return true if the given Memory has equal contents to this Memory in the given range of
-   * bytes.
-   */
-  @Override
-  public final boolean equalTo(final long thisOffsetBytes, final BaseState that,
-      final long thatOffsetBytes, final long lengthBytes) {
-    return super.equalTo(thisOffsetBytes, that, thatOffsetBytes, lengthBytes);
-  }
-
-  /**
-   * Returns the hashCode of this Memory.
-   *
-   * <p>The hash code of this Memory depends upon all of its contents.
-   * Because of this, it is inadvisable to use Memory objects as keys in hash maps
-   * or similar data structures unless it is known that their contents will not change.</p>
-   *
-   * <p>If it is desirable to use Memory objects in a hash map depending only on object identity,
-   * than the {@link java.util.IdentityHashMap} can be used.</p>
-   *
-   * @return the hashCode of this Memory.
-   */
-  @Override
-  public final int hashCode() {
-    return super.theHashCode();
-  }
-
-  //OTHER READ METHODS XXX
-  /**
-   * Checks that the specified range of bytes is within bounds of this Memory object, throws
-   * {@link IllegalArgumentException} if it's not: i. e. if offsetBytes &lt; 0, or length &lt; 0,
-   * or offsetBytes + length &gt; {@link #getCapacity()}.
-   * @param offsetBytes the given offset in bytes of this Memory
-   * @param lengthBytes the given length in bytes of this Memory
-   */
-  public abstract void checkValidAndBounds(long offsetBytes, long lengthBytes);
-
-  /**
-   * Gets the capacity of this Memory in bytes
-   * @return the capacity of this Memory in bytes
-   */
-  @Override
-  public final long getCapacity() {
-    return super.getCapacity();
-  }
-
-  /**
-   * Returns the cumulative offset in bytes of this Memory from the backing resource
-   * including the Java object header, if any.
-   *
-   * @param offsetBytes offset to be added to the base cumulative offset.
-   * @return the cumulative offset in bytes of this Memory
-   */
-  public final long getCumulativeOffset(final long offsetBytes) {
-    return super.getCumulativeOffset() + offsetBytes;
-  }
-
-  /**
-   * Returns the ByteOrder for the backing resource.
-   * @return the ByteOrder for the backing resource.
-   */
-  @Override
-  public final ByteOrder getDataByteOrder() {
-    return super.getDataByteOrder();
-  }
-
-  /**
-   * Returns true if this Memory is backed by an on-heap primitive array
-   * @return true if this Memory is backed by an on-heap primitive array
-   */
-  @Override
-  public final boolean hasArray() {
-    return super.hasArray();
-  }
-
-  /**
-   * Returns true if this Memory is backed by a ByteBuffer
-   * @return true if this Memory is backed by a ByteBuffer
-   */
-  @Override
-  public final boolean hasByteBuffer() {
-    return super.getByteBuffer() != null;
-  }
-
-  /**
-   * Returns true if the backing memory is direct (off-heap) memory.
-   * @return true if the backing memory is direct (off-heap) memory.
-   */
-  @Override
-  public final boolean isDirect() {
-    return super.isDirect();
-  }
-
-  /**
-   * Returns true if this or the backing resource is read-only
-   * @return true if this or backing resource is read-only
-   */
-  @Override
-  public final boolean isReadOnly() {
-    return super.isReadOnly();
-  }
-
-  /**
-   * Returns true if the backing resource of <i>this</i> is identical with the backing resource
-   * of <i>that</i>. If the backing resource is a heap array or ByteBuffer, the offset and
-   * capacity must also be identical.
-   * @param that A different given Memory object
-   * @return true if the backing resource of <i>this</i> is identical with the backing resource
-   * of <i>that</i>.
-   */
-  @Override
-  public final boolean isSameResource(final BaseState that) {
-    return super.isSameResource(that);
-  }
-
-  /**
-   * Returns true if this Memory is valid() and has not been closed.
-   * @return true if this Memory is valid() and has not been closed.
-   */
-  @Override
-  public final boolean isValid() {
-    return super.isValid();
-  }
-
-  /**
-   * Returns a formatted hex string of a range of this Memory.
-   * Used primarily for testing.
-   * @param header descriptive header
-   * @param offsetBytes offset bytes relative to this Memory start
-   * @param lengthBytes number of bytes to convert to a hex string
-   * @return a formatted hex string in a human readable array
-   */
-  public abstract String toHexString(String header, long offsetBytes, int lengthBytes);
-
-  /**
-   * Returns a formatted hex string of an area of this Memory.
-   * Used primarily for testing.
-   * @param state the BaseState
-   * @param preamble a descriptive header
-   * @param offsetBytes offset bytes relative to the Memory start
-   * @param lengthBytes number of bytes to convert to a hex string
-   * @return a formatted hex string in a human readable array
-   */
-  static String toHex(final BaseState state, final String preamble, final long offsetBytes,
-      final int lengthBytes) {
-    UnsafeUtil.checkBounds(offsetBytes, lengthBytes, state.getCapacity());
-    final StringBuilder sb = new StringBuilder();
-    final Object uObj = state.getUnsafeObject();
-    final String uObjStr;
-    final long uObjHeader;
-    if (uObj == null) {
-      uObjStr = "null";
-      uObjHeader = 0;
-    } else {
-      uObjStr =  uObj.getClass().getSimpleName() + ", " + (uObj.hashCode() & 0XFFFFFFFFL);
-      uObjHeader = unsafe.arrayBaseOffset(uObj.getClass());
-    }
-    final ByteBuffer bb = state.getByteBuffer();
-    final String bbStr = (bb == null) ? "null"
-            : bb.getClass().getSimpleName() + ", " + (bb.hashCode() & 0XFFFFFFFFL);
-    final MemoryRequestServer memReqSvr = state.getMemoryRequestServer();
-    final String memReqStr = (memReqSvr == null) ? "null"
-        : memReqSvr.getClass().getSimpleName() + ", " + (memReqSvr.hashCode() & 0XFFFFFFFFL);
-
-    final long cumBaseOffset = state.getCumulativeOffset();
-    sb.append(preamble).append(LS);
-    sb.append("UnsafeObj, hashCode : ").append(uObjStr).append(LS);
-    sb.append("UnsafeObjHeader     : ").append(uObjHeader).append(LS);
-    sb.append("ByteBuf, hashCode   : ").append(bbStr).append(LS);
-    sb.append("RegionOffset        : ").append(state.getRegionOffset()).append(LS);
-    sb.append("Capacity            : ").append(state.getCapacity()).append(LS);
-    sb.append("CumBaseOffset       : ").append(cumBaseOffset).append(LS);
-    sb.append("MemReq, hashCode    : ").append(memReqStr).append(LS);
-    sb.append("Valid               : ").append(state.isValid()).append(LS);
-    sb.append("Read Only           : ").append(state.isReadOnly()).append(LS);
-    sb.append("Data Endianness     : ").append(state.getDataByteOrder().toString()).append(LS);
-    sb.append("JDK Major Version   : ").append(UnsafeUtil.JDK).append(LS);
-    //Data detail
-    sb.append("Data, littleEndian  :  0  1  2  3  4  5  6  7");
-
-    for (long i = 0; i < lengthBytes; i++) {
-      final int b = unsafe.getByte(uObj, cumBaseOffset + offsetBytes + i) & 0XFF;
-      if ((i % 8) == 0) { //row header
-        sb.append(String.format("%n%20s: ", offsetBytes + i));
-      }
-      sb.append(String.format("%02x ", b));
-    }
-    sb.append(LS);
-
-    return sb.toString();
-  }
 
 }

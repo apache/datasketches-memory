@@ -312,9 +312,9 @@ public class MemoryTest {
 
   @Test
   public void checkNullMemReqSvr() {
-    Memory mem = Memory.wrap(new byte[16]);
-    assertNull(mem.getMemoryRequestServer());
-    println(mem.toHexString("Test", 0, 16));
+    WritableMemory wmem = WritableMemory.wrap(new byte[16]);
+    assertNull(wmem.getMemoryRequestServer());
+    println(wmem.toHexString("Test", 0, 16));
   }
 
   @Test

@@ -5,6 +5,9 @@
 
 package com.yahoo.memory;
 
+import static com.yahoo.memory.UnsafeUtil.LS;
+import static com.yahoo.memory.UnsafeUtil.assertBounds;
+import static com.yahoo.memory.UnsafeUtil.checkBounds;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 
 import java.nio.ByteBuffer;
@@ -25,48 +28,36 @@ class BaseState {
   static final AtomicLong currentDirectMemoryMapAllocated_ = new AtomicLong();
 
   /**
-   * The object used in most Unsafe calls. This is effectively the array object if on-heap and
-   * null for direct memory and determines how cumBaseOffset is computed.
+   * This holds a reference to a ByteBuffer until we are done with it.
+   * This is also a user supplied parameter passed to AccessByteBuffer.
    */
-  private final Object unsafeObj_;
+  private final ByteBuffer byteBuf_;
 
   /**
-   * This is the offset that defines the start of a sub-region of the backing resource. It is
-   * used to compute cumBaseOffset. If this changes, cumBaseOffset is recomputed.
-   * This will be loaded from heap ByteBuffers as they have a similar field used for slices.
-   * It is used by region() and writableRegion().
+   * The size of the backing resource in bytes. Used by all methods when checking bounds.
    */
-  private final long regionOffset_;
+  private final long capacityBytes_;
 
   /**
    * This becomes the base offset used by all Unsafe calls. It is cumulative in that in includes
    * all offsets from regions, user-defined offsets when creating Memory, and the array object
    * header offset when creating Memory from primitive arrays.
    */
-  private final long cumBaseOffset_; //= f(regionOffset, unsafeObj, nativeBaseOffset, unsafeObjHeader)
+  //= f(regionOffset, unsafeObj, nativeBaseOffset, unsafeObjHeader)
+  private final long cumBaseOffset_;
 
   /**
-   * The size of the backing resource in bytes. Used by all methods when checking bounds.
+   * The byte order for data, which may be different from the byte order state of the resource.
    */
-  final long capacityBytes_;
-
-  //FLAGS
-  /**
-   * Only the backing resources that uses AutoCloseable can set this to false.  It can only be
-   * changed from true to false once. The initial state is valid (true).
-   *
-   * <p>There is one and only one valid object and it only resides here. Everywhere else it is
-   * used is just a reference to this object.
-   */
-  private StepBoolean valid_ = null;
-
-  /**
-   * This holds a reference to a ByteBuffer until we are done with it.
-   * This is also a user supplied parameter passed to AccessByteBuffer.
-   */
-  private final ByteBuffer byteBuf_;
-
   private final ByteOrder dataByteOrder_;
+
+  /**
+   * This is a callback mechanism for a user client of direct memory to request more memory from
+   * the owner of the WritableDirectHandle
+   * Only used when user allocated direct memory is the backing resource.
+   *
+   */
+  private MemoryRequestServer memReqSvr_ = null;
 
   /**
    * Only used to compute cumBaseOffset for off-heap resources.
@@ -77,17 +68,33 @@ class BaseState {
   private long nativeBaseOffset_; //cannot be final; set to 0 when valid -> false
 
   /**
-   * Only used when user allocated direct memory is the backing resource.
-   * It is a callback mechanism for the client of a resource to request more memory from the
-   * owner of the memory resource.
-   */
-  private MemoryRequestServer memReqSvr_ = null;
-
-  /**
    * Can be set true anytime. If true, it cannot be set false. If resourceIsReadOnly is true,
    * this is automatically true.
    */
-  private boolean readOnly_;
+  private final boolean readOnly_;
+
+  /**
+   * This is the offset that defines the start of a sub-region of the backing resource. It is
+   * used to compute cumBaseOffset. If this changes, cumBaseOffset is recomputed.
+   * This will be loaded from heap ByteBuffers as they have a similar field used for slices.
+   * It is used by region() and writableRegion().
+   */
+  private final long regionOffset_;
+
+  /**
+   * The object used in most Unsafe calls. This is effectively the array object if on-heap and
+   * null for direct memory and determines how cumBaseOffset is computed.
+   */
+  private final Object unsafeObj_;
+
+  /**
+   * Only the backing resources that uses AutoCloseable can set this to false.  It can only be
+   * changed from true to false once. The initial state is valid (true).
+   *
+   * <p>There is one and only one valid object and it resides with the resource allocation or
+   * access class. This holds a reference to it.
+   */
+  private final StepBoolean valid_;
 
   //****CONSTRUCTORS****
 
@@ -122,116 +129,214 @@ class BaseState {
         : unsafe.arrayBaseOffset(unsafeObj_.getClass()));
   }
 
-  boolean equalTo(final Object that) {
+  /**
+   * Returns true if the given object is an instance of this class and has equal data contents.
+   * @param that the given object
+   * @return true if the given Object is an instance of this class and has equal data contents.
+   */
+  @Override
+  public final boolean equals(final Object that) {
     if (this == that) { return true; }
     return (that instanceof BaseState)
-        ? CompareAndCopy.equals(this, ((BaseState)that)) : false;
+      ? CompareAndCopy.equals(this, ((BaseState) that))
+      : false;
   }
 
-  boolean equalTo(final long thisOffsetBytes, final BaseState that,
+  /**
+   * Returns true if the given object is an instance of this class and has equal contents to
+   * this object in the given range of bytes. This will also check two distinct ranges within the
+   * same object for eauals.
+   * @param thisOffsetBytes the starting offset in bytes for this object.
+   * @param that the given object
+   * @param thatOffsetBytes the starting offset in bytes for the given object
+   * @param lengthBytes the size of the range in bytes
+   * @return true if the given object has equal contents to this object in the given range of
+   * bytes.
+   */
+  public final boolean equalTo(final long thisOffsetBytes, final Object that,
       final long thatOffsetBytes, final long lengthBytes) {
-    return CompareAndCopy.equals(this, thisOffsetBytes, that, thatOffsetBytes, lengthBytes);
+    return (that instanceof BaseState)
+      ? CompareAndCopy.equals(this, thisOffsetBytes, (BaseState) that, thatOffsetBytes, lengthBytes)
+      : false;
   }
 
-  ByteBuffer getByteBuffer() {
+  /**
+   * Gets the backing ByteBuffer if it exists, otherwise returns null.
+   * @return the backing ByteBuffer if it exists, otherwise returns null.
+   */
+  public final ByteBuffer getByteBuffer() {
     assertValid();
     return byteBuf_;
   }
 
-  long getCapacity() {
+  /**
+   * Gets the capacity of this object in bytes
+   * @return the capacity of this object in bytes
+   */
+  public final long getCapacity() {
     assertValid();
     return capacityBytes_;
   }
 
-  long getCumulativeOffset() {
+  /**
+   * Gets the cumulative offset in bytes of this object from the backing resource
+   * including the Java object header, if any.
+   *
+   * @return the cumulative offset in bytes of this object
+   */
+  public final long getCumulativeOffset() {
     return cumBaseOffset_;
   }
 
-  ByteOrder getDataByteOrder() {
+  /**
+   * Gets the cumulative offset in bytes of this object from the backing resource
+   * including the Java object header, if any.
+   *
+   * @param offsetBytes offset to be added to the base cumulative offset.
+   * @return the cumulative offset in bytes of this object
+   */
+  public final long getCumulativeOffset(final long offsetBytes) {
+    return cumBaseOffset_ + offsetBytes;
+  }
+
+  /**
+   * Gets the ByteOrder for the backing resource.
+   * @return the ByteOrder for the backing resource.
+   */
+  public final ByteOrder getDataByteOrder() {
     assertValid();
     return dataByteOrder_;
   }
 
-  MemoryRequestServer getMemoryRequestServer() {
+  /**
+   * Gets the MemoryRequestServer object or null.
+   * @return the MemoryRequestServer object or null.
+   */
+  final MemoryRequestServer getMemoryRequestSvr() {
     assertValid();
     return memReqSvr_;
   }
 
-  long getNativeBaseOffset() {
+  final long getNativeBaseOffset() {
     return nativeBaseOffset_;
   }
 
-  long getRegionOffset() {
+  final long getRegOffset() {
     assertValid();
     return regionOffset_;
   }
 
-  Object getUnsafeObject() {
+  final Object getUnsafeObject() {
     return unsafeObj_;
   }
 
-  StepBoolean getValid() {
+  final StepBoolean getValid() {
     return valid_;
   }
 
-  boolean hasArray() {
+  /**
+   * Returns true if this object is backed by an on-heap primitive array
+   * @return true if this object is backed by an on-heap primitive array
+   */
+  public final boolean hasArray() {
     assertValid();
     return unsafeObj_ != null;
   }
 
-  int theHashCode() {
+  /**
+   * Returns the hashCode of this class.
+   *
+   * <p>The hash code of this class depends upon all of its contents.
+   * Because of this, it is inadvisable to use these objects as keys in hash maps
+   * or similar data structures unless it is known that their contents will not change.</p>
+   *
+   * <p>If it is desirable to use these objects in a hash map depending only on object identity,
+   * than the {@link java.util.IdentityHashMap} can be used.</p>
+   *
+   * @return the hashCode of this class.
+   */
+  @Override
+  public final int hashCode() {
     return CompareAndCopy.hashCode(this);
   }
 
-  boolean hasByteBuffer() {
+  /**
+   * Returns true if this Memory is backed by a ByteBuffer
+   * @return true if this Memory is backed by a ByteBuffer
+   */
+  public final boolean hasByteBuffer() {
     assertValid();
     return byteBuf_ != null;
   }
 
-  boolean isDirect() {
+  /**
+   * Returns true if the backing memory is direct (off-heap) memory.
+   * @return true if the backing memory is direct (off-heap) memory.
+   */
+  public final boolean isDirect() {
     assertValid();
     return nativeBaseOffset_ > 0L;
   }
 
-  boolean isNativeOrder() {
+  /**
+   * Returns true if the current data byte order is native order.
+   * @return true if the current data byte order is native order.
+   */
+  public final boolean isNativeOrder() {
     return Util.isNativeOrder(dataByteOrder_);
   }
 
-  boolean isReadOnly() {
+  /**
+   * Returns true if this object or the backing resource is read-only.
+   * @return true if this object or the backing resource is read-only.
+   */
+  public final boolean isReadOnly() {
     assertValid();
     return readOnly_;
   }
 
-  //Must already have checked that for null.
-  boolean isSameResource(final BaseState that) {
+  /**
+   * Returns true if the backing resource of <i>this</i> is identical with the backing resource
+   * of <i>that</i>. If the backing resource is a heap array or ByteBuffer, the offset and
+   * capacity must also be identical.
+   * @param that A different non-null object
+   * @return true if the backing resource of <i>this</i> is identical with the backing resource
+   * of <i>that</i>.
+   */
+  public final boolean isSameResource(final Object that) {
     checkValid();
     if (that == null) { return false; }
-    that.checkValid();
-    if (this == that) { return true; }
+    final BaseState that1 = (BaseState) that;
+    that1.checkValid();
+    if (this == that1) { return true; }
 
-    return (getCumulativeOffset() == that.getCumulativeOffset())
-            && (getCapacity() == that.getCapacity())
-            && (getUnsafeObject() == that.getUnsafeObject())
-            && (getByteBuffer() == that.getByteBuffer());
+    return (getCumulativeOffset() == that1.getCumulativeOffset())
+            && (getCapacity() == that1.getCapacity())
+            && (getUnsafeObject() == that1.getUnsafeObject())
+            && (getByteBuffer() == that1.getByteBuffer());
   }
 
-  boolean isValid() {
-    return valid_.get();
-  }
-
-  void setInvalid() { //only used in test
+  final void setInvalid() { //only used in test
     valid_.change();
   }
 
-  void setMemoryRequestServer(final MemoryRequestServer svr) {
+  final void setMemoryRequestServer(final MemoryRequestServer svr) {
     memReqSvr_ = svr;
   }
 
-  void zeroNativeBaseOffset() {
+  /**
+   * Returns true if this object is valid() and has not been closed.
+   * @return true if this object is valid() and has not been closed.
+   */
+  public final boolean isValid() {
+    return valid_.get();
+  }
+
+  final void zeroNativeBaseOffset() {
     nativeBaseOffset_ = 0L;
   }
 
-  //Asserts and checks
+  //ASSERTS AND CHECKS
   final void assertValid() {
     assert valid_.get() : "Memory not valid.";
   }
@@ -242,12 +347,43 @@ class BaseState {
     }
   }
 
+  final void assertValidAndBoundsForRead(final long offsetBytes, final long lengthBytes) {
+    assertValid();
+    assertBounds(offsetBytes, lengthBytes, getCapacity());
+  }
+
+  final void assertValidAndBoundsForWrite(final long offsetBytes, final long lengthBytes) {
+    assertValid();
+    assertBounds(offsetBytes, lengthBytes, getCapacity());
+    assert !isReadOnly() : "Memory is read-only.";
+  }
+
+  /**
+   * Checks that the specified range of bytes is within bounds of this object, throws
+   * {@link IllegalArgumentException} if it's not: i. e. if offsetBytes &lt; 0, or length &lt; 0,
+   * or offsetBytes + length &gt; {@link #getCapacity()}.
+   * @param offsetBytes the given offset in bytes of this object
+   * @param lengthBytes the given length in bytes of this object
+   */
+  public final void checkValidAndBounds(final long offsetBytes, final long lengthBytes) {
+    checkValid();
+    checkBounds(offsetBytes, lengthBytes, getCapacity());
+  }
+
+  final void checkValidAndBoundsForWrite(final long offsetBytes, final long lengthBytes) {
+    checkValid();
+    checkBounds(offsetBytes, lengthBytes, getCapacity());
+    if (isReadOnly()) {
+      throw new ReadOnlyException("Memory is read-only.");
+    }
+  }
+
   //MONITORING
   /**
    * Gets the current number of active direct memory allocations.
    * @return the current number of active direct memory allocations.
    */
-  public static long getCurrentDirectMemoryAllocations() {
+  public static final long getCurrentDirectMemoryAllocations() {
     return BaseState.currentDirectMemoryAllocations_.get();
   }
 
@@ -255,7 +391,7 @@ class BaseState {
    * Gets the current size of active direct memory allocated.
    * @return the current size of active direct memory allocated.
    */
-  public static long getCurrentDirectMemoryAllocated() {
+  public static final long getCurrentDirectMemoryAllocated() {
     return BaseState.currentDirectMemoryAllocated_.get();
   }
 
@@ -263,7 +399,7 @@ class BaseState {
    * Gets the current number of active direct memory map allocations.
    * @return the current number of active direct memory map allocations.
    */
-  public static long getCurrentDirectMemoryMapAllocations() {
+  public static final long getCurrentDirectMemoryMapAllocations() {
     return BaseState.currentDirectMemoryMapAllocations_.get();
   }
 
@@ -271,8 +407,90 @@ class BaseState {
    * Gets the current size of active direct memory map allocated.
    * @return the current size of active direct memory map allocated.
    */
-  public static long getCurrentDirectMemoryMapAllocated() {
+  public static final long getCurrentDirectMemoryMapAllocated() {
     return BaseState.currentDirectMemoryMapAllocated_.get();
+  }
+
+  //TO STRING
+  /**
+   * Returns a formatted hex string of a range of this object.
+   * Used primarily for testing.
+   * @param header a descriptive header
+   * @param offsetBytes offset bytes relative to this object start
+   * @param lengthBytes number of bytes to convert to a hex string
+   * @return a formatted hex string in a human readable array
+   */
+  public final String toHexString(final String header, final long offsetBytes,
+      final int lengthBytes) {
+    checkValid();
+    final String klass = this.getClass().getSimpleName();
+    final String s1 = String.format("(..., %d, %d)", offsetBytes, lengthBytes);
+    final long hcode = hashCode() & 0XFFFFFFFFL;
+    final String call = ".toHexString" + s1 + ", hashCode: " + hcode;
+    final StringBuilder sb = new StringBuilder();
+    sb.append("### ").append(klass).append(" SUMMARY ###").append(LS);
+    sb.append("Header Comment      : ").append(header).append(LS);
+    sb.append("Call Parameters     : ").append(call);
+    return toHex(this, sb.toString(), offsetBytes, lengthBytes);
+  }
+
+  /**
+   * Returns a formatted hex string of an area of this object.
+   * Used primarily for testing.
+   * @param state the BaseState
+   * @param preamble a descriptive header
+   * @param offsetBytes offset bytes relative to the Memory start
+   * @param lengthBytes number of bytes to convert to a hex string
+   * @return a formatted hex string in a human readable array
+   */
+  static final String toHex(final BaseState state, final String preamble, final long offsetBytes,
+      final int lengthBytes) {
+    final long capacity = state.getCapacity();
+    UnsafeUtil.checkBounds(offsetBytes, lengthBytes, capacity);
+    final StringBuilder sb = new StringBuilder();
+    final Object uObj = state.getUnsafeObject();
+    final String uObjStr;
+    final long uObjHeader;
+    if (uObj == null) {
+      uObjStr = "null";
+      uObjHeader = 0;
+    } else {
+      uObjStr =  uObj.getClass().getSimpleName() + ", " + (uObj.hashCode() & 0XFFFFFFFFL);
+      uObjHeader = unsafe.arrayBaseOffset(uObj.getClass());
+    }
+    final ByteBuffer bb = state.getByteBuffer();
+    final String bbStr = (bb == null) ? "null"
+            : bb.getClass().getSimpleName() + ", " + (bb.hashCode() & 0XFFFFFFFFL);
+    final MemoryRequestServer memReqSvr = state.getMemoryRequestSvr();
+    final String memReqStr = (memReqSvr == null) ? "null"
+        : memReqSvr.getClass().getSimpleName() + ", " + (memReqSvr.hashCode() & 0XFFFFFFFFL);
+
+    final long cumBaseOffset = state.getCumulativeOffset();
+    sb.append(preamble).append(LS);
+    sb.append("UnsafeObj, hashCode : ").append(uObjStr).append(LS);
+    sb.append("UnsafeObjHeader     : ").append(uObjHeader).append(LS);
+    sb.append("ByteBuf, hashCode   : ").append(bbStr).append(LS);
+    sb.append("RegionOffset        : ").append(state.getRegOffset()).append(LS);
+    sb.append("Capacity            : ").append(capacity).append(LS);
+    sb.append("CumBaseOffset       : ").append(cumBaseOffset).append(LS);
+    sb.append("MemReq, hashCode    : ").append(memReqStr).append(LS);
+    sb.append("Valid               : ").append(state.isValid()).append(LS);
+    sb.append("Read Only           : ").append(state.isReadOnly()).append(LS);
+    sb.append("Data Endianness     : ").append(state.getDataByteOrder().toString()).append(LS);
+    sb.append("JDK Major Version   : ").append(UnsafeUtil.JDK).append(LS);
+    //Data detail
+    sb.append("Data, littleEndian  :  0  1  2  3  4  5  6  7");
+
+    for (long i = 0; i < lengthBytes; i++) {
+      final int b = unsafe.getByte(uObj, cumBaseOffset + offsetBytes + i) & 0XFF;
+      if ((i % 8) == 0) { //row header
+        sb.append(String.format("%n%20s: ", offsetBytes + i));
+      }
+      sb.append(String.format("%02x ", b));
+    }
+    sb.append(LS);
+
+    return sb.toString();
   }
 
 }

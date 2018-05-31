@@ -328,22 +328,13 @@ public abstract class WritableBuffer extends Buffer {
   public abstract Object getArray();
 
   /**
-   * Returns the backing ByteBuffer if it exists, otherwise returns null.
-   * @return the backing ByteBuffer if it exists, otherwise returns null.
-   */
-  @Override
-  public ByteBuffer getByteBuffer() {
-    return super.getByteBuffer();
-  }
-
-  /**
    * Clears all bytes of this Buffer from position to end to zero. The position will be set to end.
    */
   public abstract void clear();
 
   /**
-   * Fills this Buffer from position to end with the given byte value. The position will be set to
-   * end.
+   * Fills this Buffer from position to end with the given byte value.
+   * The position will be set to <i>end</i>.
    * @param value the given byte value
    */
   public abstract void fill(byte value);
@@ -355,9 +346,6 @@ public abstract class WritableBuffer extends Buffer {
    *
    * @return the offset of the start of this WritableBuffer from the backing resource.
    */
-  @Override
-  public long getRegionOffset() {
-    return super.getRegionOffset();
-  }
+  public abstract long getRegionOffset();
 
 }

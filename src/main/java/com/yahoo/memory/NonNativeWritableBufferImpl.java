@@ -326,4 +326,5 @@ final class NonNativeWritableBufferImpl extends BaseWritableBufferImpl {
     CompareAndCopy.putNonNativeShorts(srcArray, srcOffsetShorts, lengthShorts, copyBytes,
         getUnsafeObject(), getCumulativeOffset(), pos);
   }
+
 }

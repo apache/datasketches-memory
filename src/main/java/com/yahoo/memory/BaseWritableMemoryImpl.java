@@ -13,8 +13,6 @@ import static com.yahoo.memory.UnsafeUtil.ARRAY_CHAR_INDEX_SCALE;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_INT_INDEX_SCALE;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_LONG_INDEX_SCALE;
 import static com.yahoo.memory.UnsafeUtil.ARRAY_SHORT_INDEX_SCALE;
-import static com.yahoo.memory.UnsafeUtil.LS;
-import static com.yahoo.memory.UnsafeUtil.assertBounds;
 import static com.yahoo.memory.UnsafeUtil.checkBounds;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 
@@ -201,6 +199,18 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
         getUnsafeObject());
   }
 
+  @Override
+  public final int getCharsFromUtf8(final long offsetBytes, final int utf8LengthBytes,
+      final StringBuilder dst) throws Utf8CodingException {
+    try {
+      // Ensure that we do at most one resize of internal StringBuilder's char array
+      dst.ensureCapacity(dst.length() + utf8LengthBytes);
+      return getCharsFromUtf8(offsetBytes, utf8LengthBytes, (Appendable) dst);
+    } catch (final IOException e) {
+      throw new RuntimeException("Should not happen", e);
+    }
+  }
+
   //PRIMITIVE getXXX() Native Endian (used by both endians) XXX
   final char getNativeOrderedChar(final long offsetBytes) {
     assertValidAndBoundsForRead(offsetBytes, ARRAY_CHAR_INDEX_SCALE);
@@ -253,25 +263,15 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   }
 
   //OTHER READ METHODS XXX
+
   @Override
-  public final void checkValidAndBounds(final long offsetBytes, final long lengthBytes) {
-    checkValid();
-    checkBounds(offsetBytes, lengthBytes, getCapacity());
+  public final MemoryRequestServer getMemoryRequestServer() {
+    return super.getMemoryRequestSvr();
   }
 
   @Override
-  public final String toHexString(final String header, final long offsetBytes,
-      final int lengthBytes) {
-    checkValid();
-    final String klass = this.getClass().getSimpleName();
-    final String s1 = String.format("(..., %d, %d)", offsetBytes, lengthBytes);
-    final long hcode = hashCode() & 0XFFFFFFFFL;
-    final String call = ".toHexString" + s1 + ", hashCode: " + hcode;
-    final StringBuilder sb = new StringBuilder();
-    sb.append("### ").append(klass).append(" SUMMARY ###").append(LS);
-    sb.append("Header Comment      : ").append(header).append(LS);
-    sb.append("Call Parameters     : ").append(call);
-    return Memory.toHex(this, sb.toString(), offsetBytes, lengthBytes);
+  public final long getRegionOffset() {
+    return super.getRegOffset();
   }
 
   //PRIMITIVE putXXX() and putXXXArray() implementations XXX
@@ -443,22 +443,4 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     }
   }
 
-  final void assertValidAndBoundsForRead(final long offsetBytes, final long lengthBytes) {
-    assertValid();
-    assertBounds(offsetBytes, lengthBytes, getCapacity());
-  }
-
-  final void assertValidAndBoundsForWrite(final long offsetBytes, final long lengthBytes) {
-    assertValid();
-    assertBounds(offsetBytes, lengthBytes, getCapacity());
-    assert !isReadOnly() : "Memory is read-only.";
-  }
-
-  final void checkValidAndBoundsForWrite(final long offsetBytes, final long lengthBytes) {
-    checkValid();
-    checkBounds(offsetBytes, lengthBytes, getCapacity());
-    if (isReadOnly()) {
-      throw new ReadOnlyException("Memory is read-only.");
-    }
-  }
 }

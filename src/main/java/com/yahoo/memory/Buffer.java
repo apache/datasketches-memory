@@ -299,7 +299,7 @@ public abstract class Buffer extends BaseBuffer {
    */
   public abstract void getShortArray(short[] dstArray, int dstOffsetShorts, int lengthShorts);
 
-  //OTHER PRIMITIVE READ METHODS: copyTo, compareTo XXX
+  //SPECIAL PRIMITIVE READ METHODS: compareTo XXX
   /**
    * Compares the bytes of this Buffer to <i>that</i> Buffer.
    * This uses absolute offsets not the start, position and end.
@@ -317,112 +317,5 @@ public abstract class Buffer extends BaseBuffer {
    */
   public abstract int compareTo(long thisOffsetBytes, long thisLengthBytes, Buffer that,
           long thatOffsetBytes, long thatLengthBytes);
-
-  //OTHER READ METHODS XXX
-  /**
-   * Checks that the specified range of bytes is within bounds of this Memory object, throws
-   * {@link IllegalArgumentException} if it's not: i. e. if offsetBytes &lt; 0, or length &lt; 0,
-   * or offsetBytes + length &gt; {@link #getCapacity()}.
-   * @param offsetBytes the offset of the range of bytes to check
-   * @param lengthBytes the length of the range of bytes to check
-   */
-  public abstract void checkValidAndBounds(final long offsetBytes, final long lengthBytes);
-
-  /**
-   * Gets the capacity of this Buffer in bytes
-   * @return the capacity of this Buffer in bytes
-   */
-  @Override
-  public final long getCapacity() {
-    return super.getCapacity();
-  }
-
-  /**
-   * Returns the cumulative offset in bytes of this Buffer from the backing resource
-   * including the Java object header, if any.
-   *
-   * @param offsetBytes offset to be added to the base cumulative offset.
-   * @return the cumulative offset in bytes of this Buffer.
-   */
-  public final long getCumulativeOffset(final long offsetBytes) {
-    return super.getCumulativeOffset() + offsetBytes;
-  }
-
-  /**
-   * Returns the ByteOrder for the backing resource.
-   * @return the ByteOrder for the backing resource.
-   */
-  @Override
-  public final ByteOrder getDataByteOrder() {
-    return super.getDataByteOrder();
-  }
-
-  /**
-   * Returns true if this Buffer is backed by an on-heap primitive array
-   * @return true if this Buffer is backed by an on-heap primitive array
-   */
-  @Override
-  public final boolean hasArray() {
-    return super.hasArray();
-  }
-
-  /**
-   * Returns true if this Buffer is backed by a ByteBuffer
-   * @return true if this Buffer is backed by a ByteBuffer
-   */
-  @Override
-  public final boolean hasByteBuffer() {
-    return super.hasByteBuffer();
-  }
-
-  /**
-   * Returns true if the backing memory is direct (off-heap) memory.
-   * @return true if the backing memory is direct (off-heap) memory.
-   */
-  @Override
-  public final boolean isDirect() {
-    return super.isDirect();
-  }
-
-  /**
-   * Returns true if this or the backing resource is read-only
-   * @return true if this or backing resource is read-only
-   */
-  @Override
-  public final boolean isReadOnly() {
-    return super.isReadOnly();
-  }
-
-  /**
-   * Returns true if the backing resource of <i>this</i> is identical with the backing resource
-   * of <i>that</i>. If the backing resource is a heap array or ByteBuffer, the offset and
-   * capacity must also be identical.
-   * @param that A different given Buffer object
-   * @return true if the backing resource of <i>this</i> is identical with the backing resource
-   * of <i>that</i>.
-   */
-  @Override
-  public final boolean isSameResource(final BaseState that) {
-    return super.isSameResource(that);
-  }
-
-  /**
-   * Returns true if this Buffer is valid() and has not been closed.
-   * @return true if this Buffer is valid() and has not been closed.
-   */
-  @Override
-  public final boolean isValid() {
-    return super.isValid();
-  }
-
-  /**
-   * Returns a formatted hex string of a range of this Buffer.
-   * Used primarily for testing.
-   * @param header descriptive header
-   * @param offsetBytes offset bytes relative to this Buffer start
-   * @param lengthBytes number of bytes to convert to a hex string
-   * @return a formatted hex string in a human readable array
-   */
-  public abstract String toHexString(String header, long offsetBytes, int lengthBytes);
 
 }

@@ -25,6 +25,7 @@ import java.nio.ByteOrder;
  * @author Lee Rhodes
  */
 public abstract class BaseBuffer extends BaseState {
+  private long capacity;
   private long start = 0;
   private long pos = 0;
   private long end;
@@ -36,7 +37,7 @@ public abstract class BaseBuffer extends BaseState {
       final ByteBuffer byteBuf, final StepBoolean valid) {
     super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, dataByteOrder,
         byteBuf, valid);
-    end = capacityBytes;
+    capacity = end = capacityBytes;
   }
 
   /**
@@ -121,7 +122,7 @@ public abstract class BaseBuffer extends BaseState {
    * @return BaseBuffer
    */
   public final BaseBuffer setPosition(final long position) {
-    assertInvariants(start, position, end, capacityBytes_);
+    assertInvariants(start, position, end, capacity);
     pos = position;
     return this;
   }
@@ -134,7 +135,7 @@ public abstract class BaseBuffer extends BaseState {
    * @return BaseBuffer
    */
   public final BaseBuffer setAndCheckPosition(final long position) {
-    checkInvariants(start, position, end, capacityBytes_);
+    checkInvariants(start, position, end, capacity);
     pos = position;
     return this;
   }
@@ -150,7 +151,7 @@ public abstract class BaseBuffer extends BaseState {
    */
   public final BaseBuffer setStartPositionEnd(final long start, final long position,
       final long end) {
-    assertInvariants(start, position, end, capacityBytes_);
+    assertInvariants(start, position, end, capacity);
     this.start = start;
     this.end = end;
     pos = position;
@@ -168,7 +169,7 @@ public abstract class BaseBuffer extends BaseState {
    */
   public final BaseBuffer setAndCheckStartPositionEnd(final long start, final long position,
       final long end) {
-    checkInvariants(start, position, end, capacityBytes_);
+    checkInvariants(start, position, end, capacity);
     this.start = start;
     this.end = end;
     pos = position;
@@ -179,7 +180,7 @@ public abstract class BaseBuffer extends BaseState {
   final void incrementAndAssertPositionForRead(final long position, final long increment) {
     assertValid();
     final long newPos = position + increment;
-    assertInvariants(start, newPos, end, capacityBytes_);
+    assertInvariants(start, newPos, end, capacity);
     pos = newPos;
   }
 
@@ -187,21 +188,21 @@ public abstract class BaseBuffer extends BaseState {
     assertValid();
     assert !isReadOnly() : "Buffer is read-only.";
     final long newPos = position + increment;
-    assertInvariants(start, newPos, end, capacityBytes_);
+    assertInvariants(start, newPos, end, capacity);
     pos = newPos;
   }
 
   final void incrementAndCheckPositionForRead(final long pos, final long increment) {
     checkValid();
     final long newPos = pos + increment;
-    checkInvariants(start, newPos, end, capacityBytes_);
+    checkInvariants(start, newPos, end, capacity);
     this.pos = newPos;
   }
 
   final void incrementAndCheckPositionForWrite(final long pos, final long increment) {
     checkValidForWrite();
     final long newPos = pos + increment;
-    checkInvariants(start, newPos, end, capacityBytes_);
+    checkInvariants(start, newPos, end, capacity);
     this.pos = newPos;
   }
 

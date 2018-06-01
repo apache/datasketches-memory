@@ -42,25 +42,25 @@ public abstract class Memory {
 
   //MAP XXX
   /**
-   * Allocates direct memory used to memory map entire files for read operations
-   * (including those &gt; 2GB). This assumes that the file was written using native byte
-   * ordering.
+   * Maps the entire given file into native-ordered Memory for read operations (including those &gt;
+   * 2GB). Calling this method is equivalent to calling {@link #map(File, long, long, ByteOrder)
+   * map(file, 0, file.length(), ByteOrder.nativeOrder())}.
    * @param file the given file to map
-   * @return MapHandle for managing this map
-   * @throws IOException if file not found or internal RuntimeException is thrown.
+   * @return MapHandle for managing the mapped Memory
+   * @throws IOException if file not found or RuntimeException is thrown.
    */
   public static MapHandle map(final File file) throws IOException {
     return map(file, 0, file.length(), ByteOrder.nativeOrder());
   }
 
   /**
-   * Allocates direct memory used to memory map files for read operations
-   * (including those &gt; 2GB).
+   * Maps the specified portion of the given file into Memory for read operations (including those
+   * &gt; 2GB).
    * @param file the given file to map. It may not be null.
    * @param fileOffsetBytes the position in the given file in bytes. It may not be negative.
-   * @param capacityBytes the size of the allocated direct memory. It may not be negative or zero.
-   * @param byteOrder the endianness of the given file. It may not be null.
-   * @return MemoryMapHandler for managing this map
+   * @param capacityBytes the size of the mapped Memory. It may not be negative or zero.
+   * @param byteOrder the endianness of the returned mapped Memory. It may not be null.
+   * @return MemoryMapHandler for managing the mapped Memory
    * @throws IOException file not found or RuntimeException, etc.
    */
   public static MapHandle map(final File file, final long fileOffsetBytes, final long capacityBytes,
@@ -89,6 +89,30 @@ public abstract class Memory {
    * @return a new <i>Memory</i> representing the defined region.
    */
   public abstract Memory region(long offsetBytes, long capacityBytes);
+
+  /**
+   * Returns the specified region of this Memory object as a new read-only {@link ByteBuffer}
+   * object. The {@link ByteOrder} of the returned {@code ByteBuffer} corresponds to the {@linkplain
+   * #getResourceOrder() byte order of this Memory}. The returned ByteBuffer's position is 0 and
+   * the limit is equal to the capacity.
+   *
+   * <p>If this Memory object is the result of wrapping non-byte Java arrays ({@link
+   * Memory#wrap(int[])}, {@link Memory#wrap(long[])}, etc.) this methods throws an {@link
+   * UnsupportedOperationException}.
+   *
+   * <p>The name of this method starts with "unsafe" because if this is a native managed Memory
+   * (e. g. obtained via {@link #map(File)} or {@link WritableMemory#allocateDirect(long)})), and
+   * the returned {@code ByteBuffer} object is used after the Memory is freed, it may cause a JVM
+   * crash. This is also true for Memory objects themselves, but Memory's use-after-free is
+   * caught as AssertionError, if assertions are enabled.
+   *
+   * @param offsetBytes the starting offset with respect to the origin of this Memory
+   * @param capacityBytes the capacity of the returned ByteBuffer
+   * @return a new read-only {@code ByteBuffer} to access the specified region.
+   * @throws UnsupportedOperationException if this method couldn't be viewed as ByteBuffer, because
+   * when it wraps a non-byte Java array.
+   */
+  public abstract ByteBuffer unsafeByteBufferView(long offsetBytes, int capacityBytes);
 
   //AS BUFFER XXX
   /**

@@ -14,6 +14,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.testng.collections.Lists;
 
@@ -266,6 +267,43 @@ public class MemoryTest {
     //with -ea assert: Memory not valid.
     //with -da sometimes segfaults, sometimes passes!
     region.getByte(0);
+  }
+
+  @Test
+  public void checkUnsafeByteBufferView() {
+    try (WritableDirectHandle wmemDirectHandle = WritableMemory.allocateDirect(2)) {
+      WritableMemory wmemDirect = wmemDirectHandle.get();
+      wmemDirect.putByte(0, (byte) 1);
+      wmemDirect.putByte(1, (byte) 2);
+      checkUnsafeByteBufferView(wmemDirect);
+    }
+
+    checkUnsafeByteBufferView(Memory.wrap(new byte[] {1, 2}));
+
+    try {
+      @SuppressWarnings("unused")
+      ByteBuffer unused = Memory.wrap(new int[]{1}).unsafeByteBufferView(0, 1);
+      Assert.fail();
+    } catch (UnsupportedOperationException ingore) {
+      // expected
+    }
+  }
+
+  private static void checkUnsafeByteBufferView(final Memory mem) {
+    ByteBuffer emptyByteBuffer = mem.unsafeByteBufferView(0, 0);
+    Assert.assertEquals(emptyByteBuffer.capacity(), 0);
+    ByteBuffer bb = mem.unsafeByteBufferView(1, 1);
+    Assert.assertTrue(bb.isReadOnly());
+    Assert.assertEquals(bb.capacity(), 1);
+    Assert.assertEquals(bb.get(), 2);
+
+    try {
+      @SuppressWarnings("unused")
+      ByteBuffer unused = mem.unsafeByteBufferView(1, 2);
+      Assert.fail();
+    } catch (IllegalArgumentException ignore) {
+      // expected
+    }
   }
 
   @SuppressWarnings("resource")

@@ -116,6 +116,29 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     return handle;
   }
 
+  //UNSAFE BYTE BUFFER VIEW
+  @Override
+  public ByteBuffer unsafeByteBufferView(final long offsetBytes, final int capacityBytes) {
+    checkValidAndBounds(offsetBytes, capacityBytes);
+    final long cumOffset = getCumulativeOffset(offsetBytes);
+    final Object unsafeObj = getUnsafeObject();
+    final ByteBuffer result;
+    if (unsafeObj == null) {
+      result = AccessByteBuffer.getDummyReadOnlyDirectByteBuffer(cumOffset, capacityBytes);
+    } else if (unsafeObj instanceof byte[]) {
+      final int arrayOffset = (int) (cumOffset - ARRAY_BYTE_BASE_OFFSET);
+      result = ByteBuffer.wrap((byte[]) unsafeObj, arrayOffset, capacityBytes)
+          .slice().asReadOnlyBuffer();
+    } else {
+      throw new UnsupportedOperationException(
+          "This Memory object is the result of wrapping a "
+              + unsafeObj.getClass().getSimpleName()
+              + " array, it could not be viewed as a ByteBuffer.");
+    }
+    result.order(getDataByteOrder());
+    return result;
+  }
+
   //REGIONS XXX
   @Override
   public Memory region(final long offsetBytes, final long capacityBytes) {
@@ -413,7 +436,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     // be subject of the same safepoint problems as in Unsafe.copyMemory and Unsafe.setMemory.
     while (lengthBytes > 0) {
       final int chunk = (int) Math.min(CompareAndCopy.UNSAFE_COPY_THRESHOLD_BYTES, lengthBytes);
-      final ByteBuffer bufToWrite = AccessByteBuffer.getDummyDirectByteBuffer(addr, chunk);
+      final ByteBuffer bufToWrite = AccessByteBuffer.getDummyReadOnlyDirectByteBuffer(addr, chunk);
       writeFully(bufToWrite, out);
       addr += chunk;
       lengthBytes -= chunk;

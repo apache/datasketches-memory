@@ -19,7 +19,8 @@ import java.nio.ByteOrder;
  */
 final class AccessByteBuffer {
 
-  static final ByteBuffer ZERO_DIRECT_NIO_BUFFER = ByteBuffer.allocateDirect(0);
+  static final ByteBuffer ZERO_READ_ONLY_DIRECT_BYTE_BUFFER =
+      ByteBuffer.allocateDirect(0).asReadOnlyBuffer();
 
   private static final long NIO_BUFFER_ADDRESS_FIELD_OFFSET =
       UnsafeUtil.getFieldOffset(java.nio.Buffer.class, "address");
@@ -64,8 +65,8 @@ final class AccessByteBuffer {
    * This method is copied from https://github.com/odnoklassniki/one-nio/blob/
    * 27c768cbd28ece949c299f2d437c9a0ebd874500/src/one/nio/mem/DirectMemory.java#L95
    */
-  static ByteBuffer getDummyDirectByteBuffer(final long address, final int capacity) {
-    final ByteBuffer buf = ZERO_DIRECT_NIO_BUFFER.duplicate();
+  static ByteBuffer getDummyReadOnlyDirectByteBuffer(final long address, final int capacity) {
+    final ByteBuffer buf = ZERO_READ_ONLY_DIRECT_BYTE_BUFFER.duplicate();
     unsafe.putLong(buf, NIO_BUFFER_ADDRESS_FIELD_OFFSET, address);
     unsafe.putInt(buf, NIO_BUFFER_CAPACITY_FIELD_OFFSET, capacity);
     buf.limit(capacity);

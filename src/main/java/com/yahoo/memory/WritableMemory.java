@@ -62,24 +62,25 @@ public abstract class WritableMemory extends Memory {
 
   //MAP XXX
   /**
-   * Allocates direct memory used to memory map files for write operations
-   * (including those &gt; 2GB). This assumes that the file was written using native byte ordering.
+   * Maps the entire given file into native-ordered Memory for write operations
+   * (including those &gt; 2GB). Calling this method is equivalent to calling 
+   * {@link #map(File, long, long, ByteOrder) map(file, 0, file.length(), ByteOrder.nativeOrder())}.
    * @param file the given file to map
-   * @return WritableMapHandle for managing this map
-   * @throws IOException file not found or RuntimeException, etc.
+   * @return WritableMapHandle for managing the mapped Memory
+   * @throws IOException file not found or a RuntimeException.
    */
   public static WritableMapHandle map(final File file) throws IOException {
     return map(file, 0, file.length(), nativeOrder);
   }
 
   /**
-   * Allocates direct memory used to memory map files for write operations
+   * Maps the specified portion of the given file into Memory for write operations
    * (including those &gt; 2GB).
    * @param file the given file to map. It may not be null.
    * @param fileOffsetBytes the position in the given file in bytes. It may not be negative.
-   * @param capacityBytes the size of the allocated direct memory. It may not be negative or zero.
-   * @param dataByteOrder the endianness of the given file. It may not be null.
-   * @return WritableMapHandle for managing this map
+   * @param capacityBytes the size of the mapped Memory. It may not be negative or zero.
+   * @param dataByteOrder the endianness of the given file and the returned mapped Memory. It may not be null.
+   * @return WritableMapHandle for managing the mapped Memory
    * @throws IOException file not found or RuntimeException, etc.
    */
   public static WritableMapHandle map(final File file, final long fileOffsetBytes,
@@ -94,12 +95,13 @@ public abstract class WritableMemory extends Memory {
   //ALLOCATE DIRECT XXX
   /**
    * Allocates and provides access to capacityBytes directly in native (off-heap) memory
-   * leveraging the WritableMemory API. The allocated memory will be 8-byte aligned, but may not
-   * be page aligned. If capacityBytes is zero, endianness, backing storage and read-only status
+   * leveraging the WritableMemory API. Native byte order is assumed. 
+   * The allocated memory will be 8-byte aligned, but may not be page aligned. 
+   * If capacityBytes is zero, endianness, backing storage and read-only status
    * of the WritableMemory object, returned from {@link WritableHandle#get()} are unspecified.
    *
    * <p>The default MemoryRequestServer, which allocates any request for memory onto the heap,
-   * will be used and native byte order will be assumed.</p>
+   * will be used.</p>
    *
    * <p><b>NOTE:</b> Native/Direct memory acquired using Unsafe may have garbage in it.
    * It is the responsibility of the using class to clear this memory, if required,

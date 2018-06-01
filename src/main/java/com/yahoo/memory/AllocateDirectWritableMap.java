@@ -29,8 +29,9 @@ final class AllocateDirectWritableMap extends AllocateDirectMap implements Writa
       throw new ReadOnlyException("Memory Mapped File is Read Only.");
     }
     try {
-      MAPPED_BYTE_BUFFER_FORCE0_METHOD                 //force0 is effectively static
-          .invoke(AccessByteBuffer.ZERO_DIRECT_NIO_BUFFER, // so this is not modified
+      MAPPED_BYTE_BUFFER_FORCE0_METHOD
+          //force0 is effectively static, so ZERO_READ_ONLY_DIRECT_BYTE_BUFFER is not modified
+          .invoke(AccessByteBuffer.ZERO_READ_ONLY_DIRECT_BYTE_BUFFER,
               super.raf.getFD(),
               super.nativeBaseOffset,
               super.capacityBytes);

@@ -30,9 +30,9 @@ public abstract class Memory extends BaseState {
   //Pass-through ctor for all parameters
   Memory(
       final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
-      final long capacityBytes, final boolean readOnly, final ByteOrder dataByteOrder,
+      final long capacityBytes, final boolean readOnly, final ByteOrder byteOrder,
       final ByteBuffer byteBuf, final StepBoolean valid) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, dataByteOrder,
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, byteOrder,
         byteBuf, valid);
   }
 
@@ -61,12 +61,12 @@ public abstract class Memory extends BaseState {
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>Memory.wrap(...)</i>.
    * @param byteBuf the given ByteBuffer, must not be null
-   * @param dataByteOrder the byte order of the uderlying data independent of the byte order
-   * state of the given ByteBuffer
+   * @param byteOrder the byte order to be used, whicn may be independent of the byte order
+   * state of the given ByteBuffer.
    * @return a new <i>Memory</i> for read-only operations on the given ByteBuffer.
    */
-  public static Memory wrap(final ByteBuffer byteBuf, final ByteOrder dataByteOrder) {
-    return BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, true, dataByteOrder);
+  public static Memory wrap(final ByteBuffer byteBuf, final ByteOrder byteOrder) {
+    return BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, true, byteOrder);
   }
 
   //MAP XXX
@@ -95,17 +95,17 @@ public abstract class Memory extends BaseState {
    * @param file the given file to map. It may not be null.
    * @param fileOffsetBytes the position in the given file in bytes. It may not be negative.
    * @param capacityBytes the size of the mapped Memory. It may not be negative or zero.
-   * @param dataByteOrder the endianness of the given file and the returned mapped Memory. It may not be null.
+   * @param byteOrder the byte order to be used for the mapped Memory. It may not be null.
    * @return <i>MapHandle</i> for managing the mapped Memory
    * @throws IOException if file not found or a RuntimeException.
    */
   public static MapHandle map(final File file, final long fileOffsetBytes, final long capacityBytes,
-      final ByteOrder dataByteOrder) throws IOException {
+      final ByteOrder byteOrder) throws IOException {
     zeroCheck(capacityBytes, "Capacity");
     nullCheck(file, "file is null");
     negativeCheck(fileOffsetBytes, "File offset is negative");
     return BaseWritableMemoryImpl
-        .wrapMap(file, fileOffsetBytes, capacityBytes, true, dataByteOrder);
+        .wrapMap(file, fileOffsetBytes, capacityBytes, true, byteOrder);
   }
 
   //REGIONS XXX
@@ -200,11 +200,11 @@ public abstract class Memory extends BaseState {
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>Memory.wrap(...)</i>.
    * @param arr the given primitive array.
-   * @param dataByteOrder the byte order
+   * @param byteOrder the byte order to be used
    * @return a new <i>Memory</i> for read operations
    */
-  public static Memory wrap(final byte[] arr, final ByteOrder dataByteOrder) {
-    return Memory.wrap(arr, 0, arr.length, dataByteOrder);
+  public static Memory wrap(final byte[] arr, final ByteOrder byteOrder) {
+    return Memory.wrap(arr, 0, arr.length, byteOrder);
   }
 
   /**
@@ -217,13 +217,13 @@ public abstract class Memory extends BaseState {
    * @param arr the given primitive array.
    * @param offsetBytes the byte offset into the given array
    * @param lengthBytes the number of bytes to include from the given array
-   * @param dataByteOrder the byte order
+   * @param byteOrder the byte order to be used
    * @return a new <i>Memory</i> for read operations
    */
   public static Memory wrap(final byte[] arr, final int offsetBytes, final int lengthBytes,
-      final ByteOrder dataByteOrder) {
+      final ByteOrder byteOrder) {
     UnsafeUtil.checkBounds(offsetBytes, lengthBytes, arr.length);
-    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, true, dataByteOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, true, byteOrder);
   }
 
   /**

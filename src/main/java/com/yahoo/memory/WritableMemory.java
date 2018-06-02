@@ -27,9 +27,9 @@ public abstract class WritableMemory extends Memory {
   //Pass-through ctor for all parameters & ByteBuffer
   WritableMemory(
       final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
-      final long capacityBytes, final boolean readOnly, final ByteOrder dataByteOrder,
+      final long capacityBytes, final boolean readOnly, final ByteOrder byteOrder,
       final ByteBuffer byteBuf, final StepBoolean valid) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, dataByteOrder,
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, byteOrder,
         byteBuf, valid);
   }
 
@@ -58,12 +58,12 @@ public abstract class WritableMemory extends Memory {
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>WritableMemory.wrap(...)</i>.
    * @param byteBuf the given ByteBuffer, must not be null
-   * @param dataByteOrder the byte order of the uderlying data independent of the byte order
+   * @param byteOrder the byte order to be used, which may be independent of the byte order
    * state of the given ByteBuffer
    * @return a new WritableMemory for write operations on the given ByteBuffer.
    */
-  public static WritableMemory wrap(final ByteBuffer byteBuf, final ByteOrder dataByteOrder) {
-    return BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, false, dataByteOrder);
+  public static WritableMemory wrap(final ByteBuffer byteBuf, final ByteOrder byteOrder) {
+    return BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, false, byteOrder);
   }
 
   //MAP XXX
@@ -91,17 +91,17 @@ public abstract class WritableMemory extends Memory {
    * @param file the given file to map. It may not be null.
    * @param fileOffsetBytes the position in the given file in bytes. It may not be negative.
    * @param capacityBytes the size of the mapped Memory. It may not be negative or zero.
-   * @param dataByteOrder the endianness of the given file and the returned mapped Memory. It may not be null.
+   * @param byteOrder the byte order to be used for the given file. It may not be null.
    * @return WritableMapHandle for managing the mapped Memory
    * @throws IOException file not found or RuntimeException, etc.
    */
   public static WritableMapHandle map(final File file, final long fileOffsetBytes,
-      final long capacityBytes, final ByteOrder dataByteOrder) throws IOException {
+      final long capacityBytes, final ByteOrder byteOrder) throws IOException {
     zeroCheck(capacityBytes, "Capacity");
     nullCheck(file, "file is null");
     negativeCheck(fileOffsetBytes, "File offset is negative");
     return BaseWritableMemoryImpl
-        .wrapMap(file, fileOffsetBytes, capacityBytes, false, dataByteOrder);
+        .wrapMap(file, fileOffsetBytes, capacityBytes, false, byteOrder);
   }
 
   //ALLOCATE DIRECT XXX
@@ -230,11 +230,11 @@ public abstract class WritableMemory extends Memory {
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>WritableMemory.wrap(...)</i>.
    * @param arr the given primitive array.
-   * @param dataByteOrder the byte order
+   * @param byteOrder the byte order to be used
    * @return a new WritableMemory for write operations on the given primitive array.
    */
-  public static WritableMemory wrap(final byte[] arr, final ByteOrder dataByteOrder) {
-    return WritableMemory.wrap(arr, 0, arr.length, dataByteOrder);
+  public static WritableMemory wrap(final byte[] arr, final ByteOrder byteOrder) {
+    return WritableMemory.wrap(arr, 0, arr.length, byteOrder);
   }
 
   /**
@@ -247,13 +247,13 @@ public abstract class WritableMemory extends Memory {
    * @param arr the given primitive array.
    * @param offsetBytes the byte offset into the given array
    * @param lengthBytes the number of bytes to include from the given array
-   * @param dataByteOrder the byte order
+   * @param byteOrder the byte order to be used
    * @return a new WritableMemory for write operations on the given primitive array.
    */
   public static WritableMemory wrap(final byte[] arr, final int offsetBytes, final int lengthBytes,
-      final ByteOrder dataByteOrder) {
+      final ByteOrder byteOrder) {
     UnsafeUtil.checkBounds(offsetBytes, lengthBytes, arr.length);
-    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, dataByteOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, byteOrder);
   }
 
   /**

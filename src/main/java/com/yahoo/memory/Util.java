@@ -245,7 +245,7 @@ public final class Util {
     }
   }
 
-  static boolean isNativeOrder(final ByteOrder dataByteOrder) {
-    return (nativeOrder == dataByteOrder);
+  static boolean isNativeOrder(final ByteOrder byteOrder) {
+    return (nativeOrder == byteOrder);
   }
 }

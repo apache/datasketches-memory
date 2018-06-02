@@ -20,9 +20,9 @@ public abstract class WritableBuffer extends Buffer {
   //Pass-through ctor for all parameters
   WritableBuffer(
       final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
-      final long capacityBytes, final boolean readOnly, final ByteOrder dataByteOrder,
+      final long capacityBytes, final boolean readOnly, final ByteOrder byteOrder,
       final ByteBuffer byteBuf, final StepBoolean valid) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, dataByteOrder,
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, byteOrder,
         byteBuf, valid);
   }
 
@@ -45,13 +45,13 @@ public abstract class WritableBuffer extends Buffer {
    * the given ByteBuffer is zero the endianness of the returned WritableBuffer object
    * (as well as backing storage) is unspecified.
    * @param byteBuf the given ByteBuffer, must not be null
-   * @param dataByteOrder the byte order of the uderlying data independent of the byte order
+   * @param byteOrder the byte order to be used, which may be independent of the byte order
    * state of the given ByteBuffer
    * @return a new WritableBuffer for write operations on the given ByteBuffer.
    */
-  public static WritableBuffer wrap(final ByteBuffer byteBuf, final ByteOrder dataByteOrder) {
+  public static WritableBuffer wrap(final ByteBuffer byteBuf, final ByteOrder byteOrder) {
     final BaseWritableMemoryImpl wmem =
-        BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, false, dataByteOrder);
+        BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, false, byteOrder);
     final WritableBuffer wbuf = wmem.asWritableBufferImpl(false);
     wbuf.setStartPositionEnd(0, byteBuf.position(), byteBuf.limit());
     return wbuf;

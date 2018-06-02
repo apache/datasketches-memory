@@ -33,9 +33,9 @@ public abstract class BaseBuffer extends BaseState {
   //Pass-through ctor for all parameters
   BaseBuffer(
       final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
-      final long capacityBytes, final boolean readOnly, final ByteOrder dataByteOrder,
+      final long capacityBytes, final boolean readOnly, final ByteOrder byteOrder,
       final ByteBuffer byteBuf, final StepBoolean valid) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, dataByteOrder,
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, byteOrder,
         byteBuf, valid);
     capacity = end = capacityBytes;
   }
@@ -196,14 +196,14 @@ public abstract class BaseBuffer extends BaseState {
     checkValid();
     final long newPos = position + increment;
     checkInvariants(start, newPos, end, capacity);
-    this.pos = newPos;
+    pos = newPos;
   }
 
   final void incrementAndCheckPositionForWrite(final long position, final long increment) {
     checkValidForWrite();
     final long newPos = position + increment;
     checkInvariants(start, newPos, end, capacity);
-    this.pos = newPos;
+    pos = newPos;
   }
 
   final void checkValidForWrite() {

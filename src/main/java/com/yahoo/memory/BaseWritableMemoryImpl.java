@@ -52,27 +52,27 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   //called from one of the Endian-sensitive WritableMemoryImpls
   BaseWritableMemoryImpl(
       final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
-      final long capacityBytes, final boolean readOnly, final ByteOrder dataByteOrder,
+      final long capacityBytes, final boolean readOnly, final ByteOrder byteOrder,
       final ByteBuffer byteBuf, final StepBoolean valid) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, dataByteOrder,
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, byteOrder,
         byteBuf, valid);
   }
 
   static BaseWritableMemoryImpl wrapHeapArray(final Object arr, final long offsetBytes,
-      final long lengthBytes, final boolean readOnly, final ByteOrder dataByteOrder) {
+      final long lengthBytes, final boolean readOnly, final ByteOrder byteOrder) {
     if (lengthBytes == 0) { return BaseWritableMemoryImpl.ZERO_SIZE_MEMORY; }
-    return Util.isNativeOrder(dataByteOrder)
+    return Util.isNativeOrder(byteOrder)
         ? new WritableMemoryImpl(arr, 0L, offsetBytes, lengthBytes, readOnly, null, null)
         : new NonNativeWritableMemoryImpl(arr, 0L, offsetBytes, lengthBytes, readOnly, null, null);
   }
 
   static BaseWritableMemoryImpl wrapByteBuffer(
-      final ByteBuffer byteBuf, final boolean localReadOnly, final ByteOrder dataByteOrder) {
+      final ByteBuffer byteBuf, final boolean localReadOnly, final ByteOrder byteOrder) {
     final AccessByteBuffer abb = new AccessByteBuffer(byteBuf);
     if (abb.resourceReadOnly && !localReadOnly) {
       throw new ReadOnlyException("ByteBuffer is Read Only");
     }
-    return Util.isNativeOrder(dataByteOrder)
+    return Util.isNativeOrder(byteOrder)
         ? new WritableMemoryImpl(abb.unsafeObj, abb.nativeBaseOffset,
             abb.regionOffset, abb.capacityBytes, abb.resourceReadOnly || localReadOnly,
             byteBuf, null)
@@ -83,14 +83,14 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
 
   @SuppressWarnings("resource")
   static WritableMapHandle wrapMap(final File file, final long fileOffsetBytes,
-      final long capacityBytes, final boolean localReadOnly, final ByteOrder dataByteOrder) {
+      final long capacityBytes, final boolean localReadOnly, final ByteOrder byteOrder) {
     final AllocateDirectWritableMap dirWMap =
         new AllocateDirectWritableMap(file, fileOffsetBytes, capacityBytes);
     if (dirWMap.resourceReadOnly && !localReadOnly) {
       dirWMap.close();
       throw new ReadOnlyException("File is Read Only");
     }
-    final BaseWritableMemoryImpl impl = Util.isNativeOrder(dataByteOrder)
+    final BaseWritableMemoryImpl impl = Util.isNativeOrder(byteOrder)
         ? new WritableMemoryImpl(null, dirWMap.nativeBaseOffset, 0L, capacityBytes,
             dirWMap.resourceReadOnly || localReadOnly, null, dirWMap.getValid())
         : new NonNativeWritableMemoryImpl(null, dirWMap.nativeBaseOffset, 0L, capacityBytes,
@@ -100,12 +100,12 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
 
   @SuppressWarnings("resource")
   static WritableDirectHandle wrapDirect(final long capacityBytes,
-      final ByteOrder dataByteOrder, final MemoryRequestServer memReqSvr) {
+      final ByteOrder byteOrder, final MemoryRequestServer memReqSvr) {
     if (capacityBytes == 0) {
       return new WritableDirectHandle(null, ZERO_SIZE_MEMORY, null);
     }
     final AllocateDirect direct = new AllocateDirect(capacityBytes);
-    final BaseWritableMemoryImpl impl = Util.isNativeOrder(dataByteOrder)
+    final BaseWritableMemoryImpl impl = Util.isNativeOrder(byteOrder)
         ? new WritableMemoryImpl(null, direct.getNativeBaseOffset(),
             0L, capacityBytes, false, null, direct.getValid())
         : new NonNativeWritableMemoryImpl(null, direct.getNativeBaseOffset(),

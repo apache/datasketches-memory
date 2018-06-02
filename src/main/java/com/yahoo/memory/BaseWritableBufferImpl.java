@@ -49,9 +49,9 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   //called from one of the Endian-sensitive WritableBufferImpls
   BaseWritableBufferImpl(
       final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
-      final long capacityBytes, final boolean readOnly, final ByteOrder dataByteOrder,
+      final long capacityBytes, final boolean readOnly, final ByteOrder byteOrder,
       final ByteBuffer byteBuf, final StepBoolean valid, final BaseWritableMemoryImpl originMemory) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, dataByteOrder,
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, byteOrder,
         byteBuf, valid);
     this.originMemory = originMemory;
   }

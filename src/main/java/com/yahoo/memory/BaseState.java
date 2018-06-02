@@ -323,8 +323,8 @@ class BaseState {
   }
 
   /**
-   * Returns true if this object is valid() and has not been closed.
-   * @return true if this object is valid() and has not been closed.
+   * Returns true if this object is valid and has not been closed.
+   * @return true if this object is valid and has not been closed.
    */
   public final boolean isValid() {
     return valid_.get();

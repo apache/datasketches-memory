@@ -127,7 +127,7 @@ public abstract class Memory extends BaseState {
   /**
    * Returns the specified region of this Memory object as a new read-only {@link ByteBuffer}
    * object. The {@link ByteOrder} of the returned {@code ByteBuffer} corresponds to the {@linkplain
-   * #getDataByteOrder() byte order of this Memory}. The returned ByteBuffer's position is 0 and
+   * #getByteOrder() byte order of this Memory}. The returned ByteBuffer's position is 0 and
    * the limit is equal to the capacity.
    *
    * <p>If this Memory object is the result of wrapping non-byte Java arrays ({@link

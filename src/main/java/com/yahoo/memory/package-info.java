@@ -26,8 +26,8 @@
  *
  * <li>Immediate invalidation of all downstream references of an AutoCloseable
  * resource when that resource is closed, either manually or by the JVM.
- * This virtually eliminates the possibility of accidentally writing into the memory space once
- * owned by a closed resource.</li>
+ * This virtually eliminates the possibility of accidentally writing into the memory space
+ * previously owned by a closed resource.</li>
  *
  * <li>Improved performance over the prior Memory implementation.</li>
  *
@@ -57,18 +57,18 @@
  *
  * An access API is joined with
  * a resource either with a static factory method or in combination with a
- * {@link com.yahoo.memory.Handle}, which is used exclusively for resources that are external to the
- * JVM, such as allocation of direct memory and memory-mapped files.
+ * {@link com.yahoo.memory.Handle}, which is used exclusively for resources that are external to
+ * the JVM, such as allocation of direct memory and memory-mapped files.
  *
- * <p>The role of a Handle is to hold onto the reference of a resource that is outside the control of
- * the JVM. The resource is obtained from the handle with {@code get()}.
+ * <p>The role of a Handle is to hold onto the reference of a resource that is outside the control
+ * of the JVM. The resource is obtained from the handle with {@code get()}.
  *
  * <p>When a handle is extended for an AutoCloseable resource and then joined with an access API
  * it becomes an <i>implementation handle</i>. There are 3 implementation handles:
  *
  * <ul><li>{@link com.yahoo.memory.MapHandle} for read-only access to a memory-mapped file</li>
  * <li>{@link com.yahoo.memory.WritableMapHandle} for writable access to a memory-mapped file</li>
- * <li>{@link com.yahoo.memory.WritableHandle} for writable access to off-heap memory.</li>
+ * <li>{@link com.yahoo.memory.WritableDirectHandle} for writable access to off-heap memory.</li>
  * </ul>
  *
  * <p>As long as the implementation handle is valid the JVM will not attempt to close the resource.
@@ -80,26 +80,26 @@
  * The resource can also be explicitly closed by the user by calling {@code Handle.close()}.
  * <pre>{@code
  *     //Using try-with-resources block:
- *     try (WritableMemoryMapHandler handle = WritableResource.map(File file)) {
+ *     try (WritableyMapHandle handle = WritableMemory.map(File file)) {
  *       WritableMemory wMem = handle.get();
  *       doWork(wMem) // read and write to memory mapped file.
  *     }
  *
  *     //Using explicit close():
- *     WritableMemoryMapHandle handle = WritableResource.map(File file);
+ *     WritableMapHandle handle = WritableMemory.map(File file);
  *     WritableMemory wMem = handle.get();
  *     doWork(wMem) // read and write to memory mapped file.
  *     handle.close();
  * }</pre>
  *
- * <p>Where it is desirable to pass ownership of the resource (and the {@code close()} responsibility)
- * one can not use the TWR block. Instead:
+ * <p>Where it is desirable to pass ownership of the resource (and the {@code close()}
+ * responsibility) one can not use the TWR block. Instead:
  * <pre>{@code
- *     WritableMemoryMapHandler handler = WritableResource.map(File file);
+ *     WritableMapHandle handler = WritableMemory.map(File file);
  *     doWorkAndClose(handle); //passes the handle to object that closes the resource.
  * }</pre>
  *
- * In your system, whatever part of your process is responsible for allocating a resource external
+ * Whatever part of your process is responsible for allocating a resource external
  * to the JVM must be responsible for closing it or making sure it gets closed.
  * Since only the implementation Handles implement AutoCloseable, you must not let go of the
  * handle reference until you are done with its associated resource.
@@ -115,7 +115,7 @@
  * As long as there is at least one reference to the handle that is still valid and the resource
  * has not been closed, the resource will remain valid. If you drop all references to all handles,
  * the JVM will eventually close the resource, making it invalid, but it is possible that you might
- * run out of memory first.  Depending on this is a bad idea and a could be a serious,
+ * run out of memory first. Depending on this is a bad idea and a could be a serious,
  * hard-to-find bug.</li>
  * </ul>
  *

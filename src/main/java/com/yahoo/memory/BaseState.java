@@ -15,7 +15,8 @@ import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Keeps the configuration state for Resources.
+ * Keeps key configuration state for Memory and Buffer plus some common static variables
+ * and check methods.
  *
  * @author Lee Rhodes
  */
@@ -34,6 +35,12 @@ class BaseState {
   private final ByteBuffer byteBuf_;
 
   /**
+   * The byte order for Memory or Buffer, which may be different from the byte order state of
+   * the backing resource.
+   */
+  private final ByteOrder byteOrder_;
+
+  /**
    * The size of the backing resource in bytes. Used by all methods when checking bounds.
    */
   private final long capacityBytes_;
@@ -45,11 +52,6 @@ class BaseState {
    */
   //= f(regionOffset, unsafeObj, nativeBaseOffset, unsafeObjHeader)
   private final long cumBaseOffset_;
-
-  /**
-   * The byte order for data, which may be different from the byte order state of the resource.
-   */
-  private final ByteOrder dataByteOrder_;
 
   /**
    * This is a callback mechanism for a user client of direct memory to request more memory from
@@ -68,7 +70,7 @@ class BaseState {
   private long nativeBaseOffset_; //cannot be final; set to 0 when valid -> false
 
   /**
-   * Can be set true anytime. If true, it cannot be set false. If resourceIsReadOnly is true,
+   * Can be set true anytime. If true, it cannot be set false. If resource read-only is true,
    * this is automatically true.
    */
   private final boolean readOnly_;
@@ -105,7 +107,7 @@ class BaseState {
       final long regionOffset,
       final long capacityBytes,
       final boolean readOnly,
-      final ByteOrder dataByteOrder,
+      final ByteOrder byteOrder,
       final ByteBuffer byteBuf,
       final StepBoolean valid)
   {
@@ -114,7 +116,7 @@ class BaseState {
     regionOffset_ = regionOffset;
     capacityBytes_ = capacityBytes;
     readOnly_ = readOnly;
-    dataByteOrder_ = dataByteOrder;
+    byteOrder_ = byteOrder;
     byteBuf_ = byteBuf;
     cumBaseOffset_ = compute();
     valid_ = (valid == null) ? new StepBoolean(true) : valid;
@@ -200,12 +202,13 @@ class BaseState {
   }
 
   /**
-   * Gets the ByteOrder for the backing resource.
-   * @return the ByteOrder for the backing resource.
+   * Gets the current ByteOrder.
+   * This may be different from the ByteOrder of the backing resource.
+   * @return the current ByteOrder.
    */
-  public final ByteOrder getDataByteOrder() {
+  public final ByteOrder getByteOrder() {
     assertValid();
-    return dataByteOrder_;
+    return byteOrder_;
   }
 
   /**
@@ -283,11 +286,11 @@ class BaseState {
   }
 
   /**
-   * Returns true if the current data byte order is native order.
-   * @return true if the current data byte order is native order.
+   * Returns true if the current byte order is native order.
+   * @return true if the current byte order is native order.
    */
   public final boolean isNativeOrder() {
-    return Util.isNativeOrder(dataByteOrder_);
+    return Util.isNativeOrder(byteOrder_);
   }
 
   /**
@@ -480,7 +483,7 @@ class BaseState {
     sb.append("MemReq, hashCode    : ").append(memReqStr).append(LS);
     sb.append("Valid               : ").append(state.isValid()).append(LS);
     sb.append("Read Only           : ").append(state.isReadOnly()).append(LS);
-    sb.append("Data Endianness     : ").append(state.getDataByteOrder().toString()).append(LS);
+    sb.append("Endianness          : ").append(state.getByteOrder().toString()).append(LS);
     sb.append("JDK Major Version   : ").append(UnsafeUtil.JDK).append(LS);
     //Data detail
     sb.append("Data, littleEndian  :  0  1  2  3  4  5  6  7");

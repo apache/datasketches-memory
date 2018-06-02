@@ -184,7 +184,7 @@ public class BufferTest {
     ByteBuffer bb = ByteBuffer.allocate(n * 8);
     bb.order(ByteOrder.BIG_ENDIAN);
     Buffer buf = Buffer.wrap(bb);
-    assertEquals(buf.getDataByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(buf.getByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test

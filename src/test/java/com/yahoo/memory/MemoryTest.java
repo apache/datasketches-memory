@@ -179,7 +179,7 @@ public class MemoryTest {
     bb.order(ByteOrder.BIG_ENDIAN);
     Memory mem = Memory.wrap(bb);
     assertFalse(mem.isNativeOrder());
-    assertEquals(mem.getDataByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(mem.getByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test

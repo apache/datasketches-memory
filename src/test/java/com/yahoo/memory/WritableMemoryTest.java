@@ -22,7 +22,7 @@ public class WritableMemoryTest {
   public void wrapBigEndian() {
     ByteBuffer bb = ByteBuffer.allocate(64); //big endian
     WritableMemory wmem = WritableMemory.wrap(bb);
-    assertEquals(wmem.getDataByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(wmem.getByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test
@@ -30,7 +30,7 @@ public class WritableMemoryTest {
     ByteBuffer bb = ByteBuffer.allocate(64);
     WritableBuffer wbuf = WritableBuffer.wrap(bb);
     assertFalse(wbuf.isNativeOrder());
-    assertEquals(wbuf.getDataByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(wbuf.getByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test

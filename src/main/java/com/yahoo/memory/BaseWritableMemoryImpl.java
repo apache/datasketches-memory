@@ -135,7 +135,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
               + unsafeObj.getClass().getSimpleName()
               + " array, it could not be viewed as a ByteBuffer.");
     }
-    result.order(getDataByteOrder());
+    result.order(getByteOrder());
     return result;
   }
 

@@ -59,7 +59,7 @@ class BaseState {
    * Only used when user allocated direct memory is the backing resource.
    *
    */
-  private MemoryRequestServer memReqSvr_ = null;
+  private MemoryRequestServer memReqSvr_ = null; //cannot be final
 
   /**
    * Only used to compute cumBaseOffset for off-heap resources.
@@ -98,9 +98,7 @@ class BaseState {
    */
   private final StepBoolean valid_;
 
-  //****CONSTRUCTORS****
-
-  //All fields constructor except for memReqSvr and cumBaseOffset
+  //Initializes all fields except for memReqSvr, which is initialized lazily.
   BaseState(
       final Object unsafeObj,
       final long nativeBaseOffset,
@@ -118,17 +116,10 @@ class BaseState {
     readOnly_ = readOnly;
     byteOrder_ = byteOrder;
     byteBuf_ = byteBuf;
-    cumBaseOffset_ = compute();
-    valid_ = (valid == null) ? new StepBoolean(true) : valid;
-    //not memReqSvr
-  }
-
-  //****END CONSTRUCTORS****
-
-  private final long compute() {
-    return regionOffset_ + ((unsafeObj_ == null)
+    cumBaseOffset_ = regionOffset_ + ((unsafeObj_ == null)
         ? nativeBaseOffset_
         : unsafe.arrayBaseOffset(unsafeObj_.getClass()));
+    valid_ = (valid == null) ? new StepBoolean(true) : valid;
   }
 
   /**

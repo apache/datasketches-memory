@@ -7,7 +7,7 @@ package com.yahoo.memory;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 import java.io.File;
@@ -351,7 +351,7 @@ public class MemoryTest {
   @Test
   public void checkNullMemReqSvr() {
     WritableMemory wmem = WritableMemory.wrap(new byte[16]);
-    assertNull(wmem.getMemoryRequestServer());
+    assertNotNull(wmem.getMemoryRequestServer());
     println(wmem.toHexString("Test", 0, 16));
   }
 

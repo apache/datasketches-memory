@@ -38,9 +38,13 @@ public abstract class Memory extends BaseState {
 
   //BYTE BUFFER XXX
   /**
-   * Accesses the given ByteBuffer for read-only operations. The returned <i>Memory</i> object has the
-   * same byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is zero,
-   * then endianness of the returned <i>Memory</i> object (as well as backing storage) is unspecified.
+   * Accesses the given ByteBuffer for read-only operations. The returned <i>Memory</i> object has
+   * the same byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is
+   * zero, then endianness of the returned <i>Memory</i> object (as well as backing storage) is
+   * unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>Memory.wrap(...)</i>.
    * @param byteBuf the given ByteBuffer, must not be null
    * @return a new <i>Memory</i> for read-only operations on the given ByteBuffer.
    */
@@ -53,6 +57,9 @@ public abstract class Memory extends BaseState {
    * given byte order, ignoring the byte order of the given ByteBuffer.  If the capacity of the
    * given ByteBuffer is zero the endianness of the returned <i>Memory</i> object (as well as backing
    * storage) is unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>Memory.wrap(...)</i>.
    * @param byteBuf the given ByteBuffer, must not be null
    * @param dataByteOrder the byte order of the uderlying data independent of the byte order
    * state of the given ByteBuffer
@@ -64,10 +71,13 @@ public abstract class Memory extends BaseState {
 
   //MAP XXX
   /**
-   * Maps the entire given file into native-ordered Memory for read operations 
+   * Maps the entire given file into native-ordered Memory for read operations
    * (including those &gt; 2GB).
    * Calling this method is equivalent to calling {@link #map(File, long, long, ByteOrder)
    * map(file, 0, file.length(), ByteOrder.nativeOrder())}.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>Memory.map(...)</i>.
    * @param file the given file to map
    * @return <i>MapHandle</i> for managing the mapped Memory
    * @throws IOException if file not found or a RuntimeException.
@@ -79,6 +89,9 @@ public abstract class Memory extends BaseState {
   /**
    * Maps the specified portion of the given file into Memory for read operations
    * (including those &gt; 2GB).
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>Memory.map(...)</i>.
    * @param file the given file to map. It may not be null.
    * @param fileOffsetBytes the position in the given file in bytes. It may not be negative.
    * @param capacityBytes the size of the mapped Memory. It may not be negative or zero.
@@ -114,7 +127,7 @@ public abstract class Memory extends BaseState {
   /**
    * Returns the specified region of this Memory object as a new read-only {@link ByteBuffer}
    * object. The {@link ByteOrder} of the returned {@code ByteBuffer} corresponds to the {@linkplain
-   * #getResourceOrder() byte order of this Memory}. The returned ByteBuffer's position is 0 and
+   * #getDataByteOrder() byte order of this Memory}. The returned ByteBuffer's position is 0 and
    * the limit is equal to the capacity.
    *
    * <p>If this Memory object is the result of wrapping non-byte Java arrays ({@link
@@ -156,6 +169,9 @@ public abstract class Memory extends BaseState {
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
    * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>Memory.wrap(...)</i>.
    * @param arr the given primitive array.
    * @return a new <i>Memory</i> for read operations
    */
@@ -167,6 +183,9 @@ public abstract class Memory extends BaseState {
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
    * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>Memory.wrap(...)</i>.
    * @param arr the given primitive array.
    * @return a new <i>Memory</i> for read operations
    */
@@ -177,6 +196,9 @@ public abstract class Memory extends BaseState {
   /**
    * Wraps the given primitive array for read operations with the given byte order. If the array
    * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>Memory.wrap(...)</i>.
    * @param arr the given primitive array.
    * @param dataByteOrder the byte order
    * @return a new <i>Memory</i> for read operations
@@ -189,6 +211,9 @@ public abstract class Memory extends BaseState {
    * Wraps the given primitive array for read operations with the given byte order. If the given
    * lengthBytes is zero, backing storage and endianness of the returned <i>Memory</i> object are
    * unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>Memory.wrap(...)</i>.
    * @param arr the given primitive array.
    * @param offsetBytes the byte offset into the given array
    * @param lengthBytes the number of bytes to include from the given array
@@ -204,6 +229,9 @@ public abstract class Memory extends BaseState {
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
    * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>Memory.wrap(...)</i>.
    * @param arr the given primitive array.
    * @return a new <i>Memory</i> for read operations
    */
@@ -215,6 +243,9 @@ public abstract class Memory extends BaseState {
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
    * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>Memory.wrap(...)</i>.
    * @param arr the given primitive array.
    * @return a new <i>Memory</i> for read operations
    */
@@ -226,6 +257,9 @@ public abstract class Memory extends BaseState {
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
    * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>Memory.wrap(...)</i>.
    * @param arr the given primitive array.
    * @return a new <i>Memory</i> for read operations
    */
@@ -237,6 +271,9 @@ public abstract class Memory extends BaseState {
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
    * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>Memory.wrap(...)</i>.
    * @param arr the given primitive array.
    * @return a new <i>Memory</i> for read operations
    */
@@ -248,6 +285,9 @@ public abstract class Memory extends BaseState {
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
    * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>Memory.wrap(...)</i>.
    * @param arr the given primitive array.
    * @return a new <i>Memory</i> for read operations
    */
@@ -259,6 +299,9 @@ public abstract class Memory extends BaseState {
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
    * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>Memory.wrap(...)</i>.
    * @param arr the given primitive array.
    * @return a new <i>Memory</i> for read operations
    */

@@ -103,74 +103,74 @@ public class MemoryReadWriteSafetyTest {
 
   @Test(expectedExceptions = AssertionError.class)
   public void testWritableMemoryRegion() {
-    WritableMemory mem = (WritableMemory) WritableMemory.allocate(8).region(0, 8);
-    mem.putInt(0, 1);
+    WritableMemory mem1 = (WritableMemory) WritableMemory.allocate(8).region(0, 8);
+    mem1.putInt(0, 1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testByteArrayWrap() {
-    WritableMemory mem = (WritableMemory) Memory.wrap(new byte[8]);
-    mem.putInt(0, 1);
+    WritableMemory mem1 = (WritableMemory) Memory.wrap(new byte[8]);
+    mem1.putInt(0, 1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testByteArrayWrapWithBO() {
-    WritableMemory mem = (WritableMemory) Memory.wrap(new byte[8], ByteOrder.nativeOrder());
-    mem.putInt(0, 1);
+    WritableMemory mem1 = (WritableMemory) Memory.wrap(new byte[8], ByteOrder.nativeOrder());
+    mem1.putInt(0, 1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testByteArrayWrapWithOffsetsAndBO() {
-    WritableMemory mem = (WritableMemory) Memory.wrap(new byte[8], 0, 4, ByteOrder.nativeOrder());
-    mem.putInt(0, 1);
+    WritableMemory mem1 = (WritableMemory) Memory.wrap(new byte[8], 0, 4, ByteOrder.nativeOrder());
+    mem1.putInt(0, 1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testBooleanArrayWrap() {
-    WritableMemory mem = (WritableMemory) Memory.wrap(new boolean[8]);
-    mem.putInt(0, 1);
+    WritableMemory mem1 = (WritableMemory) Memory.wrap(new boolean[8]);
+    mem1.putInt(0, 1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testShortArrayWrap() {
-    WritableMemory mem = (WritableMemory) Memory.wrap(new short[8]);
-    mem.putInt(0, 1);
+    WritableMemory mem1 = (WritableMemory) Memory.wrap(new short[8]);
+    mem1.putInt(0, 1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testCharArrayWrap() {
-    WritableMemory mem = (WritableMemory) Memory.wrap(new char[8]);
-    mem.putInt(0, 1);
+    WritableMemory mem1 = (WritableMemory) Memory.wrap(new char[8]);
+    mem1.putInt(0, 1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testIntArrayWrap() {
-    WritableMemory mem = (WritableMemory) Memory.wrap(new int[8]);
-    mem.putInt(0, 1);
+    WritableMemory mem1 = (WritableMemory) Memory.wrap(new int[8]);
+    mem1.putInt(0, 1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testLongArrayWrap() {
-    WritableMemory mem = (WritableMemory) Memory.wrap(new long[8]);
-    mem.putInt(0, 1);
+    WritableMemory mem1 = (WritableMemory) Memory.wrap(new long[8]);
+    mem1.putInt(0, 1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testFloatArrayWrap() {
-    WritableMemory mem = (WritableMemory) Memory.wrap(new float[8]);
-    mem.putInt(0, 1);
+    WritableMemory mem1 = (WritableMemory) Memory.wrap(new float[8]);
+    mem1.putInt(0, 1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testDoubleArrayWrap() {
-    WritableMemory mem = (WritableMemory) Memory.wrap(new double[8]);
-    mem.putInt(0, 1);
+    WritableMemory mem1 = (WritableMemory) Memory.wrap(new double[8]);
+    mem1.putInt(0, 1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testByteBufferWrap() {
-    WritableMemory mem = (WritableMemory) Memory.wrap(ByteBuffer.allocate(8));
-    mem.putInt(0, 1);
+    WritableMemory mem1 = (WritableMemory) Memory.wrap(ByteBuffer.allocate(8));
+    mem1.putInt(0, 1);
   }
 
   @SuppressWarnings("resource")

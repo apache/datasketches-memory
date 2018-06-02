@@ -139,19 +139,19 @@ public class BufferReadWriteSafetyTest {
 
   @Test(expectedExceptions = AssertionError.class)
   public void testWritableMemoryAsBuffer() {
-    WritableBuffer buf = (WritableBuffer) WritableMemory.allocate(8).asBuffer();
-    buf.putInt(1);
+    WritableBuffer buf1 = (WritableBuffer) WritableMemory.allocate(8).asBuffer();
+    buf1.putInt(1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testWritableBufferRegion() {
-    WritableBuffer buf = (WritableBuffer) WritableMemory.allocate(8).asWritableBuffer().region();
-    buf.putInt(1);
+    WritableBuffer buf1 = (WritableBuffer) WritableMemory.allocate(8).asWritableBuffer().region();
+    buf1.putInt(1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testWritableBufferDuplicate() {
-    WritableBuffer buf = (WritableBuffer) WritableMemory.allocate(8).asWritableBuffer().duplicate();
-    buf.putInt(1);
+    WritableBuffer buf1 = (WritableBuffer) WritableMemory.allocate(8).asWritableBuffer().duplicate();
+    buf1.putInt(1);
   }
 }

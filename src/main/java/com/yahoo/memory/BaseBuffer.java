@@ -192,16 +192,16 @@ public abstract class BaseBuffer extends BaseState {
     pos = newPos;
   }
 
-  final void incrementAndCheckPositionForRead(final long pos, final long increment) {
+  final void incrementAndCheckPositionForRead(final long position, final long increment) {
     checkValid();
-    final long newPos = pos + increment;
+    final long newPos = position + increment;
     checkInvariants(start, newPos, end, capacity);
     this.pos = newPos;
   }
 
-  final void incrementAndCheckPositionForWrite(final long pos, final long increment) {
+  final void incrementAndCheckPositionForWrite(final long position, final long increment) {
     checkValidForWrite();
-    final long newPos = pos + increment;
+    final long newPos = position + increment;
     checkInvariants(start, newPos, end, capacity);
     this.pos = newPos;
   }

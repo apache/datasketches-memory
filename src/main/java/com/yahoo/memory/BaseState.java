@@ -209,11 +209,15 @@ class BaseState {
   }
 
   /**
-   * Gets the MemoryRequestServer object or null.
-   * @return the MemoryRequestServer object or null.
+   * Gets the MemoryRequestServer. If not explictly set using
+   * setMemoryRequestServer(...), this returns the <i>DefaultMemoryRequestServer</i>.
+   * @return the MemoryRequestServer.
    */
   final MemoryRequestServer getMemoryRequestSvr() {
     assertValid();
+    if (memReqSvr_ == null) {
+      memReqSvr_ = new DefaultMemoryRequestServer();
+    }
     return memReqSvr_;
   }
 

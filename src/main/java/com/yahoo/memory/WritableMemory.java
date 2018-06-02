@@ -39,6 +39,9 @@ public abstract class WritableMemory extends Memory {
    * the same byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is
    * zero, then endianness of the returned WritableMemory object, as well as backing storage and
    * read-only status are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.wrap(...)</i>.
    * @param byteBuf the given ByteBuffer
    * @return a new WritableMemory for write operations on the given ByteBuffer.
    */
@@ -51,6 +54,9 @@ public abstract class WritableMemory extends Memory {
    * the given byte order, ignoring the byte order of the given ByteBuffer. If the capacity of
    * the given ByteBuffer is zero the endianness of the returned WritableMemory object
    * (as well as backing storage) is unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.wrap(...)</i>.
    * @param byteBuf the given ByteBuffer, must not be null
    * @param dataByteOrder the byte order of the uderlying data independent of the byte order
    * state of the given ByteBuffer
@@ -63,8 +69,11 @@ public abstract class WritableMemory extends Memory {
   //MAP XXX
   /**
    * Maps the entire given file into native-ordered Memory for write operations
-   * (including those &gt; 2GB). Calling this method is equivalent to calling 
+   * (including those &gt; 2GB). Calling this method is equivalent to calling
    * {@link #map(File, long, long, ByteOrder) map(file, 0, file.length(), ByteOrder.nativeOrder())}.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.map(...)</i>.
    * @param file the given file to map
    * @return WritableMapHandle for managing the mapped Memory
    * @throws IOException file not found or a RuntimeException.
@@ -76,6 +85,9 @@ public abstract class WritableMemory extends Memory {
   /**
    * Maps the specified portion of the given file into Memory for write operations
    * (including those &gt; 2GB).
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.map(...)</i>.
    * @param file the given file to map. It may not be null.
    * @param fileOffsetBytes the position in the given file in bytes. It may not be negative.
    * @param capacityBytes the size of the mapped Memory. It may not be negative or zero.
@@ -95,8 +107,8 @@ public abstract class WritableMemory extends Memory {
   //ALLOCATE DIRECT XXX
   /**
    * Allocates and provides access to capacityBytes directly in native (off-heap) memory
-   * leveraging the WritableMemory API. Native byte order is assumed. 
-   * The allocated memory will be 8-byte aligned, but may not be page aligned. 
+   * leveraging the WritableMemory API. Native byte order is assumed.
+   * The allocated memory will be 8-byte aligned, but may not be page aligned.
    * If capacityBytes is zero, endianness, backing storage and read-only status
    * of the WritableMemory object, returned from {@link WritableHandle#get()} are unspecified.
    *
@@ -143,6 +155,7 @@ public abstract class WritableMemory extends Memory {
    * </ul>
    * If the given capacityBytes is zero, the returned object is effectively immutable and
    * the backing storage and endianness are unspecified.
+   *
    * @param offsetBytes the starting offset with respect to this object.
    * @param capacityBytes the capacity of the returned object in bytes.
    * @return a new <i>WritableMemory</i> representing the defined writable region.
@@ -184,6 +197,9 @@ public abstract class WritableMemory extends Memory {
    * Wraps the given primitive array for write operations assuming native byte order. If the array
    * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
    * object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.wrap(...)</i>.
    * @param arr the given primitive array.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
@@ -196,6 +212,9 @@ public abstract class WritableMemory extends Memory {
    * Wraps the given primitive array for write operations assuming native byte order. If the array
    * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
    * object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.wrap(...)</i>.
    * @param arr the given primitive array.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
@@ -207,6 +226,9 @@ public abstract class WritableMemory extends Memory {
    * Wraps the given primitive array for write operations with the given byte order. If the array
    * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
    * object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.wrap(...)</i>.
    * @param arr the given primitive array.
    * @param dataByteOrder the byte order
    * @return a new WritableMemory for write operations on the given primitive array.
@@ -219,6 +241,9 @@ public abstract class WritableMemory extends Memory {
    * Wraps the given primitive array for write operations with the given byte order. If the given
    * lengthBytes is zero, backing storage, endianness and read-only status of the returned
    * WritableMemory object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.wrap(...)</i>.
    * @param arr the given primitive array.
    * @param offsetBytes the byte offset into the given array
    * @param lengthBytes the number of bytes to include from the given array
@@ -235,6 +260,9 @@ public abstract class WritableMemory extends Memory {
    * Wraps the given primitive array for write operations assuming native byte order. If the array
    * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
    * object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.wrap(...)</i>.
    * @param arr the given primitive array.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
@@ -247,6 +275,9 @@ public abstract class WritableMemory extends Memory {
    * Wraps the given primitive array for write operations assuming native byte order. If the array
    * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
    * object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.wrap(...)</i>.
    * @param arr the given primitive array.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
@@ -259,6 +290,9 @@ public abstract class WritableMemory extends Memory {
    * Wraps the given primitive array for write operations assuming native byte order. If the array
    * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
    * object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.wrap(...)</i>.
    * @param arr the given primitive array.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
@@ -271,6 +305,9 @@ public abstract class WritableMemory extends Memory {
    * Wraps the given primitive array for write operations assuming native byte order. If the array
    * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
    * object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.wrap(...)</i>.
    * @param arr the given primitive array.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
@@ -283,6 +320,9 @@ public abstract class WritableMemory extends Memory {
    * Wraps the given primitive array for write operations assuming native byte order. If the array
    * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
    * object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.wrap(...)</i>.
    * @param arr the given primitive array.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
@@ -295,6 +335,9 @@ public abstract class WritableMemory extends Memory {
    * Wraps the given primitive array for write operations assuming native byte order. If the array
    * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
    * object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.wrap(...)</i>.
    * @param arr the given primitive array.
    * @return a new WritableMemory for write operations on the given primitive array.
    */

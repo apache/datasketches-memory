@@ -330,6 +330,11 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     return super.getRegOffset();
   }
 
+  @Override
+  public final long getRegionOffset(final long offsetBytes) {
+    return super.getRegOffset() + offsetBytes;
+  }
+
   //PRIMITIVE putXXX() and putXXXArray() implementations XXX
   @Override
   public final void putBoolean(final long offsetBytes, final boolean value) {

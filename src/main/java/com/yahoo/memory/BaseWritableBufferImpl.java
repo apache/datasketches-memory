@@ -263,6 +263,11 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
     return super.getRegOffset();
   }
 
+  @Override
+  public final long getRegionOffset(final long offsetBytes) {
+    return super.getRegOffset() + offsetBytes;
+  }
+
   //PRIMITIVE putXXX() and putXXXArray() XXX
   @Override
   public final void putBoolean(final boolean value) {

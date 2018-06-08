@@ -610,4 +610,13 @@ public abstract class WritableMemory extends Memory {
    */
   public abstract long getRegionOffset();
 
+  /**
+   * Returns the offset of the start of this WritableMemory from the backing resource plus
+   * the given offsetBytes, but not including any Java object header.
+   *
+   * @param offsetBytes the given offset bytes
+   * @return the offset of the start of this WritableMemory from the backing resource.
+   */
+  public abstract long getRegionOffset(long offsetBytes);
+
 }

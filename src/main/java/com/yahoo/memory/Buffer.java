@@ -53,7 +53,7 @@ public abstract class Buffer extends BaseBuffer {
   public static Buffer wrap(final ByteBuffer byteBuf, final ByteOrder byteOrder) {
     final BaseWritableMemoryImpl wmem =
         BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, true, byteOrder);
-    final WritableBuffer wbuf = wmem.asWritableBufferImpl(true);
+    final WritableBuffer wbuf = wmem.asWritableBufferImpl(true, byteOrder);
     wbuf.setStartPositionEnd(0, byteBuf.position(), byteBuf.limit());
     return wbuf;
   }
@@ -90,6 +90,32 @@ public abstract class Buffer extends BaseBuffer {
    * @return a new <i>Buffer</i> representing the defined region.
    */
   public abstract Buffer region();
+
+  /**
+   * A region is a read-only view of the backing store of this object.
+   * This returns a new <i>Buffer</i> representing the defined region
+   * with the given offsetBytes, capacityBytes and byte order.
+   * <ul>
+   * <li>Returned object's origin = this objects' origin + <i>offsetBytes</i></li>
+   * <li>Returned object's <i>start</i> = 0</li>
+   * <li>Returned object's <i>position</i> = 0</li>
+   * <li>Returned object's <i>end</i> = <i>capacityBytes</i></li>
+   * <li>Returned object's <i>capacity</i> = <i>capacityBytes</i></li>
+   * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable and
+   * independent of this object's <i>start</i>, <i>position</i> and <i>end</i></li>
+   * <li>Returned object's byte order = <i>byteOrder</i></li>
+   * </ul>
+   * If this object's capacity is zero, the returned object is effectively immutable and
+   * the backing storage and endianness are unspecified.
+   *
+   * <p><b>Note: </b><i>asMemory()</i> will return the originating <i>Memory</i> byte order.</p>
+   * @param offsetBytes the starting offset with respect to the origin of this <i>WritableBuffer</i>
+   * @param capacityBytes the <i>capacity</i> of the returned region in bytes
+   * @param byteOrder the given byte order
+   * @return a new <i>WritableBuffer</i> representing the defined writable region.
+   */
+  public abstract Buffer region(long offsetBytes, long capacityBytes,
+      ByteOrder byteOrder);
 
   //MEMORY XXX
   /**

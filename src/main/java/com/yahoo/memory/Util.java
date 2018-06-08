@@ -147,6 +147,8 @@ public final class Util {
   /**
    * Creates random valid Character Code Points (as integers). By definition, valid CodePoints
    * are integers in the range 0 to Character.MAX_CODE_POINT, and exclude the surrogate values.
+   * This is used in unit testing and characterization testing of the UTF8 class. Because the
+   * characterization tools are in a separate package, this must remain public.
    *
    * @author Lee Rhodes
    */
@@ -225,7 +227,7 @@ public final class Util {
         }
       }
     }
-  }
+  } //End class RandomCodePoints
 
   static final void zeroCheck(final long value, final String arg) {
     if (value <= 0) {

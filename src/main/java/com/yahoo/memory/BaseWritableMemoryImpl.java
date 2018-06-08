@@ -142,36 +142,69 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   //REGIONS XXX
   @Override
   public Memory region(final long offsetBytes, final long capacityBytes) {
-    return writableRegionImpl(offsetBytes, capacityBytes, true);
+    return writableRegionImpl(offsetBytes, capacityBytes, true, getByteOrder());
+  }
+
+  @Override
+  public Memory region(final long offsetBytes, final long capacityBytes, final ByteOrder byteOrder) {
+    return writableRegionImpl(offsetBytes, capacityBytes, true, byteOrder);
   }
 
   @Override
   public WritableMemory writableRegion(final long offsetBytes, final long capacityBytes) {
-    if (capacityBytes == 0) { return ZERO_SIZE_MEMORY; }
-    if (isReadOnly()) {
-      throw new ReadOnlyException("Writable region of a read-only Memory is not allowed.");
-    }
-    return writableRegionImpl(offsetBytes, capacityBytes, false);
+    return writableRegionImpl(offsetBytes, capacityBytes, false, getByteOrder());
   }
 
-  abstract WritableMemory writableRegionImpl(long offsetBytes, long capacityBytes,
-      boolean localReadOnly);
+  @Override
+  public WritableMemory writableRegion(final long offsetBytes, final long capacityBytes,
+      final ByteOrder byteOrder) {
+    return writableRegionImpl(offsetBytes, capacityBytes, false, byteOrder);
+  }
 
-  //BUFFER XXX
+  WritableMemory writableRegionImpl(final long offsetBytes, final long capacityBytes,
+      final boolean localReadOnly, final ByteOrder byteOrder) {
+    if (capacityBytes == 0) { return ZERO_SIZE_MEMORY; }
+    if (isReadOnly() && !localReadOnly) {
+      throw new ReadOnlyException("Writable region of a read-only Memory is not allowed.");
+    }
+    checkValidAndBounds(offsetBytes, capacityBytes);
+    return Util.isNativeOrder(byteOrder)
+        ? new WritableMemoryImpl(getUnsafeObject(), getNativeBaseOffset(),
+            getRegionOffset() + offsetBytes, capacityBytes,
+            isReadOnly() || localReadOnly, getByteBuffer(), getValid())
+        : new NonNativeWritableMemoryImpl(getUnsafeObject(), getNativeBaseOffset(),
+            getRegionOffset() + offsetBytes, capacityBytes,
+            isReadOnly() || localReadOnly, getByteBuffer(), getValid());
+  }
+
+  //AS BUFFER XXX
   @Override
   public Buffer asBuffer() {
-    return asWritableBufferImpl(true);
+    return asWritableBufferImpl(true, getByteOrder());
   }
 
   @Override
   public WritableBuffer asWritableBuffer() {
-    if (isReadOnly()) {
-      throw new ReadOnlyException("Converting a read-only Memory to a writable Buffer is not allowed.");
-    }
-    return asWritableBufferImpl(false);
+    return asWritableBufferImpl(false, getByteOrder());
   }
 
-  abstract WritableBuffer asWritableBufferImpl(boolean localReadOnly);
+  //Developer note: we don't currently allow switching byte order when switching from Memory to
+  // Buffer.
+  //This is here to reduce complexity in the endian-sensitive classes and to allow us to easily
+  // change our mind in the future :)
+  WritableBuffer asWritableBufferImpl(final boolean localReadOnly, final ByteOrder byteOrder) {
+    if (isReadOnly() && !localReadOnly) {
+      throw new ReadOnlyException(
+          "Converting a read-only Memory to a writable Buffer is not allowed.");
+    }
+    return Util.isNativeOrder(byteOrder)
+        ? new WritableBufferImpl(getUnsafeObject(), getNativeBaseOffset(),
+            getRegionOffset(), getCapacity(),
+            isReadOnly() || localReadOnly, getByteBuffer(), getValid(), this)
+        : new NonNativeWritableBufferImpl(getUnsafeObject(), getNativeBaseOffset(),
+            getRegionOffset(), getCapacity(),
+            isReadOnly() || localReadOnly, getByteBuffer(), getValid(), this);
+  }
 
   //PRIMITIVE getXXX() and getXXXArray() ENDIAN INDEPENDENT XXX
   @Override

@@ -48,31 +48,6 @@ final class NonNativeWritableMemoryImpl extends BaseWritableMemoryImpl {
         byteBuf, valid);
   }
 
-  //REGIONS XXX
-  @Override
-  BaseWritableMemoryImpl writableRegionImpl(
-      final long offsetBytes, final long capacityBytes, final boolean localReadOnly) {
-    checkValidAndBounds(offsetBytes, capacityBytes);
-    return new NonNativeWritableMemoryImpl(getUnsafeObject(), getNativeBaseOffset(),
-        getRegionOffset() + offsetBytes, capacityBytes, isReadOnly() || localReadOnly,
-        getByteBuffer(), getValid());
-  }
-
-  //BUFFER XXX
-  @Override
-  BaseWritableBufferImpl asWritableBufferImpl(final boolean localReadOnly) {
-    checkValid();
-    final BaseWritableBufferImpl wbuf;
-    if (getCapacity() == 0) {
-      wbuf = BaseWritableBufferImpl.ZERO_SIZE_BUFFER;
-    } else {
-      wbuf = new NonNativeWritableBufferImpl(getUnsafeObject(), getNativeBaseOffset(),
-          getRegionOffset(), getCapacity(), isReadOnly(), getByteBuffer(), getValid(), this);
-      wbuf.setAndCheckStartPositionEnd(0, 0, getCapacity());
-    }
-    return wbuf;
-  }
-
   ///PRIMITIVE getXXX() and getXXXArray() XXX
   @Override
   public char getChar(final long offsetBytes) {

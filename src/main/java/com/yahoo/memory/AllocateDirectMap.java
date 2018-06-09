@@ -157,7 +157,7 @@ class AllocateDirectMap implements Map {
   }
 
   //Does the actual mapping work, resourceReadOnly must already be set
-  private static final RandomAccessFile mapper(final File file, final long fileOffset,
+  private static RandomAccessFile mapper(final File file, final long fileOffset,
       final long capacityBytes, final boolean resourceReadOnly)  {
 
     final String mode = resourceReadOnly ? "r" : "rw";
@@ -193,7 +193,7 @@ class AllocateDirectMap implements Map {
    * @return the native base offset address
    * @throws RuntimeException Encountered an exception while mapping
    */
-  private static final long map(final FileChannel fileChannel, final boolean resourceReadOnly,
+  private static long map(final FileChannel fileChannel, final boolean resourceReadOnly,
       final long position, final long lengthBytes) {
     final int pagePosition = (int) (position % unsafe.pageSize());
     final long mapPosition = position - pagePosition;
@@ -210,7 +210,7 @@ class AllocateDirectMap implements Map {
     }
   }
 
-  private static final boolean isFileReadOnly(final File file) {
+  private static boolean isFileReadOnly(final File file) {
     if (System.getProperty("os.name").startsWith("Windows")) {
       return !file.canWrite();
     }
@@ -248,7 +248,7 @@ class AllocateDirectMap implements Map {
     //It can never be modified until it is deallocated.
     private long actualNativeBaseOffset;
     private final long myCapacity;
-    private StepBoolean valid = new StepBoolean(true); //only place for this
+    private final StepBoolean valid = new StepBoolean(true); //only place for this
 
     Deallocator(final long nativeBaseOffset, final long capacityBytes,
         final RandomAccessFile raf) {
@@ -271,9 +271,6 @@ class AllocateDirectMap implements Map {
         unmap();
       }
       actualNativeBaseOffset = 0L;
-      if (valid == null) {
-        throw new IllegalStateException("valid state not properly initialized.");
-      }
       valid.change(); //set invalid
       BaseState.currentDirectMemoryMapAllocations_.decrementAndGet();
       BaseState.currentDirectMemoryMapAllocated_.addAndGet(-myCapacity);

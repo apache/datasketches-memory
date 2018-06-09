@@ -52,7 +52,9 @@ final class NonNativeWritableBufferImpl extends BaseWritableBufferImpl {
   @Override
   WritableBuffer writableDuplicateImpl(final boolean localReadOnly) {
     checkValid();
-    //if (capacity == 0) { return ZERO_SIZE_BUFFER; } //cannot be zero here
+    if (getCapacity() == 0) {
+      throw new AssertionError("Don't expect zero capacity");
+    }
     final NonNativeWritableBufferImpl wBufImpl =
         new NonNativeWritableBufferImpl(getUnsafeObject(),
             getNativeBaseOffset(), getRegionOffset(), getCapacity(), isReadOnly(), getByteBuffer(),

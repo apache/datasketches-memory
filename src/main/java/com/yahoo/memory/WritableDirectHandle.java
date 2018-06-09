@@ -17,8 +17,8 @@ public final class WritableDirectHandle implements WritableHandle {
   private static final MemoryRequestServer defaultMemReqSvr = new DefaultMemoryRequestServer();
 
   AllocateDirect direct;
-  WritableMemory wMem;
-  MemoryRequestServer memReqSvr = defaultMemReqSvr;
+  private WritableMemory wMem;
+  MemoryRequestServer memReqSvr;
 
   WritableDirectHandle(final AllocateDirect allocatedDirect, final WritableMemory wMem,
       final MemoryRequestServer memReqSvr) {

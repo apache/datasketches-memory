@@ -20,8 +20,6 @@ final class AllocateDirect implements AutoCloseable {
   private final Cleaner cleaner;
   private final long nativeBaseOffset;
 
-
-
   /**
    * Base Constructor for allocate native memory.
    *
@@ -29,7 +27,6 @@ final class AllocateDirect implements AutoCloseable {
    * leveraging the Memory interface.
    * The allocated memory will be 8-byte aligned, but may not be page aligned.
    * @param capacityBytes the the requested capacity of off-heap memory. Cannot be zero.
-   * @param state contains valid, capacity at this point
    */
   AllocateDirect(final long capacityBytes) {
     final boolean pageAligned = NioBits.isPageAligned();
@@ -75,7 +72,7 @@ final class AllocateDirect implements AutoCloseable {
     private long nativeAddress; //set to 0 when deallocated. Different from nativeBaseOffset
     private final long allocationSize;
     private final long capacity;
-    private StepBoolean valid = new StepBoolean(true); //only place for this
+    private final StepBoolean valid = new StepBoolean(true); //only place for this
 
     private Deallocator(final long nativeAddress, final long allocationSize, final long capacity) {
       this.nativeAddress = nativeAddress;
@@ -95,9 +92,6 @@ final class AllocateDirect implements AutoCloseable {
         NioBits.unreserveMemory(allocationSize, capacity);
       }
       nativeAddress = 0L;
-      if (valid == null) {
-        throw new IllegalStateException("valid state not properly initialized.");
-      }
       valid.change(); //sets invalid here
       BaseState.currentDirectMemoryAllocations_.decrementAndGet();
       BaseState.currentDirectMemoryAllocated_.addAndGet(-capacity);

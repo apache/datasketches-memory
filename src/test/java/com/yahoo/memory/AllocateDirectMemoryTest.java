@@ -66,6 +66,7 @@ public class AllocateDirectMemoryTest {
       WritableMemory wmem = wdh.get();
 
       wmem.setInvalid();//intentional before end of scope
+      //noinspection RedundantExplicitClose
       wdh.close(); //checks that AllocateDirect.close is called even when invalid.
     }
   }

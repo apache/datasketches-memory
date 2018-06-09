@@ -104,8 +104,7 @@ public abstract class Memory extends BaseState {
     zeroCheck(capacityBytes, "Capacity");
     nullCheck(file, "file is null");
     negativeCheck(fileOffsetBytes, "File offset is negative");
-    return BaseWritableMemoryImpl
-        .wrapMap(file, fileOffsetBytes, capacityBytes, true, byteOrder);
+    return BaseWritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, true, byteOrder);
   }
 
   //REGIONS XXX

@@ -57,11 +57,19 @@ final class AllocateDirect implements AutoCloseable {
 
   @Override
   public void close() {
-    deallocator.deallocate(false);
-    // This Cleaner.clean() call effectively just removes the Cleaner from the internal linked list
-    // of all cleaners. It will delegate to Deallocator.deallocate() which will be a no-op because
-    // the valid state is already changed.
-    cleaner.clean();
+    doClose();
+  }
+
+  boolean doClose() {
+    if (deallocator.deallocate(false)) {
+      // This Cleaner.clean() call effectively just removes the Cleaner from the internal linked list
+      // of all cleaners. It will delegate to Deallocator.deallocate() which will be a no-op because
+      // the valid state is already changed.
+      cleaner.clean();
+      return true;
+    } else {
+      return false;
+    }
   }
 
   long getNativeBaseOffset() {
@@ -97,7 +105,7 @@ final class AllocateDirect implements AutoCloseable {
       deallocate(true);
     }
 
-    void deallocate(boolean calledFromCleaner) {
+    boolean deallocate(boolean calledFromCleaner) {
       if (valid.change()) {
         if (calledFromCleaner) {
           // Warn about non-deterministic resource cleanup.
@@ -107,6 +115,9 @@ final class AllocateDirect implements AutoCloseable {
         NioBits.unreserveMemory(allocationSize, capacity);
         BaseState.currentDirectMemoryAllocations_.decrementAndGet();
         BaseState.currentDirectMemoryAllocated_.addAndGet(-capacity);
+        return true;
+      } else {
+        return false;
       }
     }
   }

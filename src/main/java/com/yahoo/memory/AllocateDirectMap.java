@@ -132,11 +132,19 @@ class AllocateDirectMap implements Map {
 
   @Override
   public void close() {
-    deallocator.deallocate(false);
-    // This Cleaner.clean() call effectively just removes the Cleaner from the internal linked list
-    // of all cleaners. It will delegate to Deallocator.deallocate() which will be a no-op because
-    // the valid state is already changed.
-    cleaner.clean();
+    doClose();
+  }
+
+  boolean doClose() {
+    if (deallocator.deallocate(false)) {
+      // This Cleaner.clean() call effectively just removes the Cleaner from the internal linked
+      // list of all cleaners. It will delegate to Deallocator.deallocate() which will be a no-op
+      // because the valid state is already changed.
+      cleaner.clean();
+      return true;
+    } else {
+      return false;
+    }
   }
 
   StepBoolean getValid() {
@@ -277,7 +285,7 @@ class AllocateDirectMap implements Map {
       deallocate(true);
     }
 
-    void deallocate(boolean calledFromCleaner) {
+    boolean deallocate(boolean calledFromCleaner) {
       if (valid.change()) {
         if (calledFromCleaner) {
           // Warn about non-deterministic resource cleanup.
@@ -290,6 +298,9 @@ class AllocateDirectMap implements Map {
           BaseState.currentDirectMemoryMapAllocations_.decrementAndGet();
           BaseState.currentDirectMemoryMapAllocated_.addAndGet(-myCapacity);
         }
+        return true;
+      } else {
+        return false;
       }
     }
 

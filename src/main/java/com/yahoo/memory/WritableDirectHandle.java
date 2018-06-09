@@ -16,7 +16,10 @@ package com.yahoo.memory;
 public final class WritableDirectHandle implements WritableHandle {
   private static final MemoryRequestServer defaultMemReqSvr = new DefaultMemoryRequestServer();
 
-  AllocateDirect direct;
+  /**
+   * Having at least one final field makes this class safe for concurrent publication.
+   */
+  final AllocateDirect direct;
   private WritableMemory wMem;
   MemoryRequestServer memReqSvr;
 
@@ -36,10 +39,9 @@ public final class WritableDirectHandle implements WritableHandle {
 
   @Override
   public void close() {
-    if (direct != null) { //may already be invalid
-      direct.close();
-      direct = null;
+    if (direct.doClose()) {
       wMem.zeroNativeBaseOffset();
+      wMem = null;
     }
   }
 }

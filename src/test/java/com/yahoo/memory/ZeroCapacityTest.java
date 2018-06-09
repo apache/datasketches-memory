@@ -9,6 +9,7 @@ import static org.testng.Assert.assertEquals;
 
 import java.nio.ByteBuffer;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -26,8 +27,11 @@ public class ZeroCapacityTest {
     Memory mem2 = Memory.wrap(ByteBuffer.allocate(0));
     Memory mem3 = Memory.wrap(ByteBuffer.allocateDirect(0));
     Memory reg = mem3.region(0, 0);
-    try (WritableHandle wmem1 = WritableMemory.allocateDirect(0)) {
-      //empty
+    try {
+      WritableMemory.allocateDirect(0);
+      Assert.fail();
+    } catch (IllegalArgumentException ignore) {
+      // expected
     }
   }
 

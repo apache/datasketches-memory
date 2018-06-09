@@ -7,6 +7,8 @@ package com.yahoo.memory;
 
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.misc.Cleaner;
 
 /**
@@ -16,6 +18,8 @@ import sun.misc.Cleaner;
  * @author Lee Rhodes
  */
 final class AllocateDirect implements AutoCloseable {
+  private static final Logger LOG = LoggerFactory.getLogger(AllocateDirect.class);
+
   private final Deallocator deallocator;
   private final Cleaner cleaner;
   private final long nativeBaseOffset;
@@ -49,13 +53,15 @@ final class AllocateDirect implements AutoCloseable {
     }
     deallocator = new Deallocator(nativeAddress, allocationSize, capacityBytes);
     cleaner = Cleaner.create(this, deallocator);
-    BaseState.currentDirectMemoryAllocations_.incrementAndGet();
-    BaseState.currentDirectMemoryAllocated_.addAndGet(capacityBytes);
   }
 
   @Override
   public void close() {
-    cleaner.clean(); //sets invalid
+    deallocator.deallocate(false);
+    // This Cleaner.clean() call effectively just removes the Cleaner from the internal linked list
+    // of all cleaners. It will delegate to Deallocator.deallocate() which will be a no-op because
+    // the valid state is already changed.
+    cleaner.clean();
   }
 
   long getNativeBaseOffset() {
@@ -68,13 +74,14 @@ final class AllocateDirect implements AutoCloseable {
 
   private static final class Deallocator implements Runnable {
     //This is the only place the actual native address is kept for use by unsafe.freeMemory();
-    //It can never be modified until it is deallocated.
-    private long nativeAddress; //set to 0 when deallocated. Different from nativeBaseOffset
+    private final long nativeAddress;
     private final long allocationSize;
     private final long capacity;
     private final StepBoolean valid = new StepBoolean(true); //only place for this
 
     private Deallocator(final long nativeAddress, final long allocationSize, final long capacity) {
+      BaseState.currentDirectMemoryAllocations_.incrementAndGet();
+      BaseState.currentDirectMemoryAllocated_.addAndGet(capacity);
       this.nativeAddress = nativeAddress;
       this.allocationSize = allocationSize;
       this.capacity = capacity;
@@ -87,14 +94,20 @@ final class AllocateDirect implements AutoCloseable {
 
     @Override
     public void run() {
-      if (nativeAddress > 0) {
+      deallocate(true);
+    }
+
+    void deallocate(boolean calledFromCleaner) {
+      if (valid.change()) {
+        if (calledFromCleaner) {
+          // Warn about non-deterministic resource cleanup.
+          LOG.warn("A WritableDirectHandle was not closed manually");
+        }
         unsafe.freeMemory(nativeAddress);
         NioBits.unreserveMemory(allocationSize, capacity);
+        BaseState.currentDirectMemoryAllocations_.decrementAndGet();
+        BaseState.currentDirectMemoryAllocated_.addAndGet(-capacity);
       }
-      nativeAddress = 0L;
-      valid.change(); //sets invalid here
-      BaseState.currentDirectMemoryAllocations_.decrementAndGet();
-      BaseState.currentDirectMemoryAllocated_.addAndGet(-capacity);
     }
   }
 

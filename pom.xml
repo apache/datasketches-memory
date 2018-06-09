@@ -135,6 +135,11 @@
     <!-- End of Environment Settings -->
 
     <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.25</version>
+        </dependency>
         <!-- Compile, Test Scope -->
         <dependency>
             <groupId>org.testng</groupId>

@@ -52,7 +52,7 @@ public abstract class WritableBuffer extends Buffer {
   public static WritableBuffer wrap(final ByteBuffer byteBuf, final ByteOrder byteOrder) {
     final BaseWritableMemoryImpl wmem =
         BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, false, byteOrder);
-    final WritableBuffer wbuf = wmem.asWritableBufferImpl(false);
+    final WritableBuffer wbuf = wmem.asWritableBufferImpl(false, byteOrder);
     wbuf.setStartPositionEnd(0, byteBuf.position(), byteBuf.limit());
     return wbuf;
   }

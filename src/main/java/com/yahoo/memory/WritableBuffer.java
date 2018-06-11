@@ -30,7 +30,7 @@ public abstract class WritableBuffer extends Buffer {
   /**
    * Accesses the given ByteBuffer for write operations. The returned WritableBuffer object has
    * the same byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is
-   * zero, then endianness of the returned WritableBuffer object, as well as backing storage and
+   * zero, then byte order of the returned WritableBuffer object, as well as backing storage and
    * read-only status are unspecified.
    * @param byteBuf the given ByteBuffer, must not be null.
    * @return a new WritableBuffer for write operations on the given ByteBuffer.
@@ -42,7 +42,7 @@ public abstract class WritableBuffer extends Buffer {
   /**
    * Accesses the given ByteBuffer for write operations. The returned WritableBuffer object has
    * the given byte order, ignoring the byte order of the given ByteBuffer. If the capacity of
-   * the given ByteBuffer is zero the endianness of the returned WritableBuffer object
+   * the given ByteBuffer is zero the byte order of the returned WritableBuffer object
    * (as well as backing storage) is unspecified.
    * @param byteBuf the given ByteBuffer, must not be null
    * @param byteOrder the byte order to be used, which may be independent of the byte order
@@ -52,7 +52,7 @@ public abstract class WritableBuffer extends Buffer {
   public static WritableBuffer wrap(final ByteBuffer byteBuf, final ByteOrder byteOrder) {
     final BaseWritableMemoryImpl wmem =
         BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, false, byteOrder);
-    final WritableBuffer wbuf = wmem.asWritableBufferImpl(false);
+    final WritableBuffer wbuf = wmem.asWritableBufferImpl(false, byteOrder);
     wbuf.setStartPositionEnd(0, byteBuf.position(), byteBuf.limit());
     return wbuf;
   }
@@ -68,7 +68,7 @@ public abstract class WritableBuffer extends Buffer {
    * Returns a duplicate writable view of this Buffer with the same but independent values of
    * <i>start</i>, <i>position</i> and <i>end</i>.
    * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and endianness are unspecified.
+   * the backing storage and byte order are unspecified.
    * @return a duplicate writable view of this Buffer with the same but independent values of
    * <i>start</i>, <i>position</i> and <i>end</i>.
    */
@@ -88,14 +88,15 @@ public abstract class WritableBuffer extends Buffer {
    * independent of this object's <i>start</i>, <i>position</i> and <i>end</i></li>
    * </ul>
    * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and endianness are unspecified.
+   * the backing storage and byte order are unspecified.
    * @return a new <i>WritableBuffer</i> representing the defined writable region.
    */
   public abstract WritableBuffer writableRegion();
 
   /**
    * A writable region is a writable view of the backing store of this object.
-   * This returns a new <i>WritableBuffer</i> representing the defined writable region.
+   * This returns a new <i>WritableBuffer</i> representing the defined writable region
+   * with the given offsetBytes, capacityBytes and byte order.
    * <ul>
    * <li>Returned object's origin = this objects' origin + <i>offsetBytes</i></li>
    * <li>Returned object's <i>start</i> = 0</li>
@@ -104,20 +105,26 @@ public abstract class WritableBuffer extends Buffer {
    * <li>Returned object's <i>capacity</i> = <i>capacityBytes</i></li>
    * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable and
    * independent of this object's <i>start</i>, <i>position</i> and <i>end</i></li>
+   * <li>Returned object's byte order = <i>byteOrder</i></li>
    * </ul>
    * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and endianness are unspecified.
+   * the backing storage and byte order are unspecified.
+   *
+   * <p><b>Note: </b><i>asWritableMemory()</i> and <i>asMemory()</i>
+   * will return the originating <i>Memory</i> byte order.</p>
    * @param offsetBytes the starting offset with respect to the origin of this <i>WritableBuffer</i>
    * @param capacityBytes the <i>capacity</i> of the returned region in bytes
+   * @param byteOrder the given byte order
    * @return a new <i>WritableBuffer</i> representing the defined writable region.
    */
-  public abstract WritableBuffer writableRegion(long offsetBytes, long capacityBytes);
+  public abstract WritableBuffer writableRegion(long offsetBytes, long capacityBytes,
+      ByteOrder byteOrder);
 
   //AS MEMORY XXX
   /**
    * Convert this WritableBuffer to a WritableMemory.
    * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and endianness are unspecified.
+   * the backing storage and byte order are unspecified.
    * @return WritableMemory
    */
   public abstract WritableMemory asWritableMemory();
@@ -347,5 +354,14 @@ public abstract class WritableBuffer extends Buffer {
    * @return the offset of the start of this WritableBuffer from the backing resource.
    */
   public abstract long getRegionOffset();
+
+  /**
+   * Returns the offset of the start of this WritableBuffer from the backing resource plus
+   * the given offsetBytes, but not including any Java object header.
+   *
+   * @param offsetBytes the given offset bytes
+   * @return the offset of the start of this WritableBuffer from the backing resource.
+   */
+  public abstract long getRegionOffset(long offsetBytes);
 
 }

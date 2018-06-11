@@ -32,7 +32,7 @@ public abstract class Buffer extends BaseBuffer {
   /**
    * Accesses the given ByteBuffer for read-only operations. The returned Buffer object has the
    * same byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is zero,
-   * then endianness of the returned Buffer object (as well as backing storage) is unspecified.
+   * then byte order of the returned Buffer object (as well as backing storage) is unspecified.
    * @param byteBuf the given ByteBuffer, must not be null.
    * @return a new Buffer for read-only operations on the given ByteBuffer.
    */
@@ -43,7 +43,7 @@ public abstract class Buffer extends BaseBuffer {
   /**
    * Accesses the given ByteBuffer for read-only operations. The returned Buffer object has
    * the given byte order, ignoring the byte order of the given ByteBuffer. If the capacity of
-   * the given ByteBuffer is zero the endianness of the returned Buffer object
+   * the given ByteBuffer is zero the byte order of the returned Buffer object
    * (as well as backing storage) is unspecified.
    * @param byteBuf the given ByteBuffer, must not be null
    * @param byteOrder the byte order to be used, which may be independent of the byte order
@@ -53,7 +53,7 @@ public abstract class Buffer extends BaseBuffer {
   public static Buffer wrap(final ByteBuffer byteBuf, final ByteOrder byteOrder) {
     final BaseWritableMemoryImpl wmem =
         BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, true, byteOrder);
-    final WritableBuffer wbuf = wmem.asWritableBufferImpl(true);
+    final WritableBuffer wbuf = wmem.asWritableBufferImpl(true, byteOrder);
     wbuf.setStartPositionEnd(0, byteBuf.position(), byteBuf.limit());
     return wbuf;
   }
@@ -66,7 +66,7 @@ public abstract class Buffer extends BaseBuffer {
    * Returns a read-only duplicate view of this Buffer with the same but independent values of
    * <i>start</i>, <i>position</i> and <i>end</i>.
    * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and endianness are unspecified.
+   * the backing storage and byte order are unspecified.
    * @return a read-only duplicate view of this Buffer with the same but independent values of
    * <i>start</i>, <i>position</i> and <i>end</i>.
    */
@@ -86,17 +86,45 @@ public abstract class Buffer extends BaseBuffer {
    * independent of this object's <i>start</i>, <i>position</i> and <i>end</i></li>
    * </ul>
    * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and endianness are unspecified.
+   * the backing storage and byte order are unspecified.
    * @return a new <i>Buffer</i> representing the defined region.
    */
   public abstract Buffer region();
+
+  /**
+   * A region is a read-only view of the backing store of this object.
+   * This returns a new <i>Buffer</i> representing the defined region
+   * with the given offsetBytes, capacityBytes and byte order.
+   * <ul>
+   * <li>Returned object's origin = this objects' origin + <i>offsetBytes</i></li>
+   * <li>Returned object's <i>start</i> = 0</li>
+   * <li>Returned object's <i>position</i> = 0</li>
+   * <li>Returned object's <i>end</i> = <i>capacityBytes</i></li>
+   * <li>Returned object's <i>capacity</i> = <i>capacityBytes</i></li>
+   * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable and
+   * independent of this object's <i>start</i>, <i>position</i> and <i>end</i></li>
+   * <li>Returned object's byte order = <i>byteOrder</i></li>
+   * </ul>
+   * If this object's capacity is zero, the returned object is effectively immutable and
+   * the backing storage and byte order are unspecified.
+   *
+   * <p><b>Note: The Memory returned with </b><i>asMemory()</i> will have the originating
+   * <i>Memory</i> byte order.</p>
+   *
+   * @param offsetBytes the starting offset with respect to the origin of this <i>WritableBuffer</i>
+   * @param capacityBytes the <i>capacity</i> of the returned region in bytes
+   * @param byteOrder the given byte order
+   * @return a new <i>WritableBuffer</i> representing the defined writable region.
+   */
+  public abstract Buffer region(long offsetBytes, long capacityBytes,
+      ByteOrder byteOrder);
 
   //MEMORY XXX
   /**
    * Convert this Buffer to a Memory. The current <i>start</i>, <i>position</i> and <i>end</i>
    * are ignored.
    * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and endianness are unspecified.
+   * the backing storage and byte order are unspecified.
    * @return Memory
    */
   public abstract Memory asMemory();

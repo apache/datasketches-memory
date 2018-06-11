@@ -460,8 +460,8 @@ class BaseState {
     final String bbStr = (bb == null) ? "null"
             : bb.getClass().getSimpleName() + ", " + (bb.hashCode() & 0XFFFFFFFFL);
     final MemoryRequestServer memReqSvr = state.getMemoryRequestSvr();
-    final String memReqStr = (memReqSvr == null) ? "null"
-        : memReqSvr.getClass().getSimpleName() + ", " + (memReqSvr.hashCode() & 0XFFFFFFFFL);
+    final String memReqStr =
+        memReqSvr.getClass().getSimpleName() + ", " + (memReqSvr.hashCode() & 0XFFFFFFFFL);
 
     final long cumBaseOffset = state.getCumulativeOffset();
     sb.append(preamble).append(LS);
@@ -474,7 +474,7 @@ class BaseState {
     sb.append("MemReq, hashCode    : ").append(memReqStr).append(LS);
     sb.append("Valid               : ").append(state.isValid()).append(LS);
     sb.append("Read Only           : ").append(state.isReadOnly()).append(LS);
-    sb.append("Endianness          : ").append(state.getByteOrder().toString()).append(LS);
+    sb.append("Byte Order          : ").append(state.getByteOrder().toString()).append(LS);
     sb.append("JDK Major Version   : ").append(UnsafeUtil.JDK).append(LS);
     //Data detail
     sb.append("Data, littleEndian  :  0  1  2  3  4  5  6  7");

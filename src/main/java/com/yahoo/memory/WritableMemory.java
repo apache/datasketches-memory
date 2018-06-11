@@ -148,10 +148,11 @@ public abstract class WritableMemory extends Memory {
   //REGIONS XXX
   /**
    * A writable region is a writable view of the backing store of this object.
-   * This returns a new <i>WritableMemory</i> representing the defined writable region.
+   * This returns a new <i>WritableMemory</i> representing the defined writable region with the
+   * given offsetBytes and capacityBytes.
    * <ul>
-   * <li>Returned object's origin = this objects' origin + offsetBytes</li>
-   * <li>Returned object's <i>capacity</i> = <i>capacityBytes</i></li>
+   * <li>Returned object's origin = this objects' origin + <i>offsetBytes</i></li>
+   * <li>Returned object's capacity = <i>capacityBytes</i></li>
    * </ul>
    * If the given capacityBytes is zero, the returned object is effectively immutable and
    * the backing storage and byte order are unspecified.
@@ -161,6 +162,27 @@ public abstract class WritableMemory extends Memory {
    * @return a new <i>WritableMemory</i> representing the defined writable region.
    */
   public abstract WritableMemory writableRegion(long offsetBytes, long capacityBytes);
+
+  /**
+   * A writable region is a writable view of the backing store of this object.
+   * This returns a new <i>WritableMemory</i> representing the defined writable region with the
+   * given offsetBytes, capacityBytes and byte order.
+   * <ul>
+   * <li>Returned object's origin = this objects' origin + <i>offsetBytes</i></li>
+   * <li>Returned object's capacity = <i>capacityBytes</i></li>
+   * <li>Returned object's byte order = <i>byteOrder</i></li>
+   * </ul>
+   * If the given capacityBytes is zero, the returned object is effectively immutable and
+   * the backing storage and byte order are unspecified.
+   *
+   * @param offsetBytes the starting offset with respect to this object.
+   * @param capacityBytes the capacity of the returned object in bytes.
+   * @param byteOrder the given byte order
+   * @return a new <i>WritableMemory</i> representing the defined writable region.
+   */
+  public abstract WritableMemory writableRegion(long offsetBytes, long capacityBytes,
+      ByteOrder byteOrder);
+
 
   //AS BUFFER XXX
   /**
@@ -587,5 +609,14 @@ public abstract class WritableMemory extends Memory {
    * @return the offset of the start of this WritableMemory from the backing resource.
    */
   public abstract long getRegionOffset();
+
+  /**
+   * Returns the offset of the start of this WritableMemory from the backing resource plus
+   * the given offsetBytes, but not including any Java object header.
+   *
+   * @param offsetBytes the given offset bytes
+   * @return the offset of the start of this WritableMemory from the backing resource.
+   */
+  public abstract long getRegionOffset(long offsetBytes);
 
 }

@@ -59,44 +59,74 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   //DUPLICATES XXX
   @Override
   public Buffer duplicate() {
-    return writableDuplicateImpl(true);
+    return writableDuplicateImpl(true, getByteOrder());
   }
 
   @Override
   public WritableBuffer writableDuplicate() {
-    if (isReadOnly()) {
-      throw new ReadOnlyException("Writable duplicate of a read-only Buffer is not allowed.");
-    }
-    return writableDuplicateImpl(false);
+    return writableDuplicateImpl(false, getByteOrder());
   }
 
-  abstract WritableBuffer writableDuplicateImpl(boolean localReadOnly);
+  //Developer note: we don't allow switching byte order on duplicates.
+  //This is here to reduce complexity in the endian-sensitive classes and to allow us to easily
+  // change our mind in the future :)
+  WritableBuffer writableDuplicateImpl(final boolean localReadOnly, final ByteOrder byteOrder) {
+    if (isReadOnly() && !localReadOnly) {
+      throw new ReadOnlyException("Writable duplicate of a read-only Buffer is not allowed.");
+    }
+    final WritableBuffer wbuf = Util.isNativeOrder(byteOrder)
+        ? new WritableBufferImpl(getUnsafeObject(), getNativeBaseOffset(),
+            getRegionOffset(), getCapacity(),
+            localReadOnly, getByteBuffer(), getValid(), originMemory)
+        : new NonNativeWritableBufferImpl(getUnsafeObject(), getNativeBaseOffset(),
+            getRegionOffset(), getCapacity(),
+            localReadOnly, getByteBuffer(), getValid(), originMemory);
+    wbuf.setStartPositionEnd(getStart(), getPosition(), getEnd());
+    return wbuf;
+  }
 
   //REGIONS XXX
   @Override
   public Buffer region() {
-    return writableRegionImpl(getPosition(), getEnd() - getPosition(), true);
+    return writableRegionImpl(getPosition(), getEnd() - getPosition(), true, getByteOrder());
+  }
+
+  @Override
+  public Buffer region(final long offsetBytes, final long capacityBytes,
+      final ByteOrder byteOrder) {
+    final Buffer buf = writableRegionImpl(offsetBytes, capacityBytes, true, byteOrder);
+    buf.setAndCheckStartPositionEnd(0, 0, capacityBytes);
+    return buf;
   }
 
   @Override
   public WritableBuffer writableRegion() {
-    if (isReadOnly()) {
-      throw new ReadOnlyException("Writable region of a read-only Buffer is not allowed.");
-    }
-    return writableRegionImpl(getPosition(), getEnd() - getPosition(), false);
+    return writableRegionImpl(getPosition(), getEnd() - getPosition(), false, getByteOrder());
   }
 
   @Override
-  public WritableBuffer writableRegion(final long offsetBytes, final long capacityBytes) {
-    if (capacityBytes == 0) { return ZERO_SIZE_BUFFER; }
-    if (isReadOnly()) {
-      throw new ReadOnlyException("Writable region of a read-only Buffer is not allowed.");
-    }
-    return writableRegionImpl(offsetBytes, capacityBytes, false);
+  public WritableBuffer writableRegion(final long offsetBytes, final long capacityBytes,
+      final ByteOrder byteOrder) {
+    final WritableBuffer wbuf = writableRegionImpl(offsetBytes, capacityBytes, false, byteOrder);
+    wbuf.setAndCheckStartPositionEnd(0, 0, capacityBytes);
+    return wbuf;
   }
 
-  abstract WritableBuffer writableRegionImpl(long offsetBytes, long capacityBytes,
-      boolean localReadOnly);
+  WritableBuffer writableRegionImpl(final long offsetBytes, final long capacityBytes,
+      final boolean localReadOnly, final ByteOrder byteOrder) {
+    if (capacityBytes == 0) { return ZERO_SIZE_BUFFER; }
+    if (isReadOnly() && !localReadOnly) {
+      throw new ReadOnlyException("Writable region of a read-only Buffer is not allowed.");
+    }
+    checkValidAndBounds(offsetBytes, capacityBytes);
+    return Util.isNativeOrder(byteOrder)
+        ? new WritableBufferImpl(getUnsafeObject(), getNativeBaseOffset(),
+            getRegionOffset() + offsetBytes, capacityBytes,
+            localReadOnly, getByteBuffer(), getValid(), originMemory)
+        : new NonNativeWritableBufferImpl(getUnsafeObject(), getNativeBaseOffset(),
+            getRegionOffset() + offsetBytes, capacityBytes,
+            localReadOnly, getByteBuffer(), getValid(), originMemory);
+  }
 
   //MEMORY XXX
   @Override
@@ -231,6 +261,11 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   @Override
   public final long getRegionOffset() {
     return super.getRegOffset();
+  }
+
+  @Override
+  public final long getRegionOffset(final long offsetBytes) {
+    return super.getRegOffset() + offsetBytes;
   }
 
   //PRIMITIVE putXXX() and putXXXArray() XXX

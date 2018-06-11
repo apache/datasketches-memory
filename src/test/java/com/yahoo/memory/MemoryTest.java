@@ -219,9 +219,26 @@ public class MemoryTest {
     long[] arr = new long[n];
     for (int i = 0; i < n; i++) { arr[i] = i; }
     Memory mem = Memory.wrap(arr);
-    Memory reg = mem.region(n2 * 8, n2 * 8);
+    Memory reg = mem.region(n2 * 8, n2 * 8); //top half
     for (int i = 0; i < n2; i++) {
-      assertEquals(reg.getLong(i * 8), i + n2);
+      long v = reg.getLong(i * 8);
+      long e = i + n2;
+      assertEquals(v, e);
+    }
+  }
+
+  @Test
+  public void checkRORegionsReverseBO() {
+    int n = 16;
+    int n2 = n / 2;
+    long[] arr = new long[n];
+    for (int i = 0; i < n; i++) { arr[i] = i; }
+    Memory mem = Memory.wrap(arr);
+    Memory reg = mem.region(n2 * 8, n2 * 8, Util.nonNativeOrder); //top half
+    for (int i = 0; i < n2; i++) {
+      long v = Long.reverseBytes(reg.getLong(i * 8));
+      long e = i + n2;
+      assertEquals(v, e);
     }
   }
 
@@ -241,6 +258,31 @@ public class MemoryTest {
     for (int i = 0; i < n2; i++) { reg.putLong(i * 8, i); }
     for (int i = 0; i < n; i++) {
       assertEquals(wmem.getLong(i * 8), i % 8);
+      //println("" + wmem.getLong(i * 8));
+    }
+  }
+
+  @Test
+  public void checkWRegionsReverseBO() {
+    int n = 16;
+    int n2 = n / 2;
+    long[] arr = new long[n];
+    for (int i = 0; i < n; i++) { arr[i] = i; }
+    WritableMemory wmem = WritableMemory.wrap(arr);
+    for (int i = 0; i < n; i++) {
+      assertEquals(wmem.getLong(i * 8), i);
+      //println("" + wmem.getLong(i * 8));
+    }
+    //println("");
+    WritableMemory reg = wmem.writableRegion(n2 * 8, n2 * 8, Util.nonNativeOrder);
+    for (int i = 0; i < n2; i++) { reg.putLong(i * 8, i); }
+    for (int i = 0; i < n; i++) {
+      long v = wmem.getLong(i * 8);
+      if (i < n2) {
+        assertEquals(v, i % 8);
+      } else {
+        assertEquals(Long.reverseBytes(v), i % 8);
+      }
       //println("" + wmem.getLong(i * 8));
     }
   }

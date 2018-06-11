@@ -107,6 +107,9 @@ public abstract class WritableBuffer extends Buffer {
    * </ul>
    * If this object's capacity is zero, the returned object is effectively immutable and
    * the backing storage and byte order are unspecified.
+   *
+   * <p><b>Note: </b><i>asWritableMemory()</i> and <i>asMemory()</i>
+   * will return the originating <i>Memory</i> byte order.</p>
    * @param offsetBytes the starting offset with respect to the origin of this <i>WritableBuffer</i>
    * @param capacityBytes the <i>capacity</i> of the returned region in bytes
    * @return a new <i>WritableBuffer</i> representing the defined writable region.

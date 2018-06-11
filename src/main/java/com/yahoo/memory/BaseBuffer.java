@@ -16,6 +16,7 @@ import java.nio.ByteOrder;
  * <li>It always starts up as (0, 0, capacity, capacity).</li>
  * <li>You set (start, position, end) in one call with
  * {@link #setStartPositionEnd(long, long, long)}</li>
+ * <li>Position can be set directly or indirectly when using the positional get/put methods.
  * <li>Added incrementPosition(long), which is much easier when you know the increment.</li>
  * <li>This approach eliminated a number of methods and checks, and has no unseen side effects,
  * e.g., mark being invalidated.</li>

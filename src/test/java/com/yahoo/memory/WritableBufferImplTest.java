@@ -213,7 +213,7 @@ public class WritableBufferImplTest {
     try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory wmem = wrh.get();
       WritableBuffer wbuf = wmem.asWritableBuffer();
-      wbuf.writableRegion(1, 64); //wrong!
+      wbuf.writableRegion(1, 64, wbuf.getByteOrder()); //wrong!
     }
   }
 
@@ -455,6 +455,8 @@ public class WritableBufferImplTest {
     WritableMemory reg = wmem.writableRegion(32, 32);
     WritableBuffer buf = reg.asWritableBuffer();
     assertEquals(buf.getRegionOffset(), 32);
+    assertEquals(buf.getRegionOffset(0), 32);
+    assertEquals(buf.getCumulativeOffset(), 32 + 16);
     assertEquals(buf.getCumulativeOffset(0), 32 + 16);
   }
 
@@ -533,13 +535,13 @@ public class WritableBufferImplTest {
     ByteBuffer bb = ByteBuffer.allocate(64);
     WritableBuffer wbuf = WritableBuffer.wrap(bb);
     @SuppressWarnings("unused")
-    WritableBuffer wreg = wbuf.writableRegion(0, 1);
+    WritableBuffer wreg = wbuf.writableRegion(0, 1, wbuf.getByteOrder());
 
     try {
       Buffer buf = Buffer.wrap(bb);
       wbuf = (WritableBuffer) buf;
       @SuppressWarnings("unused")
-      WritableBuffer wreg2 = wbuf.writableRegion(0, 1);
+      WritableBuffer wreg2 = wbuf.writableRegion(0, 1, wbuf.getByteOrder());
       Assert.fail();
     } catch (ReadOnlyException expected) {
       // ignore
@@ -549,7 +551,7 @@ public class WritableBufferImplTest {
   @Test void checkZeroBuffer() {
     WritableMemory wmem = WritableMemory.allocate(8);
     WritableBuffer wbuf = wmem.asWritableBuffer();
-    WritableBuffer reg = wbuf.writableRegion(0, 0);
+    WritableBuffer reg = wbuf.writableRegion(0, 0, wbuf.getByteOrder());
     assertEquals(reg.getCapacity(), 0);
   }
 

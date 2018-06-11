@@ -317,6 +317,22 @@ public class Buffer2Test {
   }
 
   @Test
+  public void checkRORegions() {
+    int n = 16;
+    int n2 = n / 2;
+    long[] arr = new long[n];
+    for (int i = 0; i < n; i++) { arr[i] = i; }
+    Memory mem = Memory.wrap(arr);
+    Buffer buf = mem.asBuffer();
+    Buffer reg = buf.region(n2 * 8, n2 * 8, buf.getByteOrder()); //top half
+    for (int i = 0; i < n2; i++) {
+      long v = reg.getLong(i * 8);
+      long e = i + n2;
+      assertEquals(v, e);
+    }
+  }
+
+  @Test
   public void testAsMemory() {
     ByteBuffer bb = ByteBuffer.allocate(64).order(ByteOrder.nativeOrder());
 

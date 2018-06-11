@@ -171,10 +171,10 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     return Util.isNativeOrder(byteOrder)
         ? new WritableMemoryImpl(getUnsafeObject(), getNativeBaseOffset(),
             getRegionOffset() + offsetBytes, capacityBytes,
-            isReadOnly() || localReadOnly, getByteBuffer(), getValid())
+            localReadOnly, getByteBuffer(), getValid())
         : new NonNativeWritableMemoryImpl(getUnsafeObject(), getNativeBaseOffset(),
             getRegionOffset() + offsetBytes, capacityBytes,
-            isReadOnly() || localReadOnly, getByteBuffer(), getValid());
+            localReadOnly, getByteBuffer(), getValid());
   }
 
   //AS BUFFER XXX
@@ -200,10 +200,10 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     return Util.isNativeOrder(byteOrder)
         ? new WritableBufferImpl(getUnsafeObject(), getNativeBaseOffset(),
             getRegionOffset(), getCapacity(),
-            isReadOnly() || localReadOnly, getByteBuffer(), getValid(), this)
+            localReadOnly, getByteBuffer(), getValid(), this)
         : new NonNativeWritableBufferImpl(getUnsafeObject(), getNativeBaseOffset(),
             getRegionOffset(), getCapacity(),
-            isReadOnly() || localReadOnly, getByteBuffer(), getValid(), this);
+            localReadOnly, getByteBuffer(), getValid(), this);
   }
 
   //PRIMITIVE getXXX() and getXXXArray() ENDIAN INDEPENDENT XXX

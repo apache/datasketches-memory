@@ -77,10 +77,10 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
     final WritableBuffer wbuf = Util.isNativeOrder(byteOrder)
         ? new WritableBufferImpl(getUnsafeObject(), getNativeBaseOffset(),
             getRegionOffset(), getCapacity(),
-            isReadOnly() || localReadOnly, getByteBuffer(), getValid(), originMemory)
+            localReadOnly, getByteBuffer(), getValid(), originMemory)
         : new NonNativeWritableBufferImpl(getUnsafeObject(), getNativeBaseOffset(),
             getRegionOffset(), getCapacity(),
-            isReadOnly() || localReadOnly, getByteBuffer(), getValid(), originMemory);
+            localReadOnly, getByteBuffer(), getValid(), originMemory);
     wbuf.setStartPositionEnd(getStart(), getPosition(), getEnd());
     return wbuf;
   }
@@ -122,10 +122,10 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
     return Util.isNativeOrder(byteOrder)
         ? new WritableBufferImpl(getUnsafeObject(), getNativeBaseOffset(),
             getRegionOffset() + offsetBytes, capacityBytes,
-            isReadOnly() || localReadOnly, getByteBuffer(), getValid(), originMemory)
+            localReadOnly, getByteBuffer(), getValid(), originMemory)
         : new NonNativeWritableBufferImpl(getUnsafeObject(), getNativeBaseOffset(),
             getRegionOffset() + offsetBytes, capacityBytes,
-            isReadOnly() || localReadOnly, getByteBuffer(), getValid(), originMemory);
+            localReadOnly, getByteBuffer(), getValid(), originMemory);
   }
 
   //MEMORY XXX

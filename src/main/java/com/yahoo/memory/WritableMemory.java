@@ -37,7 +37,7 @@ public abstract class WritableMemory extends Memory {
   /**
    * Accesses the given ByteBuffer for write operations. The returned WritableMemory object has
    * the same byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is
-   * zero, then endianness of the returned WritableMemory object, as well as backing storage and
+   * zero, then byte order of the returned WritableMemory object, as well as backing storage and
    * read-only status are unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
@@ -52,7 +52,7 @@ public abstract class WritableMemory extends Memory {
   /**
    * Accesses the given ByteBuffer for write operations. The returned WritableMemory object has
    * the given byte order, ignoring the byte order of the given ByteBuffer. If the capacity of
-   * the given ByteBuffer is zero the endianness of the returned WritableMemory object
+   * the given ByteBuffer is zero the byte order of the returned WritableMemory object
    * (as well as backing storage) is unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
@@ -109,7 +109,7 @@ public abstract class WritableMemory extends Memory {
    * Allocates and provides access to capacityBytes directly in native (off-heap) memory
    * leveraging the WritableMemory API. Native byte order is assumed.
    * The allocated memory will be 8-byte aligned, but may not be page aligned.
-   * If capacityBytes is zero, endianness, backing storage and read-only status
+   * If capacityBytes is zero, byte order, backing storage and read-only status
    * of the WritableMemory object, returned from {@link WritableHandle#get()} are unspecified.
    *
    * <p>The default MemoryRequestServer, which allocates any request for memory onto the heap,
@@ -129,7 +129,7 @@ public abstract class WritableMemory extends Memory {
   /**
    * Allocates and provides access to capacityBytes directly in native (off-heap) memory
    * leveraging the WritableMemory API. The allocated memory will be 8-byte aligned, but may not
-   * be page aligned. If capacityBytes is zero, endianness, backing storage and read-only status
+   * be page aligned. If capacityBytes is zero, byte order, backing storage and read-only status
    * of the WritableMemory object, returned from {@link WritableHandle#get()} are unspecified.
    *
    * <p><b>NOTE:</b> Native/Direct memory acquired using Unsafe may have garbage in it.
@@ -155,7 +155,7 @@ public abstract class WritableMemory extends Memory {
    * <li>Returned object's capacity = <i>capacityBytes</i></li>
    * </ul>
    * If the given capacityBytes is zero, the returned object is effectively immutable and
-   * the backing storage and endianness are unspecified.
+   * the backing storage and byte order are unspecified.
    *
    * @param offsetBytes the starting offset with respect to this object.
    * @param capacityBytes the capacity of the returned object in bytes.
@@ -173,7 +173,7 @@ public abstract class WritableMemory extends Memory {
    * <li>Returned object's byte order = <i>byteOrder</i></li>
    * </ul>
    * If the given capacityBytes is zero, the returned object is effectively immutable and
-   * the backing storage and endianness are unspecified.
+   * the backing storage and byte order are unspecified.
    *
    * @param offsetBytes the starting offset with respect to this object.
    * @param capacityBytes the capacity of the returned object in bytes.
@@ -196,7 +196,7 @@ public abstract class WritableMemory extends Memory {
    * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable</li>
    * </ul>
    * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and endianness are unspecified.
+   * the backing storage and byte order are unspecified.
    * @return a new <i>WritableBuffer</i> with a view of this WritableMemory
    */
   public abstract WritableBuffer asWritableBuffer();
@@ -204,7 +204,7 @@ public abstract class WritableMemory extends Memory {
   //ALLOCATE HEAP VIA AUTOMATIC BYTE ARRAY XXX
   /**
    * Creates on-heap WritableMemory with the given capacity. If the given capacityBytes is zero,
-   * backing storage, endianness and read-only status of the returned WritableMemory object are
+   * backing storage, byte order and read-only status of the returned WritableMemory object are
    * unspecified.
    * @param capacityBytes the given capacity in bytes.
    * @return a new WritableMemory for write operations on a new byte array.
@@ -217,7 +217,7 @@ public abstract class WritableMemory extends Memory {
   //ACCESS PRIMITIVE HEAP ARRAYS for write XXX
   /**
    * Wraps the given primitive array for write operations assuming native byte order. If the array
-   * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
+   * size is zero, backing storage, byte order and read-only status of the returned WritableMemory
    * object are unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
@@ -232,7 +232,7 @@ public abstract class WritableMemory extends Memory {
 
   /**
    * Wraps the given primitive array for write operations assuming native byte order. If the array
-   * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
+   * size is zero, backing storage, byte order and read-only status of the returned WritableMemory
    * object are unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
@@ -246,7 +246,7 @@ public abstract class WritableMemory extends Memory {
 
   /**
    * Wraps the given primitive array for write operations with the given byte order. If the array
-   * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
+   * size is zero, backing storage, byte order and read-only status of the returned WritableMemory
    * object are unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
@@ -261,7 +261,7 @@ public abstract class WritableMemory extends Memory {
 
   /**
    * Wraps the given primitive array for write operations with the given byte order. If the given
-   * lengthBytes is zero, backing storage, endianness and read-only status of the returned
+   * lengthBytes is zero, backing storage, byte order and read-only status of the returned
    * WritableMemory object are unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
@@ -280,7 +280,7 @@ public abstract class WritableMemory extends Memory {
 
   /**
    * Wraps the given primitive array for write operations assuming native byte order. If the array
-   * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
+   * size is zero, backing storage, byte order and read-only status of the returned WritableMemory
    * object are unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
@@ -295,7 +295,7 @@ public abstract class WritableMemory extends Memory {
 
   /**
    * Wraps the given primitive array for write operations assuming native byte order. If the array
-   * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
+   * size is zero, backing storage, byte order and read-only status of the returned WritableMemory
    * object are unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
@@ -310,7 +310,7 @@ public abstract class WritableMemory extends Memory {
 
   /**
    * Wraps the given primitive array for write operations assuming native byte order. If the array
-   * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
+   * size is zero, backing storage, byte order and read-only status of the returned WritableMemory
    * object are unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
@@ -325,7 +325,7 @@ public abstract class WritableMemory extends Memory {
 
   /**
    * Wraps the given primitive array for write operations assuming native byte order. If the array
-   * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
+   * size is zero, backing storage, byte order and read-only status of the returned WritableMemory
    * object are unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
@@ -340,7 +340,7 @@ public abstract class WritableMemory extends Memory {
 
   /**
    * Wraps the given primitive array for write operations assuming native byte order. If the array
-   * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
+   * size is zero, backing storage, byte order and read-only status of the returned WritableMemory
    * object are unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
@@ -355,7 +355,7 @@ public abstract class WritableMemory extends Memory {
 
   /**
    * Wraps the given primitive array for write operations assuming native byte order. If the array
-   * size is zero, backing storage, endianness and read-only status of the returned WritableMemory
+   * size is zero, backing storage, byte order and read-only status of the returned WritableMemory
    * object are unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,

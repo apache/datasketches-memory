@@ -30,7 +30,7 @@ public abstract class WritableBuffer extends Buffer {
   /**
    * Accesses the given ByteBuffer for write operations. The returned WritableBuffer object has
    * the same byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is
-   * zero, then endianness of the returned WritableBuffer object, as well as backing storage and
+   * zero, then byte order of the returned WritableBuffer object, as well as backing storage and
    * read-only status are unspecified.
    * @param byteBuf the given ByteBuffer, must not be null.
    * @return a new WritableBuffer for write operations on the given ByteBuffer.
@@ -42,7 +42,7 @@ public abstract class WritableBuffer extends Buffer {
   /**
    * Accesses the given ByteBuffer for write operations. The returned WritableBuffer object has
    * the given byte order, ignoring the byte order of the given ByteBuffer. If the capacity of
-   * the given ByteBuffer is zero the endianness of the returned WritableBuffer object
+   * the given ByteBuffer is zero the byte order of the returned WritableBuffer object
    * (as well as backing storage) is unspecified.
    * @param byteBuf the given ByteBuffer, must not be null
    * @param byteOrder the byte order to be used, which may be independent of the byte order
@@ -68,7 +68,7 @@ public abstract class WritableBuffer extends Buffer {
    * Returns a duplicate writable view of this Buffer with the same but independent values of
    * <i>start</i>, <i>position</i> and <i>end</i>.
    * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and endianness are unspecified.
+   * the backing storage and byte order are unspecified.
    * @return a duplicate writable view of this Buffer with the same but independent values of
    * <i>start</i>, <i>position</i> and <i>end</i>.
    */
@@ -88,7 +88,7 @@ public abstract class WritableBuffer extends Buffer {
    * independent of this object's <i>start</i>, <i>position</i> and <i>end</i></li>
    * </ul>
    * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and endianness are unspecified.
+   * the backing storage and byte order are unspecified.
    * @return a new <i>WritableBuffer</i> representing the defined writable region.
    */
   public abstract WritableBuffer writableRegion();
@@ -108,7 +108,7 @@ public abstract class WritableBuffer extends Buffer {
    * <li>Returned object's byte order = <i>byteOrder</i></li>
    * </ul>
    * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and endianness are unspecified.
+   * the backing storage and byte order are unspecified.
    *
    * <p><b>Note: </b><i>asWritableMemory()</i> and <i>asMemory()</i>
    * will return the originating <i>Memory</i> byte order.</p>
@@ -124,7 +124,7 @@ public abstract class WritableBuffer extends Buffer {
   /**
    * Convert this WritableBuffer to a WritableMemory.
    * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and endianness are unspecified.
+   * the backing storage and byte order are unspecified.
    * @return WritableMemory
    */
   public abstract WritableMemory asWritableMemory();

@@ -95,7 +95,8 @@ public abstract class WritableBuffer extends Buffer {
 
   /**
    * A writable region is a writable view of the backing store of this object.
-   * This returns a new <i>WritableBuffer</i> representing the defined writable region.
+   * This returns a new <i>WritableBuffer</i> representing the defined writable region
+   * with the given offsetBytes, capacityBytes and byte order.
    * <ul>
    * <li>Returned object's origin = this objects' origin + <i>offsetBytes</i></li>
    * <li>Returned object's <i>start</i> = 0</li>
@@ -104,6 +105,7 @@ public abstract class WritableBuffer extends Buffer {
    * <li>Returned object's <i>capacity</i> = <i>capacityBytes</i></li>
    * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable and
    * independent of this object's <i>start</i>, <i>position</i> and <i>end</i></li>
+   * <li>Returned object's byte order = <i>byteOrder</i></li>
    * </ul>
    * If this object's capacity is zero, the returned object is effectively immutable and
    * the backing storage and byte order are unspecified.
@@ -112,9 +114,11 @@ public abstract class WritableBuffer extends Buffer {
    * will return the originating <i>Memory</i> byte order.</p>
    * @param offsetBytes the starting offset with respect to the origin of this <i>WritableBuffer</i>
    * @param capacityBytes the <i>capacity</i> of the returned region in bytes
+   * @param byteOrder the given byte order
    * @return a new <i>WritableBuffer</i> representing the defined writable region.
    */
-  public abstract WritableBuffer writableRegion(long offsetBytes, long capacityBytes);
+  public abstract WritableBuffer writableRegion(long offsetBytes, long capacityBytes,
+      ByteOrder byteOrder);
 
   //AS MEMORY XXX
   /**

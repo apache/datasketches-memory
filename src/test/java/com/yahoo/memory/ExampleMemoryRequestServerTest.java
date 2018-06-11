@@ -51,10 +51,13 @@ public class ExampleMemoryRequestServerTest {
     }
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void checkZeroCapacity() {
     ExampleMemoryRequestServer svr = new ExampleMemoryRequestServer();
-    WritableMemory.allocateDirect(0, svr);
+    try (WritableHandle handle = WritableMemory.allocateDirect(0, svr)) {
+      Memory wMem = handle.get(); //will be read-only at this point due to ZERO_SIZE_MEMORY
+      assertEquals(wMem.getCapacity(), 0);
+    }
   }
 
   /**

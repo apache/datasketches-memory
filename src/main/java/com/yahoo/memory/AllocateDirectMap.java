@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import sun.misc.Cleaner;
 import sun.nio.ch.FileChannelImpl;
 
@@ -285,7 +286,7 @@ class AllocateDirectMap implements Map {
       deallocate(true);
     }
 
-    boolean deallocate(boolean calledFromCleaner) {
+    boolean deallocate(final boolean calledFromCleaner) {
       if (valid.change()) {
         if (calledFromCleaner) {
           // Warn about non-deterministic resource cleanup.

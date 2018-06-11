@@ -9,6 +9,7 @@ import static com.yahoo.memory.UnsafeUtil.unsafe;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import sun.misc.Cleaner;
 
 /**
@@ -105,7 +106,7 @@ final class AllocateDirect implements AutoCloseable {
       deallocate(true);
     }
 
-    boolean deallocate(boolean calledFromCleaner) {
+    boolean deallocate(final boolean calledFromCleaner) {
       if (valid.change()) {
         if (calledFromCleaner) {
           // Warn about non-deterministic resource cleanup.

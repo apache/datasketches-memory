@@ -40,7 +40,7 @@ final class StepBoolean {
    * changed
    */
   boolean change() {
-    int notInitialState = initialState == TRUE ? FALSE : TRUE;
+    final int notInitialState = initialState == TRUE ? FALSE : TRUE;
     return STATE_FIELD_UPDATER.compareAndSet(this, initialState, notInitialState);
   }
 

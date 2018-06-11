@@ -460,8 +460,8 @@ class BaseState {
     final String bbStr = (bb == null) ? "null"
             : bb.getClass().getSimpleName() + ", " + (bb.hashCode() & 0XFFFFFFFFL);
     final MemoryRequestServer memReqSvr = state.getMemoryRequestSvr();
-    final String memReqStr = (memReqSvr == null) ? "null"
-        : memReqSvr.getClass().getSimpleName() + ", " + (memReqSvr.hashCode() & 0XFFFFFFFFL);
+    final String memReqStr =
+        memReqSvr.getClass().getSimpleName() + ", " + (memReqSvr.hashCode() & 0XFFFFFFFFL);
 
     final long cumBaseOffset = state.getCumulativeOffset();
     sb.append(preamble).append(LS);

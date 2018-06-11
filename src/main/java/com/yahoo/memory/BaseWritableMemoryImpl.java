@@ -101,9 +101,8 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   @SuppressWarnings("resource")
   static WritableDirectHandle wrapDirect(final long capacityBytes,
       final ByteOrder byteOrder, final MemoryRequestServer memReqSvr) {
-    if (capacityBytes <= 0) {
-      throw new IllegalArgumentException(
-          "Capacity bytes should be positive, " + capacityBytes + " given");
+    if (capacityBytes == 0) {
+      return new WritableDirectHandle(null, ZERO_SIZE_MEMORY, null);
     }
     final AllocateDirect direct = new AllocateDirect(capacityBytes);
     final BaseWritableMemoryImpl impl = Util.isNativeOrder(byteOrder)

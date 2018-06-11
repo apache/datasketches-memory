@@ -32,7 +32,7 @@ public abstract class Buffer extends BaseBuffer {
   /**
    * Accesses the given ByteBuffer for read-only operations. The returned Buffer object has the
    * same byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is zero,
-   * then endianness of the returned Buffer object (as well as backing storage) is unspecified.
+   * then byte order of the returned Buffer object (as well as backing storage) is unspecified.
    * @param byteBuf the given ByteBuffer, must not be null.
    * @return a new Buffer for read-only operations on the given ByteBuffer.
    */
@@ -43,7 +43,7 @@ public abstract class Buffer extends BaseBuffer {
   /**
    * Accesses the given ByteBuffer for read-only operations. The returned Buffer object has
    * the given byte order, ignoring the byte order of the given ByteBuffer. If the capacity of
-   * the given ByteBuffer is zero the endianness of the returned Buffer object
+   * the given ByteBuffer is zero the byte order of the returned Buffer object
    * (as well as backing storage) is unspecified.
    * @param byteBuf the given ByteBuffer, must not be null
    * @param byteOrder the byte order to be used, which may be independent of the byte order
@@ -66,7 +66,7 @@ public abstract class Buffer extends BaseBuffer {
    * Returns a read-only duplicate view of this Buffer with the same but independent values of
    * <i>start</i>, <i>position</i> and <i>end</i>.
    * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and endianness are unspecified.
+   * the backing storage and byte order are unspecified.
    * @return a read-only duplicate view of this Buffer with the same but independent values of
    * <i>start</i>, <i>position</i> and <i>end</i>.
    */
@@ -86,7 +86,7 @@ public abstract class Buffer extends BaseBuffer {
    * independent of this object's <i>start</i>, <i>position</i> and <i>end</i></li>
    * </ul>
    * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and endianness are unspecified.
+   * the backing storage and byte order are unspecified.
    * @return a new <i>Buffer</i> representing the defined region.
    */
   public abstract Buffer region();
@@ -96,7 +96,7 @@ public abstract class Buffer extends BaseBuffer {
    * Convert this Buffer to a Memory. The current <i>start</i>, <i>position</i> and <i>end</i>
    * are ignored.
    * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and endianness are unspecified.
+   * the backing storage and byte order are unspecified.
    * @return Memory
    */
   public abstract Memory asMemory();

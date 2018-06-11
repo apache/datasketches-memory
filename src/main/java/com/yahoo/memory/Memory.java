@@ -40,7 +40,7 @@ public abstract class Memory extends BaseState {
   /**
    * Accesses the given ByteBuffer for read-only operations. The returned <i>Memory</i> object has
    * the same byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is
-   * zero, then endianness of the returned <i>Memory</i> object (as well as backing storage) is
+   * zero, then byte order of the returned <i>Memory</i> object (as well as backing storage) is
    * unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
@@ -55,7 +55,7 @@ public abstract class Memory extends BaseState {
   /**
    * Accesses the given ByteBuffer for read-only operations. The returned <i>Memory</i> object has the
    * given byte order, ignoring the byte order of the given ByteBuffer.  If the capacity of the
-   * given ByteBuffer is zero the endianness of the returned <i>Memory</i> object (as well as backing
+   * given ByteBuffer is zero the byte order of the returned <i>Memory</i> object (as well as backing
    * storage) is unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
@@ -116,7 +116,7 @@ public abstract class Memory extends BaseState {
    * <li>Returned object's capacity = capacityBytes</li>
    * </ul>
    * If the given capacityBytes is zero, the returned object is effectively immutable and
-   * the backing storage and endianness are unspecified.
+   * the backing storage and byte order are unspecified.
    * @param offsetBytes the starting offset with respect to the origin of this Memory.
    * @param capacityBytes the capacity of the region in bytes
    * @return a new <i>Memory</i> representing the defined region.
@@ -159,7 +159,7 @@ public abstract class Memory extends BaseState {
    * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable</li>
    * </ul>
    * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and endianness are unspecified.
+   * the backing storage and byte order are unspecified.
    * @return a new <i>Buffer</i>
    */
   public abstract Buffer asBuffer();
@@ -167,7 +167,7 @@ public abstract class Memory extends BaseState {
   //ACCESS PRIMITIVE HEAP ARRAYS for readOnly XXX
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
+   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>Memory.wrap(...)</i>.
@@ -181,7 +181,7 @@ public abstract class Memory extends BaseState {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
+   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>Memory.wrap(...)</i>.
@@ -194,7 +194,7 @@ public abstract class Memory extends BaseState {
 
   /**
    * Wraps the given primitive array for read operations with the given byte order. If the array
-   * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
+   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>Memory.wrap(...)</i>.
@@ -208,7 +208,7 @@ public abstract class Memory extends BaseState {
 
   /**
    * Wraps the given primitive array for read operations with the given byte order. If the given
-   * lengthBytes is zero, backing storage and endianness of the returned <i>Memory</i> object are
+   * lengthBytes is zero, backing storage and byte order of the returned <i>Memory</i> object are
    * unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
@@ -227,7 +227,7 @@ public abstract class Memory extends BaseState {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
+   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>Memory.wrap(...)</i>.
@@ -241,7 +241,7 @@ public abstract class Memory extends BaseState {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
+   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>Memory.wrap(...)</i>.
@@ -255,7 +255,7 @@ public abstract class Memory extends BaseState {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
+   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>Memory.wrap(...)</i>.
@@ -269,7 +269,7 @@ public abstract class Memory extends BaseState {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
+   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>Memory.wrap(...)</i>.
@@ -283,7 +283,7 @@ public abstract class Memory extends BaseState {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
+   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>Memory.wrap(...)</i>.
@@ -297,7 +297,7 @@ public abstract class Memory extends BaseState {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and endianness of the returned <i>Memory</i> object are unspecified.
+   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>Memory.wrap(...)</i>.

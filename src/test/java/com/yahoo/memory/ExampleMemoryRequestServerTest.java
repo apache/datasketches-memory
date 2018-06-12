@@ -5,7 +5,6 @@
 
 package com.yahoo.memory;
 
-import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
 import java.util.IdentityHashMap;
@@ -51,13 +50,10 @@ public class ExampleMemoryRequestServerTest {
     }
   }
 
-  @Test
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void checkZeroCapacity() {
     ExampleMemoryRequestServer svr = new ExampleMemoryRequestServer();
-    try (WritableHandle handle = WritableMemory.allocateDirect(0, svr)) {
-      Memory wMem = handle.get(); //will be read-only at this point due to ZERO_SIZE_MEMORY
-      assertEquals(wMem.getCapacity(), 0);
-    }
+    WritableMemory.allocateDirect(0, svr);
   }
 
   /**

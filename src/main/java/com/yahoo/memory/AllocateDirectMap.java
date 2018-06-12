@@ -23,6 +23,9 @@ import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import sun.misc.Cleaner;
 import sun.nio.ch.FileChannelImpl;
 
@@ -43,6 +46,8 @@ import sun.nio.ch.FileChannelImpl;
  * @author Praveenkumar Venkatesan
  */
 class AllocateDirectMap implements Map {
+  private static final Logger LOG = LoggerFactory.getLogger(AllocateDirectMap.class);
+
   private static final int MAP_RO = 0;
   private static final int MAP_RW = 1;
 
@@ -95,14 +100,12 @@ class AllocateDirectMap implements Map {
     nativeBaseOffset = map(raf.getChannel(), resourceReadOnly, fileOffsetBytes, capacityBytes);
     deallocator = new Deallocator(nativeBaseOffset, capacityBytes, raf);
     cleaner = Cleaner.create(this, deallocator);
-    BaseState.currentDirectMemoryMapAllocations_.incrementAndGet();
-    BaseState.currentDirectMemoryMapAllocated_.addAndGet(capacityBytes);
   }
 
   @Override
   public void load() {
     madvise();
-    // Read a byte from each page to bring it into memory.
+    // Performance optimization. Read a byte from each page to bring it into memory.
     final int ps = NioBits.pageSize();
     final int count = NioBits.pageCount(capacityBytes);
     long offset = nativeBaseOffset;
@@ -130,7 +133,19 @@ class AllocateDirectMap implements Map {
 
   @Override
   public void close() {
-    cleaner.clean(); //sets invalid
+    doClose();
+  }
+
+  boolean doClose() {
+    if (deallocator.deallocate(false)) {
+      // This Cleaner.clean() call effectively just removes the Cleaner from the internal linked
+      // list of all cleaners. It will delegate to Deallocator.deallocate() which will be a no-op
+      // because the valid state is already changed.
+      cleaner.clean();
+      return true;
+    } else {
+      return false;
+    }
   }
 
   StepBoolean getValid() {
@@ -157,7 +172,7 @@ class AllocateDirectMap implements Map {
   }
 
   //Does the actual mapping work, resourceReadOnly must already be set
-  private static final RandomAccessFile mapper(final File file, final long fileOffset,
+  private static RandomAccessFile mapper(final File file, final long fileOffset,
       final long capacityBytes, final boolean resourceReadOnly)  {
 
     final String mode = resourceReadOnly ? "r" : "rw";
@@ -193,7 +208,7 @@ class AllocateDirectMap implements Map {
    * @return the native base offset address
    * @throws RuntimeException Encountered an exception while mapping
    */
-  private static final long map(final FileChannel fileChannel, final boolean resourceReadOnly,
+  private static long map(final FileChannel fileChannel, final boolean resourceReadOnly,
       final long position, final long lengthBytes) {
     final int pagePosition = (int) (position % unsafe.pageSize());
     final long mapPosition = position - pagePosition;
@@ -210,7 +225,7 @@ class AllocateDirectMap implements Map {
     }
   }
 
-  private static final boolean isFileReadOnly(final File file) {
+  private static boolean isFileReadOnly(final File file) {
     if (System.getProperty("os.name").startsWith("Windows")) {
       return !file.canWrite();
     }
@@ -245,13 +260,14 @@ class AllocateDirectMap implements Map {
     private final RandomAccessFile myRaf;
     private final FileChannel myFc;
     //This is the only place the actual native offset is kept for use by unsafe.freeMemory();
-    //It can never be modified until it is deallocated.
-    private long actualNativeBaseOffset;
+    private final long actualNativeBaseOffset;
     private final long myCapacity;
-    private StepBoolean valid = new StepBoolean(true); //only place for this
+    private final StepBoolean valid = new StepBoolean(true); //only place for this
 
     Deallocator(final long nativeBaseOffset, final long capacityBytes,
         final RandomAccessFile raf) {
+      BaseState.currentDirectMemoryMapAllocations_.incrementAndGet();
+      BaseState.currentDirectMemoryMapAllocated_.addAndGet(capacityBytes);
       myRaf = raf;
       assert (myRaf != null);
       myFc = myRaf.getChannel();
@@ -267,16 +283,26 @@ class AllocateDirectMap implements Map {
 
     @Override
     public void run() {
-      if (myFc != null) {
-        unmap();
+      deallocate(true);
+    }
+
+    boolean deallocate(final boolean calledFromCleaner) {
+      if (valid.change()) {
+        if (calledFromCleaner) {
+          // Warn about non-deterministic resource cleanup.
+          LOG.warn("A WritableMapHandle was not closed manually");
+        }
+        try {
+          unmap();
+        }
+        finally {
+          BaseState.currentDirectMemoryMapAllocations_.decrementAndGet();
+          BaseState.currentDirectMemoryMapAllocated_.addAndGet(-myCapacity);
+        }
+        return true;
+      } else {
+        return false;
       }
-      actualNativeBaseOffset = 0L;
-      if (valid == null) {
-        throw new IllegalStateException("valid state not properly initialized.");
-      }
-      valid.change(); //set invalid
-      BaseState.currentDirectMemoryMapAllocations_.decrementAndGet();
-      BaseState.currentDirectMemoryMapAllocated_.addAndGet(-myCapacity);
     }
 
     /**

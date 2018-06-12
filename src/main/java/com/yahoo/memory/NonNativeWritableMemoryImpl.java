@@ -232,12 +232,12 @@ final class NonNativeWritableMemoryImpl extends BaseWritableMemoryImpl {
     assertValidAndBoundsForWrite(offsetBytes, ARRAY_LONG_INDEX_SCALE);
     final long addr = getCumulativeOffset() + offsetBytes;
     long oldValReverseBytes, oldVal, newValReverseBytes;
+    Object unsafeObj = getUnsafeObject();
     do {
-      oldValReverseBytes = unsafe.getLongVolatile(getUnsafeObject(), addr);
+      oldValReverseBytes = unsafe.getLongVolatile(unsafeObj, addr);
       oldVal = Long.reverseBytes(oldValReverseBytes);
       newValReverseBytes = Long.reverseBytes(oldVal + delta);
-    } while (!unsafe.compareAndSwapLong(getUnsafeObject(), addr, oldValReverseBytes,
-        newValReverseBytes));
+    } while (!unsafe.compareAndSwapLong(unsafeObj, addr, oldValReverseBytes, newValReverseBytes));
 
     return oldVal;
   }
@@ -247,14 +247,12 @@ final class NonNativeWritableMemoryImpl extends BaseWritableMemoryImpl {
     assertValidAndBoundsForWrite(offsetBytes, ARRAY_LONG_INDEX_SCALE);
     final long addr = getCumulativeOffset() + offsetBytes;
     final long newValueReverseBytes = Long.reverseBytes(newValue);
-    long oldValReverseBytes, oldVal;
-    do {
-      oldValReverseBytes = unsafe.getLongVolatile(getUnsafeObject(), addr);
-      oldVal = Long.reverseBytes(oldValReverseBytes);
-    } while (!unsafe.compareAndSwapLong(getUnsafeObject(), addr, oldValReverseBytes,
-        newValueReverseBytes));
-
-    return oldVal;
+    if (UnsafeUtil.JDK8_OR_ABOVE) {
+      return Long.reverseBytes(unsafe.getAndSetLong(getUnsafeObject(), addr, newValueReverseBytes));
+    } else {
+      return Long.reverseBytes(
+          JDK7Compatible.getAndSetLong(getUnsafeObject(), addr, newValueReverseBytes));
+    }
   }
 
   @Override

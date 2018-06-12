@@ -9,6 +9,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.fail;
 
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 public class AllocateDirectMemoryTest {
@@ -63,10 +64,8 @@ public class AllocateDirectMemoryTest {
   public void checkClose() {
     final long cap = 128;
     try (WritableHandle wdh = WritableMemory.allocateDirect(cap)) {
-      WritableMemory wmem = wdh.get();
-
-      wmem.setInvalid();//intentional before end of scope
-      wdh.close(); //checks that AllocateDirect.close is called even when invalid.
+      //RedundantExplicitClose
+      wdh.close(); //checks
     }
   }
 
@@ -77,6 +76,14 @@ public class AllocateDirectMemoryTest {
       WritableMemory wmem = h.get();
       wmem.putChar(0, (char) 1);
       assertEquals(wmem.getByte(1), (byte) 1);
+    }
+  }
+
+  @AfterClass
+  public void checkDirectCounter() {
+    if (BaseState.getCurrentDirectMemoryAllocations() != 0) {
+      println(""+BaseState.getCurrentDirectMemoryAllocations());
+      fail();
     }
   }
 

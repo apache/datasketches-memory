@@ -314,10 +314,6 @@ class BaseState {
             && (getByteBuffer() == that1.getByteBuffer());
   }
 
-  final void setInvalid() { //only used in test
-    valid_.change();
-  }
-
   final void setMemoryRequestServer(final MemoryRequestServer svr) {
     memReqSvr_ = svr;
   }

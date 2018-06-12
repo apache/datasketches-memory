@@ -14,8 +14,11 @@ package com.yahoo.memory;
  */
 //Joins a Read-only Handle with an AutoCloseable Map resource.
 public class MapHandle implements Map, Handle {
-  AllocateDirectMap dirMap;
-  BaseWritableMemoryImpl wMem;
+  /**
+   * Having at least one final field makes this class safe for concurrent publication.
+   */
+  final AllocateDirectMap dirMap;
+  private BaseWritableMemoryImpl wMem;
 
   MapHandle(final AllocateDirectMap dirMap, final BaseWritableMemoryImpl wMem) {
     this.dirMap = dirMap;
@@ -29,11 +32,7 @@ public class MapHandle implements Map, Handle {
 
   @Override
   public void close() {
-    if (dirMap != null) {
-      dirMap.close();
-      dirMap = null;
-    }
-    if (wMem != null) {
+    if (dirMap.doClose()) {
       wMem.zeroNativeBaseOffset();
       wMem = null;
     }

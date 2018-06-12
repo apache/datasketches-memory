@@ -17,6 +17,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteOrder;
 
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 public class AllocateDirectWritableMapMemoryTest {
@@ -108,13 +109,12 @@ public class AllocateDirectWritableMapMemoryTest {
     Memory.map(dummy, 0, dummy.length(), ByteOrder.nativeOrder());
   }
 
-
-
   @Test(expectedExceptions = ReadOnlyException.class)
   public void simpleMap2() throws Exception {
-    File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
+    File file =
+        new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
     try (WritableMapHandle rh = WritableMemory.map(file)) {
-      //rh.close();
+      //
     }
   }
 
@@ -167,6 +167,25 @@ public class AllocateDirectWritableMapMemoryTest {
       e.printStackTrace();
     }
     return file;
+  }
+
+  @Test
+  public void checkExplicitClose() throws Exception {
+    File file =
+        new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
+    try (MapHandle wmh = Memory.map(file)) {
+      wmh.close(); //explicit close. Does the work of closing
+      wmh.dirMap.close(); //redundant
+    } //end of scope call to Cleaner/Deallocator also will be redundant
+  }
+
+  @AfterClass
+  public void checkMapCounter() {
+    final long count = BaseState.getCurrentDirectMemoryMapAllocations();
+    if (count != 0) {
+      println(""+count);
+      fail();
+    }
   }
 
   @Test

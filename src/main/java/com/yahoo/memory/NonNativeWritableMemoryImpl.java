@@ -232,7 +232,7 @@ final class NonNativeWritableMemoryImpl extends BaseWritableMemoryImpl {
     assertValidAndBoundsForWrite(offsetBytes, ARRAY_LONG_INDEX_SCALE);
     final long addr = getCumulativeOffset() + offsetBytes;
     long oldValReverseBytes, oldVal, newValReverseBytes;
-    Object unsafeObj = getUnsafeObject();
+    final Object unsafeObj = getUnsafeObject();
     do {
       oldValReverseBytes = unsafe.getLongVolatile(unsafeObj, addr);
       oldVal = Long.reverseBytes(oldValReverseBytes);

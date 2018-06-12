@@ -61,15 +61,6 @@ public class AllocateDirectMemoryTest {
   }
 
   @Test
-  public void checkClose() {
-    final long cap = 128;
-    try (WritableHandle wdh = WritableMemory.allocateDirect(cap)) {
-      //RedundantExplicitClose
-      wdh.close(); //checks
-    }
-  }
-
-  @Test
   public void checkNonNativeDirect() { //not allowed in public API
     try (WritableDirectHandle h =
         BaseWritableMemoryImpl.wrapDirect(8, Util.nonNativeOrder, null)) {
@@ -79,10 +70,20 @@ public class AllocateDirectMemoryTest {
     }
   }
 
+  @Test
+  public void checkExplicitClose() {
+    final long cap = 128;
+    try (WritableDirectHandle wdh = WritableMemory.allocateDirect(cap)) {
+      wdh.close(); //explicit close. Does the work of closing
+      wdh.direct.close(); //redundant
+    } //end of scope call to Cleaner/Deallocator also will be redundant
+  }
+
   @AfterClass
   public void checkDirectCounter() {
-    if (BaseState.getCurrentDirectMemoryAllocations() != 0) {
-      println(""+BaseState.getCurrentDirectMemoryAllocations());
+    final long count = BaseState.getCurrentDirectMemoryAllocations();
+    if (count != 0) {
+      println(""+count);
       fail();
     }
   }

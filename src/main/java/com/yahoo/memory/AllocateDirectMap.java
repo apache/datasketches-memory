@@ -105,7 +105,7 @@ class AllocateDirectMap implements Map {
   @Override
   public void load() {
     madvise();
-    // Read a byte from each page to bring it into memory.
+    // Performance optimization. Read a byte from each page to bring it into memory.
     final int ps = NioBits.pageSize();
     final int count = NioBits.pageCount(capacityBytes);
     long offset = nativeBaseOffset;

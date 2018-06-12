@@ -37,7 +37,7 @@ public class ZeroCapacityTest {
 
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+    //println("PRINTING: "+this.getClass().getName());
   }
 
   /**

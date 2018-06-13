@@ -37,7 +37,7 @@ import java.nio.ByteBuffer;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-final class NonNativeWritableBufferImpl extends BaseWritableBufferImpl {
+class NonNativeWritableBufferImpl extends BaseWritableBufferImpl {
 
   //ctor for all parameters
   NonNativeWritableBufferImpl(

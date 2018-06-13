@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author Lee Rhodes
  */
-class BaseState {
+abstract class BaseState {
 
   //Monitoring
   static final AtomicLong currentDirectMemoryAllocations_ = new AtomicLong();
@@ -109,17 +109,21 @@ class BaseState {
       final ByteBuffer byteBuf,
       final StepBoolean valid)
   {
-    unsafeObj_ = unsafeObj;
-    nativeBaseOffset_ = nativeBaseOffset;
+    unsafeObj_ = unsafeObj; //hoist
+    nativeBaseOffset_ = nativeBaseOffset; //hoist
     regionOffset_ = regionOffset;
     capacityBytes_ = capacityBytes;
     readOnly_ = readOnly;
-    byteOrder_ = byteOrder;
-    byteBuf_ = byteBuf;
-    cumBaseOffset_ = regionOffset_ + ((unsafeObj_ == null)
-        ? nativeBaseOffset_
-        : unsafe.arrayBaseOffset(unsafeObj_.getClass()));
+    byteOrder_ = byteOrder; //hoist
+    byteBuf_ = byteBuf; //hoist
+    cumBaseOffset_ = compute();
     valid_ = (valid == null) ? new StepBoolean(true) : valid;
+  }
+
+  final long compute() {
+    return getRegOffset() + ((getUnsafeObject() == null) //hoist this computation
+        ? getNativeBaseOffset()
+        : unsafe.arrayBaseOffset(unsafeObj_.getClass()));
   }
 
   /**
@@ -128,7 +132,7 @@ class BaseState {
    * @return true if the given Object is an instance of this class and has equal data contents.
    */
   @Override
-  public final boolean equals(final Object that) {
+  public final boolean equals(final Object that) { //root
     if (this == that) { return true; }
     return (that instanceof BaseState)
       ? CompareAndCopy.equals(this, ((BaseState) that))
@@ -147,7 +151,7 @@ class BaseState {
    * bytes.
    */
   public final boolean equalTo(final long thisOffsetBytes, final Object that,
-      final long thatOffsetBytes, final long lengthBytes) {
+      final long thatOffsetBytes, final long lengthBytes) { //root
     return (that instanceof BaseState)
       ? CompareAndCopy.equals(this, thisOffsetBytes, (BaseState) that, thatOffsetBytes, lengthBytes)
       : false;
@@ -157,7 +161,7 @@ class BaseState {
    * Gets the backing ByteBuffer if it exists, otherwise returns null.
    * @return the backing ByteBuffer if it exists, otherwise returns null.
    */
-  public ByteBuffer getByteBuffer() {
+  public ByteBuffer getByteBuffer() { //abstract
     assertValid();
     return byteBuf_;
   }
@@ -167,7 +171,7 @@ class BaseState {
    * This may be different from the ByteOrder of the backing resource.
    * @return the current ByteOrder.
    */
-  public ByteOrder getByteOrder() {
+  public ByteOrder getByteOrder() { //abstract
     assertValid();
     return byteOrder_;
   }
@@ -176,7 +180,7 @@ class BaseState {
    * Gets the capacity of this object in bytes
    * @return the capacity of this object in bytes
    */
-  public long getCapacity() {
+  public final long getCapacity() { //root
     assertValid();
     return capacityBytes_;
   }
@@ -187,7 +191,7 @@ class BaseState {
    *
    * @return the cumulative offset in bytes of this object
    */
-  public long getCumulativeOffset() {
+  public final long getCumulativeOffset() { //root
     return cumBaseOffset_;
   }
 
@@ -198,7 +202,7 @@ class BaseState {
    * @param offsetBytes offset to be added to the base cumulative offset.
    * @return the cumulative offset in bytes of this object
    */
-  public long getCumulativeOffset(final long offsetBytes) {
+  public final long getCumulativeOffset(final long offsetBytes) { //root
     return cumBaseOffset_ + offsetBytes;
   }
 
@@ -207,7 +211,7 @@ class BaseState {
    * setMemoryRequestServer(...), this returns the <i>DefaultMemoryRequestServer</i>.
    * @return the MemoryRequestServer.
    */
-  final MemoryRequestServer getMemoryRequestSvr() {
+  MemoryRequestServer getMemoryRequestSvr() { //abstract
     assertValid();
     if (memReqSvr_ == null) {
       memReqSvr_ = new DefaultMemoryRequestServer();
@@ -215,20 +219,20 @@ class BaseState {
     return memReqSvr_;
   }
 
-  long getNativeBaseOffset() {
+  long getNativeBaseOffset() { //abstract
     return nativeBaseOffset_;
   }
 
-  long getRegOffset() {
+  final long getRegOffset() { //root
     assertValid();
     return regionOffset_;
   }
 
-  Object getUnsafeObject() {
+  Object getUnsafeObject() { //abstract,
     return unsafeObj_;
   }
 
-  final StepBoolean getValid() {
+  final StepBoolean getValid() { //abstract?
     return valid_;
   }
 
@@ -236,9 +240,9 @@ class BaseState {
    * Returns true if this object is backed by an on-heap primitive array
    * @return true if this object is backed by an on-heap primitive array
    */
-  public boolean hasArray() {
+  public final boolean hasArray() { //root
     assertValid();
-    return unsafeObj_ != null;
+    return getUnsafeObject() != null;
   }
 
   /**
@@ -254,7 +258,7 @@ class BaseState {
    * @return the hashCode of this class.
    */
   @Override
-  public final int hashCode() {
+  public final int hashCode() { //root
     return CompareAndCopy.hashCode(this);
   }
 
@@ -262,33 +266,34 @@ class BaseState {
    * Returns true if this Memory is backed by a ByteBuffer
    * @return true if this Memory is backed by a ByteBuffer
    */
-  public boolean hasByteBuffer() {
+  public final boolean hasByteBuffer() {
     assertValid();
-    return byteBuf_ != null;
+    return getByteBuffer() != null;
   }
 
   /**
    * Returns true if the backing memory is direct (off-heap) memory.
+   * This is the case for allocated direct memory, memory mapped files,
    * @return true if the backing memory is direct (off-heap) memory.
    */
-  public boolean isDirect() {
+  public final boolean isDirect() {
     assertValid();
-    return nativeBaseOffset_ > 0L;
+    return getNativeBaseOffset() > 0L;
   }
 
   /**
    * Returns true if the current byte order is native order.
    * @return true if the current byte order is native order.
    */
-  public boolean isNativeOrder() {
-    return Util.isNativeOrder(byteOrder_);
+  public final boolean isNativeOrder() { //root
+    return Util.isNativeOrder(getByteOrder());
   }
 
   /**
    * Returns true if this object or the backing resource is read-only.
    * @return true if this object or the backing resource is read-only.
    */
-  public boolean isReadOnly() {
+  public final boolean isReadOnly() { //root
     assertValid();
     return readOnly_;
   }
@@ -301,7 +306,7 @@ class BaseState {
    * @return true if the backing resource of <i>this</i> is identical with the backing resource
    * of <i>that</i>.
    */
-  public final boolean isSameResource(final Object that) {
+  public final boolean isSameResource(final Object that) { //root
     checkValid();
     if (that == null) { return false; }
     final BaseState that1 = (BaseState) that;
@@ -314,7 +319,7 @@ class BaseState {
             && (getByteBuffer() == that1.getByteBuffer());
   }
 
-  final void setMemoryRequestServer(final MemoryRequestServer svr) {
+  final void setMemoryRequestServer(final MemoryRequestServer svr) { //abstract
     memReqSvr_ = svr;
   }
 
@@ -322,26 +327,26 @@ class BaseState {
    * Returns true if this object is valid and has not been closed.
    * @return true if this object is valid and has not been closed.
    */
-  public boolean isValid() {
-    return valid_.get();
+  public boolean isValid() { //abstract? otherwise make final
+    return getValid().get();
   }
 
-  final void zeroNativeBaseOffset() {
+  final void zeroNativeBaseOffset() { //abstract
     nativeBaseOffset_ = 0L;
   }
 
   //ASSERTS AND CHECKS
-  void assertValid() {
-    assert valid_.get() : "Memory not valid.";
+  final void assertValid() { //root
+    assert isValid() : "Memory not valid.";
   }
 
-  void checkValid() {
-    if (!valid_.get()) {
+  final void checkValid() { //root
+    if (!isValid()) {
       throw new IllegalStateException("Memory not valid.");
     }
   }
 
-  void assertValidAndBoundsForRead(final long offsetBytes, final long lengthBytes) {
+  final void assertValidAndBoundsForRead(final long offsetBytes, final long lengthBytes) {
     assertValid();
     assertBounds(offsetBytes, lengthBytes, getCapacity());
   }
@@ -359,12 +364,12 @@ class BaseState {
    * @param offsetBytes the given offset in bytes of this object
    * @param lengthBytes the given length in bytes of this object
    */
-  public void checkValidAndBounds(final long offsetBytes, final long lengthBytes) {
+  public final void checkValidAndBounds(final long offsetBytes, final long lengthBytes) {
     checkValid();
     checkBounds(offsetBytes, lengthBytes, getCapacity());
   }
 
-  void checkValidAndBoundsForWrite(final long offsetBytes, final long lengthBytes) {
+  final void checkValidAndBoundsForWrite(final long offsetBytes, final long lengthBytes) {
     checkValid();
     checkBounds(offsetBytes, lengthBytes, getCapacity());
     if (isReadOnly()) {

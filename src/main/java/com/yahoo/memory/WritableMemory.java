@@ -594,7 +594,7 @@ public abstract class WritableMemory extends Memory {
    */
   public abstract void setBits(long offsetBytes, byte bitMask);
 
-  //OTHER XXX
+  //OTHER WRITABLE API METHODS XXX
   /**
    * Gets the MemoryRequestServer object or null.
    * @return the MemoryRequestServer object or null.

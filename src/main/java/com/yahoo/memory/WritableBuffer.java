@@ -346,7 +346,13 @@ public abstract class WritableBuffer extends Buffer {
    */
   public abstract void fill(byte value);
 
-  //OTHER XXX
+  //OTHER WRITABLE API METHODS XXX
+  /**
+   * Gets the MemoryRequestServer object or null.
+   * @return the MemoryRequestServer object or null.
+   */
+  public abstract MemoryRequestServer getMemoryRequestServer();
+
   /**
    * Returns the offset of the start of this WritableBuffer from the backing resource,
    * but not including any Java object header.

@@ -257,7 +257,13 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
    * the positional values. Switch to Memory view to do copyTo.
    */
 
-  //OTHER READ METHODS XXX
+  //OTHER WRITABLE API METHODS XXX
+
+  @Override
+  public MemoryRequestServer getMemoryRequestServer() {
+    return super.getMemoryRequestSvr();
+  }
+
   @Override
   public final long getRegionOffset() {
     return super.getRegOffset();

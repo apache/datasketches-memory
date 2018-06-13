@@ -14,15 +14,16 @@ import java.nio.ByteOrder;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
+class HeapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   private final Object unsafeObj;
 
-  HeapNonNativeWritableMemoryImpl(
+  HeapNonNativeWritableBufferImpl(
       final Object unsafeObj,
       final long regionOffset,
       final long capacityBytes,
-      final boolean readOnly) {
-    super(unsafeObj, 0, regionOffset, capacityBytes, readOnly, null, null);
+      final boolean readOnly,
+      final BaseWritableMemoryImpl originMemory) {
+    super(unsafeObj, 0, regionOffset, capacityBytes, readOnly, null, null, originMemory);
     this.unsafeObj = unsafeObj;
   }
 
@@ -36,7 +37,7 @@ class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
     return Util.nonNativeOrder;
   }
 
-  @Override //TODO remove from baseWMemImpl NOTE WRITABLE ONLY
+  @Override //TODO remove from baseWBufImpl NOTE WRITABLE ONLY
   public MemoryRequestServer getMemoryRequestServer() {
     return null;
   }

@@ -9,20 +9,21 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
- * Implementation of {@link WritableMemory} for heap-based, non-native byte order.
+ * Implementation of {@link WritableMemory} for heap-based, native endian byte order.
  *
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
+class HeapWritableBufferImpl extends WritableBufferImpl {
   private final Object unsafeObj;
 
-  HeapNonNativeWritableMemoryImpl(
+  HeapWritableBufferImpl(
       final Object unsafeObj,
       final long regionOffset,
       final long capacityBytes,
-      final boolean readOnly) {
-    super(unsafeObj, 0, regionOffset, capacityBytes, readOnly, null, null);
+      final boolean readOnly,
+      final BaseWritableMemoryImpl originMemory) {
+    super(unsafeObj, 0, regionOffset, capacityBytes, readOnly, null, null, originMemory);
     this.unsafeObj = unsafeObj;
   }
 
@@ -33,10 +34,10 @@ class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
 
   @Override
   public ByteOrder getByteOrder() {
-    return Util.nonNativeOrder;
+    return Util.nativeOrder;
   }
 
-  @Override //TODO remove from baseWMemImpl NOTE WRITABLE ONLY
+  @Override //TODO remove from baseWBufImpl NOTE WRITABLE ONLY
   public MemoryRequestServer getMemoryRequestServer() {
     return null;
   }

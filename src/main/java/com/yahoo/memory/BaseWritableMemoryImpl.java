@@ -117,7 +117,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     return handle;
   }
 
-  //UNSAFE BYTE BUFFER VIEW
+  //UNSAFE BYTE BUFFER VIEW FOR DIRECT MEMORY ONLY
   @Override
   public ByteBuffer unsafeByteBufferView(final long offsetBytes, final int capacityBytes) {
     checkValidAndBounds(offsetBytes, capacityBytes);
@@ -319,7 +319,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     }
   }
 
-  //OTHER READ METHODS XXX
+  //OTHER WRITABLE API METHODS XXX
 
   @Override
   public MemoryRequestServer getMemoryRequestServer() {
@@ -327,12 +327,12 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   }
 
   @Override
-  public long getRegionOffset() {
+  public final long getRegionOffset() {
     return super.getRegOffset();
   }
 
   @Override
-  public long getRegionOffset(final long offsetBytes) {
+  public final long getRegionOffset(final long offsetBytes) {
     return super.getRegOffset() + offsetBytes;
   }
 

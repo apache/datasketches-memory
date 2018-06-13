@@ -74,7 +74,7 @@ final class WritableBufferImpl extends BaseWritableBufferImpl {
     checkBounds(dstOffsetChars, lengthChars, dstArray.length);
     CompareAndCopy.copyMemoryCheckingDifferentObject(
             getUnsafeObject(),
-            getCumulativeOffset() + pos,
+            getCumulativeOffset(pos),
             dstArray,
             ARRAY_CHAR_BASE_OFFSET + (((long) dstOffsetChars) << CHAR_SHIFT),
             copyBytes);
@@ -84,13 +84,13 @@ final class WritableBufferImpl extends BaseWritableBufferImpl {
   public double getDouble() {
     final long pos = getPosition();
     incrementAndAssertPositionForRead(pos, ARRAY_DOUBLE_INDEX_SCALE);
-    return unsafe.getDouble(getUnsafeObject(), getCumulativeOffset() + pos);
+    return unsafe.getDouble(getUnsafeObject(), getCumulativeOffset(pos));
   }
 
   @Override
   public double getDouble(final long offsetBytes) {
     assertValidAndBoundsForRead(offsetBytes, ARRAY_DOUBLE_INDEX_SCALE);
-    return unsafe.getDouble(getUnsafeObject(), getCumulativeOffset() + offsetBytes);
+    return unsafe.getDouble(getUnsafeObject(), getCumulativeOffset(offsetBytes));
   }
 
   @Override
@@ -102,7 +102,7 @@ final class WritableBufferImpl extends BaseWritableBufferImpl {
     checkBounds(dstOffsetDoubles, lengthDoubles, dstArray.length);
     CompareAndCopy.copyMemoryCheckingDifferentObject(
             getUnsafeObject(),
-            getCumulativeOffset() + pos,
+            getCumulativeOffset(pos),
             dstArray,
             ARRAY_DOUBLE_BASE_OFFSET + (((long) dstOffsetDoubles) << DOUBLE_SHIFT),
             copyBytes);
@@ -112,13 +112,13 @@ final class WritableBufferImpl extends BaseWritableBufferImpl {
   public float getFloat() {
     final long pos = getPosition();
     incrementAndAssertPositionForRead(pos, ARRAY_FLOAT_INDEX_SCALE);
-    return unsafe.getFloat(getUnsafeObject(), getCumulativeOffset() + pos);
+    return unsafe.getFloat(getUnsafeObject(), getCumulativeOffset(pos));
   }
 
   @Override
   public float getFloat(final long offsetBytes) {
     assertValidAndBoundsForRead(offsetBytes, ARRAY_FLOAT_INDEX_SCALE);
-    return unsafe.getFloat(getUnsafeObject(), getCumulativeOffset() + offsetBytes);
+    return unsafe.getFloat(getUnsafeObject(), getCumulativeOffset(offsetBytes));
   }
 
   @Override
@@ -130,7 +130,7 @@ final class WritableBufferImpl extends BaseWritableBufferImpl {
     checkBounds(dstOffsetFloats, lengthFloats, dstArray.length);
     CompareAndCopy.copyMemoryCheckingDifferentObject(
             getUnsafeObject(),
-            getCumulativeOffset() + pos,
+            getCumulativeOffset(pos),
             dstArray,
             ARRAY_FLOAT_BASE_OFFSET + (((long) dstOffsetFloats) << FLOAT_SHIFT),
             copyBytes);
@@ -154,7 +154,7 @@ final class WritableBufferImpl extends BaseWritableBufferImpl {
     checkBounds(dstOffsetInts, lengthInts, dstArray.length);
     CompareAndCopy.copyMemoryCheckingDifferentObject(
             getUnsafeObject(),
-            getCumulativeOffset() + pos,
+            getCumulativeOffset(pos),
             dstArray,
             ARRAY_INT_BASE_OFFSET + (((long) dstOffsetInts) << INT_SHIFT),
             copyBytes);
@@ -178,7 +178,7 @@ final class WritableBufferImpl extends BaseWritableBufferImpl {
     checkBounds(dstOffsetLongs, lengthLongs, dstArray.length);
     CompareAndCopy.copyMemoryCheckingDifferentObject(
             getUnsafeObject(),
-            getCumulativeOffset() + pos,
+            getCumulativeOffset(pos),
             dstArray,
             ARRAY_LONG_BASE_OFFSET + (((long) dstOffsetLongs) << LONG_SHIFT),
             copyBytes);
@@ -203,7 +203,7 @@ final class WritableBufferImpl extends BaseWritableBufferImpl {
     checkBounds(dstOffsetShorts, lengthShorts, dstArray.length);
     CompareAndCopy.copyMemoryCheckingDifferentObject(
             getUnsafeObject(),
-            getCumulativeOffset() + pos,
+            getCumulativeOffset(pos),
             dstArray,
             ARRAY_SHORT_BASE_OFFSET + (((long) dstOffsetShorts) << SHORT_SHIFT),
             copyBytes);
@@ -230,7 +230,7 @@ final class WritableBufferImpl extends BaseWritableBufferImpl {
             srcArray,
             ARRAY_CHAR_BASE_OFFSET + (((long) srcOffsetChars) << CHAR_SHIFT),
             getUnsafeObject(),
-            getCumulativeOffset() + pos,
+            getCumulativeOffset(pos),
             copyBytes);
   }
 
@@ -238,13 +238,13 @@ final class WritableBufferImpl extends BaseWritableBufferImpl {
   public void putDouble(final double value) {
     final long pos = getPosition();
     incrementAndAssertPositionForWrite(pos, ARRAY_DOUBLE_INDEX_SCALE);
-    unsafe.putDouble(getUnsafeObject(), getCumulativeOffset() + pos, value);
+    unsafe.putDouble(getUnsafeObject(), getCumulativeOffset(pos), value);
   }
 
   @Override
   public void putDouble(final long offsetBytes, final double value) {
     assertValidAndBoundsForWrite(offsetBytes, ARRAY_DOUBLE_INDEX_SCALE);
-    unsafe.putDouble(getUnsafeObject(), getCumulativeOffset() + offsetBytes, value);
+    unsafe.putDouble(getUnsafeObject(), getCumulativeOffset(offsetBytes), value);
   }
 
   @Override
@@ -258,7 +258,7 @@ final class WritableBufferImpl extends BaseWritableBufferImpl {
             srcArray,
             ARRAY_DOUBLE_BASE_OFFSET + (((long) srcOffsetDoubles) << DOUBLE_SHIFT),
             getUnsafeObject(),
-            getCumulativeOffset() + pos,
+            getCumulativeOffset(pos),
             copyBytes);
   }
 
@@ -266,13 +266,13 @@ final class WritableBufferImpl extends BaseWritableBufferImpl {
   public void putFloat(final float value) {
     final long pos = getPosition();
     incrementAndAssertPositionForWrite(pos, ARRAY_FLOAT_INDEX_SCALE);
-    unsafe.putFloat(getUnsafeObject(), getCumulativeOffset() + pos, value);
+    unsafe.putFloat(getUnsafeObject(), getCumulativeOffset(pos), value);
   }
 
   @Override
   public void putFloat(final long offsetBytes, final float value) {
     assertValidAndBoundsForWrite(offsetBytes, ARRAY_FLOAT_INDEX_SCALE);
-    unsafe.putFloat(getUnsafeObject(), getCumulativeOffset() + offsetBytes, value);
+    unsafe.putFloat(getUnsafeObject(), getCumulativeOffset(offsetBytes), value);
   }
 
   @Override
@@ -286,7 +286,7 @@ final class WritableBufferImpl extends BaseWritableBufferImpl {
             srcArray,
             ARRAY_FLOAT_BASE_OFFSET + (((long) srcOffsetFloats) << FLOAT_SHIFT),
             getUnsafeObject(),
-            getCumulativeOffset() + pos,
+            getCumulativeOffset(pos),
             copyBytes);
   }
 
@@ -310,7 +310,7 @@ final class WritableBufferImpl extends BaseWritableBufferImpl {
             srcArray,
             ARRAY_INT_BASE_OFFSET + (((long) srcOffsetInts) << INT_SHIFT),
             getUnsafeObject(),
-            getCumulativeOffset() + pos,
+            getCumulativeOffset(pos),
             copyBytes);
   }
 
@@ -334,7 +334,7 @@ final class WritableBufferImpl extends BaseWritableBufferImpl {
             srcArray,
             ARRAY_LONG_BASE_OFFSET + (((long) srcOffsetLongs) << LONG_SHIFT),
             getUnsafeObject(),
-            getCumulativeOffset() + pos,
+            getCumulativeOffset(pos),
             copyBytes);
   }
 
@@ -359,7 +359,7 @@ final class WritableBufferImpl extends BaseWritableBufferImpl {
             srcArray,
             ARRAY_SHORT_BASE_OFFSET + (((long) srcOffsetShorts) << SHORT_SHIFT),
             getUnsafeObject(),
-            getCumulativeOffset() + pos,
+            getCumulativeOffset(pos),
             copyBytes);
   }
 }

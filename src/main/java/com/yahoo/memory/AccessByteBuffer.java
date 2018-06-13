@@ -36,7 +36,7 @@ final class AccessByteBuffer {
   final long regionOffset;
   final Object unsafeObj;
   final boolean resourceReadOnly;
-  final ByteOrder byteOrder;
+  final ByteOrder byteOrder; //not used externally, here for reference.
 
   /**
    * The given ByteBuffer may be either readOnly or writable

@@ -183,7 +183,6 @@ public abstract class WritableMemory extends Memory {
   public abstract WritableMemory writableRegion(long offsetBytes, long capacityBytes,
       ByteOrder byteOrder);
 
-
   //AS BUFFER XXX
   /**
    * Returns a new <i>WritableBuffer</i> with a writable view of the backing store of this object.

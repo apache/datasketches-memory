@@ -121,10 +121,10 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
     checkValidAndBounds(offsetBytes, capacityBytes);
     return Util.isNativeOrder(byteOrder)
         ? new WritableBufferImpl(getUnsafeObject(), getNativeBaseOffset(),
-            getRegionOffset() + offsetBytes, capacityBytes,
+            getRegionOffset(offsetBytes), capacityBytes,
             localReadOnly, getByteBuffer(), getValid(), originMemory)
         : new NonNativeWritableBufferImpl(getUnsafeObject(), getNativeBaseOffset(),
-            getRegionOffset() + offsetBytes, capacityBytes,
+            getRegionOffset(offsetBytes), capacityBytes,
             localReadOnly, getByteBuffer(), getValid(), originMemory);
   }
 
@@ -147,13 +147,13 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   public final boolean getBoolean() {
     final long pos = getPosition();
     incrementAndAssertPositionForRead(pos, ARRAY_BOOLEAN_INDEX_SCALE);
-    return unsafe.getBoolean(getUnsafeObject(), getCumulativeOffset() + pos);
+    return unsafe.getBoolean(getUnsafeObject(), getCumulativeOffset(pos));
   }
 
   @Override
   public final boolean getBoolean(final long offsetBytes) {
     assertValidAndBoundsForRead(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE);
-    return unsafe.getBoolean(getUnsafeObject(), getCumulativeOffset() + offsetBytes);
+    return unsafe.getBoolean(getUnsafeObject(), getCumulativeOffset(offsetBytes));
   }
 
   @Override
@@ -165,7 +165,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
     checkBounds(dstOffsetBooleans, lengthBooleans, dstArray.length);
     CompareAndCopy.copyMemoryCheckingDifferentObject(
             getUnsafeObject(),
-            getCumulativeOffset() + pos,
+            getCumulativeOffset(pos),
             dstArray,
             ARRAY_BOOLEAN_BASE_OFFSET + dstOffsetBooleans,
             copyBytes);
@@ -175,13 +175,13 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   public final byte getByte() {
     final long pos = getPosition();
     incrementAndAssertPositionForRead(pos, ARRAY_BYTE_INDEX_SCALE);
-    return unsafe.getByte(getUnsafeObject(), getCumulativeOffset() + pos);
+    return unsafe.getByte(getUnsafeObject(), getCumulativeOffset(pos));
   }
 
   @Override
   public final byte getByte(final long offsetBytes) {
     assertValidAndBoundsForRead(offsetBytes, ARRAY_BYTE_INDEX_SCALE);
-    return unsafe.getByte(getUnsafeObject(), getCumulativeOffset() + offsetBytes);
+    return unsafe.getByte(getUnsafeObject(), getCumulativeOffset(offsetBytes));
   }
 
   @Override
@@ -193,7 +193,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
     checkBounds(dstOffsetBytes, lengthBytes, dstArray.length);
     CompareAndCopy.copyMemoryCheckingDifferentObject(
             getUnsafeObject(),
-            getCumulativeOffset() + pos,
+            getCumulativeOffset(pos),
             dstArray,
             ARRAY_BYTE_BASE_OFFSET + dstOffsetBytes,
             copyBytes);
@@ -203,45 +203,45 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   final char getNativeOrderedChar() {
     final long pos = getPosition();
     incrementAndAssertPositionForRead(pos, ARRAY_CHAR_INDEX_SCALE);
-    return unsafe.getChar(getUnsafeObject(), getCumulativeOffset() + pos);
+    return unsafe.getChar(getUnsafeObject(), getCumulativeOffset(pos));
   }
 
   final char getNativeOrderedChar(final long offsetBytes) {
     assertValidAndBoundsForRead(offsetBytes, ARRAY_CHAR_INDEX_SCALE);
-    return unsafe.getChar(getUnsafeObject(), getCumulativeOffset() + offsetBytes);
+    return unsafe.getChar(getUnsafeObject(), getCumulativeOffset(offsetBytes));
   }
 
   final int getNativeOrderedInt() {
     final long pos = getPosition();
     incrementAndAssertPositionForRead(pos, ARRAY_INT_INDEX_SCALE);
-    return unsafe.getInt(getUnsafeObject(), getCumulativeOffset() + pos);
+    return unsafe.getInt(getUnsafeObject(), getCumulativeOffset(pos));
   }
 
   final int getNativeOrderedInt(final long offsetBytes) {
     assertValidAndBoundsForRead(offsetBytes, ARRAY_INT_INDEX_SCALE);
-    return unsafe.getInt(getUnsafeObject(), getCumulativeOffset() + offsetBytes);
+    return unsafe.getInt(getUnsafeObject(), getCumulativeOffset(offsetBytes));
   }
 
   final long getNativeOrderedLong() {
     final long pos = getPosition();
     incrementAndAssertPositionForRead(pos, ARRAY_LONG_INDEX_SCALE);
-    return unsafe.getLong(getUnsafeObject(), getCumulativeOffset() + pos);
+    return unsafe.getLong(getUnsafeObject(), getCumulativeOffset(pos));
   }
 
   final long getNativeOrderedLong(final long offsetBytes) {
     assertValidAndBoundsForRead(offsetBytes, ARRAY_LONG_INDEX_SCALE);
-    return unsafe.getLong(getUnsafeObject(), getCumulativeOffset() + offsetBytes);
+    return unsafe.getLong(getUnsafeObject(), getCumulativeOffset(offsetBytes));
   }
 
   final short getNativeOrderedShort() {
     final long pos = getPosition();
     incrementAndAssertPositionForRead(pos, ARRAY_SHORT_INDEX_SCALE);
-    return unsafe.getShort(getUnsafeObject(), getCumulativeOffset() + pos);
+    return unsafe.getShort(getUnsafeObject(), getCumulativeOffset(pos));
   }
 
   final short getNativeOrderedShort(final long offsetBytes) {
     assertValidAndBoundsForRead(offsetBytes, ARRAY_SHORT_INDEX_SCALE);
-    return unsafe.getShort(getUnsafeObject(), getCumulativeOffset() + offsetBytes);
+    return unsafe.getShort(getUnsafeObject(), getCumulativeOffset(offsetBytes));
   }
 
   //OTHER PRIMITIVE READ METHODS: copyTo, compareTo XXX
@@ -273,13 +273,13 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   public final void putBoolean(final boolean value) {
     final long pos = getPosition();
     incrementAndAssertPositionForWrite(pos, ARRAY_BOOLEAN_INDEX_SCALE);
-    unsafe.putBoolean(getUnsafeObject(), getCumulativeOffset() + pos, value);
+    unsafe.putBoolean(getUnsafeObject(), getCumulativeOffset(pos), value);
   }
 
   @Override
   public final void putBoolean(final long offsetBytes, final boolean value) {
     assertValidAndBoundsForWrite(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE);
-    unsafe.putBoolean(getUnsafeObject(), getCumulativeOffset() + offsetBytes, value);
+    unsafe.putBoolean(getUnsafeObject(), getCumulativeOffset(offsetBytes), value);
   }
 
   @Override
@@ -293,7 +293,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
             srcArray,
             ARRAY_BOOLEAN_BASE_OFFSET + srcOffsetBooleans,
             getUnsafeObject(),
-            getCumulativeOffset() + pos,
+            getCumulativeOffset(pos),
             copyBytes);
   }
 
@@ -301,13 +301,13 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   public final void putByte(final byte value) {
     final long pos = getPosition();
     incrementAndAssertPositionForWrite(pos, ARRAY_BYTE_INDEX_SCALE);
-    unsafe.putByte(getUnsafeObject(), getCumulativeOffset() + pos, value);
+    unsafe.putByte(getUnsafeObject(), getCumulativeOffset(pos), value);
   }
 
   @Override
   public final void putByte(final long offsetBytes, final byte value) {
     assertValidAndBoundsForWrite(offsetBytes, ARRAY_BYTE_INDEX_SCALE);
-    unsafe.putByte(getUnsafeObject(), getCumulativeOffset() + offsetBytes, value);
+    unsafe.putByte(getUnsafeObject(), getCumulativeOffset(offsetBytes), value);
   }
 
   @Override
@@ -321,7 +321,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
             srcArray,
             ARRAY_BYTE_BASE_OFFSET + srcOffsetBytes,
             getUnsafeObject(),
-            getCumulativeOffset() + pos,
+            getCumulativeOffset(pos),
             copyBytes);
   }
 
@@ -329,45 +329,45 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   final void putNativeOrderedChar(final char value) {
     final long pos = getPosition();
     incrementAndAssertPositionForWrite(pos, ARRAY_CHAR_INDEX_SCALE);
-    unsafe.putChar(getUnsafeObject(), getCumulativeOffset() + pos, value);
+    unsafe.putChar(getUnsafeObject(), getCumulativeOffset(pos), value);
   }
 
   final void putNativeOrderedChar(final long offsetBytes, final char value) {
     assertValidAndBoundsForWrite(offsetBytes, ARRAY_CHAR_INDEX_SCALE);
-    unsafe.putChar(getUnsafeObject(), getCumulativeOffset() + offsetBytes, value);
+    unsafe.putChar(getUnsafeObject(), getCumulativeOffset(offsetBytes), value);
   }
 
   final void putNativeOrderedInt(final int value) {
     final long pos = getPosition();
     incrementAndAssertPositionForWrite(pos, ARRAY_INT_INDEX_SCALE);
-    unsafe.putInt(getUnsafeObject(), getCumulativeOffset() + pos, value);
+    unsafe.putInt(getUnsafeObject(), getCumulativeOffset(pos), value);
   }
 
   final void putNativeOrderedInt(final long offsetBytes, final int value) {
     assertValidAndBoundsForWrite(offsetBytes, ARRAY_INT_INDEX_SCALE);
-    unsafe.putInt(getUnsafeObject(), getCumulativeOffset() + offsetBytes, value);
+    unsafe.putInt(getUnsafeObject(), getCumulativeOffset(offsetBytes), value);
   }
 
   final void putNativeOrderedLong(final long value) {
     final long pos = getPosition();
     incrementAndAssertPositionForWrite(pos, ARRAY_LONG_INDEX_SCALE);
-    unsafe.putLong(getUnsafeObject(), getCumulativeOffset() + pos, value);
+    unsafe.putLong(getUnsafeObject(), getCumulativeOffset(pos), value);
   }
 
   final void putNativeOrderedLong(final long offsetBytes, final long value) {
     assertValidAndBoundsForWrite(offsetBytes, ARRAY_LONG_INDEX_SCALE);
-    unsafe.putLong(getUnsafeObject(), getCumulativeOffset() + offsetBytes, value);
+    unsafe.putLong(getUnsafeObject(), getCumulativeOffset(offsetBytes), value);
   }
 
   final void putNativeOrderedShort(final short value) {
     final long pos = getPosition();
     incrementAndAssertPositionForWrite(pos, ARRAY_SHORT_INDEX_SCALE);
-    unsafe.putShort(getUnsafeObject(), getCumulativeOffset() + pos, value);
+    unsafe.putShort(getUnsafeObject(), getCumulativeOffset(pos), value);
   }
 
   final void putNativeOrderedShort(final long offsetBytes, final short value) {
     assertValidAndBoundsForWrite(offsetBytes, ARRAY_SHORT_INDEX_SCALE);
-    unsafe.putShort(getUnsafeObject(), getCumulativeOffset() + offsetBytes, value);
+    unsafe.putShort(getUnsafeObject(), getCumulativeOffset(offsetBytes), value);
   }
 
   //OTHER XXX
@@ -390,7 +390,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
     checkInvariants(getStart(), pos + len, getEnd(), getCapacity());
     while (len > 0) {
       final long chunk = Math.min(len, CompareAndCopy.UNSAFE_COPY_THRESHOLD_BYTES);
-      unsafe.setMemory(getUnsafeObject(), getCumulativeOffset() + pos, chunk, value);
+      unsafe.setMemory(getUnsafeObject(), getCumulativeOffset(pos), chunk, value);
       pos += chunk;
       len -= chunk;
     }

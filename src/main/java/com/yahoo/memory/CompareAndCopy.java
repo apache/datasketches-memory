@@ -40,8 +40,8 @@ final class CompareAndCopy {
     checkBounds(offsetBytes1, lengthBytes1, state1.getCapacity());
     state2.checkValid();
     checkBounds(offsetBytes2, lengthBytes2, state2.getCapacity());
-    final long cumOff1 = state1.getCumulativeOffset() + offsetBytes1;
-    final long cumOff2 = state2.getCumulativeOffset() + offsetBytes2;
+    final long cumOff1 = state1.getCumulativeOffset(offsetBytes1);
+    final long cumOff2 = state2.getCumulativeOffset(offsetBytes2);
     final Object arr1 = state1.getUnsafeObject();
     final Object arr2 = state2.getUnsafeObject();
     if ((arr1 != arr2) || (cumOff1 != cumOff2)) {
@@ -72,8 +72,8 @@ final class CompareAndCopy {
     checkBounds(offsetBytes1, lengthBytes, state1.getCapacity());
     state2.checkValid();
     checkBounds(offsetBytes2, lengthBytes, state2.getCapacity());
-    long cumOff1 = state1.getCumulativeOffset() + offsetBytes1;
-    long cumOff2 = state2.getCumulativeOffset() + offsetBytes2;
+    long cumOff1 = state1.getCumulativeOffset(offsetBytes1);
+    long cumOff2 = state2.getCumulativeOffset(offsetBytes2);
     final Object arr1 = state1.getUnsafeObject(); //could be null
     final Object arr2 = state2.getUnsafeObject(); //could be null
     if ((arr1 == arr2) && (cumOff1 == cumOff2)) { return true; }
@@ -144,8 +144,8 @@ final class CompareAndCopy {
     checkBounds(srcOffsetBytes, lengthBytes, srcState.getCapacity());
     dstState.checkValid();
     checkBounds(dstOffsetBytes, lengthBytes, dstState.getCapacity());
-    final long srcAdd = srcState.getCumulativeOffset() + srcOffsetBytes;
-    final long dstAdd = dstState.getCumulativeOffset() + dstOffsetBytes;
+    final long srcAdd = srcState.getCumulativeOffset(srcOffsetBytes);
+    final long dstAdd = dstState.getCumulativeOffset(dstOffsetBytes);
     copyMemory(srcState.getUnsafeObject(), srcAdd, dstState.getUnsafeObject(), dstAdd,
         lengthBytes);
   }
@@ -224,339 +224,324 @@ final class CompareAndCopy {
     }
   }
 
-  static void getNonNativeChars(final Object unsafeObj, final long cumBaseOffset,
-      final long offsetBytes, long copyBytes, final char[] dstArray, int dstOffsetChars,
+  static void getNonNativeChars(final Object unsafeObj, long cumOffsetBytes,
+      long copyBytes, final char[] dstArray, int dstOffsetChars,
       int lengthChars) {
     checkBounds(dstOffsetChars, lengthChars, dstArray.length);
-    long cumulativeOffsetBytes = cumBaseOffset + offsetBytes;
     while (copyBytes > UNSAFE_COPY_THRESHOLD_BYTES) {
       final long chunkBytes = Math.min(copyBytes, UNSAFE_COPY_THRESHOLD_BYTES);
       final int chunkChars = (int) (chunkBytes >> CHAR_SHIFT);
-      getCharArrayChunk(unsafeObj, cumulativeOffsetBytes, dstArray, dstOffsetChars, chunkChars);
-      cumulativeOffsetBytes += chunkBytes;
+      getCharArrayChunk(unsafeObj, cumOffsetBytes, dstArray, dstOffsetChars, chunkChars);
+      cumOffsetBytes += chunkBytes;
       dstOffsetChars += chunkChars;
       copyBytes -= chunkBytes;
       lengthChars -= chunkChars;
     }
-    getCharArrayChunk(unsafeObj, cumulativeOffsetBytes, dstArray, dstOffsetChars, lengthChars);
+    getCharArrayChunk(unsafeObj, cumOffsetBytes, dstArray, dstOffsetChars, lengthChars);
   }
 
-  private static void getCharArrayChunk(final Object unsafeObj, final long cumulativeOffsetBytes,
+  private static void getCharArrayChunk(final Object unsafeObj, final long cumOffsetBytes,
       final char[] dstArray, final int dstOffsetChars, final int lengthChars) {
     // JDK 9 adds native intrinsics for such bulk non-native ordered primitive memory copy.
     // TODO use them when the library adds support for JDK 9
     // int-counted loop to avoid safepoint polls
     for (int i = 0; i < lengthChars; i++) {
       dstArray[dstOffsetChars + i] = Character.reverseBytes(
-          unsafe.getChar(unsafeObj, cumulativeOffsetBytes + (((long) i) << CHAR_SHIFT)));
+          unsafe.getChar(unsafeObj, cumOffsetBytes + (((long) i) << CHAR_SHIFT)));
     }
   }
 
-  static void getNonNativeDoubles(final Object unsafeObj, final long cumBaseOffset,
-      final long offsetBytes, long copyBytes, final double[] dstArray, int dstOffsetDoubles,
+  static void getNonNativeDoubles(final Object unsafeObj, long cumOffsetBytes,
+      long copyBytes, final double[] dstArray, int dstOffsetDoubles,
       int lengthDoubles) {
     checkBounds(dstOffsetDoubles, lengthDoubles, dstArray.length);
-    long cumulativeOffsetBytes = cumBaseOffset + offsetBytes;
     while (copyBytes > UNSAFE_COPY_THRESHOLD_BYTES) {
       final long chunkBytes = Math.min(copyBytes, UNSAFE_COPY_THRESHOLD_BYTES);
       final int chunkDoubles = (int) (chunkBytes >> DOUBLE_SHIFT);
-      getDoubleArrayChunk(unsafeObj, cumulativeOffsetBytes,
+      getDoubleArrayChunk(unsafeObj, cumOffsetBytes,
           dstArray, dstOffsetDoubles, chunkDoubles);
-      cumulativeOffsetBytes += chunkBytes;
+      cumOffsetBytes += chunkBytes;
       dstOffsetDoubles += chunkDoubles;
       copyBytes -= chunkBytes;
       lengthDoubles -= chunkDoubles;
     }
-    getDoubleArrayChunk(unsafeObj, cumulativeOffsetBytes,
+    getDoubleArrayChunk(unsafeObj, cumOffsetBytes,
         dstArray, dstOffsetDoubles, lengthDoubles);
   }
 
-  private static void getDoubleArrayChunk(final Object unsafeObj, final long cumulativeOffsetBytes,
+  private static void getDoubleArrayChunk(final Object unsafeObj, final long cumOffsetBytes,
       final double[] dstArray, final int dstOffsetDoubles, final int lengthDoubles) {
     // JDK 9 adds native intrinsics for such bulk non-native ordered primitive memory copy.
     // TODO use them when the library adds support for JDK 9
     // int-counted loop to avoid safepoint polls
     for (int i = 0; i < lengthDoubles; i++) {
       dstArray[dstOffsetDoubles + i] = Double.longBitsToDouble(Long.reverseBytes(
-          unsafe.getLong(unsafeObj, cumulativeOffsetBytes + (((long) i) << DOUBLE_SHIFT))));
+          unsafe.getLong(unsafeObj, cumOffsetBytes + (((long) i) << DOUBLE_SHIFT))));
     }
   }
 
-  static void getNonNativeFloats(final Object unsafeObj, final long cumBaseOffset,
-      final long offsetBytes, long copyBytes, final float[] dstArray, int dstOffsetFloats,
+  static void getNonNativeFloats(final Object unsafeObj, long cumOffsetBytes,
+      long copyBytes, final float[] dstArray, int dstOffsetFloats,
       int lengthFloats) {
     checkBounds(dstOffsetFloats, lengthFloats, dstArray.length);
-    long cumulativeOffsetBytes = cumBaseOffset + offsetBytes;
     while (copyBytes > UNSAFE_COPY_THRESHOLD_BYTES) {
       final long chunkBytes = Math.min(copyBytes, UNSAFE_COPY_THRESHOLD_BYTES);
       final int chunkFloats = (int) (chunkBytes >> FLOAT_SHIFT);
-      getFloatArrayChunk(unsafeObj, cumulativeOffsetBytes, dstArray, dstOffsetFloats, chunkFloats);
-      cumulativeOffsetBytes += chunkBytes;
+      getFloatArrayChunk(unsafeObj, cumOffsetBytes, dstArray, dstOffsetFloats, chunkFloats);
+      cumOffsetBytes += chunkBytes;
       dstOffsetFloats += chunkFloats;
       copyBytes -= chunkBytes;
       lengthFloats -= chunkFloats;
     }
-    getFloatArrayChunk(unsafeObj, cumulativeOffsetBytes, dstArray, dstOffsetFloats, lengthFloats);
+    getFloatArrayChunk(unsafeObj, cumOffsetBytes, dstArray, dstOffsetFloats, lengthFloats);
   }
 
-  private static void getFloatArrayChunk(final Object unsafeObj, final long cumulativeOffsetBytes,
+  private static void getFloatArrayChunk(final Object unsafeObj, final long cumOffsetBytes,
       final float[] dstArray, final int dstOffsetFloats, final int lengthFloats) {
     // JDK 9 adds native intrinsics for such bulk non-native ordered primitive memory copy.
     // TODO use them when the library adds support for JDK 9
     // int-counted loop to avoid safepoint polls
     for (int i = 0; i < lengthFloats; i++) {
       dstArray[dstOffsetFloats + i] = Float.intBitsToFloat(Integer.reverseBytes(
-          unsafe.getInt(unsafeObj, cumulativeOffsetBytes + (((long) i) << FLOAT_SHIFT))));
+          unsafe.getInt(unsafeObj, cumOffsetBytes + (((long) i) << FLOAT_SHIFT))));
     }
   }
 
-  static void getNonNativeInts(final Object unsafeObj, final long cumBaseOffset,
-      final long offsetBytes, long copyBytes, final int[] dstArray, int dstOffsetInts,
+  static void getNonNativeInts(final Object unsafeObj, long cumOffsetBytes,
+      long copyBytes, final int[] dstArray, int dstOffsetInts,
       int lengthInts) {
     checkBounds(dstOffsetInts, lengthInts, dstArray.length);
-    long cumulativeOffsetBytes = cumBaseOffset + offsetBytes;
     while (copyBytes > UNSAFE_COPY_THRESHOLD_BYTES) {
       final long chunkBytes = Math.min(copyBytes, UNSAFE_COPY_THRESHOLD_BYTES);
       final int chunkInts = (int) (chunkBytes >> INT_SHIFT);
-      getIntArrayChunk(unsafeObj, cumulativeOffsetBytes, dstArray, dstOffsetInts, chunkInts);
-      cumulativeOffsetBytes += chunkBytes;
+      getIntArrayChunk(unsafeObj, cumOffsetBytes, dstArray, dstOffsetInts, chunkInts);
+      cumOffsetBytes += chunkBytes;
       dstOffsetInts += chunkInts;
       copyBytes -= chunkBytes;
       lengthInts -= chunkInts;
     }
-    getIntArrayChunk(unsafeObj, cumulativeOffsetBytes, dstArray, dstOffsetInts, lengthInts);
+    getIntArrayChunk(unsafeObj, cumOffsetBytes, dstArray, dstOffsetInts, lengthInts);
   }
 
-  private static void getIntArrayChunk(final Object unsafeObj, final long cumulativeOffsetBytes,
+  private static void getIntArrayChunk(final Object unsafeObj, final long cumOffsetBytes,
       final int[] dstArray, final int dstOffsetInts, final int lengthInts) {
     // JDK 9 adds native intrinsics for such bulk non-native ordered primitive memory copy.
     // TODO use them when the library adds support for JDK 9
     // int-counted loop to avoid safepoint polls
     for (int i = 0; i < lengthInts; i++) {
       dstArray[dstOffsetInts + i] = Integer.reverseBytes(
-          unsafe.getInt(unsafeObj, cumulativeOffsetBytes + (((long) i) << INT_SHIFT)));
+          unsafe.getInt(unsafeObj, cumOffsetBytes + (((long) i) << INT_SHIFT)));
     }
   }
 
-  static void getNonNativeLongs(final Object unsafeObj, final long cumBaseOffset,
-      final long offsetBytes, long copyBytes, final long[] dstArray, int dstOffsetLongs,
+  static void getNonNativeLongs(final Object unsafeObj, long cumOffsetBytes,
+      long copyBytes, final long[] dstArray, int dstOffsetLongs,
       int lengthLongs) {
     checkBounds(dstOffsetLongs, lengthLongs, dstArray.length);
-    long cumulativeOffsetBytes = cumBaseOffset + offsetBytes;
     while (copyBytes > UNSAFE_COPY_THRESHOLD_BYTES) {
       final long chunkBytes = Math.min(copyBytes, UNSAFE_COPY_THRESHOLD_BYTES);
       final int chunkLongs = (int) (chunkBytes >> LONG_SHIFT);
-      getLongArrayChunk(unsafeObj, cumulativeOffsetBytes, dstArray, dstOffsetLongs, chunkLongs);
-      cumulativeOffsetBytes += chunkBytes;
+      getLongArrayChunk(unsafeObj, cumOffsetBytes, dstArray, dstOffsetLongs, chunkLongs);
+      cumOffsetBytes += chunkBytes;
       dstOffsetLongs += chunkLongs;
       copyBytes -= chunkBytes;
       lengthLongs -= chunkLongs;
     }
-    getLongArrayChunk(unsafeObj, cumulativeOffsetBytes, dstArray, dstOffsetLongs, lengthLongs);
+    getLongArrayChunk(unsafeObj, cumOffsetBytes, dstArray, dstOffsetLongs, lengthLongs);
   }
 
-  private static void getLongArrayChunk(final Object unsafeObj, final long cumulativeOffsetBytes,
+  private static void getLongArrayChunk(final Object unsafeObj, final long cumOffsetBytes,
       final long[] dstArray, final int dstOffsetLongs, final int lengthLongs) {
     // JDK 9 adds native intrinsics for such bulk non-native ordered primitive memory copy.
     // TODO use them when the library adds support for JDK 9
     // int-counted loop to avoid safepoint polls
     for (int i = 0; i < lengthLongs; i++) {
       dstArray[dstOffsetLongs + i] = Long.reverseBytes(
-          unsafe.getLong(unsafeObj, cumulativeOffsetBytes + (((long) i) << LONG_SHIFT)));
+          unsafe.getLong(unsafeObj, cumOffsetBytes + (((long) i) << LONG_SHIFT)));
     }
   }
 
-  static void getNonNativeShorts(final Object unsafeObj, final long cumBaseOffset,
-      final long offsetBytes, long copyBytes, final short[] dstArray, int dstOffsetShorts,
+  static void getNonNativeShorts(final Object unsafeObj, long cumOffsetBytes,
+      long copyBytes, final short[] dstArray, int dstOffsetShorts,
       int lengthShorts) {
     checkBounds(dstOffsetShorts, lengthShorts, dstArray.length);
-    long cumulativeOffsetBytes = cumBaseOffset + offsetBytes;
     while (copyBytes > UNSAFE_COPY_THRESHOLD_BYTES) {
       final long chunkBytes = Math.min(copyBytes, UNSAFE_COPY_THRESHOLD_BYTES);
       final int chunkShorts = (int) (chunkBytes >> SHORT_SHIFT);
-      getShortArrayChunk(unsafeObj, cumulativeOffsetBytes, dstArray, dstOffsetShorts, chunkShorts);
-      cumulativeOffsetBytes += chunkBytes;
+      getShortArrayChunk(unsafeObj, cumOffsetBytes, dstArray, dstOffsetShorts, chunkShorts);
+      cumOffsetBytes += chunkBytes;
       dstOffsetShorts += chunkShorts;
       copyBytes -= chunkBytes;
       lengthShorts -= chunkShorts;
     }
-    getShortArrayChunk(unsafeObj, cumulativeOffsetBytes, dstArray, dstOffsetShorts, lengthShorts);
+    getShortArrayChunk(unsafeObj, cumOffsetBytes, dstArray, dstOffsetShorts, lengthShorts);
   }
 
-  private static void getShortArrayChunk(final Object unsafeObj, final long cumulativeOffsetBytes,
+  private static void getShortArrayChunk(final Object unsafeObj, final long cumOffsetBytes,
       final short[] dstArray, final int dstOffsetShorts, final int lengthShorts) {
     // JDK 9 adds native intrinsics for such bulk non-native ordered primitive memory copy.
     // TODO use them when the library adds support for JDK 9
     // int-counted loop to avoid safepoint polls
     for (int i = 0; i < lengthShorts; i++) {
       dstArray[dstOffsetShorts + i] = Short.reverseBytes(
-          unsafe.getShort(unsafeObj, cumulativeOffsetBytes + (((long) i) << SHORT_SHIFT)));
+          unsafe.getShort(unsafeObj, cumOffsetBytes + (((long) i) << SHORT_SHIFT)));
     }
   }
 
   static void putNonNativeChars(final char[] srcArray, int srcOffsetChars, int lengthChars,
-      long copyBytes, final Object unsafeObj, final long cumBaseOffset, final long offsetBytes) {
+      long copyBytes, final Object unsafeObj, long cumOffsetBytes) {
     checkBounds(srcOffsetChars, lengthChars, srcArray.length);
-    long cumulativeOffsetBytes = cumBaseOffset + offsetBytes;
     while (copyBytes > UNSAFE_COPY_THRESHOLD_BYTES) {
       final long chunkBytes = Math.min(copyBytes, UNSAFE_COPY_THRESHOLD_BYTES);
       final int chunkChars = (int) (chunkBytes >> CHAR_SHIFT);
-      putCharArrayChunk(srcArray, srcOffsetChars, chunkChars, unsafeObj, cumulativeOffsetBytes);
-      cumulativeOffsetBytes += chunkBytes;
+      putCharArrayChunk(srcArray, srcOffsetChars, chunkChars, unsafeObj, cumOffsetBytes);
+      cumOffsetBytes += chunkBytes;
       srcOffsetChars += chunkChars;
       copyBytes -= chunkBytes;
       lengthChars -= chunkChars;
     }
-    putCharArrayChunk(srcArray, srcOffsetChars, lengthChars, unsafeObj, cumulativeOffsetBytes);
+    putCharArrayChunk(srcArray, srcOffsetChars, lengthChars, unsafeObj, cumOffsetBytes);
   }
 
   private static void putCharArrayChunk(final char[] srcArray, final int srcOffsetChars,
-      final int lengthChars, final Object unsafeObj, final long cumulativeOffsetBytes) {
+      final int lengthChars, final Object unsafeObj, final long cumOffsetBytes) {
     // JDK 9 adds native intrinsics for such bulk non-native ordered primitive memory copy.
     // TODO use them when the library adds support for JDK 9
     // int-counted loop to avoid safepoint polls
     for (int i = 0; i < lengthChars; i++) {
-      unsafe.putChar(unsafeObj, cumulativeOffsetBytes + (((long) i) << CHAR_SHIFT),
+      unsafe.putChar(unsafeObj, cumOffsetBytes + (((long) i) << CHAR_SHIFT),
           Character.reverseBytes(srcArray[srcOffsetChars + i]));
     }
   }
 
   static void putNonNativeDoubles(final double[] srcArray, int srcOffsetDoubles,
-      int lengthDoubles, long copyBytes, final Object unsafeObj, final long cumBaseOffset,
-      final long offsetBytes) {
+      int lengthDoubles, long copyBytes, final Object unsafeObj, long cumOffsetBytes) {
     checkBounds(srcOffsetDoubles, lengthDoubles, srcArray.length);
-    long cumulativeOffsetBytes = cumBaseOffset + offsetBytes;
     while (copyBytes > UNSAFE_COPY_THRESHOLD_BYTES) {
       final long chunkBytes = Math.min(copyBytes, UNSAFE_COPY_THRESHOLD_BYTES);
       final int chunkDoubles = (int) (chunkBytes >> DOUBLE_SHIFT);
       putDoubleArrayChunk(srcArray, srcOffsetDoubles, chunkDoubles,
-          unsafeObj, cumulativeOffsetBytes);
-      cumulativeOffsetBytes += chunkBytes;
+          unsafeObj, cumOffsetBytes);
+      cumOffsetBytes += chunkBytes;
       srcOffsetDoubles += chunkDoubles;
       copyBytes -= chunkBytes;
       lengthDoubles -= chunkDoubles;
     }
     putDoubleArrayChunk(srcArray, srcOffsetDoubles, lengthDoubles,
-        unsafeObj, cumulativeOffsetBytes);
+        unsafeObj, cumOffsetBytes);
   }
 
   private static void putDoubleArrayChunk(final double[] srcArray, final int srcOffsetDoubles,
-      final int lengthDoubles, final Object unsafeObj, final long cumulativeOffsetBytes) {
+      final int lengthDoubles, final Object unsafeObj, final long cumOffsetBytes) {
     // JDK 9 adds native intrinsics for such bulk non-native ordered primitive memory copy.
     // TODO use them when the library adds support for JDK 9
     // int-counted loop to avoid safepoint polls
     for (int i = 0; i < lengthDoubles; i++) {
-      unsafe.putLong(unsafeObj, cumulativeOffsetBytes + (((long) i) << DOUBLE_SHIFT),
+      unsafe.putLong(unsafeObj, cumOffsetBytes + (((long) i) << DOUBLE_SHIFT),
           Long.reverseBytes(Double.doubleToRawLongBits(srcArray[srcOffsetDoubles + i])));
     }
   }
 
   static void putNonNativeFloats(final float[] srcArray, int srcOffsetFloats,
-      int lengthFloats, long copyBytes, final Object unsafeObj, final long cumBaseOffset,
-      final long offsetBytes) {
+      int lengthFloats, long copyBytes, final Object unsafeObj, long cumOffsetBytes) {
     checkBounds(srcOffsetFloats, lengthFloats, srcArray.length);
-    long cumulativeOffsetBytes = cumBaseOffset + offsetBytes;
     while (copyBytes > UNSAFE_COPY_THRESHOLD_BYTES) {
       final long chunkBytes = Math.min(copyBytes, UNSAFE_COPY_THRESHOLD_BYTES);
       final int chunkFloats = (int) (chunkBytes >> FLOAT_SHIFT);
-      putFloatArrayChunk(srcArray, srcOffsetFloats, chunkFloats, unsafeObj, cumulativeOffsetBytes);
-      cumulativeOffsetBytes += chunkBytes;
+      putFloatArrayChunk(srcArray, srcOffsetFloats, chunkFloats, unsafeObj, cumOffsetBytes);
+      cumOffsetBytes += chunkBytes;
       srcOffsetFloats += chunkFloats;
       copyBytes -= chunkBytes;
       lengthFloats -= chunkFloats;
     }
-    putFloatArrayChunk(srcArray, srcOffsetFloats, lengthFloats, unsafeObj, cumulativeOffsetBytes);
+    putFloatArrayChunk(srcArray, srcOffsetFloats, lengthFloats, unsafeObj, cumOffsetBytes);
   }
 
   private static void putFloatArrayChunk(final float[] srcArray, final int srcOffsetFloats,
-      final int lengthFloats, final Object unsafeObj, final long cumulativeOffsetBytes) {
+      final int lengthFloats, final Object unsafeObj, final long cumOffsetBytes) {
     // JDK 9 adds native intrinsics for such bulk non-native ordered primitive memory copy.
     // TODO use them when the library adds support for JDK 9
     // int-counted loop to avoid safepoint polls
     for (int i = 0; i < lengthFloats; i++) {
-      unsafe.putInt(unsafeObj, cumulativeOffsetBytes + (((long) i) << FLOAT_SHIFT),
+      unsafe.putInt(unsafeObj, cumOffsetBytes + (((long) i) << FLOAT_SHIFT),
           Integer.reverseBytes(Float.floatToRawIntBits(srcArray[srcOffsetFloats + i])));
     }
   }
 
   static void putNonNativeInts(final int[] srcArray, int srcOffsetInts, int lengthInts,
-      long copyBytes, final Object unsafeObj, final long cumBaseOffset, final long offsetBytes) {
+      long copyBytes, final Object unsafeObj, long cumOffsetBytes) {
     checkBounds(srcOffsetInts, lengthInts, srcArray.length);
-    long cumulativeOffsetBytes = cumBaseOffset + offsetBytes;
     while (copyBytes > UNSAFE_COPY_THRESHOLD_BYTES) {
       final long chunkBytes = Math.min(copyBytes, UNSAFE_COPY_THRESHOLD_BYTES);
       final int chunkInts = (int) (chunkBytes >> INT_SHIFT);
-      putIntArrayChunk(srcArray, srcOffsetInts, chunkInts, unsafeObj, cumulativeOffsetBytes);
-      cumulativeOffsetBytes += chunkBytes;
+      putIntArrayChunk(srcArray, srcOffsetInts, chunkInts, unsafeObj, cumOffsetBytes);
+      cumOffsetBytes += chunkBytes;
       srcOffsetInts += chunkInts;
       copyBytes -= chunkBytes;
       lengthInts -= chunkInts;
     }
-    putIntArrayChunk(srcArray, srcOffsetInts, lengthInts, unsafeObj, cumulativeOffsetBytes);
+    putIntArrayChunk(srcArray, srcOffsetInts, lengthInts, unsafeObj, cumOffsetBytes);
   }
 
   private static void putIntArrayChunk(final int[] srcArray, final int srcOffsetInts,
-      final int lengthInts, final Object unsafeObj, final long cumulativeOffsetBytes) {
+      final int lengthInts, final Object unsafeObj, final long cumOffsetBytes) {
     // JDK 9 adds native intrinsics for such bulk non-native ordered primitive memory copy.
     // TODO use them when the library adds support for JDK 9
     // int-counted loop to avoid safepoint polls
     for (int i = 0; i < lengthInts; i++) {
-      unsafe.putInt(unsafeObj, cumulativeOffsetBytes + (((long) i) << INT_SHIFT),
+      unsafe.putInt(unsafeObj, cumOffsetBytes + (((long) i) << INT_SHIFT),
           Integer.reverseBytes(srcArray[srcOffsetInts + i]));
     }
   }
 
   static void putNonNativeLongs(final long[] srcArray, int srcOffsetLongs, int lengthLongs,
-      long copyBytes, final Object unsafeObj, final long cumBaseOffset, final long offsetBytes) {
+      long copyBytes, final Object unsafeObj, long cumOffsetBytes) {
     checkBounds(srcOffsetLongs, lengthLongs, srcArray.length);
-    long cumulativeOffsetBytes = cumBaseOffset + offsetBytes;
     while (copyBytes > UNSAFE_COPY_THRESHOLD_BYTES) {
       final long chunkBytes = Math.min(copyBytes, UNSAFE_COPY_THRESHOLD_BYTES);
       final int chunkLongs = (int) (chunkBytes >> LONG_SHIFT);
-      putLongArrayChunk(srcArray, srcOffsetLongs, chunkLongs, unsafeObj, cumulativeOffsetBytes);
-      cumulativeOffsetBytes += chunkBytes;
+      putLongArrayChunk(srcArray, srcOffsetLongs, chunkLongs, unsafeObj, cumOffsetBytes);
+      cumOffsetBytes += chunkBytes;
       srcOffsetLongs += chunkLongs;
       copyBytes -= chunkBytes;
       lengthLongs -= chunkLongs;
     }
-    putLongArrayChunk(srcArray, srcOffsetLongs, lengthLongs, unsafeObj, cumulativeOffsetBytes);
+    putLongArrayChunk(srcArray, srcOffsetLongs, lengthLongs, unsafeObj, cumOffsetBytes);
   }
 
   private static void putLongArrayChunk(final long[] srcArray, final int srcOffsetLongs,
-      final int lengthLongs, final Object unsafeObj, final long cumulativeOffsetBytes) {
+      final int lengthLongs, final Object unsafeObj, final long cumOffsetBytes) {
     // JDK 9 adds native intrinsics for such bulk non-native ordered primitive memory copy.
     // TODO use them when the library adds support for JDK 9
     // int-counted loop to avoid safepoint polls
     for (int i = 0; i < lengthLongs; i++) {
-      unsafe.putLong(unsafeObj, cumulativeOffsetBytes + (((long) i) << LONG_SHIFT),
+      unsafe.putLong(unsafeObj, cumOffsetBytes + (((long) i) << LONG_SHIFT),
           Long.reverseBytes(srcArray[srcOffsetLongs + i]));
     }
   }
 
   static void putNonNativeShorts(final short[] srcArray, int srcOffsetShorts,
-      int lengthShorts, long copyBytes, final Object unsafeObj, final long cumBaseOffset,
-      final long offsetBytes) {
+      int lengthShorts, long copyBytes, final Object unsafeObj, long cumOffsetBytes) {
     checkBounds(srcOffsetShorts, lengthShorts, srcArray.length);
-    long cumulativeOffsetBytes = cumBaseOffset + offsetBytes;
     while (copyBytes > UNSAFE_COPY_THRESHOLD_BYTES) {
       final long chunkBytes = Math.min(copyBytes, UNSAFE_COPY_THRESHOLD_BYTES);
       final int chunkShorts = (int) (chunkBytes >> SHORT_SHIFT);
-      putShortArrayChunk(srcArray, srcOffsetShorts, chunkShorts, unsafeObj, cumulativeOffsetBytes);
-      cumulativeOffsetBytes += chunkBytes;
+      putShortArrayChunk(srcArray, srcOffsetShorts, chunkShorts, unsafeObj, cumOffsetBytes);
+      cumOffsetBytes += chunkBytes;
       srcOffsetShorts += chunkShorts;
       copyBytes -= chunkBytes;
       lengthShorts -= chunkShorts;
     }
-    putShortArrayChunk(srcArray, srcOffsetShorts, lengthShorts, unsafeObj, cumulativeOffsetBytes);
+    putShortArrayChunk(srcArray, srcOffsetShorts, lengthShorts, unsafeObj, cumOffsetBytes);
   }
 
   private static void putShortArrayChunk(final short[] srcArray, final int srcOffsetShorts,
-      final int lengthShorts, final Object unsafeObj, final long cumulativeOffsetBytes) {
+      final int lengthShorts, final Object unsafeObj, final long cumOffsetBytes) {
     // JDK 9 adds native intrinsics for such bulk non-native ordered primitive memory copy.
     // TODO use them when the library adds support for JDK 9
     // int-counted loop to avoid safepoint polls
     for (int i = 0; i < lengthShorts; i++) {
-      unsafe.putShort(unsafeObj, cumulativeOffsetBytes + (((long) i) << SHORT_SHIFT),
+      unsafe.putShort(unsafeObj, cumOffsetBytes + (((long) i) << SHORT_SHIFT),
           Short.reverseBytes(srcArray[srcOffsetShorts + i]));
     }
   }

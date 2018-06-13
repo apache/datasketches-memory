@@ -62,8 +62,8 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
       final long lengthBytes, final boolean readOnly, final ByteOrder byteOrder) {
     if (lengthBytes == 0) { return BaseWritableMemoryImpl.ZERO_SIZE_MEMORY; }
     return Util.isNativeOrder(byteOrder)
-        ? new WritableMemoryImpl(arr, 0L, offsetBytes, lengthBytes, readOnly, null, null)
-        : new NonNativeWritableMemoryImpl(arr, 0L, offsetBytes, lengthBytes, readOnly, null, null);
+        ? new HeapWritableMemoryImpl(arr, offsetBytes, lengthBytes, readOnly)
+        : new HeapNonNativeWritableMemoryImpl(arr, offsetBytes, lengthBytes, readOnly);
   }
 
   static BaseWritableMemoryImpl wrapByteBuffer(
@@ -322,17 +322,17 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   //OTHER READ METHODS XXX
 
   @Override
-  public final MemoryRequestServer getMemoryRequestServer() {
+  public MemoryRequestServer getMemoryRequestServer() {
     return super.getMemoryRequestSvr();
   }
 
   @Override
-  public final long getRegionOffset() {
+  public long getRegionOffset() {
     return super.getRegOffset();
   }
 
   @Override
-  public final long getRegionOffset(final long offsetBytes) {
+  public long getRegionOffset(final long offsetBytes) {
     return super.getRegOffset() + offsetBytes;
   }
 

@@ -44,7 +44,7 @@ import java.nio.ByteBuffer;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-final class WritableMemoryImpl extends BaseWritableMemoryImpl {
+class WritableMemoryImpl extends BaseWritableMemoryImpl {
 
   //ctor for all parameters
   WritableMemoryImpl(

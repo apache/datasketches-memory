@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
- * Implementation of {@link WritableMemory} for heap-based, non-native byte order.
+ * Implementation of {@link WritableBuffer} for heap-based, non-native byte order.
  *
  * @author Roman Leventov
  * @author Lee Rhodes
@@ -50,6 +50,11 @@ class HeapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   @Override
   Object getUnsafeObject() {
     return unsafeObj;
+  }
+
+  @Override
+  StepBoolean getValid() {
+    return null;
   }
 
   @Override

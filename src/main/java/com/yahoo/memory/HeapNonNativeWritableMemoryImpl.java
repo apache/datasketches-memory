@@ -52,6 +52,11 @@ class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
   }
 
   @Override
+  StepBoolean getValid() {
+    return null;
+  }
+
+  @Override
   public boolean isValid() {
     return true;
   }

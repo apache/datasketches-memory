@@ -111,12 +111,12 @@ abstract class BaseState {
   {
     unsafeObj_ = unsafeObj; //hoist
     nativeBaseOffset_ = nativeBaseOffset; //hoist
-    regionOffset_ = regionOffset;
-    capacityBytes_ = capacityBytes;
-    readOnly_ = readOnly;
+    regionOffset_ = regionOffset; //base
+    capacityBytes_ = capacityBytes; //base
+    readOnly_ = readOnly; //base
     byteOrder_ = byteOrder; //hoist
     byteBuf_ = byteBuf; //hoist
-    cumBaseOffset_ = compute();
+    cumBaseOffset_ = compute(); //base
     valid_ = (valid == null) ? new StepBoolean(true) : valid;
   }
 
@@ -232,7 +232,7 @@ abstract class BaseState {
     return unsafeObj_;
   }
 
-  final StepBoolean getValid() { //abstract?
+  StepBoolean getValid() { //abstract, can return null
     return valid_;
   }
 
@@ -319,7 +319,7 @@ abstract class BaseState {
             && (getByteBuffer() == that1.getByteBuffer());
   }
 
-  final void setMemoryRequestServer(final MemoryRequestServer svr) { //abstract
+  void setMemoryRequestServer(final MemoryRequestServer svr) { //abstract
     memReqSvr_ = svr;
   }
 

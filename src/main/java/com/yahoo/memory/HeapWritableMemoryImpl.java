@@ -52,6 +52,11 @@ class HeapWritableMemoryImpl extends WritableMemoryImpl {
   }
 
   @Override
+  StepBoolean getValid() {
+    return null;
+  }
+
+  @Override
   public boolean isValid() {
     return true;
   }

@@ -29,18 +29,6 @@ abstract class BaseState {
   static final AtomicLong currentDirectMemoryMapAllocated_ = new AtomicLong();
 
   /**
-   * This holds a reference to a ByteBuffer until we are done with it.
-   * This is also a user supplied parameter passed to AccessByteBuffer.
-   */
-  private final ByteBuffer byteBuf_;
-
-  /**
-   * The byte order for Memory or Buffer, which may be different from the byte order state of
-   * the backing resource.
-   */
-  private final ByteOrder byteOrder_;
-
-  /**
    * The size of the backing resource in bytes. Used by all methods when checking bounds.
    */
   private final long capacityBytes_;
@@ -52,22 +40,6 @@ abstract class BaseState {
    */
   //= f(regionOffset, unsafeObj, nativeBaseOffset, unsafeObjHeader)
   private final long cumBaseOffset_;
-
-  /**
-   * This is a callback mechanism for a user client of direct memory to request more memory from
-   * the owner of the WritableDirectHandle
-   * Only used when user allocated direct memory is the backing resource.
-   *
-   */
-  private MemoryRequestServer memReqSvr_ = null; //cannot be final
-
-  /**
-   * Only used to compute cumBaseOffset for off-heap resources.
-   * If this changes, cumBaseOffset is recomputed.
-   * A slice() of a Direct ByteBuffer includes the array_offset here.  It is originally computed
-   * either from the Unsafe.allocateMemory() call or from the mapping class.
-   */
-  private long nativeBaseOffset_; //cannot be final; set to 0 when valid -> false
 
   /**
    * Can be set true anytime. If true, it cannot be set false. If resource read-only is true,
@@ -83,47 +55,18 @@ abstract class BaseState {
    */
   private final long regionOffset_;
 
-  /**
-   * The object used in most Unsafe calls. This is effectively the array object if on-heap and
-   * null for direct memory and determines how cumBaseOffset is computed.
-   */
-  private final Object unsafeObj_;
-
-  /**
-   * Only the backing resources that uses AutoCloseable can set this to false.  It can only be
-   * changed from true to false once. The initial state is valid (true).
-   *
-   * <p>There is one and only one valid object and it resides with the resource allocation or
-   * access class. This holds a reference to it.
-   */
-  private final StepBoolean valid_;
-
-  //Initializes all fields except for memReqSvr, which is initialized lazily.
-  BaseState(
-      final Object unsafeObj,
-      final long nativeBaseOffset,
-      final long regionOffset,
-      final long capacityBytes,
-      final boolean readOnly,
-      final ByteOrder byteOrder,
-      final ByteBuffer byteBuf,
-      final StepBoolean valid)
-  {
-    unsafeObj_ = unsafeObj; //hoist
-    nativeBaseOffset_ = nativeBaseOffset; //hoist
+  BaseState(final long regionOffset, final long capacityBytes, final boolean readOnly) {
     regionOffset_ = regionOffset; //base
     capacityBytes_ = capacityBytes; //base
     readOnly_ = readOnly; //base
-    byteOrder_ = byteOrder; //hoist
-    byteBuf_ = byteBuf; //hoist
     cumBaseOffset_ = compute(); //base
-    valid_ = (valid == null) ? new StepBoolean(true) : valid;
   }
 
   final long compute() {
-    return getRegOffset() + ((getUnsafeObject() == null) //hoist this computation
+    final Object unsafeObj = getUnsafeObject();
+    return getRegOffset() + ((unsafeObj == null)
         ? getNativeBaseOffset()
-        : unsafe.arrayBaseOffset(unsafeObj_.getClass()));
+        : unsafe.arrayBaseOffset(unsafeObj.getClass()));
   }
 
   /**
@@ -161,20 +104,14 @@ abstract class BaseState {
    * Gets the backing ByteBuffer if it exists, otherwise returns null.
    * @return the backing ByteBuffer if it exists, otherwise returns null.
    */
-  public ByteBuffer getByteBuffer() { //abstract
-    assertValid();
-    return byteBuf_;
-  }
+  public abstract ByteBuffer getByteBuffer();
 
   /**
    * Gets the current ByteOrder.
    * This may be different from the ByteOrder of the backing resource.
    * @return the current ByteOrder.
    */
-  public ByteOrder getByteOrder() { //abstract
-    assertValid();
-    return byteOrder_;
-  }
+  public abstract ByteOrder getByteOrder();
 
   /**
    * Gets the capacity of this object in bytes
@@ -206,35 +143,18 @@ abstract class BaseState {
     return cumBaseOffset_ + offsetBytes;
   }
 
-  /**
-   * Gets the MemoryRequestServer. If not explictly set using
-   * setMemoryRequestServer(...), this returns the <i>DefaultMemoryRequestServer</i>.
-   * @return the MemoryRequestServer.
-   */
-  MemoryRequestServer getMemoryRequestSvr() { //abstract in writable memory
-    assertValid();
-    if (memReqSvr_ == null) {
-      memReqSvr_ = new DefaultMemoryRequestServer();
-    }
-    return memReqSvr_;
-  }
+  abstract MemoryRequestServer getMemoryRequestSvr();
 
-  long getNativeBaseOffset() { //abstract
-    return nativeBaseOffset_;
-  }
+  abstract long getNativeBaseOffset();
 
   final long getRegOffset() { //root
     assertValid();
     return regionOffset_;
   }
 
-  Object getUnsafeObject() { //abstract,
-    return unsafeObj_;
-  }
+  abstract Object getUnsafeObject();
 
-  StepBoolean getValid() { //abstract, can return null
-    return valid_;
-  }
+  abstract StepBoolean getValid(); //can return null
 
   /**
    * Returns true if this object is backed by an on-heap primitive array
@@ -266,7 +186,7 @@ abstract class BaseState {
    * Returns true if this Memory is backed by a ByteBuffer
    * @return true if this Memory is backed by a ByteBuffer
    */
-  public final boolean hasByteBuffer() {
+  public final boolean hasByteBuffer() { //root
     assertValid();
     return getByteBuffer() != null;
   }
@@ -276,7 +196,7 @@ abstract class BaseState {
    * This is the case for allocated direct memory, memory mapped files,
    * @return true if the backing memory is direct (off-heap) memory.
    */
-  public final boolean isDirect() {
+  public final boolean isDirect() { //root
     assertValid();
     return getNativeBaseOffset() > 0L;
   }
@@ -319,21 +239,11 @@ abstract class BaseState {
             && (getByteBuffer() == that1.getByteBuffer());
   }
 
-  void setMemoryRequestServer(final MemoryRequestServer svr) { //abstract in base writable
-    memReqSvr_ = svr;
-  }
-
   /**
    * Returns true if this object is valid and has not been closed.
    * @return true if this object is valid and has not been closed.
    */
-  public boolean isValid() { //abstract? otherwise make final
-    return getValid().get();
-  }
-
-  final void zeroNativeBaseOffset() { //abstract
-    nativeBaseOffset_ = 0L;
-  }
+  public abstract boolean isValid();
 
   //ASSERTS AND CHECKS
   final void assertValid() { //root

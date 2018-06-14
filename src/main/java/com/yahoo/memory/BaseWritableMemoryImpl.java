@@ -45,17 +45,12 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   final static BaseWritableMemoryImpl ZERO_SIZE_MEMORY;
 
   static {
-    ZERO_SIZE_MEMORY = new WritableMemoryImpl(new byte[0], 0L, 0L, 0L, true, null, null);
+    ZERO_SIZE_MEMORY = wrapHeapArray(new byte[0], 0L, 0L, true, Util.nativeOrder);
   }
 
-  //Pass-through ctor for all parameters
-  //called from one of the Endian-sensitive WritableMemoryImpls
-  BaseWritableMemoryImpl(
-      final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
-      final long capacityBytes, final boolean readOnly, final ByteOrder byteOrder,
-      final ByteBuffer byteBuf, final StepBoolean valid) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, byteOrder,
-        byteBuf, valid);
+  //Pass-through ctor
+  BaseWritableMemoryImpl(final long regionOffset, final long capacityBytes, final boolean readOnly) {
+    super(regionOffset, capacityBytes, readOnly);
   }
 
   static BaseWritableMemoryImpl wrapHeapArray(final Object arr, final long offsetBytes,
@@ -73,12 +68,12 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
       throw new ReadOnlyException("ByteBuffer is Read Only");
     }
     return Util.isNativeOrder(byteOrder)
-        ? new WritableMemoryImpl(abb.unsafeObj, abb.nativeBaseOffset,
+        ? new BBWritableMemoryImpl(abb.unsafeObj, abb.nativeBaseOffset,
             abb.regionOffset, abb.capacityBytes, abb.resourceReadOnly || localReadOnly,
-            byteBuf, null)
-        : new NonNativeWritableMemoryImpl(abb.unsafeObj, abb.nativeBaseOffset,
+            byteBuf)
+        : new BBNonNativeWritableMemoryImpl(abb.unsafeObj, abb.nativeBaseOffset,
             abb.regionOffset, abb.capacityBytes,  abb.resourceReadOnly || localReadOnly,
-            byteBuf, null);
+            byteBuf);
   }
 
   @SuppressWarnings("resource")
@@ -91,10 +86,10 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
       throw new ReadOnlyException("File is Read Only");
     }
     final BaseWritableMemoryImpl impl = Util.isNativeOrder(byteOrder)
-        ? new WritableMemoryImpl(null, dirWMap.nativeBaseOffset, 0L, capacityBytes,
-            dirWMap.resourceReadOnly || localReadOnly, null, dirWMap.getValid())
-        : new NonNativeWritableMemoryImpl(null, dirWMap.nativeBaseOffset, 0L, capacityBytes,
-            dirWMap.resourceReadOnly || localReadOnly, null, dirWMap.getValid());
+        ? new MapWritableMemoryImpl(dirWMap.nativeBaseOffset, 0L, capacityBytes,
+            dirWMap.resourceReadOnly || localReadOnly, dirWMap.getValid())
+        : new MapNonNativeWritableMemoryImpl(dirWMap.nativeBaseOffset, 0L, capacityBytes,
+            dirWMap.resourceReadOnly || localReadOnly, dirWMap.getValid());
     return new WritableMapHandle(dirWMap, impl);
   }
 
@@ -107,10 +102,10 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     }
     final AllocateDirect direct = new AllocateDirect(capacityBytes);
     final BaseWritableMemoryImpl impl = Util.isNativeOrder(byteOrder)
-        ? new WritableMemoryImpl(null, direct.getNativeBaseOffset(),
-            0L, capacityBytes, false, null, direct.getValid())
-        : new NonNativeWritableMemoryImpl(null, direct.getNativeBaseOffset(),
-            0L, capacityBytes, false, null, direct.getValid());
+        ? new DirectWritableMemoryImpl(direct.getNativeBaseOffset(), 0L, capacityBytes,
+            false, direct.getValid())
+        : new DirectNonNativeWritableMemoryImpl(direct.getNativeBaseOffset(), 0L, capacityBytes,
+            false, direct.getValid());
 
     final WritableDirectHandle handle = new WritableDirectHandle(direct, impl, memReqSvr);
     impl.setMemoryRequestServer(handle.memReqSvr);
@@ -322,9 +317,11 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   //OTHER WRITABLE API METHODS XXX
 
   @Override
-  public MemoryRequestServer getMemoryRequestServer() {
-    return super.getMemoryRequestSvr();
+  MemoryRequestServer getMemoryRequestSvr() {
+    return getMemoryRequestServer();
   }
+
+  abstract void setMemoryRequestServer(MemoryRequestServer svr);
 
   @Override
   public final long getRegionOffset() {

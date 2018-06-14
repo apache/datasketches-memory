@@ -24,13 +24,9 @@ import java.nio.ByteOrder;
  */
 public abstract class WritableMemory extends Memory {
 
-  //Pass-through ctor for all parameters & ByteBuffer
-  WritableMemory(
-      final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
-      final long capacityBytes, final boolean readOnly, final ByteOrder byteOrder,
-      final ByteBuffer byteBuf, final StepBoolean valid) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, byteOrder,
-        byteBuf, valid);
+  //Pass-through ctor
+  WritableMemory(final long regionOffset, final long capacityBytes, final boolean readOnly) {
+    super(regionOffset, capacityBytes, readOnly);
   }
 
   //BYTE BUFFER XXX
@@ -138,6 +134,8 @@ public abstract class WritableMemory extends Memory {
    *
    * @param capacityBytes the size of the desired memory in bytes.
    * @param memReqSvr A user-specified MemoryRequestServer.
+   * This is a callback mechanism for a user client of direct memory to request more memory from
+   * the owner of the WritableDirectHandle
    * @return WritableHandle for this off-heap resource
    */
   public static WritableDirectHandle allocateDirect(final long capacityBytes,
@@ -596,8 +594,10 @@ public abstract class WritableMemory extends Memory {
 
   //OTHER WRITABLE API METHODS XXX
   /**
-   * Gets the MemoryRequestServer object or null.
-   * @return the MemoryRequestServer object or null.
+   * For Direct Memory only, otherwise returns null. Gets the MemoryRequestServer object.
+   * If not explictly set using
+   * setMemoryRequestServer(...), this returns the <i>DefaultMemoryRequestServer</i>.
+   * @return the MemoryRequestServer object (if direct memory) or null.
    */
   public abstract MemoryRequestServer getMemoryRequestServer();
 

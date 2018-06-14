@@ -15,8 +15,8 @@ import java.nio.ByteOrder;
  * @author Lee Rhodes
  */
 class MapNonNativeWritableMemoryImpl extends WritableMemoryImpl {
-  private final long nativeBaseOffset;
-  final StepBoolean valid; //a reference only
+  private final long nativeBaseOffset; //used to compute cumBaseOffset
+  private final StepBoolean valid; //a reference only
 
   MapNonNativeWritableMemoryImpl(
       final long nativeBaseOffset,
@@ -24,7 +24,7 @@ class MapNonNativeWritableMemoryImpl extends WritableMemoryImpl {
       final long capacityBytes,
       final boolean readOnly,
       final StepBoolean valid) {
-    super(null, nativeBaseOffset, regionOffset, capacityBytes, readOnly, null, valid);
+    super(regionOffset, capacityBytes, readOnly);
     this.nativeBaseOffset = nativeBaseOffset;
     this.valid = valid;
     if (valid == null) {
@@ -39,6 +39,7 @@ class MapNonNativeWritableMemoryImpl extends WritableMemoryImpl {
 
   @Override
   public ByteOrder getByteOrder() {
+    assertValid();
     return Util.nonNativeOrder;
   }
 
@@ -49,6 +50,7 @@ class MapNonNativeWritableMemoryImpl extends WritableMemoryImpl {
 
   @Override
   long getNativeBaseOffset() {
+    assertValid();
     return nativeBaseOffset;
   }
 

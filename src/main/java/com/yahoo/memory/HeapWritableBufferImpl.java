@@ -23,7 +23,7 @@ class HeapWritableBufferImpl extends WritableBufferImpl {
       final long capacityBytes,
       final boolean readOnly,
       final BaseWritableMemoryImpl originMemory) {
-    super(unsafeObj, 0, regionOffset, capacityBytes, readOnly, null, null, originMemory);
+    super(regionOffset, capacityBytes, readOnly, originMemory);
     this.unsafeObj = unsafeObj;
   }
 
@@ -34,6 +34,7 @@ class HeapWritableBufferImpl extends WritableBufferImpl {
 
   @Override
   public ByteOrder getByteOrder() {
+    assertValid();
     return Util.nativeOrder;
   }
 
@@ -44,11 +45,13 @@ class HeapWritableBufferImpl extends WritableBufferImpl {
 
   @Override
   long getNativeBaseOffset() {
+    assertValid();
     return 0;
   }
 
   @Override
   Object getUnsafeObject() {
+    assertValid();
     return unsafeObj;
   }
 

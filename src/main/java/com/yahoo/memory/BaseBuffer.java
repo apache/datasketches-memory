@@ -5,9 +5,6 @@
 
 package com.yahoo.memory;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 /**
  * A new positional API. This is different from and simpler than Java Buffer positional approach.
  * <ul><li>All based on longs instead of ints.</li>
@@ -31,13 +28,9 @@ public abstract class BaseBuffer extends BaseState {
   private long pos = 0;
   private long end;
 
-  //Pass-through ctor for all parameters
-  BaseBuffer(
-      final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
-      final long capacityBytes, final boolean readOnly, final ByteOrder byteOrder,
-      final ByteBuffer byteBuf, final StepBoolean valid) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, byteOrder,
-        byteBuf, valid);
+  //Pass-through ctor
+  BaseBuffer(final long regionOffset,final long capacityBytes, final boolean readOnly) {
+    super(regionOffset, capacityBytes, readOnly);
     capacity = end = capacityBytes;
   }
 

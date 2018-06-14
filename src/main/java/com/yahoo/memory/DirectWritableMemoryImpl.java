@@ -15,8 +15,8 @@ import java.nio.ByteOrder;
  * @author Lee Rhodes
  */
 class DirectWritableMemoryImpl extends WritableMemoryImpl {
-  private final long nativeBaseOffset;
-  final StepBoolean valid; //a reference only
+  private final long nativeBaseOffset; //used to compute cumBaseOffset
+  private final StepBoolean valid; //a reference only
   private MemoryRequestServer memReqSvr = null; //cannot be final;
 
   DirectWritableMemoryImpl(
@@ -25,7 +25,7 @@ class DirectWritableMemoryImpl extends WritableMemoryImpl {
       final long capacityBytes,
       final boolean readOnly,
       final StepBoolean valid) {
-    super(null, nativeBaseOffset, regionOffset, capacityBytes, readOnly, null, valid);
+    super(regionOffset, capacityBytes, readOnly);
     this.nativeBaseOffset = nativeBaseOffset;
     this.valid = valid;
     if (valid == null) {
@@ -40,6 +40,7 @@ class DirectWritableMemoryImpl extends WritableMemoryImpl {
 
   @Override
   public ByteOrder getByteOrder() {
+    assertValid();
     return Util.nativeOrder;
   }
 
@@ -54,6 +55,7 @@ class DirectWritableMemoryImpl extends WritableMemoryImpl {
 
   @Override
   long getNativeBaseOffset() {
+    assertValid();
     return nativeBaseOffset;
   }
 

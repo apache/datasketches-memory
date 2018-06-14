@@ -16,7 +16,6 @@ import static com.yahoo.memory.UnsafeUtil.ARRAY_SHORT_INDEX_SCALE;
 import static com.yahoo.memory.UnsafeUtil.checkBounds;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 
-import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /*
@@ -46,13 +45,10 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
     ZERO_SIZE_BUFFER = new WritableBufferImpl(new byte[0], 0L, 0L, 0L, true, null, null, null);
   }
 
-  //called from one of the Endian-sensitive WritableBufferImpls
-  BaseWritableBufferImpl(
-      final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
-      final long capacityBytes, final boolean readOnly, final ByteOrder byteOrder,
-      final ByteBuffer byteBuf, final StepBoolean valid, final BaseWritableMemoryImpl originMemory) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, byteOrder,
-        byteBuf, valid);
+  //Pass-through ctor
+  BaseWritableBufferImpl(final long regionOffset, final long capacityBytes, final boolean readOnly,
+      final BaseWritableMemoryImpl originMemory) {
+    super(regionOffset, capacityBytes, readOnly);
     this.originMemory = originMemory;
   }
 
@@ -260,9 +256,11 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   //OTHER WRITABLE API METHODS XXX
 
   @Override
-  public MemoryRequestServer getMemoryRequestServer() {
-    return super.getMemoryRequestSvr();
+  MemoryRequestServer getMemoryRequestSvr() {
+    return getMemoryRequestServer();
   }
+
+  abstract void setMemoryRequestServer(MemoryRequestServer svr);
 
   @Override
   public final long getRegionOffset() {

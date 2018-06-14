@@ -19,13 +19,9 @@ import java.nio.ByteOrder;
  */
 public abstract class Buffer extends BaseBuffer {
 
-  //Pass-through ctor for all parameters
-  Buffer(
-      final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
-      final long capacityBytes, final boolean readOnly, final ByteOrder byteOrder,
-      final ByteBuffer byteBuf, final StepBoolean valid) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, byteOrder,
-        byteBuf, valid);
+  //Pass-through ctor
+  Buffer(final long regionOffset, final long capacityBytes, final boolean readOnly) {
+    super(regionOffset, capacityBytes, readOnly);
   }
 
   //BYTE BUFFER XXX

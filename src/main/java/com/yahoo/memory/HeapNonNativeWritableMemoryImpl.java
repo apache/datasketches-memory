@@ -22,7 +22,7 @@ class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
       final long regionOffset,
       final long capacityBytes,
       final boolean readOnly) {
-    super(unsafeObj, 0, regionOffset, capacityBytes, readOnly, null, null);
+    super(regionOffset, capacityBytes, readOnly);
     this.unsafeObj = unsafeObj;
   }
 
@@ -33,6 +33,7 @@ class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
 
   @Override
   public ByteOrder getByteOrder() {
+    assertValid();
     return Util.nonNativeOrder;
   }
 
@@ -43,11 +44,13 @@ class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
 
   @Override
   long getNativeBaseOffset() {
+    assertValid();
     return 0;
   }
 
   @Override
   Object getUnsafeObject() {
+    assertValid();
     return unsafeObj;
   }
 

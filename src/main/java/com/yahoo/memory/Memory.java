@@ -27,13 +27,9 @@ import java.nio.channels.WritableByteChannel;
  */
 public abstract class Memory extends BaseState {
 
-  //Pass-through ctor for all parameters
-  Memory(
-      final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
-      final long capacityBytes, final boolean readOnly, final ByteOrder byteOrder,
-      final ByteBuffer byteBuf, final StepBoolean valid) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, byteOrder,
-        byteBuf, valid);
+  //Pass-through ctor
+  Memory(final long regionOffset, final long capacityBytes, final boolean readOnly) {
+    super(regionOffset, capacityBytes, readOnly);
   }
 
   //BYTE BUFFER XXX

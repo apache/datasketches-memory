@@ -17,13 +17,9 @@ import java.nio.ByteOrder;
  */
 public abstract class WritableBuffer extends Buffer {
 
-  //Pass-through ctor for all parameters
-  WritableBuffer(
-      final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
-      final long capacityBytes, final boolean readOnly, final ByteOrder byteOrder,
-      final ByteBuffer byteBuf, final StepBoolean valid) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, byteOrder,
-        byteBuf, valid);
+  //Pass-through ctor
+  WritableBuffer(final long regionOffset, final long capacityBytes, final boolean readOnly) {
+    super(regionOffset, capacityBytes, readOnly);
   }
 
   //BYTE BUFFER XXX
@@ -348,8 +344,10 @@ public abstract class WritableBuffer extends Buffer {
 
   //OTHER WRITABLE API METHODS XXX
   /**
-   * Gets the MemoryRequestServer object or null.
-   * @return the MemoryRequestServer object or null.
+   * For Direct Memory only, otherwise returns null. Gets the MemoryRequestServer object.
+   * If not explictly set using
+   * setMemoryRequestServer(...), this returns the <i>DefaultMemoryRequestServer</i>.
+   * @return the MemoryRequestServer object (if direct memory) or null.
    */
   public abstract MemoryRequestServer getMemoryRequestServer();
 

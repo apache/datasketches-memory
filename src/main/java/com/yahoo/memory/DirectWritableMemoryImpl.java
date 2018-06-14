@@ -72,9 +72,9 @@ class DirectWritableMemoryImpl extends WritableMemoryImpl {
     return valid.get();
   }
 
-  @Override
-  public void setMemoryRequestServer(final MemoryRequestServer svr) {
-    memReqSvr = null;
+  @Override //TODO make abstract in BaseWritable?
+  void setMemoryRequestServer(final MemoryRequestServer svr) {
+    memReqSvr = svr;
   }
 
 }

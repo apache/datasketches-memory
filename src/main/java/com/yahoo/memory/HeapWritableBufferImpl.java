@@ -62,4 +62,8 @@ class HeapWritableBufferImpl extends WritableBufferImpl {
     return true;
   }
 
+  @Override
+  public void setMemoryRequestServer(final MemoryRequestServer svr) {
+
+  }
 }

@@ -62,4 +62,8 @@ class HeapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
     return true;
   }
 
+  @Override
+  public void setMemoryRequestServer(final MemoryRequestServer svr) {
+
+  }
 }

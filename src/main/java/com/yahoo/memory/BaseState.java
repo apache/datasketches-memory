@@ -211,7 +211,7 @@ abstract class BaseState {
    * setMemoryRequestServer(...), this returns the <i>DefaultMemoryRequestServer</i>.
    * @return the MemoryRequestServer.
    */
-  MemoryRequestServer getMemoryRequestSvr() { //abstract
+  MemoryRequestServer getMemoryRequestSvr() { //abstract in writable memory
     assertValid();
     if (memReqSvr_ == null) {
       memReqSvr_ = new DefaultMemoryRequestServer();
@@ -319,7 +319,7 @@ abstract class BaseState {
             && (getByteBuffer() == that1.getByteBuffer());
   }
 
-  void setMemoryRequestServer(final MemoryRequestServer svr) { //abstract
+  void setMemoryRequestServer(final MemoryRequestServer svr) { //abstract in base writable
     memReqSvr_ = svr;
   }
 

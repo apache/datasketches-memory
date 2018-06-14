@@ -75,7 +75,7 @@ class DirectWritableBufferImpl extends WritableBufferImpl {
 
   @Override
   public void setMemoryRequestServer(final MemoryRequestServer svr) {
-    memReqSvr = null;
+    memReqSvr = svr;
   }
 
 }

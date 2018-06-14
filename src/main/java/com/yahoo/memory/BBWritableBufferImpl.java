@@ -9,31 +9,38 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
- * Implementation of {@link WritableMemory} for heap-based, non-native byte order.
+ * Implementation of {@link WritableBuffer} for ByteBuffer, native byte order.
  *
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
+class BBWritableBufferImpl extends WritableBufferImpl {
   private final Object unsafeObj;
+  private final long nativeBaseOffset;
+  private final ByteBuffer byteBuf;
 
-  HeapNonNativeWritableMemoryImpl(
-      final Object unsafeObj,
+  BBWritableBufferImpl(
+      final long unsafeObj,
+      final long nativeBaseOffset,
       final long regionOffset,
       final long capacityBytes,
-      final boolean readOnly) {
-    super(unsafeObj, 0, regionOffset, capacityBytes, readOnly, null, null);
+      final boolean readOnly,
+      final ByteBuffer byteBuf,
+      final BaseWritableMemoryImpl originMemory) {
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, null, null, originMemory);
     this.unsafeObj = unsafeObj;
+    this.nativeBaseOffset = nativeBaseOffset;
+    this.byteBuf = byteBuf;
   }
 
   @Override
   public ByteBuffer getByteBuffer() {
-    return null;
+    return byteBuf;
   }
 
   @Override
   public ByteOrder getByteOrder() {
-    return Util.nonNativeOrder;
+    return Util.nativeOrder;
   }
 
   @Override //TODO remove from baseWMemImpl NOTE WRITABLE ONLY
@@ -43,7 +50,7 @@ class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
 
   @Override
   long getNativeBaseOffset() {
-    return 0;
+    return nativeBaseOffset;
   }
 
   @Override
@@ -66,3 +73,4 @@ class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
 
   }
 }
+

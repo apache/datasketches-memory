@@ -23,7 +23,7 @@ class HeapWritableBufferImpl extends WritableBufferImpl {
       final long capacityBytes,
       final boolean readOnly,
       final BaseWritableMemoryImpl originMemory) {
-    super(regionOffset, capacityBytes, readOnly, originMemory);
+    super(unsafeObj, 0L, regionOffset, capacityBytes, readOnly, originMemory);
     this.unsafeObj = unsafeObj;
   }
 
@@ -55,11 +55,6 @@ class HeapWritableBufferImpl extends WritableBufferImpl {
   public ByteOrder getByteOrder() {
     assertValid();
     return Util.nativeOrder;
-  }
-
-  @Override
-  int getClassID() {
-    return BUF | NAT | HEAP;
   }
 
   @Override //TODO remove from baseWBufImpl NOTE WRITABLE ONLY

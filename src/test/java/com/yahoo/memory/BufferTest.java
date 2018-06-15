@@ -68,7 +68,8 @@ public class BufferTest {
       assertEquals(v, i);
     }
     // Check Zero length array wraps
-    Buffer buffZeroLengthArrayWrap = Memory.wrap(new byte[0]).asBuffer();
+    Memory mem = Memory.wrap(new byte[0]);
+    Buffer buffZeroLengthArrayWrap = mem.asBuffer();
     assertEquals(buffZeroLengthArrayWrap.getCapacity(), 0);
     // check 0 length array wraps
     List<Buffer> buffersToCheck = Lists.newArrayList();

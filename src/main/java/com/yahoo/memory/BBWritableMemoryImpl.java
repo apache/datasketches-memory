@@ -26,7 +26,7 @@ class BBWritableMemoryImpl extends WritableMemoryImpl {
       final long capacityBytes,
       final boolean readOnly,
       final ByteBuffer byteBuf) {
-    super(regionOffset, capacityBytes, readOnly);
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly);
     this.unsafeObj = unsafeObj;
     this.nativeBaseOffset = nativeBaseOffset;
     this.byteBuf = byteBuf;
@@ -66,11 +66,6 @@ class BBWritableMemoryImpl extends WritableMemoryImpl {
   public ByteOrder getByteOrder() {
     assertValid();
     return Util.nativeOrder;
-  }
-
-  @Override
-  int getClassID() {
-    return MEM | NAT | BB;
   }
 
   @Override //TODO remove from baseWMemImpl NOTE WRITABLE ONLY

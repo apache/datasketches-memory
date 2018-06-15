@@ -14,7 +14,7 @@ import java.nio.ByteOrder;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-class BBNonNativeWritableMemoryImpl extends WritableMemoryImpl {
+class BBNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
   private final Object unsafeObj;
   private final long nativeBaseOffset; //used to compute cumBaseOffset
   private final ByteBuffer byteBuf; //holds a reference to a ByteBuffer until we are done with it.
@@ -26,7 +26,7 @@ class BBNonNativeWritableMemoryImpl extends WritableMemoryImpl {
       final long capacityBytes,
       final boolean readOnly,
       final ByteBuffer byteBuf) {
-    super(regionOffset, capacityBytes, readOnly);
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly);
     this.unsafeObj = unsafeObj;
     this.nativeBaseOffset = nativeBaseOffset;
     this.byteBuf = byteBuf;
@@ -65,11 +65,6 @@ class BBNonNativeWritableMemoryImpl extends WritableMemoryImpl {
   public ByteOrder getByteOrder() {
     assertValid();
     return Util.nonNativeOrder;
-  }
-
-  @Override
-  int getClassID() {
-    return MEM | NNAT | BB;
   }
 
   @Override //TODO remove from baseWMemImpl NOTE WRITABLE ONLY

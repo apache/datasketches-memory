@@ -25,8 +25,9 @@ import java.nio.ByteOrder;
 public abstract class WritableMemory extends Memory {
 
   //Pass-through ctor
-  WritableMemory(final long regionOffset, final long capacityBytes, final boolean readOnly) {
-    super(regionOffset, capacityBytes, readOnly);
+  WritableMemory(final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
+      final long capacityBytes, final boolean readOnly) {
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly);
   }
 
   //BYTE BUFFER XXX

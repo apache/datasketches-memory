@@ -23,7 +23,7 @@ class HeapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
       final long capacityBytes,
       final boolean readOnly,
       final BaseWritableMemoryImpl originMemory) {
-    super(regionOffset, capacityBytes, readOnly, originMemory);
+    super(unsafeObj, 0L, regionOffset, capacityBytes, readOnly, originMemory);
     this.unsafeObj = unsafeObj;
   }
 
@@ -55,11 +55,6 @@ class HeapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   public ByteOrder getByteOrder() {
     assertValid();
     return Util.nonNativeOrder;
-  }
-
-  @Override
-  int getClassID() {
-    return BUF | NNAT | HEAP;
   }
 
   @Override //TODO remove from baseWBufImpl NOTE WRITABLE ONLY

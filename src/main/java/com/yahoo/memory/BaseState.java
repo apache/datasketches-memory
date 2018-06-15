@@ -28,16 +28,6 @@ abstract class BaseState {
   static final AtomicLong currentDirectMemoryMapAllocations_ = new AtomicLong();
   static final AtomicLong currentDirectMemoryMapAllocated_ = new AtomicLong();
 
-  //ID's
-  static final int MEM = 0;
-  static final int BUF = 8;
-  static final int NAT = 0;
-  static final int NNAT = 4;
-  static final int HEAP = 0;
-  static final int DIR = 1;
-  static final int MAP = 2;
-  static final int BB = 3;
-
   /**
    * The size of the backing resource in bytes. Used by all methods when checking bounds.
    */
@@ -65,17 +55,13 @@ abstract class BaseState {
    */
   private final long regionOffset_;
 
-  BaseState(final long regionOffset, final long capacityBytes, final boolean readOnly) {
+  BaseState(final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
+      final long capacityBytes, final boolean readOnly) {
     regionOffset_ = regionOffset; //base
     capacityBytes_ = capacityBytes; //base
     readOnly_ = readOnly; //base
-    cumBaseOffset_ = compute(); //base
-  }
-
-  final long compute() {
-    final Object unsafeObj = getUnsafeObject();
-    return getRegOffset() + ((unsafeObj == null)
-        ? getNativeBaseOffset()
+    cumBaseOffset_ = regionOffset + ((unsafeObj == null)
+        ? nativeBaseOffset
         : unsafe.arrayBaseOffset(unsafeObj.getClass()));
   }
 
@@ -128,7 +114,6 @@ abstract class BaseState {
    * @return the capacity of this object in bytes
    */
   public final long getCapacity() { //root
-    assertValid();
     return capacityBytes_;
   }
 
@@ -138,7 +123,7 @@ abstract class BaseState {
    *
    * @return the cumulative offset in bytes of this object
    */
-  public final long getCumulativeOffset() { //root
+  public final long getCumulativeOffset() { //cannot test valid here
     return cumBaseOffset_;
   }
 
@@ -153,14 +138,11 @@ abstract class BaseState {
     return cumBaseOffset_ + offsetBytes;
   }
 
-  abstract int getClassID();
-
   abstract MemoryRequestServer getMemoryRequestSvr();
 
   abstract long getNativeBaseOffset();
 
   final long getRegOffset() { //root
-    assertValid();
     return regionOffset_;
   }
 
@@ -172,8 +154,7 @@ abstract class BaseState {
    * Returns true if this object is backed by an on-heap primitive array
    * @return true if this object is backed by an on-heap primitive array
    */
-  public final boolean hasArray() { //root
-    assertValid();
+  public final boolean hasArray() { //cannot test valid here
     return getUnsafeObject() != null;
   }
 
@@ -383,9 +364,9 @@ abstract class BaseState {
     final String bbStr = (bb == null) ? "null"
             : bb.getClass().getSimpleName() + ", " + (bb.hashCode() & 0XFFFFFFFFL);
     final MemoryRequestServer memReqSvr = state.getMemoryRequestSvr();
-    final String memReqStr =
-        memReqSvr.getClass().getSimpleName() + ", " + (memReqSvr.hashCode() & 0XFFFFFFFFL);
-
+    final String memReqStr = (memReqSvr != null)
+        ? memReqSvr.getClass().getSimpleName() + ", " + (memReqSvr.hashCode() & 0XFFFFFFFFL)
+        : "null";
     final long cumBaseOffset = state.getCumulativeOffset();
     sb.append(preamble).append(LS);
     sb.append("UnsafeObj, hashCode : ").append(uObjStr).append(LS);

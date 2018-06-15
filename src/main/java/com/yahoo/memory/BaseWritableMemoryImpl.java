@@ -45,12 +45,13 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   final static BaseWritableMemoryImpl ZERO_SIZE_MEMORY;
 
   static {
-    ZERO_SIZE_MEMORY = wrapHeapArray(new byte[0], 0L, 0L, true, Util.nativeOrder);
+    ZERO_SIZE_MEMORY = new HeapWritableMemoryImpl(new byte[0], 0L, 0L, true);
   }
 
   //Pass-through ctor
-  BaseWritableMemoryImpl(final long regionOffset, final long capacityBytes, final boolean readOnly) {
-    super(regionOffset, capacityBytes, readOnly);
+  BaseWritableMemoryImpl(final Object unsafeObj, final long nativeBaseOffset,
+      final long regionOffset, final long capacityBytes, final boolean readOnly) {
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly);
   }
 
   static BaseWritableMemoryImpl wrapHeapArray(final Object arr, final long offsetBytes,

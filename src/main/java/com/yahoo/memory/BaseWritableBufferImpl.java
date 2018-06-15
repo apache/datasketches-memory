@@ -42,13 +42,15 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   final static WritableBufferImpl ZERO_SIZE_BUFFER;
 
   static {
-    ZERO_SIZE_BUFFER = new HeapWritableBufferImpl(new byte[0], 0L, 0L, true, null);
+    final BaseWritableMemoryImpl mem = new HeapWritableMemoryImpl(new byte[0], 0L, 0L, true);
+    ZERO_SIZE_BUFFER = new HeapWritableBufferImpl(new byte[0], 0L, 0L, true, mem);
   }
 
   //Pass-through ctor
-  BaseWritableBufferImpl(final long regionOffset, final long capacityBytes, final boolean readOnly,
+  BaseWritableBufferImpl(final Object unsafeObj, final long nativeBaseOffset,
+      final long regionOffset, final long capacityBytes, final boolean readOnly,
       final BaseWritableMemoryImpl originMemory) {
-    super(regionOffset, capacityBytes, readOnly);
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly);
     this.originMemory = originMemory;
   }
 

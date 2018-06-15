@@ -25,7 +25,7 @@ class MapWritableBufferImpl extends WritableBufferImpl {
       final boolean readOnly,
       final StepBoolean valid,
       final BaseWritableMemoryImpl originMemory) {
-    super(regionOffset, capacityBytes, readOnly, originMemory);
+    super(null, nativeBaseOffset, regionOffset, capacityBytes, readOnly, originMemory);
     this.nativeBaseOffset = nativeBaseOffset;
     this.valid = valid;
     if (valid == null) {
@@ -67,11 +67,6 @@ class MapWritableBufferImpl extends WritableBufferImpl {
     return Util.nativeOrder;
   }
 
-  @Override
-  int getClassID() {
-    return BUF | NAT | MAP;
-  }
-
   @Override //TODO remove from baseWMemImpl NOTE WRITABLE ONLY
   public MemoryRequestServer getMemoryRequestServer() {
     return null;
@@ -79,7 +74,6 @@ class MapWritableBufferImpl extends WritableBufferImpl {
 
   @Override
   long getNativeBaseOffset() {
-    assertValid();
     return nativeBaseOffset;
   }
 

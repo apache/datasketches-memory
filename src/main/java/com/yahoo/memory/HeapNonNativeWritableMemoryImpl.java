@@ -22,7 +22,7 @@ class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
       final long regionOffset,
       final long capacityBytes,
       final boolean readOnly) {
-    super(regionOffset, capacityBytes, readOnly);
+    super(unsafeObj, 0L, regionOffset, capacityBytes, readOnly);
     this.unsafeObj = unsafeObj;
   }
 
@@ -54,11 +54,6 @@ class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
   public ByteOrder getByteOrder() {
     assertValid();
     return Util.nonNativeOrder;
-  }
-
-  @Override
-  int getClassID() {
-    return MEM | NNAT | HEAP;
   }
 
   @Override //TODO remove from baseWMemImpl NOTE WRITABLE ONLY

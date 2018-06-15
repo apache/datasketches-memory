@@ -44,9 +44,10 @@ import static com.yahoo.memory.UnsafeUtil.unsafe;
 abstract class WritableBufferImpl extends BaseWritableBufferImpl {
 
   //Pass-through ctor
-  WritableBufferImpl(final long regionOffset, final long capacityBytes, final boolean readOnly,
+  WritableBufferImpl(final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
+      final long capacityBytes, final boolean readOnly,
       final BaseWritableMemoryImpl originMemory) {
-    super(regionOffset, capacityBytes, readOnly, originMemory);
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, originMemory);
   }
 
   //PRIMITIVE getXXX() and getXXXArray() XXX

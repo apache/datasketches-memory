@@ -26,7 +26,7 @@ class DirectWritableBufferImpl extends WritableBufferImpl {
       final boolean readOnly,
       final StepBoolean valid,
       final BaseWritableMemoryImpl originMemory) {
-    super(regionOffset, capacityBytes, readOnly, originMemory);
+    super(null, nativeBaseOffset, regionOffset, capacityBytes, readOnly, originMemory);
     this.nativeBaseOffset = nativeBaseOffset;
     this.valid = valid;
     if (valid == null) {
@@ -37,24 +37,28 @@ class DirectWritableBufferImpl extends WritableBufferImpl {
   @Override
   BaseWritableBufferImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
       final boolean localReadOnly, final ByteOrder byteOrder) {
-    return Util.isNativeOrder(byteOrder)
+    final BaseWritableBufferImpl wmem = Util.isNativeOrder(byteOrder)
         ? new DirectWritableBufferImpl(
             nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, localReadOnly,
             valid, originMemory)
         : new DirectNonNativeWritableBufferImpl(
             nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, localReadOnly,
             valid, originMemory);
+    wmem.setMemoryRequestServer(memReqSvr);
+    return wmem;
   }
 
   @Override
   BaseWritableBufferImpl toDuplicate(final boolean localReadOnly, final ByteOrder byteOrder) {
-    return Util.isNativeOrder(byteOrder)
+    final BaseWritableBufferImpl wmem = Util.isNativeOrder(byteOrder)
         ? new DirectWritableBufferImpl(
             nativeBaseOffset, getRegionOffset(), getCapacity(), localReadOnly,
             valid, originMemory)
         : new DirectNonNativeWritableBufferImpl(
             nativeBaseOffset, getRegionOffset(), getCapacity(), localReadOnly,
             valid, originMemory);
+    wmem.setMemoryRequestServer(memReqSvr);
+    return wmem;
   }
 
   @Override
@@ -68,11 +72,6 @@ class DirectWritableBufferImpl extends WritableBufferImpl {
     return Util.nativeOrder;
   }
 
-  @Override
-  int getClassID() {
-    return BUF | NAT | DIR;
-  }
-
   @Override //TODO remove from baseWMemImpl NOTE WRITABLE ONLY
   public MemoryRequestServer getMemoryRequestServer() {
     assertValid();
@@ -84,7 +83,6 @@ class DirectWritableBufferImpl extends WritableBufferImpl {
 
   @Override
   long getNativeBaseOffset() {
-    assertValid();
     return nativeBaseOffset;
   }
 

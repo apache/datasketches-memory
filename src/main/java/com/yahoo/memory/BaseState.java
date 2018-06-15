@@ -28,6 +28,16 @@ abstract class BaseState {
   static final AtomicLong currentDirectMemoryMapAllocations_ = new AtomicLong();
   static final AtomicLong currentDirectMemoryMapAllocated_ = new AtomicLong();
 
+  //ID's
+  static final int MEM = 0;
+  static final int BUF = 8;
+  static final int NAT = 0;
+  static final int NNAT = 4;
+  static final int HEAP = 0;
+  static final int DIR = 1;
+  static final int MAP = 2;
+  static final int BB = 3;
+
   /**
    * The size of the backing resource in bytes. Used by all methods when checking bounds.
    */
@@ -142,6 +152,8 @@ abstract class BaseState {
   public final long getCumulativeOffset(final long offsetBytes) { //root
     return cumBaseOffset_ + offsetBytes;
   }
+
+  abstract int getClassID();
 
   abstract MemoryRequestServer getMemoryRequestSvr();
 

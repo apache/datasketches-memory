@@ -35,6 +35,29 @@ class DirectWritableBufferImpl extends WritableBufferImpl {
   }
 
   @Override
+  BaseWritableBufferImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
+      final boolean localReadOnly, final ByteOrder byteOrder) {
+    return Util.isNativeOrder(byteOrder)
+        ? new DirectWritableBufferImpl(
+            nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, localReadOnly,
+            valid, originMemory)
+        : new DirectNonNativeWritableBufferImpl(
+            nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, localReadOnly,
+            valid, originMemory);
+  }
+
+  @Override
+  BaseWritableBufferImpl toDuplicate(final boolean localReadOnly, final ByteOrder byteOrder) {
+    return Util.isNativeOrder(byteOrder)
+        ? new DirectWritableBufferImpl(
+            nativeBaseOffset, getRegionOffset(), getCapacity(), localReadOnly,
+            valid, originMemory)
+        : new DirectNonNativeWritableBufferImpl(
+            nativeBaseOffset, getRegionOffset(), getCapacity(), localReadOnly,
+            valid, originMemory);
+  }
+
+  @Override
   public ByteBuffer getByteBuffer() {
     return null;
   }
@@ -43,6 +66,11 @@ class DirectWritableBufferImpl extends WritableBufferImpl {
   public ByteOrder getByteOrder() {
     assertValid();
     return Util.nativeOrder;
+  }
+
+  @Override
+  int getClassID() {
+    return BUF | NAT | DIR;
   }
 
   @Override //TODO remove from baseWMemImpl NOTE WRITABLE ONLY

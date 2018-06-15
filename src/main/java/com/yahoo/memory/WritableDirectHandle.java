@@ -40,7 +40,6 @@ public final class WritableDirectHandle implements WritableHandle {
   @Override
   public void close() {
     if (direct.doClose()) {
-      wMem.zeroNativeBaseOffset();
       wMem = null;
     }
   }

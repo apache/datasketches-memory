@@ -33,6 +33,29 @@ class BBNonNativeWritableMemoryImpl extends WritableMemoryImpl {
   }
 
   @Override
+  BaseWritableMemoryImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
+      final boolean localReadOnly, final ByteOrder byteOrder) {
+    return Util.isNativeOrder(byteOrder)
+        ? new BBWritableMemoryImpl(
+            unsafeObj, getNativeBaseOffset(), getRegionOffset(offsetBytes), capacityBytes,
+            localReadOnly, getByteBuffer())
+        : new BBNonNativeWritableMemoryImpl(
+            unsafeObj, getNativeBaseOffset(), getRegionOffset(offsetBytes), capacityBytes,
+            localReadOnly, getByteBuffer());
+  }
+
+  @Override
+  BaseWritableBufferImpl toWritableBuffer(final boolean localReadOnly, final ByteOrder byteOrder) {
+    return Util.isNativeOrder(byteOrder)
+        ? new BBWritableBufferImpl(
+            unsafeObj, nativeBaseOffset, getRegionOffset(), getCapacity(), localReadOnly,
+            byteBuf, this)
+        : new BBNonNativeWritableBufferImpl(
+            unsafeObj, nativeBaseOffset, getRegionOffset(), getCapacity(), localReadOnly,
+            byteBuf, this);
+  }
+
+  @Override
   public ByteBuffer getByteBuffer() {
     assertValid();
     return byteBuf;
@@ -42,6 +65,11 @@ class BBNonNativeWritableMemoryImpl extends WritableMemoryImpl {
   public ByteOrder getByteOrder() {
     assertValid();
     return Util.nonNativeOrder;
+  }
+
+  @Override
+  int getClassID() {
+    return MEM | NNAT | BB;
   }
 
   @Override //TODO remove from baseWMemImpl NOTE WRITABLE ONLY

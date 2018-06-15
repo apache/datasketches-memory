@@ -34,7 +34,7 @@ import static com.yahoo.memory.UnsafeUtil.unsafe;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-class NonNativeWritableMemoryImpl extends BaseWritableMemoryImpl {
+abstract class NonNativeWritableMemoryImpl extends BaseWritableMemoryImpl {
 
   //Pass-through ctor
   NonNativeWritableMemoryImpl(final long regionOffset, final long capacityBytes,

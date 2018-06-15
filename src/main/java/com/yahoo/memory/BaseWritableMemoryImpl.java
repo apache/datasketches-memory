@@ -164,14 +164,11 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
       throw new ReadOnlyException("Writable region of a read-only Memory is not allowed.");
     }
     checkValidAndBounds(offsetBytes, capacityBytes);
-    return Util.isNativeOrder(byteOrder)
-        ? new WritableMemoryImpl(getUnsafeObject(), getNativeBaseOffset(),
-            getRegionOffset(offsetBytes), capacityBytes,
-            localReadOnly, getByteBuffer(), getValid())
-        : new NonNativeWritableMemoryImpl(getUnsafeObject(), getNativeBaseOffset(),
-            getRegionOffset(offsetBytes), capacityBytes,
-            localReadOnly, getByteBuffer(), getValid());
+    return toWritableRegion(offsetBytes, capacityBytes, localReadOnly, byteOrder);
   }
+
+  abstract BaseWritableMemoryImpl toWritableRegion(
+      long offsetBytes, long capcityBytes, boolean localReadOnly, ByteOrder byteOrder);
 
   //AS BUFFER XXX
   @Override
@@ -193,14 +190,12 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
       throw new ReadOnlyException(
           "Converting a read-only Memory to a writable Buffer is not allowed.");
     }
-    return Util.isNativeOrder(byteOrder)
-        ? new WritableBufferImpl(getUnsafeObject(), getNativeBaseOffset(),
-            getRegionOffset(), getCapacity(),
-            localReadOnly, getByteBuffer(), getValid(), this)
-        : new NonNativeWritableBufferImpl(getUnsafeObject(), getNativeBaseOffset(),
-            getRegionOffset(), getCapacity(),
-            localReadOnly, getByteBuffer(), getValid(), this);
+    final WritableBuffer wbuf = toWritableBuffer(localReadOnly, byteOrder);
+    wbuf.setStartPositionEnd(0, 0, getCapacity());
+    return wbuf;
   }
+
+  abstract BaseWritableBufferImpl toWritableBuffer(boolean localReadOnly, ByteOrder byteOrder);
 
   //PRIMITIVE getXXX() and getXXXArray() ENDIAN INDEPENDENT XXX
   @Override

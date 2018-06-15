@@ -33,7 +33,6 @@ public class MapHandle implements Map, Handle {
   @Override
   public void close() {
     if (dirMap.doClose()) {
-      wMem.zeroNativeBaseOffset();
       wMem = null;
     }
   }

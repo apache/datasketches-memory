@@ -27,6 +27,25 @@ class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
   }
 
   @Override
+  BaseWritableMemoryImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
+      final boolean localReadOnly, final ByteOrder byteOrder) {
+    return Util.isNativeOrder(byteOrder)
+        ? new HeapWritableMemoryImpl(
+            unsafeObj, getRegionOffset(offsetBytes), capacityBytes, localReadOnly)
+        : new HeapNonNativeWritableMemoryImpl(
+            unsafeObj, getRegionOffset(offsetBytes), capacityBytes, localReadOnly);
+  }
+
+  @Override
+  BaseWritableBufferImpl toWritableBuffer(final boolean localReadOnly, final ByteOrder byteOrder) {
+    return Util.isNativeOrder(byteOrder)
+        ? new HeapWritableBufferImpl(
+            unsafeObj, getRegionOffset(), getCapacity(), localReadOnly, this)
+        : new HeapNonNativeWritableBufferImpl(
+            unsafeObj, getRegionOffset(), getCapacity(), localReadOnly, this);
+  }
+
+  @Override
   public ByteBuffer getByteBuffer() {
     return null;
   }
@@ -35,6 +54,11 @@ class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
   public ByteOrder getByteOrder() {
     assertValid();
     return Util.nonNativeOrder;
+  }
+
+  @Override
+  int getClassID() {
+    return MEM | NNAT | HEAP;
   }
 
   @Override //TODO remove from baseWMemImpl NOTE WRITABLE ONLY

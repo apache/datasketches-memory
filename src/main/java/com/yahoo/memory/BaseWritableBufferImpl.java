@@ -42,7 +42,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   final static WritableBufferImpl ZERO_SIZE_BUFFER;
 
   static {
-    ZERO_SIZE_BUFFER = new WritableBufferImpl(new byte[0], 0L, 0L, 0L, true, null, null, null);
+    ZERO_SIZE_BUFFER = new HeapWritableBufferImpl(new byte[0], 0L, 0L, true, null);
   }
 
   //Pass-through ctor
@@ -70,16 +70,12 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
     if (isReadOnly() && !localReadOnly) {
       throw new ReadOnlyException("Writable duplicate of a read-only Buffer is not allowed.");
     }
-    final WritableBuffer wbuf = Util.isNativeOrder(byteOrder)
-        ? new WritableBufferImpl(getUnsafeObject(), getNativeBaseOffset(),
-            getRegionOffset(), getCapacity(),
-            localReadOnly, getByteBuffer(), getValid(), originMemory)
-        : new NonNativeWritableBufferImpl(getUnsafeObject(), getNativeBaseOffset(),
-            getRegionOffset(), getCapacity(),
-            localReadOnly, getByteBuffer(), getValid(), originMemory);
+    final WritableBuffer wbuf = toDuplicate(localReadOnly, byteOrder);
     wbuf.setStartPositionEnd(getStart(), getPosition(), getEnd());
     return wbuf;
   }
+
+  abstract BaseWritableBufferImpl toDuplicate(boolean localReadOnly, ByteOrder byteOrder);
 
   //REGIONS XXX
   @Override
@@ -115,14 +111,14 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
       throw new ReadOnlyException("Writable region of a read-only Buffer is not allowed.");
     }
     checkValidAndBounds(offsetBytes, capacityBytes);
-    return Util.isNativeOrder(byteOrder)
-        ? new WritableBufferImpl(getUnsafeObject(), getNativeBaseOffset(),
-            getRegionOffset(offsetBytes), capacityBytes,
-            localReadOnly, getByteBuffer(), getValid(), originMemory)
-        : new NonNativeWritableBufferImpl(getUnsafeObject(), getNativeBaseOffset(),
-            getRegionOffset(offsetBytes), capacityBytes,
-            localReadOnly, getByteBuffer(), getValid(), originMemory);
+    final WritableBuffer wbuf = toWritableRegion(
+        offsetBytes, capacityBytes, localReadOnly, byteOrder);
+    wbuf.setStartPositionEnd(0, 0, capacityBytes);
+    return wbuf;
   }
+
+  abstract BaseWritableBufferImpl toWritableRegion(
+      long offsetBytes, long capcityBytes, boolean localReadOnly, ByteOrder byteOrder);
 
   //MEMORY XXX
   @Override

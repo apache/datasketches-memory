@@ -33,6 +33,27 @@ class MapWritableMemoryImpl extends WritableMemoryImpl {
   }
 
   @Override
+  BaseWritableMemoryImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
+      final boolean localReadOnly, final ByteOrder byteOrder) {
+    return Util.isNativeOrder(byteOrder)
+        ? new MapWritableMemoryImpl(
+            nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, localReadOnly,
+            valid)
+        : new MapNonNativeWritableMemoryImpl(
+            nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, localReadOnly,
+            valid);
+  }
+
+  @Override
+  BaseWritableBufferImpl toWritableBuffer(final boolean localReadOnly, final ByteOrder byteOrder) {
+    return Util.isNativeOrder(byteOrder)
+        ? new MapWritableBufferImpl(
+            nativeBaseOffset, getRegionOffset(), getCapacity(), localReadOnly, valid, this)
+        : new MapNonNativeWritableBufferImpl(
+            nativeBaseOffset, getRegionOffset(), getCapacity(), localReadOnly, valid, this);
+  }
+
+  @Override
   public ByteBuffer getByteBuffer() {
     return null;
   }
@@ -41,6 +62,11 @@ class MapWritableMemoryImpl extends WritableMemoryImpl {
   public ByteOrder getByteOrder() {
     assertValid();
     return Util.nativeOrder;
+  }
+
+  @Override
+  int getClassID() {
+    return MEM | NAT | MAP;
   }
 
   @Override //TODO remove from baseWMemImpl NOTE WRITABLE ONLY

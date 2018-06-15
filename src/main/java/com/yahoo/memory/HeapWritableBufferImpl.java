@@ -28,6 +28,25 @@ class HeapWritableBufferImpl extends WritableBufferImpl {
   }
 
   @Override
+  BaseWritableBufferImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
+      final boolean localReadOnly, final ByteOrder byteOrder) {
+    return Util.isNativeOrder(byteOrder)
+        ? new HeapWritableBufferImpl(
+            unsafeObj, getRegionOffset(offsetBytes), capacityBytes, localReadOnly, originMemory)
+        : new HeapNonNativeWritableBufferImpl(
+            unsafeObj, getRegionOffset(offsetBytes), capacityBytes, localReadOnly, originMemory);
+  }
+
+  @Override
+  BaseWritableBufferImpl toDuplicate(final boolean localReadOnly, final ByteOrder byteOrder) {
+    return Util.isNativeOrder(byteOrder)
+        ? new HeapWritableBufferImpl(
+            unsafeObj, getRegionOffset(), getCapacity(), localReadOnly, originMemory)
+        : new HeapNonNativeWritableBufferImpl(
+            unsafeObj, getRegionOffset(), getCapacity(), localReadOnly, originMemory);
+  }
+
+  @Override
   public ByteBuffer getByteBuffer() {
     return null;
   }
@@ -36,6 +55,11 @@ class HeapWritableBufferImpl extends WritableBufferImpl {
   public ByteOrder getByteOrder() {
     assertValid();
     return Util.nativeOrder;
+  }
+
+  @Override
+  int getClassID() {
+    return BUF | NAT | HEAP;
   }
 
   @Override //TODO remove from baseWBufImpl NOTE WRITABLE ONLY

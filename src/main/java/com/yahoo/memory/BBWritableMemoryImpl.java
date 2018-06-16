@@ -55,7 +55,6 @@ class BBWritableMemoryImpl extends WritableMemoryImpl {
             byteBuf, this);
   }
 
-
   @Override
   public ByteBuffer getByteBuffer() {
     assertValid();
@@ -100,4 +99,3 @@ class BBWritableMemoryImpl extends WritableMemoryImpl {
 
   }
 }
-

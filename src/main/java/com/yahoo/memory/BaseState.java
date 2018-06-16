@@ -60,7 +60,7 @@ abstract class BaseState {
     regionOffset_ = regionOffset; //base
     capacityBytes_ = capacityBytes; //base
     readOnly_ = readOnly; //base
-    cumBaseOffset_ = regionOffset + ((unsafeObj == null)
+    cumBaseOffset_ = regionOffset + ((unsafeObj == null) //base
         ? nativeBaseOffset
         : unsafe.arrayBaseOffset(unsafeObj.getClass()));
   }
@@ -71,7 +71,7 @@ abstract class BaseState {
    * @return true if the given Object is an instance of this class and has equal data contents.
    */
   @Override
-  public final boolean equals(final Object that) { //root
+  public final boolean equals(final Object that) {
     if (this == that) { return true; }
     return (that instanceof BaseState)
       ? CompareAndCopy.equals(this, ((BaseState) that))
@@ -90,7 +90,7 @@ abstract class BaseState {
    * bytes.
    */
   public final boolean equalTo(final long thisOffsetBytes, final Object that,
-      final long thatOffsetBytes, final long lengthBytes) { //root
+      final long thatOffsetBytes, final long lengthBytes) {
     return (that instanceof BaseState)
       ? CompareAndCopy.equals(this, thisOffsetBytes, (BaseState) that, thatOffsetBytes, lengthBytes)
       : false;
@@ -113,7 +113,8 @@ abstract class BaseState {
    * Gets the capacity of this object in bytes
    * @return the capacity of this object in bytes
    */
-  public final long getCapacity() { //root
+  public final long getCapacity() {
+    assertValid();
     return capacityBytes_;
   }
 
@@ -123,7 +124,8 @@ abstract class BaseState {
    *
    * @return the cumulative offset in bytes of this object
    */
-  public final long getCumulativeOffset() { //cannot test valid here
+  public final long getCumulativeOffset() {
+    assertValid();
     return cumBaseOffset_;
   }
 
@@ -134,15 +136,16 @@ abstract class BaseState {
    * @param offsetBytes offset to be added to the base cumulative offset.
    * @return the cumulative offset in bytes of this object
    */
-  public final long getCumulativeOffset(final long offsetBytes) { //root
+  public final long getCumulativeOffset(final long offsetBytes) {
+    assertValid();
     return cumBaseOffset_ + offsetBytes;
   }
 
-  abstract MemoryRequestServer getMemoryRequestSvr();
+  abstract MemoryRequestServer getMemoryRequestServer();
 
   abstract long getNativeBaseOffset();
 
-  final long getRegOffset() { //root
+  final long getRegOffset() {
     return regionOffset_;
   }
 
@@ -154,7 +157,8 @@ abstract class BaseState {
    * Returns true if this object is backed by an on-heap primitive array
    * @return true if this object is backed by an on-heap primitive array
    */
-  public final boolean hasArray() { //cannot test valid here
+  public final boolean hasArray() {
+    assertValid();
     return getUnsafeObject() != null;
   }
 
@@ -171,7 +175,7 @@ abstract class BaseState {
    * @return the hashCode of this class.
    */
   @Override
-  public final int hashCode() { //root
+  public final int hashCode() {
     return CompareAndCopy.hashCode(this);
   }
 
@@ -179,7 +183,7 @@ abstract class BaseState {
    * Returns true if this Memory is backed by a ByteBuffer
    * @return true if this Memory is backed by a ByteBuffer
    */
-  public final boolean hasByteBuffer() { //root
+  public final boolean hasByteBuffer() {
     assertValid();
     return getByteBuffer() != null;
   }
@@ -189,7 +193,7 @@ abstract class BaseState {
    * This is the case for allocated direct memory, memory mapped files,
    * @return true if the backing memory is direct (off-heap) memory.
    */
-  public final boolean isDirect() { //root
+  public final boolean isDirect() {
     assertValid();
     return getNativeBaseOffset() > 0L;
   }
@@ -198,7 +202,8 @@ abstract class BaseState {
    * Returns true if the current byte order is native order.
    * @return true if the current byte order is native order.
    */
-  public final boolean isNativeOrder() { //root
+  public final boolean isNativeOrder() {
+    assertValid();
     return Util.isNativeOrder(getByteOrder());
   }
 
@@ -239,11 +244,11 @@ abstract class BaseState {
   public abstract boolean isValid();
 
   //ASSERTS AND CHECKS
-  final void assertValid() { //root
+  final void assertValid() {
     assert isValid() : "Memory not valid.";
   }
 
-  final void checkValid() { //root
+  final void checkValid() {
     if (!isValid()) {
       throw new IllegalStateException("Memory not valid.");
     }
@@ -363,7 +368,7 @@ abstract class BaseState {
     final ByteBuffer bb = state.getByteBuffer();
     final String bbStr = (bb == null) ? "null"
             : bb.getClass().getSimpleName() + ", " + (bb.hashCode() & 0XFFFFFFFFL);
-    final MemoryRequestServer memReqSvr = state.getMemoryRequestSvr();
+    final MemoryRequestServer memReqSvr = state.getMemoryRequestServer();
     final String memReqStr = (memReqSvr != null)
         ? memReqSvr.getClass().getSimpleName() + ", " + (memReqSvr.hashCode() & 0XFFFFFFFFL)
         : "null";

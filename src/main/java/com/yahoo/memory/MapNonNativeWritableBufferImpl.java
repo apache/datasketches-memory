@@ -98,4 +98,3 @@ class MapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   }
 
 }
-

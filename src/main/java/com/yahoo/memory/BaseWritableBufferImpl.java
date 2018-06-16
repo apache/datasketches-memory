@@ -253,11 +253,6 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
 
   //OTHER WRITABLE API METHODS XXX
 
-  @Override
-  MemoryRequestServer getMemoryRequestSvr() {
-    return getMemoryRequestServer();
-  }
-
   abstract void setMemoryRequestServer(MemoryRequestServer svr);
 
   @Override

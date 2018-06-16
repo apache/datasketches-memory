@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
- * Implementation of {@link WritableBuffer} for direct memory, native byte order.
+ * Implementation of {@link WritableBuffer} for direct memory, non-native byte order.
  *
  * @author Roman Leventov
  * @author Lee Rhodes
@@ -107,4 +107,3 @@ class DirectNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   }
 
 }
-

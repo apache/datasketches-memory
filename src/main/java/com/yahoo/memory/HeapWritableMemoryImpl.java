@@ -56,20 +56,18 @@ class HeapWritableMemoryImpl extends WritableMemoryImpl {
     return Util.nativeOrder;
   }
 
-  @Override //TODO remove from baseWMemImpl NOTE WRITABLE ONLY
+  @Override
   public MemoryRequestServer getMemoryRequestServer() {
     return null;
   }
 
   @Override
   long getNativeBaseOffset() {
-    assertValid();
     return 0;
   }
 
   @Override
   Object getUnsafeObject() {
-    assertValid();
     return unsafeObj;
   }
 

@@ -100,4 +100,3 @@ class BBWritableBufferImpl extends WritableBufferImpl {
 
   }
 }
-

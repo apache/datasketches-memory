@@ -57,20 +57,18 @@ class HeapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
     return Util.nonNativeOrder;
   }
 
-  @Override //TODO remove from baseWBufImpl NOTE WRITABLE ONLY
+  @Override
   public MemoryRequestServer getMemoryRequestServer() {
     return null;
   }
 
   @Override
   long getNativeBaseOffset() {
-    assertValid();
     return 0;
   }
 
   @Override
   Object getUnsafeObject() {
-    assertValid();
     return unsafeObj;
   }
 

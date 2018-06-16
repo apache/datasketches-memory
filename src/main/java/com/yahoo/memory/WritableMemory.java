@@ -600,6 +600,7 @@ public abstract class WritableMemory extends Memory {
    * setMemoryRequestServer(...), this returns the <i>DefaultMemoryRequestServer</i>.
    * @return the MemoryRequestServer object (if direct memory) or null.
    */
+  @Override
   public abstract MemoryRequestServer getMemoryRequestServer();
 
   /**

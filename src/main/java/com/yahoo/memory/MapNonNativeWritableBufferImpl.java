@@ -14,7 +14,7 @@ import java.nio.ByteOrder;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-class MapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
+final class MapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   private final long nativeBaseOffset; //used to compute cumBaseOffset
   private final StepBoolean valid; //a reference only
 

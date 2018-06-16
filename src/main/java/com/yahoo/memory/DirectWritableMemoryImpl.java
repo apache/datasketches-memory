@@ -14,7 +14,7 @@ import java.nio.ByteOrder;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-class DirectWritableMemoryImpl extends WritableMemoryImpl {
+final class DirectWritableMemoryImpl extends WritableMemoryImpl {
   private final long nativeBaseOffset; //used to compute cumBaseOffset
   private final StepBoolean valid; //a reference only
   private MemoryRequestServer memReqSvr = null; //cannot be final;

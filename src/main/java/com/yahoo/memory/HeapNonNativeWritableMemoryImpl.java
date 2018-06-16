@@ -14,7 +14,7 @@ import java.nio.ByteOrder;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
+final class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
   private final Object unsafeObj;
 
   HeapNonNativeWritableMemoryImpl(

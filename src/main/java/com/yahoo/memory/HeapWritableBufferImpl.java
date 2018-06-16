@@ -14,7 +14,7 @@ import java.nio.ByteOrder;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-class HeapWritableBufferImpl extends WritableBufferImpl {
+final class HeapWritableBufferImpl extends WritableBufferImpl {
   private final Object unsafeObj;
 
   HeapWritableBufferImpl(

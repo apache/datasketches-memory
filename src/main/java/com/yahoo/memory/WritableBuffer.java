@@ -64,12 +64,42 @@ public abstract class WritableBuffer extends Buffer {
   /**
    * Returns a duplicate writable view of this Buffer with the same but independent values of
    * <i>start</i>, <i>position</i> and <i>end</i>.
+   * <ul>
+   * <li>Returned object's origin = this object's origin</li>
+   * <li>Returned object's <i>start</i> = this object's <i>start</i></li>
+   * <li>Returned object's <i>position</i> = this object's <i>position</i></li>
+   * <li>Returned object's <i>end</i> = this object's <i>end</i></li>
+   * <li>Returned object's <i>capacity</i> = this object' <i>capacityBytes</i></li>
+   * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable and
+   * independent of this object's <i>start</i>, <i>position</i> and <i>end</i></li>
+   * </ul>
    * If this object's capacity is zero, the returned object is effectively immutable and
    * the backing storage and byte order are unspecified.
    * @return a duplicate writable view of this Buffer with the same but independent values of
    * <i>start</i>, <i>position</i> and <i>end</i>.
    */
   public abstract WritableBuffer writableDuplicate();
+
+  /**
+   * Returns a duplicate writable view of this Buffer with the same but independent values of
+   * <i>start</i>, <i>position</i> and <i>end</i>, but with the specified byteOrder.
+   * <ul>
+   * <li>Returned object's origin = this object's origin</li>
+   * <li>Returned object's <i>start</i> = this object's <i>start</i></li>
+   * <li>Returned object's <i>position</i> = this object's <i>position</i></li>
+   * <li>Returned object's <i>end</i> = this object's <i>end</i></li>
+   * <li>Returned object's <i>capacity</i> = this object' <i>capacityBytes</i></li>
+   * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable and
+   * independent of this object's <i>start</i>, <i>position</i> and <i>end</i></li>
+   * </ul>
+   * If this object's capacity is zero, the returned object is effectively immutable and
+   * the backing storage and byte order are unspecified.
+   * @param byteOrder the given <i>ByteOrder</i>.
+   * @return a duplicate writable view of this Buffer with the same but independent values of
+   * <i>start</i>, <i>position</i> and <i>end</i>.
+   */
+  public abstract WritableBuffer writableDuplicate(ByteOrder byteOrder);
+
 
   //REGIONS XXX
   /**

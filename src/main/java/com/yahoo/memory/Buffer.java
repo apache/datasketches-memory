@@ -62,6 +62,15 @@ public abstract class Buffer extends BaseBuffer {
   /**
    * Returns a read-only duplicate view of this Buffer with the same but independent values of
    * <i>start</i>, <i>position</i> and <i>end</i>.
+   * <ul>
+   * <li>Returned object's origin = this object's origin</li>
+   * <li>Returned object's <i>start</i> = this object's <i>start</i></li>
+   * <li>Returned object's <i>position</i> = this object's <i>position</i></li>
+   * <li>Returned object's <i>end</i> = this object's <i>end</i></li>
+   * <li>Returned object's <i>capacity</i> = this object' <i>capacityBytes</i></li>
+   * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable and
+   * independent of this object's <i>start</i>, <i>position</i> and <i>end</i></li>
+   * </ul>
    * If this object's capacity is zero, the returned object is effectively immutable and
    * the backing storage and byte order are unspecified.
    * @return a read-only duplicate view of this Buffer with the same but independent values of
@@ -69,10 +78,30 @@ public abstract class Buffer extends BaseBuffer {
    */
   public abstract Buffer duplicate();
 
+  /**
+   * Returns a read-only duplicate view of this Buffer with the same but independent values of
+   * <i>start</i>, <i>position</i> and <i>end</i>, but with the specified byteOrder.
+   * <ul>
+   * <li>Returned object's origin = this object's origin</li>
+   * <li>Returned object's <i>start</i> = this object's <i>start</i></li>
+   * <li>Returned object's <i>position</i> = this object's <i>position</i></li>
+   * <li>Returned object's <i>end</i> = this object's <i>end</i></li>
+   * <li>Returned object's <i>capacity</i> = this object' <i>capacityBytes</i></li>
+   * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable and
+   * independent of this object's <i>start</i>, <i>position</i> and <i>end</i></li>
+   * </ul>
+   * If this object's capacity is zero, the returned object is effectively immutable and
+   * the backing storage and byte order are unspecified.
+   * @param byteOrder the given <i>ByteOrder</i>.
+   * @return a read-only duplicate view of this Buffer with the same but independent values of
+   * <i>start</i>, <i>position</i> and <i>end</i>.
+   */
+  public abstract Buffer duplicate(ByteOrder byteOrder);
+
   //REGIONS XXX
   /**
    * A region is a read-only view of the backing store of this object.
-   * This returns a new <i>Buffer</i> representing the defined region.
+   * The new Buffer region returned will be based on the current <i>position</i> and <i>end</i>.
    * <ul>
    * <li>Returned object's origin = this object's <i>position</i></li>
    * <li>Returned object's <i>start</i> = 0</li>

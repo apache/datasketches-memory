@@ -67,7 +67,7 @@ final class BBWritableMemoryImpl extends WritableMemoryImpl {
     return Util.nativeOrder;
   }
 
-  @Override //TODO remove from baseWMemImpl NOTE WRITABLE ONLY
+  @Override
   public MemoryRequestServer getMemoryRequestServer() {
     return null;
   }

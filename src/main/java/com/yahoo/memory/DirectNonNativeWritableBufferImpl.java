@@ -72,13 +72,10 @@ final class DirectNonNativeWritableBufferImpl extends NonNativeWritableBufferImp
     return Util.nonNativeOrder;
   }
 
-  @Override //TODO remove from baseWMemImpl NOTE WRITABLE ONLY
+  @Override
   public MemoryRequestServer getMemoryRequestServer() {
     assertValid();
-    if (memReqSvr == null) {
-      memReqSvr = new DefaultMemoryRequestServer();
-    }
-    return memReqSvr;
+    return memReqSvr; //cannot be null
   }
 
   @Override

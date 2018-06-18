@@ -61,13 +61,20 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   }
 
   @Override
+  public Buffer duplicate(final ByteOrder byteOrder) {
+    return writableDuplicateImpl(true, byteOrder);
+  }
+
+  @Override
   public WritableBuffer writableDuplicate() {
     return writableDuplicateImpl(false, getByteOrder());
   }
 
-  //Developer note: we don't allow switching byte order on duplicates.
-  //This is here to reduce complexity in the endian-sensitive classes and to allow us to easily
-  // change our mind in the future :)
+  @Override
+  public WritableBuffer writableDuplicate(final ByteOrder byteOrder) {
+    return writableDuplicateImpl(false, byteOrder);
+  }
+
   WritableBuffer writableDuplicateImpl(final boolean localReadOnly, final ByteOrder byteOrder) {
     if (isReadOnly() && !localReadOnly) {
       throw new ReadOnlyException("Writable duplicate of a read-only Buffer is not allowed.");

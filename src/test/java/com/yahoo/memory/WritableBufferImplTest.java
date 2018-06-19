@@ -548,11 +548,20 @@ public class WritableBufferImplTest {
     }
   }
 
-  @Test void checkZeroBuffer() {
+  @Test
+  public void checkZeroBuffer() {
     WritableMemory wmem = WritableMemory.allocate(8);
     WritableBuffer wbuf = wmem.asWritableBuffer();
     WritableBuffer reg = wbuf.writableRegion(0, 0, wbuf.getByteOrder());
     assertEquals(reg.getCapacity(), 0);
+  }
+
+  @Test
+  public void checkDuplicateNonNative() {
+    WritableMemory wmem = WritableMemory.allocate(64);
+    wmem.putShort(0, (short) 1);
+    Buffer buf = wmem.asWritableBuffer().duplicate(Util.nonNativeOrder);
+    assertEquals(buf.getShort(0), 256);
   }
 
   @Test

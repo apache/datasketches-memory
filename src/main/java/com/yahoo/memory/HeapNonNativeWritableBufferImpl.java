@@ -73,17 +73,12 @@ final class HeapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl 
   }
 
   @Override
-  StepBoolean getValid() {
-    return null;
-  }
-
-  @Override
   public boolean isValid() {
     return true;
   }
 
   @Override
-  public void setMemoryRequestServer(final MemoryRequestServer svr) {
-
+  void setMemoryRequestServer(final MemoryRequestServer svr) {
+    //do nothing
   }
 }

@@ -67,7 +67,7 @@ final class BBNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
     return Util.nonNativeOrder;
   }
 
-  @Override //TODO remove from baseWMemImpl NOTE WRITABLE ONLY
+  @Override
   public MemoryRequestServer getMemoryRequestServer() {
     return null;
   }
@@ -85,17 +85,12 @@ final class BBNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
   }
 
   @Override
-  StepBoolean getValid() {
-    return null;
-  }
-
-  @Override
   public boolean isValid() {
     return true;
   }
 
   @Override
-  public void setMemoryRequestServer(final MemoryRequestServer svr) {
-
+  void setMemoryRequestServer(final MemoryRequestServer svr) {
+    //do nothing
   }
 }

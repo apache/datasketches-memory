@@ -178,8 +178,18 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   }
 
   @Override
+  public Buffer asBuffer(final ByteOrder byteOrder) {
+    return asWritableBufferImpl(true, byteOrder);
+  }
+
+  @Override
   public WritableBuffer asWritableBuffer() {
     return asWritableBufferImpl(false, getByteOrder());
+  }
+
+  @Override
+  public WritableBuffer asWritableBuffer(final ByteOrder byteOrder) {
+    return asWritableBufferImpl(false, byteOrder);
   }
 
   //Developer note: we don't currently allow switching byte order when switching from Memory to

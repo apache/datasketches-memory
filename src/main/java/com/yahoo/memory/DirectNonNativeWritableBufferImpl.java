@@ -29,9 +29,6 @@ final class DirectNonNativeWritableBufferImpl extends NonNativeWritableBufferImp
     super(null, nativeBaseOffset, regionOffset, capacityBytes, readOnly, originMemory);
     this.nativeBaseOffset = nativeBaseOffset;
     this.valid = valid;
-    if (valid == null) {
-      throw new IllegalArgumentException("Valid cannot be null.");
-    }
   }
 
   @Override
@@ -89,17 +86,12 @@ final class DirectNonNativeWritableBufferImpl extends NonNativeWritableBufferImp
   }
 
   @Override
-  StepBoolean getValid() {
-    return valid;
-  }
-
-  @Override
   public boolean isValid() {
     return valid.get();
   }
 
   @Override
-  public void setMemoryRequestServer(final MemoryRequestServer svr) {
+  void setMemoryRequestServer(final MemoryRequestServer svr) {
     memReqSvr = svr;
   }
 

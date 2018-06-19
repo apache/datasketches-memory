@@ -199,6 +199,24 @@ public abstract class WritableMemory extends Memory {
    */
   public abstract WritableBuffer asWritableBuffer();
 
+  /**
+   * Returns a new <i>WritableBuffer</i> with a writable view of the backing store of this object
+   * with the given byte order.
+   * <ul>
+   * <li>Returned object's origin = this object's origin</li>
+   * <li>Returned object's <i>start</i> = 0</li>
+   * <li>Returned object's <i>position</i> = 0</li>
+   * <li>Returned object's <i>end</i> = this object's capacity</li>
+   * <li>Returned object's <i>capacity</i> = this object's capacity</li>
+   * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable</li>
+   * </ul>
+   * If this object's capacity is zero, the returned object is effectively immutable and
+   * the backing storage and byte order are unspecified.
+   * @param byteOrder the given byte order
+   * @return a new <i>WritableBuffer</i> with a view of this WritableMemory
+   */
+  public abstract WritableBuffer asWritableBuffer(ByteOrder byteOrder);
+
   //ALLOCATE HEAP VIA AUTOMATIC BYTE ARRAY XXX
   /**
    * Creates on-heap WritableMemory with the given capacity. If the given capacityBytes is zero,

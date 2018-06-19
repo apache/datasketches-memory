@@ -28,9 +28,6 @@ final class MapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
     super(null, nativeBaseOffset, regionOffset, capacityBytes, readOnly, originMemory);
     this.nativeBaseOffset = nativeBaseOffset;
     this.valid = valid;
-    if (valid == null) {
-      throw new IllegalArgumentException("Valid cannot be null.");
-    }
   }
 
   @Override
@@ -83,18 +80,13 @@ final class MapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   }
 
   @Override
-  StepBoolean getValid() {
-    return valid;
-  }
-
-  @Override
   public boolean isValid() {
     return valid.get();
   }
 
   @Override //TODO make abstract in BaseWritable?
   void setMemoryRequestServer(final MemoryRequestServer svr) {
-
+    //do nothing
   }
 
 }

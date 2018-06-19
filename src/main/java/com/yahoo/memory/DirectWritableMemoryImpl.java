@@ -28,9 +28,6 @@ final class DirectWritableMemoryImpl extends WritableMemoryImpl {
     super(null, nativeBaseOffset, regionOffset, capacityBytes, readOnly);
     this.nativeBaseOffset = nativeBaseOffset;
     this.valid = valid;
-    if (valid == null) {
-      throw new IllegalArgumentException("Valid cannot be null.");
-    }
   }
 
   @Override
@@ -84,17 +81,12 @@ final class DirectWritableMemoryImpl extends WritableMemoryImpl {
   }
 
   @Override
-  StepBoolean getValid() {
-    return valid;
-  }
-
-  @Override
   public boolean isValid() {
     return valid.get();
   }
 
   @Override
-  public void setMemoryRequestServer(final MemoryRequestServer svr) {
+  void setMemoryRequestServer(final MemoryRequestServer svr) {
     memReqSvr = svr;
   }
 

@@ -49,7 +49,7 @@ abstract class BaseState {
 
   /**
    * This is the offset that defines the start of a sub-region of the backing resource. It is
-   * used to compute cumBaseOffset. If this changes, cumBaseOffset is recomputed.
+   * used to compute cumBaseOffset.
    * This will be loaded from heap ByteBuffers as they have a similar field used for slices.
    * It is used by region() and writableRegion().
    */
@@ -57,10 +57,10 @@ abstract class BaseState {
 
   BaseState(final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
       final long capacityBytes, final boolean readOnly) {
-    regionOffset_ = regionOffset; //base
-    capacityBytes_ = capacityBytes; //base
+    regionOffset_ = regionOffset;
+    capacityBytes_ = capacityBytes;
     readOnly_ = readOnly; //base
-    cumBaseOffset_ = regionOffset + ((unsafeObj == null) //base
+    cumBaseOffset_ = regionOffset + ((unsafeObj == null)
         ? nativeBaseOffset
         : unsafe.arrayBaseOffset(unsafeObj.getClass()));
   }
@@ -151,8 +151,6 @@ abstract class BaseState {
 
   abstract Object getUnsafeObject();
 
-  abstract StepBoolean getValid(); //can return null
-
   /**
    * Returns true if this object is backed by an on-heap primitive array
    * @return true if this object is backed by an on-heap primitive array
@@ -211,7 +209,7 @@ abstract class BaseState {
    * Returns true if this object or the backing resource is read-only.
    * @return true if this object or the backing resource is read-only.
    */
-  public final boolean isReadOnly() { //root
+  public final boolean isReadOnly() {
     assertValid();
     return readOnly_;
   }
@@ -224,7 +222,7 @@ abstract class BaseState {
    * @return true if the backing resource of <i>this</i> is identical with the backing resource
    * of <i>that</i>.
    */
-  public final boolean isSameResource(final Object that) { //root
+  public final boolean isSameResource(final Object that) {
     checkValid();
     if (that == null) { return false; }
     final BaseState that1 = (BaseState) that;

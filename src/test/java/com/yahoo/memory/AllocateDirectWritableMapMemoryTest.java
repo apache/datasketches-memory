@@ -24,7 +24,8 @@ public class AllocateDirectWritableMapMemoryTest {
 
   @Test
   public void simpleMap() throws Exception {
-    File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
+    File file =
+        new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
     try (MapHandle h = Memory.map(file); WritableMapHandle wh = (WritableMapHandle) h) {
       Memory mem = h.get();
       byte[] bytes = new byte[(int)mem.getCapacity()];
@@ -53,9 +54,9 @@ public class AllocateDirectWritableMapMemoryTest {
         throw new RuntimeException(e);
       }
     }
-    assert file.createNewFile();
-    assert file.setWritable(true, false); //writable=true, ownerOnly=false
-    assert file.isFile();
+    assertTrue(file.createNewFile());
+    assertTrue (file.setWritable(true, false)); //writable=true, ownerOnly=false
+    assertTrue (file.isFile());
     file.deleteOnExit();  //comment out if you want to examine the file.
 
     try (
@@ -80,7 +81,7 @@ public class AllocateDirectWritableMapMemoryTest {
   }
 
   @Test
-  public void checkNonNativeFile() throws Exception {
+  public void checkNonNativeFile() throws IOException {
     File file = new File("TestFile2.bin");
     if (file.exists()) {
       try {
@@ -89,9 +90,9 @@ public class AllocateDirectWritableMapMemoryTest {
         throw new RuntimeException(e);
       }
     }
-    assert file.createNewFile();
-    assert file.setWritable(true, false); //writable=true, ownerOnly=false
-    assert file.isFile();
+    assertTrue(file.createNewFile());
+    assertTrue(file.setWritable(true, false)); //writable=true, ownerOnly=false
+    assertTrue(file.isFile());
     file.deleteOnExit();  //comment out if you want to examine the file.
 
     final long bytes = 8;

@@ -37,10 +37,10 @@ final class BBWritableMemoryImpl extends WritableMemoryImpl {
       final boolean localReadOnly, final ByteOrder byteOrder) {
     return Util.isNativeOrder(byteOrder)
         ? new BBWritableMemoryImpl(
-            unsafeObj, getNativeBaseOffset(), getRegionOffset(offsetBytes), capacityBytes,
+            unsafeObj, nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes,
             localReadOnly, getByteBuffer())
         : new BBNonNativeWritableMemoryImpl(
-            unsafeObj, getNativeBaseOffset(), getRegionOffset(offsetBytes), capacityBytes,
+            unsafeObj, nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes,
             localReadOnly, getByteBuffer());
   }
 

@@ -74,15 +74,14 @@ final class BBNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   }
 
   @Override
-  long getNativeBaseOffset() {
-    assertValid();
-    return nativeBaseOffset;
-  }
-
-  @Override
   Object getUnsafeObject() {
     assertValid();
     return unsafeObj;
+  }
+
+  @Override
+  public boolean isDirect() {
+    return unsafeObj == null;
   }
 
   @Override

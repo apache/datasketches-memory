@@ -67,13 +67,13 @@ final class MapWritableMemoryImpl extends WritableMemoryImpl {
   }
 
   @Override
-  long getNativeBaseOffset() {
-    return nativeBaseOffset;
+  Object getUnsafeObject() {
+    return null;
   }
 
   @Override
-  Object getUnsafeObject() {
-    return null;
+  public boolean isDirect() {
+    return true;
   }
 
   @Override

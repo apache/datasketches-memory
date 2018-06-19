@@ -143,8 +143,6 @@ abstract class BaseState {
 
   abstract MemoryRequestServer getMemoryRequestServer();
 
-  abstract long getNativeBaseOffset();
-
   final long getRegOffset() {
     return regionOffset_;
   }
@@ -191,10 +189,7 @@ abstract class BaseState {
    * This is the case for allocated direct memory, memory mapped files,
    * @return true if the backing memory is direct (off-heap) memory.
    */
-  public final boolean isDirect() {
-    assertValid();
-    return getNativeBaseOffset() > 0L;
-  }
+  public abstract boolean isDirect();
 
   /**
    * Returns true if the current byte order is native order.

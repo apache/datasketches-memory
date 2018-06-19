@@ -63,13 +63,13 @@ final class HeapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl 
   }
 
   @Override
-  long getNativeBaseOffset() {
-    return 0;
+  Object getUnsafeObject() {
+    return unsafeObj;
   }
 
   @Override
-  Object getUnsafeObject() {
-    return unsafeObj;
+  public boolean isDirect() {
+    return false;
   }
 
   @Override

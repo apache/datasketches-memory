@@ -80,17 +80,19 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   @SuppressWarnings("resource")
   static WritableMapHandle wrapMap(final File file, final long fileOffsetBytes,
       final long capacityBytes, final boolean localReadOnly, final ByteOrder byteOrder) {
+
     final AllocateDirectWritableMap dirWMap =
-        new AllocateDirectWritableMap(file, fileOffsetBytes, capacityBytes);
+        new AllocateDirectWritableMap(file, fileOffsetBytes, capacityBytes, localReadOnly);
     if (dirWMap.resourceReadOnly && !localReadOnly) {
       dirWMap.close();
       throw new ReadOnlyException("File is Read Only");
     }
+    final boolean readOnly = dirWMap.resourceReadOnly || localReadOnly;
     final BaseWritableMemoryImpl impl = Util.isNativeOrder(byteOrder)
         ? new MapWritableMemoryImpl(dirWMap.nativeBaseOffset, 0L, capacityBytes,
-            dirWMap.resourceReadOnly || localReadOnly, dirWMap.getValid())
+            readOnly, dirWMap.getValid())
         : new MapNonNativeWritableMemoryImpl(dirWMap.nativeBaseOffset, 0L, capacityBytes,
-            dirWMap.resourceReadOnly || localReadOnly, dirWMap.getValid());
+            readOnly, dirWMap.getValid());
     return new WritableMapHandle(dirWMap, impl);
   }
 

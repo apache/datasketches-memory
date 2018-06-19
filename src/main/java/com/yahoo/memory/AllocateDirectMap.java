@@ -93,9 +93,14 @@ class AllocateDirectMap implements Map {
   final boolean resourceReadOnly;
 
   //called from AllocateDirectWritableMap constructor
-  AllocateDirectMap(final File file, final long fileOffsetBytes, final long capacityBytes) {
+  AllocateDirectMap(final File file, final long fileOffsetBytes, final long capacityBytes,
+      final boolean localReadOnly) {
     this.capacityBytes = capacityBytes;
     resourceReadOnly = isFileReadOnly(file);
+    final long fileLength = file.length();
+    if ((localReadOnly || resourceReadOnly) && ((fileOffsetBytes + capacityBytes) > fileLength)) {
+      throw new IllegalArgumentException("Requested map length is greater than file length.");
+    }
     raf = mapper(file, fileOffsetBytes, capacityBytes, resourceReadOnly);
     nativeBaseOffset = map(raf.getChannel(), resourceReadOnly, fileOffsetBytes, capacityBytes);
     deallocator = new Deallocator(nativeBaseOffset, capacityBytes, raf);

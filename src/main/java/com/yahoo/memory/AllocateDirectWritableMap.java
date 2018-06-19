@@ -19,8 +19,8 @@ import java.io.File;
 final class AllocateDirectWritableMap extends AllocateDirectMap implements WritableMap {
 
   AllocateDirectWritableMap(final File file, final long fileOffsetBytes,
-      final long capacityBytes) {
-    super(file, fileOffsetBytes, capacityBytes);
+      final long capacityBytes, final boolean localReadOnly) {
+    super(file, fileOffsetBytes, capacityBytes, localReadOnly);
   }
 
   @Override

@@ -104,17 +104,26 @@ public class AllocateDirectWritableMapMemoryTest {
   }
 
   @Test(expectedExceptions = RuntimeException.class)
-  public void testMapException() throws Exception {
+  public void testMapException() throws IOException {
     File dummy = createFile("dummy.txt", ""); //zero length
     //throws java.lang.reflect.InvocationTargetException
     Memory.map(dummy, 0, dummy.length(), ByteOrder.nativeOrder());
   }
 
   @Test(expectedExceptions = ReadOnlyException.class)
-  public void simpleMap2() throws Exception {
+  public void simpleMap2() throws IOException {
     File file =
         new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
     try (WritableMapHandle rh = WritableMemory.map(file)) {
+      //
+    }
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void checkOverLength() throws IOException {
+    File file =
+        new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
+    try (WritableMapHandle rh = WritableMemory.map(file, 0, 1 << 20, Util.nativeOrder)) {
       //
     }
   }

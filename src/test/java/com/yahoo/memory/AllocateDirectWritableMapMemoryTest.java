@@ -120,11 +120,13 @@ public class AllocateDirectWritableMapMemoryTest {
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)
-  public void checkOverLength() throws IOException {
+  public void checkOverLength()  {
     File file =
         new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
     try (WritableMapHandle rh = WritableMemory.map(file, 0, 1 << 20, Util.nativeOrder)) {
       //
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
   }
 

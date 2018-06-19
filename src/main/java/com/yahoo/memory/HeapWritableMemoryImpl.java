@@ -57,11 +57,6 @@ final class HeapWritableMemoryImpl extends WritableMemoryImpl {
   }
 
   @Override
-  public MemoryRequestServer getMemoryRequestServer() {
-    return null;
-  }
-
-  @Override
   Object getUnsafeObject() {
     return unsafeObj;
   }
@@ -76,8 +71,4 @@ final class HeapWritableMemoryImpl extends WritableMemoryImpl {
     return true;
   }
 
-  @Override
-  void setMemoryRequestServer(final MemoryRequestServer svr) {
-    //do nothing
-  }
 }

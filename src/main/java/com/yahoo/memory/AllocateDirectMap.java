@@ -185,13 +185,7 @@ class AllocateDirectMap implements Map {
     try {
       raf = new RandomAccessFile(file, mode);
       if ((fileOffset + capacityBytes) > raf.length()) {
-        if (resourceReadOnly) {
-          throw new IllegalStateException(
-              "File is shorter than the region that is requested to be mapped: file length="
-             + raf.length() + ", mapping offset=" + fileOffset + ", mapping size=" + capacityBytes);
-        } else {
-          raf.setLength(fileOffset + capacityBytes);
-        }
+        raf.setLength(fileOffset + capacityBytes);
       }
     } catch (final IOException e) {
       throw new RuntimeException(e);

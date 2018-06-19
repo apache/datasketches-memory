@@ -68,11 +68,6 @@ final class BBNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
   }
 
   @Override
-  public MemoryRequestServer getMemoryRequestServer() {
-    return null;
-  }
-
-  @Override
   Object getUnsafeObject() {
     assertValid();
     return unsafeObj;
@@ -88,8 +83,4 @@ final class BBNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
     return true;
   }
 
-  @Override
-  void setMemoryRequestServer(final MemoryRequestServer svr) {
-    //do nothing
-  }
 }

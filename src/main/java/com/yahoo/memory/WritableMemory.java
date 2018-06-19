@@ -135,8 +135,7 @@ public abstract class WritableMemory extends Memory {
    *
    * @param capacityBytes the size of the desired memory in bytes.
    * @param memReqSvr A user-specified MemoryRequestServer.
-   * This is a callback mechanism for a user client of direct memory to request more memory from
-   * the owner of the WritableDirectHandle
+   * This is a callback mechanism for a user client of direct memory to request more memory.
    * @return WritableHandle for this off-heap resource
    */
   public static WritableDirectHandle allocateDirect(final long capacityBytes,
@@ -613,13 +612,17 @@ public abstract class WritableMemory extends Memory {
 
   //OTHER WRITABLE API METHODS XXX
   /**
-   * For Direct Memory only, otherwise returns null. Gets the MemoryRequestServer object.
-   * If not explictly set using
-   * setMemoryRequestServer(...), this returns the <i>DefaultMemoryRequestServer</i>.
+   * For Direct Memory only. Other types of backing resources will return null.
+   * Gets the MemoryRequestServer object used by dynamic off-heap (Direct) memory objects
+   * to request additional memory.
+   * Set using {@link WritableMemory#allocateDirect(long, MemoryRequestServer)}.
+   * If not explicity set, this returns the {@link DefaultMemoryRequestServer}.
    * @return the MemoryRequestServer object (if direct memory) or null.
    */
   @Override
-  public abstract MemoryRequestServer getMemoryRequestServer();
+  public MemoryRequestServer getMemoryRequestServer() {
+    return null;
+  }
 
   /**
    * Returns the offset of the start of this WritableMemory from the backing resource,

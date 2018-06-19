@@ -260,8 +260,6 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
 
   //OTHER WRITABLE API METHODS XXX
 
-  abstract void setMemoryRequestServer(MemoryRequestServer svr);
-
   @Override
   public final long getRegionOffset() {
     return super.getRegOffset();

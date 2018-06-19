@@ -88,12 +88,12 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
       throw new ReadOnlyException("File is Read Only");
     }
     final boolean readOnly = dirWMap.resourceReadOnly || localReadOnly;
-    final BaseWritableMemoryImpl impl = Util.isNativeOrder(byteOrder)
+    final BaseWritableMemoryImpl wmem = Util.isNativeOrder(byteOrder)
         ? new MapWritableMemoryImpl(dirWMap.nativeBaseOffset, 0L, capacityBytes,
             readOnly, dirWMap.getValid())
         : new MapNonNativeWritableMemoryImpl(dirWMap.nativeBaseOffset, 0L, capacityBytes,
             readOnly, dirWMap.getValid());
-    return new WritableMapHandle(dirWMap, impl);
+    return new WritableMapHandle(dirWMap, wmem);
   }
 
   @SuppressWarnings("resource")
@@ -104,14 +104,13 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
           "Capacity bytes should be positive, " + capacityBytes + " given");
     }
     final AllocateDirect direct = new AllocateDirect(capacityBytes);
-    final BaseWritableMemoryImpl impl = Util.isNativeOrder(byteOrder)
+    final BaseWritableMemoryImpl wmem = Util.isNativeOrder(byteOrder)
         ? new DirectWritableMemoryImpl(direct.getNativeBaseOffset(), 0L, capacityBytes,
-            false, direct.getValid())
+            false, direct.getValid(), memReqSvr)
         : new DirectNonNativeWritableMemoryImpl(direct.getNativeBaseOffset(), 0L, capacityBytes,
-            false, direct.getValid());
+            false, direct.getValid(), memReqSvr);
 
-    final WritableDirectHandle handle = new WritableDirectHandle(direct, impl, memReqSvr);
-    impl.setMemoryRequestServer(handle.memReqSvr);
+    final WritableDirectHandle handle = new WritableDirectHandle(direct, wmem);
     return handle;
   }
 
@@ -323,8 +322,6 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   }
 
   //OTHER WRITABLE API METHODS XXX
-
-  abstract void setMemoryRequestServer(MemoryRequestServer svr);
 
   @Override
   public final long getRegionOffset() {

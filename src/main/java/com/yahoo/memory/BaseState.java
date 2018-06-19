@@ -28,6 +28,8 @@ abstract class BaseState {
   static final AtomicLong currentDirectMemoryMapAllocations_ = new AtomicLong();
   static final AtomicLong currentDirectMemoryMapAllocated_ = new AtomicLong();
 
+  static final MemoryRequestServer defaultMemReqSvr = new DefaultMemoryRequestServer();
+
   /**
    * The size of the backing resource in bytes. Used by all methods when checking bounds.
    */
@@ -141,6 +143,7 @@ abstract class BaseState {
     return cumBaseOffset_ + offsetBytes;
   }
 
+  //This is used only by toHex(...)
   abstract MemoryRequestServer getMemoryRequestServer();
 
   final long getRegOffset() {

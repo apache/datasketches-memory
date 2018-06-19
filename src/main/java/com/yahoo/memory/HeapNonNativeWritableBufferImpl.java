@@ -58,11 +58,6 @@ final class HeapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl 
   }
 
   @Override
-  public MemoryRequestServer getMemoryRequestServer() {
-    return null;
-  }
-
-  @Override
   Object getUnsafeObject() {
     return unsafeObj;
   }
@@ -77,8 +72,4 @@ final class HeapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl 
     return true;
   }
 
-  @Override
-  void setMemoryRequestServer(final MemoryRequestServer svr) {
-    //do nothing
-  }
 }

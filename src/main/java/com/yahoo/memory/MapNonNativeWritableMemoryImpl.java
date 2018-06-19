@@ -61,11 +61,6 @@ final class MapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
     return Util.nonNativeOrder;
   }
 
-  @Override //TODO remove from baseWMemImpl NOTE WRITABLE ONLY
-  public MemoryRequestServer getMemoryRequestServer() {
-    return null;
-  }
-
   @Override
   Object getUnsafeObject() {
     return null;
@@ -79,11 +74,6 @@ final class MapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
   @Override
   public boolean isValid() {
     return valid.get();
-  }
-
-  @Override //TODO make abstract in BaseWritable?
-  void setMemoryRequestServer(final MemoryRequestServer svr) {
-    //do nothing
   }
 
 }

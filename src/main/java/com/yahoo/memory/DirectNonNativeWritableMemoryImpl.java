@@ -24,10 +24,12 @@ final class DirectNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImp
       final long regionOffset,
       final long capacityBytes,
       final boolean readOnly,
-      final StepBoolean valid) {
+      final StepBoolean valid,
+      final MemoryRequestServer memReqSvr) {
     super(null, nativeBaseOffset, regionOffset, capacityBytes, readOnly);
     this.nativeBaseOffset = nativeBaseOffset;
     this.valid = valid;
+    this.memReqSvr = (memReqSvr == null) ? defaultMemReqSvr : memReqSvr;
   }
 
   @Override
@@ -35,10 +37,11 @@ final class DirectNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImp
       final boolean localReadOnly, final ByteOrder byteOrder) {
     final BaseWritableMemoryImpl wmem = Util.isNativeOrder(byteOrder)
         ? new DirectWritableMemoryImpl(
-            nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, localReadOnly, valid)
+            nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, localReadOnly,
+            valid, memReqSvr)
         : new DirectNonNativeWritableMemoryImpl(
-            nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, localReadOnly, valid);
-    wmem.setMemoryRequestServer(memReqSvr);
+            nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, localReadOnly,
+            valid, memReqSvr);
     return wmem;
   }
 
@@ -46,10 +49,11 @@ final class DirectNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImp
   BaseWritableBufferImpl toWritableBuffer(final boolean localReadOnly, final ByteOrder byteOrder) {
     final BaseWritableBufferImpl wmem = Util.isNativeOrder(byteOrder)
         ? new DirectWritableBufferImpl(
-            nativeBaseOffset, getRegionOffset(), getCapacity(), localReadOnly, valid, this)
+            nativeBaseOffset, getRegionOffset(), getCapacity(), localReadOnly,
+            valid, memReqSvr, this)
         : new DirectNonNativeWritableBufferImpl(
-            nativeBaseOffset, getRegionOffset(), getCapacity(), localReadOnly, valid, this);
-    wmem.setMemoryRequestServer(memReqSvr);
+            nativeBaseOffset, getRegionOffset(), getCapacity(), localReadOnly,
+            valid, memReqSvr, this);
     return wmem;
   }
 
@@ -83,11 +87,6 @@ final class DirectNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImp
   @Override
   public boolean isValid() {
     return valid.get();
-  }
-
-  @Override
-  void setMemoryRequestServer(final MemoryRequestServer svr) {
-    memReqSvr = svr;
   }
 
 }

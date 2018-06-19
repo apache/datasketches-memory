@@ -375,13 +375,17 @@ public abstract class WritableBuffer extends Buffer {
 
   //OTHER WRITABLE API METHODS XXX
   /**
-   * For Direct Memory only, otherwise returns null. Gets the MemoryRequestServer object.
-   * If not explictly set using
-   * setMemoryRequestServer(...), this returns the <i>DefaultMemoryRequestServer</i>.
+   * For Direct Memory only. Other types of backing resources will return null.
+   * Gets the MemoryRequestServer object used by dynamic off-heap (Direct) memory objects
+   * to request additional memory.
+   * Set using {@link WritableMemory#allocateDirect(long, MemoryRequestServer)}.
+   * If not explicity set, this returns the {@link DefaultMemoryRequestServer}.
    * @return the MemoryRequestServer object (if direct memory) or null.
    */
   @Override
-  public abstract MemoryRequestServer getMemoryRequestServer();
+  public MemoryRequestServer getMemoryRequestServer() {
+    return null;
+  }
 
   /**
    * Returns the offset of the start of this WritableBuffer from the backing resource,

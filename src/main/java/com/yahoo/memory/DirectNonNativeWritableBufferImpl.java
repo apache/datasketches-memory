@@ -25,10 +25,13 @@ final class DirectNonNativeWritableBufferImpl extends NonNativeWritableBufferImp
       final long capacityBytes,
       final boolean readOnly,
       final StepBoolean valid,
+      final MemoryRequestServer memReqSvr,
       final BaseWritableMemoryImpl originMemory) {
     super(null, nativeBaseOffset, regionOffset, capacityBytes, readOnly, originMemory);
     this.nativeBaseOffset = nativeBaseOffset;
     this.valid = valid;
+    assert memReqSvr != null;
+    this.memReqSvr = memReqSvr;
   }
 
   @Override
@@ -37,11 +40,10 @@ final class DirectNonNativeWritableBufferImpl extends NonNativeWritableBufferImp
     final BaseWritableBufferImpl wmem = Util.isNativeOrder(byteOrder)
         ? new DirectWritableBufferImpl(
             nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, localReadOnly,
-            valid, originMemory)
+            valid, memReqSvr, originMemory)
         : new DirectNonNativeWritableBufferImpl(
             nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, localReadOnly,
-            valid, originMemory);
-    wmem.setMemoryRequestServer(memReqSvr);
+            valid, memReqSvr, originMemory);
     return wmem;
   }
 
@@ -50,11 +52,10 @@ final class DirectNonNativeWritableBufferImpl extends NonNativeWritableBufferImp
     final BaseWritableBufferImpl wmem = Util.isNativeOrder(byteOrder)
         ? new DirectWritableBufferImpl(
             nativeBaseOffset, getRegionOffset(), getCapacity(), localReadOnly,
-            valid, originMemory)
+            valid, memReqSvr, originMemory)
         : new DirectNonNativeWritableBufferImpl(
             nativeBaseOffset, getRegionOffset(), getCapacity(), localReadOnly,
-            valid, originMemory);
-    wmem.setMemoryRequestServer(memReqSvr);
+            valid, memReqSvr, originMemory);
     return wmem;
   }
 
@@ -88,11 +89,6 @@ final class DirectNonNativeWritableBufferImpl extends NonNativeWritableBufferImp
   @Override
   public boolean isValid() {
     return valid.get();
-  }
-
-  @Override
-  void setMemoryRequestServer(final MemoryRequestServer svr) {
-    memReqSvr = svr;
   }
 
 }

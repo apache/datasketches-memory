@@ -19,8 +19,8 @@ public abstract class WritableBuffer extends Buffer {
 
   //Pass-through ctor
   WritableBuffer(final Object unsafeObj, final long nativeBaseOffset,
-      final long regionOffset, final long capacityBytes, final boolean readOnly) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly);
+      final long regionOffset, final long capacityBytes) {
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
   }
 
   //BYTE BUFFER XXX

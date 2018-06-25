@@ -30,6 +30,26 @@ abstract class BaseState {
 
   static final MemoryRequestServer defaultMemReqSvr = new DefaultMemoryRequestServer();
 
+  //class type IDs. Do not change the bit orders
+  // 0000 0XXX
+  static final int READONLY = 1;
+  static final int REGION = 2;
+  static final int DUPLICATE = 4;
+
+  // 000X X000
+  static final int HEAP = 0;
+  static final int DIRECT = 1 << 3;
+  static final int MAP = 2 << 3;
+  static final int BYTEBUF = 3 << 3;
+
+  // 00X0 0000
+  static final int NATIVE = 0;
+  static final int NONNATIVE = 1 << 5;
+
+  // 0X00 0000
+  static final int MEMORY = 0;
+  static final int BUFFER = 1 << 6;
+
   /**
    * The size of the backing resource in bytes. Used by all methods when checking bounds.
    */
@@ -44,10 +64,9 @@ abstract class BaseState {
   private final long cumBaseOffset_;
 
   /**
-   * Can be set true anytime. If true, it cannot be set false. If resource read-only is true,
-   * this is automatically true.
+   * The type Id
    */
-  private final boolean readOnly_;
+  abstract int getTypeId();
 
   /**
    * This is the offset that defines the start of a sub-region of the backing resource. It is
@@ -58,10 +77,9 @@ abstract class BaseState {
   private final long regionOffset_;
 
   BaseState(final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
-      final long capacityBytes, final boolean readOnly) {
+      final long capacityBytes) {
     regionOffset_ = regionOffset;
     capacityBytes_ = capacityBytes;
-    readOnly_ = readOnly; //base
     cumBaseOffset_ = regionOffset + ((unsafeObj == null)
         ? nativeBaseOffset
         : unsafe.arrayBaseOffset(unsafeObj.getClass()));
@@ -143,7 +161,6 @@ abstract class BaseState {
     return cumBaseOffset_ + offsetBytes;
   }
 
-  //This is used only by toHex(...)
   abstract MemoryRequestServer getMemoryRequestServer();
 
   final long getRegOffset() {
@@ -209,7 +226,7 @@ abstract class BaseState {
    */
   public final boolean isReadOnly() {
     assertValid();
-    return readOnly_;
+    return (getTypeId() & READONLY) > 0;
   }
 
   /**

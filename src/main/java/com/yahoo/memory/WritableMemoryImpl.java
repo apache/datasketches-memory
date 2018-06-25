@@ -45,8 +45,8 @@ abstract class WritableMemoryImpl extends BaseWritableMemoryImpl {
 
   //Pass-through ctor
   WritableMemoryImpl(final Object unsafeObj, final long nativeBaseOffset,
-      final long regionOffset, final long capacityBytes, final boolean readOnly) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly);
+      final long regionOffset, final long capacityBytes) {
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
   }
 
   ///PRIMITIVE getXXX() and getXXXArray() XXX

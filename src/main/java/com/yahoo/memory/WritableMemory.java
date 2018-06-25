@@ -26,8 +26,8 @@ public abstract class WritableMemory extends Memory {
 
   //Pass-through ctor
   WritableMemory(final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
-      final long capacityBytes, final boolean readOnly) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly);
+      final long capacityBytes) {
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
   }
 
   //BYTE BUFFER XXX

@@ -15,39 +15,46 @@ import java.nio.ByteOrder;
  * @author Lee Rhodes
  */
 final class MapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
+  private static final int id = MEMORY | NONNATIVE | MAP;
   private final long nativeBaseOffset; //used to compute cumBaseOffset
   private final StepBoolean valid; //a reference only
+  private final byte typeId;
 
   MapNonNativeWritableMemoryImpl(
       final long nativeBaseOffset,
       final long regionOffset,
       final long capacityBytes,
-      final boolean readOnly,
+      final int typeId,
       final StepBoolean valid) {
-    super(null, nativeBaseOffset, regionOffset, capacityBytes, readOnly);
+    super(null, nativeBaseOffset, regionOffset, capacityBytes);
     this.nativeBaseOffset = nativeBaseOffset;
     this.valid = valid;
+    this.typeId = (byte) (id | (typeId & 0x7));
   }
 
   @Override
   BaseWritableMemoryImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
-      final boolean localReadOnly, final ByteOrder byteOrder) {
+      final boolean readOnly, final ByteOrder byteOrder) {
+    final int type = REGION | (readOnly ? READONLY : 0);
     return Util.isNativeOrder(byteOrder)
         ? new MapWritableMemoryImpl(
-            nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, localReadOnly,
-            valid)
+            nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes,
+            type, valid)
         : new MapNonNativeWritableMemoryImpl(
-            nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, localReadOnly,
-            valid);
+            nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes,
+            type, valid);
   }
 
   @Override
-  BaseWritableBufferImpl toWritableBuffer(final boolean localReadOnly, final ByteOrder byteOrder) {
+  BaseWritableBufferImpl toWritableBuffer(final boolean readOnly, final ByteOrder byteOrder) {
+    final int type = readOnly ? READONLY : 0;
     return Util.isNativeOrder(byteOrder)
         ? new MapWritableBufferImpl(
-            nativeBaseOffset, getRegionOffset(), getCapacity(), localReadOnly, valid, this)
+            nativeBaseOffset, getRegionOffset(), getCapacity(),
+            type, valid, this)
         : new MapNonNativeWritableBufferImpl(
-            nativeBaseOffset, getRegionOffset(), getCapacity(), localReadOnly, valid, this);
+            nativeBaseOffset, getRegionOffset(), getCapacity(),
+            type, valid, this);
   }
 
   @Override
@@ -59,6 +66,11 @@ final class MapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
   public ByteOrder getByteOrder() {
     assertValid();
     return Util.nonNativeOrder;
+  }
+
+  @Override
+  int getTypeId() {
+    return typeId & 0xff;
   }
 
   @Override

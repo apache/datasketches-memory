@@ -42,49 +42,17 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   final static WritableBufferImpl ZERO_SIZE_BUFFER;
 
   static {
-    final BaseWritableMemoryImpl mem = new HeapWritableMemoryImpl(new byte[0], 0L, 0L, true);
-    ZERO_SIZE_BUFFER = new HeapWritableBufferImpl(new byte[0], 0L, 0L, true, mem);
+    final BaseWritableMemoryImpl mem = BaseWritableMemoryImpl.ZERO_SIZE_MEMORY;
+    ZERO_SIZE_BUFFER = new HeapWritableBufferImpl(new byte[0], 0L, 0L, READONLY, mem);
   }
 
   //Pass-through ctor
   BaseWritableBufferImpl(final Object unsafeObj, final long nativeBaseOffset,
-      final long regionOffset, final long capacityBytes, final boolean readOnly,
+      final long regionOffset, final long capacityBytes,
       final BaseWritableMemoryImpl originMemory) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly);
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
     this.originMemory = originMemory;
   }
-
-  //DUPLICATES XXX
-  @Override
-  public Buffer duplicate() {
-    return writableDuplicateImpl(true, getByteOrder());
-  }
-
-  @Override
-  public Buffer duplicate(final ByteOrder byteOrder) {
-    return writableDuplicateImpl(true, byteOrder);
-  }
-
-  @Override
-  public WritableBuffer writableDuplicate() {
-    return writableDuplicateImpl(false, getByteOrder());
-  }
-
-  @Override
-  public WritableBuffer writableDuplicate(final ByteOrder byteOrder) {
-    return writableDuplicateImpl(false, byteOrder);
-  }
-
-  WritableBuffer writableDuplicateImpl(final boolean localReadOnly, final ByteOrder byteOrder) {
-    if (isReadOnly() && !localReadOnly) {
-      throw new ReadOnlyException("Writable duplicate of a read-only Buffer is not allowed.");
-    }
-    final WritableBuffer wbuf = toDuplicate(localReadOnly, byteOrder);
-    wbuf.setStartPositionEnd(getStart(), getPosition(), getEnd());
-    return wbuf;
-  }
-
-  abstract BaseWritableBufferImpl toDuplicate(boolean localReadOnly, ByteOrder byteOrder);
 
   //REGIONS XXX
   @Override
@@ -120,14 +88,47 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
       throw new ReadOnlyException("Writable region of a read-only Buffer is not allowed.");
     }
     checkValidAndBounds(offsetBytes, capacityBytes);
-    final WritableBuffer wbuf = toWritableRegion(
-        offsetBytes, capacityBytes, localReadOnly, byteOrder);
+    final boolean readOnly = isReadOnly() || localReadOnly;
+    final WritableBuffer wbuf = toWritableRegion(offsetBytes, capacityBytes, readOnly, byteOrder);
     wbuf.setStartPositionEnd(0, 0, capacityBytes);
     return wbuf;
   }
 
   abstract BaseWritableBufferImpl toWritableRegion(
-      long offsetBytes, long capcityBytes, boolean localReadOnly, ByteOrder byteOrder);
+      long offsetBytes, long capcityBytes, boolean readOnly, ByteOrder byteOrder);
+
+  //DUPLICATES XXX
+  @Override
+  public Buffer duplicate() {
+    return writableDuplicateImpl(true, getByteOrder());
+  }
+
+  @Override
+  public Buffer duplicate(final ByteOrder byteOrder) {
+    return writableDuplicateImpl(true, byteOrder);
+  }
+
+  @Override
+  public WritableBuffer writableDuplicate() {
+    return writableDuplicateImpl(false, getByteOrder());
+  }
+
+  @Override
+  public WritableBuffer writableDuplicate(final ByteOrder byteOrder) {
+    return writableDuplicateImpl(false, byteOrder);
+  }
+
+  WritableBuffer writableDuplicateImpl(final boolean localReadOnly, final ByteOrder byteOrder) {
+    if (isReadOnly() && !localReadOnly) {
+      throw new ReadOnlyException("Writable duplicate of a read-only Buffer is not allowed.");
+    }
+    final boolean readOnly = isReadOnly() || localReadOnly;
+    final WritableBuffer wbuf = toDuplicate(readOnly, byteOrder);
+    wbuf.setStartPositionEnd(getStart(), getPosition(), getEnd());
+    return wbuf;
+  }
+
+  abstract BaseWritableBufferImpl toDuplicate(boolean readOnly, ByteOrder byteOrder);
 
   //MEMORY XXX
   @Override

@@ -30,8 +30,8 @@ public abstract class BaseBuffer extends BaseState {
 
   //Pass-through ctor
   BaseBuffer(final Object unsafeObj, final long nativeBaseOffset,
-      final long regionOffset, final long capacityBytes, final boolean readOnly) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly);
+      final long regionOffset, final long capacityBytes) {
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
     capacity = end = capacityBytes;
   }
 

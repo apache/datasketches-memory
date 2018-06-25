@@ -45,21 +45,22 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   final static BaseWritableMemoryImpl ZERO_SIZE_MEMORY;
 
   static {
-    ZERO_SIZE_MEMORY = new HeapWritableMemoryImpl(new byte[0], 0L, 0L, true);
+    ZERO_SIZE_MEMORY = new HeapWritableMemoryImpl(new byte[0], 0L, 0L, READONLY);
   }
 
   //Pass-through ctor
   BaseWritableMemoryImpl(final Object unsafeObj, final long nativeBaseOffset,
-      final long regionOffset, final long capacityBytes, final boolean readOnly) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly);
+      final long regionOffset, final long capacityBytes) {
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
   }
 
   static BaseWritableMemoryImpl wrapHeapArray(final Object arr, final long offsetBytes,
-      final long lengthBytes, final boolean readOnly, final ByteOrder byteOrder) {
+      final long lengthBytes, final boolean localReadOnly, final ByteOrder byteOrder) {
     if (lengthBytes == 0) { return BaseWritableMemoryImpl.ZERO_SIZE_MEMORY; }
+    final int typeId = localReadOnly ? READONLY : 0;
     return Util.isNativeOrder(byteOrder)
-        ? new HeapWritableMemoryImpl(arr, offsetBytes, lengthBytes, readOnly)
-        : new HeapNonNativeWritableMemoryImpl(arr, offsetBytes, lengthBytes, readOnly);
+        ? new HeapWritableMemoryImpl(arr, offsetBytes, lengthBytes, typeId)
+        : new HeapNonNativeWritableMemoryImpl(arr, offsetBytes, lengthBytes, typeId);
   }
 
   static BaseWritableMemoryImpl wrapByteBuffer(
@@ -68,13 +69,12 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     if (abb.resourceReadOnly && !localReadOnly) {
       throw new ReadOnlyException("ByteBuffer is Read Only");
     }
+    final int typeId = (abb.resourceReadOnly || localReadOnly) ? READONLY : 0;
     return Util.isNativeOrder(byteOrder)
         ? new BBWritableMemoryImpl(abb.unsafeObj, abb.nativeBaseOffset,
-            abb.regionOffset, abb.capacityBytes, abb.resourceReadOnly || localReadOnly,
-            byteBuf)
+            abb.regionOffset, abb.capacityBytes, typeId, byteBuf)
         : new BBNonNativeWritableMemoryImpl(abb.unsafeObj, abb.nativeBaseOffset,
-            abb.regionOffset, abb.capacityBytes,  abb.resourceReadOnly || localReadOnly,
-            byteBuf);
+            abb.regionOffset, abb.capacityBytes,  typeId, byteBuf);
   }
 
   @SuppressWarnings("resource")
@@ -87,12 +87,12 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
       dirWMap.close();
       throw new ReadOnlyException("File is Read Only");
     }
-    final boolean readOnly = dirWMap.resourceReadOnly || localReadOnly;
+    final int typeId = (dirWMap.resourceReadOnly || localReadOnly) ? READONLY : 0;
     final BaseWritableMemoryImpl wmem = Util.isNativeOrder(byteOrder)
         ? new MapWritableMemoryImpl(dirWMap.nativeBaseOffset, 0L, capacityBytes,
-            readOnly, dirWMap.getValid())
+            typeId, dirWMap.getValid())
         : new MapNonNativeWritableMemoryImpl(dirWMap.nativeBaseOffset, 0L, capacityBytes,
-            readOnly, dirWMap.getValid());
+            typeId, dirWMap.getValid());
     return new WritableMapHandle(dirWMap, wmem);
   }
 
@@ -104,11 +104,12 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
           "Capacity bytes should be positive, " + capacityBytes + " given");
     }
     final AllocateDirect direct = new AllocateDirect(capacityBytes);
+    final int typeId = 0; //direct is never read-only on construction
     final BaseWritableMemoryImpl wmem = Util.isNativeOrder(byteOrder)
         ? new DirectWritableMemoryImpl(direct.getNativeBaseOffset(), 0L, capacityBytes,
-            false, direct.getValid(), memReqSvr)
+            typeId, direct.getValid(), memReqSvr)
         : new DirectNonNativeWritableMemoryImpl(direct.getNativeBaseOffset(), 0L, capacityBytes,
-            false, direct.getValid(), memReqSvr);
+            typeId, direct.getValid(), memReqSvr);
 
     final WritableDirectHandle handle = new WritableDirectHandle(direct, wmem);
     return handle;
@@ -165,12 +166,13 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     if (isReadOnly() && !localReadOnly) {
       throw new ReadOnlyException("Writable region of a read-only Memory is not allowed.");
     }
+    final boolean readOnly = isReadOnly() || localReadOnly;
     checkValidAndBounds(offsetBytes, capacityBytes);
-    return toWritableRegion(offsetBytes, capacityBytes, localReadOnly, byteOrder);
+    return toWritableRegion(offsetBytes, capacityBytes, readOnly, byteOrder);
   }
 
   abstract BaseWritableMemoryImpl toWritableRegion(
-      long offsetBytes, long capcityBytes, boolean localReadOnly, ByteOrder byteOrder);
+      long offsetBytes, long capcityBytes, boolean readOnly, ByteOrder byteOrder);
 
   //AS BUFFER XXX
   @Override
@@ -193,21 +195,18 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     return asWritableBufferImpl(false, byteOrder);
   }
 
-  //Developer note: we don't currently allow switching byte order when switching from Memory to
-  // Buffer.
-  //This is here to reduce complexity in the endian-sensitive classes and to allow us to easily
-  // change our mind in the future :)
   WritableBuffer asWritableBufferImpl(final boolean localReadOnly, final ByteOrder byteOrder) {
     if (isReadOnly() && !localReadOnly) {
       throw new ReadOnlyException(
           "Converting a read-only Memory to a writable Buffer is not allowed.");
     }
-    final WritableBuffer wbuf = toWritableBuffer(localReadOnly, byteOrder);
+    final boolean readOnly = isReadOnly() || localReadOnly;
+    final WritableBuffer wbuf = toWritableBuffer(readOnly, byteOrder);
     wbuf.setStartPositionEnd(0, 0, getCapacity());
     return wbuf;
   }
 
-  abstract BaseWritableBufferImpl toWritableBuffer(boolean localReadOnly, ByteOrder byteOrder);
+  abstract BaseWritableBufferImpl toWritableBuffer(boolean readOnly, ByteOrder byteOrder);
 
   //PRIMITIVE getXXX() and getXXXArray() ENDIAN INDEPENDENT XXX
   @Override

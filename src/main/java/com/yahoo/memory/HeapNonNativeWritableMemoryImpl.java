@@ -15,34 +15,43 @@ import java.nio.ByteOrder;
  * @author Lee Rhodes
  */
 final class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
+  private static final int id = MEMORY | NONNATIVE | HEAP;
   private final Object unsafeObj;
+  private final byte typeId;
 
   HeapNonNativeWritableMemoryImpl(
       final Object unsafeObj,
       final long regionOffset,
       final long capacityBytes,
-      final boolean readOnly) {
-    super(unsafeObj, 0L, regionOffset, capacityBytes, readOnly);
+      final int typeId) {
+    super(unsafeObj, 0L, regionOffset, capacityBytes);
     this.unsafeObj = unsafeObj;
+    this.typeId = (byte) (id | (typeId & 0x7));
   }
 
   @Override
   BaseWritableMemoryImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
-      final boolean localReadOnly, final ByteOrder byteOrder) {
+      final boolean readOnly, final ByteOrder byteOrder) {
+    final int type = REGION | (readOnly ? READONLY : 0);
     return Util.isNativeOrder(byteOrder)
         ? new HeapWritableMemoryImpl(
-            unsafeObj, getRegionOffset(offsetBytes), capacityBytes, localReadOnly)
+            unsafeObj, getRegionOffset(offsetBytes), capacityBytes,
+            type)
         : new HeapNonNativeWritableMemoryImpl(
-            unsafeObj, getRegionOffset(offsetBytes), capacityBytes, localReadOnly);
+            unsafeObj, getRegionOffset(offsetBytes), capacityBytes,
+            type);
   }
 
   @Override
-  BaseWritableBufferImpl toWritableBuffer(final boolean localReadOnly, final ByteOrder byteOrder) {
+  BaseWritableBufferImpl toWritableBuffer(final boolean readOnly, final ByteOrder byteOrder) {
+    final int type = readOnly ? READONLY : 0;
     return Util.isNativeOrder(byteOrder)
         ? new HeapWritableBufferImpl(
-            unsafeObj, getRegionOffset(), getCapacity(), localReadOnly, this)
+            unsafeObj, getRegionOffset(), getCapacity(),
+            type, this)
         : new HeapNonNativeWritableBufferImpl(
-            unsafeObj, getRegionOffset(), getCapacity(), localReadOnly, this);
+            unsafeObj, getRegionOffset(), getCapacity(),
+            type, this);
   }
 
   @Override
@@ -54,6 +63,11 @@ final class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl 
   public ByteOrder getByteOrder() {
     assertValid();
     return Util.nonNativeOrder;
+  }
+
+  @Override
+  int getTypeId() {
+    return typeId & 0xff;
   }
 
   @Override

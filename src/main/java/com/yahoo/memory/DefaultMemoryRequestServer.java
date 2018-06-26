@@ -19,7 +19,8 @@ final class DefaultMemoryRequestServer implements MemoryRequestServer {
 
   @Override
   public void requestClose(final WritableMemory memToRelease, final WritableMemory newMemory) {
-    //Because the new allocations are on the heap, we can ignore this
+    //If memToRelease is direct, this must be overridden to explicitly close.
+    //Otherwise, the AutoCloseable will eventually close the resource.
   }
 
 }

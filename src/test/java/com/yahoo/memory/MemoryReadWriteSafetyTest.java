@@ -196,7 +196,7 @@ public class MemoryReadWriteSafetyTest {
   }
 
   @SuppressWarnings("resource")
-  @Test(expectedExceptions = IllegalStateException.class)
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void testMapFileBeyondTheFileSize() throws IOException {
     File tempFile = File.createTempFile("test", "test");
     tempFile.deleteOnExit();

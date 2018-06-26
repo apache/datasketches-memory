@@ -21,9 +21,6 @@ import static com.yahoo.memory.UnsafeUtil.LONG_SHIFT;
 import static com.yahoo.memory.UnsafeUtil.SHORT_SHIFT;
 import static com.yahoo.memory.UnsafeUtil.checkBounds;
 import static com.yahoo.memory.UnsafeUtil.unsafe;
-import static com.yahoo.memory.Util.nativeOrder;
-
-import java.nio.ByteBuffer;
 
 /*
  * Developer notes: The heavier methods, such as put/get arrays, duplicate, region, clear, fill,
@@ -44,15 +41,12 @@ import java.nio.ByteBuffer;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-final class WritableBufferImpl extends BaseWritableBufferImpl {
+abstract class WritableBufferImpl extends BaseWritableBufferImpl {
 
-  //ctor for all parameters
-  WritableBufferImpl(
-      final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
-      final long capacityBytes, final boolean readOnly, final ByteBuffer byteBuf,
-      final StepBoolean valid, final BaseWritableMemoryImpl originMemory) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, nativeOrder,
-        byteBuf, valid, originMemory);
+  //Pass-through ctor
+  WritableBufferImpl(final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
+      final long capacityBytes, final BaseWritableMemoryImpl originMemory) {
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, originMemory);
   }
 
   //PRIMITIVE getXXX() and getXXXArray() XXX

@@ -682,6 +682,14 @@ public class WritableMemoryImplTest {
   }
 
   @Test
+  public void checkAsBufferNonNative() {
+    WritableMemory wmem = WritableMemory.allocate(64);
+    wmem.putShort(0, (short) 1);
+    Buffer buf = wmem.asBuffer(Util.nonNativeOrder);
+    assertEquals(buf.getShort(0), 256);
+  }
+
+  @Test
   public void printlnTest() {
     println("PRINTING: "+this.getClass().getName());
   }

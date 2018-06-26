@@ -7,6 +7,7 @@ package com.yahoo.memory;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.fail;
 
 import org.testng.annotations.AfterClass;
@@ -55,10 +56,21 @@ public class AllocateDirectMemoryTest {
           assertEquals(newWmem.getLong(i << 3), i);
       }
       memReqSvr.requestClose(origWmem, newWmem);
-      //The default MRS doesn't actually realease because it could be misused.
+      //The default MRS doesn't actually release because it could be misused.
       // so we let the TWR release it.
     }
   }
+
+  @Test
+  public void checkNullMemoryRequestServer() {
+    try (WritableHandle wh = WritableMemory.allocateDirect(128, null)) {
+      WritableMemory wmem = wh.get();
+      assertNotNull(wmem.getMemoryRequestServer());
+
+
+    }
+  }
+
 
   @Test
   public void checkNonNativeDirect() { //not allowed in public API

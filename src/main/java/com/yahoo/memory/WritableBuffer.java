@@ -17,13 +17,10 @@ import java.nio.ByteOrder;
  */
 public abstract class WritableBuffer extends Buffer {
 
-  //Pass-through ctor for all parameters
-  WritableBuffer(
-      final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
-      final long capacityBytes, final boolean readOnly, final ByteOrder byteOrder,
-      final ByteBuffer byteBuf, final StepBoolean valid) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, byteOrder,
-        byteBuf, valid);
+  //Pass-through ctor
+  WritableBuffer(final Object unsafeObj, final long nativeBaseOffset,
+      final long regionOffset, final long capacityBytes) {
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
   }
 
   //BYTE BUFFER XXX
@@ -67,12 +64,42 @@ public abstract class WritableBuffer extends Buffer {
   /**
    * Returns a duplicate writable view of this Buffer with the same but independent values of
    * <i>start</i>, <i>position</i> and <i>end</i>.
+   * <ul>
+   * <li>Returned object's origin = this object's origin</li>
+   * <li>Returned object's <i>start</i> = this object's <i>start</i></li>
+   * <li>Returned object's <i>position</i> = this object's <i>position</i></li>
+   * <li>Returned object's <i>end</i> = this object's <i>end</i></li>
+   * <li>Returned object's <i>capacity</i> = this object' <i>capacityBytes</i></li>
+   * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable and
+   * independent of this object's <i>start</i>, <i>position</i> and <i>end</i></li>
+   * </ul>
    * If this object's capacity is zero, the returned object is effectively immutable and
    * the backing storage and byte order are unspecified.
    * @return a duplicate writable view of this Buffer with the same but independent values of
    * <i>start</i>, <i>position</i> and <i>end</i>.
    */
   public abstract WritableBuffer writableDuplicate();
+
+  /**
+   * Returns a duplicate writable view of this Buffer with the same but independent values of
+   * <i>start</i>, <i>position</i> and <i>end</i>, but with the specified byteOrder.
+   * <ul>
+   * <li>Returned object's origin = this object's origin</li>
+   * <li>Returned object's <i>start</i> = this object's <i>start</i></li>
+   * <li>Returned object's <i>position</i> = this object's <i>position</i></li>
+   * <li>Returned object's <i>end</i> = this object's <i>end</i></li>
+   * <li>Returned object's <i>capacity</i> = this object' <i>capacityBytes</i></li>
+   * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable and
+   * independent of this object's <i>start</i>, <i>position</i> and <i>end</i></li>
+   * </ul>
+   * If this object's capacity is zero, the returned object is effectively immutable and
+   * the backing storage and byte order are unspecified.
+   * @param byteOrder the given <i>ByteOrder</i>.
+   * @return a duplicate writable view of this Buffer with the same but independent values of
+   * <i>start</i>, <i>position</i> and <i>end</i>.
+   */
+  public abstract WritableBuffer writableDuplicate(ByteOrder byteOrder);
+
 
   //REGIONS XXX
   /**
@@ -346,7 +373,20 @@ public abstract class WritableBuffer extends Buffer {
    */
   public abstract void fill(byte value);
 
-  //OTHER XXX
+  //OTHER WRITABLE API METHODS XXX
+  /**
+   * For Direct Memory only. Other types of backing resources will return null.
+   * Gets the MemoryRequestServer object used by dynamic off-heap (Direct) memory objects
+   * to request additional memory.
+   * Set using {@link WritableMemory#allocateDirect(long, MemoryRequestServer)}.
+   * If not explicity set, this returns the {@link DefaultMemoryRequestServer}.
+   * @return the MemoryRequestServer object (if direct memory) or null.
+   */
+  @Override
+  public MemoryRequestServer getMemoryRequestServer() {
+    return null;
+  }
+
   /**
    * Returns the offset of the start of this WritableBuffer from the backing resource,
    * but not including any Java object header.

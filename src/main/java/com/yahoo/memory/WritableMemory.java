@@ -24,13 +24,10 @@ import java.nio.ByteOrder;
  */
 public abstract class WritableMemory extends Memory {
 
-  //Pass-through ctor for all parameters & ByteBuffer
-  WritableMemory(
-      final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
-      final long capacityBytes, final boolean readOnly, final ByteOrder byteOrder,
-      final ByteBuffer byteBuf, final StepBoolean valid) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, readOnly, byteOrder,
-        byteBuf, valid);
+  //Pass-through ctor
+  WritableMemory(final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
+      final long capacityBytes) {
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
   }
 
   //BYTE BUFFER XXX
@@ -138,6 +135,7 @@ public abstract class WritableMemory extends Memory {
    *
    * @param capacityBytes the size of the desired memory in bytes.
    * @param memReqSvr A user-specified MemoryRequestServer.
+   * This is a callback mechanism for a user client of direct memory to request more memory.
    * @return WritableHandle for this off-heap resource
    */
   public static WritableDirectHandle allocateDirect(final long capacityBytes,
@@ -199,6 +197,24 @@ public abstract class WritableMemory extends Memory {
    * @return a new <i>WritableBuffer</i> with a view of this WritableMemory
    */
   public abstract WritableBuffer asWritableBuffer();
+
+  /**
+   * Returns a new <i>WritableBuffer</i> with a writable view of the backing store of this object
+   * with the given byte order.
+   * <ul>
+   * <li>Returned object's origin = this object's origin</li>
+   * <li>Returned object's <i>start</i> = 0</li>
+   * <li>Returned object's <i>position</i> = 0</li>
+   * <li>Returned object's <i>end</i> = this object's capacity</li>
+   * <li>Returned object's <i>capacity</i> = this object's capacity</li>
+   * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable</li>
+   * </ul>
+   * If this object's capacity is zero, the returned object is effectively immutable and
+   * the backing storage and byte order are unspecified.
+   * @param byteOrder the given byte order
+   * @return a new <i>WritableBuffer</i> with a view of this WritableMemory
+   */
+  public abstract WritableBuffer asWritableBuffer(ByteOrder byteOrder);
 
   //ALLOCATE HEAP VIA AUTOMATIC BYTE ARRAY XXX
   /**
@@ -594,12 +610,19 @@ public abstract class WritableMemory extends Memory {
    */
   public abstract void setBits(long offsetBytes, byte bitMask);
 
-  //OTHER XXX
+  //OTHER WRITABLE API METHODS XXX
   /**
-   * Gets the MemoryRequestServer object or null.
-   * @return the MemoryRequestServer object or null.
+   * For Direct Memory only. Other types of backing resources will return null.
+   * Gets the MemoryRequestServer object used by dynamic off-heap (Direct) memory objects
+   * to request additional memory.
+   * Set using {@link WritableMemory#allocateDirect(long, MemoryRequestServer)}.
+   * If not explicity set, this returns the {@link DefaultMemoryRequestServer}.
+   * @return the MemoryRequestServer object (if direct memory) or null.
    */
-  public abstract MemoryRequestServer getMemoryRequestServer();
+  @Override
+  public MemoryRequestServer getMemoryRequestServer() {
+    return null;
+  }
 
   /**
    * Returns the offset of the start of this WritableMemory from the backing resource,

@@ -93,9 +93,14 @@ class AllocateDirectMap implements Map {
   final boolean resourceReadOnly;
 
   //called from AllocateDirectWritableMap constructor
-  AllocateDirectMap(final File file, final long fileOffsetBytes, final long capacityBytes) {
+  AllocateDirectMap(final File file, final long fileOffsetBytes, final long capacityBytes,
+      final boolean localReadOnly) {
     this.capacityBytes = capacityBytes;
     resourceReadOnly = isFileReadOnly(file);
+    final long fileLength = file.length();
+    if ((localReadOnly || resourceReadOnly) && ((fileOffsetBytes + capacityBytes) > fileLength)) {
+      throw new IllegalArgumentException("Requested map length is greater than file length.");
+    }
     raf = mapper(file, fileOffsetBytes, capacityBytes, resourceReadOnly);
     nativeBaseOffset = map(raf.getChannel(), resourceReadOnly, fileOffsetBytes, capacityBytes);
     deallocator = new Deallocator(nativeBaseOffset, capacityBytes, raf);
@@ -180,13 +185,7 @@ class AllocateDirectMap implements Map {
     try {
       raf = new RandomAccessFile(file, mode);
       if ((fileOffset + capacityBytes) > raf.length()) {
-        if (resourceReadOnly) {
-          throw new IllegalStateException(
-              "File is shorter than the region that is requested to be mapped: file length="
-             + raf.length() + ", mapping offset=" + fileOffset + ", mapping size=" + capacityBytes);
-        } else {
-          raf.setLength(fileOffset + capacityBytes);
-        }
+        raf.setLength(fileOffset + capacityBytes);
       }
     } catch (final IOException e) {
       throw new RuntimeException(e);

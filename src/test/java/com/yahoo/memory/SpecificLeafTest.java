@@ -101,6 +101,7 @@ public class SpecificLeafTest {
       assertTrue((buf.getTypeId() & REGION) > 0);
       assertTrue((buf2.getTypeId() & REGION) > 0);
       assertTrue((buf3.getTypeId() & DUPLICATE) > 0);
+      assertTrue((buf4.getTypeId() & DUPLICATE) > 0);
     }
   }
 

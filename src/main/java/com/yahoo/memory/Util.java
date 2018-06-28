@@ -248,6 +248,9 @@ public final class Util {
   }
 
   static boolean isNativeOrder(final ByteOrder byteOrder) {
+    if (byteOrder == null) {
+      throw new IllegalArgumentException("ByteOrder parameter cannot be null.");
+    }
     return (nativeOrder == byteOrder);
   }
 }

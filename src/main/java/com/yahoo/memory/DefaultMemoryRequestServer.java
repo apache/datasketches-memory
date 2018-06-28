@@ -8,7 +8,7 @@ package com.yahoo.memory;
 /**
  * @author Lee Rhodes
  */
-final class DefaultMemoryRequestServer implements MemoryRequestServer {
+public final class DefaultMemoryRequestServer implements MemoryRequestServer {
 
   @Override
   //By default this allocates new memory requests on the Java heap.
@@ -18,9 +18,10 @@ final class DefaultMemoryRequestServer implements MemoryRequestServer {
   }
 
   @Override
+  //If memToRelease is direct, this must be overridden to explicitly close.
+  //Otherwise, the AutoCloseable will eventually close the resource.
   public void requestClose(final WritableMemory memToRelease, final WritableMemory newMemory) {
-    //If memToRelease is direct, this must be overridden to explicitly close.
-    //Otherwise, the AutoCloseable will eventually close the resource.
+    //no op
   }
 
 }

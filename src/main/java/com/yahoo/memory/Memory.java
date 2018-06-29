@@ -106,9 +106,7 @@ public abstract class Memory extends BaseState {
 
   //REGIONS XXX
   /**
-   * A region is a read-only view of the backing store of this object.
-   * This returns a new <i>Memory</i> representing the defined region with the given
-   * offsetBytes and capacityBytes.
+   * A region is a read-only view of this object.
    * <ul>
    * <li>Returned object's origin = this object's origin + offsetBytes</li>
    * <li>Returned object's capacity = capacityBytes</li>
@@ -117,14 +115,13 @@ public abstract class Memory extends BaseState {
    * the backing storage and byte order are unspecified.
    * @param offsetBytes the starting offset with respect to the origin of this Memory.
    * @param capacityBytes the capacity of the region in bytes
-   * @return a new <i>Memory</i> representing the defined region.
+   * @return a new <i>Memory</i> representing the defined region based on the given
+   * offsetBytes and capacityBytes.
    */
   public abstract Memory region(long offsetBytes, long capacityBytes);
 
   /**
-   * A region is a read-only view of the backing store of this object.
-   * This returns a new <i>Memory</i> representing the defined region with the given
-   * offsetBytes, capacityBytes and byte order.
+   * A region is a read-only view of this object.
    * <ul>
    * <li>Returned object's origin = this object's origin + <i>offsetBytes</i></li>
    * <li>Returned object's capacity = <i>capacityBytes</i></li>
@@ -135,13 +132,14 @@ public abstract class Memory extends BaseState {
    * @param offsetBytes the starting offset with respect to the origin of this Memory.
    * @param capacityBytes the capacity of the region in bytes
    * @param byteOrder the given byte order
-   * @return a new <i>Memory</i> representing the defined region.
+   * @return a new <i>Memory</i> representing the defined region based on the given
+   * offsetBytes, capacityBytes and byteOrder.
    */
   public abstract Memory region(long offsetBytes, long capacityBytes, ByteOrder byteOrder);
 
   //AS BUFFER XXX
   /**
-   * Returns a new <i>Buffer</i> view of the backing store of this object.
+   * Returns a new <i>Buffer</i> view of this object.
    * <ul>
    * <li>Returned object's origin = this object's origin</li>
    * <li>Returned object's <i>start</i> = 0</li>
@@ -157,7 +155,7 @@ public abstract class Memory extends BaseState {
   public abstract Buffer asBuffer();
 
   /**
-   * Returns a new <i>Buffer</i> view of the backing store of this object, with the given
+   * Returns a new <i>Buffer</i> view of this object, with the given
    * byte order.
    * <ul>
    * <li>Returned object's origin = this object's origin</li>
@@ -170,7 +168,7 @@ public abstract class Memory extends BaseState {
    * If this object's capacity is zero, the returned object is effectively immutable and
    * the backing storage and byte order are unspecified.
    * @param byteOrder the given byte order
-   * @return a new <i>Buffer</i>
+   * @return a new <i>Buffer</i> with the given byteOrder.
    */
   public abstract Buffer asBuffer(ByteOrder byteOrder);
 
@@ -189,8 +187,8 @@ public abstract class Memory extends BaseState {
    * <p>The name of this method starts with "unsafe" because if this is a native managed Memory
    * (e. g. obtained via {@link #map(File)} or {@link WritableMemory#allocateDirect(long)})), and
    * the returned {@code ByteBuffer} object is used after the Memory is freed, it may cause a JVM
-   * crash. This is also true for Memory objects themselves, but Memory's use-after-free is
-   * caught as AssertionError, if assertions are enabled.
+   * crash. This is also possible for Memory objects themselves with some methods,
+   * but Memory's use-after-free is caught as an AssertionError, if assertions are enabled.
    *
    * @param offsetBytes the starting offset with respect to the origin of this Memory
    * @param capacityBytes the capacity of the returned ByteBuffer

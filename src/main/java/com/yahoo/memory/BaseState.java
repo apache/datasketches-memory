@@ -205,9 +205,9 @@ abstract class BaseState {
   }
 
   /**
-   * Returns true if the backing memory is direct (off-heap) memory.
+   * Returns true if the backing resource is direct (off-heap) memory.
    * This is the case for allocated direct memory, memory mapped files,
-   * @return true if the backing memory is direct (off-heap) memory.
+   * @return true if the backing resource is direct (off-heap) memory.
    */
   public abstract boolean isDirect();
 

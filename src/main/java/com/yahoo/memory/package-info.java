@@ -1,7 +1,9 @@
 /**
  * <p>This package provides high performance primitive and primitive array access to direct (native),
  * off-heap memory and memory-mapped file resources, and consistent views into
- * {@link java.nio.ByteBuffer}, and on-heap primitive arrays.</p>
+ * {@link java.nio.ByteBuffer}, and on-heap primitive arrays. It can be used as a more
+ * comprehensive and flexible replacement for {@link java.nio.ByteBuffer}.
+ * </p>
  *
  * <p>In addition, this package provides:</p>
  *
@@ -15,10 +17,10 @@
  *
  * <li>The conversion from Writable to read-only is just a cast, so no unnecessary objects are
  * created. For example:
- * <pre>{@code
+ * <blockquote><pre>
  *     WritableMemory wMem = ...
  *     Memory mem = wMem;
- * }</pre>
+ * </pre></blockquote>
  * </li>
  *
  * <li> {@link java.lang.AutoCloseable} for the external resources that require it,
@@ -38,7 +40,7 @@
  * </ul>
  *
  * <p>More specifically, this package provides access to four different types of resources using
- * two different access APIs.  These resources can be viewed as blobs of bytes and minimally provide
+ * two different access APIs. These resources are contiguous blobs of bytes that provide at least
  * byte-level read and write access. The four resources are:
  *
  * <ul><li>Direct (a.k.a. Native) off-heap memory allocated by the user.</li>
@@ -52,7 +54,12 @@
  * <li><i>Buffer, WritableBuffer</i>: Position relative addressing into a resource.</li>
  * </ul>
  *
- * The resources don't know or care about the access APIs, and the access
+ * <p>In addition, all combinations of access APIs and backing resources can be accessed via
+ * multibyte primitive methods (e.g.
+ * <i>getLong(...), getLongArray(...), putLong(...), putLongArray(...)</i>) as either
+ * {@link java.nio.ByteOrder#BIG_ENDIAN} or {@link java.nio.ByteOrder#LITTLE_ENDIAN}.
+ *
+ * <p>The resources don't know or care about the access APIs, and the access
  * APIs don't really know or care what resource they are accessing.
  *
  * An access API is joined with
@@ -78,7 +85,7 @@
  * in a try-with-resources (TWR) block, it's associated resource will be automatically closed by
  * the JVM at the end of the block.
  * The resource can also be explicitly closed by the user by calling {@code Handle.close()}.
- * <pre>{@code
+ * <blockquote><pre>
  *     //Using try-with-resources block:
  *     try (WritableyMapHandle handle = WritableMemory.map(File file)) {
  *       WritableMemory wMem = handle.get();
@@ -90,14 +97,14 @@
  *     WritableMemory wMem = handle.get();
  *     doWork(wMem) // read and write to memory mapped file.
  *     handle.close();
- * }</pre>
+ * </pre></blockquote>
  *
  * <p>Where it is desirable to pass ownership of the resource (and the {@code close()}
  * responsibility) one can not use the TWR block. Instead:
- * <pre>{@code
+ * <blockquote><pre>
  *     WritableMapHandle handler = WritableMemory.map(File file);
  *     doWorkAndClose(handle); //passes the handle to object that closes the resource.
- * }</pre>
+ * </pre></blockquote>
  *
  * Whatever part of your process is responsible for allocating a resource external
  * to the JVM must be responsible for closing it or making sure it gets closed.
@@ -120,20 +127,20 @@
  * </ul>
  *
  *<p>Moving back and forth between <i>Memory</i> and <i>Buffer</i>:
- *<pre>{@code
+ *<blockquote><pre>
  *    Memory mem = ...
  *    Buffer buf = mem.asBuffer();
  *    ...
  *    Memory mem2 = buf.asMemory();
  *    ...
- * }</pre>
+ * </pre></blockquote>
  *
  * <p>Hierarchical memory regions can be easily created:
- * <pre>{@code
+ * <blockquote><pre>
  *     WritableMemory wMem = ...
  *     WritableMemory wReg = wMem.writableRegion(offset, length); //OR
  *     Memory reg = wMem.region(offset, length);
- * }</pre>
+ * </pre></blockquote>
  *
  * With asserts enabled in the JVM, all methods are checked for bounds and
  * use-after-close violations.

@@ -145,7 +145,7 @@ public abstract class WritableMemory extends Memory {
 
   //REGIONS XXX
   /**
-   * A writable region is a writable view of the backing store of this object.
+   * A writable region is a writable view of this object.
    * This returns a new <i>WritableMemory</i> representing the defined writable region with the
    * given offsetBytes and capacityBytes.
    * <ul>
@@ -162,7 +162,7 @@ public abstract class WritableMemory extends Memory {
   public abstract WritableMemory writableRegion(long offsetBytes, long capacityBytes);
 
   /**
-   * A writable region is a writable view of the backing store of this object.
+   * A writable region is a writable view of this object.
    * This returns a new <i>WritableMemory</i> representing the defined writable region with the
    * given offsetBytes, capacityBytes and byte order.
    * <ul>
@@ -183,7 +183,7 @@ public abstract class WritableMemory extends Memory {
 
   //AS BUFFER XXX
   /**
-   * Returns a new <i>WritableBuffer</i> with a writable view of the backing store of this object.
+   * Returns a new <i>WritableBuffer</i> with a writable view of this object.
    * <ul>
    * <li>Returned object's origin = this object's origin</li>
    * <li>Returned object's <i>start</i> = 0</li>
@@ -199,7 +199,7 @@ public abstract class WritableMemory extends Memory {
   public abstract WritableBuffer asWritableBuffer();
 
   /**
-   * Returns a new <i>WritableBuffer</i> with a writable view of the backing store of this object
+   * Returns a new <i>WritableBuffer</i> with a writable view of this object
    * with the given byte order.
    * <ul>
    * <li>Returned object's origin = this object's origin</li>

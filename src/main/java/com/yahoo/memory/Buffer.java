@@ -100,8 +100,7 @@ public abstract class Buffer extends BaseBuffer {
 
   //REGIONS XXX
   /**
-   * A region is a read-only view of the backing store of this object.
-   * The new Buffer region returned will be based on the current <i>position</i> and <i>end</i>.
+   * A region is a read-only view of this object.
    * <ul>
    * <li>Returned object's origin = this object's <i>position</i></li>
    * <li>Returned object's <i>start</i> = 0</li>
@@ -113,14 +112,13 @@ public abstract class Buffer extends BaseBuffer {
    * </ul>
    * If this object's capacity is zero, the returned object is effectively immutable and
    * the backing storage and byte order are unspecified.
-   * @return a new <i>Buffer</i> representing the defined region.
+   * @return a new <i>Buffer</i> representing the defined region based on the current
+   * <i>position</i> and <i>end</i>.
    */
   public abstract Buffer region();
 
   /**
-   * A region is a read-only view of the backing store of this object.
-   * This returns a new <i>Buffer</i> representing the defined region
-   * with the given offsetBytes, capacityBytes and byte order.
+   * A region is a read-only view of this object.
    * <ul>
    * <li>Returned object's origin = this objects' origin + <i>offsetBytes</i></li>
    * <li>Returned object's <i>start</i> = 0</li>
@@ -140,7 +138,8 @@ public abstract class Buffer extends BaseBuffer {
    * @param offsetBytes the starting offset with respect to the origin of this <i>WritableBuffer</i>
    * @param capacityBytes the <i>capacity</i> of the returned region in bytes
    * @param byteOrder the given byte order
-   * @return a new <i>WritableBuffer</i> representing the defined writable region.
+   * @return a new <i>WritableBuffer</i> representing the defined writable region
+   * based on the current <i>position</i>, <i>end</i> and byteOrder.
    */
   public abstract Buffer region(long offsetBytes, long capacityBytes,
       ByteOrder byteOrder);
@@ -150,7 +149,7 @@ public abstract class Buffer extends BaseBuffer {
    * Convert this Buffer to a Memory. The current <i>start</i>, <i>position</i> and <i>end</i>
    * are ignored.
    * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and byte order are unspecified.
+   * the backing resource and byte order are unspecified.
    * @return Memory
    */
   public abstract Memory asMemory();

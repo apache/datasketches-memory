@@ -64,11 +64,6 @@ abstract class BaseState {
   private final long cumBaseOffset_;
 
   /**
-   * The type Id
-   */
-  abstract int getTypeId();
-
-  /**
    * This is the offset that defines the start of a sub-region of the backing resource. It is
    * used to compute cumBaseOffset.
    * This will be loaded from heap ByteBuffers as they have a similar field used for slices.
@@ -120,14 +115,18 @@ abstract class BaseState {
    * Gets the backing ByteBuffer if it exists, otherwise returns null.
    * @return the backing ByteBuffer if it exists, otherwise returns null.
    */
-  public abstract ByteBuffer getByteBuffer();
+  public ByteBuffer getByteBuffer() {
+    return null;
+  }
 
   /**
    * Gets the current ByteOrder.
    * This may be different from the ByteOrder of the backing resource.
    * @return the current ByteOrder.
    */
-  public abstract ByteOrder getByteOrder();
+  public final ByteOrder getByteOrder() {
+    return isNonNativeType() ? Util.nonNativeOrder : Util.nativeOrder;
+  }
 
   /**
    * Gets the capacity of this object in bytes
@@ -167,6 +166,8 @@ abstract class BaseState {
     return regionOffset_;
   }
 
+  abstract int getTypeId();
+
   abstract Object getUnsafeObject();
 
   /**
@@ -196,8 +197,8 @@ abstract class BaseState {
   }
 
   /**
-   * Returns true if this Memory is backed by a ByteBuffer
-   * @return true if this Memory is backed by a ByteBuffer
+   * Returns true if this Memory is backed by a ByteBuffer.
+   * @return true if this Memory is backed by a ByteBuffer.
    */
   public final boolean hasByteBuffer() {
     assertValid();
@@ -209,7 +210,9 @@ abstract class BaseState {
    * This is the case for allocated direct memory, memory mapped files,
    * @return true if the backing resource is direct (off-heap) memory.
    */
-  public abstract boolean isDirect();
+  public final boolean isDirect() {
+    return getUnsafeObject() == null;
+  }
 
   /**
    * Returns true if the current byte order is native order.
@@ -226,7 +229,7 @@ abstract class BaseState {
    */
   public final boolean isReadOnly() {
     assertValid();
-    return (getTypeId() & READONLY) > 0;
+    return isReadOnlyType();
   }
 
   /**
@@ -252,6 +255,7 @@ abstract class BaseState {
 
   /**
    * Returns true if this object is valid and has not been closed.
+   * This is relevant only for direct (off-heap) memory and Mapped Files.
    * @return true if this object is valid and has not been closed.
    */
   public abstract boolean isValid();
@@ -296,6 +300,43 @@ abstract class BaseState {
     if (isReadOnly()) {
       throw new ReadOnlyException("Memory is read-only.");
     }
+  }
+
+  //TYPE ID CHECKS
+  boolean isReadOnlyType() {
+    return (getTypeId() & READONLY) > 0;
+  }
+
+  boolean isBufferType() {
+    return (getTypeId() & BUFFER) > 0;
+  }
+
+  boolean isDuplicateType() {
+    return (getTypeId() & DUPLICATE) > 0;
+  }
+
+  boolean isRegionType() {
+    return (getTypeId() & REGION) > 0;
+  }
+
+  boolean isNonNativeType() {
+    return (getTypeId() & NONNATIVE) > 0;
+  }
+
+  boolean isHeapType() {
+    return ((getTypeId() >>> 3) & 3) == 0;
+  }
+
+  boolean isDirectType() {
+    return ((getTypeId() >>> 3) & 3) == 1;
+  }
+
+  boolean isMapType() {
+    return ((getTypeId() >>> 3) & 3) == 2;
+  }
+
+  boolean isBBType() {
+    return ((getTypeId() >>> 3) & 3) == 3;
   }
 
   //MONITORING

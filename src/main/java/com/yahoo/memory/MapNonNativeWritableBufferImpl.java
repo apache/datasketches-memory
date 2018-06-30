@@ -5,7 +5,6 @@
 
 package com.yahoo.memory;
 
-import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
@@ -59,17 +58,6 @@ final class MapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   }
 
   @Override
-  public ByteBuffer getByteBuffer() {
-    return null;
-  }
-
-  @Override
-  public ByteOrder getByteOrder() {
-    assertValid();
-    return Util.nonNativeOrder;
-  }
-
-  @Override
   int getTypeId() {
     return typeId & 0xff;
   }
@@ -77,11 +65,6 @@ final class MapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   @Override
   Object getUnsafeObject() {
     return null;
-  }
-
-  @Override
-  public boolean isDirect() {
-    return true;
   }
 
   @Override

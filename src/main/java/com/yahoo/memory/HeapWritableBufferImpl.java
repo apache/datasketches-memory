@@ -5,7 +5,6 @@
 
 package com.yahoo.memory;
 
-import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
@@ -33,7 +32,7 @@ final class HeapWritableBufferImpl extends WritableBufferImpl {
   @Override
   BaseWritableBufferImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
       final boolean readOnly, final ByteOrder byteOrder) {
-    final int type = REGION | (readOnly ? READONLY : 0);
+    final int type = typeId | REGION | (readOnly ? READONLY : 0);
     return Util.isNativeOrder(byteOrder)
         ? new HeapWritableBufferImpl(
             unsafeObj, getRegionOffset(offsetBytes), capacityBytes,
@@ -45,7 +44,7 @@ final class HeapWritableBufferImpl extends WritableBufferImpl {
 
   @Override
   BaseWritableBufferImpl toDuplicate(final boolean readOnly, final ByteOrder byteOrder) {
-    final int type = DUPLICATE | (readOnly ? READONLY : 0);
+    final int type = typeId | DUPLICATE | (readOnly ? READONLY : 0);
     return Util.isNativeOrder(byteOrder)
         ? new HeapWritableBufferImpl(
             unsafeObj, getRegionOffset(), getCapacity(),
@@ -56,17 +55,6 @@ final class HeapWritableBufferImpl extends WritableBufferImpl {
   }
 
   @Override
-  public ByteBuffer getByteBuffer() {
-    return null;
-  }
-
-  @Override
-  public ByteOrder getByteOrder() {
-    assertValid();
-    return Util.nativeOrder;
-  }
-
-  @Override
   int getTypeId() {
     return typeId & 0xff;
   }
@@ -74,11 +62,6 @@ final class HeapWritableBufferImpl extends WritableBufferImpl {
   @Override
   Object getUnsafeObject() {
     return unsafeObj;
-  }
-
-  @Override
-  public boolean isDirect() {
-    return false;
   }
 
   @Override

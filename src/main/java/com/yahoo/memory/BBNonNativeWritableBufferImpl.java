@@ -39,7 +39,7 @@ final class BBNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   @Override
   BaseWritableBufferImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
       final boolean readOnly, final ByteOrder byteOrder) {
-    final int type = REGION | (readOnly ? READONLY : 0);
+    final int type = typeId | REGION | (readOnly ? READONLY : 0);
     return Util.isNativeOrder(byteOrder)
         ? new BBWritableBufferImpl(
           unsafeObj, nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes,
@@ -51,7 +51,7 @@ final class BBNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
 
   @Override
   BaseWritableBufferImpl toDuplicate(final boolean readOnly, final ByteOrder byteOrder) {
-    final int type = DUPLICATE | (readOnly ? READONLY : 0);
+    final int type = typeId | DUPLICATE | (readOnly ? READONLY : 0);
     return Util.isNativeOrder(byteOrder)
         ? new BBWritableBufferImpl(
             unsafeObj, nativeBaseOffset, getRegionOffset(), getCapacity(),
@@ -68,12 +68,6 @@ final class BBNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   }
 
   @Override
-  public ByteOrder getByteOrder() {
-    assertValid();
-    return Util.nonNativeOrder;
-  }
-
-  @Override
   int getTypeId() {
     return typeId & 0xff;
   }
@@ -82,11 +76,6 @@ final class BBNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   Object getUnsafeObject() {
     assertValid();
     return unsafeObj;
-  }
-
-  @Override
-  public boolean isDirect() {
-    return unsafeObj == null;
   }
 
   @Override

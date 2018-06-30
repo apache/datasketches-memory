@@ -5,7 +5,6 @@
 
 package com.yahoo.memory;
 
-import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
@@ -38,7 +37,7 @@ final class DirectNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImp
   @Override
   BaseWritableMemoryImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
       final boolean readOnly, final ByteOrder byteOrder) {
-    final int type = REGION | (readOnly ? READONLY : 0);
+    final int type = typeId | REGION | (readOnly ? READONLY : 0);
     return Util.isNativeOrder(byteOrder)
         ? new DirectWritableMemoryImpl(
             nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes,
@@ -50,7 +49,7 @@ final class DirectNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImp
 
   @Override
   BaseWritableBufferImpl toWritableBuffer(final boolean readOnly, final ByteOrder byteOrder) {
-    final int type = readOnly ? READONLY : 0;
+    final int type = typeId | (readOnly ? READONLY : 0);
     return Util.isNativeOrder(byteOrder)
         ? new DirectWritableBufferImpl(
             nativeBaseOffset, getRegionOffset(), getCapacity(),
@@ -58,17 +57,6 @@ final class DirectNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImp
         : new DirectNonNativeWritableBufferImpl(
             nativeBaseOffset, getRegionOffset(), getCapacity(),
             type, valid, memReqSvr, this);
-  }
-
-  @Override
-  public ByteBuffer getByteBuffer() {
-    return null;
-  }
-
-  @Override
-  public ByteOrder getByteOrder() {
-    assertValid();
-    return Util.nonNativeOrder;
   }
 
   @Override
@@ -85,11 +73,6 @@ final class DirectNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImp
   @Override
   Object getUnsafeObject() {
     return null;
-  }
-
-  @Override
-  public boolean isDirect() {
-    return true;
   }
 
   @Override

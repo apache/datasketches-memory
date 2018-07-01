@@ -50,9 +50,6 @@ abstract class BaseState {
   static final int MEMORY = 0;
   static final int BUFFER = 1 << 6;
 
-  /**
-   * The size of the backing resource in bytes. Used by all methods when checking bounds.
-   */
   private final long capacityBytes_;
 
   /**
@@ -60,20 +57,21 @@ abstract class BaseState {
    * all offsets from regions, user-defined offsets when creating Memory, and the array object
    * header offset when creating Memory from primitive arrays.
    */
-  //= f(regionOffset, unsafeObj, nativeBaseOffset, unsafeObjHeader)
   private final long cumBaseOffset_;
 
   /**
-   * This is the offset that defines the start of a sub-region of the backing resource. It is
-   * used to compute cumBaseOffset.
-   * This will be loaded from heap ByteBuffers as they have a similar field used for slices.
+   *
+   * @param unsafeObj The primitive backing array. It may be null. Used by Unsafe calls.
+   * @param nativeBaseOffset The off-heap memory address including DirectByteBuffer split offsets.
+   * @param regionOffset This offset defines address zero of this object (usually a region)
+   * relative to address zero of the backing resource. It is used to compute cumBaseOffset.
+   * This will be loaded from heap ByteBuffers, which have a similar field used for slices.
    * It is used by region() and writableRegion().
+   * This offset does not include the size of an object array header, if there is one.
+   * @param capacityBytes the capacity of this object. Used by all methods when checking bounds.
    */
-  private final long regionOffset_;
-
   BaseState(final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
       final long capacityBytes) {
-    regionOffset_ = regionOffset;
     capacityBytes_ = capacityBytes;
     cumBaseOffset_ = regionOffset + ((unsafeObj == null)
         ? nativeBaseOffset
@@ -115,6 +113,7 @@ abstract class BaseState {
    * Gets the backing ByteBuffer if it exists, otherwise returns null.
    * @return the backing ByteBuffer if it exists, otherwise returns null.
    */
+  //Overridden by ByteBuffer Leafs
   public ByteBuffer getByteBuffer() {
     return null;
   }
@@ -160,15 +159,47 @@ abstract class BaseState {
     return cumBaseOffset_ + offsetBytes;
   }
 
+  //made public in WritableMemory and WritableBuffer, only implemented in Direct Leafs
   abstract MemoryRequestServer getMemoryRequestServer();
 
-  final long getRegOffset() {
-    return regionOffset_;
+  //Overridden by ByteBuffer, Direct and Map leafs
+  long getNativeBaseOffset() {
+    return 0;
+  }
+
+  /**
+   * Returns the offset of address zero of this object relative to the address zero of the
+   * backing resource but not including the size of any Java object header.
+   * @return the offset of address zero of this object relative to the address zero of the
+   * backing resource but not including the size of any Java object header.
+   */
+  public final long getRegionOffset() {
+    final Object unsafeObj = getUnsafeObject();
+    return (unsafeObj == null)
+        ? cumBaseOffset_ - getNativeBaseOffset()
+        : cumBaseOffset_ - unsafe.arrayBaseOffset(unsafeObj.getClass());
+  }
+
+  /**
+   * Returns the offset of address zero of this object relative to the address zero of the
+   * backing resource plus the given offsetBytes but not including the size of any Java object
+   * header.
+   * @param offsetBytes the given offsetBytes
+   * @return the offset of address zero of this object relative to the address zero of the
+   * backing resource plus the given offsetBytes but not including the size of any Java object
+   * header.
+   */
+  public final long getRegionOffset(final long offsetBytes) {
+    return getRegionOffset() + offsetBytes;
   }
 
   abstract int getTypeId();
 
-  abstract Object getUnsafeObject();
+  //Overridden by Heap and ByteBuffer Leafs. Made public as getArray() in WritableMemory and
+  // WritableBuffer
+  Object getUnsafeObject() {
+    return null;
+  }
 
   /**
    * Returns true if this object is backed by an on-heap primitive array
@@ -258,7 +289,9 @@ abstract class BaseState {
    * This is relevant only for direct (off-heap) memory and Mapped Files.
    * @return true if this object is valid and has not been closed.
    */
-  public abstract boolean isValid();
+  public boolean isValid() {
+    return true;
+  }
 
   //ASSERTS AND CHECKS
   final void assertValid() {
@@ -431,7 +464,7 @@ abstract class BaseState {
     sb.append("UnsafeObj, hashCode : ").append(uObjStr).append(LS);
     sb.append("UnsafeObjHeader     : ").append(uObjHeader).append(LS);
     sb.append("ByteBuf, hashCode   : ").append(bbStr).append(LS);
-    sb.append("RegionOffset        : ").append(state.getRegOffset()).append(LS);
+    sb.append("RegionOffset        : ").append(state.getRegionOffset()).append(LS);
     sb.append("Capacity            : ").append(capacity).append(LS);
     sb.append("CumBaseOffset       : ").append(cumBaseOffset).append(LS);
     sb.append("MemReq, hashCode    : ").append(memReqStr).append(LS);

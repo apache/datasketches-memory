@@ -64,9 +64,4 @@ final class HeapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl 
     return unsafeObj;
   }
 
-  @Override
-  public boolean isValid() {
-    return true;
-  }
-
 }

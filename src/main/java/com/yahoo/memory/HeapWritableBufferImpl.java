@@ -64,9 +64,4 @@ final class HeapWritableBufferImpl extends WritableBufferImpl {
     return unsafeObj;
   }
 
-  @Override
-  public boolean isValid() {
-    return true;
-  }
-
 }

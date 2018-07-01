@@ -60,19 +60,19 @@ final class DirectWritableMemoryImpl extends WritableMemoryImpl {
   }
 
   @Override
-  int getTypeId() {
-    return typeId & 0xff;
-  }
-
-  @Override
   public MemoryRequestServer getMemoryRequestServer() {
     assertValid();
     return memReqSvr; //cannot be null
   }
 
   @Override
-  Object getUnsafeObject() {
-    return null;
+  long getNativeBaseOffset() {
+    return nativeBaseOffset;
+  }
+
+  @Override
+  int getTypeId() {
+    return typeId & 0xff;
   }
 
   @Override

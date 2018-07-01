@@ -58,13 +58,13 @@ final class MapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   }
 
   @Override
-  int getTypeId() {
-    return typeId & 0xff;
+  long getNativeBaseOffset() {
+    return nativeBaseOffset;
   }
 
   @Override
-  Object getUnsafeObject() {
-    return null;
+  int getTypeId() {
+    return typeId & 0xff;
   }
 
   @Override

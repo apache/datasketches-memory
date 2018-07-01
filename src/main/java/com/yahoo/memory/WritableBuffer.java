@@ -385,21 +385,4 @@ public abstract class WritableBuffer extends Buffer {
     return null;
   }
 
-  /**
-   * Returns the offset of the start of this WritableBuffer from the backing resource,
-   * but not including any Java object header.
-   *
-   * @return the offset of the start of this WritableBuffer from the backing resource.
-   */
-  public abstract long getRegionOffset();
-
-  /**
-   * Returns the offset of the start of this WritableBuffer from the backing resource plus
-   * the given offsetBytes, but not including any Java object header.
-   *
-   * @param offsetBytes the given offset bytes
-   * @return the offset of the start of this WritableBuffer from the backing resource.
-   */
-  public abstract long getRegionOffset(long offsetBytes);
-
 }

@@ -68,6 +68,11 @@ final class BBWritableBufferImpl extends WritableBufferImpl {
   }
 
   @Override
+  long getNativeBaseOffset() {
+    return nativeBaseOffset;
+  }
+
+  @Override
   int getTypeId() {
     return typeId & 0xff;
   }
@@ -76,11 +81,6 @@ final class BBWritableBufferImpl extends WritableBufferImpl {
   Object getUnsafeObject() {
     assertValid();
     return unsafeObj;
-  }
-
-  @Override
-  public boolean isValid() {
-    return true;
   }
 
 }

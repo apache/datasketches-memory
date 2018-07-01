@@ -67,6 +67,11 @@ final class BBNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
   }
 
   @Override
+  long getNativeBaseOffset() {
+    return nativeBaseOffset;
+  }
+
+  @Override
   int getTypeId() {
     return typeId & 0xff;
   }
@@ -75,11 +80,6 @@ final class BBNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
   Object getUnsafeObject() {
     assertValid();
     return unsafeObj;
-  }
-
-  @Override
-  public boolean isValid() {
-    return true;
   }
 
 }

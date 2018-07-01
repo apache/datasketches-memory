@@ -193,6 +193,7 @@ abstract class BaseState {
     return getRegionOffset() + offsetBytes;
   }
 
+  //Overridden by all leafs
   abstract int getTypeId();
 
   //Overridden by Heap and ByteBuffer Leafs. Made public as getArray() in WritableMemory and
@@ -289,6 +290,7 @@ abstract class BaseState {
    * This is relevant only for direct (off-heap) memory and Mapped Files.
    * @return true if this object is valid and has not been closed.
    */
+  //Overridden by Direct and Map leafs
   public boolean isValid() {
     return true;
   }
@@ -336,39 +338,39 @@ abstract class BaseState {
   }
 
   //TYPE ID CHECKS
-  boolean isReadOnlyType() {
+  final boolean isReadOnlyType() {
     return (getTypeId() & READONLY) > 0;
   }
 
-  boolean isBufferType() {
+  final boolean isBufferType() {
     return (getTypeId() & BUFFER) > 0;
   }
 
-  boolean isDuplicateType() {
+  final boolean isDuplicateType() {
     return (getTypeId() & DUPLICATE) > 0;
   }
 
-  boolean isRegionType() {
+  final boolean isRegionType() {
     return (getTypeId() & REGION) > 0;
   }
 
-  boolean isNonNativeType() {
+  final boolean isNonNativeType() {
     return (getTypeId() & NONNATIVE) > 0;
   }
 
-  boolean isHeapType() {
+  final boolean isHeapType() {
     return ((getTypeId() >>> 3) & 3) == 0;
   }
 
-  boolean isDirectType() {
+  final boolean isDirectType() {
     return ((getTypeId() >>> 3) & 3) == 1;
   }
 
-  boolean isMapType() {
+  final boolean isMapType() {
     return ((getTypeId() >>> 3) & 3) == 2;
   }
 
-  boolean isBBType() {
+  final boolean isBBType() {
     return ((getTypeId() >>> 3) & 3) == 3;
   }
 

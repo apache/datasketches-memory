@@ -63,6 +63,11 @@ public class BaseStateTest {
     assertEquals(Prim.DOUBLE.scale(), ARRAY_DOUBLE_INDEX_SCALE);
   }
 
+  @Test
+  public void checkGetNativeBaseOffset_Heap() {
+    WritableMemory wmem = WritableMemory.allocate(8);
+    assertEquals(wmem.getNativeBaseOffset(), 0L);
+  }
 
   @Test
   public void printlnTest() {

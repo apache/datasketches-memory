@@ -35,6 +35,7 @@ final class NioBits {
 
   static {
     try {
+      //TODO-JDK9 VM_CLASS = Class.forName("jdk.internal.misc.VM");
       VM_CLASS = Class.forName("sun.misc.VM");
       VM_MAX_DIRECT_MEMORY_METHOD =
           VM_CLASS.getDeclaredMethod("maxDirectMemory");

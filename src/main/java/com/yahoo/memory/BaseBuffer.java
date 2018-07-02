@@ -171,7 +171,7 @@ public abstract class BaseBuffer extends BaseState {
     return this;
   }
 
-  //RESTRICTED XXX
+  //RESTRICTED
   final void incrementAndAssertPositionForRead(final long position, final long increment) {
     assertValid();
     final long newPos = position + increment;

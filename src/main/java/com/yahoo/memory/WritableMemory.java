@@ -30,7 +30,7 @@ public abstract class WritableMemory extends Memory {
     super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
   }
 
-  //BYTE BUFFER XXX
+  //BYTE BUFFER
   /**
    * Accesses the given ByteBuffer for write operations. The returned WritableMemory object has
    * the same byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is
@@ -63,7 +63,7 @@ public abstract class WritableMemory extends Memory {
     return BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, false, byteOrder);
   }
 
-  //MAP XXX
+  //MAP
   /**
    * Maps the entire given file into native-ordered Memory for write operations
    * (including those &gt; 2GB). Calling this method is equivalent to calling
@@ -101,7 +101,7 @@ public abstract class WritableMemory extends Memory {
         .wrapMap(file, fileOffsetBytes, capacityBytes, false, byteOrder);
   }
 
-  //ALLOCATE DIRECT XXX
+  //ALLOCATE DIRECT
   /**
    * Allocates and provides access to capacityBytes directly in native (off-heap) memory
    * leveraging the WritableMemory API. Native byte order is assumed.
@@ -143,7 +143,7 @@ public abstract class WritableMemory extends Memory {
     return BaseWritableMemoryImpl.wrapDirect(capacityBytes, nativeOrder, memReqSvr);
   }
 
-  //REGIONS XXX
+  //REGIONS
   /**
    * A writable region is a writable view of this object.
    * This returns a new <i>WritableMemory</i> representing the defined writable region with the
@@ -181,7 +181,7 @@ public abstract class WritableMemory extends Memory {
   public abstract WritableMemory writableRegion(long offsetBytes, long capacityBytes,
       ByteOrder byteOrder);
 
-  //AS BUFFER XXX
+  //AS BUFFER
   /**
    * Returns a new <i>WritableBuffer</i> with a writable view of this object.
    * <ul>
@@ -216,7 +216,7 @@ public abstract class WritableMemory extends Memory {
    */
   public abstract WritableBuffer asWritableBuffer(ByteOrder byteOrder);
 
-  //ALLOCATE HEAP VIA AUTOMATIC BYTE ARRAY XXX
+  //ALLOCATE HEAP VIA AUTOMATIC BYTE ARRAY
   /**
    * Creates on-heap WritableMemory with the given capacity. If the given capacityBytes is zero,
    * backing storage, byte order and read-only status of the returned WritableMemory object are
@@ -229,7 +229,7 @@ public abstract class WritableMemory extends Memory {
     return wrap(arr, nativeOrder);
   }
 
-  //ACCESS PRIMITIVE HEAP ARRAYS for write XXX
+  //ACCESS PRIMITIVE HEAP ARRAYS for write
   /**
    * Wraps the given primitive array for write operations assuming native byte order. If the array
    * size is zero, backing storage, byte order and read-only status of the returned WritableMemory
@@ -384,7 +384,7 @@ public abstract class WritableMemory extends Memory {
   }
   //END OF CONSTRUCTOR-TYPE METHODS
 
-  //PRIMITIVE putXXX() and putXXXArray() XXX
+  //PRIMITIVE putX() and putXArray()
   /**
    * Puts the boolean value at the given offset
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
@@ -535,7 +535,7 @@ public abstract class WritableMemory extends Memory {
   public abstract void putShortArray(long offsetBytes, short[] srcArray,
           final int srcOffsetShorts, final int lengthShorts);
 
-  //Atomic Methods XXX
+  //Atomic Methods
   /**
    * Atomically adds the given value to the long located at offsetBytes.
    * @param offsetBytes offset bytes relative to this Memory start
@@ -563,7 +563,7 @@ public abstract class WritableMemory extends Memory {
    */
   public abstract long getAndSetLong(long offsetBytes, long newValue);
 
-  //OTHER WRITE METHODS XXX
+  //OTHER WRITE METHODS
   /**
    * Returns the primitive backing array, otherwise null.
    * @return the primitive backing array, otherwise null.
@@ -610,7 +610,7 @@ public abstract class WritableMemory extends Memory {
    */
   public abstract void setBits(long offsetBytes, byte bitMask);
 
-  //OTHER WRITABLE API METHODS XXX
+  //OTHER WRITABLE API METHODS
   /**
    * For Direct Memory only. Other types of backing resources will return null.
    * Gets the MemoryRequestServer object used by dynamic off-heap (Direct) memory objects

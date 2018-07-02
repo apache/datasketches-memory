@@ -54,7 +54,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
     this.originMemory = originMemory;
   }
 
-  //REGIONS XXX
+  //REGIONS
   @Override
   public Buffer region() {
     return writableRegionImpl(getPosition(), getEnd() - getPosition(), true, getByteOrder());
@@ -97,7 +97,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   abstract BaseWritableBufferImpl toWritableRegion(
       long offsetBytes, long capcityBytes, boolean readOnly, ByteOrder byteOrder);
 
-  //DUPLICATES XXX
+  //DUPLICATES
   @Override
   public Buffer duplicate() {
     return writableDuplicateImpl(true, getByteOrder());
@@ -130,7 +130,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
 
   abstract BaseWritableBufferImpl toDuplicate(boolean readOnly, ByteOrder byteOrder);
 
-  //MEMORY XXX
+  //MEMORY
   @Override
   public Memory asMemory() {
     return originMemory;
@@ -144,7 +144,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
     return originMemory;
   }
 
-  //PRIMITIVE getXXX() and getXXXArray() XXX
+  //PRIMITIVE getX() and getArray()
   @Override
   public final boolean getBoolean() {
     final long pos = getPosition();
@@ -201,7 +201,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
             copyBytes);
   }
 
-  //PRIMITIVE getXXX() Native Endian (used by both endians) XXX
+  //PRIMITIVE getX() Native Endian (used by both endians)
   final char getNativeOrderedChar() {
     final long pos = getPosition();
     incrementAndAssertPositionForRead(pos, ARRAY_CHAR_INDEX_SCALE);
@@ -246,7 +246,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
     return unsafe.getShort(getUnsafeObject(), getCumulativeOffset(offsetBytes));
   }
 
-  //OTHER PRIMITIVE READ METHODS: copyTo, compareTo XXX
+  //OTHER PRIMITIVE READ METHODS: copyTo, compareTo
   @Override
   public final int compareTo(final long thisOffsetBytes, final long thisLengthBytes,
       final Buffer thatBuf, final long thatOffsetBytes, final long thatLengthBytes) {
@@ -259,7 +259,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
    * the positional values. Switch to Memory view to do copyTo.
    */
 
-  //PRIMITIVE putXXX() and putXXXArray() XXX
+  //PRIMITIVE putX() and putXArray()
   @Override
   public final void putBoolean(final boolean value) {
     final long pos = getPosition();
@@ -316,7 +316,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
             copyBytes);
   }
 
-  //PRIMITIVE putXXX() Native Endian (used by both endians) XXX
+  //PRIMITIVE putX() Native Endian (used by both endians)
   final void putNativeOrderedChar(final char value) {
     final long pos = getPosition();
     incrementAndAssertPositionForWrite(pos, ARRAY_CHAR_INDEX_SCALE);
@@ -361,7 +361,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
     unsafe.putShort(getUnsafeObject(), getCumulativeOffset(offsetBytes), value);
   }
 
-  //OTHER XXX
+  //OTHER
   @Override
   public final Object getArray() {
     assertValid();

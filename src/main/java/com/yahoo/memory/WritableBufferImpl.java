@@ -49,7 +49,7 @@ abstract class WritableBufferImpl extends BaseWritableBufferImpl {
     super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, originMemory);
   }
 
-  //PRIMITIVE getXXX() and getXXXArray() XXX
+  //PRIMITIVE getX() and getXArray()
   @Override
   public char getChar() {
     return getNativeOrderedChar();
@@ -203,7 +203,7 @@ abstract class WritableBufferImpl extends BaseWritableBufferImpl {
             copyBytes);
   }
 
-  //PRIMITIVE putXXX() and putXXXArray() XXX
+  //PRIMITIVE putX() and putXArray()
   @Override
   public void putChar(final char value) {
     putNativeOrderedChar(value);

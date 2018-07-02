@@ -22,7 +22,7 @@ final class AllocateDirect implements AutoCloseable {
   private static final Logger LOG = LoggerFactory.getLogger(AllocateDirect.class);
 
   private final Deallocator deallocator;
-  private final Cleaner cleaner;
+  private final Cleaner cleaner; //TODO-JDK9 import jdk.internal.ref.Cleaner;
   private final long nativeBaseOffset;
 
   /**

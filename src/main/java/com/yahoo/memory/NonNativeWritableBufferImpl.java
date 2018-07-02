@@ -42,7 +42,7 @@ abstract class NonNativeWritableBufferImpl extends BaseWritableBufferImpl {
     super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, originMemory);
   }
 
-  //PRIMITIVE getXXX() and getXXXArray() XXX
+  //PRIMITIVE getX() and getXArray()
   @Override
   public char getChar() {
     return Character.reverseBytes(getNativeOrderedChar());
@@ -170,7 +170,7 @@ abstract class NonNativeWritableBufferImpl extends BaseWritableBufferImpl {
         dstArray, dstOffsetShorts, lengthShorts);
   }
 
-  //PRIMITIVE putXXX() and putXXXArray() XXX
+  //PRIMITIVE putX() and putXArray()
   @Override
   public void putChar(final char value) {
     putNativeOrderedChar(Character.reverseBytes(value));

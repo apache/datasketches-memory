@@ -1,8 +1,8 @@
 # Eclipse project files 
-.classpath
-.project
-.settings/
-.checkstyle
+/.classpath
+/.project
+/.settings/
+/.checkstyle
 
 #OSX files
 .DS_Store

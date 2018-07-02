@@ -243,7 +243,7 @@ final class CompareAndCopy {
   private static void getCharArrayChunk(final Object unsafeObj, final long cumOffsetBytes,
       final char[] dstArray, final int dstOffsetChars, final int lengthChars) {
     // JDK 9 adds native intrinsics for such bulk non-native ordered primitive memory copy.
-    // TODO use them when the library adds support for JDK 9
+    // TODO-JDK9 use them when the library adds support for JDK 9
     // int-counted loop to avoid safepoint polls
     for (int i = 0; i < lengthChars; i++) {
       dstArray[dstOffsetChars + i] = Character.reverseBytes(
@@ -272,7 +272,7 @@ final class CompareAndCopy {
   private static void getDoubleArrayChunk(final Object unsafeObj, final long cumOffsetBytes,
       final double[] dstArray, final int dstOffsetDoubles, final int lengthDoubles) {
     // JDK 9 adds native intrinsics for such bulk non-native ordered primitive memory copy.
-    // TODO use them when the library adds support for JDK 9
+    // TODO-JDK9 use them when the library adds support for JDK 9
     // int-counted loop to avoid safepoint polls
     for (int i = 0; i < lengthDoubles; i++) {
       dstArray[dstOffsetDoubles + i] = Double.longBitsToDouble(Long.reverseBytes(
@@ -299,7 +299,7 @@ final class CompareAndCopy {
   private static void getFloatArrayChunk(final Object unsafeObj, final long cumOffsetBytes,
       final float[] dstArray, final int dstOffsetFloats, final int lengthFloats) {
     // JDK 9 adds native intrinsics for such bulk non-native ordered primitive memory copy.
-    // TODO use them when the library adds support for JDK 9
+    // TODO-JDK9 use them when the library adds support for JDK 9
     // int-counted loop to avoid safepoint polls
     for (int i = 0; i < lengthFloats; i++) {
       dstArray[dstOffsetFloats + i] = Float.intBitsToFloat(Integer.reverseBytes(
@@ -326,7 +326,7 @@ final class CompareAndCopy {
   private static void getIntArrayChunk(final Object unsafeObj, final long cumOffsetBytes,
       final int[] dstArray, final int dstOffsetInts, final int lengthInts) {
     // JDK 9 adds native intrinsics for such bulk non-native ordered primitive memory copy.
-    // TODO use them when the library adds support for JDK 9
+    // TODO-JDK9 use them when the library adds support for JDK 9
     // int-counted loop to avoid safepoint polls
     for (int i = 0; i < lengthInts; i++) {
       dstArray[dstOffsetInts + i] = Integer.reverseBytes(
@@ -353,7 +353,7 @@ final class CompareAndCopy {
   private static void getLongArrayChunk(final Object unsafeObj, final long cumOffsetBytes,
       final long[] dstArray, final int dstOffsetLongs, final int lengthLongs) {
     // JDK 9 adds native intrinsics for such bulk non-native ordered primitive memory copy.
-    // TODO use them when the library adds support for JDK 9
+    // TODO-JDK9 use them when the library adds support for JDK 9
     // int-counted loop to avoid safepoint polls
     for (int i = 0; i < lengthLongs; i++) {
       dstArray[dstOffsetLongs + i] = Long.reverseBytes(
@@ -380,7 +380,7 @@ final class CompareAndCopy {
   private static void getShortArrayChunk(final Object unsafeObj, final long cumOffsetBytes,
       final short[] dstArray, final int dstOffsetShorts, final int lengthShorts) {
     // JDK 9 adds native intrinsics for such bulk non-native ordered primitive memory copy.
-    // TODO use them when the library adds support for JDK 9
+    // TODO-JDK9 use them when the library adds support for JDK 9
     // int-counted loop to avoid safepoint polls
     for (int i = 0; i < lengthShorts; i++) {
       dstArray[dstOffsetShorts + i] = Short.reverseBytes(
@@ -406,7 +406,7 @@ final class CompareAndCopy {
   private static void putCharArrayChunk(final char[] srcArray, final int srcOffsetChars,
       final int lengthChars, final Object unsafeObj, final long cumOffsetBytes) {
     // JDK 9 adds native intrinsics for such bulk non-native ordered primitive memory copy.
-    // TODO use them when the library adds support for JDK 9
+    // TODO-JDK9 use them when the library adds support for JDK 9
     // int-counted loop to avoid safepoint polls
     for (int i = 0; i < lengthChars; i++) {
       unsafe.putChar(unsafeObj, cumOffsetBytes + (((long) i) << CHAR_SHIFT),
@@ -434,7 +434,7 @@ final class CompareAndCopy {
   private static void putDoubleArrayChunk(final double[] srcArray, final int srcOffsetDoubles,
       final int lengthDoubles, final Object unsafeObj, final long cumOffsetBytes) {
     // JDK 9 adds native intrinsics for such bulk non-native ordered primitive memory copy.
-    // TODO use them when the library adds support for JDK 9
+    // TODO-JDK9 use them when the library adds support for JDK 9
     // int-counted loop to avoid safepoint polls
     for (int i = 0; i < lengthDoubles; i++) {
       unsafe.putLong(unsafeObj, cumOffsetBytes + (((long) i) << DOUBLE_SHIFT),
@@ -460,7 +460,7 @@ final class CompareAndCopy {
   private static void putFloatArrayChunk(final float[] srcArray, final int srcOffsetFloats,
       final int lengthFloats, final Object unsafeObj, final long cumOffsetBytes) {
     // JDK 9 adds native intrinsics for such bulk non-native ordered primitive memory copy.
-    // TODO use them when the library adds support for JDK 9
+    // TODO-JDK9 use them when the library adds support for JDK 9
     // int-counted loop to avoid safepoint polls
     for (int i = 0; i < lengthFloats; i++) {
       unsafe.putInt(unsafeObj, cumOffsetBytes + (((long) i) << FLOAT_SHIFT),
@@ -486,7 +486,7 @@ final class CompareAndCopy {
   private static void putIntArrayChunk(final int[] srcArray, final int srcOffsetInts,
       final int lengthInts, final Object unsafeObj, final long cumOffsetBytes) {
     // JDK 9 adds native intrinsics for such bulk non-native ordered primitive memory copy.
-    // TODO use them when the library adds support for JDK 9
+    // TODO-JDK9 use them when the library adds support for JDK 9
     // int-counted loop to avoid safepoint polls
     for (int i = 0; i < lengthInts; i++) {
       unsafe.putInt(unsafeObj, cumOffsetBytes + (((long) i) << INT_SHIFT),
@@ -512,7 +512,7 @@ final class CompareAndCopy {
   private static void putLongArrayChunk(final long[] srcArray, final int srcOffsetLongs,
       final int lengthLongs, final Object unsafeObj, final long cumOffsetBytes) {
     // JDK 9 adds native intrinsics for such bulk non-native ordered primitive memory copy.
-    // TODO use them when the library adds support for JDK 9
+    // TODO-JDK9 use them when the library adds support for JDK 9
     // int-counted loop to avoid safepoint polls
     for (int i = 0; i < lengthLongs; i++) {
       unsafe.putLong(unsafeObj, cumOffsetBytes + (((long) i) << LONG_SHIFT),
@@ -538,7 +538,7 @@ final class CompareAndCopy {
   private static void putShortArrayChunk(final short[] srcArray, final int srcOffsetShorts,
       final int lengthShorts, final Object unsafeObj, final long cumOffsetBytes) {
     // JDK 9 adds native intrinsics for such bulk non-native ordered primitive memory copy.
-    // TODO use them when the library adds support for JDK 9
+    // TODO-JDK9 use them when the library adds support for JDK 9
     // int-counted loop to avoid safepoint polls
     for (int i = 0; i < lengthShorts; i++) {
       unsafe.putShort(unsafeObj, cumOffsetBytes + (((long) i) << SHORT_SHIFT),

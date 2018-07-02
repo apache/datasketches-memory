@@ -23,7 +23,7 @@ public abstract class WritableBuffer extends Buffer {
     super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
   }
 
-  //BYTE BUFFER XXX
+  //BYTE BUFFER
   /**
    * Accesses the given ByteBuffer for write operations. The returned WritableBuffer object has
    * the same byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is
@@ -54,13 +54,13 @@ public abstract class WritableBuffer extends Buffer {
     return wbuf;
   }
 
-  //MAP XXX
+  //MAP
   //Use WritableMemory for mapping files and then asWritableBuffer()
 
-  //ALLOCATE DIRECT XXX
+  //ALLOCATE DIRECT
   //Use WritableMemory to allocate direct memory and then asWritableBuffer().
 
-  //DUPLICATES XXX
+  //DUPLICATES
   /**
    * Returns a duplicate writable view of this Buffer with the same but independent values of
    * <i>start</i>, <i>position</i> and <i>end</i>.
@@ -101,7 +101,7 @@ public abstract class WritableBuffer extends Buffer {
   public abstract WritableBuffer writableDuplicate(ByteOrder byteOrder);
 
 
-  //REGIONS XXX
+  //REGIONS
   /**
    * A writable region is a writable view of this object.
    * <ul>
@@ -145,7 +145,7 @@ public abstract class WritableBuffer extends Buffer {
   public abstract WritableBuffer writableRegion(long offsetBytes, long capacityBytes,
       ByteOrder byteOrder);
 
-  //AS MEMORY XXX
+  //AS MEMORY
   /**
    * Convert this WritableBuffer to a WritableMemory.
    * If this object's capacity is zero, the returned object is effectively immutable and
@@ -154,11 +154,11 @@ public abstract class WritableBuffer extends Buffer {
    */
   public abstract WritableMemory asWritableMemory();
 
-  //ACCESS PRIMITIVE HEAP ARRAYS for write XXX
+  //ACCESS PRIMITIVE HEAP ARRAYS for write
   //use WritableMemory and then asWritableBuffer().
   //END OF CONSTRUCTOR-TYPE METHODS
 
-  //PRIMITIVE putXXX() and putXXXArray() XXX
+  //PRIMITIVE putX() and putXArray()
   /**
    * Puts the boolean value at the current position.
    * Increments the position by 1.
@@ -352,7 +352,7 @@ public abstract class WritableBuffer extends Buffer {
    */
   public abstract void putShortArray(short[] srcArray, int srcOffsetShorts, int lengthShorts);
 
-  //OTHER WRITE METHODS XXX
+  //OTHER WRITE METHODS
   /**
    * Returns the primitive backing array, otherwise null.
    * @return the primitive backing array, otherwise null.
@@ -371,7 +371,7 @@ public abstract class WritableBuffer extends Buffer {
    */
   public abstract void fill(byte value);
 
-  //OTHER WRITABLE API METHODS XXX
+  //OTHER WRITABLE API METHODS
   /**
    * For Direct Memory only. Other types of backing resources will return null.
    * Gets the MemoryRequestServer object used by dynamic off-heap (Direct) memory objects

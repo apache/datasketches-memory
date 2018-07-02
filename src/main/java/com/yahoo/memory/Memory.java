@@ -33,7 +33,7 @@ public abstract class Memory extends BaseState {
     super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
   }
 
-  //BYTE BUFFER XXX
+  //BYTE BUFFER
   /**
    * Accesses the given ByteBuffer for read-only operations. The returned <i>Memory</i> object has
    * the same byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is
@@ -66,7 +66,7 @@ public abstract class Memory extends BaseState {
     return BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, true, byteOrder);
   }
 
-  //MAP XXX
+  //MAP
   /**
    * Maps the entire given file into native-ordered Memory for read operations
    * (including those &gt; 2GB).
@@ -104,7 +104,7 @@ public abstract class Memory extends BaseState {
     return BaseWritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, true, byteOrder);
   }
 
-  //REGIONS XXX
+  //REGIONS
   /**
    * A region is a read-only view of this object.
    * <ul>
@@ -137,7 +137,7 @@ public abstract class Memory extends BaseState {
    */
   public abstract Memory region(long offsetBytes, long capacityBytes, ByteOrder byteOrder);
 
-  //AS BUFFER XXX
+  //AS BUFFER
   /**
    * Returns a new <i>Buffer</i> view of this object.
    * <ul>
@@ -198,7 +198,7 @@ public abstract class Memory extends BaseState {
    */
   public abstract ByteBuffer unsafeByteBufferView(long offsetBytes, int capacityBytes);
 
-  //ACCESS PRIMITIVE HEAP ARRAYS for readOnly XXX
+  //ACCESS PRIMITIVE HEAP ARRAYS for readOnly
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
    * size is zero, backing storage and byte order of the returned <i>Memory</i> object are unspecified.
@@ -343,7 +343,7 @@ public abstract class Memory extends BaseState {
     return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, true, nativeOrder);
   }
 
-  //PRIMITIVE getXXX() and getXXXArray() XXX
+  //PRIMITIVE getX() and getXArray()
   /**
    * Gets the boolean value at the given offset
    * @param offsetBytes offset bytes relative to this Memory start
@@ -517,7 +517,7 @@ public abstract class Memory extends BaseState {
   public abstract void getShortArray(long offsetBytes, short[] dstArray, int dstOffsetShorts,
       int lengthShorts);
 
-  //SPECIAL PRIMITIVE READ METHODS: compareTo, copyTo, writeTo XXX
+  //SPECIAL PRIMITIVE READ METHODS: compareTo, copyTo, writeTo
   /**
    * Compares the bytes of this Memory to <i>that</i> Memory.
    * Returns <i>(this &lt; that) ? (some negative value) : (this &gt; that) ? (some positive value)

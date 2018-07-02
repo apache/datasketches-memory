@@ -25,7 +25,7 @@ public abstract class Buffer extends BaseBuffer {
     super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
   }
 
-  //BYTE BUFFER XXX
+  //BYTE BUFFER
   /**
    * Accesses the given ByteBuffer for read-only operations. The returned Buffer object has the
    * same byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is zero,
@@ -55,10 +55,10 @@ public abstract class Buffer extends BaseBuffer {
     return wbuf;
   }
 
-  //MAP XXX
+  //MAP
   //Use Memory for mapping files and the asBuffer()
 
-  //DUPLICATES XXX
+  //DUPLICATES
   /**
    * Returns a read-only duplicate view of this Buffer with the same but independent values of
    * <i>start</i>, <i>position</i> and <i>end</i>.
@@ -98,7 +98,7 @@ public abstract class Buffer extends BaseBuffer {
    */
   public abstract Buffer duplicate(ByteOrder byteOrder);
 
-  //REGIONS XXX
+  //REGIONS
   /**
    * A region is a read-only view of this object.
    * <ul>
@@ -144,7 +144,7 @@ public abstract class Buffer extends BaseBuffer {
   public abstract Buffer region(long offsetBytes, long capacityBytes,
       ByteOrder byteOrder);
 
-  //MEMORY XXX
+  //MEMORY
   /**
    * Convert this Buffer to a Memory. The current <i>start</i>, <i>position</i> and <i>end</i>
    * are ignored.
@@ -154,11 +154,11 @@ public abstract class Buffer extends BaseBuffer {
    */
   public abstract Memory asMemory();
 
-  //ACCESS PRIMITIVE HEAP ARRAYS for readOnly XXX
+  //ACCESS PRIMITIVE HEAP ARRAYS for readOnly
   // use Memory or WritableMemory and then asBuffer().
   //END OF CONSTRUCTOR-TYPE METHODS
 
-  //PRIMITIVE getXXX() and getXXXArray() //XXX
+  //PRIMITIVE getX() and getXArray()
   /**
    * Gets the boolean value at the current position.
    * Increments the position by 1.
@@ -352,7 +352,7 @@ public abstract class Buffer extends BaseBuffer {
    */
   public abstract void getShortArray(short[] dstArray, int dstOffsetShorts, int lengthShorts);
 
-  //SPECIAL PRIMITIVE READ METHODS: compareTo XXX
+  //SPECIAL PRIMITIVE READ METHODS: compareTo
   /**
    * Compares the bytes of this Buffer to <i>that</i> Buffer.
    * This uses absolute offsets not the start, position and end.

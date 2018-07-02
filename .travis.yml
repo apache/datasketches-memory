@@ -3,20 +3,24 @@
 language: java
 
 jdk:
- - oraclejdk8
+ - oraclejdk8 
+ #TODO-JDK9: - oraclejdk9
 
 install:
  - mvn install -Dmaven.javadoc.skip=true -Dsource.skip=true -DskipTests=true -Dgpg.skip=true
-
+ #TODO-JDK9: - mvn install -Dmaven.compiler.fork=true -Dmaven.javadoc.skip=true -Dsource.skip=true -DskipTests=true -Dgpg.skip=true -Pstrict
+ 
 before_script:
- - _JAVA_OPTIONS="-Xmx4g -Xms1g" 
+ - _JAVA_OPTIONS="-Xmx4g -Xms1g"
 
 script:
  - mvn clean compile test -Dgpg.skip=true
+ #TODO-JDK9: - mvn clean compile test -Dgpg.skip=true -Pstrict -Dmaven.compiler.fork=true
 
 after_success: 
   - mvn clean test jacoco:report coveralls:report -DrepoToken=$coveralls_token
-
+ #TODO-JDK9: - mvn clean test jacoco:report coveralls:report -DrepoToken=$coveralls_token -Pstrict -Dmaven.compiler.fork=true
+ 
 notifications:
   email: false
 

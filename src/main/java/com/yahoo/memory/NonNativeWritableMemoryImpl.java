@@ -42,7 +42,7 @@ abstract class NonNativeWritableMemoryImpl extends BaseWritableMemoryImpl {
     super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
   }
 
-  ///PRIMITIVE getXXX() and getXXXArray() XXX
+  ///PRIMITIVE getX() and getXArray()
   @Override
   public char getChar(final long offsetBytes) {
     return Character.reverseBytes(getNativeOrderedChar(offsetBytes));
@@ -131,7 +131,7 @@ abstract class NonNativeWritableMemoryImpl extends BaseWritableMemoryImpl {
         copyBytes, dstArray, dstOffsetShorts, lengthShorts);
   }
 
-  //PRIMITIVE putXXX() and putXXXArray() implementations XXX
+  //PRIMITIVE putX() and putXArray() implementations
   @Override
   public void putChar(final long offsetBytes, final char value) {
     putNativeOrderedChar(offsetBytes, Character.reverseBytes(value));
@@ -220,7 +220,7 @@ abstract class NonNativeWritableMemoryImpl extends BaseWritableMemoryImpl {
         getUnsafeObject(), getCumulativeOffset(offsetBytes));
   }
 
-  //Atomic Write Methods XXX
+  //Atomic Write Methods
   @Override
   public long getAndAddLong(final long offsetBytes, final long delta) { //JDK 8+
     assertValidAndBoundsForWrite(offsetBytes, ARRAY_LONG_INDEX_SCALE);

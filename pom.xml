@@ -49,8 +49,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source> <!-- TODO-JDK9: 1.9 -->
+        <maven.compiler.target>1.8</maven.compiler.target> <!-- TODO-JDK9: 1.9 -->
         <argLine>-Xmx4g -Duser.language=en -Duser.country=US -Dfile.encoding=UTF-8</argLine>
     </properties>
 
@@ -115,8 +115,16 @@
                             <configuration>
                                 <source>${maven.compiler.source}</source>
                                 <target>${maven.compiler.target}</target>
-                                <compilerId>javac-with-errorprone</compilerId>
-                                <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                                <compilerId>javac-with-errorprone</compilerId> <!-- TODO-JDK9: remove? -->
+                                <forceJavacCompilerUse>true</forceJavacCompilerUse> <!-- TODO-JDK9: remove? -->
+                                <!-- TODO-JDK9: add, convert -x- to two dashes:
+                                <compilerArgument>-Xlint:deprecation</compilerArgument>
+                                <encoding>UTF-8</encoding>                             
+                                <compilerArgs>
+                                  <arg> -x-add-exports</arg><arg>java.base/jdk.internal.ref=ALL-UNNAMED</arg>
+                                  <arg> -x-add-exports</arg><arg>java.base/sun.nio.ch=ALL-UNNAMED</arg>
+                                </compilerArgs>
+                                -->
                             </configuration>
                             <dependencies>
                                 <dependency>
@@ -208,7 +216,7 @@
                     <autoReleaseAfterClose>false</autoReleaseAfterClose>
                 </configuration>
             </plugin>
-            
+
             <!-- Code coverage plugin, generates coverage report to target/site/jacoco/
                  To skip coverage generation add -Djacoco.skip=true -->
             <plugin>
@@ -281,9 +289,17 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <enableAssertions>true</enableAssertions>
+                    <!-- TODO-JDK9 add, convert -x- to two dashes:
+                    <argLine>
+                      -x-add-exports java.base/jdk.internal.ref=ALL-UNNAMED
+                      -x-add-exports java.base/jdk.internal.misc=ALL-UNNAMED
+                      -x-add-opens=java.base/sun.nio.ch=ALL-UNNAMED
+                      -x-add-opens=java.base/java.nio=ALL-UNNAMED
+                    </argLine>
+                    -->
                 </configuration>
             </plugin>
-            
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
@@ -297,7 +313,7 @@
                     </execution>
                 </executions>
             </plugin>
-            
+
         </plugins>
 
         <pluginManagement>

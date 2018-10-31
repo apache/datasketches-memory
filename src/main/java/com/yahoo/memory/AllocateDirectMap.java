@@ -99,7 +99,10 @@ class AllocateDirectMap implements Map {
     resourceReadOnly = isFileReadOnly(file);
     final long fileLength = file.length();
     if ((localReadOnly || resourceReadOnly) && ((fileOffsetBytes + capacityBytes) > fileLength)) {
-      throw new IllegalArgumentException("Requested map length is greater than file length.");
+      throw new IllegalArgumentException(
+          "Read-only mode and requested map length is greater than current file length: "
+          + "Requested Length = " + (fileOffsetBytes + capacityBytes)
+          + ", Current File Length = " + fileLength);
     }
     raf = mapper(file, fileOffsetBytes, capacityBytes, resourceReadOnly);
     nativeBaseOffset = map(raf.getChannel(), resourceReadOnly, fileOffsetBytes, capacityBytes);

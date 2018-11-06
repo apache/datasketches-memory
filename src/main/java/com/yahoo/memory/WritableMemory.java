@@ -218,15 +218,27 @@ public abstract class WritableMemory extends Memory {
 
   //ALLOCATE HEAP VIA AUTOMATIC BYTE ARRAY
   /**
-   * Creates on-heap WritableMemory with the given capacity. If the given capacityBytes is zero,
-   * backing storage, byte order and read-only status of the returned WritableMemory object are
-   * unspecified.
+   * Creates on-heap WritableMemory with the given capacity and the native byte order. If the given
+   * capacityBytes is zero, backing storage, byte order and read-only status of the returned
+   * WritableMemory object are unspecified.
    * @param capacityBytes the given capacity in bytes.
    * @return a new WritableMemory for write operations on a new byte array.
    */
   public static WritableMemory allocate(final int capacityBytes) {
     final byte[] arr = new byte[capacityBytes];
     return wrap(arr, nativeOrder);
+  }
+
+  /**
+   * Creates on-heap WritableMemory with the given capacity and byte order. If the given
+   * capacityBytes is zero, backing storage, byte order and read-only status of the returned
+   * WritableMemory object are unspecified.
+   * @param capacityBytes the given capacity in bytes.
+   * @return a new WritableMemory for write operations on a new byte array.
+   */
+  public static WritableMemory allocate(final int capacityBytes, final ByteOrder byteOrder) {
+    final byte[] arr = new byte[capacityBytes];
+    return wrap(arr, byteOrder);
   }
 
   //ACCESS PRIMITIVE HEAP ARRAYS for write

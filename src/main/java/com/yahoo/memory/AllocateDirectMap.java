@@ -255,7 +255,13 @@ class AllocateDirectMap implements Map {
     bits |= ((permissions.contains(PosixFilePermission.OTHERS_WRITE))   ? 1 << 1 : 0);
     bits |= ((permissions.contains(PosixFilePermission.OTHERS_EXECUTE)) ? 1      : 0);
     // Here we are going to ignore the Owner Write & Execute bits to allow root/owner testing.
-    //System.err.println(file.getName() + " : " + Integer.toBinaryString(bits));
+    final String filename = file.getName();
+    System.err.println(filename + " : " + Integer.toBinaryString(bits));
+    if ((filename == "GettysburgAddress.txt") && (bits == 436)) {
+      for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+        System.err.println(ste);
+      }
+    }
     return ((bits & 0477) == 0444);
   }
 

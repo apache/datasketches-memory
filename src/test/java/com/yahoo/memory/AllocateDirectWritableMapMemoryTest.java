@@ -129,8 +129,7 @@ public class AllocateDirectWritableMapMemoryTest {
   public void simpleMap2() throws IOException {
     File file =
         new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
-    boolean ro = isFileReadOnly(file);
-    assertTrue(ro);
+    assertTrue(isFileReadOnly(file));
     try (WritableMapHandle rh = WritableMemory.map(file)) {
       //
     }

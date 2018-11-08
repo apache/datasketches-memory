@@ -37,7 +37,7 @@ public class AllocateDirectWritableMapMemoryTest {
     }
   }
 
-  //@Test  //TODO
+  @Test
   public void simpleMap() throws Exception {
     File file =
         new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
@@ -136,7 +136,7 @@ public class AllocateDirectWritableMapMemoryTest {
     }
   }
 
-  //@Test(expectedExceptions = IllegalArgumentException.class) //TODO
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void checkOverLength()  {
     File file =
         new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());

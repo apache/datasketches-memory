@@ -11,13 +11,28 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.ByteOrder;
+import java.nio.file.Files;
+import java.nio.file.attribute.PosixFilePermissions;
 
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class AllocateDirectMapMemoryTest {
   MapHandle hand = null;
+
+  @BeforeClass
+  public void setReadOnly() {
+    File file =
+        new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
+    try {
+    Files.setPosixFilePermissions(file.toPath(), PosixFilePermissions.fromString("rw-r--r--"));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
   @Test
   public void simpleMap() throws Exception {

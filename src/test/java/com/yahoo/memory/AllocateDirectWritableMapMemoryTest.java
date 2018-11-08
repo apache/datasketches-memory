@@ -5,6 +5,7 @@
 
 package com.yahoo.memory;
 
+import static com.yahoo.memory.AllocateDirectMap.isFileReadOnly;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -114,6 +115,7 @@ public class AllocateDirectWritableMapMemoryTest {
   public void simpleMap2() throws IOException {
     File file =
         new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
+    assertTrue(isFileReadOnly(file));
     try (WritableMapHandle rh = WritableMemory.map(file)) {
       //
     }

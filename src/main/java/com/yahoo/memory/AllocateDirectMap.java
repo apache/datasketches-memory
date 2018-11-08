@@ -227,7 +227,7 @@ class AllocateDirectMap implements Map {
     }
   }
 
-  private static boolean isFileReadOnly(final File file) {
+  static boolean isFileReadOnly(final File file) {
     if (System.getProperty("os.name").startsWith("Windows")) {
       return !file.canWrite();
     }

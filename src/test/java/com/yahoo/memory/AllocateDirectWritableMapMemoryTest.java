@@ -116,9 +116,6 @@ public class AllocateDirectWritableMapMemoryTest {
     File file =
         new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
     boolean ro = isFileReadOnly(file);
-    for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
-      System.err.println(ste);
-    }
     assertTrue(ro);
     try (WritableMapHandle rh = WritableMemory.map(file)) {
       //

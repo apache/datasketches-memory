@@ -42,6 +42,14 @@ public class WritableMemoryTest {
   }
 
   @Test
+  public void allocateWithByteOrder() {
+    WritableMemory wmem = WritableMemory.allocate(64, ByteOrder.BIG_ENDIAN);
+    assertEquals(wmem.getByteOrder(), ByteOrder.BIG_ENDIAN);
+    wmem = WritableMemory.allocate(64, ByteOrder.LITTLE_ENDIAN);
+    assertEquals(wmem.getByteOrder(), ByteOrder.LITTLE_ENDIAN);
+  }
+
+  @Test
   public void checkGetArray() {
     byte[] byteArr = new byte[64];
     WritableMemory wmem = WritableMemory.wrap(byteArr);

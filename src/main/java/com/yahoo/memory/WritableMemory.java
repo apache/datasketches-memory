@@ -230,10 +230,11 @@ public abstract class WritableMemory extends Memory {
   }
 
   /**
-   * Creates on-heap WritableMemory with the given capacity and byte order. If the given
+   * Creates on-heap WritableMemory with the given capacity and the given byte order. If the given
    * capacityBytes is zero, backing storage, byte order and read-only status of the returned
    * WritableMemory object are unspecified.
    * @param capacityBytes the given capacity in bytes.
+   * @param byteOrder the given byte order to allocate new Memory object with.
    * @return a new WritableMemory for write operations on a new byte array.
    */
   public static WritableMemory allocate(final int capacityBytes, final ByteOrder byteOrder) {

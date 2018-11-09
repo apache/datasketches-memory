@@ -9,7 +9,6 @@ import static com.yahoo.memory.UnsafeUtil.unsafe;
 
 import java.io.File;
 import java.io.FileDescriptor;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.reflect.InvocationTargetException;
@@ -222,50 +221,12 @@ class AllocateDirectMap implements Map {
   }
 
   static boolean isFileReadOnly(final File file) {
-    try (FileOutputStream fos = new FileOutputStream(file)) {
-      fos.close();
+    try (RandomAccessFile raf = new RandomAccessFile(file, "rw")) {
+      raf.close();
       return false;
     } catch (final Exception e) { //could not open for write
       return true;
     }
-
-
-  //    if (System.getProperty("os.name").startsWith("Windows")) {
-  //      return !file.canWrite();
-  //    }
-  //    //All Unix-like OSes
-  //    final Path path = Paths.get(file.getAbsolutePath());
-  //    return !Files.isWritable(path);
-  //    PosixFileAttributes attributes = null;
-  //    try {
-  //      attributes = Files.getFileAttributeView(path, PosixFileAttributeView.class).readAttributes();
-  //    } catch (final IOException e) {
-  //      // File presence is guaranteed. Ignore
-  //      e.printStackTrace();
-  //    }
-  //    if (attributes == null) { return false; }
-  //
-  //    // Most restrictive read-only file status in Linux-derived OSes is when it has 0444 permissions.
-  //    final Set<PosixFilePermission> permissions = attributes.permissions();
-  //    int bits = 0;
-  //    bits |= ((permissions.contains(PosixFilePermission.OWNER_READ))     ? 1 << 8 : 0);
-  //    bits |= ((permissions.contains(PosixFilePermission.OWNER_WRITE))    ? 1 << 7 : 0);
-  //    bits |= ((permissions.contains(PosixFilePermission.OWNER_EXECUTE))  ? 1 << 6 : 0);
-  //    bits |= ((permissions.contains(PosixFilePermission.GROUP_READ))     ? 1 << 5 : 0);
-  //    bits |= ((permissions.contains(PosixFilePermission.GROUP_WRITE))    ? 1 << 4 : 0);
-  //    bits |= ((permissions.contains(PosixFilePermission.GROUP_EXECUTE))  ? 1 << 3 : 0);
-  //    bits |= ((permissions.contains(PosixFilePermission.OTHERS_READ))    ? 1 << 2 : 0);
-  //    bits |= ((permissions.contains(PosixFilePermission.OTHERS_WRITE))   ? 1 << 1 : 0);
-  //    bits |= ((permissions.contains(PosixFilePermission.OTHERS_EXECUTE)) ? 1      : 0);
-  //    // Here we are going to ignore the Owner Write & Execute bits to allow root/owner testing.
-  //    final String filename = file.getName();
-  //    System.err.println(filename + " : " + Integer.toBinaryString(bits));
-  //    if ((filename == "GettysburgAddress.txt") && (bits == 436)) {
-  //      for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
-  //        System.err.println(ste);
-  //      }
-  //    }
-  //    return ((bits & 0477) == 0444);
   }
 
   private static final class Deallocator implements Runnable {

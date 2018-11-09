@@ -25,14 +25,7 @@ public class MemoryTest {
 
   @BeforeClass
   public void setReadOnly() {
-    UtilTest.setTestFileToReadOnly(this);
-//    File file =
-//        new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
-//    try {
-//    Files.setPosixFilePermissions(file.toPath(), PosixFilePermissions.fromString("r--r--r--"));
-//    } catch (IOException e) {
-//      throw new RuntimeException(e);
-//    }
+    UtilTest.setGettysburgAddressFileToReadOnly(this);
   }
 
   @Test

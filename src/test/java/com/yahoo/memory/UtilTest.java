@@ -14,6 +14,14 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.attribute.PosixFileAttributeView;
+import java.nio.file.attribute.PosixFileAttributes;
+import java.nio.file.attribute.PosixFilePermissions;
+
 import org.testng.annotations.Test;
 
 public class UtilTest {
@@ -97,6 +105,31 @@ public class UtilTest {
       if ((cp >= Character.MIN_SURROGATE) && (cp <= Character.MAX_SURROGATE)) {
         fail();
       }
+    }
+  }
+
+  static final String getFileAttributes(File file) {
+    try {
+    PosixFileAttributes attrs = Files.getFileAttributeView(
+        file.toPath(), PosixFileAttributeView.class, new LinkOption[0]).readAttributes();
+    String s = String.format("%s: %s %s %s%n",
+        file.getPath(),
+        attrs.owner().getName(),
+        attrs.group().getName(),
+        PosixFilePermissions.toString(attrs.permissions()));
+    return s;
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  static final void setGettysburgAddressFileToReadOnly(Object obj) {
+    File file =
+        new File(obj.getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
+    try {
+    Files.setPosixFilePermissions(file.toPath(), PosixFilePermissions.fromString("r--r--r--"));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
   }
 

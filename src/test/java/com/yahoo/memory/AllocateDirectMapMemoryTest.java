@@ -14,10 +14,16 @@ import java.io.File;
 import java.nio.ByteOrder;
 
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class AllocateDirectMapMemoryTest {
   MapHandle hand = null;
+
+  @BeforeClass
+  public void setReadOnly() {
+    UtilTest.setGettysburgAddressFileToReadOnly(this);
+  }
 
   @Test
   public void simpleMap() throws Exception {

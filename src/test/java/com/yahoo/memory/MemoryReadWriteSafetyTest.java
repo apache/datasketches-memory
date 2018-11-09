@@ -173,14 +173,17 @@ public class MemoryReadWriteSafetyTest {
     mem1.putInt(0, 1);
   }
 
-  @SuppressWarnings("resource")
+  //@SuppressWarnings("resource")
   @Test(expectedExceptions = AssertionError.class)
   public void testMapFile() throws IOException {
-    File tempFile = File.createTempFile("test", "test");
+    File tempFile = File.createTempFile("test", null);
     tempFile.deleteOnExit();
-    new RandomAccessFile(tempFile, "rw").setLength(8);
-    try (MapHandle h = Memory.map(tempFile)) {
-      ((WritableMemory) h.get()).putInt(0, 1);
+    try (RandomAccessFile raf = new RandomAccessFile(tempFile, "rw")) {
+      raf.setLength(8);
+      //System.out.println(UtilTest.getFileAttributes(tempFile));
+      try (MapHandle h = Memory.map(tempFile)) {
+        ((WritableMemory) h.get()).putInt(0, 1);
+      }
     }
   }
 

@@ -15,13 +15,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.PosixFileAttributeView;
-import java.nio.file.attribute.PosixFileAttributes;
-import java.nio.file.attribute.PosixFilePermission;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -227,35 +220,13 @@ class AllocateDirectMap implements Map {
     }
   }
 
-  private static boolean isFileReadOnly(final File file) {
-    if (System.getProperty("os.name").startsWith("Windows")) {
-      return !file.canWrite();
+  static boolean isFileReadOnly(final File file) {
+    try (RandomAccessFile raf = new RandomAccessFile(file, "rw")) {
+      raf.close();
+      return false;
+    } catch (final Exception e) { //could not open for write
+      return true;
     }
-    //All Unix-like OSes
-    final Path path = Paths.get(file.getAbsolutePath());
-    PosixFileAttributes attributes = null;
-    try {
-      attributes = Files.getFileAttributeView(path, PosixFileAttributeView.class).readAttributes();
-    } catch (final IOException e) {
-      // File presence is guaranteed. Ignore
-      e.printStackTrace();
-    }
-    if (attributes == null) { return false; }
-
-    // A file is read-only in Linux-derived OSes only when it has 0444 permissions.
-    final Set<PosixFilePermission> permissions = attributes.permissions();
-    int bits = 0;
-    bits |= ((permissions.contains(PosixFilePermission.OWNER_READ))     ? 1 << 8 : 0);
-    bits |= ((permissions.contains(PosixFilePermission.OWNER_WRITE))    ? 1 << 7 : 0);
-    bits |= ((permissions.contains(PosixFilePermission.OWNER_EXECUTE))  ? 1 << 6 : 0);
-    bits |= ((permissions.contains(PosixFilePermission.GROUP_READ))     ? 1 << 5 : 0);
-    bits |= ((permissions.contains(PosixFilePermission.GROUP_WRITE))    ? 1 << 4 : 0);
-    bits |= ((permissions.contains(PosixFilePermission.GROUP_EXECUTE))  ? 1 << 3 : 0);
-    bits |= ((permissions.contains(PosixFilePermission.OTHERS_READ))    ? 1 << 2 : 0);
-    bits |= ((permissions.contains(PosixFilePermission.OTHERS_WRITE))   ? 1 << 1 : 0);
-    bits |= ((permissions.contains(PosixFilePermission.OTHERS_EXECUTE)) ? 1      : 0);
-    // Here we are going to ignore the Owner Write & Execute bits to allow root/owner testing.
-    return ((bits & 0477) == 0444);
   }
 
   private static final class Deallocator implements Runnable {

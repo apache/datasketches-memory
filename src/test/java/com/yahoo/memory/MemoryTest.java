@@ -17,10 +17,16 @@ import java.nio.ByteOrder;
 import java.util.List;
 
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.testng.collections.Lists;
 
 public class MemoryTest {
+
+  @BeforeClass
+  public void setReadOnly() {
+    UtilTest.setGettysburgAddressFileToReadOnly(this);
+  }
 
   @Test
   public void checkDirectRoundTrip() {

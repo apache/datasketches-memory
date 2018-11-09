@@ -17,8 +17,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteOrder;
-import java.nio.file.Files;
-import java.nio.file.attribute.PosixFilePermissions;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -28,13 +26,14 @@ public class AllocateDirectWritableMapMemoryTest {
 
   @BeforeClass
   public void setReadOnly() {
-    File file =
-        new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
-    try {
-    Files.setPosixFilePermissions(file.toPath(), PosixFilePermissions.fromString("rw-r--r--"));
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    UtilTest.setTestFileToReadOnly(this);
+//    File file =
+//        new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
+//    try {
+//    Files.setPosixFilePermissions(file.toPath(), PosixFilePermissions.fromString("r--r--r--"));
+//    } catch (IOException e) {
+//      throw new RuntimeException(e);
+//    }
   }
 
   @Test

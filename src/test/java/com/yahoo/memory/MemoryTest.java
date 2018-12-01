@@ -412,7 +412,7 @@ public class MemoryTest {
   public void checkHashCode() {
     WritableMemory wmem = WritableMemory.allocate(32 + 7);
     int hc = wmem.hashCode();
-    assertEquals(hc, 28629151);
+    assertEquals(hc, -960627348);
   }
 
   @Test

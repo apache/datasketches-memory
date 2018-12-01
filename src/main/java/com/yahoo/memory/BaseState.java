@@ -212,20 +212,33 @@ abstract class BaseState {
   }
 
   /**
-   * Returns the hashCode of this class.
-   *
-   * <p>The hash code of this class depends upon all of its contents.
-   * Because of this, it is inadvisable to use these objects as keys in hash maps
-   * or similar data structures unless it is known that their contents will not change.</p>
+   * Returns the hash code of this object depends upon all of its contents. Because of this, it is
+   * inadvisable to use these objects as keys in hash maps or similar data structures unless it is
+   * known that their contents will not change.</p>
    *
    * <p>If it is desirable to use these objects in a hash map depending only on object identity,
    * than the {@link java.util.IdentityHashMap} can be used.</p>
    *
-   * @return the hashCode of this class.
+   * <p>Use {@link #longHashCode(long, long) longHashCode(0, getCapacity())} if a 64-bit hash code
+   * is required.</p>
+   *
+   * @return the hashCode of this object.
    */
   @Override
   public final int hashCode() {
     return CompareAndCopy.hashCode(this);
+  }
+
+  /**
+   * Returns the 64-bit hash code of the specified range of bytes in this object.
+   *
+   * @param offsetBytes the offset to the first byte of the byte sequence in this object to compute
+   *                    hash code of
+   * @param lengthBytes the length of the byte sequence to compute hash code of
+   * @return the 64-bit hash code of the specified range of bytes in this object.
+   */
+  public final long longHashCode(final long offsetBytes, final long lengthBytes) {
+    return CompareAndCopy.longHashCode(this, offsetBytes, lengthBytes);
   }
 
   /**

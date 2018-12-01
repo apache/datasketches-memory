@@ -108,13 +108,30 @@ final class CompareAndCopy {
     return true;
   }
 
+  static int hashCode(final BaseState state) {
+    state.checkValid();
+    final long lengthBytes = state.getCapacity();
+    long offsetBytes = state.getCumulativeOffset();
+    final Object unsafeObj = state.getUnsafeObject(); //could be null
+
+    long hash = xxHash64(unsafeObj, offsetBytes, lengthBytes);
+    return (int) hash;
+  }
+
+  static long longHashCode(final BaseState state, final long offsetBytes, final long lengthBytes) {
+    state.checkValid();
+    checkBounds(offsetBytes, lengthBytes, state.getCapacity());
+    long cumulativeOffset = state.getCumulativeOffset(offsetBytes);
+    final Object unsafeObj = state.getUnsafeObject(); //could be null
+    return xxHash64(unsafeObj, cumulativeOffset, lengthBytes);
+  }
+
   // Unsigned, 64-bit primes
   private static final long P1 = -7046029288634856825L;
   private static final long P2 = -4417276706812531889L;
   private static final long P3 =  1609587929392839161L;
   private static final long P4 = -8796714831421723037L;
   private static final long P5 =  2870177450012600261L;
-
 
   /**
    * The hashCode is computed using the XxHash algorithm, a fast, non-cryptographic, 64-bit hash
@@ -132,12 +149,7 @@ final class CompareAndCopy {
    * <a href="https://github.com/OpenHFT/Zero-Allocation-Hashing/blob/master/src/main/java/net/openhft/hashing/XxHash.java">
    * OpenHFT/Zero-Allocation-Hashing</a>, which has an Apache 2 license as does this site.
    */
-  static int hashCode(final BaseState state) {
-    state.checkValid();
-    final long lengthBytes = state.getCapacity();
-    long offsetBytes = state.getCumulativeOffset();
-    final Object arr = state.getUnsafeObject(); //could be null
-
+  private static long xxHash64(final Object unsafeObj, long offsetBytes, final long lengthBytes) {
     long hash;
     long remaining = lengthBytes;
 
@@ -145,22 +157,22 @@ final class CompareAndCopy {
       long v1 = P1 + P2;
       long v2 = P2;
       long v3 = 0;
-      long v4 = P1;
+      long v4 = -P1;
 
       do {
-        v1 += unsafe.getLong(arr, offsetBytes) * P2;
+        v1 += unsafe.getLong(unsafeObj, offsetBytes) * P2;
         v1 = Long.rotateLeft(v1, 31);
         v1 *= P1;
 
-        v2 += unsafe.getLong(arr, offsetBytes + 8L) * P2;
+        v2 += unsafe.getLong(unsafeObj, offsetBytes + 8L) * P2;
         v2 = Long.rotateLeft(v2, 31);
         v2 *= P1;
 
-        v3 += unsafe.getLong(arr, offsetBytes + 16L) * P2;
+        v3 += unsafe.getLong(unsafeObj, offsetBytes + 16L) * P2;
         v3 = Long.rotateLeft(v3, 31);
         v3 *= P1;
 
-        v4 += unsafe.getLong(arr, offsetBytes + 24L) * P2;
+        v4 += unsafe.getLong(unsafeObj, offsetBytes + 24L) * P2;
         v4 = Long.rotateLeft(v4, 31);
         v4 *= P1;
 
@@ -204,7 +216,7 @@ final class CompareAndCopy {
     hash += lengthBytes;
 
     while (remaining >= 8) {
-      long k1 = unsafe.getLong(arr, offsetBytes);
+      long k1 = unsafe.getLong(unsafeObj, offsetBytes);
       k1 *= P2;
       k1 = Long.rotateLeft(k1, 31);
       k1 *= P1;
@@ -215,14 +227,14 @@ final class CompareAndCopy {
     }
 
     if (remaining >= 4) { //treat as unsigned ints
-      hash ^= (unsafe.getInt(arr, offsetBytes) & 0XFFFF_FFFFL) * P1;
+      hash ^= (unsafe.getInt(unsafeObj, offsetBytes) & 0XFFFF_FFFFL) * P1;
       hash = (Long.rotateLeft(hash, 23) * P2) + P3;
       offsetBytes += 4;
       remaining -= 4;
     }
 
     while (remaining != 0) { //treat as unsigned bytes
-      hash ^= (unsafe.getByte(arr, offsetBytes) & 0XFFL) * P5;
+      hash ^= (unsafe.getByte(unsafeObj, offsetBytes) & 0XFFL) * P5;
       hash = Long.rotateLeft(hash, 11) * P1;
       --remaining;
       ++offsetBytes;
@@ -234,7 +246,7 @@ final class CompareAndCopy {
     hash ^= hash >>> 29;
     hash *= P3;
     hash ^= hash >>> 32;
-    return (int) hash;
+    return hash;
   }
 
   static void copy(final BaseState srcState, final long srcOffsetBytes,

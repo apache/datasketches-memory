@@ -14,6 +14,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.yahoo.hash.XxHash64;
+
 /**
  * Keeps key configuration state for Memory and Buffer plus some common static variables
  * and check methods.
@@ -212,20 +214,41 @@ abstract class BaseState {
   }
 
   /**
-   * Returns the hashCode of this class.
+   * Returns the hashCode of this object.
    *
-   * <p>The hash code of this class depends upon all of its contents.
+   * <p>The hash code of this object depends upon all of its contents.
    * Because of this, it is inadvisable to use these objects as keys in hash maps
    * or similar data structures unless it is known that their contents will not change.</p>
    *
    * <p>If it is desirable to use these objects in a hash map depending only on object identity,
    * than the {@link java.util.IdentityHashMap} can be used.</p>
    *
-   * @return the hashCode of this class.
+   * @return the hashCode of this object.
    */
   @Override
   public final int hashCode() {
-    return CompareAndCopy.hashCode(this);
+    checkValid();
+    final long lengthBytes = getCapacity();
+    final long offsetBytes = getCumulativeOffset();
+    final Object unsafeObj = getUnsafeObject(); //could be null
+    final long seed = 0;
+    return (int) XxHash64.hash(unsafeObj, offsetBytes, lengthBytes, seed);
+  }
+
+  /**
+   * Returns the 64-bit hash of the sequence of bytes in this object specified by
+   * <i>offsetBytes</i>, <i>lengthBytes</i> and a <i>seed</i>.
+   *
+   * @param offsetBytes the given offset in bytes to the first byte of the byte sequence.
+   * @param lengthBytes the given length in bytes of the byte sequence.
+   * @param seed the given long seed.
+   * @return the 64-bit hash of the sequence of bytes in this object specified by
+   * <i>offsetBytes</i> and <i>lengthBytes</i>.
+   */
+  public final long hash(final long offsetBytes, final long lengthBytes, final long seed) {
+    checkValid();
+    final Object unsafeObj = getUnsafeObject(); //could be null
+    return (int) XxHash64.hash(unsafeObj, offsetBytes, lengthBytes, seed);
   }
 
   /**

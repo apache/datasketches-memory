@@ -14,8 +14,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.yahoo.hash.XxHash64;
-
 /**
  * Keeps key configuration state for Memory and Buffer plus some common static variables
  * and check methods.
@@ -139,10 +137,11 @@ abstract class BaseState {
   }
 
   /**
-   * Gets the cumulative offset in bytes of this object from the backing resource
-   * including the Java object header, if any.
+   * Gets the cumulative offset in bytes of this object from the backing resource.
+   * This offset may also include other offset components such as the native off-heap
+   * memory address, DirectByteBuffer split offsets, region offsets, and unsafe arrayBaseOffsets.
    *
-   * @return the cumulative offset in bytes of this object
+   * @return the cumulative offset in bytes of this object from the backing resource.
    */
   public final long getCumulativeOffset() {
     assertValid();
@@ -150,11 +149,13 @@ abstract class BaseState {
   }
 
   /**
-   * Gets the cumulative offset in bytes of this object from the backing resource
-   * including the Java object header, if any.
+   * Gets the cumulative offset in bytes of this object from the backing resource including the given
+   * offsetBytes. This offset may also include other offset components such as the native off-heap
+   * memory address, DirectByteBuffer split offsets, region offsets, and unsafe arrayBaseOffsets.
    *
-   * @param offsetBytes offset to be added to the base cumulative offset.
-   * @return the cumulative offset in bytes of this object
+   * @param offsetBytes offset to be added to the cumulative offset.
+   * @return the cumulative offset in bytes of this object from the backing resource including the
+   * given offsetBytes.
    */
   public final long getCumulativeOffset(final long offsetBytes) {
     assertValid();
@@ -228,16 +229,17 @@ abstract class BaseState {
   @Override
   public final int hashCode() {
     checkValid();
+    final Object unsafeObj = getUnsafeObject();
+    final long cumOffsetBytes = getCumulativeOffset();
     final long lengthBytes = getCapacity();
-    final long offsetBytes = getCumulativeOffset();
-    final Object unsafeObj = getUnsafeObject(); //could be null
     final long seed = 0;
-    return (int) XxHash64.hash(unsafeObj, offsetBytes, lengthBytes, seed);
+    return (int) XxHash64.hash(unsafeObj, cumOffsetBytes, lengthBytes, seed);
   }
 
   /**
    * Returns the 64-bit hash of the sequence of bytes in this object specified by
-   * <i>offsetBytes</i>, <i>lengthBytes</i> and a <i>seed</i>.
+   * <i>offsetBytes</i>, <i>lengthBytes</i> and a <i>seed</i>.  Note that the sequence of bytes is
+   * always processed in the same order independent of endianness.
    *
    * @param offsetBytes the given offset in bytes to the first byte of the byte sequence.
    * @param lengthBytes the given length in bytes of the byte sequence.
@@ -245,10 +247,11 @@ abstract class BaseState {
    * @return the 64-bit hash of the sequence of bytes in this object specified by
    * <i>offsetBytes</i> and <i>lengthBytes</i>.
    */
-  public final long hash(final long offsetBytes, final long lengthBytes, final long seed) {
+  public final long xxHash64(final long offsetBytes, final long lengthBytes, final long seed) {
     checkValid();
-    final Object unsafeObj = getUnsafeObject(); //could be null
-    return (int) XxHash64.hash(unsafeObj, offsetBytes, lengthBytes, seed);
+    final Object unsafeObj = getUnsafeObject();
+    final long cumOffsetBytes = getCumulativeOffset() + offsetBytes;
+    return XxHash64.hash(unsafeObj, cumOffsetBytes, lengthBytes, seed);
   }
 
   /**

@@ -3,7 +3,7 @@
  * Apache License 2.0. See LICENSE file at the project root for terms.
  */
 
-package com.yahoo.hash;
+package com.yahoo.memory;
 
 import static org.testng.Assert.assertEquals;
 
@@ -19,12 +19,11 @@ public class XxHash64LoopingTest {
   @Test
   public void testWithSeed() {
     long seed = 42L;
-    for (int i = 0; i < 2; i++) { //1025
+    for (int i = 0; i < 1025; i++) {
       byte[] byteArr = new byte[i];
       for (int j = 0; j < byteArr.length; j++) { byteArr[j] = (byte) j; }
       WritableMemory wmem = WritableMemory.wrap(byteArr);
-      final long cumOffset = wmem.getCumulativeOffset();
-      long hash = XxHash64.hash(wmem.getArray(), cumOffset, byteArr.length, seed);
+      long hash = wmem.xxHash64(0, byteArr.length, seed);
       assertEquals(hash, HASHES_OF_LOOPING_BYTES_WITH_SEED_42[i]);
     }
   }

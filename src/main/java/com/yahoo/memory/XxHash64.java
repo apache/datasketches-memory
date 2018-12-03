@@ -3,7 +3,7 @@
  * Apache License 2.0. See LICENSE file at the project root for terms.
  */
 
-package com.yahoo.hash;
+package com.yahoo.memory;
 
 import static com.yahoo.memory.UnsafeUtil.unsafe;
 
@@ -25,7 +25,7 @@ import static com.yahoo.memory.UnsafeUtil.unsafe;
  *
  * @author Lee Rhodes
  */
-public class XxHash64 {
+class XxHash64 {
   // Unsigned, 64-bit primes
   private static final long P1 = -7046029288634856825L;
   private static final long P2 = -4417276706812531889L;
@@ -34,33 +34,20 @@ public class XxHash64 {
   private static final long P5 =  2870177450012600261L;
 
   /**
-   * Returns a 64-bit hash.
-   * @param in a long
-   * @param seed A long valued seed.
-   * @return the hash
-   */
-  public static long hash(final long in, final long seed) {
-    long hash = seed + P5;
-    hash += 8;
-    long k1 = in;
-    k1 *= P2;
-    k1 = Long.rotateLeft(k1, 31);
-    k1 *= P1;
-    hash ^= k1;
-    hash = (Long.rotateLeft(hash, 27) * P1) + P4;
-    return finalize(hash);
-  }
-
-  /**
-   * Returns a 64-bit hash.
+   * Returns the 64-bit hash of the sequence of bytes in the unsafeObject specified by
+   * <i>cumOffsetBytes</i>, <i>lengthBytes</i> and a <i>seed</i>.
    *
-   * @param unsafeObj The Object containing the sequence of bytes to hash.
-   * @param offsetBytes the offset in bytes
-   * @param lengthBytes the length in bytes
+   * @param unsafeObject A reference to the object parameter required by unsafe.
+   * @param cumOffsetBytes cumulative offset in bytes of this object from the backing resource
+   * including any user given offsetBytes. This offset may also include other offset components
+   * such as the native off-heap memory address, DirectByteBuffer split offsets, region offsets,
+   * and unsafe arrayBaseOffsets.
+   * @param lengthBytes the length in bytes of the sequence to be hashed
    * @param seed a given seed
-   * @return a 64-bit hash
+   * @return the 64-bit hash of the sequence of bytes in the unsafeObject specified by
+   * <i>cumOffsetBytes</i>, <i>lengthBytes</i> and a <i>seed</i>.
    */
-  public static long hash(final Object unsafeObj, long offsetBytes, final long lengthBytes, final long seed) {
+  static long hash(final Object unsafeObj, long cumOffsetBytes, final long lengthBytes, final long seed) {
     long hash;
     long remaining = lengthBytes;
 
@@ -71,23 +58,23 @@ public class XxHash64 {
       long v4 = seed - P1;
 
       do {
-        v1 += unsafe.getLong(unsafeObj, offsetBytes) * P2;
+        v1 += unsafe.getLong(unsafeObj, cumOffsetBytes) * P2;
         v1 = Long.rotateLeft(v1, 31);
         v1 *= P1;
 
-        v2 += unsafe.getLong(unsafeObj, offsetBytes + 8L) * P2;
+        v2 += unsafe.getLong(unsafeObj, cumOffsetBytes + 8L) * P2;
         v2 = Long.rotateLeft(v2, 31);
         v2 *= P1;
 
-        v3 += unsafe.getLong(unsafeObj, offsetBytes + 16L) * P2;
+        v3 += unsafe.getLong(unsafeObj, cumOffsetBytes + 16L) * P2;
         v3 = Long.rotateLeft(v3, 31);
         v3 *= P1;
 
-        v4 += unsafe.getLong(unsafeObj, offsetBytes + 24L) * P2;
+        v4 += unsafe.getLong(unsafeObj, cumOffsetBytes + 24L) * P2;
         v4 = Long.rotateLeft(v4, 31);
         v4 *= P1;
 
-        offsetBytes += 32;
+        cumOffsetBytes += 32;
         remaining -= 32;
       } while (remaining >= 32);
 
@@ -127,28 +114,28 @@ public class XxHash64 {
     hash += lengthBytes;
 
     while (remaining >= 8) {
-      long k1 = unsafe.getLong(unsafeObj, offsetBytes);
+      long k1 = unsafe.getLong(unsafeObj, cumOffsetBytes);
       k1 *= P2;
       k1 = Long.rotateLeft(k1, 31);
       k1 *= P1;
       hash ^= k1;
       hash = (Long.rotateLeft(hash, 27) * P1) + P4;
-      offsetBytes += 8;
+      cumOffsetBytes += 8;
       remaining -= 8;
     }
 
     if (remaining >= 4) { //treat as unsigned ints
-      hash ^= (unsafe.getInt(unsafeObj, offsetBytes) & 0XFFFF_FFFFL) * P1;
+      hash ^= (unsafe.getInt(unsafeObj, cumOffsetBytes) & 0XFFFF_FFFFL) * P1;
       hash = (Long.rotateLeft(hash, 23) * P2) + P3;
-      offsetBytes += 4;
+      cumOffsetBytes += 4;
       remaining -= 4;
     }
 
     while (remaining != 0) { //treat as unsigned bytes
-      hash ^= (unsafe.getByte(unsafeObj, offsetBytes) & 0XFFL) * P5;
+      hash ^= (unsafe.getByte(unsafeObj, cumOffsetBytes) & 0XFFL) * P5;
       hash = Long.rotateLeft(hash, 11) * P1;
       --remaining;
-      ++offsetBytes;
+      ++cumOffsetBytes;
     }
 
     return finalize(hash);
@@ -162,6 +149,5 @@ public class XxHash64 {
     hash ^= hash >>> 32;
     return hash;
   }
-
 }
 

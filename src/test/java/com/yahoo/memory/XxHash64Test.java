@@ -3,7 +3,7 @@
  * Apache License 2.0. See LICENSE file at the project root for terms.
  */
 
-package com.yahoo.hash;
+package com.yahoo.memory;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -31,7 +31,7 @@ public class XxHash64Test {
 
     for (int offset = 0; offset < 16; offset++) {
       int arrLen = cap - offset;
-      hash = XxHash64.hash(wmem.getArray(), offset, arrLen, seed);
+      hash = wmem.xxHash64(offset, arrLen, seed);
       assertTrue(hash != 0);
     }
   }
@@ -48,16 +48,9 @@ public class XxHash64Test {
       WritableMemory wmem = WritableMemory.wrap(in);
       for (int i = 0; i < j; i++) { wmem.putByte(i, (byte) (-128 + i)); }
 
-      long hash = XxHash64.hash(wmem.getArray(), offset, bytes, seed);
+      long hash =wmem.xxHash64(offset, bytes, seed);
       assertTrue(hash != 0);
     }
-  }
-
-  @Test
-  public void longCheck() {
-    long seed = 0;
-    long hash = XxHash64.hash(123L, seed);
-    assertTrue(hash != 0);
   }
 
   @Test
@@ -66,17 +59,17 @@ public class XxHash64Test {
     wmem.putLong(0, 1);
     wmem.putLong(16, 42);
     wmem.putLong(32, 2);
-    long h1 = XxHash64.hash(wmem.getArray(), 0, wmem.getCapacity(), 0);
+    long h1 = wmem.xxHash64(0, wmem.getCapacity(), 0);
 
     wmem.putLong(0, 1 + 0xBA79078168D4BAFL);
     wmem.putLong(32, 2 + 0x9C90005B80000000L);
-    long h2 = XxHash64.hash(wmem.getArray(), 0, wmem.getCapacity(), 0);
+    long h2 = wmem.xxHash64(0, wmem.getCapacity(), 0);
     assertEquals(h1, h2);
 
     wmem.putLong(0, 1 + (0xBA79078168D4BAFL * 2));
     wmem.putLong(32, 2 + (0x9C90005B80000000L * 2));
 
-    long h3 = XxHash64.hash(wmem.getArray(), 0, wmem.getCapacity(), 0);
+    long h3 = wmem.xxHash64(0, wmem.getCapacity(), 0);
     assertEquals(h2, h3);
   }
 

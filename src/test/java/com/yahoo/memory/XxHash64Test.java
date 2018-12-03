@@ -8,10 +8,12 @@ package com.yahoo.memory;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+
 import org.testng.annotations.Test;
 
-import com.yahoo.memory.WritableMemory;
-
+import net.openhft.hashing.LongHashFunction;
 
 /**
  * @author Lee Rhodes
@@ -53,6 +55,11 @@ public class XxHash64Test {
     }
   }
 
+  /*
+   * This test is modeled from
+   * <a href="https://github.com/OpenHFT/Zero-Allocation-Hashing/blob/master/src/test/java/net/openhft/hashing/XxHashTest.java">
+   * OpenHFT/Zero-Allocation-Hashing</a> to test hash compatibility with that implementation.
+   */
   @Test
   public void collisionTest() {
     WritableMemory wmem = WritableMemory.allocate(128);
@@ -71,6 +78,29 @@ public class XxHash64Test {
 
     long h3 = wmem.xxHash64(0, wmem.getCapacity(), 0);
     assertEquals(h2, h3);
+  }
+
+  /**
+   * This simple test compares the output of {@link BaseState#xxHash64(long, long, long)} with the
+   * output of {@link net.openhft.hashing.LongHashFunction}, that itself is tested against the
+   * reference implementation in C.  This increase confidence that the xxHash function implemented
+   * in this package is in fact the same xxHash function implemented in C.
+   *
+   * @author Roman Leventov
+   * @author Lee Rhodes
+   */
+  @Test
+  public void testXxHash() {
+    Random random = ThreadLocalRandom.current();
+    for (int len = 0; len < 100; len++) {
+      byte[] bytes = new byte[len];
+      for (int i = 0; i < 10; i++) {
+        long zahXxHash = LongHashFunction.xx().hashBytes(bytes);
+        long memoryXxHash = Memory.wrap(bytes).xxHash64(0, len, 0);
+        assertEquals(memoryXxHash, zahXxHash);
+        random.nextBytes(bytes);
+      }
+    }
   }
 
 }

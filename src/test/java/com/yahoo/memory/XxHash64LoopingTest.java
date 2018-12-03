@@ -9,13 +9,16 @@ import static org.testng.Assert.assertEquals;
 
 import org.testng.annotations.Test;
 
-import com.yahoo.memory.WritableMemory;
-
 /**
  * @author Lee Rhodes
  */
 public class XxHash64LoopingTest {
 
+  /*
+   * This test is modeled from
+   * <a href="https://github.com/OpenHFT/Zero-Allocation-Hashing/blob/master/src/test/java/net/openhft/hashing/XxHashTest.java">
+   * OpenHFT/Zero-Allocation-Hashing</a> to test hash compatibility with that implementation.
+   */
   @Test
   public void testWithSeed() {
     long seed = 42L;

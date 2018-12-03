@@ -228,12 +228,7 @@ abstract class BaseState {
    */
   @Override
   public final int hashCode() {
-    checkValid();
-    final Object unsafeObj = getUnsafeObject();
-    final long cumOffsetBytes = getCumulativeOffset();
-    final long lengthBytes = getCapacity();
-    final long seed = 0;
-    return (int) XxHash64.hash(unsafeObj, cumOffsetBytes, lengthBytes, seed);
+    return (int) xxHash64(0, getCapacity(), 0);
   }
 
   /**

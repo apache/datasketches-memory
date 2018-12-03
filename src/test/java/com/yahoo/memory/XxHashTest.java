@@ -5,12 +5,13 @@
 
 package com.yahoo.memory;
 
-import net.openhft.hashing.LongHashFunction;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
+import net.openhft.hashing.LongHashFunction;
 
 /**
  * This test compares the output of {@link BaseState#longHashCode(long, long)} with the output of

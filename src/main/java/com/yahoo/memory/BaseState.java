@@ -230,12 +230,13 @@ abstract class BaseState {
   }
 
   /**
-   * Returns the 64-bit hash code of the specified range of bytes in this object.
+   * Returns the 64-bit hash of the sequence of bytes in this object specified by 
+   * <i>offsetBytes</i> and <i>lengthBytes</i>.
    *
-   * @param offsetBytes the offset to the first byte of the byte sequence in this object to compute
-   *                    hash code of
-   * @param lengthBytes the length of the byte sequence to compute hash code of
-   * @return the 64-bit hash code of the specified range of bytes in this object.
+   * @param offsetBytes the given offset in bytes to the first byte of the byte sequence.
+   * @param lengthBytes the given length in bytes of the byte sequence.
+   * @return the 64-bit hash of the sequence of bytes in this object specified by 
+   * <i>offsetBytes</i> and <i>lengthBytes</i>.
    */
   public final long longHashCode(final long offsetBytes, final long lengthBytes) {
     return CompareAndCopy.longHashCode(this, offsetBytes, lengthBytes);

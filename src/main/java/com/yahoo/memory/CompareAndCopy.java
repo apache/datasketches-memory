@@ -111,17 +111,17 @@ final class CompareAndCopy {
   static int hashCode(final BaseState state) {
     state.checkValid();
     final long lengthBytes = state.getCapacity();
-    long offsetBytes = state.getCumulativeOffset();
+    final long offsetBytes = state.getCumulativeOffset();
     final Object unsafeObj = state.getUnsafeObject(); //could be null
 
-    long hash = xxHash64(unsafeObj, offsetBytes, lengthBytes);
+    final long hash = xxHash64(unsafeObj, offsetBytes, lengthBytes);
     return (int) hash;
   }
 
   static long longHashCode(final BaseState state, final long offsetBytes, final long lengthBytes) {
     state.checkValid();
     checkBounds(offsetBytes, lengthBytes, state.getCapacity());
-    long cumulativeOffset = state.getCumulativeOffset(offsetBytes);
+    final long cumulativeOffset = state.getCumulativeOffset(offsetBytes);
     final Object unsafeObj = state.getUnsafeObject(); //could be null
     return xxHash64(unsafeObj, cumulativeOffset, lengthBytes);
   }

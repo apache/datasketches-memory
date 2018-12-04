@@ -61,6 +61,7 @@ public class XxHash64Test {
    * OpenHFT/Zero-Allocation-Hashing</a> to test hash compatibility with that implementation.
    */
   @Test
+  @SuppressWarnings("ConstantOverflow")
   public void collisionTest() {
     WritableMemory wmem = WritableMemory.allocate(128);
     wmem.putLong(0, 1);

@@ -1,4 +1,6 @@
-[![][travis img]][travis] [![][mavenbadge img]][mavenbadge] [![][versioneye img]][versioneye] [![][coveralls img]][coveralls]
+[![][travis img]][travis] [![][mavenbadge img]][mavenbadge] 
+[![Code Quality: Java][lgtm-badge]][lgtm-badge-url] [![Total alerts][lgtm-alerts]][lgtm-alerts-url]
+[![][coveralls img]][coveralls]
 
  =================
 
@@ -26,8 +28,10 @@
 [mavenbadge]:https://search.maven.org/#search|gav|1|g%3A%22com.yahoo.datasketches%22%20AND%20a%3A%22memory%22
 [mavenbadge img]:https://maven-badges.herokuapp.com/maven-central/com.yahoo.datasketches/memory/badge.svg
 
-[versioneye]:https://www.versioneye.com/user/projects/59486c720fb24f004421522d
-[versioneye img]:https://www.versioneye.com/user/projects/59486c720fb24f004421522d/badge.svg?style=flat
+[lgtm-badge]: https://img.shields.io/lgtm/grade/java/g/DataSketches/memory.svg?logo=lgtm&logoWidth=18
+[lgtm-badge-url]: https://lgtm.com/projects/g/DataSketches/memory/context:java
+[lgtm-alerts]: https://img.shields.io/lgtm/alerts/g/DataSketches/memory.svg?logo=lgtm&logoWidth=18
+[lgtm-alerts-url]: https://lgtm.com/projects/g/DataSketches/memory/alerts
 
 [coveralls]:https://coveralls.io/github/DataSketches/memory?branch=master
 [coveralls img]:https://coveralls.io/repos/github/DataSketches/memory/badge.svg?branch=master&service=github

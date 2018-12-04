@@ -244,9 +244,7 @@ abstract class BaseState {
    */
   public final long xxHash64(final long offsetBytes, final long lengthBytes, final long seed) {
     checkValid();
-    final Object unsafeObj = getUnsafeObject();
-    final long cumOffsetBytes = getCumulativeOffset() + offsetBytes;
-    return XxHash64.hash(unsafeObj, cumOffsetBytes, lengthBytes, seed);
+    return XxHash64.hash(getUnsafeObject(), getCumulativeOffset() + offsetBytes, lengthBytes, seed);
   }
 
   /**

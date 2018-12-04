@@ -37,7 +37,7 @@ class XxHash64 {
    * Returns the 64-bit hash of the sequence of bytes in the unsafeObject specified by
    * <i>cumOffsetBytes</i>, <i>lengthBytes</i> and a <i>seed</i>.
    *
-   * @param unsafeObj A reference to the object parameter required by unsafe.
+   * @param unsafeObj A reference to the object parameter required by unsafe. It may be null.
    * @param cumOffsetBytes cumulative offset in bytes of this object from the backing resource
    * including any user given offsetBytes. This offset may also include other offset components
    * such as the native off-heap memory address, DirectByteBuffer split offsets, region offsets,
@@ -47,7 +47,8 @@ class XxHash64 {
    * @return the 64-bit hash of the sequence of bytes in the unsafeObject specified by
    * <i>cumOffsetBytes</i>, <i>lengthBytes</i> and a <i>seed</i>.
    */
-  static long hash(final Object unsafeObj, long cumOffsetBytes, final long lengthBytes, final long seed) {
+  static long hash(final Object unsafeObj, long cumOffsetBytes, final long lengthBytes,
+      final long seed) {
     long hash;
     long remaining = lengthBytes;
 

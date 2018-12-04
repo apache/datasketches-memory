@@ -137,10 +137,11 @@ abstract class BaseState {
   }
 
   /**
-   * Gets the cumulative offset in bytes of this object from the backing resource
-   * including the Java object header, if any.
+   * Gets the cumulative offset in bytes of this object from the backing resource.
+   * This offset may also include other offset components such as the native off-heap
+   * memory address, DirectByteBuffer split offsets, region offsets, and unsafe arrayBaseOffsets.
    *
-   * @return the cumulative offset in bytes of this object
+   * @return the cumulative offset in bytes of this object from the backing resource.
    */
   public final long getCumulativeOffset() {
     assertValid();
@@ -148,11 +149,13 @@ abstract class BaseState {
   }
 
   /**
-   * Gets the cumulative offset in bytes of this object from the backing resource
-   * including the Java object header, if any.
+   * Gets the cumulative offset in bytes of this object from the backing resource including the given
+   * offsetBytes. This offset may also include other offset components such as the native off-heap
+   * memory address, DirectByteBuffer split offsets, region offsets, and unsafe arrayBaseOffsets.
    *
-   * @param offsetBytes offset to be added to the base cumulative offset.
-   * @return the cumulative offset in bytes of this object
+   * @param offsetBytes offset to be added to the cumulative offset.
+   * @return the cumulative offset in bytes of this object from the backing resource including the
+   * given offsetBytes.
    */
   public final long getCumulativeOffset(final long offsetBytes) {
     assertValid();
@@ -212,20 +215,36 @@ abstract class BaseState {
   }
 
   /**
-   * Returns the hashCode of this class.
+   * Returns the hashCode of this object.
    *
-   * <p>The hash code of this class depends upon all of its contents.
+   * <p>The hash code of this object depends upon all of its contents.
    * Because of this, it is inadvisable to use these objects as keys in hash maps
    * or similar data structures unless it is known that their contents will not change.</p>
    *
    * <p>If it is desirable to use these objects in a hash map depending only on object identity,
    * than the {@link java.util.IdentityHashMap} can be used.</p>
    *
-   * @return the hashCode of this class.
+   * @return the hashCode of this object.
    */
   @Override
   public final int hashCode() {
-    return CompareAndCopy.hashCode(this);
+    return (int) xxHash64(0, getCapacity(), 0);
+  }
+
+  /**
+   * Returns the 64-bit hash of the sequence of bytes in this object specified by
+   * <i>offsetBytes</i>, <i>lengthBytes</i> and a <i>seed</i>.  Note that the sequence of bytes is
+   * always processed in the same order independent of endianness.
+   *
+   * @param offsetBytes the given offset in bytes to the first byte of the byte sequence.
+   * @param lengthBytes the given length in bytes of the byte sequence.
+   * @param seed the given long seed.
+   * @return the 64-bit hash of the sequence of bytes in this object specified by
+   * <i>offsetBytes</i> and <i>lengthBytes</i>.
+   */
+  public final long xxHash64(final long offsetBytes, final long lengthBytes, final long seed) {
+    checkValid();
+    return XxHash64.hash(getUnsafeObject(), getCumulativeOffset() + offsetBytes, lengthBytes, seed);
   }
 
   /**

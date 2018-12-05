@@ -72,8 +72,10 @@
         <maven-help-plugin.version>3.1.0</maven-help-plugin.version>
         <maven-install-plugin.version>2.5.2</maven-install-plugin.version>
         <maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
+        <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
+        <maven-site-plugin.version>3.5.1</maven-site-plugin.version>
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
         <maven-surefire-plugin.version>2.22.1</maven-surefire-plugin.version>
         
@@ -418,7 +420,13 @@
                   <artifactId>maven-javadoc-plugin</artifactId>
                   <version>${maven-javadoc-plugin.version}</version>
               </plugin>
-
+              
+              <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-jar-plugin</artifactId>
+                  <version>${maven-jar-plugin.version}</version>
+              </plugin>
+              
               <plugin>
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-release-plugin</artifactId>
@@ -430,7 +438,13 @@
                   <artifactId>maven-resources-plugin</artifactId>
                   <version>${maven-resources-plugin.version}</version>
               </plugin>
-
+              
+              <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-site-plugin</artifactId>
+                  <version>${maven-site-plugin.version}</version>
+              </plugin>
+              
               <plugin>
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-source-plugin</artifactId>

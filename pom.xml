@@ -8,7 +8,7 @@
 
     <groupId>com.yahoo.datasketches</groupId>
     <artifactId>memory</artifactId>
-    <version>0.12.1</version>
+    <version>0.12.2-SNAPSHOT</version>
 
     <!-- Project Information -->
     <name>${project.groupId}:${project.artifactId}</name>
@@ -117,7 +117,7 @@
         <connection>scm:git:ssh://git@github.com/DataSketches/memory.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/DataSketches/memory.git</developerConnection>
         <url>https://github.com/DataSketches/memory</url>
-        <tag>memory-0.12.1</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <prerequisites>

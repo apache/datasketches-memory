@@ -72,7 +72,8 @@ public abstract class WritableMemory extends Memory {
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>WritableMemory.map(...)</i>.
    * @param file the given file to map
-   * @return WritableMapHandle for managing the mapped Memory
+   * @return WritableMapHandle for managing the mapped Memory.
+   * Please read Javadocs for {@link Handle}.
    * @throws IOException file not found or a RuntimeException.
    */
   public static WritableMapHandle map(final File file) throws IOException {
@@ -89,7 +90,8 @@ public abstract class WritableMemory extends Memory {
    * @param fileOffsetBytes the position in the given file in bytes. It may not be negative.
    * @param capacityBytes the size of the mapped Memory. It may not be negative or zero.
    * @param byteOrder the byte order to be used for the given file. It may not be null.
-   * @return WritableMapHandle for managing the mapped Memory
+   * @return WritableMapHandle for managing the mapped Memory.
+   * Please read Javadocs for {@link Handle}.
    * @throws IOException file not found or RuntimeException, etc.
    */
   public static WritableMapHandle map(final File file, final long fileOffsetBytes,
@@ -117,7 +119,8 @@ public abstract class WritableMemory extends Memory {
    * and to call <i>close()</i> when done.</p>
    *
    * @param capacityBytes the size of the desired memory in bytes.
-   * @return WritableDirectHandle for this off-heap resource
+   * @return WritableDirectHandle for this off-heap resource.
+   * Please read Javadocs for {@link Handle}.
    */
   public static WritableDirectHandle allocateDirect(final long capacityBytes) {
     return allocateDirect(capacityBytes, null);
@@ -136,7 +139,8 @@ public abstract class WritableMemory extends Memory {
    * @param capacityBytes the size of the desired memory in bytes.
    * @param memReqSvr A user-specified MemoryRequestServer.
    * This is a callback mechanism for a user client of direct memory to request more memory.
-   * @return WritableHandle for this off-heap resource
+   * @return WritableHandle for this off-heap resource.
+   * Please read Javadocs for {@link Handle}.
    */
   public static WritableDirectHandle allocateDirect(final long capacityBytes,
       final MemoryRequestServer memReqSvr) {

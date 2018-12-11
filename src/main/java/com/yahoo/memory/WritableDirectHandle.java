@@ -6,11 +6,11 @@
 package com.yahoo.memory;
 
 /**
- * References a WritableMemory for a writable direct memory resource. It is highly recommended that
- * this be created inside a <i>try-with-resources</i> statement.
+ * A Handle for a writable direct memory resource.
+ * Please read Javadocs for {@link Handle}.
  *
- * @author Roman Leventov
  * @author Lee Rhodes
+ * @author Roman Leventov
  */
 //Joins a WritableMemory with a writable, AutoCloseable AllocateDirect resource
 public final class WritableDirectHandle implements WritableHandle {

@@ -76,7 +76,8 @@ public abstract class Memory extends BaseState {
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>Memory.map(...)</i>.
    * @param file the given file to map
-   * @return <i>MapHandle</i> for managing the mapped Memory
+   * @return <i>MapHandle</i> for managing the mapped Memory.
+   * Please read Javadocs for {@link Handle}.
    * @throws IOException if file not found or a RuntimeException.
    */
   public static MapHandle map(final File file) throws IOException {
@@ -93,7 +94,8 @@ public abstract class Memory extends BaseState {
    * @param fileOffsetBytes the position in the given file in bytes. It may not be negative.
    * @param capacityBytes the size of the mapped Memory. It may not be negative or zero.
    * @param byteOrder the byte order to be used for the mapped Memory. It may not be null.
-   * @return <i>MapHandle</i> for managing the mapped Memory
+   * @return <i>MapHandle</i> for managing the mapped Memory.
+   * Please read Javadocs for {@link Handle}.
    * @throws IOException if file not found or a RuntimeException.
    */
   public static MapHandle map(final File file, final long fileOffsetBytes, final long capacityBytes,
@@ -201,7 +203,8 @@ public abstract class Memory extends BaseState {
   //ACCESS PRIMITIVE HEAP ARRAYS for readOnly
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are unspecified.
+   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are
+   * unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>Memory.wrap(...)</i>.
@@ -215,7 +218,8 @@ public abstract class Memory extends BaseState {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are unspecified.
+   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are
+   * unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>Memory.wrap(...)</i>.
@@ -228,7 +232,8 @@ public abstract class Memory extends BaseState {
 
   /**
    * Wraps the given primitive array for read operations with the given byte order. If the array
-   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are unspecified.
+   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are
+   * unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>Memory.wrap(...)</i>.
@@ -303,7 +308,8 @@ public abstract class Memory extends BaseState {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are unspecified.
+   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are
+   * unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>Memory.wrap(...)</i>.
@@ -317,7 +323,8 @@ public abstract class Memory extends BaseState {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are unspecified.
+   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are
+   * unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>Memory.wrap(...)</i>.
@@ -331,7 +338,8 @@ public abstract class Memory extends BaseState {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are unspecified.
+   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are
+   * unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>Memory.wrap(...)</i>.

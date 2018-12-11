@@ -426,6 +426,9 @@ abstract class BaseState {
     return BaseState.currentDirectMemoryMapAllocated_.get();
   }
 
+  //REACHABILITY FENCE
+  static void reachabilityFence(@SuppressWarnings("unused") final Object obj) { }
+
   //TO STRING
   /**
    * Returns a formatted hex string of a range of this object.

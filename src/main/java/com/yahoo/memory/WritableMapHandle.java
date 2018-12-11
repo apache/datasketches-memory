@@ -6,8 +6,8 @@
 package com.yahoo.memory;
 
 /**
- * Gets a WritableMemory for a writable memory-mapped file resource. It is highly recommended
- * that this be created inside a <i>try-with-resources</i> statement.
+ * A Handle for a memory-mapped, writable file resource.
+ * Please read Javadocs for {@link Handle}.
  *
  * @author Roman Leventov
  * @author Lee Rhodes

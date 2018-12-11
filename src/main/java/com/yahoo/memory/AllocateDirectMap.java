@@ -138,14 +138,18 @@ class AllocateDirectMap implements Map {
   }
 
   boolean doClose() {
-    if (deallocator.deallocate(false)) {
-      // This Cleaner.clean() call effectively just removes the Cleaner from the internal linked
-      // list of all cleaners. It will delegate to Deallocator.deallocate() which will be a no-op
-      // because the valid state is already changed.
-      cleaner.clean();
-      return true;
-    } else {
-      return false;
+    try {
+      if (deallocator.deallocate(false)) {
+        // This Cleaner.clean() call effectively just removes the Cleaner from the internal linked
+        // list of all cleaners. It will delegate to Deallocator.deallocate() which will be a no-op
+        // because the valid state is already changed.
+        cleaner.clean();
+        return true;
+      } else {
+        return false;
+      }
+    } finally {
+      BaseState.reachabilityFence(this);
     }
   }
 

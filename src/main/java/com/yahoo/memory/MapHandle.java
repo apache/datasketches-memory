@@ -6,11 +6,11 @@
 package com.yahoo.memory;
 
 /**
- * Gets a Memory for a memory-mapped, read-only file resource, It is highly recommended that this
- * be created inside a <i>try-with-resources</i> statement.
+ * A Handle for a memory-mapped, read-only file resource.
+ * Please read Javadocs for {@link Handle}.
  *
- * @author Roman Leventov
  * @author Lee Rhodes
+ * @author Roman Leventov
  */
 //Joins a Read-only Handle with an AutoCloseable Map resource.
 public class MapHandle implements Map, Handle {

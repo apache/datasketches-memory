@@ -228,7 +228,7 @@ class AllocateDirectMap implements Map {
     try (RandomAccessFile raf = new RandomAccessFile(file, "rw")) {
       raf.close();
       return false;
-    } catch (final Exception e) { //could not open for write
+    } catch (final SecurityException | IOException f) { //could not open for write
       return true;
     }
   }

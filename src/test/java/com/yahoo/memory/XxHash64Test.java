@@ -5,9 +5,16 @@
 
 package com.yahoo.memory;
 
+import static com.yahoo.memory.XxHash64.hashBooleans;
+import static com.yahoo.memory.XxHash64.hashBytes;
+import static com.yahoo.memory.XxHash64.hashChars;
+import static com.yahoo.memory.XxHash64.hashDoubles;
+import static com.yahoo.memory.XxHash64.hashFloats;
+import static com.yahoo.memory.XxHash64.hashInts;
+import static com.yahoo.memory.XxHash64.hashLongs;
+import static com.yahoo.memory.XxHash64.hashShorts;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import static com.yahoo.memory.XxHash64.*;
 
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;

@@ -12,7 +12,7 @@ import static com.yahoo.memory.XxHash64.hashDoubles;
 import static com.yahoo.memory.XxHash64.hashFloats;
 import static com.yahoo.memory.XxHash64.hashInts;
 import static com.yahoo.memory.XxHash64.hashLongs;
-import static com.yahoo.memory.XxHash64.hashShorts;
+import static com.yahoo.memory.XxHash64.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -154,6 +154,15 @@ public class XxHash64Test {
     boolean[] blarr = new boolean[16];
     wmem.getBooleanArray(0, blarr, 0, 16); //any byte != 0 is true
     hash1 = hashBooleans(blarr, 8, 8, 0);
+    assertEquals(hash1, hash0);
+  }
+
+  @Test
+  public void testString() {
+    String s = "Now is the time for all good men to come to the aid of their country.";
+    char[] arr = s.toCharArray();
+    long hash0 = hashString(s, 0, s.length(), 0);
+    long hash1 = hashChars(arr, 0, arr.length, 0);
     assertEquals(hash1, hash0);
   }
 

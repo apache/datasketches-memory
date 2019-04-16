@@ -221,6 +221,20 @@
         <plugins>
 
             <plugin>
+                <groupId>io.timeandspace</groupId>
+                <artifactId>jpsg-maven-plugin</artifactId>
+                <version>1.2</version>
+                <executions>
+                    <execution>
+                        <id>jpsg</id>
+                        <goals>
+                            <goal>jpsg</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>

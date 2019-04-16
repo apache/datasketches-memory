@@ -5,21 +5,7 @@
 
 package com.yahoo.memory;
 
-import static com.yahoo.memory.UnsafeUtil.ARRAY_BOOLEAN_BASE_OFFSET;
-import static com.yahoo.memory.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
-import static com.yahoo.memory.UnsafeUtil.ARRAY_CHAR_BASE_OFFSET;
-import static com.yahoo.memory.UnsafeUtil.ARRAY_DOUBLE_BASE_OFFSET;
-import static com.yahoo.memory.UnsafeUtil.ARRAY_FLOAT_BASE_OFFSET;
-import static com.yahoo.memory.UnsafeUtil.ARRAY_INT_BASE_OFFSET;
-import static com.yahoo.memory.UnsafeUtil.ARRAY_LONG_BASE_OFFSET;
-import static com.yahoo.memory.UnsafeUtil.ARRAY_SHORT_BASE_OFFSET;
-import static com.yahoo.memory.UnsafeUtil.CHAR_SHIFT;
-import static com.yahoo.memory.UnsafeUtil.DOUBLE_SHIFT;
-import static com.yahoo.memory.UnsafeUtil.FLOAT_SHIFT;
-import static com.yahoo.memory.UnsafeUtil.INT_SHIFT;
-import static com.yahoo.memory.UnsafeUtil.LONG_SHIFT;
-import static com.yahoo.memory.UnsafeUtil.SHORT_SHIFT;
-import static com.yahoo.memory.UnsafeUtil.unsafe;
+import static com.yahoo.memory.UnsafeUtil.*;
 
 /**
  * The XxHash is a fast, non-cryptographic, 64-bit hash function that has
@@ -165,49 +151,7 @@ public class XxHash64 {
     return hash;
   }
 
-  /**
-   * Hash the given arr starting at the given offset and continuing for the given length using the
-   * given seed.
-   * @param arr the given array
-   * @param offsetBooleans starting at this offset
-   * @param lengthBooleans continuing for this length
-   * @param seed the given seed
-   * @return the hash
-   */
-  public static long hashBooleans(final boolean[] arr, final long offsetBooleans,
-      final long lengthBooleans, final long seed) {
-    return hash(arr, ARRAY_BOOLEAN_BASE_OFFSET + offsetBooleans, lengthBooleans, seed);
-  }
-
-  /**
-   * Hash the given arr starting at the given offset and continuing for the given length using the
-   * given seed.
-   * @param arr the given array
-   * @param offsetBytes starting at this offset
-   * @param lengthBytes continuing for this length
-   * @param seed the given seed
-   * @return the hash
-   */
-  public static long hashBytes(final byte[] arr, final long offsetBytes,
-      final long lengthBytes, final long seed) {
-    return hash(arr, ARRAY_BYTE_BASE_OFFSET + offsetBytes, lengthBytes, seed);
-  }
-
-  /**
-   * Hash the given arr starting at the given offset and continuing for the given length using the
-   * given seed.
-   * @param arr the given array
-   * @param offsetShorts starting at this offset
-   * @param lengthShorts continuing for this length
-   * @param seed the given seed
-   * @return the hash
-   */
-  public static long hashShorts(final short[] arr, final long offsetShorts,
-      final long lengthShorts, final long seed) {
-    return hash(arr, ARRAY_SHORT_BASE_OFFSET + (offsetShorts << SHORT_SHIFT),
-        lengthShorts << SHORT_SHIFT, seed);
-  }
-
+  /* with char|byte|boolean|short|int|long|float|double arrayElement */
   /**
    * Hash the given arr starting at the given offset and continuing for the given length using the
    * given seed.
@@ -223,65 +167,7 @@ public class XxHash64 {
         lengthChars << CHAR_SHIFT, seed);
   }
 
-  /**
-   * Hash the given arr starting at the given offset and continuing for the given length using the
-   * given seed.
-   * @param arr the given array
-   * @param offsetInts starting at this offset
-   * @param lengthInts continuing for this length
-   * @param seed the given seed
-   * @return the hash
-   */
-  public static long hashInts(final int[] arr, final long offsetInts,
-      final long lengthInts, final long seed) {
-    return hash(arr, ARRAY_INT_BASE_OFFSET + (offsetInts << INT_SHIFT),
-        lengthInts << INT_SHIFT, seed);
-  }
-
-  /**
-   * Hash the given arr starting at the given offset and continuing for the given length using the
-   * given seed.
-   * @param arr the given array
-   * @param offsetLongs starting at this offset
-   * @param lengthLongs continuing for this length
-   * @param seed the given seed
-   * @return the hash
-   */
-  public static long hashLongs(final long[] arr, final long offsetLongs,
-      final long lengthLongs, final long seed) {
-    return hash(arr, ARRAY_LONG_BASE_OFFSET + (offsetLongs << LONG_SHIFT),
-        lengthLongs << LONG_SHIFT, seed);
-  }
-
-  /**
-   * Hash the given arr starting at the given offset and continuing for the given length using the
-   * given seed.
-   * @param arr the given array
-   * @param offsetFloats starting at this offset
-   * @param lengthFloats continuing for this length
-   * @param seed the given seed
-   * @return the hash
-   */
-  public static long hashFloats(final float[] arr, final long offsetFloats,
-      final long lengthFloats, final long seed) {
-    return hash(arr, ARRAY_FLOAT_BASE_OFFSET + (offsetFloats << FLOAT_SHIFT),
-        lengthFloats << FLOAT_SHIFT, seed);
-  }
-
-  /**
-   * Hash the given arr starting at the given offset and continuing for the given length using the
-   * given seed.
-   * @param arr the given array
-   * @param offsetDoubles starting at this offset
-   * @param lengthDoubles continuing for this length
-   * @param seed the given seed
-   * @return the hash
-   */
-  public static long hashDoubles(final double[] arr, final long offsetDoubles,
-      final long lengthDoubles, final long seed) {
-    return hash(arr, ARRAY_DOUBLE_BASE_OFFSET + (offsetDoubles << DOUBLE_SHIFT),
-        lengthDoubles << DOUBLE_SHIFT, seed);
-  }
+  /* endwith */
 
   /**
    * Hash the given arr starting at the given offset and continuing for the given length using the

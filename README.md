@@ -35,3 +35,4 @@
 
 [coveralls]:https://coveralls.io/github/DataSketches/memory?branch=master
 [coveralls img]:https://coveralls.io/repos/github/DataSketches/memory/badge.svg?branch=master&service=github
+

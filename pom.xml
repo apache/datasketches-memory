@@ -23,7 +23,7 @@
 
     <groupId>org.apache.datasketches</groupId>
     <artifactId>datasketches-memory</artifactId>
-    <version>0.12.3-SNAPSHOT</version>
+    <version>0.12.3-incubating-SNAPSHOT</version>
 
     <!-- Project Information -->
     <name>${project.groupId}:${project.artifactId}</name>
@@ -38,18 +38,10 @@
         </license>
     </licenses>
 
-    <organization>
-        <name>Yahoo! Inc.</name>
-        <url>https://www.yahoo.com</url>
-    </organization>
-
     <developers>
         <developer>
-            <name>Lee Rhodes</name>
-            <roles>
-                <role>founder, project admin, lead developer</role>
-            </roles>
-            <url>https://github.com/leerho</url>
+            <name>Apache DataSketches Committers</name>
+            <url>https://druid.apache.org/community/#committers</url>
         </developer>
     </developers>
 
@@ -112,7 +104,7 @@
     <!-- Environment Settings -->
     <issueManagement>
         <system>GitHub Issues</system>
-        <url>https://github.com/DataSketches/memory/issues</url>
+        <url>https://github.com/Apache/incubator-datasketches-memory/issues</url>
     </issueManagement>
 
     <ciManagement>
@@ -121,6 +113,13 @@
     </ciManagement>
 
     <mailingLists>
+        <mailingList>
+            <name>Apache DataSketches (incubating) developers list</name>
+            <subscribe>dev-subscribe@datasketches.apache.org</subscribe>
+            <unsubscribe>dev-unsubscribe@datasketches.apache.org</unsubscribe>
+            <post>dev@datasketches.apache.org</post>
+            <archive>https://mail-archives.apache.org/mod_mbox/datasketches-dev</archive>
+        </mailingList>
         <mailingList>
             <name>sketches-user</name>
             <archive>https://groups.google.com/forum/#!forum/sketches-user</archive>
@@ -131,9 +130,9 @@
     </mailingLists>
 
     <scm>
-        <connection>scm:git:ssh://git@github.com/DataSketches/memory.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/DataSketches/memory.git</developerConnection>
-        <url>https://github.com/DataSketches/memory</url>
+        <connection>scm:git:ssh://git@github.com/apache/incubator-datasketches-memory.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/apache/incubator-datasketches-memory.git</developerConnection>
+        <url>https://github.com/apache/incubator-datasketches-memory.git</url>
         <tag>HEAD</tag>
     </scm>
 

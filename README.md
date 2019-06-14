@@ -1,10 +1,12 @@
-[![][travis img]][travis] [![][mavenbadge img]][mavenbadge] 
-[![Code Quality: Java][lgtm-badge]][lgtm-badge-url] [![Total alerts][lgtm-alerts]][lgtm-alerts-url]
-[![][coveralls img]][coveralls]
+[![Build Status](https://travis-ci.org/apache/incubator-datasketches-memory.svg?branch=master)](https://travis-ci.org/apache/incubator-datasketches-memory) 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.yahoo.datasketches/memory/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.yahoo.datasketches/memory) 
+[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/apache/incubator-datasketches-memory.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/apache/incubator-datasketches-memory/context:java)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/apache/incubator-datasketches-memory.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/apache/incubator-datasketches-memory/alerts/)
+[![Coverage Status](https://coveralls.io/repos/github/apache/incubator-datasketches-memory/badge.svg?branch=master)](https://coveralls.io/github/apache/incubator-datasketches-memory?branch=master)
 
  =================
 
-# memory
+# DataSketches Memory
  The goal of this package is to provide high performance access to native memory for primitives
  and primitive arrays. It also provides consistent views into heap-based arrays,
  Java ByteBuffers and memory mapped files. This package is general purpose, has minimal external
@@ -20,19 +22,4 @@
 ## [Comments](https://groups.google.com/forum/#!forum/sketches-user)
 
 ## [Building](https://github.com/DataSketches/memory/blob/master/README_building.md)
-
-
-[travis]:https://travis-ci.org//DataSketches/memory/builds?branch=master
-[travis img]:https://secure.travis-ci.org/DataSketches/memory.svg?branch=master
-
-[mavenbadge]:https://search.maven.org/#search|gav|1|g%3A%22com.yahoo.datasketches%22%20AND%20a%3A%22memory%22
-[mavenbadge img]:https://maven-badges.herokuapp.com/maven-central/com.yahoo.datasketches/memory/badge.svg
-
-[lgtm-badge]: https://img.shields.io/lgtm/grade/java/g/DataSketches/memory.svg?logo=lgtm&logoWidth=18
-[lgtm-badge-url]: https://lgtm.com/projects/g/DataSketches/memory/context:java
-[lgtm-alerts]: https://img.shields.io/lgtm/alerts/g/DataSketches/memory.svg?logo=lgtm&logoWidth=18
-[lgtm-alerts-url]: https://lgtm.com/projects/g/DataSketches/memory/alerts
-
-[coveralls]:https://coveralls.io/github/DataSketches/memory?branch=master
-[coveralls img]:https://coveralls.io/repos/github/DataSketches/memory/badge.svg?branch=master&service=github
 

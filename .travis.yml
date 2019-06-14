@@ -25,11 +25,11 @@ sudo: false # faster builds
 dist: trusty
 
 jdk:
- - oraclejdk8 
+ - oraclejdk8
 
 install:
  - mvn install -Dmaven.javadoc.skip=true -Dsource.skip=true -DskipTests=true -Dgpg.skip=true
- 
+
 before_script:
  - _JAVA_OPTIONS="-Xmx4g -Xms1g"
 
@@ -38,7 +38,7 @@ script:
 
 after_success: 
  - mvn clean cobertura:cobertura coveralls:report
- 
+
 notifications:
   email: false
 

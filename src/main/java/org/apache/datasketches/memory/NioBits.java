@@ -49,7 +49,6 @@ final class NioBits {
 
   static {
     try {
-      //TODO-JDK9 VM_CLASS = Class.forName("jdk.internal.misc.VM");
       VM_CLASS = Class.forName("sun.misc.VM");
       VM_MAX_DIRECT_MEMORY_METHOD =
           VM_CLASS.getDeclaredMethod("maxDirectMemory");
@@ -86,8 +85,7 @@ final class NioBits {
       nioBitsTotalCapacity = (AtomicLong) (totalCapacityField.get(null));
 
     } catch (final Exception e) {
-      throw new RuntimeException("Could not acquire java.nio.Bits class: " + e.getClass()
-      + UnsafeUtil.tryIllegalAccessPermit);
+      throw new RuntimeException("Could not acquire java.nio.Bits class: " + e.getClass());
     }
   }
 

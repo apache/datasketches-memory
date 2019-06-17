@@ -51,7 +51,7 @@ final class AllocateDirectWritableMap extends AllocateDirectMap implements Writa
               capacityBytes);
     } catch (final Exception e) {
       throw new RuntimeException(String.format("Encountered %s exception in force. "
-          + UnsafeUtil.tryIllegalAccessPermit, e.getClass()));
+          + e.getClass()));
     }
   }
 }

@@ -33,21 +33,17 @@ import sun.misc.Unsafe;
  * jdk8 and it must be done with both source and target versions of jdk7 specified in pom.xml.
  * The resultant jar will work on jdk7 and jdk8.</p>
  *
- * <p>This may work with jdk9 but might require the JVM arg <i>-permit-illegal-access</i>,
- * <i>–illegal-access=permit</i> or equivalent. Proper operation with jdk9 or above is not
- * guaranteed and has not been tested.
- *
  * @author Lee Rhodes
  */
 public final class UnsafeUtil {
   public static final Unsafe unsafe;
-  public static final String JDK;
-  static final boolean JDK8_OR_ABOVE;
+  public static final String JDK; //must be at least "1.8"
+  public static final int JDK_MAJOR; //8, 9, 10, 11, 12, etc
 
   //not an indicator of whether compressed references are used.
   public static final int ADDRESS_SIZE;
 
-  //For 64-bit JVMs: varies depending on coop: 16 for JVM <= 32GB; 24 for JVM > 32GB
+  //For 64-bit JVMs: these offsets vary depending on coop: 16 for JVM <= 32GB; 24 for JVM > 32GB.
   // Making this constant long-typed, rather than int, to exclude possibility of accidental overflow
   // in expressions like arrayLength * ARRAY_BYTE_BASE_OFFSET, where arrayLength is int-typed.
   // The same consideration for constants below: ARRAY_*_INDEX_SCALE, ARRAY_*_INDEX_SHIFT.
@@ -91,10 +87,6 @@ public final class UnsafeUtil {
 
   //@formatter:on
 
-  static String tryIllegalAccessPermit =
-      " If using JDK 9+ try setting JVM arg -permit-illegal-access, "
-      + "–illegal-access=permit or equivalent.";
-
   static {
     try {
       final Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
@@ -109,7 +101,7 @@ public final class UnsafeUtil {
     } catch (final InstantiationException | IllegalAccessException | IllegalArgumentException
         | InvocationTargetException | NoSuchMethodException e) {
       e.printStackTrace();
-      throw new RuntimeException("Unable to acquire Unsafe. " + tryIllegalAccessPermit, e);
+      throw new RuntimeException("Unable to acquire Unsafe. " + e);
     }
 
     //4 on 32-bit systems. 4 on 64-bit systems < 32GB, otherwise 8.
@@ -132,32 +124,35 @@ public final class UnsafeUtil {
     final String jdkVer = System.getProperty("java.version");
     final int[] p = parseJavaVersion(jdkVer);
     JDK = p[0] + "." + p[1];
-    JDK8_OR_ABOVE = checkJavaVersion(JDK, p[0], p[1]);
+    JDK_MAJOR = (p[0] == 1) ? p[1] : p[0];
   }
 
   private UnsafeUtil() {}
 
+  /**
+   * Returns first two number groups of the java version string.
+   * @param jdkVer the java version string from System.getProperty("java.version").
+   * @return first two number groups of the java version string.
+   */
   static int[] parseJavaVersion(final String jdkVer) {
+    final int p0, p1;
     try {
-      String[] parts = jdkVer.trim().split("[^0-9\\.]");
-      if (parts.length == 0) {
-        throw new ExceptionInInitializerError("Improper Java -version string: " + jdkVer);
-      }
-      parts = parts[0].split("\\.");
-      final int p0 = Integer.parseInt(parts[0]);
-      final int p1 = (parts.length > 1) ? Integer.parseInt(parts[1]) : 0;
-      return new int[] {p0, p1};
+      String[] parts = jdkVer.trim().split("[^0-9\\.]");//grab only number groups and "."
+      parts = parts[0].split("\\."); //split out the number groups
+      p0 = Integer.parseInt(parts[0]); //the first number group
+      p1 = (parts.length > 1) ? Integer.parseInt(parts[1]) : 0; //2nd number group, or 0
     } catch (final Exception e) {
-      throw new ExceptionInInitializerError("Improper Java -version string: "
-          + jdkVer + "\n" + e);
+      throw new ExceptionInInitializerError("Improper Java -version string: " + jdkVer + "\n" + e);
     }
+    checkJavaVersion(jdkVer, p0, p1);
+    return new int[] {p0, p1};
   }
 
-  static boolean checkJavaVersion(final String jdk, final int p0, final int p1) {
-    if ( (p0 < 1) || ((p0 == 1) && (p1 < 7)) ) {
-      throw new ExceptionInInitializerError("JDK Major Version must be >= 1.7: " + jdk);
+  static void checkJavaVersion(final String jdkVer, final int p0, final int p1) {
+    if ( (p0 < 1) || ((p0 == 1) && (p1 < 8)) || (p0 >= 9)  ) {
+      throw new ExceptionInInitializerError(
+          "Unsupported JDK Major Version, must be 1.8: " + jdkVer);
     }
-    return  !( (p0 == 1) && (p1 == 7) );
   }
 
   static long getFieldOffset(final Class<?> c, final String fieldName) {

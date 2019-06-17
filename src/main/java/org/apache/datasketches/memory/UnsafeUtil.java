@@ -27,12 +27,6 @@ import sun.misc.Unsafe;
 /**
  * Provides access to the sun.misc.Unsafe class and its key static fields.
  *
- * <p>The internal static initializer also detects whether the methods unique to the Unsafe class
- * in JDK8 are present; if not, methods that are compatible with JDK7 are substituted using an
- * internal interface.  In order for this to work with jdk7, this library must be compiled using
- * jdk8 and it must be done with both source and target versions of jdk7 specified in pom.xml.
- * The resultant jar will work on jdk7 and jdk8.</p>
- *
  * @author Lee Rhodes
  */
 public final class UnsafeUtil {

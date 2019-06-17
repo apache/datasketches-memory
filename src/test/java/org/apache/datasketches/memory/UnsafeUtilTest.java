@@ -20,7 +20,6 @@
 package org.apache.datasketches.memory;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
@@ -54,16 +53,31 @@ public class UnsafeUtilTest {
   public void checkJdkString() {
     String jdkVer;
     int[] p = new int[2];
-    String[] good1_8Strings = {"1.8.0_121", "1.8.0_162", "9.0.4", "10.0.1", "11", "12b", "12_.2"};
+    String[] good1_8Strings = {"1.8.0_121", "1.8.0_162"};
     int len = good1_8Strings.length;
     for (int i = 0; i < len; i++) {
       jdkVer = good1_8Strings[i];
       p = UnsafeUtil.parseJavaVersion(jdkVer);
-      assertTrue(UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]));
+      UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]);
+      int jdkMajor = (p[0] == 1) ? p[1] : p[0]; //model the actual JDK_MAJOR
+      if (p[0] == 1) { assertTrue(jdkMajor == p[1]); }
+      if (p[0] > 1 ) { assertTrue(jdkMajor == p[0]); }
     }
-    jdkVer = "1.7.0_80"; //1.7 string
-    p = UnsafeUtil.parseJavaVersion(jdkVer);
-    assertFalse(UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]));
+    try {
+      jdkVer = "9.0.4"; //ver 9 string
+      p = UnsafeUtil.parseJavaVersion(jdkVer);
+      UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]);
+    } catch (Error e) {
+      println("" + e);
+    }
+
+    try {
+      jdkVer = "1.7.0_80"; //1.7 string
+      p = UnsafeUtil.parseJavaVersion(jdkVer);
+      UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]);
+    } catch (Error e) {
+      println("" + e);
+    }
     try {
       jdkVer = "1.6.0_65"; //valid string but < 1.7
       p = UnsafeUtil.parseJavaVersion(jdkVer);

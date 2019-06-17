@@ -255,12 +255,7 @@ abstract class NonNativeWritableMemoryImpl extends BaseWritableMemoryImpl {
     assertValidAndBoundsForWrite(offsetBytes, ARRAY_LONG_INDEX_SCALE);
     final long addr = getCumulativeOffset(offsetBytes);
     final long newValueReverseBytes = Long.reverseBytes(newValue);
-    if (UnsafeUtil.JDK8_OR_ABOVE) {
-      return Long.reverseBytes(unsafe.getAndSetLong(getUnsafeObject(), addr, newValueReverseBytes));
-    } else {
-      return Long.reverseBytes(
-          JDK7Compatible.getAndSetLong(getUnsafeObject(), addr, newValueReverseBytes));
-    }
+    return Long.reverseBytes(unsafe.getAndSetLong(getUnsafeObject(), addr, newValueReverseBytes));
   }
 
   @Override

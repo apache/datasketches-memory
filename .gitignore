@@ -13,7 +13,7 @@ bin/
 #Test config and output
 test-output/
 .clover/
-
+/local/
 reports/
 .pmd
 tmp/

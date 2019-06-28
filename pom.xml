@@ -63,11 +63,18 @@ under the License.
 
     <mailingLists>
         <mailingList>
-            <name>Apache DataSketches (incubating) developers list</name>
+            <name>DataSketches Developers</name>
             <subscribe>dev-subscribe@datasketches.apache.org</subscribe>
             <unsubscribe>dev-unsubscribe@datasketches.apache.org</unsubscribe>
             <post>dev@datasketches.apache.org</post>
             <archive>https://mail-archives.apache.org/mod_mbox/datasketches-dev</archive>
+        </mailingList>
+        <mailingList>
+          <name>DataSketches Commits</name>
+          <subscribe>commits-subscribe@datasketches.apache.org</subscribe>
+          <unsubscribe>commits-unsubscribe@datasketches.apache.org</unsubscribe>
+          <post>commits@datasketches.apache.org</post>
+          <archive>http://www.mail-archive.com/commits%datasketches.apache.org</archive>
         </mailingList>
         <mailingList>
             <name>sketches-user</name>
@@ -124,6 +131,9 @@ under the License.
 
         <!-- org.eluder Maven Plugins -->
         <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
+        
+        <!-- other -->
+        <reproducible-build-maven-plugin.version>0.4</reproducible-build-maven-plugin.version>
     </properties>
 
     <repositories>
@@ -185,10 +195,44 @@ under the License.
 
     <build>
         <plugins>
+            <!-- Create a source-release artifact that contains the fully buildable
+            project directory source structure. This is the artifact which is the
+            official subject of any release vote. -->
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-assembly-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>source-release-assembly</id>
+                  <phase>package</phase>
+                  <goals>
+                    <goal>single</goal>
+                  </goals>
+                  <configuration>
+                    <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
+                    <descriptors>
+                      <descriptor>assembly.xml</descriptor>
+                    </descriptors>
+                    <tarLongFileMode>gnu</tarLongFileMode>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+            <!-- We want to deploy the artifact to a staging location for perusal -->
+            <!-- exact duplicate of Parent -->
+            <plugin>
+              <inherited>true</inherited>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-deploy-plugin</artifactId>
+              <configuration>
+                <updateReleaseInfo>true</updateReleaseInfo>
+              </configuration>
+            </plugin>
+
+            <!-- exact duplicate of Parent -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
-                <!-- version in parent -->
                 <executions>
                     <execution>
                         <id>sign-release-artifacts</id>
@@ -199,7 +243,7 @@ under the License.
                 </executions>
             </plugin>
 
-            <plugin>
+            <plugin> <!--  extends the Parent -->
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-jar-plugin</artifactId>
               <version>${maven-jar-plugin.version}</version>
@@ -222,11 +266,10 @@ under the License.
               </configuration>
             </plugin>
 
-            <plugin>
+            <plugin> <!--  extends the Parent -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <!-- version in parent -->
-                <configuration>  <!-- not in parent -->
+                <configuration>
                   <!--
                     <show>private</show>
                   -->
@@ -244,15 +287,22 @@ under the License.
             </plugin>
 
             <plugin>
+              <groupId>org.apache.rat</groupId>
+              <artifactId>apache-rat-plugin</artifactId>
+              <configuration>
+                <skip>false</skip>
+              </configuration>
+            </plugin>
+
+            <plugin> <!-- extends the Parent -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <!-- version in parent -->
                 <executions>
                     <execution>
                         <id>attach-sources</id>
                         <goals>
                             <goal>jar-no-fork</goal>
-                            <goal>test-jar-no-fork</goal> <!-- not in parent -->
+                            <goal>test-jar-no-fork</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -300,7 +350,51 @@ under the License.
                     <!-- Since we use Travis CI we do not have to put a Coveralls token here. -->
                 </configuration>
             </plugin>
+            <plugin>
+              <groupId>io.github.zlika</groupId>
+              <artifactId>reproducible-build-maven-plugin</artifactId>
+              <version>${reproducible-build-maven-plugin.version}</version>
+              <executions>
+                <execution>
+                  <goals>
+                    <goal>strip-jar</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
         </plugins>
+
+        <pluginManagement>
+            <plugins>
+                <!-- Ignore nuisance warning from Apache parent plugin: 
+                  "maven-remote-resources-plugin (goal "process") is ignored by m2e" -->
+                <plugin> 
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-remote-resources-plugin</artifactId>
+                                        <versionRange>[1.0,)</versionRange>
+                                        <goals>
+                                            <goal>process</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore>
+                                        </ignore>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
 
     </build>
 

@@ -38,6 +38,10 @@ under the License.
     <url>https://datasketches.apache.org/</url>
     <inceptionYear>2015</inceptionYear>
     <packaging>jar</packaging> <!-- jar is the default -->
+    
+    <prerequisites>
+        <maven>3.0.4</maven>
+    </prerequisites>
 
     <licenses>
         <license>

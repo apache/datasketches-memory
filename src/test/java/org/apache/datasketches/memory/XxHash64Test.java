@@ -83,7 +83,7 @@ public class XxHash64Test {
    * OpenHFT/Zero-Allocation-Hashing</a> to test hash compatibility with that implementation.
    */
   @Test
-  @SuppressWarnings("ConstantOverflow")
+  //@SuppressWarnings("ConstantOverflow")
   public void collisionTest() {
     WritableMemory wmem = WritableMemory.allocate(128);
     wmem.putLong(0, 1);
@@ -91,13 +91,13 @@ public class XxHash64Test {
     wmem.putLong(32, 2);
     long h1 = wmem.xxHash64(0, wmem.getCapacity(), 0);
 
-    wmem.putLong(0, 1 + 0xBA79078168D4BAFL);
-    wmem.putLong(32, 2 + 0x9C90005B80000000L);
+    wmem.putLong(0, 1L + 0xBA79078168D4BAFL);
+    wmem.putLong(32, 2L + 0x9C90005B80000000L);
     long h2 = wmem.xxHash64(0, wmem.getCapacity(), 0);
     assertEquals(h1, h2);
 
-    wmem.putLong(0, 1 + (0xBA79078168D4BAFL * 2));
-    wmem.putLong(32, 2 + (0x9C90005B80000000L * 2));
+    wmem.putLong(0, 1L + (0xBA79078168D4BAFL * 2));
+    wmem.putLong(32, 2L + (0x9C90005B80000000L * 2));
 
     long h3 = wmem.xxHash64(0, wmem.getCapacity(), 0);
     assertEquals(h2, h3);

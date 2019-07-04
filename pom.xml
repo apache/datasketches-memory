@@ -318,8 +318,7 @@ under the License.
                 <useDefaultExcludes>true</useDefaultExcludes>
                 <excludes>
                   <!-- rat uses .gitignore for excludes -->
-                  <!-- ignore files we track but do not distribute and client tool config files-->
-                  <exclude>**/*.txt</exclude>
+                  <exclude>**/test/resources/**/*.txt</exclude>
                   <!-- ignore licence files-->
                   <exclude>LICENSE</exclude>
                   <exclude>NOTICE</exclude>

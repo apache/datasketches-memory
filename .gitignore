@@ -1,8 +1,8 @@
 # Eclipse project files 
-/.classpath
-/.project
-/.settings/
-/.checkstyle
+.classpath
+.project
+.settings/
+.checkstyle
 
 #OSX files
 .DS_Store
@@ -13,7 +13,7 @@ bin/
 #Test config and output
 test-output/
 .clover/
-/local/
+local/
 reports/
 .pmd
 tmp/
@@ -33,8 +33,6 @@ build.xml
 *.tag
 
 # Jekyll
-Gemfile
-Gemfile.lock
 _site/
 _*
 _*/

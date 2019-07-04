@@ -397,47 +397,60 @@ under the License.
             </plugin>
         </plugins>
 
-        <pluginManagement>
-            <plugins>
-                <!-- Ignore nuisance warning from Apache parent plugin: 
-                  "maven-remote-resources-plugin (goal "process") is ignored by m2e" -->
-                <plugin> 
-                    <groupId>org.eclipse.m2e</groupId>
-                    <artifactId>lifecycle-mapping</artifactId>
-                    <version>${lifecycle-mapping.version}</version>
-                    <configuration>
-                        <lifecycleMappingMetadata>
-                            <pluginExecutions>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>org.apache.maven.plugins</groupId>
-                                        <artifactId>maven-remote-resources-plugin</artifactId>
-                                        <versionRange>[1.0,)</versionRange>
-                                        <goals>
-                                            <goal>process</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore>
-                                        </ignore>
-                                    </action>
-                                </pluginExecution>
-                            </pluginExecutions>
-                        </lifecycleMappingMetadata>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-
     </build>
 
     <profiles>
+        <!-- Ignore nuisance warning from Apache parent plugin: 
+          "maven-remote-resources-plugin (goal "process") is ignored by m2e".
+          This also should fix the Maven warning that it can't find the lifecycle-mapping jar 
+        -->
+        <profile>
+            <id>m2e</id>
+            <!-- This profile is only active when the property "m2e.version"
+              is set, which is the case when building in Eclipse with m2e. -->
+            <activation>
+              <property>
+                <name>m2e.version</name>
+              </property>
+            </activation>
+            <build>
+                <pluginManagement>
+                  <plugins>
+                    <plugin>
+                      <groupId>org.eclipse.m2e</groupId>
+                      <artifactId>lifecycle-mapping</artifactId>
+                      <version>1.0.0</version>
+                      <configuration>
+                        <lifecycleMappingMetadata>
+                          <pluginExecutions>
+                            <pluginExecution>
+                                <pluginExecutionFilter>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-remote-resources-plugin</artifactId>
+                                    <versionRange>[1.0,)</versionRange>
+                                    <goals>
+                                        <goal>process</goal>
+                                    </goals>
+                                </pluginExecutionFilter>
+                              <action>
+                                <!-- ignore: tells m2eclipse to skip the execution. -->
+                                <ignore />
+                              </action>
+                            </pluginExecution>
+                          </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                      </configuration>
+                    </plugin>
+                  </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        
         <profile>
             <id>strict</id>
             <build>
                 <pluginManagement>
                     <plugins>
-
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-compiler-plugin</artifactId>
@@ -456,7 +469,6 @@ under the License.
                                 </dependency>
                             </dependencies>
                         </plugin>
-
                     </plugins>
                 </pluginManagement>
             </build>

@@ -354,6 +354,7 @@ under the License.
                 <!-- version in parent -->
                 <configuration>
                   <trimStackTrace>false</trimStackTrace>
+                  <useManifestOnlyJar>false</useManifestOnlyJar>
                   <redirectTestOutputToFile>true</redirectTestOutputToFile>
                 </configuration>
             </plugin>
@@ -394,8 +395,37 @@ under the License.
                 </execution>
               </executions>
             </plugin>
+            <!-- calculate checksums of source release for Apache dist area -->
+            <plugin>
+              <groupId>net.nicoulaj.maven.plugins</groupId>
+              <artifactId>checksum-maven-plugin</artifactId>
+              <version>1.7</version>
+              <executions>
+                <execution>
+                  <id>source-release-checksum</id>
+                  <goals>
+                    <goal>files</goal>
+                  </goals>
+                </execution>
+              </executions>
+              <configuration>
+                <algorithms>
+                  <algorithm>SHA-512</algorithm>
+                </algorithms>
+                <csvSummary>false</csvSummary>
+                <fileSets>
+                  <fileSet>
+                    <directory>${project.build.directory}</directory> <!-- /target -->
+                    <includes>
+                      <include>${project.artifactId}-${project.version}-source-release.zip</include>
+                      <include>${project.artifactId}-${project.version}-source-release.tar*</include>
+                    </includes>
+                  </fileSet>
+                </fileSets>
+                <failIfNoFiles>false</failIfNoFiles><!-- usually, no file to do checksum: don't consider error -->
+              </configuration>
+            </plugin>
         </plugins>
-
     </build>
 
     <profiles>

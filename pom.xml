@@ -419,6 +419,13 @@ under the License.
                     <includes>
                       <include>${project.artifactId}-${project.version}-source-release.zip</include>
                       <include>${project.artifactId}-${project.version}-source-release.tar*</include>
+                      <include>${project.artifactId}-${project.version}-javadoc.jar</include>
+                      <include>${project.artifactId}-${project.version}-source.zip</include>
+                      <include>${project.artifactId}-${project.version}-sources.jar</include>
+                      <include>${project.artifactId}-${project.version}-test-sources.jar</include>
+                      <include>${project.artifactId}-${project.version}-tests.jar</include>
+                      <include>${project.artifactId}-${project.version}.jar</include>
+                      <include>${project.artifactId}-${project.version}.pom</include>
                     </includes>
                   </fileSet>
                 </fileSets>

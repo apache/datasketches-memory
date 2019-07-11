@@ -199,8 +199,8 @@ public class MemoryTest {
     ByteBuffer bb = ByteBuffer.allocate(n * 8);
     bb.order(ByteOrder.BIG_ENDIAN);
     Memory mem = Memory.wrap(bb);
-    assertFalse(mem.isNativeOrder());
-    assertEquals(mem.getByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertFalse(mem.getTypeByteOrder() == BaseState.nativeCpuByteOrder);
+    assertEquals(mem.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test
@@ -255,7 +255,7 @@ public class MemoryTest {
     long[] arr = new long[n];
     for (int i = 0; i < n; i++) { arr[i] = i; }
     Memory mem = Memory.wrap(arr);
-    Memory reg = mem.region(n2 * 8, n2 * 8, Util.nonNativeOrder); //top half
+    Memory reg = mem.region(n2 * 8, n2 * 8, BaseState.nonNativeCpuByteOrder); //top half
     for (int i = 0; i < n2; i++) {
       long v = Long.reverseBytes(reg.getLong(i * 8));
       long e = i + n2;
@@ -295,7 +295,7 @@ public class MemoryTest {
       //println("" + wmem.getLong(i * 8));
     }
     //println("");
-    WritableMemory reg = wmem.writableRegion(n2 * 8, n2 * 8, Util.nonNativeOrder);
+    WritableMemory reg = wmem.writableRegion(n2 * 8, n2 * 8, BaseState.nonNativeCpuByteOrder);
     for (int i = 0; i < n2; i++) { reg.putLong(i * 8, i); }
     for (int i = 0; i < n; i++) {
       long v = wmem.getLong(i * 8);

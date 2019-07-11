@@ -227,7 +227,7 @@ public class WritableBufferImplTest {
     try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory wmem = wrh.get();
       WritableBuffer wbuf = wmem.asWritableBuffer();
-      wbuf.writableRegion(1, 64, wbuf.getByteOrder()); //wrong!
+      wbuf.writableRegion(1, 64, wbuf.getTypeByteOrder()); //wrong!
     }
   }
 
@@ -549,13 +549,13 @@ public class WritableBufferImplTest {
     ByteBuffer bb = ByteBuffer.allocate(64);
     WritableBuffer wbuf = WritableBuffer.wrap(bb);
     @SuppressWarnings("unused")
-    WritableBuffer wreg = wbuf.writableRegion(0, 1, wbuf.getByteOrder());
+    WritableBuffer wreg = wbuf.writableRegion(0, 1, wbuf.getTypeByteOrder());
 
     try {
       Buffer buf = Buffer.wrap(bb);
       wbuf = (WritableBuffer) buf;
       @SuppressWarnings("unused")
-      WritableBuffer wreg2 = wbuf.writableRegion(0, 1, wbuf.getByteOrder());
+      WritableBuffer wreg2 = wbuf.writableRegion(0, 1, wbuf.getTypeByteOrder());
       Assert.fail();
     } catch (ReadOnlyException expected) {
       // ignore
@@ -566,7 +566,7 @@ public class WritableBufferImplTest {
   public void checkZeroBuffer() {
     WritableMemory wmem = WritableMemory.allocate(8);
     WritableBuffer wbuf = wmem.asWritableBuffer();
-    WritableBuffer reg = wbuf.writableRegion(0, 0, wbuf.getByteOrder());
+    WritableBuffer reg = wbuf.writableRegion(0, 0, wbuf.getTypeByteOrder());
     assertEquals(reg.getCapacity(), 0);
   }
 
@@ -574,7 +574,7 @@ public class WritableBufferImplTest {
   public void checkDuplicateNonNative() {
     WritableMemory wmem = WritableMemory.allocate(64);
     wmem.putShort(0, (short) 1);
-    Buffer buf = wmem.asWritableBuffer().duplicate(Util.nonNativeOrder);
+    Buffer buf = wmem.asWritableBuffer().duplicate(BaseState.nonNativeCpuByteOrder);
     assertEquals(buf.getShort(0), 256);
   }
 

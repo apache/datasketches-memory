@@ -36,15 +36,15 @@ public class WritableMemoryTest {
   public void wrapBigEndian() {
     ByteBuffer bb = ByteBuffer.allocate(64); //big endian
     WritableMemory wmem = WritableMemory.wrap(bb);
-    assertEquals(wmem.getByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(wmem.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test
   public void wrapBigEndian2() {
     ByteBuffer bb = ByteBuffer.allocate(64);
     WritableBuffer wbuf = WritableBuffer.wrap(bb);
-    assertFalse(wbuf.isNativeOrder());
-    assertEquals(wbuf.getByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertFalse(wbuf.getTypeByteOrder() == BaseState.nativeCpuByteOrder);
+    assertEquals(wbuf.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test
@@ -58,9 +58,9 @@ public class WritableMemoryTest {
   @Test
   public void allocateWithByteOrder() {
     WritableMemory wmem = WritableMemory.allocate(64, ByteOrder.BIG_ENDIAN);
-    assertEquals(wmem.getByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(wmem.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
     wmem = WritableMemory.allocate(64, ByteOrder.LITTLE_ENDIAN);
-    assertEquals(wmem.getByteOrder(), ByteOrder.LITTLE_ENDIAN);
+    assertEquals(wmem.getTypeByteOrder(), ByteOrder.LITTLE_ENDIAN);
   }
 
   @Test
@@ -165,11 +165,13 @@ public class WritableMemoryTest {
   @Test
   public void checkWrapWithBO() {
     WritableMemory wmem = WritableMemory.wrap(new byte[0], ByteOrder.BIG_ENDIAN);
-    assertTrue(wmem.isNativeOrder()); //for ZeroSizeMemory
-    println("" + wmem.isNativeOrder());
+    boolean nativeBO = wmem.getTypeByteOrder() == BaseState.nativeCpuByteOrder;
+    assertTrue(nativeBO); //remains true for ZeroSizeMemory
+    println("" + nativeBO);
     wmem = WritableMemory.wrap(new byte[8], ByteOrder.BIG_ENDIAN);
-    assertFalse(wmem.isNativeOrder());
-    println("" + wmem.isNativeOrder());
+    nativeBO = wmem.getTypeByteOrder() == BaseState.nativeCpuByteOrder;
+    assertFalse(nativeBO);
+    println("" + nativeBO);
   }
 
   @Test

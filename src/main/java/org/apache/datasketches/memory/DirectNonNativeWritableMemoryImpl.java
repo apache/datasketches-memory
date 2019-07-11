@@ -52,7 +52,7 @@ final class DirectNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImp
   BaseWritableMemoryImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
       final boolean readOnly, final ByteOrder byteOrder) {
     final int type = typeId | REGION | (readOnly ? READONLY : 0);
-    return Util.isNativeOrder(byteOrder)
+    return isNativeCpuByteOrder(byteOrder)
         ? new DirectWritableMemoryImpl(
             nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes,
             type, valid, memReqSvr)
@@ -64,7 +64,7 @@ final class DirectNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImp
   @Override
   BaseWritableBufferImpl toWritableBuffer(final boolean readOnly, final ByteOrder byteOrder) {
     final int type = typeId | (readOnly ? READONLY : 0);
-    return Util.isNativeOrder(byteOrder)
+    return isNativeCpuByteOrder(byteOrder)
         ? new DirectWritableBufferImpl(
             nativeBaseOffset, getRegionOffset(), getCapacity(),
             type, valid, memReqSvr, this)

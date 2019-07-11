@@ -147,12 +147,6 @@ public class UtilTest {
     }
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
-  public void checkByteOrderNull() {
-    Util.isNativeOrder(null);
-    fail();
-  }
-
   @Test
   public void printlnTest() {
     println("PRINTING: "+this.getClass().getName());

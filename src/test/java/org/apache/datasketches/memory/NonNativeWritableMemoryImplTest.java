@@ -203,7 +203,7 @@ public class NonNativeWritableMemoryImplTest {
   @Test
   public void checkRegion() {
     WritableMemory wreg = wmem.writableRegion(0, wmem.getCapacity());
-    assertEquals(wreg.getByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(wreg.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test
@@ -211,7 +211,7 @@ public class NonNativeWritableMemoryImplTest {
     byte[] bArr1 = new byte[0];
     WritableMemory wmem1 = WritableMemory.wrap(bArr1, ByteOrder.BIG_ENDIAN);
     Memory reg = wmem1.region(0, wmem1.getCapacity());
-    assertEquals(reg.getByteOrder(), ByteOrder.LITTLE_ENDIAN);
+    assertEquals(reg.getTypeByteOrder(), ByteOrder.LITTLE_ENDIAN);
   }
 
 }

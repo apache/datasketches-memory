@@ -21,18 +21,12 @@ package org.apache.datasketches.memory;
 
 import static org.apache.datasketches.memory.UnsafeUtil.checkBounds;
 
-import java.nio.ByteOrder;
 import java.util.Random;
 
 /**
  * @author Lee Rhodes
  */
 public final class Util {
-  static final ByteOrder nativeOrder = ByteOrder.nativeOrder();
-  static final ByteOrder nonNativeOrder = (nativeOrder == ByteOrder.LITTLE_ENDIAN)
-      ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
-
-
   private Util() { }
 
   /**
@@ -261,10 +255,4 @@ public final class Util {
     }
   }
 
-  static boolean isNativeOrder(final ByteOrder byteOrder) {
-    if (byteOrder == null) {
-      throw new IllegalArgumentException("ByteOrder parameter cannot be null.");
-    }
-    return (nativeOrder == byteOrder);
-  }
 }

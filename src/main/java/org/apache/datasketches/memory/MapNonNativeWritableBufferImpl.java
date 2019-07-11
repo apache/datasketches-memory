@@ -50,7 +50,7 @@ final class MapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   BaseWritableBufferImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
       final boolean readOnly, final ByteOrder byteOrder) {
     final int type = REGION | (readOnly ? READONLY : 0);
-    return Util.isNativeOrder(byteOrder)
+    return isNativeCpuByteOrder(byteOrder)
         ? new MapWritableBufferImpl(
             nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes,
             type, valid, originMemory)
@@ -62,7 +62,7 @@ final class MapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   @Override
   BaseWritableBufferImpl toDuplicate(final boolean readOnly, final ByteOrder byteOrder) {
     final int type = DUPLICATE | (readOnly ? READONLY : 0);
-    return Util.isNativeOrder(byteOrder)
+    return isNativeCpuByteOrder(byteOrder)
         ? new MapWritableBufferImpl(
             nativeBaseOffset, getRegionOffset(), getCapacity(),
             type, valid, originMemory)

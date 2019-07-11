@@ -36,6 +36,11 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 abstract class BaseState {
 
+  //Byte Order related
+  static final ByteOrder nativeCpuByteOrder = ByteOrder.nativeOrder();
+  static final ByteOrder nonNativeCpuByteOrder = (nativeCpuByteOrder == ByteOrder.LITTLE_ENDIAN)
+      ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
+
   //Monitoring
   static final AtomicLong currentDirectMemoryAllocations_ = new AtomicLong();
   static final AtomicLong currentDirectMemoryAllocated_ = new AtomicLong();
@@ -92,6 +97,49 @@ abstract class BaseState {
         : unsafe.arrayBaseOffset(unsafeObj.getClass()));
   }
 
+  //Byte Order Related
+
+  /**
+   * Returns the CPU Byte Order
+   * @return the CPU Byte Order
+   */
+  public static final ByteOrder getCpuByteOrder() {
+    return nativeCpuByteOrder;
+  }
+
+  /**
+   * Gets the current Type ByteOrder.
+   * This may be different from the ByteOrder of the backing resource and of the CPU Byte Order.
+   * @return the current Type ByteOrder.
+   */
+  public final ByteOrder getTypeByteOrder() {
+    return isNonNativeType() ? BaseState.nonNativeCpuByteOrder : BaseState.nativeCpuByteOrder;
+  }
+
+  /**
+   * Returns true if the given byteOrder is the same as the native CPU byte order.
+   * @param byteOrder the given byte order
+   * @return true if the given byteOrder is the same as the native CPU byte order.
+   */
+  static boolean isNativeCpuByteOrder(final ByteOrder byteOrder) {
+    if (byteOrder == null) {
+      throw new IllegalArgumentException("ByteOrder parameter cannot be null.");
+    }
+    return (BaseState.nativeCpuByteOrder == byteOrder);
+  }
+
+  /**
+   * Returns true if the ByteOrder of the CPU is the same as the ByteOrder of the
+   * current Buffer or Memory and the same ByteOrder as the given byteOrder.
+   * @param byteOrder the given ByteOrder
+   * @return true if the ByteOrder of the CPU is the same as the ByteOrder of the
+   * current Buffer or Memory and the same ByteOrder as the given byteOrder.
+   */
+  public final boolean isByteOrderCompatible(final ByteOrder byteOrder) {
+    final ByteOrder typeBO = getTypeByteOrder();
+    return ((typeBO == getCpuByteOrder()) && (typeBO == byteOrder));
+  }
+
   /**
    * Returns true if the given object is an instance of this class and has equal data contents.
    * @param that the given object
@@ -130,15 +178,6 @@ abstract class BaseState {
   //Overridden by ByteBuffer Leafs
   public ByteBuffer getByteBuffer() {
     return null;
-  }
-
-  /**
-   * Gets the current ByteOrder.
-   * This may be different from the ByteOrder of the backing resource.
-   * @return the current ByteOrder.
-   */
-  public final ByteOrder getByteOrder() {
-    return isNonNativeType() ? Util.nonNativeOrder : Util.nativeOrder;
   }
 
   /**
@@ -277,15 +316,6 @@ abstract class BaseState {
    */
   public final boolean isDirect() {
     return getUnsafeObject() == null;
-  }
-
-  /**
-   * Returns true if the current byte order is native order.
-   * @return true if the current byte order is native order.
-   */
-  public final boolean isNativeOrder() {
-    assertValid();
-    return Util.isNativeOrder(getByteOrder());
   }
 
   /**
@@ -508,7 +538,8 @@ abstract class BaseState {
     sb.append("MemReq, hashCode    : ").append(memReqStr).append(LS);
     sb.append("Valid               : ").append(state.isValid()).append(LS);
     sb.append("Read Only           : ").append(state.isReadOnly()).append(LS);
-    sb.append("Byte Order          : ").append(state.getByteOrder().toString()).append(LS);
+    sb.append("Type Byte Order     : ").append(state.getTypeByteOrder().toString()).append(LS);
+    sb.append("CPU Byte Order      : ").append(nativeCpuByteOrder.toString()).append(LS);
     sb.append("JDK Major Version   : ").append(UnsafeUtil.JDK).append(LS);
     //Data detail
     sb.append("Data, littleEndian  :  0  1  2  3  4  5  6  7");

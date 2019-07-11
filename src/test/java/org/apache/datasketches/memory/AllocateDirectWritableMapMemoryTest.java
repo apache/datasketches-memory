@@ -117,7 +117,7 @@ public class AllocateDirectWritableMapMemoryTest {
     file.deleteOnExit();  //comment out if you want to examine the file.
 
     final long bytes = 8;
-    try (WritableMapHandle h = WritableMemory.map(file, 0L, bytes, Util.nonNativeOrder)) {
+    try (WritableMapHandle h = WritableMemory.map(file, 0L, bytes, BaseState.nonNativeCpuByteOrder)) {
       WritableMemory wmem = h.get();
       wmem.putChar(0, (char) 1);
       assertEquals(wmem.getByte(1), (byte) 1);
@@ -145,7 +145,7 @@ public class AllocateDirectWritableMapMemoryTest {
   public void checkOverLength()  {
     File file =
         new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
-    try (WritableMapHandle rh = WritableMemory.map(file, 0, 1 << 20, Util.nativeOrder)) {
+    try (WritableMapHandle rh = WritableMemory.map(file, 0, 1 << 20, ByteOrder.nativeOrder())) {
       //
     } catch (IOException e) {
       throw new RuntimeException(e);

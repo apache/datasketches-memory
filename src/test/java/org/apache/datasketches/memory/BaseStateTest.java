@@ -23,6 +23,9 @@ import static org.apache.datasketches.memory.UnsafeUtil.ARRAY_DOUBLE_INDEX_SCALE
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
+import java.nio.ByteOrder;
 
 import org.testng.annotations.Test;
 
@@ -81,6 +84,18 @@ public class BaseStateTest {
   public void checkGetNativeBaseOffset_Heap() {
     WritableMemory wmem = WritableMemory.allocate(8);
     assertEquals(wmem.getNativeBaseOffset(), 0L);
+  }
+
+  @Test
+  public void checkIsByteOrderCompatible() {
+    WritableMemory wmem = WritableMemory.allocate(8);
+    assertTrue(wmem.isByteOrderCompatible(ByteOrder.nativeOrder()));
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void checkByteOrderNull() {
+    BaseState.isNativeCpuByteOrder(null);
+    fail();
   }
 
   @Test

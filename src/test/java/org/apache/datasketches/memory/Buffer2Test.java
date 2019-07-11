@@ -343,7 +343,7 @@ public class Buffer2Test {
     for (int i = 0; i < n; i++) { arr[i] = i; }
     Memory mem = Memory.wrap(arr);
     Buffer buf = mem.asBuffer();
-    Buffer reg = buf.region(n2 * 8, n2 * 8, buf.getByteOrder()); //top half
+    Buffer reg = buf.region(n2 * 8, n2 * 8, buf.getTypeByteOrder()); //top half
     for (int i = 0; i < n2; i++) {
       long v = reg.getLong(i * 8);
       long e = i + n2;

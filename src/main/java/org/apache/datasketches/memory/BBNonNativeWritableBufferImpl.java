@@ -54,7 +54,7 @@ final class BBNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   BaseWritableBufferImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
       final boolean readOnly, final ByteOrder byteOrder) {
     final int type = typeId | REGION | (readOnly ? READONLY : 0);
-    return Util.isNativeOrder(byteOrder)
+    return isNativeCpuByteOrder(byteOrder)
         ? new BBWritableBufferImpl(
           unsafeObj, nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes,
           type, byteBuf, originMemory)
@@ -66,7 +66,7 @@ final class BBNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   @Override
   BaseWritableBufferImpl toDuplicate(final boolean readOnly, final ByteOrder byteOrder) {
     final int type = typeId | DUPLICATE | (readOnly ? READONLY : 0);
-    return Util.isNativeOrder(byteOrder)
+    return isNativeCpuByteOrder(byteOrder)
         ? new BBWritableBufferImpl(
             unsafeObj, nativeBaseOffset, getRegionOffset(), getCapacity(),
             type, byteBuf, originMemory)

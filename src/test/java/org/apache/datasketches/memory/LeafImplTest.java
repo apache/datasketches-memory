@@ -58,7 +58,7 @@ public class LeafImplTest {
     assertEquals(mem.asWritableBuffer(BE).getShort(0), 256);
 
     assertTrue(mem.getByteBuffer() == null);
-    assertTrue(mem.getByteOrder() == Util.nativeOrder);
+    assertTrue(mem.getTypeByteOrder() == BaseState.nativeCpuByteOrder);
     assertTrue(mem.getMemoryRequestServer() != null);
     assertTrue(mem.isDirect());
     assertTrue(mem.getUnsafeObject() == null);
@@ -72,13 +72,13 @@ public class LeafImplTest {
     assertEquals(buf.writableDuplicate(BE).getShort(0), 256);
 
     assertTrue(buf.getByteBuffer() == null);
-    assertTrue(buf.getByteOrder() == Util.nativeOrder);
+    assertTrue(buf.getTypeByteOrder() == BaseState.nativeCpuByteOrder);
     assertTrue(buf.getMemoryRequestServer() != null);
     assertTrue(buf.isDirect());
     assertTrue(buf.getUnsafeObject() == null);
     assertTrue(buf.isValid() == true);
 
-    WritableMemory nnMem = mem.writableRegion(off, cap, Util.nonNativeOrder);
+    WritableMemory nnMem = mem.writableRegion(off, cap, BaseState.nonNativeCpuByteOrder);
 
     assertEquals(nnMem.writableRegion(off, cap, LE).getShort(0), 1);
     assertEquals(nnMem.writableRegion(off, cap, BE).getShort(0), 256);
@@ -86,13 +86,13 @@ public class LeafImplTest {
     assertEquals(nnMem.asWritableBuffer(BE).getShort(0), 256);
 
     assertTrue(nnMem.getByteBuffer() == null);
-    assertTrue(nnMem.getByteOrder() == Util.nonNativeOrder);
+    assertTrue(nnMem.getTypeByteOrder() == BaseState.nonNativeCpuByteOrder);
     assertTrue(nnMem.getMemoryRequestServer() != null);
     assertTrue(nnMem.isDirect());
     assertTrue(nnMem.getUnsafeObject() == null);
     assertTrue(nnMem.isValid() == true);
 
-    WritableBuffer nnBuf = mem.asWritableBuffer(Util.nonNativeOrder);
+    WritableBuffer nnBuf = mem.asWritableBuffer(BaseState.nonNativeCpuByteOrder);
 
     assertEquals(nnBuf.writableRegion(off, cap, LE).getShort(0), 1);
     assertEquals(nnBuf.writableRegion(off, cap, BE).getShort(0), 256);
@@ -100,7 +100,7 @@ public class LeafImplTest {
     assertEquals(nnBuf.writableDuplicate(BE).getShort(0), 256);
 
     assertTrue(nnBuf.getByteBuffer() == null);
-    assertTrue(nnBuf.getByteOrder() == Util.nonNativeOrder);
+    assertTrue(nnBuf.getTypeByteOrder() == BaseState.nonNativeCpuByteOrder);
     assertTrue(nnBuf.getMemoryRequestServer() != null);
     assertTrue(nnBuf.isDirect());
     assertTrue(nnBuf.getUnsafeObject() == null);
@@ -124,7 +124,7 @@ public class LeafImplTest {
     assertTrue(file.isFile());
     file.deleteOnExit();  //comment out if you want to examine the file.
 
-    try (WritableMapHandle wmh = WritableMemory.map(file, off, cap, Util.nativeOrder)) {
+    try (WritableMapHandle wmh = WritableMemory.map(file, off, cap, BaseState.nativeCpuByteOrder)) {
       WritableMemory mem = wmh.get();
       mem.putShort(0, (short) 1);
       assertEquals(mem.getByte(0), (byte) 1);
@@ -139,7 +139,7 @@ public class LeafImplTest {
     assertEquals(mem.asWritableBuffer(BE).getShort(0), 256);
 
     assertTrue(mem.getByteBuffer() == null);
-    assertTrue(mem.getByteOrder() == Util.nativeOrder);
+    assertTrue(mem.getTypeByteOrder() == BaseState.nativeCpuByteOrder);
     assertTrue(mem.getMemoryRequestServer() == null);
     assertTrue(mem.isDirect());
     assertTrue(mem.getUnsafeObject() == null);
@@ -153,13 +153,13 @@ public class LeafImplTest {
     assertEquals(buf.writableDuplicate(BE).getShort(0), 256);
 
     assertTrue(buf.getByteBuffer() == null);
-    assertTrue(buf.getByteOrder() == Util.nativeOrder);
+    assertTrue(buf.getTypeByteOrder() == BaseState.nativeCpuByteOrder);
     assertTrue(buf.getMemoryRequestServer() == null);
     assertTrue(buf.isDirect());
     assertTrue(buf.getUnsafeObject() == null);
     assertTrue(buf.isValid() == true);
 
-    WritableMemory nnMem = mem.writableRegion(off, cap, Util.nonNativeOrder);
+    WritableMemory nnMem = mem.writableRegion(off, cap, BaseState.nonNativeCpuByteOrder);
 
     assertEquals(nnMem.writableRegion(off, cap, LE).getShort(0), 1);
     assertEquals(nnMem.writableRegion(off, cap, BE).getShort(0), 256);
@@ -167,13 +167,13 @@ public class LeafImplTest {
     assertEquals(nnMem.asWritableBuffer(BE).getShort(0), 256);
 
     assertTrue(nnMem.getByteBuffer() == null);
-    assertTrue(nnMem.getByteOrder() == Util.nonNativeOrder);
+    assertTrue(nnMem.getTypeByteOrder() == BaseState.nonNativeCpuByteOrder);
     assertTrue(nnMem.getMemoryRequestServer() == null);
     assertTrue(nnMem.isDirect());
     assertTrue(nnMem.getUnsafeObject() == null);
     assertTrue(nnMem.isValid() == true);
 
-    WritableBuffer nnBuf = mem.asWritableBuffer(Util.nonNativeOrder);
+    WritableBuffer nnBuf = mem.asWritableBuffer(BaseState.nonNativeCpuByteOrder);
 
     assertEquals(nnBuf.writableRegion(off, cap, LE).getShort(0), 1);
     assertEquals(nnBuf.writableRegion(off, cap, BE).getShort(0), 256);
@@ -181,7 +181,7 @@ public class LeafImplTest {
     assertEquals(nnBuf.writableDuplicate(BE).getShort(0), 256);
 
     assertTrue(nnBuf.getByteBuffer() == null);
-    assertTrue(nnBuf.getByteOrder() == Util.nonNativeOrder);
+    assertTrue(nnBuf.getTypeByteOrder() == BaseState.nonNativeCpuByteOrder);
     assertTrue(nnBuf.getMemoryRequestServer() == null);
     assertTrue(nnBuf.isDirect());
     assertTrue(nnBuf.getUnsafeObject() == null);
@@ -212,7 +212,7 @@ public class LeafImplTest {
     assertEquals(mem.asWritableBuffer(BE).getShort(0), 256);
 
     assertTrue(mem.getByteBuffer() != null);
-    assertTrue(mem.getByteOrder() == Util.nativeOrder);
+    assertTrue(mem.getTypeByteOrder() == BaseState.nativeCpuByteOrder);
     assertTrue(mem.getMemoryRequestServer() == null);
     Object obj = mem.getUnsafeObject();
     if (direct) {
@@ -232,7 +232,7 @@ public class LeafImplTest {
     assertEquals(buf.writableDuplicate(BE).getShort(0), 256);
 
     assertTrue(buf.getByteBuffer() != null);
-    assertTrue(buf.getByteOrder() == Util.nativeOrder);
+    assertTrue(buf.getTypeByteOrder() == BaseState.nativeCpuByteOrder);
     assertTrue(buf.getMemoryRequestServer() == null);
     obj = buf.getUnsafeObject();
     if (direct) {
@@ -244,7 +244,7 @@ public class LeafImplTest {
     }
     assertTrue(buf.isValid() == true);
 
-    WritableMemory nnMem = mem.writableRegion(off, cap, Util.nonNativeOrder);
+    WritableMemory nnMem = mem.writableRegion(off, cap, BaseState.nonNativeCpuByteOrder);
 
     assertEquals(nnMem.writableRegion(off, cap, LE).getShort(0), 1);
     assertEquals(nnMem.writableRegion(off, cap, BE).getShort(0), 256);
@@ -252,7 +252,7 @@ public class LeafImplTest {
     assertEquals(nnMem.asWritableBuffer(BE).getShort(0), 256);
 
     assertTrue(nnMem.getByteBuffer() != null);
-    assertTrue(nnMem.getByteOrder() == Util.nonNativeOrder);
+    assertTrue(nnMem.getTypeByteOrder() == BaseState.nonNativeCpuByteOrder);
     assertTrue(nnMem.getMemoryRequestServer() == null);
     obj = nnMem.getUnsafeObject();
     if (direct) {
@@ -264,7 +264,7 @@ public class LeafImplTest {
     }
     assertTrue(nnMem.isValid() == true);
 
-    WritableBuffer nnBuf = mem.asWritableBuffer(Util.nonNativeOrder);
+    WritableBuffer nnBuf = mem.asWritableBuffer(BaseState.nonNativeCpuByteOrder);
 
     assertEquals(nnBuf.writableRegion(off, cap, LE).getShort(0), 1);
     assertEquals(nnBuf.writableRegion(off, cap, BE).getShort(0), 256);
@@ -272,7 +272,7 @@ public class LeafImplTest {
     assertEquals(nnBuf.writableDuplicate(BE).getShort(0), 256);
 
     assertTrue(nnBuf.getByteBuffer() != null);
-    assertTrue(nnBuf.getByteOrder() == Util.nonNativeOrder);
+    assertTrue(nnBuf.getTypeByteOrder() == BaseState.nonNativeCpuByteOrder);
     assertTrue(nnBuf.getMemoryRequestServer() == null);
     obj = nnBuf.getUnsafeObject();
     if (direct) {
@@ -301,7 +301,7 @@ public class LeafImplTest {
     assertEquals(mem.asWritableBuffer(BE).getShort(0), 256);
 
     assertTrue(mem.getByteBuffer() == null);
-    assertTrue(mem.getByteOrder() == Util.nativeOrder);
+    assertTrue(mem.getTypeByteOrder() == BaseState.nativeCpuByteOrder);
     assertTrue(mem.getMemoryRequestServer() == null);
     assertFalse(mem.isDirect());
     assertTrue(mem.getUnsafeObject() != null);
@@ -315,13 +315,13 @@ public class LeafImplTest {
     assertEquals(buf.writableDuplicate(BE).getShort(0), 256);
 
     assertTrue(buf.getByteBuffer() == null);
-    assertTrue(buf.getByteOrder() == Util.nativeOrder);
+    assertTrue(buf.getTypeByteOrder() == BaseState.nativeCpuByteOrder);
     assertTrue(buf.getMemoryRequestServer() == null);
     assertFalse(buf.isDirect());
     assertTrue(buf.getUnsafeObject() != null);
     assertTrue(buf.isValid() == true);
 
-    WritableMemory nnMem = mem.writableRegion(off, cap, Util.nonNativeOrder);
+    WritableMemory nnMem = mem.writableRegion(off, cap, BaseState.nonNativeCpuByteOrder);
 
     assertEquals(nnMem.writableRegion(off, cap, LE).getShort(0), 1);
     assertEquals(nnMem.writableRegion(off, cap, BE).getShort(0), 256);
@@ -329,13 +329,13 @@ public class LeafImplTest {
     assertEquals(nnMem.asWritableBuffer(BE).getShort(0), 256);
 
     assertTrue(nnMem.getByteBuffer() == null);
-    assertTrue(nnMem.getByteOrder() == Util.nonNativeOrder);
+    assertTrue(nnMem.getTypeByteOrder() == BaseState.nonNativeCpuByteOrder);
     assertTrue(nnMem.getMemoryRequestServer() == null);
     assertFalse(nnMem.isDirect());
     assertTrue(nnMem.getUnsafeObject() != null);
     assertTrue(nnMem.isValid() == true);
 
-    WritableBuffer nnBuf = mem.asWritableBuffer(Util.nonNativeOrder);
+    WritableBuffer nnBuf = mem.asWritableBuffer(BaseState.nonNativeCpuByteOrder);
 
     assertEquals(nnBuf.writableRegion(off, cap, LE).getShort(0), 1);
     assertEquals(nnBuf.writableRegion(off, cap, BE).getShort(0), 256);
@@ -343,7 +343,7 @@ public class LeafImplTest {
     assertEquals(nnBuf.writableDuplicate(BE).getShort(0), 256);
 
     assertTrue(nnBuf.getByteBuffer() == null);
-    assertTrue(nnBuf.getByteOrder() == Util.nonNativeOrder);
+    assertTrue(nnBuf.getTypeByteOrder() == BaseState.nonNativeCpuByteOrder);
     assertTrue(nnBuf.getMemoryRequestServer() == null);
     assertFalse(nnBuf.isDirect());
     assertTrue(nnBuf.getUnsafeObject() != null);

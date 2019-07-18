@@ -334,6 +334,15 @@ cd $LocalSvnBasePath
 svn add --force .
 svn ci -m "Deploy $FileVersion to DIST"
 
+TMP=$(svn status)
+if [[ -n $TMP ]];
+then
+  echo "svn status:  $TMP"
+  echo "ERROR!!! Your svn status is not clean!"
+  echo
+  exit 1
+fi
+
 echo
 echo "Is the dist directory structure and content OK? [y|N]"
 read confirm

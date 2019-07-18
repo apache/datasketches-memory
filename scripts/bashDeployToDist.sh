@@ -86,9 +86,10 @@ echo "5. Locally checkout the branch or tag that you want to deploy."
 echo
 echo "Proceed? [y|N]"; read confirm; if [[ $confirm != "y" ]]; then echo "Please rerun this script when ready."; exit; fi
 
-if [[ -n $(git status --porcelain) ]];
+TMP=$(git status --porcelain)
+if [[ -n $TMP ]];
 then
-  echo
+  echo "git status --porcelain:  $TMP"
   echo "ERROR!!! Your GitHub repo is not clean!"
   echo
   exit 1

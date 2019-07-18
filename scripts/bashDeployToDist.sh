@@ -243,7 +243,7 @@ cd $LocalSvnBasePath
 svn co $RemoteSvnBasePath .
 cd $BASE
 
-if [ -d "$LocalFilesPath" && ! $Snapshot ]; 
+if [ -d "$LocalFilesPath" ] && [ ! $Snapshot ]; 
 then
   echo
   echo "ERROR!!! $LocalFilesPath already exists."

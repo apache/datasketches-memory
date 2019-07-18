@@ -29,7 +29,7 @@ under the License.
     </parent>
 
     <groupId>org.apache.datasketches</groupId>
-    <artifactId>memory</artifactId>
+    <artifactId>datasketches-memory</artifactId>
 
     <version>0.12.3-incubating-SNAPSHOT</version>
     
@@ -114,33 +114,24 @@ under the License.
         <testng.version>6.14.3</testng.version>
         <slf4j-api.version>1.7.25</slf4j-api.version>
         <protobuf-java.version>3.6.0</protobuf-java.version> <!-- Used for UTF8 testing -->
+        <zero-allocation-hashing.version>0.8</zero-allocation-hashing.version>
 
         <!-- org.codehaus.plexus used for strict profile testing-->
         <plexus-compiler-javac-errorprone.version>2.8.5</plexus-compiler-javac-errorprone.version>
         
         <!--  Maven Plugins -->
         <maven-jar-plugin.version>3.1.2</maven-jar-plugin.version>
-       
-        
-        <!-- External Maven Plugins -->
-        <!-- org.eclipse.m2e Plugins -->
-        <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
-        
-        <!-- org.codehaus.mojo Maven Plugins -->
-        <!-- <exec-maven-plugin.version>1.6.0</exec-maven-plugin.version> -->
-        <!-- <license-maven-plugin.version>1.19</license-maven-plugin.version> -->
 
         <!-- org.jacoco Maven Plugins -->
         <jacoco-maven-plugin.version>0.8.4</jacoco-maven-plugin.version>
-
-        <!-- org.sonatype Maven Plugins -->
-        <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
 
         <!-- org.eluder Maven Plugins -->
         <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
         
         <!-- other -->
         <reproducible-build-maven-plugin.version>0.4</reproducible-build-maven-plugin.version>
+        <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
+        <maven-remote-resources-plugin.version>[1.0,)</maven-remote-resources-plugin.version>
     </properties>
 
     <repositories>
@@ -195,38 +186,14 @@ under the License.
             <!-- Used for xxHash testing -->
             <groupId>net.openhft</groupId>
             <artifactId>zero-allocation-hashing</artifactId>
-            <version>0.8</version>
+            <version>${zero-allocation-hashing.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!-- Create a source-release artifact that contains the fully buildable
-            project directory source structure. This is the artifact which is the
-            official subject of any release vote. -->
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-assembly-plugin</artifactId>
-              <!-- version in parent -->
-              <executions>
-                <execution>
-                  <id>source-release-assembly</id>
-                  <phase>package</phase>
-                  <goals>
-                    <goal>single</goal>
-                  </goals>
-                  <configuration>
-                    <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
-                    <descriptors>
-                      <descriptor>assembly.xml</descriptor>
-                    </descriptors>
-                    <tarLongFileMode>gnu</tarLongFileMode>
-                  </configuration>
-                </execution>
-              </executions>
-            </plugin>
-            <!-- We want to deploy the artifact to a staging location for perusal -->
+            <!-- We want to deploy the artifacts to a staging location for perusal -->
             <!-- exact duplicate of Parent -->
             <plugin>
               <inherited>true</inherited>
@@ -322,6 +289,7 @@ under the License.
                   <!-- ignore licence files-->
                   <exclude>LICENSE</exclude>
                   <exclude>NOTICE</exclude>
+                  <exclude>DISCLAIMER</exclude>
                 </excludes>
               </configuration>
             </plugin>
@@ -395,43 +363,6 @@ under the License.
                 </execution>
               </executions>
             </plugin>
-            <!-- calculate checksums of source release for Apache dist area -->
-            <plugin>
-              <groupId>net.nicoulaj.maven.plugins</groupId>
-              <artifactId>checksum-maven-plugin</artifactId>
-              <version>1.7</version>
-              <executions>
-                <execution>
-                  <id>source-release-checksum</id>
-                  <goals>
-                    <goal>files</goal>
-                  </goals>
-                </execution>
-              </executions>
-              <configuration>
-                <algorithms>
-                  <algorithm>SHA-512</algorithm>
-                </algorithms>
-                <csvSummary>false</csvSummary>
-                <fileSets>
-                  <fileSet>
-                    <directory>${project.build.directory}</directory> <!-- /target -->
-                    <includes>
-                      <include>${project.artifactId}-${project.version}-source-release.zip</include>
-                      <include>${project.artifactId}-${project.version}-source-release.tar*</include>
-                      <include>${project.artifactId}-${project.version}-javadoc.jar</include>
-                      <include>${project.artifactId}-${project.version}-source.zip</include>
-                      <include>${project.artifactId}-${project.version}-sources.jar</include>
-                      <include>${project.artifactId}-${project.version}-test-sources.jar</include>
-                      <include>${project.artifactId}-${project.version}-tests.jar</include>
-                      <include>${project.artifactId}-${project.version}.jar</include>
-                      <include>${project.artifactId}-${project.version}.pom</include>
-                    </includes>
-                  </fileSet>
-                </fileSets>
-                <failIfNoFiles>false</failIfNoFiles><!-- usually, no file to do checksum: don't consider error -->
-              </configuration>
-            </plugin>
         </plugins>
     </build>
 
@@ -455,7 +386,7 @@ under the License.
                     <plugin>
                       <groupId>org.eclipse.m2e</groupId>
                       <artifactId>lifecycle-mapping</artifactId>
-                      <version>1.0.0</version>
+                      <version>${lifecycle-mapping.version}</version>
                       <configuration>
                         <lifecycleMappingMetadata>
                           <pluginExecutions>
@@ -463,7 +394,7 @@ under the License.
                                 <pluginExecutionFilter>
                                     <groupId>org.apache.maven.plugins</groupId>
                                     <artifactId>maven-remote-resources-plugin</artifactId>
-                                    <versionRange>[1.0,)</versionRange>
+                                    <versionRange>${maven-remote-resources-plugin.version}</versionRange>
                                     <goals>
                                         <goal>process</goal>
                                     </goals>
@@ -481,7 +412,7 @@ under the License.
                 </pluginManagement>
             </build>
         </profile>
-        
+
         <profile>
             <id>strict</id>
             <build>

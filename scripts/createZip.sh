@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -17,7 +17,22 @@
 # specific language governing permissions and limitations
 # under the License.
 
-PARAM=$1
-cd ../
-RESULT=$(mvn help:evaluate -Dexpression=$PARAM -q -DforceStdout)
-echo $RESULT
+ZipName=$1
+LocalPath=$2     # target/assy-tmp/dist/dev/incubator/datasketches/memory/<leafDir>
+
+#  what should be included is a shorter list that all possible excludes!
+cp .travis.yml $LocalPath
+cp .gitignore $LocalPath
+cp DISCLAIMER $LocalPath
+cp LICENSE $LocalPath
+cp NOTICE $LocalPath
+cp pom.xml $LocalPath
+cp README.md $LocalPath
+cp -R scripts $LocalPath
+cp -R src $LocalPath
+cp -R tools $LocalPath
+
+cd $LocalPath
+
+zip -rqmT "$ZipName" "."
+

@@ -27,7 +27,42 @@ echo "================Bash Deploy to Dist================"
 echo " This script must be run from the base directory of the project."
 echo " This script obtains the 'project.artifactId' and the 'project.version' from the \$1 and \$2 input parameters "
 echo "   For example:  $ scripts/bashDeployToDist.sh datasketches-memory 0.12.3-incubator"
-echo " Refer to the top of the 'pomDeployToDist.sh' for a description of the dist datastructure."
+echo
+echo "===========The Dist Deployment Structure==========="
+echo "The DataSketche base directories in https://dist.apache.org/repos/dist/ are:"
+echo " - dev/incubator/datasketches/"
+echo " - release/incubator/datasketches/"
+echo
+echo " Each of these two directories contain a KEYS file, which is where you must have your GPG public key stored."
+echo
+echo "After graduation the base directories will be the same but without the incubator level."
+echo
+echo "For both the dev and the release branches, the root contains sub-directories for each of "
+echo "the datasketches-X repositories as follows:"
+echo " - characterization/"
+echo " - core/"
+echo " - cpp/"
+echo " - hive/"
+echo " - memory/"
+echo " - pig/"
+echo " - postgresql/"
+echo " - vector/"
+echo
+echo "Below these sub=directories is a level of leaf directories that define a particular release or release candidate."
+echo
+echo "Finally the leaf directories contain the zip and signature files for a release or release candidate."
+echo "The full tree will look something like this example:"
+echo "  dist/"
+echo "    dev/"
+echo "      incubator/"
+echo "        datasketches/"
+echo "          KEYS"
+echo "          memory/"
+echo "            0.12.3-incubating-RC1/"
+echo "              apache-datasketches-memory-0.12.3-incubating-src.zip"
+echo "              apache-datasketches-memory-0.12.3-incubating-src.zip.asc"
+echo "              apache-datasketches-memory-0.12.3-incubating-src.zip.sha512"
+echo "          etc."
 echo
 echo "===================Check List======================"
 echo "1. Verify that you can successfully read and write to the dist directories using SVN."
@@ -45,14 +80,20 @@ echo
 echo "   'SNAPSHOT', if relevant, is always at the end of the version string and capitalized."
 echo "   Note: SNAPSHOT deployments are never relevant for the 'release' branch."
 echo
-echo "Proceed? [y|N]"
-read confirm
-if [[ $confirm != "y" ]];
+echo "4. Verify that your local GitHub repository current and the git status is clean."
+echo
+echo "5. Locally checkout the branch or tag that you want to deploy."
+echo
+echo "Proceed? [y|N]"; read confirm; if [[ $confirm != "y" ]]; then echo "Please rerun this script when ready."; exit; fi
+
+if [[ -n $(git status --porcelain) ]];
 then
-  "Please rerun this script when ready."
   echo
-  exit
+  echo "ERROR!!! Your GitHub repo is not clean!"
+  echo
+  exit 1
 fi
+
 
 TIME=$(date -u +%Y%m%d.%H%M%S)
 BASE=$(pwd)
@@ -63,7 +104,7 @@ echo
 echo "## Load GPG Agent:"
 eval $(gpg-agent --daemon) > /dev/null
 
-## Extract project.artifactId and project.version from POM:
+## Extract project.artifactId and project.version from input parameters:
 
 ProjectArtifactId=$1
 ProjectVersion=$2

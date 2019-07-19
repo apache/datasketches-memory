@@ -303,6 +303,9 @@ cd $BASE
 echo 
 echo "=================DEPLOY TO DIST===================="
 echo
+echo "Proceed? [y|N]"; read confirm; if [[ $confirm != "y" ]]; then echo "Please rerun this script when ready."; exit 1; fi
+
+echo
 cd $LocalSvnBasePath
 svn add --force .
 svn ci -m "Deploy $FileVersion to DIST"
@@ -317,7 +320,7 @@ then
 fi
 
 echo
-echo "Is the dist directory structure and content OK? [y|N]"
+echo "Is the remote dist directory structure and content OK? [y|N]"
 read confirm
 if [[ $confirm != "y" ]]; 
 then

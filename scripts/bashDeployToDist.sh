@@ -60,9 +60,9 @@ TMP=$(git status --porcelain)
 if [[ -n $TMP ]];
 then
   echo "git status --porcelain:  $TMP"
-  echo "ERROR!!! Your GitHub repo is not clean!"
+  echo "WARNING!!! Your GitHub repo is not clean!"
   echo
-  exit 1
+  # exit 1  #Don't exit for now
 fi
 
 
@@ -86,62 +86,37 @@ Tag=$2
 Release=false
 Snapshot=false
 ReleaseCandidate=false
-RCNUM=
-ReleaseType=
 FileVersion=
 LeafDir=
 
+### SNAPSHOT ?
 if [[ $Tag =~ .*-SNAPSHOT  ]]; 
 then
   echo
-  echo "This version is a SNAPSHOT. Do you still want to deploy?"
-  read confirm
-  if [[ $confirm != "y" ]]; 
-  then
-    echo "Please correct the version string and rerun this script"
-    echo
-    exit 1
-  fi
+  echo "This Tag is for a SNAPSHOT."
+  echo "Proceed? [y|N]"; read confirm; if [[ $confirm != "y" ]]; then echo "Please rerun this script when ready."; exit 1; fi
   Snapshot=true
-  ReleaseType="SNAPSHOT"
   FileVersion=${Tag%-SNAPSHOT}-$TIME # Remove SNAPSHOT, add date-time
   LeafDir=$Tag
-  #continue
-else # NOT a SNAPSHOT
-  Snapshot=false
-  echo
-  echo "Is this a Release Candidate? [y|N]"
-  read confirm
-  if [[ $confirm != "y" ]]; 
-  then # NOT ReleaseCandidate, could be Final Release
-    ReleaseCandidate=false
-    echo "Please confirm that this the Final Release of $ProjectArtifactId : $Tag ? [y|N]"
-    read confirm
-    if [[ $confirm != "y" ]];
-    then # NOT Final Release either, bail out
-      Release=false
-      echo "Please correct the input and rerun this script"
-      echo
-      exit 1
-      
-    else # Final Release
-      Release=true
-      ReleaseType="Release"
-      FileVersion="$Tag"
-      LeafDir=$Tag
-      #continue
-    fi
-  else # ReleaseCandidate
+else
+  ### RELEASE CANDIDATE ?
+  if [[ $Tag =~ .*-[rR][cC][0-9][0-9]* ]];
+  then
+    echo
+    echo "This Tag is for a Release Candidate."
+    echo "Proceed? [y|N]"; read confirm; if [[ $confirm != "y" ]]; then echo "Please rerun this script when ready."; exit 1; fi
     ReleaseCandidate=true
-    echo "What is the Release Candidate Number? NNN" 
-    read RCNUM   
-    ReleaseType="Release Candidate: RC$RCNUM"
+    RCSubStr=$(expr "$Tag" : '.*\(-[rR][cC][0-9]*\)')
+    FileVersion=${Tag%$RCSubStr}
+    LeafDir="$Tag"
+  else
+    echo "Please confirm that this the Final Release of $ProjectArtifactId : $Tag"
+    echo "Proceed? [y|N]"; read confirm; if [[ $confirm != "y" ]]; then echo "Please rerun this script when ready."; exit 1; fi
+    Release=true
     FileVersion="$Tag"
-    LeafDir="$Tag-RC$RCNUM"
-    #continue
+    LeafDir=$Tag
   fi
 fi
-
 
 
 # extract the SubDir name, e.g., "memory" from the artifactId
@@ -151,7 +126,7 @@ SubDir=$(expr "$ProjectArtifactId" : 'datasketches-\([a-z]*\)')
 if [[ $Tag =~ .*-incubating.* ]]
 then
   Incubating=true
-  Incubator="incubator/"
+  Incubator="incubator/" #part of file path
 else
   Incubating=false
   Incubator=""
@@ -185,8 +160,7 @@ ZipName=apache-${ProjectArtifactId}-${FileVersion}-src.zip
 echo
 echo "===========SUMMARY OF INPUT PARAMETERS============="
 echo "ProjectArtifactId    : $ProjectArtifactId"
-echo "Project Version      : $Tag"
-echo "Release Type         : $ReleaseType"
+echo "Tag                  : $Tag"
 echo "Incubating           : $Incubating"
 echo "File Version String  : $FileVersion"
 echo "Target ZIP File Name : $ZipName"
@@ -198,14 +172,8 @@ echo "RemoteSvnBasePath    : $RemoteSvnBasePath"
 echo "LocalFilesPath       : $LocalFilesPath"
 
 echo
-echo "Please confirm if the above is correct: [y|N]"
-read confirm
-if [[ $confirm != "y" ]]; 
-then
-  echo "Please correct the input and rerun this script"
-  echo
-  exit 1
-fi
+echo "Please confirm if the above is correct."
+echo "Proceed? [y|N]"; read confirm; if [[ $confirm != "y" ]]; then echo "Please rerun this script when ready."; exit 1; fi
 
 # move to base path and checkout
 mkdir -p $LocalSvnBasePath
@@ -223,15 +191,8 @@ then
 fi
 
 echo
-echo "Is the SVN Checkout without conflicts? [y|N]"
-read confirm
-if [[ $confirm != "y" ]]; 
-then
-  echo
-  echo "Please correct the input and rerun this script"
-  echo
-  exit 1
-fi
+echo "Is the SVN Checkout without conflicts?"
+echo "Proceed? [y|N]"; read confirm; if [[ $confirm != "y" ]]; then echo "Please rerun this script when ready."; exit 1; fi
 
 #make the leaf directories
 mkdir -p $LocalFilesPath
@@ -244,14 +205,8 @@ echo "## Zip:"
 git archive --output="$LocalFilesPath"/$ZipName $Tag
 
 echo
-echo "Is the Zip file correct? [y|N]"
-read confirm
-if [[ $confirm != "y" ]]; 
-then
-  echo "Please correct the input and rerun this script"
-  echo
-  exit 1
-fi
+echo "Is the Zip file correct?"
+echo "Proceed? [y|N]"; read confirm; if [[ $confirm != "y" ]]; then echo "Please rerun this script when ready."; exit 1; fi
 
 cd $LocalFilesPath #for signing
 
@@ -320,16 +275,15 @@ then
 fi
 
 echo
-echo "Is the remote dist directory structure and content OK? [y|N]"
-read confirm
-if [[ $confirm != "y" ]]; 
-then
-  echo "Please correct the input and rerun this script"
-  echo "You may have to manually remove some contents from Dist"
-  echo
-  exit 1
+echo "Is the remote dist directory structure and content OK?"
+echo "Proceed? [y|N]"; read confirm; if [[ $confirm != "y" ]]; 
+then 
+  echo "Please rerun this script when ready."; 
+  echo "You may need to manually delete files from the dist repo"
+  exit 1; 
 fi
+
 echo
-echo "# SUCCESS"
+echo "# DEPLOYMENT SUCCESS"
 echo
 

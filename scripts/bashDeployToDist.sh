@@ -44,8 +44,8 @@ echo
 echo "5. Locally create a tag with a name of one of the following forms:"
 echo "     1.0.0"
 echo "     1.0.0-SNAPSHOT"
-echo "     1.0.0-incubator"
-echo "     1.0.0-incubator-SNAPSHOT"
+echo "     1.0.0-incubating"
+echo "     1.0.0-incubating-SNAPSHOT"
 echo
 echo "   'SNAPSHOT', if relevant, is always at the end of the version string and capitalized."
 echo "   Note: SNAPSHOT deployments are never relevant for the 'dist/release' branch."

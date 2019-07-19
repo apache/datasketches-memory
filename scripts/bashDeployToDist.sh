@@ -43,11 +43,13 @@ echo "     1.0.X-incubating"
 echo
 echo "5. Locally create a tag with a name of one of the following forms:"
 echo "     1.0.0"
-echo "     1.0.0-SNAPSHOT"
+echo "     1.0.0-SNAPSHOTNN"
+echo "     1.0.0-RCNN"
 echo "     1.0.0-incubating"
-echo "     1.0.0-incubating-SNAPSHOT"
+echo "     1.0.0-incubating-SNAPSHOTNN"
+echo "     1.0.0-incubating-RCNN"
 echo
-echo "   'SNAPSHOT', if relevant, is always at the end of the version string and capitalized."
+echo "   'SNAPSHOT', if relevant, is always capitalized."
 echo "   Note: SNAPSHOT deployments are never relevant for the 'dist/release' branch."
 echo
 echo "   Commit the branch and tag back to the remote origin"
@@ -90,7 +92,7 @@ FileVersion=
 LeafDir=
 
 ### SNAPSHOT ?
-if [[ $Tag =~ .*-SNAPSHOT  ]]; 
+if [[ $Tag =~ .*-SNAPSHOT[0-9]* ]]; 
 then
   echo
   echo "This Tag is for a SNAPSHOT."

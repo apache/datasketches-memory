@@ -46,7 +46,7 @@ final class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl 
   BaseWritableMemoryImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
       final boolean readOnly, final ByteOrder byteOrder) {
     final int type = typeId | REGION | (readOnly ? READONLY : 0);
-    return isNativeCpuByteOrder(byteOrder)
+    return isNativeByteOrder(byteOrder)
         ? new HeapWritableMemoryImpl(
             unsafeObj, getRegionOffset(offsetBytes), capacityBytes,
             type)
@@ -58,7 +58,7 @@ final class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl 
   @Override
   BaseWritableBufferImpl toWritableBuffer(final boolean readOnly, final ByteOrder byteOrder) {
     final int type = typeId | (readOnly ? READONLY : 0);
-    return isNativeCpuByteOrder(byteOrder)
+    return isNativeByteOrder(byteOrder)
         ? new HeapWritableBufferImpl(
             unsafeObj, getRegionOffset(), getCapacity(),
             type, this)

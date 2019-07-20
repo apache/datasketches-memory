@@ -94,7 +94,7 @@ public class BaseStateTest {
 
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void checkByteOrderNull() {
-    BaseState.isNativeCpuByteOrder(null);
+    BaseState.isNativeByteOrder(null);
     fail();
   }
 

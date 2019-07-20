@@ -23,8 +23,9 @@
 # It does us Git.
 
 #  Input Parameters:
-#  \$1 = project.artifactId
-#  \$2 = GitHub Tag 
+#  \$1 = project.basedir
+#  \$2 = project.artifactId
+#  \$3 = GitHub Tag for this deployment
 #    For example:  $ scripts/<this script>.sh datasketches-memory 0.12.3-incubator
 
 echo
@@ -58,6 +59,19 @@ echo "6. Verify that your local GitHub repository current and the git status is 
 echo
 echo "Proceed? [y|N]"; read confirm; if [[ $confirm != "y" ]]; then echo "Please rerun this script when ready."; exit 1; fi
 
+# Setup absolute directory references
+MyBase=$(pwd)
+
+# Move to project directory
+cd $1
+ProjectBaseDir=$(pwd) #create as absolute address
+
+## Extract project.artifactId and Tag from input parameters:
+ProjectArtifactId=$2
+Tag=$3
+
+
+
 TMP=$(git status --porcelain)
 if [[ -n $TMP ]];
 then
@@ -67,9 +81,8 @@ then
   # exit 1  #Don't exit for now
 fi
 
-
 TIME=$(date -u +%Y%m%d.%H%M%S)
-BASE=$(pwd)
+
 echo
 echo "DateTime: $TIME"
 
@@ -77,10 +90,7 @@ echo
 echo "## Load GPG Agent:"
 eval $(gpg-agent --daemon) > /dev/null
 
-## Extract project.artifactId and project.version from input parameters:
 
-ProjectArtifactId=$1
-Tag=$2
 
 # Determine the type of release / deployment we are dealing with
 #  and adjust the target directories and file version to be used in the file name accordingly.
@@ -108,8 +118,8 @@ else
     echo "This Tag is for a Release Candidate."
     echo "Proceed? [y|N]"; read confirm; if [[ $confirm != "y" ]]; then echo "Please rerun this script when ready."; exit 1; fi
     ReleaseCandidate=true
-    RCSubStr=$(expr "$Tag" : '.*\(-[rR][cC][0-9]*\)')
-    FileVersion=${Tag%$RCSubStr}
+    # RCSubStr=$(expr "$Tag" : '.*\(-[rR][cC][0-9]*\)')
+    FileVersion=$Tag   # ${Tag%$RCSubStr}
     LeafDir="$Tag"
   else
     echo "Please confirm that this the Final Release of $ProjectArtifactId : $Tag"
@@ -182,7 +192,7 @@ mkdir -p $LocalSvnBasePath
 
 cd $LocalSvnBasePath
 svn co $RemoteSvnBasePath .
-cd $BASE
+cd $ProjectBaseDir
 
 if [ -d "$LocalFilesPath" ] && [ ! $Snapshot ]; 
 then
@@ -255,7 +265,7 @@ echo
 echo "## SHA512 Check:"
 shasum -a 512 -c $SHA512
 
-cd $BASE
+cd $ProjectBaseDir
 
 echo 
 echo "=================DEPLOY TO DIST===================="
@@ -275,6 +285,8 @@ then
   echo
   exit 1
 fi
+
+cd $ProjectBaseDir
 
 echo
 echo "Is the remote dist directory structure and content OK?"

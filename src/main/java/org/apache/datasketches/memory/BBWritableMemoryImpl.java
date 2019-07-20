@@ -53,7 +53,7 @@ final class BBWritableMemoryImpl extends WritableMemoryImpl {
   BaseWritableMemoryImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
       final boolean readOnly, final ByteOrder byteOrder) {
     final int type = typeId | REGION | (readOnly ? READONLY : 0);
-    return isNativeCpuByteOrder(byteOrder)
+    return isNativeByteOrder(byteOrder)
         ? new BBWritableMemoryImpl(
             unsafeObj, nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes,
             type, getByteBuffer())
@@ -65,7 +65,7 @@ final class BBWritableMemoryImpl extends WritableMemoryImpl {
   @Override
   BaseWritableBufferImpl toWritableBuffer(final boolean readOnly, final ByteOrder byteOrder) {
     final int type = typeId | (readOnly ? READONLY : 0);
-    return isNativeCpuByteOrder(byteOrder)
+    return isNativeByteOrder(byteOrder)
         ? new BBWritableBufferImpl(
             unsafeObj, nativeBaseOffset, getRegionOffset(), getCapacity(),
             type, byteBuf, this)

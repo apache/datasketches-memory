@@ -117,7 +117,7 @@ public class AllocateDirectWritableMapMemoryTest {
     file.deleteOnExit();  //comment out if you want to examine the file.
 
     final long bytes = 8;
-    try (WritableMapHandle h = WritableMemory.map(file, 0L, bytes, BaseState.nonNativeCpuByteOrder)) {
+    try (WritableMapHandle h = WritableMemory.map(file, 0L, bytes, BaseState.nonNativeByteOrder)) {
       WritableMemory wmem = h.get();
       wmem.putChar(0, (char) 1);
       assertEquals(wmem.getByte(1), (byte) 1);

@@ -89,7 +89,7 @@ public class AllocateDirectMemoryTest {
   @Test
   public void checkNonNativeDirect() { //not allowed in public API
     try (WritableDirectHandle h =
-        BaseWritableMemoryImpl.wrapDirect(8, BaseState.nonNativeCpuByteOrder, null)) {
+        BaseWritableMemoryImpl.wrapDirect(8, BaseState.nonNativeByteOrder, null)) {
       WritableMemory wmem = h.get();
       wmem.putChar(0, (char) 1);
       assertEquals(wmem.getByte(1), (byte) 1);

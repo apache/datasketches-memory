@@ -699,7 +699,7 @@ public class WritableMemoryImplTest {
   public void checkAsBufferNonNative() {
     WritableMemory wmem = WritableMemory.allocate(64);
     wmem.putShort(0, (short) 1);
-    Buffer buf = wmem.asBuffer(BaseState.nonNativeCpuByteOrder);
+    Buffer buf = wmem.asBuffer(BaseState.nonNativeByteOrder);
     assertEquals(buf.getShort(0), 256);
   }
 

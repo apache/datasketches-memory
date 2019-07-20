@@ -574,7 +574,7 @@ public class WritableBufferImplTest {
   public void checkDuplicateNonNative() {
     WritableMemory wmem = WritableMemory.allocate(64);
     wmem.putShort(0, (short) 1);
-    Buffer buf = wmem.asWritableBuffer().duplicate(BaseState.nonNativeCpuByteOrder);
+    Buffer buf = wmem.asWritableBuffer().duplicate(BaseState.nonNativeByteOrder);
     assertEquals(buf.getShort(0), 256);
   }
 

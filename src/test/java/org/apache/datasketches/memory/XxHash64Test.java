@@ -79,11 +79,12 @@ public class XxHash64Test {
 
   /*
    * This test is modeled from
-   * <a href="https://github.com/OpenHFT/Zero-Allocation-Hashing/blob/master/src/test/java/net/openhft/hashing/XxHashTest.java">
+   * <a href="https://github.com/OpenHFT/Zero-Allocation-Hashing/blob/master/src/test/java/net\
+   *   /openhft/hashing/XxHashCollisionTest.java">
    * OpenHFT/Zero-Allocation-Hashing</a> to test hash compatibility with that implementation.
+   * It is licensed under Apache License, version 2.0.
    */
   @Test
-  //@SuppressWarnings("ConstantOverflow")
   public void collisionTest() {
     WritableMemory wmem = WritableMemory.allocate(128);
     wmem.putLong(0, 1);
@@ -97,11 +98,17 @@ public class XxHash64Test {
     assertEquals(h1, h2);
 
     wmem.putLong(0, 1L + (0xBA79078168D4BAFL * 2));
-    wmem.putLong(32, 2L + (0x9C90005B80000000L * 2));
+    wmem.putLong(32, 2L + (0x392000b700000000L)); //= (0x9C90005B80000000L * 2) fix overflow false pos
 
     long h3 = wmem.xxHash64(0, wmem.getCapacity(), 0);
     assertEquals(h2, h3);
   }
+
+//  @Test
+//  public void fixOverflow() {
+//    long out = 0x9C90005B80000000L * 2L;
+//    System.out.println(Long.toHexString(out));
+//  }
 
   /**
    * This simple test compares the output of {@link BaseState#xxHash64(long, long, long)} with the

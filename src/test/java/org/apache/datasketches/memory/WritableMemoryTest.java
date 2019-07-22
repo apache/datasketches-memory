@@ -83,7 +83,7 @@ public class WritableMemoryTest {
   public void checkEquals() {
     int len = 7;
     WritableMemory wmem1 = WritableMemory.allocate(len);
-    //@SuppressWarnings({"EqualsWithItself", "SelfEquals"})
+    @SuppressWarnings({"EqualsWithItself", "SelfEquals"})
     //SelfEquals for Plexus, EqualsWithItself for IntelliJ
     boolean eq1 = wmem1.equals(wmem1);
     assertTrue(eq1);
@@ -126,7 +126,7 @@ public class WritableMemoryTest {
     int len = 23;
     WritableMemory wmem1 = WritableMemory.allocate(len);
     assertFalse(wmem1.equals(null));
-    //@SuppressWarnings({"EqualsWithItself", "SelfEquals"})
+    @SuppressWarnings({"EqualsWithItself", "SelfEquals"})
     //SelfEquals for Plexus, EqualsWithItself for IntelliJ
     boolean eq1 = wmem1.equals(wmem1);
     assertTrue(eq1);

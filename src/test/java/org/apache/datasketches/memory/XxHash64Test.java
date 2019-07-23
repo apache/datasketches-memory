@@ -104,12 +104,6 @@ public class XxHash64Test {
     assertEquals(h2, h3);
   }
 
-//  @Test
-//  public void fixOverflow() {
-//    long out = 0x9C90005B80000000L * 2L;
-//    System.out.println(Long.toHexString(out));
-//  }
-
   /**
    * This simple test compares the output of {@link BaseState#xxHash64(long, long, long)} with the
    * output of {@link net.openhft.hashing.LongHashFunction}, that itself is tested against the

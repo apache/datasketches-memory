@@ -118,8 +118,8 @@ else
     echo "This Tag is for a Release Candidate."
     echo "Proceed? [y|N]"; read confirm; if [[ $confirm != "y" ]]; then echo "Please rerun this script when ready."; exit 1; fi
     ReleaseCandidate=true
-    # RCSubStr=$(expr "$Tag" : '.*\(-[rR][cC][0-9]*\)')
-    FileVersion=$Tag   # ${Tag%$RCSubStr}
+    RCSubStr=$(expr "$Tag" : '.*\(-[rR][cC][0-9]*\)')
+    FileVersion=${Tag%$RCSubStr}
     LeafDir="$Tag"
   else
     echo "Please confirm that this the Final Release of $ProjectArtifactId : $Tag"

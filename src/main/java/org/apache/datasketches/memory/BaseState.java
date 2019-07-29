@@ -94,7 +94,7 @@ abstract class BaseState {
     capacityBytes_ = capacityBytes;
     cumBaseOffset_ = regionOffset + ((unsafeObj == null)
         ? nativeBaseOffset
-        : unsafe.arrayBaseOffset(unsafeObj.getClass()));
+        : UnsafeUtil.getArrayBaseOffset(unsafeObj.getClass()));
   }
 
   //Byte Order Related
@@ -233,7 +233,7 @@ abstract class BaseState {
     final Object unsafeObj = getUnsafeObject();
     return (unsafeObj == null)
         ? cumBaseOffset_ - getNativeBaseOffset()
-        : cumBaseOffset_ - unsafe.arrayBaseOffset(unsafeObj.getClass());
+        : cumBaseOffset_ - UnsafeUtil.getArrayBaseOffset(unsafeObj.getClass());
   }
 
   /**
@@ -518,7 +518,7 @@ abstract class BaseState {
       uObjHeader = 0;
     } else {
       uObjStr =  uObj.getClass().getSimpleName() + ", " + (uObj.hashCode() & 0XFFFFFFFFL);
-      uObjHeader = unsafe.arrayBaseOffset(uObj.getClass());
+      uObjHeader = UnsafeUtil.getArrayBaseOffset(uObj.getClass());
     }
     final ByteBuffer bb = state.getByteBuffer();
     final String bbStr = (bb == null) ? "null"

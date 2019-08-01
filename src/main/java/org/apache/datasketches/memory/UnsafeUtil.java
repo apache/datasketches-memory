@@ -158,6 +158,35 @@ public final class UnsafeUtil {
   }
 
   /**
+   * Like {@link Unsafe#arrayBaseOffset(Class)}, but caches return values for common array types. Useful because
+   * calling {@link Unsafe#arrayBaseOffset(Class)} directly incurs more overhead.
+   */
+  static long getArrayBaseOffset(final Class<?> c) {
+    // Ordering here is roughly in order of what we expect to be most popular.
+    if (c == byte[].class) {
+      return ARRAY_BYTE_BASE_OFFSET;
+    } else if (c == int[].class) {
+      return ARRAY_INT_BASE_OFFSET;
+    } else if (c == long[].class) {
+      return ARRAY_LONG_BASE_OFFSET;
+    } else if (c == float[].class) {
+      return ARRAY_FLOAT_BASE_OFFSET;
+    } else if (c == double[].class) {
+      return ARRAY_DOUBLE_BASE_OFFSET;
+    } else if (c == boolean[].class) {
+      return ARRAY_BOOLEAN_BASE_OFFSET;
+    } else if (c == short[].class) {
+      return ARRAY_SHORT_BASE_OFFSET;
+    } else if (c == char[].class) {
+      return ARRAY_CHAR_BASE_OFFSET;
+    } else if (c == Object[].class) {
+      return ARRAY_OBJECT_BASE_OFFSET;
+    } else {
+      return unsafe.arrayBaseOffset(c);
+    }
+  }
+
+  /**
    * Assert the requested offset and length against the allocated size.
    * The invariants equation is: {@code 0 <= reqOff <= reqLen <= reqOff + reqLen <= allocSize}.
    * If this equation is violated and assertions are enabled, an {@link AssertionError} will

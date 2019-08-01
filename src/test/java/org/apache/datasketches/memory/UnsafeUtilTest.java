@@ -23,6 +23,9 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.testng.annotations.Test;
 
 
@@ -120,6 +123,30 @@ public class UnsafeUtilTest {
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void checkInts() {
     Ints.checkedCast(1L << 32);
+  }
+
+  @Test
+  public void checkArrayBaseOffset()
+  {
+    final List<Class<?>> classes = new ArrayList<>();
+    classes.add(byte[].class);
+    classes.add(int[].class);
+    classes.add(long[].class);
+    classes.add(float[].class);
+    classes.add(double[].class);
+    classes.add(boolean[].class);
+    classes.add(short[].class);
+    classes.add(char[].class);
+    classes.add(Object[].class);
+    classes.add(byte[][].class); // An array type that is not cached
+
+    for (Class<?> clazz : classes) {
+      assertEquals(
+          UnsafeUtil.getArrayBaseOffset(clazz),
+          UnsafeUtil.unsafe.arrayBaseOffset(clazz),
+          clazz.getTypeName()
+      );
+    }
   }
 
   @Test

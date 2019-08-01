@@ -158,8 +158,8 @@ public final class UnsafeUtil {
   }
 
   /**
-   * Like {@link Unsafe#arrayBaseOffset(Class)}, but caches return values for common array types. Useful because
-   * calling {@link Unsafe#arrayBaseOffset(Class)} directly incurs more overhead.
+   * Like {@link Unsafe#arrayBaseOffset(Class)}, but caches return values for common array types.
+   * Useful because calling {@link Unsafe#arrayBaseOffset(Class)} directly incurs more overhead.
    */
   static long getArrayBaseOffset(final Class<?> c) {
     // Ordering here is roughly in order of what we expect to be most popular.

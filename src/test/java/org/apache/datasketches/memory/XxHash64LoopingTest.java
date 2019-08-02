@@ -29,8 +29,9 @@ import org.testng.annotations.Test;
 public class XxHash64LoopingTest {
 
   /*
-   * This test is modeled from
-   * <a href="https://github.com/OpenHFT/Zero-Allocation-Hashing/blob/master/src/test/java/net/openhft/hashing/XxHashTest.java">
+   * This test is adapted from
+   * <a href="https://github.com/OpenHFT/Zero-Allocation-Hashing\
+   * /blob/master/src/test/java/net/openhft/hashing/XxHashTest.java">
    * OpenHFT/Zero-Allocation-Hashing</a> to test hash compatibility with that implementation.
    */
   @Test

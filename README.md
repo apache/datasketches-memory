@@ -41,3 +41,5 @@
 
 ## [Building](https://github.com/DataSketches/memory/blob/master/README_building.md)
 
+
+# Note: This package can only be compiled using Java 1.8.

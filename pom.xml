@@ -38,10 +38,6 @@ under the License.
     <url>https://datasketches.apache.org/</url>
     <inceptionYear>2015</inceptionYear>
     <packaging>jar</packaging> <!-- jar is the default -->
-    
-    <prerequisites>
-        <maven>3.0.4</maven>
-    </prerequisites>
 
     <licenses>
         <license>
@@ -120,8 +116,11 @@ under the License.
         <plexus-compiler-javac-errorprone.version>2.8.5</plexus-compiler-javac-errorprone.version>
         
         <!--  Maven Plugins -->
+        <maven-assembly-plugin.version>3.1.1</maven-assembly-plugin.version>
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-jar-plugin.version>3.1.2</maven-jar-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
+        <maven-enforcer-plugin.version>3.0.0-M2</maven-enforcer-plugin.version>
 
         <!-- org.jacoco Maven Plugins -->
         <jacoco-maven-plugin.version>0.8.4</jacoco-maven-plugin.version>
@@ -246,7 +245,6 @@ under the License.
                   <!--
                     <show>private</show>
                   -->
-                  <stylesheetfile>src/main/javadoc/stylesheet.css</stylesheetfile>
                   <docfilessubdirs>true</docfilessubdirs>
                 </configuration>
                 <executions>
@@ -255,6 +253,37 @@ under the License.
                         <goals>
                             <goal>jar</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>${maven-enforcer-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>enforce-banned-dependencies</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>1.8.0</version>
+                                </requireJavaVersion>
+                                <requireMavenVersion>
+                                    <version>3.0.4,</version>
+                                </requireMavenVersion>
+                                <bannedDependencies>
+                                    <excludes>
+                                        <!--LGPL licenced library-->
+                                        <exclude>com.google.code.findbugs:annotations</exclude>
+                                    </excludes>
+                                </bannedDependencies>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -367,12 +396,14 @@ under the License.
     <profiles>
         <!-- Ignore nuisance warning from Apache parent plugin: 
           "maven-remote-resources-plugin (goal "process") is ignored by m2e".
-          This also should fix the Maven warning that it can't find the lifecycle-mapping jar 
+          This also should fix the Maven warning that it can't find the lifecycle-mapping jar.
+          This profile is only active when the property "m2e.version" is set, 
+          which is the case when building in Eclipse with m2e.
+          The ignore below tells m2eclipse to skip the execution.
         -->
         <profile>
             <id>m2e</id>
-            <!-- This profile is only active when the property "m2e.version"
-              is set, which is the case when building in Eclipse with m2e. -->
+            <!--  -->
             <activation>
               <property>
                 <name>m2e.version</name>
@@ -398,7 +429,6 @@ under the License.
                                     </goals>
                                 </pluginExecutionFilter>
                               <action>
-                                <!-- ignore: tells m2eclipse to skip the execution. -->
                                 <ignore />
                               </action>
                             </pluginExecution>
@@ -419,7 +449,7 @@ under the License.
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-compiler-plugin</artifactId>
-                            <!-- version in parent -->
+                            <version>${maven-compiler-plugin.version}</version>
                             <configuration>
                                 <source>${maven.compiler.source}</source>
                                 <target>${maven.compiler.target}</target>
@@ -463,13 +493,15 @@ under the License.
           </build>
         </profile>
         
-        <!-- Disable source release assembly for 'apache-release' profile. -->
+        <!-- Disable source release assembly for 'apache-release' profile. 
+             This is performed from a script outside Maven-->
         <profile>
           <id>apache-release</id>
           <build>
             <plugins>
               <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>${maven-assembly-plugin.version}</version>
                 <executions>
                   <execution>
                     <id>source-release-assembly</id>

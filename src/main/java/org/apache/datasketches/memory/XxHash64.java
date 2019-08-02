@@ -48,8 +48,7 @@ import static org.apache.datasketches.memory.UnsafeUtil.unsafe;
  * http://www.opensource.org/licenses/bsd-license.php</a>
  *
  * <p>Portions of this code were adapted from
- * <a href="https://github.com/OpenHFT/Zero-Allocation-Hashing\
- * /blob/master/src/main/java/net/openhft/hashing/XxHash.java">
+ * <a href="https://github.com/OpenHFT/Zero-Allocation-Hashing/blob/master/src/main/java/net/openhft/hashing/XxHash.java">
  * OpenHFT/Zero-Allocation-Hashing</a>,
  * which has an Apache 2 license as does this site.
  *

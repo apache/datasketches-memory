@@ -35,9 +35,9 @@ import java.nio.CharBuffer;
  * <p>This is specifically designed to reduce the production of intermediate objects (garbage),
  * thus significantly reducing pressure on the JVM Garbage Collector.
  *
- * <p>UTF-8 encoding/decoding is based on
- * https://github.com/google/protobuf/blob/3e944aec9ebdf5043780fba751d604c0a55511f2/
- * java/core/src/main/java/com/google/protobuf/Utf8.java
+ * <p>UTF-8 encoding/decoding is adapted from
+ * https://github.com/protocolbuffers/protobuf\
+ * /blob/master/java/core/src/main/java/com/google/protobuf/Utf8.java
  *
  * <p>Copyright 2008 Google Inc.  All rights reserved.
  * https://developers.google.com/protocol-buffers/

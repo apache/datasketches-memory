@@ -396,12 +396,14 @@ under the License.
     <profiles>
         <!-- Ignore nuisance warning from Apache parent plugin: 
           "maven-remote-resources-plugin (goal "process") is ignored by m2e".
-          This also should fix the Maven warning that it can't find the lifecycle-mapping jar 
+          This also should fix the Maven warning that it can't find the lifecycle-mapping jar.
+          This profile is only active when the property "m2e.version" is set, 
+          which is the case when building in Eclipse with m2e.
+          The ignore below tells m2eclipse to skip the execution.
         -->
         <profile>
             <id>m2e</id>
-            <!-- This profile is only active when the property "m2e.version"
-              is set, which is the case when building in Eclipse with m2e. -->
+            <!--  -->
             <activation>
               <property>
                 <name>m2e.version</name>
@@ -427,7 +429,6 @@ under the License.
                                     </goals>
                                 </pluginExecutionFilter>
                               <action>
-                                <!-- ignore: tells m2eclipse to skip the execution. -->
                                 <ignore />
                               </action>
                             </pluginExecution>

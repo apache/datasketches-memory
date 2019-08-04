@@ -204,30 +204,27 @@ under the License.
     <build>
         <plugins>
             <!-- We want to deploy the artifacts to a staging location for perusal -->
+            <!-- Apache Parent pom: apache-release profile -->
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-deploy-plugin</artifactId>
               <version>${maven-deploy-plugin.version}</version>
-              <!-- Apache Parent pom: apache-release profile -->
-              <!-- Druid: PM, Beam 2.4: release, Pinot: none, Dubbo: build -->
               <configuration>
                 <updateReleaseInfo>true</updateReleaseInfo>
               </configuration>
             </plugin>
 
+            <!-- Apache Parent pom, pluginManagement-->
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-release-plugin</artifactId>
               <version>${maven-release-plugin.version}</version>
-              <!-- Apache Parent pom, pluginManagement-->
-              <!-- Druid: PM, Beam 2.4: PM, Pinot: PM, Dubbo: build -->
             </plugin>
 
-            <plugin> <!--  extends the Parent -->
+            <!-- Extends Apache Parent pom, pluginManagement-->
+            <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-jar-plugin</artifactId>
-              <!-- Apache Parent pom, pluginManagement-->
-              <!-- Druid: none, Beam 2.4: PM, Pinot: PM, Dubbo: build -->
               <version>${maven-jar-plugin.version}</version>
               <executions>
                 <execution>
@@ -244,20 +241,25 @@ under the License.
                 </execution>
               </executions>
               <configuration>
-                <skipIfEmpty>true</skipIfEmpty>
+                  <archive>
+                      <manifestEntries> <!-- the same as Druid -->
+                          <Build-Jdk>${java.version} (${java.vendor} ${java.vm.version})</Build-Jdk>
+                          <Build-OS>${os.name} ${os.arch} ${os.version}</Build-OS>
+                          <Build-Timestamp>${git.build.time}</Build-Timestamp>
+                          <Build-Version>${git.build.version}</Build-Version>
+                          <Build-Revision>${git.commit.id}</Build-Revision>
+                          <Build-Revision-Describe>${git.commit.id.describe}</Build-Revision-Describe>
+                      </manifestEntries>
+                  </archive>
               </configuration>
             </plugin>
 
-            <plugin> <!--  extends the Parent -->
+            <!-- Extends Apache Parent pom, apache-release profile -->
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>${maven-javadoc-plugin.version}</version>
-                <!-- Apache Parent pom, apache-release profile -->
-                <!-- Druid: PM, Beam 2.4: release profile, Pinot: build, reporting, Dubbo: release -->
                 <configuration>
-                  <!--
-                    <show>private</show>
-                  -->
                   <docfilessubdirs>true</docfilessubdirs>
                 </configuration>
                 <executions>
@@ -301,12 +303,11 @@ under the License.
                 </executions>
             </plugin>
 
+            <!-- Apache Parent pom, pluginManagement-->
             <plugin>
               <groupId>org.apache.rat</groupId>
               <artifactId>apache-rat-plugin</artifactId>
               <version>${apache-rat-plugin.version}</version>
-              <!-- Apache Parent pom, pluginManagement-->
-              <!-- Druid: rat profile, Beam 2.4: release profile, Pinot: build, reporting, Dubbo: build -->
               <executions>
                 <execution>
                   <phase>verify</phase>
@@ -320,9 +321,8 @@ under the License.
                 <consoleOutput>true</consoleOutput>
                 <useDefaultExcludes>true</useDefaultExcludes>
                 <excludes>
-                  <!-- rat uses .gitignore for excludes -->
+                  <!-- rat uses .gitignore for excludes by default -->
                   <exclude>**/test/resources/**/*.txt</exclude>
-                  <!-- ignore licence files-->
                   <exclude>LICENSE</exclude>
                   <exclude>NOTICE</exclude>
                   <exclude>DISCLAIMER</exclude>
@@ -330,12 +330,11 @@ under the License.
               </configuration>
             </plugin>
 
-            <plugin> <!-- extends parent -->
+            <!-- Extends Apache Parent pom, apache-release profile -->
+            <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-source-plugin</artifactId>
               <version>${maven-source-plugin.version}</version>
-              <!-- Apache Parent pom, apache-release profile -->
-              <!-- Druid: none, Beam 2.4: release profile, Pinot: PM, Dubbo: build -->
               <executions>
                 <execution>
                   <id>attach-sources</id>
@@ -354,12 +353,11 @@ under the License.
               </executions>
             </plugin>
 
+            <!-- Apache Parent pom, pluginManagement-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
-                 <!-- Apache Parent pom, pluginManagement-->
-                 <!-- Druid: profiles: java9+, parallelTest, Beam 2.4: PM, Pinot: build, travis profile, Dubbo: build -->
                 <configuration>
                   <trimStackTrace>false</trimStackTrace>
                   <useManifestOnlyJar>false</useManifestOnlyJar>
@@ -371,7 +369,6 @@ under the License.
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <!-- Druid: none; Beam 2.4: PM; Pinot: build;  Dubbo: build -->
                 <version>${jacoco-maven-plugin.version}</version>
                 <executions>
                     <execution>
@@ -388,23 +385,9 @@ under the License.
                 <groupId>org.eluder.coveralls</groupId>
                 <artifactId>coveralls-maven-plugin</artifactId>
                 <version>${coveralls-maven-plugin.version}</version>
-                <!-- Druid: build; Beam 2.4: PM; Pinot: none;  Dubbo: none -->
                 <configuration>
                     <!-- Since we use Travis CI we do not have to put a Coveralls token here. -->
                 </configuration>
-            </plugin>
-            <plugin>
-              <groupId>io.github.zlika</groupId>
-              <artifactId>reproducible-build-maven-plugin</artifactId>
-              <version>${reproducible-build-maven-plugin.version}</version>
-              <!-- Druid: none; Beam 2.4: release profile; Pinot: none;  Dubbo: none -->
-              <executions>
-                <execution>
-                  <goals>
-                    <goal>strip-jar</goal>
-                  </goals>
-                </execution>
-              </executions>
             </plugin>
 
             <plugin>

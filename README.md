@@ -31,15 +31,17 @@
  runtime dependencies and can be used in any application that needs to manage data structures outside
  the Java heap.
 
-## [DataSketches Documentation](https://datasketches.github.io)
+## [DataSketches Library Website](https://datasketches.github.io/)
+
+## [Memory Package Overview Documentation](https://datasketches.github.io/docs/Memory/MemoryPackage.html)
+
+## [Memory Package Performance](https://datasketches.github.io/docs/Memory/MemoryPerformance.html)
 
 ## [Memory JavaDocs](https://datasketches.github.io/api/memory/snapshot/apidocs/index.html)
 
-## [Latest Release](https://github.com/DataSketches/memory/releases)
+## [Latest Release](https://github.com/apache/incubator-datasketches-memory/releases)
 
 ## [Comments](https://groups.google.com/forum/#!forum/sketches-user)
 
-## [Building](https://github.com/DataSketches/memory/blob/master/README_building.md)
 
-
-# Note: This package can only be compiled using Java 1.8.
+## Note: This package can only be compiled using Java 1.8.

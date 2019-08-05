@@ -40,6 +40,14 @@ under the License.
     <inceptionYear>2015</inceptionYear>
     <packaging>jar</packaging> <!-- jar is the default -->
 
+    <!-- With the 3.6.1 version of Maven this causes a warning to obsolete this in
+         favor of using the enforcer plugin (which we do).  But removing this
+         causes the command "mvn versions:display-plugin-updates" to issue an error 
+         and not work properly. So this will stay for the time being. -->
+    <prerequisites>
+        <maven>3.2.0</maven>
+    </prerequisites>
+
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
@@ -289,7 +297,7 @@ under the License.
                                     <version>1.8.0</version>
                                 </requireJavaVersion>
                                 <requireMavenVersion>
-                                    <version>3.0.4,</version>
+                                    <version>3.2,</version>
                                 </requireMavenVersion>
                                 <bannedDependencies>
                                     <excludes>

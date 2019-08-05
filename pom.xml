@@ -26,6 +26,7 @@ under the License.
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
         <version>21</version>
+        <relativePath></relativePath> <!-- fixes dumb maven warning -->
     </parent>
 
     <groupId>org.apache.datasketches</groupId>
@@ -141,7 +142,7 @@ under the License.
         <!-- other -->
         <reproducible-build-maven-plugin.version>0.4</reproducible-build-maven-plugin.version>
         <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
-        <git-commit-id-plugin.version>2.2.5</git-commit-id-plugin.version>
+        <git-commit-id-plugin.version>3.0.0</git-commit-id-plugin.version>
     </properties>
 
     <repositories>
@@ -409,20 +410,21 @@ under the License.
                     <skipPoms>false</skipPoms>
                     <format>json</format>
                     <generateGitPropertiesFile>true</generateGitPropertiesFile>
-                    <generateGitPropertiesFilename>${project.build.directory}/git.version</generateGitPropertiesFilename>
+                    <generateGitPropertiesFilename>${project.build.directory}/git.properties</generateGitPropertiesFilename>
                     <failOnNoGitDirectory>true</failOnNoGitDirectory>
                     <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
                     <commitIdGenerationMode>full</commitIdGenerationMode>
-                    <excludeProperties>
-                        <excludeProperty>git.build.user.email</excludeProperty>
-                        <excludeProperty>git.build.host</excludeProperty>
-                        <excludeProperty>git.commit.id.describe-short</excludeProperty>
-                        <excludeProperty>git.commit.user.*</excludeProperty>
-                        <excludeProperty>git.commit.message.*</excludeProperty>
-                        <excludeProperty>git.closest.tag.*</excludeProperty>
-                        <excludeProperty>git.commit.id.abbrev</excludeProperty>
-                        <excludeProperty>git.dirty</excludeProperty>
-                    </excludeProperties>
+                    <includeOnlyProperties>
+                        <includeProperty>git.branch</includeProperty>
+                        <includeProperty>git.build.version</includeProperty>
+                        <includeProperty>git.closest.tag.name</includeProperty>
+                        <includeProperty>git.commit.id.describe</includeProperty>
+                        <includeProperty>git.commit.id.full</includeProperty>
+                        <includeProperty>git.commit.message.full</includeProperty>
+                        <includeProperty>git.commit.time</includeProperty>
+                        <includeProperty>git.commit.user.email</includeProperty>
+                        <includeProperty>git.tags</includeProperty>
+                    </includeOnlyProperties>
                     <gitDescribe>
                         <skip>false</skip>
                         <always>true</always>

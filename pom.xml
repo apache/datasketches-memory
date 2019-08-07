@@ -32,7 +32,7 @@ under the License.
     <groupId>org.apache.datasketches</groupId>
     <artifactId>datasketches-memory</artifactId>
 
-    <version>1.2.0-incubating-SNAPSHOT</version>
+    <version>1.1.0-incubating</version>
     
     <name>${project.groupId}:${project.artifactId}</name>
     <description>High-performance native memory access.</description>

@@ -283,7 +283,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 Public Domain
 ================================
-  This product contains the text of Lincoln's Gettysburg Address which is used in various file tests.
+  This product contains the text of Lincoln's Gettysburg Address, which is in the public domain, and is used in various file tests.
   This file is read-only and tested for its exact character sequence and cannot be appended with any additional text. 
   * src/test/java/org/apache/datasketches/memory/AllocateDirectMapMemoryTest.java
   * src/test/java/org/apache/datasketches/memory/AllocateDirectWritableMapMemoryTest.java

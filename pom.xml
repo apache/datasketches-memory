@@ -117,7 +117,7 @@ under the License.
 
         <!-- Dependencies -->
         <testng.version>6.14.3</testng.version>
-        <slf4j-api.version>1.7.25</slf4j-api.version>
+        <slf4j-api.version>1.7.27</slf4j-api.version>
         <protobuf-java.version>3.6.0</protobuf-java.version> <!-- Used for UTF8 testing -->
         <zero-allocation-hashing.version>0.8</zero-allocation-hashing.version>
 
@@ -186,6 +186,13 @@ under the License.
         </dependency>
 
         <!-- Test Scope -->
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-simple</artifactId>
+          <version>${slf4j-api.version}</version>
+           <scope>test</scope>
+        </dependency>
+        
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
@@ -529,7 +536,6 @@ under the License.
             <plugins>
               <!-- We want to sign the artifacts, POM, and all attached artifacts -->
               <!-- Apache Parent pom, PM, apache-release profile -->
-              <!-- Druid: none; Beam 2.4: sign profile, Pinot: none, Dubbo: release profile -->
               <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>

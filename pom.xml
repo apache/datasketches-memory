@@ -258,7 +258,7 @@ under the License.
               </executions>
               <configuration>
                   <archive>
-                      <manifestEntries> <!-- the same as Druid -->
+                      <manifestEntries>
                           <Build-Jdk>${java.version} (${java.vendor} ${java.vm.version})</Build-Jdk>
                           <Build-OS>${os.name} ${os.arch} ${os.version}</Build-OS>
                           <Build-Timestamp>${git.build.time}</Build-Timestamp>
@@ -464,7 +464,6 @@ under the License.
         -->
         <profile>
             <id>m2e</id>
-            <!--  -->
             <activation>
               <property>
                 <name>m2e.version</name>

@@ -35,11 +35,11 @@ import org.apache.datasketches.memory.Util.RandomCodePoints;
 
 /**
  * Adapted version of
- * https://github.com/protocolbuffers/protobuf\
- * /blob/master/java/core/src/test/java/com/google/protobuf/DecodeUtf8Test.java
+ * https://github.com/protocolbuffers/protobuf/blob/master/java/core/src/test/java/com/google/protobuf/DecodeUtf8Test.java
  *
  * Copyright 2008 Google Inc.  All rights reserved.
  * https://developers.google.com/protocol-buffers/
+ * See LICENSE.
  */
 public class Utf8Test {
 

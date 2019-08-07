@@ -76,8 +76,9 @@ final class AccessByteBuffer {
   }
 
   /**
-   * This method is adapted from https://github.com/odnoklassniki/one-nio\
-   * /blob/master/src/one/nio/mem/DirectMemory.java : wrap(...). See LICENSE.
+   * This method is adapted from
+   * https://github.com/odnoklassniki/one-nio/blob/master/src/one/nio/mem/DirectMemory.java
+   * : wrap(...). See LICENSE.
    */
   static ByteBuffer getDummyReadOnlyDirectByteBuffer(final long address, final int capacity) {
     final ByteBuffer buf = ZERO_READ_ONLY_DIRECT_BYTE_BUFFER.duplicate();

@@ -29,18 +29,18 @@ import java.nio.BufferOverflowException;
 import java.nio.CharBuffer;
 
 /**
- * Encoding and decoding implementations of {@link WritableMemory#putCharsToUtf8} and {@link
- * Memory#getCharsFromUtf8}.
+ * Encoding and decoding implementations of {@link WritableMemory#putCharsToUtf8} and
+ * {@link Memory#getCharsFromUtf8}.
  *
  * <p>This is specifically designed to reduce the production of intermediate objects (garbage),
  * thus significantly reducing pressure on the JVM Garbage Collector.
  *
  * <p>UTF-8 encoding/decoding is adapted from
- * https://github.com/protocolbuffers/protobuf\
- * /blob/master/java/core/src/main/java/com/google/protobuf/Utf8.java
+ * https://github.com/protocolbuffers/protobuf/blob/master/java/core/src/main/java/com/google/protobuf/Utf8.java
  *
  * <p>Copyright 2008 Google Inc.  All rights reserved.
  * https://developers.google.com/protocol-buffers/
+ * See LICENSE.
  *
  * @author Lee Rhodes
  * @author Roman Leventov

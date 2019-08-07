@@ -17,6 +17,10 @@
  * under the License.
  */
 
+/*
+ * Note: Lincoln's Gettysburg Address is in the public domain. See LICENSE.
+ */
+
 package org.apache.datasketches.memory;
 
 import static org.apache.datasketches.memory.Util.characterPad;

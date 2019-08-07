@@ -40,12 +40,12 @@ import sun.nio.ch.FileChannelImpl;
  * Allocates direct memory used to memory map files for read operations.
  * (including those &gt; 2GB).
  *
- * <p>Reference native code for map0, unmap0:
+ * <p>To understand how it works, reference native code for map0, unmap0:
  * <a href="http://hg.openjdk.java.net/jdk8u/jdk8u/jdk/file/f940e7a48b72/src/solaris/native/
  * sun/nio/ch/FileChannelImpl.c">
  * FileChannelImpl.c</a></p>
  *
- * <p>Reference native code for load0(), isLoaded0(), and force0():
+ * <p>To understand how it works, reference native code for load0(), isLoaded0(), and force0():
  * <a href="http://hg.openjdk.java.net/jdk8u/jdk8u/jdk/file/f940e7a48b72/src/solaris/native/
  * java/nio/MappedByteBuffer.c">
  * MappedByteBuffer.c</a></p>

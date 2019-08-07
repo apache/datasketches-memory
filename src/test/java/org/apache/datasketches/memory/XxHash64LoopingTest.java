@@ -30,9 +30,9 @@ public class XxHash64LoopingTest {
 
   /*
    * This test is adapted from
-   * <a href="https://github.com/OpenHFT/Zero-Allocation-Hashing\
-   * /blob/master/src/test/java/net/openhft/hashing/XxHashTest.java">
+   * <a href="https://github.com/OpenHFT/Zero-Allocation-Hashing/blob/master/src/test/java/net/openhft/hashing/XxHashTest.java">
    * OpenHFT/Zero-Allocation-Hashing</a> to test hash compatibility with that implementation.
+   * See LICENSE.
    */
   @Test
   public void testWithSeed() {
@@ -49,6 +49,7 @@ public class XxHash64LoopingTest {
   /*This data is from
    * <a href="https://github.com/OpenHFT/Zero-Allocation-Hashing/blob/master/src/test/java/net/openhft/hashing/XxHashTest.java">
    * OpenHFT/Zero-Allocation-Hashing</a> to test hash compatibility with that implementation.
+   * See LICENSE.
    */
   private static final long[] HASHES_OF_LOOPING_BYTES_WITH_SEED_42 = {
     -7444071767201028348L,

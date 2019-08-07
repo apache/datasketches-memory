@@ -21,11 +21,11 @@ package org.apache.datasketches.memory;
 
 /**
  * Stripped down version of
- * https://github.com/protocolbuffers/protobuf\
- * /blob/master/java/core/src/test/java/com/google/protobuf/IsValidUtf8TestUtil.java
+ * https://github.com/protocolbuffers/protobuf/blob/master/java/core/src/test/java/com/google/protobuf/IsValidUtf8TestUtil.java
  *
  * Copyright 2008 Google Inc.  All rights reserved.
  * https://developers.google.com/protocol-buffers/
+ * See LICENSE.
  */
 public class IsValidUtf8TestUtil {
 

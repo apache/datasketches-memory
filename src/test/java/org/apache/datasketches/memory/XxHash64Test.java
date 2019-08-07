@@ -79,10 +79,9 @@ public class XxHash64Test {
 
   /*
    * This test is adapted from
-   * <a href="https://github.com/OpenHFT/Zero-Allocation-Hashing/blob/master/src/test/java/net\
-   *   /openhft/hashing/XxHashCollisionTest.java">
+   * <a href="https://github.com/OpenHFT/Zero-Allocation-Hashing/blob/master/src/test/java/net/openhft/hashing/XxHashCollisionTest.java">
    * OpenHFT/Zero-Allocation-Hashing</a> to test hash compatibility with that implementation.
-   * It is licensed under Apache License, version 2.0.
+   * It is licensed under Apache License, version 2.0. See LICENSE.
    */
   @Test
   public void collisionTest() {

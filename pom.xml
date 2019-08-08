@@ -267,7 +267,7 @@ under the License.
                       <manifestEntries>
                           <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
                           <GroupId-ArtifactId>${project.groupId}:${project.artifactId}</GroupId-ArtifactId>
-                          <git-branch>1.0.X-incubating</git-branch>
+                          <git-branch>${git.branch}</git-branch>
                           <git-build-version>${git.build.version}</git-build-version>
                           <git-closest-tag-name>${git.closest.tag.name}</git-closest-tag-name>
                           <git-commit-id-describe>${git.commit.id.describe}</git-commit-id-describe>

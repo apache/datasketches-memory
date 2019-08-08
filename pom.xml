@@ -257,17 +257,25 @@ under the License.
                 </execution>
               </executions>
               <configuration>
+                  <injectAllReactorProjects>true</injectAllReactorProjects>
                   <archive>
+                      <manifest>
+                          <addDefaultEntries>false</addDefaultEntries>
+                          <addDefaultSpecificationEntries>false</addDefaultSpecificationEntries>
+                          <addDefaultImplementationEntries>false</addDefaultImplementationEntries>
+                      </manifest>
                       <manifestEntries>
-                          <git.branch>${git.branch}</git.branch>
-                          <git.build.version>${git.build.version}</git.build.version>
-                          <git.closest.tag.name>${git.closest.tag.name}</git.closest.tag.name>
-                          <git.commit.id.describe>${git.commit.id.describe}</git.commit.id.describe>
-                          <git.commit.id.full>${git.commit.id.full}</git.commit.id.full>
-                          <git.commit.message.full>${git.commit.message.full}</git.commit.message.full>
-                          <git.commit.time>${git.commit.time}</git.commit.time>
-                          <git.commit.user.email>${git.commit.user.email}</git.commit.user.email>
-                          <git.tags>${git.tags}</git.tags>
+                          <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
+                          <GroupId-ArtifactId>${project.groupId}:${project.artifactId}</GroupId-ArtifactId>
+                          <git-branch>1.0.X-incubating</git-branch>
+                          <git-build-version>${git.build.version}</git-build-version>
+                          <git-closest-tag-name>${git.closest.tag.name}</git-closest-tag-name>
+                          <git-commit-id-describe>${git.commit.id.describe}</git-commit-id-describe>
+                          <git-commit-id-full>${git.commit.id.full}</git-commit-id-full>
+                          <git-commit-message-full>${git.commit.message.full}</git-commit-message-full>
+                          <git-commit-time>${git.commit.time}</git-commit-time>
+                          <git-commit-user-email>${git.commit.user.email}</git-commit-user-email>
+                          <git-tags>${git.tags}</git-tags>
                           <Build-Jdk>${java.version} (${java.vendor} ${java.vm.version})</Build-Jdk>
                           <Build-OS>${os.name} ${os.arch} ${os.version}</Build-OS>
                       </manifestEntries>

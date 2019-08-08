@@ -259,12 +259,17 @@ under the License.
               <configuration>
                   <archive>
                       <manifestEntries>
+                          <git.branch>${git.branch}</git.branch>
+                          <git.build.version>${git.build.version}</git.build.version>
+                          <git.closest.tag.name>${git.closest.tag.name}</git.closest.tag.name>
+                          <git.commit.id.describe>${git.commit.id.describe}</git.commit.id.describe>
+                          <git.commit.id.full>${git.commit.id.full}</git.commit.id.full>
+                          <git.commit.message.full>${git.commit.message.full}</git.commit.message.full>
+                          <git.commit.time>${git.commit.time}</git.commit.time>
+                          <git.commit.user.email>${git.commit.user.email}</git.commit.user.email>
+                          <git.tags>${git.tags}</git.tags>
                           <Build-Jdk>${java.version} (${java.vendor} ${java.vm.version})</Build-Jdk>
                           <Build-OS>${os.name} ${os.arch} ${os.version}</Build-OS>
-                          <Build-Timestamp>${git.build.time}</Build-Timestamp>
-                          <Build-Version>${git.build.version}</Build-Version>
-                          <Build-Revision>${git.commit.id}</Build-Revision>
-                          <Build-Revision-Describe>${git.commit.id.describe}</Build-Revision-Describe>
                       </manifestEntries>
                   </archive>
               </configuration>

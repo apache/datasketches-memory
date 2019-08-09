@@ -218,6 +218,7 @@ under the License.
     </dependencies>
 
     <build>
+
         <plugins>
             <!-- We want to deploy the artifacts to a staging location for perusal -->
             <!-- Apache Parent pom: apache-release profile -->
@@ -256,27 +257,6 @@ under the License.
                   </goals>
                 </execution>
               </executions>
-              <configuration>
-                  <injectAllReactorProjects>true</injectAllReactorProjects>
-                  <archive>
-                      <manifest>
-                          <addDefaultEntries>false</addDefaultEntries>
-                          <addDefaultSpecificationEntries>false</addDefaultSpecificationEntries>
-                          <addDefaultImplementationEntries>false</addDefaultImplementationEntries>
-                      </manifest>
-                      <manifestEntries>
-                          <Build-Jdk>${java.version} (${java.vendor} ${java.vm.version})</Build-Jdk>
-                          <Build-OS>${os.name} ${os.arch} ${os.version}</Build-OS>
-                          <Implementation-Vendor>The Apache Software Foundataion</Implementation-Vendor>
-                          <GroupId-ArtifactId>${project.groupId}:${project.artifactId}</GroupId-ArtifactId>
-                          <git-branch>${git.branch}</git-branch>
-                          <git-commit-id>${git.commit.id.full}</git-commit-id>
-                          <git-commit-time>${git.commit.time}</git-commit-time>
-                          <git-commit-user-email>${git.commit.user.email}</git-commit-user-email>
-                          <git-commit-tag>${git.tags}</git-commit-tag>
-                      </manifestEntries>
-                  </archive>
-              </configuration>
             </plugin>
 
             <!-- Extends Apache Parent pom, apache-release profile -->
@@ -414,48 +394,6 @@ under the License.
                     <!-- Since we use Travis CI we do not have to put a Coveralls token here. -->
                 </configuration>
             </plugin>
-
-            <plugin>
-                <groupId>pl.project13.maven</groupId>
-                <artifactId>git-commit-id-plugin</artifactId>
-                <version>${git-commit-id-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>revision</goal>
-                        </goals>
-                        <phase>initialize</phase>
-                    </execution>
-                </executions>
-                <configuration>
-                    <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
-                    <dateFormatTimeZone>UTC</dateFormatTimeZone>
-                    <verbose>false</verbose>
-                    <skipPoms>false</skipPoms>
-                    <format>json</format>
-                    <generateGitPropertiesFile>true</generateGitPropertiesFile>
-                    <generateGitPropertiesFilename>${project.build.directory}/git.properties</generateGitPropertiesFilename>
-                    <failOnNoGitDirectory>true</failOnNoGitDirectory>
-                    <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
-                    <commitIdGenerationMode>full</commitIdGenerationMode>
-                    <includeOnlyProperties>
-                        <includeProperty>git.branch</includeProperty>
-                        <includeProperty>git.commit.id.full</includeProperty>
-                        <includeProperty>git.commit.time</includeProperty>
-                        <includeProperty>git.commit.user.email</includeProperty>
-                        <includeProperty>git.tags</includeProperty>
-                    </includeOnlyProperties>
-                    <gitDescribe>
-                        <skip>false</skip>
-                        <always>true</always>
-                        <abbrev>7</abbrev>
-                        <dirty>-dirty</dirty>
-                        <tags>true</tags>
-                        <forceLongFormat>true</forceLongFormat>
-                    </gitDescribe>
-                </configuration>
-            </plugin>
-
         </plugins>
     </build>
 
@@ -535,9 +473,103 @@ under the License.
         </profile>
         
         <profile>
-          <id>sign</id>
+          <id>nexus-jars</id>
           <build>
+            <pluginManagement>
+              <plugins>
+                <plugin>
+                    <groupId>pl.project13.maven</groupId>
+                    <artifactId>git-commit-id-plugin</artifactId>
+                    <version>${git-commit-id-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>revision</goal>
+                            </goals>
+                            <phase>initialize</phase>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+                        <dateFormatTimeZone>UTC</dateFormatTimeZone>
+                        <verbose>false</verbose>
+                        <skipPoms>false</skipPoms>
+                        <format>json</format>
+                        <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                        <generateGitPropertiesFilename>${project.build.directory}/git.properties</generateGitPropertiesFilename>
+                        <failOnNoGitDirectory>true</failOnNoGitDirectory>
+                        <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
+                        <commitIdGenerationMode>full</commitIdGenerationMode>
+                        <includeOnlyProperties>
+                            <includeProperty>git.branch</includeProperty>
+                            <includeProperty>git.commit.id.full</includeProperty>
+                            <includeProperty>git.commit.time</includeProperty>
+                            <includeProperty>git.commit.user.email</includeProperty>
+                            <includeProperty>git.tags</includeProperty>
+                        </includeOnlyProperties>
+                        <gitDescribe>
+                            <skip>false</skip>
+                            <always>true</always>
+                            <abbrev>7</abbrev>
+                            <dirty>-dirty</dirty>
+                            <tags>true</tags>
+                            <forceLongFormat>true</forceLongFormat>
+                        </gitDescribe>
+                    </configuration>
+                </plugin>
+
+                <!-- Extends Apache Parent pom, pluginManagement-->
+                <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-jar-plugin</artifactId>
+                  <version>${maven-jar-plugin.version}</version>
+                  <executions>
+                    <execution>
+                      <id>default-jar</id>
+                      <goals>
+                        <goal>jar</goal>
+                      </goals>
+                    </execution>
+                    <execution>
+                      <id>default-test-jar</id>
+                      <goals>
+                        <goal>test-jar</goal>
+                      </goals>
+                    </execution>
+                  </executions>
+                  <configuration>
+                      <injectAllReactorProjects>true</injectAllReactorProjects>
+                      <archive>
+                          <manifest>
+                              <addDefaultEntries>false</addDefaultEntries>
+                              <addDefaultSpecificationEntries>false</addDefaultSpecificationEntries>
+                              <addDefaultImplementationEntries>false</addDefaultImplementationEntries>
+                          </manifest>
+                          <manifestEntries>
+                              <Build-Jdk>${java.version} (${java.vendor} ${java.vm.version})</Build-Jdk>
+                              <Build-OS>${os.name} ${os.arch} ${os.version}</Build-OS>
+                              <Implementation-Vendor>The Apache Software Foundataion</Implementation-Vendor>
+                              <GroupId-ArtifactId>${project.groupId}:${project.artifactId}</GroupId-ArtifactId>
+                              <git-branch>${git.branch}</git-branch>
+                              <git-commit-id>${git.commit.id.full}</git-commit-id>
+                              <git-commit-time>${git.commit.time}</git-commit-time>
+                              <git-commit-user-email>${git.commit.user.email}</git-commit-user-email>
+                              <git-commit-tag>${git.tags}</git-commit-tag>
+                          </manifestEntries>
+                      </archive>
+                  </configuration>
+                </plugin>
+              </plugins>
+            </pluginManagement>
             <plugins>
+              <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+              </plugin>
+              <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+              </plugin>
               <!-- We want to sign the artifacts, POM, and all attached artifacts -->
               <!-- Apache Parent pom, PM, apache-release profile -->
               <plugin>

@@ -265,19 +265,15 @@ under the License.
                           <addDefaultImplementationEntries>false</addDefaultImplementationEntries>
                       </manifest>
                       <manifestEntries>
-                          <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
-                          <GroupId-ArtifactId>${project.groupId}:${project.artifactId}</GroupId-ArtifactId>
-                          <git-branch>${git.branch}</git-branch>
-                          <git-build-version>${git.build.version}</git-build-version>
-                          <git-closest-tag-name>${git.closest.tag.name}</git-closest-tag-name>
-                          <git-commit-id-describe>${git.commit.id.describe}</git-commit-id-describe>
-                          <git-commit-id-full>${git.commit.id.full}</git-commit-id-full>
-                          <git-commit-message-full>${git.commit.message.full}</git-commit-message-full>
-                          <git-commit-time>${git.commit.time}</git-commit-time>
-                          <git-commit-user-email>${git.commit.user.email}</git-commit-user-email>
-                          <git-tags>${git.tags}</git-tags>
                           <Build-Jdk>${java.version} (${java.vendor} ${java.vm.version})</Build-Jdk>
                           <Build-OS>${os.name} ${os.arch} ${os.version}</Build-OS>
+                          <Implementation-Vendor>The Apache Software Foundataion</Implementation-Vendor>
+                          <GroupId-ArtifactId>${project.groupId}:${project.artifactId}</GroupId-ArtifactId>
+                          <git-branch>${git.branch}</git-branch>
+                          <git-commit-id>${git.commit.id.full}</git-commit-id>
+                          <git-commit-time>${git.commit.time}</git-commit-time>
+                          <git-commit-user-email>${git.commit.user.email}</git-commit-user-email>
+                          <git-commit-tag>${git.tags}</git-commit-tag>
                       </manifestEntries>
                   </archive>
               </configuration>
@@ -444,11 +440,7 @@ under the License.
                     <commitIdGenerationMode>full</commitIdGenerationMode>
                     <includeOnlyProperties>
                         <includeProperty>git.branch</includeProperty>
-                        <includeProperty>git.build.version</includeProperty>
-                        <includeProperty>git.closest.tag.name</includeProperty>
-                        <includeProperty>git.commit.id.describe</includeProperty>
                         <includeProperty>git.commit.id.full</includeProperty>
-                        <includeProperty>git.commit.message.full</includeProperty>
                         <includeProperty>git.commit.time</includeProperty>
                         <includeProperty>git.commit.user.email</includeProperty>
                         <includeProperty>git.tags</includeProperty>

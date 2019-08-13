@@ -27,7 +27,7 @@ under the License.
     <!-- fixes dumb maven warning -->
   </parent>
   <groupId>org.apache.datasketches</groupId>
-  <artifactId>memory</artifactId>
+  <artifactId>datasketches-memory</artifactId>
   <version>1.2.0-incubating-SNAPSHOT</version>
   <name>${project.artifactId}</name>
   <description>High-performance native memory access.</description>

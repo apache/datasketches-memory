@@ -28,7 +28,7 @@ under the License.
   </parent>
   <groupId>org.apache.datasketches</groupId>
   <artifactId>memory</artifactId>
-  <version>1.2.0-incubating-SNAPSHOT</version>
+  <version>1.1.0-incubating</version>
   <name>${project.artifactId}</name>
   <description>High-performance native memory access.</description>
   <url>https://datasketches.apache.org/</url>

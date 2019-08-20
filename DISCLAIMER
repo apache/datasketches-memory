@@ -9,7 +9,6 @@ While incubation status is not necessarily a reflection of the
 completeness or stability of the code, it does indicate that the
 project has yet to be fully endorsed by the ASF.
 
-
 Some of the incubating project's releases may not be fully compliant
 with ASF policy. For example, releases may have incomplete or
 un-reviewed licensing conditions. What follows is a list of known
@@ -19,9 +18,9 @@ definition, is likely to be incomplete):
  * The LICENSE file is incomplete and will be fixed with the next release.
 
 If you are planning to incorporate this work into your
-product/project, please be aware that you will need to conduct a
+product or project, please be aware that you will need to conduct a
 thorough licensing review to determine the overall implications of
 including this work. For the current status of this project through the Apache
 Incubator visit: 
 
-http://incubator.apache.org/project/#Podling-Name#.html
+http://incubator.apache.org/projects/datasketches.html

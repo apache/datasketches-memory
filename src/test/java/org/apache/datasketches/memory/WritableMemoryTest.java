@@ -40,14 +40,6 @@ public class WritableMemoryTest {
   }
 
   @Test
-  public void wrapBigEndian2() {
-    ByteBuffer bb = ByteBuffer.allocate(64);
-    WritableBuffer wbuf = WritableBuffer.wrap(bb);
-    assertFalse(wbuf.getTypeByteOrder() == BaseState.nativeByteOrder);
-    assertEquals(wbuf.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
-  }
-
-  @Test
   public void wrapBigEndianAsLittle() {
     ByteBuffer bb = ByteBuffer.allocate(64);
     bb.putChar(0, (char)1); //as BE

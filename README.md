@@ -24,8 +24,8 @@
 
  =================
 
-# DataSketches Memory
- The goal of this package is to provide high performance access to native memory for primitives
+# DataSketches Memory Component
+ The goal of this component of the library is to provide high performance access to native memory for primitives
  and primitive arrays. It also provides consistent views into heap-based arrays,
  Java ByteBuffers and memory mapped files. This package is general purpose, has minimal external
  runtime dependencies and can be used in any application that needs to manage data structures outside
@@ -41,7 +41,7 @@
 
 ## [Latest Release](https://github.com/apache/incubator-datasketches-memory/releases)
 
-## [Comments](https://groups.google.com/forum/#!forum/sketches-user)
+## [Forum](https://groups.google.com/forum/#!forum/sketches-user)
 
 
 ## Note: This package can only be compiled using Java 1.8.

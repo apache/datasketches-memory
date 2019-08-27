@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 
 import org.testng.annotations.Test;
 
+@SuppressWarnings("javadoc")
 public class BufferReadWriteSafetyTest {
 
   // Test various operations with read-only Buffer

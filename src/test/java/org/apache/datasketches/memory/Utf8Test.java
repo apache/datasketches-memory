@@ -41,6 +41,7 @@ import org.apache.datasketches.memory.Util.RandomCodePoints;
  * https://developers.google.com/protocol-buffers/
  * See LICENSE.
  */
+@SuppressWarnings("javadoc")
 public class Utf8Test {
 
   @Test

@@ -30,6 +30,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import org.testng.annotations.Test;
 
+@SuppressWarnings("javadoc")
 public class WritableMemoryTest {
 
   @Test

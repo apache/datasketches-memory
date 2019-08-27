@@ -29,6 +29,7 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
+@SuppressWarnings("javadoc")
 public class CommonMemoryTest {
 
   @Test

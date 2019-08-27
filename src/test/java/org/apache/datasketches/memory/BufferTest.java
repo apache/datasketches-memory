@@ -28,8 +28,8 @@ import java.util.List;
 import org.testng.annotations.Test;
 import org.testng.collections.Lists;
 
+@SuppressWarnings("javadoc")
 public class BufferTest {
-
 
   @Test
   public void checkDirectRoundTrip() {

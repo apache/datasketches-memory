@@ -25,6 +25,7 @@ import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 @Ignore("Test causes OutOfMemoryError in Travis CI, run only locally")
+@SuppressWarnings("javadoc")
 public class IgnoredArrayOverflowTest {
 
   private WritableHandle h;

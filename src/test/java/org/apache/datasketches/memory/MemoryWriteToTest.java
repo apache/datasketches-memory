@@ -28,6 +28,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+@SuppressWarnings("javadoc")
 public class MemoryWriteToTest {
 
   @Test

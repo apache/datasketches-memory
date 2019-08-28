@@ -49,8 +49,7 @@ import static org.apache.datasketches.memory.UnsafeUtil.unsafe;
  *
  * <p>Portions of this code were adapted from
  * <a href="https://github.com/OpenHFT/Zero-Allocation-Hashing/blob/master/src/main/java/net/openhft/hashing/XxHash.java">
- * OpenHFT/Zero-Allocation-Hashing</a>,
- * which has an Apache 2 license as does this site. See LICENSE.
+ * OpenHFT/Zero-Allocation-Hashing</a>, which has an Apache 2 license as does this site. See LICENSE.
  *
  * @author Lee Rhodes
  */

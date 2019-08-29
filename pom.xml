@@ -46,21 +46,21 @@ under the License.
   <licenses>
     <license>
       <name>Apache License, Version 2.0</name>
-      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
   <scm>
-    <connection>scm:git:ssh://git@github.com/apache/incubator-datasketches-memory.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/apache/incubator-datasketches-memory.git</developerConnection>
-    <url>https://github.com/apache/incubator-datasketches-memory</url>
+    <connection>scm:git:ssh://git@github.com/apache/incubator-${project.artifactId}.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/apache/incubator-${project.artifactId}.git</developerConnection>
+    <url>https://github.com/apache/incubator-${project.artifactId}</url>
     <tag>HEAD</tag>
   </scm>
   <issueManagement>
     <!-- <system>jira</system>
       <url>https://issues.apache.org/jira/browse/DATASKETCHES</url> -->
     <system>GitHub</system>
-    <url>https://github.com/apache/incubator-datasketches-memory/issues</url>
+    <url>https://github.com/apache/incubator-${project.artifactId}/issues</url>
   </issueManagement>
   <mailingLists>
     <mailingList>
@@ -69,13 +69,6 @@ under the License.
       <unsubscribe>dev-unsubscribe@datasketches.apache.org</unsubscribe>
       <post>dev@datasketches.apache.org</post>
       <archive>https://mail-archives.apache.org/mod_mbox/datasketches-dev</archive>
-    </mailingList>
-    <mailingList>
-      <name>DataSketches Commits</name>
-      <subscribe>commits-subscribe@datasketches.apache.org</subscribe>
-      <unsubscribe>commits-unsubscribe@datasketches.apache.org</unsubscribe>
-      <post>commits@datasketches.apache.org</post>
-      <archive>http://www.mail-archive.com/commits%datasketches.apache.org</archive>
     </mailingList>
     <mailingList>
       <name>sketches-user</name>
@@ -107,6 +100,7 @@ under the License.
     <!-- Dependencies -->
     <testng.version>6.14.3</testng.version>
     <slf4j-api.version>1.7.27</slf4j-api.version>
+    <slf4j-simple.version>1.7.27</slf4j-simple.version>
     <protobuf-java.version>3.6.0</protobuf-java.version>
     <!-- Used for UTF8 testing -->
     <zero-allocation-hashing.version>0.8</zero-allocation-hashing.version>
@@ -131,7 +125,6 @@ under the License.
     <!-- org.eluder Maven Plugins -->
     <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
     <!-- other -->
-    <reproducible-build-maven-plugin.version>0.4</reproducible-build-maven-plugin.version>
     <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
     <git-commit-id-plugin.version>3.0.0</git-commit-id-plugin.version>
   </properties>
@@ -139,7 +132,7 @@ under the License.
     <repository>
       <id>apache.snapshots</id>
       <name>Apache Snapshot Repository</name>
-      <url>https://repository.apache.org/content/groups/snapshots</url>
+      <url>https://repository.apache.org/content/groups/snapshots/org/apache/datasketches/</url>
       <releases>
         <enabled>false</enabled>
       </releases>
@@ -149,8 +142,8 @@ under the License.
     </repository>
     <repository>
       <id>apache</id>
-      <name>Apache Repository</name>
-      <url>https://repository.apache.org/content/repositories/releases/</url>
+      <name>Apache Releases Repository</name>
+      <url>https://repository.apache.org/content/repositories/releases/org/apache/datasketches/</url>
       <releases>
         <enabled>true</enabled>
       </releases>
@@ -169,7 +162,7 @@ under the License.
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-      <version>${slf4j-api.version}</version>
+      <version>${slf4j-simple.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -196,9 +189,9 @@ under the License.
   <build>
     <pluginManagement>
       <plugins>
-        <!-- We want to deploy the artifacts to a staging location for perusal -->
-        <!-- Apache Parent pom: apache-release profile -->
         <plugin>
+          <!-- We want to deploy the artifacts to a staging location for perusal -->
+          <!-- Apache Parent pom: apache-release profile -->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
           <version>${maven-deploy-plugin.version}</version>
@@ -207,14 +200,14 @@ under the License.
             <!-- see maven-install-plugin -->
           </configuration>
         </plugin>
-        <!-- Apache Parent pom, pluginManagement-->
         <plugin>
+          <!-- Apache Parent pom, pluginManagement-->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
           <version>${maven-release-plugin.version}</version>
         </plugin>
-        <!-- Extends Apache Parent pom, pluginManagement-->
         <plugin>
+          <!-- Extends Apache Parent pom, pluginManagement-->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
           <version>${maven-jar-plugin.version}</version>
@@ -233,8 +226,8 @@ under the License.
             </execution>
           </executions>
         </plugin>
-        <!-- Extends Apache Parent pom, apache-release profile -->
         <plugin>
+          <!-- Extends Apache Parent pom, apache-release profile -->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>${maven-javadoc-plugin.version}</version>
@@ -280,8 +273,8 @@ under the License.
             </execution>
           </executions>
         </plugin>
-        <!-- Apache Parent pom, pluginManagement-->
         <plugin>
+          <!-- Apache Parent pom, pluginManagement-->
           <groupId>org.apache.rat</groupId>
           <artifactId>apache-rat-plugin</artifactId>
           <version>${apache-rat-plugin.version}</version>
@@ -306,8 +299,8 @@ under the License.
             </excludes>
           </configuration>
         </plugin>
-        <!-- Extends Apache Parent pom, apache-release profile -->
         <plugin>
+          <!-- Extends Apache Parent pom, apache-release profile -->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
           <version>${maven-source-plugin.version}</version>
@@ -328,8 +321,8 @@ under the License.
             </execution>
           </executions>
         </plugin>
-        <!-- Apache Parent pom, pluginManagement-->
         <plugin>
+          <!-- Apache Parent pom, pluginManagement-->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>${maven-surefire-plugin.version}</version>
@@ -339,8 +332,8 @@ under the License.
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
           </configuration>
         </plugin>
-        <!-- Generates code coverage report from website. -->
         <plugin>
+          <!-- Generates code coverage report from website. -->
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
           <version>${jacoco-maven-plugin.version}</version>
@@ -353,8 +346,8 @@ under the License.
             </execution>
           </executions>
         </plugin>
-        <!-- Submit code coverage report to Coveralls.io. -->
         <plugin>
+          <!-- Submit code coverage report to Coveralls.io. -->
           <groupId>org.eluder.coveralls</groupId>
           <artifactId>coveralls-maven-plugin</artifactId>
           <version>${coveralls-maven-plugin.version}</version>

@@ -29,6 +29,10 @@ public final class Utf8CodingException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
 
+  /**
+   * A coding exception occured processing UTF_8
+   * @param message the error message
+   */
   public Utf8CodingException(final String message) {
     super(message);
   }

@@ -29,6 +29,7 @@ import java.nio.ByteOrder;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+@SuppressWarnings("javadoc")
 public class WritableBufferImplTest {
 
   //Simple Native direct

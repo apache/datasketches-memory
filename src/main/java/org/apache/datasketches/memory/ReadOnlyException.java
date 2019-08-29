@@ -27,6 +27,10 @@ package org.apache.datasketches.memory;
 public class ReadOnlyException extends UnsupportedOperationException {
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Read Only Exception
+     * @param message the error message
+     */
     public ReadOnlyException(final String message) {
       super(message);
     }

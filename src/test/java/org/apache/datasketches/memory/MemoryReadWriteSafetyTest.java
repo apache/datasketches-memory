@@ -27,6 +27,7 @@ import java.nio.ByteOrder;
 
 import org.testng.annotations.Test;
 
+@SuppressWarnings("javadoc")
 public class MemoryReadWriteSafetyTest {
 
   // Test various operations with read-only Memory

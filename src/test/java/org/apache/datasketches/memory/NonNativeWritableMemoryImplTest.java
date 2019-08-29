@@ -28,6 +28,7 @@ import org.testng.annotations.Test;
 /**
  * @author Lee Rhodes
  */
+@SuppressWarnings("javadoc")
 public class NonNativeWritableMemoryImplTest {
   private byte[] bArr = new byte[8];
   private final WritableMemory wmem = WritableMemory.wrap(bArr, ByteOrder.BIG_ENDIAN);

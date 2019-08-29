@@ -35,6 +35,7 @@ import org.testng.annotations.Test;
 /**
  * @author Lee Rhodes
  */
+@SuppressWarnings("javadoc")
 public class LeafImplTest {
   static final ByteOrder LE = ByteOrder.LITTLE_ENDIAN;
   static final ByteOrder BE = ByteOrder.BIG_ENDIAN;

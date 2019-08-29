@@ -27,6 +27,7 @@ import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
+@SuppressWarnings("javadoc")
 public class AllocateDirectMemoryTest {
 
   @Test

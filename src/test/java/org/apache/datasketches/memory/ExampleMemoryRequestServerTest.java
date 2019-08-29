@@ -29,6 +29,7 @@ import org.testng.annotations.Test;
  * Examples of how to use the MemoryRequestServer with a memory hungry client.
  * @author Lee Rhodes
  */
+@SuppressWarnings("javadoc")
 public class ExampleMemoryRequestServerTest {
 
   /**

@@ -42,6 +42,7 @@ import java.nio.file.attribute.PosixFilePermissions;
 
 import org.testng.annotations.Test;
 
+@SuppressWarnings("javadoc")
 public class UtilTest {
 
   //Binary Search

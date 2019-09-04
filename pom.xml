@@ -478,7 +478,7 @@ under the License.
              and at a Release Candidate tag (e.g., 1.1.0-incubating-RC1).
              The pom version in the release branch must be properly set to something like: "1.1.0-incubating".
              The pom version in the master would be set to something like: "1.2.0-incubating-SNAPSHOT".
-             Test Command: mvn clean verify -Pnexus-jars -Dmaven.test.skip=true
+             Test Command: mvn clean verify -Pnexus-jars -DskipTests=true
              Command: mvn clean deploy -Dnexus-jars
              Verify Command (from terminal): gpg -v &#45;&#45;verify $ASC $FILE 
     -->

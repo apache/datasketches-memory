@@ -23,6 +23,7 @@
 
 package org.apache.datasketches.memory;
 
+import static org.apache.datasketches.memory.Util.*;
 import static org.apache.datasketches.memory.AllocateDirectMap.isFileReadOnly;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.testng.Assert.assertEquals;
@@ -42,16 +43,16 @@ import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")
 public class AllocateDirectWritableMapMemoryTest {
+  private static final String LS = System.getProperty("line.separator");
 
   @BeforeClass
   public void setReadOnly() {
-    UtilTest.setGettysburgAddressFileToReadOnly(this);
+    UtilTest.setGettysburgAddressFileToReadOnly();
   }
 
   @Test
   public void simpleMap() throws Exception {
-    File file =
-        new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
+    File file = getResourceFile("GettysburgAddress.txt");
     try (MapHandle h = Memory.map(file); WritableMapHandle wh = (WritableMapHandle) h) {
       Memory mem = h.get();
       byte[] bytes = new byte[(int)mem.getCapacity()];
@@ -138,8 +139,7 @@ public class AllocateDirectWritableMapMemoryTest {
 
   @Test(expectedExceptions = ReadOnlyException.class)
   public void simpleMap2() throws IOException {
-    File file =
-        new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
+    File file = getResourceFile("GettysburgAddress.txt");
     assertTrue(isFileReadOnly(file));
     try (WritableMapHandle rh = WritableMemory.map(file)) {
       //
@@ -148,8 +148,7 @@ public class AllocateDirectWritableMapMemoryTest {
 
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void checkOverLength()  {
-    File file =
-        new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
+    File file = getResourceFile("GettysburgAddress.txt");
     try (WritableMapHandle rh = WritableMemory.map(file, 0, 1 << 20, ByteOrder.nativeOrder())) {
       //
     } catch (IOException e) {
@@ -210,8 +209,7 @@ public class AllocateDirectWritableMapMemoryTest {
 
   @Test
   public void checkExplicitClose() throws Exception {
-    File file =
-        new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
+    File file = getResourceFile("GettysburgAddress.txt");
     try (MapHandle wmh = Memory.map(file)) {
       wmh.close(); //explicit close. Does the work of closing
       wmh.dirMap.close(); //redundant
@@ -232,10 +230,18 @@ public class AllocateDirectWritableMapMemoryTest {
     println("PRINTING: "+this.getClass().getName());
   }
 
-  /**
-   * @param s String to print
-   */
-  static void println(final String s) {
-    //System.out.println(s);
+  static void println(final Object o) {
+    if (o == null) { print(LS); }
+    else { print(o.toString() + LS); }
   }
+
+  /**
+   * @param o value to print
+   */
+  static void print(final Object o) {
+    if (o != null) {
+      //System.out.print(o.toString()); //disable here
+    }
+  }
+
 }

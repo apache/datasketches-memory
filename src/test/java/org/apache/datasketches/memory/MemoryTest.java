@@ -23,6 +23,7 @@
 
 package org.apache.datasketches.memory;
 
+import static org.apache.datasketches.memory.Util.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
@@ -41,10 +42,11 @@ import org.testng.collections.Lists;
 
 @SuppressWarnings("javadoc")
 public class MemoryTest {
+  private static final String LS = System.getProperty("line.separator");
 
   @BeforeClass
   public void setReadOnly() {
-    UtilTest.setGettysburgAddressFileToReadOnly(this);
+    UtilTest.setGettysburgAddressFileToReadOnly();
   }
 
   @Test
@@ -397,7 +399,7 @@ public class MemoryTest {
   @SuppressWarnings("resource")
   @Test
   public void checkMonitorDirectMapStats() throws Exception {
-    File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
+    File file = getResourceFile("GettysburgAddress.txt");
     long bytes = file.length();
 
     MapHandle mmh1 = Memory.map(file);
@@ -458,11 +460,18 @@ public class MemoryTest {
     println("PRINTING: "+this.getClass().getName());
   }
 
+  static void println(final Object o) {
+    if (o == null) { print(LS); }
+    else { print(o.toString() + LS); }
+  }
+
   /**
-   * @param s value to print
+   * @param o value to print
    */
-  static void println(final String s) {
-    //System.out.println(s);
+  static void print(final Object o) {
+    if (o != null) {
+      //System.out.print(o.toString()); //disable here
+    }
   }
 
 }

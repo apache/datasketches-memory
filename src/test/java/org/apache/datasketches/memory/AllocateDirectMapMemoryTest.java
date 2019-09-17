@@ -23,6 +23,7 @@
 
 package org.apache.datasketches.memory;
 
+import static org.apache.datasketches.memory.Util.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -37,16 +38,17 @@ import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")
 public class AllocateDirectMapMemoryTest {
+  private static final String LS = System.getProperty("line.separator");
   MapHandle hand = null;
 
   @BeforeClass
   public void setReadOnly() {
-    UtilTest.setGettysburgAddressFileToReadOnly(this);
+    UtilTest.setGettysburgAddressFileToReadOnly();
   }
 
   @Test
   public void simpleMap() throws Exception {
-    File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
+    File file = getResourceFile("GettysburgAddress.txt");
     try (MapHandle rh = Memory.map(file)) {
       rh.close();
     }
@@ -54,7 +56,7 @@ public class AllocateDirectMapMemoryTest {
 
   @Test
   public void testIllegalArguments() throws Exception {
-    File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
+    File file = getResourceFile("GettysburgAddress.txt");
     try (MapHandle rh = Memory.map(file, -1, Integer.MAX_VALUE, ByteOrder.nativeOrder())) {
       fail("Failed: testIllegalArgumentException: Position was negative.");
     } catch (IllegalArgumentException e) {
@@ -70,7 +72,7 @@ public class AllocateDirectMapMemoryTest {
 
   @Test
   public void testMapAndMultipleClose() throws Exception {
-    File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
+    File file = getResourceFile("GettysburgAddress.txt");
     long memCapacity = file.length();
     try (MapHandle rh = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
       Memory map = rh.get();
@@ -85,7 +87,7 @@ public class AllocateDirectMapMemoryTest {
 
   @Test
   public void testReadFailAfterClose() throws Exception {
-    File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
+    File file = getResourceFile("GettysburgAddress.txt");
     long memCapacity = file.length();
     try (MapHandle rh = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
       Memory mmf = rh.get();
@@ -98,7 +100,7 @@ public class AllocateDirectMapMemoryTest {
 
   @Test
   public void testLoad() throws Exception {
-    File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
+    File file = getResourceFile("GettysburgAddress.txt");
     long memCapacity = file.length();
     try (MapHandle rh = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
       rh.load();
@@ -109,7 +111,7 @@ public class AllocateDirectMapMemoryTest {
 
   @Test
   public void testHandlerHandoffWithTWR() throws Exception {
-    File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
+    File file = getResourceFile("GettysburgAddress.txt");
     long memCapacity = file.length();
     Memory mem;
     try (MapHandle rh = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
@@ -124,7 +126,7 @@ public class AllocateDirectMapMemoryTest {
 
   @Test
   public void testHandoffWithoutClose() throws Exception {
-    File file = new File(getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
+    File file = getResourceFile("GettysburgAddress.txt");
     long memCapacity = file.length();
     MapHandle rh = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder());
     rh.load();
@@ -149,10 +151,18 @@ public class AllocateDirectMapMemoryTest {
     println("PRINTING: "+this.getClass().getName());
   }
 
-  /**
-   * @param s value to print
-   */
-  static void println(String s) {
-    //System.out.println(s); //disable here
+  static void println(final Object o) {
+    if (o == null) { print(LS); }
+    else { print(o.toString() + LS); }
   }
+
+  /**
+   * @param o value to print
+   */
+  static void print(final Object o) {
+    if (o != null) {
+      //System.out.print(o.toString()); //disable here
+    }
+  }
+
 }

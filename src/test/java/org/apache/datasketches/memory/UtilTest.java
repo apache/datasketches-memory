@@ -24,6 +24,8 @@
 package org.apache.datasketches.memory;
 
 import static org.apache.datasketches.memory.Util.characterPad;
+import static org.apache.datasketches.memory.Util.getResourceFile;
+import static org.apache.datasketches.memory.Util.getResourceBytes;
 import static org.apache.datasketches.memory.Util.negativeCheck;
 import static org.apache.datasketches.memory.Util.nullCheck;
 import static org.apache.datasketches.memory.Util.zeroCheck;
@@ -44,6 +46,7 @@ import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")
 public class UtilTest {
+  private static final String LS = System.getProperty("line.separator");
 
   //Binary Search
   @Test
@@ -142,9 +145,8 @@ public class UtilTest {
     }
   }
 
-  static final void setGettysburgAddressFileToReadOnly(Object obj) {
-    File file =
-        new File(obj.getClass().getClassLoader().getResource("GettysburgAddress.txt").getFile());
+  static final void setGettysburgAddressFileToReadOnly() {
+    File file = getResourceFile("GettysburgAddress.txt");
     try {
     Files.setPosixFilePermissions(file.toPath(), PosixFilePermissions.fromString("r--r--r--"));
     } catch (IOException e) {
@@ -152,16 +154,51 @@ public class UtilTest {
     }
   }
 
+  //Resources
+
+  @Test
+  public void resourceFileExits() {
+    final String shortFileName = "GettysburgAddress.txt";
+    final File file = getResourceFile(shortFileName);
+    assertTrue(file.exists());
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void resourceFileNotFound() {
+    final String shortFileName = "GettysburgAddress.txt";
+    getResourceFile(shortFileName + "123");
+  }
+
+  @Test
+  public void resourceBytesCorrect() {
+    final String shortFileName = "GettysburgAddress.txt";
+    final byte[] bytes = getResourceBytes(shortFileName);
+    assertTrue(bytes.length == 1541);
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void resourceBytesFileNotFound() {
+    final String shortFileName = "GettysburgAddress.txt";
+    getResourceBytes(shortFileName + "123");
+  }
+
   @Test
   public void printlnTest() {
     println("PRINTING: "+this.getClass().getName());
   }
 
+  static void println(final Object o) {
+    if (o == null) { print(LS); }
+    else { print(o.toString() + LS); }
+  }
+
   /**
-   * @param s value to print
+   * @param o value to print
    */
-  static void println(String s) {
-    //System.out.println(s); //disable here
+  static void print(final Object o) {
+    if (o != null) {
+      //System.out.print(o.toString()); //disable here
+    }
   }
 
 }

@@ -16,6 +16,7 @@
     specific language governing permissions and limitations
     under the License.
 -->
+
 [![Build Status](https://travis-ci.org/apache/incubator-datasketches-memory.svg?branch=master)](https://travis-ci.org/apache/incubator-datasketches-memory) 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.datasketches/datasketches-memory/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.apache.datasketches/datasketches-memory) 
 [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/apache/incubator-datasketches-memory.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/apache/incubator-datasketches-memory/context:java)
@@ -26,22 +27,72 @@
 
 # DataSketches Memory Component
  The goal of this component of the library is to provide high performance access to native memory for primitives
- and primitive arrays. It also provides consistent views into heap-based arrays,
+ and primitive arrays. It also provides consistent views into heap-based primitive arrays,
  Java ByteBuffers and memory mapped files. This package is general purpose, has minimal external
  runtime dependencies and can be used in any application that needs to manage data structures outside
  the Java heap.
 
-## [DataSketches Library Website](https://datasketches.github.io/)
+## Documentation and Feedback
 
-## [Memory Package Overview Documentation](https://datasketches.github.io/docs/Memory/MemoryPackage.html)
+### [DataSketches Library Website](https://datasketches.github.io/)
 
-## [Memory Package Performance](https://datasketches.github.io/docs/Memory/MemoryPerformance.html)
+### [Memory Package Overview Documentation](https://datasketches.github.io/docs/Memory/MemoryPackage.html)
 
-## [Memory JavaDocs](https://datasketches.github.io/api/memory/snapshot/apidocs/index.html)
+### [Memory Package Performance](https://datasketches.github.io/docs/Memory/MemoryPerformance.html)
 
-## [Latest Release](https://github.com/apache/incubator-datasketches-memory/releases)
+### [Memory JavaDocs](https://datasketches.github.io/api/memory/snapshot/apidocs/index.html)
 
-## [Forum](https://groups.google.com/forum/#!forum/sketches-user)
+### [Forum](https://groups.google.com/forum/#!forum/sketches-user)
 
+## Downloading Latest Release
+__NOTE:__ This component accesses resource files for testing. As a result, the directory elements of the full absolute path of the target installation directory 
+    must qualify as Java identifiers. In other words, the directory elements must not have any space characters (or non-Java identifier characters) in any of the path elements.
+    
+This is required by the Oracle Java Specification in order to ensure location-independent 
+    access to resources: [See Oracle Location-Independent Access to Resources](https://docs.oracle.com/javase/8/docs/technotes/guides/lang/resources.html)
 
-## Note: This package can only be compiled using Java 1.8.
+### [Zip File from Apache Archive](http://archive.apache.org/dist/incubator/datasketches/memory/)
+
+### [Jar Files from Maven Central](https://repository.apache.org/content/repositories/releases/org/apache/datasketches/datasketches-memory/)
+
+### [GitHub](https://github.com/apache/incubator-datasketches-memory/releases)
+
+## Build Instructions
+
+### JDK8 is Required Compiler
+This DataSketches component is pure Java and you must compile using JDK 8.
+
+### Recommended Build Tool
+The DataSketches-java component structured as a Maven project and Maven is the recommended Build Tool.
+
+There are two types of tests: normal unit tests and tests run by the strict profile.  
+
+To run normal unit tests:
+
+    $ mvn clean test
+
+To run the strict profile tests:
+
+    $ mvn clean test -P strict
+
+To install jars built from the downloaded source:
+
+    $ mvn clean install -DskipTests=true
+
+This will create the following Jars:
+
+* datasketches-memory-X.Y.Z-incubating.jar The compiled main class files.
+* datasketches-memory-X.Y.Z-incubating-tests.jar The compiled test class files.
+* datasketches-memory-X.Y.Z-incubating-sources.jar The main source files.
+* datasketches-memory-X.Y.Z-incubating-test-sources.jar The test source files
+* datasketches-memory-X.Y.Z-incubating-javadoc.jar  The compressed Javadocs.
+
+### Dependencies
+
+#### Run-time
+There is one run-time dependency: 
+
+* org.slf4j:slf4j-api
+
+#### Testing
+See the pom.xml file for test dependencies.

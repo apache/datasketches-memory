@@ -540,7 +540,7 @@ abstract class BaseState {
     sb.append("Read Only           : ").append(state.isReadOnly()).append(LS);
     sb.append("Type Byte Order     : ").append(state.getTypeByteOrder().toString()).append(LS);
     sb.append("Native Byte Order   : ").append(nativeByteOrder.toString()).append(LS);
-    sb.append("JDK Major Version   : ").append(UnsafeUtil.JDK).append(LS);
+    sb.append("JDK Runtime Version : ").append(UnsafeUtil.JDK).append(LS);
     //Data detail
     sb.append("Data, littleEndian  :  0  1  2  3  4  5  6  7");
 

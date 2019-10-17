@@ -139,7 +139,7 @@ public final class UnsafeUtil {
     } catch (final Exception e) {
       throw new ExceptionInInitializerError("Improper Java -version string: " + jdkVer + "\n" + e);
     }
-    checkJavaVersion(jdkVer, p0, p1);
+    //checkJavaVersion(jdkVer, p0, p1);
     return new int[] {p0, p1};
   }
 

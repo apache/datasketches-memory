@@ -30,7 +30,7 @@ under the License.
 
   <!-- UNIQUE FOR THIS JAVA COMPONENT -->
   <artifactId>datasketches-memory</artifactId>
-  <version>1.2.0-incubating-SNAPSHOT</version>
+  <version>1.2.0-incubating</version>
   <description>High-performance native memory access.</description>
   <!-- END: UNIQUE FOR THIS JAVA COMPONENT -->
 

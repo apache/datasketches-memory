@@ -225,10 +225,10 @@ APPENDIX B: Additional licenses relevant to this product:
     Code locations:
     -------------------------------------------------------------
     This product contains a method to create a dummy read-only ByteBuffer using unsafe:
-      * https://github.com/apache/incubator-datasketches-memory/blob/master/src/main/java/org/apache/datasketches/memory/AccessByteBuffer.java,
+      * src/main/java/org/apache/datasketches/memory/AccessByteBuffer.java,
         Method: getDummyReadOnlyDirectByteBuffer(...)
     and adapted from Java source code located at:
-      * https://github.com/odnoklassniki/one-nio/blob/master/src/one/nio/mem/DirectMemory.java,
+      * src/one/nio/mem/DirectMemory.java,
         Method: wrap(...).
 
 
@@ -242,10 +242,10 @@ APPENDIX B: Additional licenses relevant to this product:
     Code locations:
     -------------------------------------------------------------
     This product contains code to implement and test the xxHash function:
-      * https://github.com/apache/incubator-datasketches-memory/blob/master/src/main/java/org/apache/datasketches/memory/XxHash64.java
-      * https://github.com/apache/incubator-datasketches-memory/blob/master/src/test/java/org/apache/datasketches/memory/XxHash64Test.java
+      * src/main/java/org/apache/datasketches/memory/XxHash64.java
+      * src/test/java/org/apache/datasketches/memory/XxHash64Test.java
         Method: collisionTest(),
-      * https://github.com/apache/incubator-datasketches-memory/blob/master/src/test/java/org/apache/datasketches/memory/XxHash64LoopingTest.java
+      * src/test/java/org/apache/datasketches/memory/XxHash64LoopingTest.java
         Method: testWithSeed() and HASHES_OF_LOOPING_BYTES_WITH_SEED_42 test data,
     and adapted from Java source code located at:
       * https://github.com/OpenHFT/Zero-Allocation-Hashing
@@ -290,9 +290,9 @@ APPENDIX B: Additional licenses relevant to this product:
     Code locations:
     -------------------------------------------------------------
     This product contains code for encoding, decoding and testing UTF8:
-      * https://github.com/apache/incubator-datasketches-memory/blob/master/src/main/java/org/apache/datasketches/memory/Utf8.java
-      * https://github.com/apache/incubator-datasketches-memory/blob/master/src/test/java/org/apache/datasketches/memory/Utf8Test.java
-      * https://github.com/apache/incubator-datasketches-memory/blob/master/src/test/java/org/apache/datasketches/memory/IsValidUtf8TestUtil.java
+      * src/main/java/org/apache/datasketches/memory/Utf8.java
+      * src/test/java/org/apache/datasketches/memory/Utf8Test.java
+      * src/test/java/org/apache/datasketches/memory/IsValidUtf8TestUtil.java
     and adapted from Java source code located at: 
       * https://github.com/protocolbuffers/protobuf/blob/master/java/core/src/main/java/com/google/protobuf/Utf8.java,
       * https://github.com/protocolbuffers/protobuf/blob/master/java/core/src/test/java/com/google/protobuf/Utf8Test.java,
@@ -331,7 +331,7 @@ APPENDIX B: Additional licenses relevant to this product:
     Code locations:
     -------------------------------------------------------------    
     This product contains code for encoding, decoding and testing UTF8:
-      * https://github.com/apache/incubator-datasketches-memory/blob/master/src/main/java/org/apache/datasketches/memory/XxHash64.java
+      * src/main/java/org/apache/datasketches/memory/XxHash64.java
     and adapted from C++ code located at:
       * https://github.com/Cyan4973/xxHash/blob/dev/xxhash.c,
       * https://github.com/Cyan4973/xxHash/blob/dev/xxhash.h
@@ -341,9 +341,10 @@ APPENDIX B: Additional licenses relevant to this product:
     =============================================================
     Public Domain (optional notice)
     =============================================================
-      This product contains the text of Lincoln's Gettysburg Address, which is in the public domain, and is used in various file tests.
-      This file is read-only and tested for its exact character sequence and cannot be appended with any additional text.
-      * https://github.com/apache/incubator-datasketches-memory/blob/master/src/test/java/org/apache/datasketches/memory/AllocateDirectMapMemoryTest.java
-      * https://github.com/apache/incubator-datasketches-memory/blob/master/src/test/java/org/apache/datasketches/memory/AllocateDirectWritableMapMemoryTest.java
-      * https://github.com/apache/incubator-datasketches-memory/blob/master/src/test/java/org/apache/datasketches/memory/MemoryTest.java
-      * https://github.com/apache/incubator-datasketches-memory/blob/master/src/test/java/org/apache/datasketches/memory/UtilTest.java
+      This product contains the text of Lincoln's Gettysburg Address, which is in the public domain,
+      and is used in various file tests. This file is read-only and tested for its exact character 
+      sequence and cannot be appended with any additional text.
+      * src/test/java/org/apache/datasketches/memory/AllocateDirectMapMemoryTest.java
+      * src/test/java/org/apache/datasketches/memory/AllocateDirectWritableMapMemoryTest.java
+      * src/test/java/org/apache/datasketches/memory/MemoryTest.java
+      * src/test/java/org/apache/datasketches/memory/UtilTest.java

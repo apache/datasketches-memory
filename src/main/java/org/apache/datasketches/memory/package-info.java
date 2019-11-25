@@ -61,7 +61,7 @@
  *
  * <p>More specifically, this package provides access to four different types of resources using
  * two different access APIs. These resources are contiguous blobs of bytes that provide at least
- * byte-level read and write access. The four resources are:
+ * byte-level read and write access. The four resources are:</p>
  *
  * <ul><li>Direct (a.k.a. Native) off-heap memory allocated by the user.</li>
  * <li>Memory-mapped files, both writable and read-only.</li>
@@ -69,7 +69,7 @@
  * <li>Heap-based primitive arrays, which can be accessed as writable or read-only.</li>
  * </ul>
  *
- * <p>The two different access APIs are:
+ * <p>The two different access APIs are:</p>
  * <ul><li><i>Memory, WritableMemory</i>: Absolute offset addressing into a resource.</li>
  * <li><i>Buffer, WritableBuffer</i>: Position relative addressing into a resource.</li>
  * </ul>
@@ -77,21 +77,21 @@
  * <p>In addition, all combinations of access APIs and backing resources can be accessed via
  * multibyte primitive methods (e.g.
  * <i>getLong(...), getLongArray(...), putLong(...), putLongArray(...)</i>) as either
- * {@link java.nio.ByteOrder#BIG_ENDIAN} or {@link java.nio.ByteOrder#LITTLE_ENDIAN}.
+ * {@link java.nio.ByteOrder#BIG_ENDIAN} or {@link java.nio.ByteOrder#LITTLE_ENDIAN}.</p>
  *
  * <p>The resources don't know or care about the access APIs, and the access
- * APIs don't really know or care what resource they are accessing.
+ * APIs don't really know or care what resource they are accessing.</p>
  *
- * An access API is joined with
+ * <p>An access API is joined with
  * a resource either with a static factory method or in combination with a
- * {@link org.apache.datasketches.memory.Handle}, which is used exclusively for resources that are external to
- * the JVM, such as allocation of direct memory and memory-mapped files.
+ * {@link org.apache.datasketches.memory.Handle}, which is used exclusively for resources that are
+ * external to the JVM, such as allocation of direct memory and memory-mapped files.</p>
  *
  * <p>The role of a Handle is to hold onto the reference of a resource that is outside the control
- * of the JVM. The resource is obtained from the handle with {@code get()}.
+ * of the JVM. The resource is obtained from the handle with {@code get()}.</p>
  *
  * <p>When a handle is extended for an AutoCloseable resource and then joined with an access API
- * it becomes an <i>implementation handle</i>. There are 3 implementation handles:
+ * it becomes an <i>implementation handle</i>. There are 3 implementation handles:</p>
  *
  * <ul><li>{@link org.apache.datasketches.memory.MapHandle}
  * for read-only access to a memory-mapped file</li>
@@ -101,13 +101,13 @@
  * for writable access to off-heap memory.</li>
  * </ul>
  *
- * <p>As long as the implementation handle is valid the JVM will not attempt to close the resource.
+ * <p>As long as the implementation handle is valid the JVM will not attempt to close the resource.</p>
  *
  * <p>An implementation handle implements {@link java.lang.AutoCloseable},
  * which also enables compile-time checks for non-closed resources. If a Handle is acquired
  * in a try-with-resources (TWR) block, it's associated resource will be automatically closed by
  * the JVM at the end of the block.
- * The resource can also be explicitly closed by the user by calling {@code Handle.close()}.
+ * The resource can also be explicitly closed by the user by calling {@code Handle.close()}.</p>
  * <blockquote><pre>
  *     //Using try-with-resources block:
  *     try (WritableyMapHandle handle = WritableMemory.map(File file)) {
@@ -123,18 +123,18 @@
  * </pre></blockquote>
  *
  * <p>Where it is desirable to pass ownership of the resource (and the {@code close()}
- * responsibility) one can not use the TWR block. Instead:
+ * responsibility) one can not use the TWR block. Instead:</p>
  * <blockquote><pre>
  *     WritableMapHandle handler = WritableMemory.map(File file);
  *     doWorkAndClose(handle); //passes the handle to object that closes the resource.
  * </pre></blockquote>
  *
- * Whatever part of your process is responsible for allocating a resource external
+ * <p>Whatever part of your process is responsible for allocating a resource external
  * to the JVM must be responsible for closing it or making sure it gets closed.
  * Since only the implementation Handles implement AutoCloseable, you must not let go of the
- * handle reference until you are done with its associated resource.
+ * handle reference until you are done with its associated resource.</p>
  *
- * As mentioned above, there are two ways to do this:
+ * <p>As mentioned above, there are two ways to do this:</p>
  * <ul><li>Use a try-with-resources block.  At the end of the block, the JVM will automatically
  * close the resource.</li>
  *
@@ -149,7 +149,7 @@
  * hard-to-find bug.</li>
  * </ul>
  *
- *<p>Moving back and forth between <i>Memory</i> and <i>Buffer</i>:
+ *<p>Moving back and forth between <i>Memory</i> and <i>Buffer</i>:</p>
  *<blockquote><pre>
  *    Memory mem = ...
  *    Buffer buf = mem.asBuffer();
@@ -158,15 +158,15 @@
  *    ...
  * </pre></blockquote>
  *
- * <p>Hierarchical memory regions can be easily created:
+ * <p>Hierarchical memory regions can be easily created:</p>
  * <blockquote><pre>
  *     WritableMemory wMem = ...
  *     WritableMemory wReg = wMem.writableRegion(offset, length); //OR
  *     Memory reg = wMem.region(offset, length);
  * </pre></blockquote>
  *
- * With asserts enabled in the JVM, all methods are checked for bounds and
- * use-after-close violations.
+ * <p>With asserts enabled in the JVM, all methods are checked for bounds and
+ * use-after-close violations.</p>
  *
  * @author Lee Rhodes
  */

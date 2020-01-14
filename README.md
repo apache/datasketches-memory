@@ -23,7 +23,7 @@
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/apache/incubator-datasketches-memory.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/apache/incubator-datasketches-memory/alerts/)
 [![Coverage Status](https://coveralls.io/repos/github/apache/incubator-datasketches-memory/badge.svg?branch=master&service=github)](https://coveralls.io/github/apache/incubator-datasketches-memory?branch=master)
 
- =================
+=================
 
 # DataSketches Memory Component
  The goal of this component of the library is to provide high performance access to native memory for primitives
@@ -32,17 +32,15 @@
  runtime dependencies and can be used in any application that needs to manage data structures outside
  the Java heap.
 
-## Documentation and Feedback
+## Documentation
 
-### [DataSketches Library Website](https://datasketches.github.io/)
+### [DataSketches Library Website](https://datasketches.apache.org/)
 
-### [Memory Package Overview Documentation](https://datasketches.github.io/docs/Memory/MemoryPackage.html)
+### [Memory Package Overview Documentation](https://datasketches.apache.org/docs/Memory/MemoryPackage.html)
 
-### [Memory Package Performance](https://datasketches.github.io/docs/Memory/MemoryPerformance.html)
+### [Memory Package Performance](https://datasketches.apache.org/docs/Memory/MemoryPerformance.html)
 
-### [Memory JavaDocs](https://datasketches.github.io/api/memory/snapshot/apidocs/index.html)
-
-### [Forum](https://groups.google.com/forum/#!forum/sketches-user)
+### [Memory JavaDocs](https://datasketches.apache.org/api/memory/snapshot/apidocs/index.html)
 
 ## Downloading Latest Release
 __NOTE:__ This component accesses resource files for testing. As a result, the directory elements of the full absolute path of the target installation directory 
@@ -51,19 +49,23 @@ __NOTE:__ This component accesses resource files for testing. As a result, the d
 This is required by the Oracle Java Specification in order to ensure location-independent 
     access to resources: [See Oracle Location-Independent Access to Resources](https://docs.oracle.com/javase/8/docs/technotes/guides/lang/resources.html)
 
-### [Zip File from Apache Archive](http://archive.apache.org/dist/incubator/datasketches/memory/)
+### [Zip File from www.apache.org/dist](http://www.apache.org/dist/incubator/datasketches/memory/)
 
 ### [Jar Files from Maven Central](https://repository.apache.org/content/repositories/releases/org/apache/datasketches/datasketches-memory/)
 
 ### [GitHub](https://github.com/apache/incubator-datasketches-memory/releases)
 
+## Downloading Earlier Releases
+
+### [Zip File from archive.apache.org/dist](http://archive.apache.org/dist/incubator/datasketches/memory/)
+
 ## Build Instructions
 
-### JDK8 is Required Compiler
+### JDK8 is required to compile
 This DataSketches component is pure Java and you must compile using JDK 8.
 
 ### Recommended Build Tool
-The DataSketches-java component structured as a Maven project and Maven is the recommended Build Tool.
+This DataSketches component is structured as a Maven project and Maven is the recommended Build Tool.
 
 There are two types of tests: normal unit tests and tests run by the strict profile.  
 

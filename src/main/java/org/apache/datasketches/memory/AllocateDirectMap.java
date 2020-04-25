@@ -102,12 +102,13 @@ class AllocateDirectMap implements Map {
   final boolean resourceReadOnly;
 
   //called from AllocateDirectWritableMap constructor
+  @SuppressWarnings("resource")
   AllocateDirectMap(final File file, final long fileOffsetBytes, final long capacityBytes,
       final boolean localReadOnly) {
     this.capacityBytes = capacityBytes;
     resourceReadOnly = isFileReadOnly(file);
     final long fileLength = file.length();
-    if ((localReadOnly || resourceReadOnly) && ((fileOffsetBytes + capacityBytes) > fileLength)) {
+    if ((localReadOnly || resourceReadOnly) && fileOffsetBytes + capacityBytes > fileLength) {
       throw new IllegalArgumentException(
           "Read-only mode and requested map length is greater than current file length: "
           + "Requested Length = " + (fileOffsetBytes + capacityBytes)
@@ -200,7 +201,7 @@ class AllocateDirectMap implements Map {
     final RandomAccessFile raf;
     try {
       raf = new RandomAccessFile(file, mode);
-      if ((fileOffset + capacityBytes) > raf.length()) {
+      if (fileOffset + capacityBytes > raf.length()) {
         raf.setLength(fileOffset + capacityBytes);
       }
     } catch (final IOException e) {
@@ -262,12 +263,12 @@ class AllocateDirectMap implements Map {
       BaseState.currentDirectMemoryMapAllocations_.incrementAndGet();
       BaseState.currentDirectMemoryMapAllocated_.addAndGet(capacityBytes);
       myRaf = raf;
-      assert (myRaf != null);
+      assert myRaf != null;
       myFc = myRaf.getChannel();
       actualNativeBaseOffset = nativeBaseOffset;
-      assert (actualNativeBaseOffset != 0);
+      assert actualNativeBaseOffset != 0;
       myCapacity = capacityBytes;
-      assert (myCapacity != 0);
+      assert myCapacity != 0;
     }
 
     StepBoolean getValid() {

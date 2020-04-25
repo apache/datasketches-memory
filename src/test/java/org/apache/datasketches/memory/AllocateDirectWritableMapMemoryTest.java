@@ -23,9 +23,9 @@
 
 package org.apache.datasketches.memory;
 
-import static org.apache.datasketches.memory.Util.*;
-import static org.apache.datasketches.memory.AllocateDirectMap.isFileReadOnly;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.apache.datasketches.memory.AllocateDirectMap.isFileReadOnly;
+import static org.apache.datasketches.memory.Util.getResourceFile;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -94,7 +94,7 @@ public class AllocateDirectWritableMapMemoryTest {
       WritableMemory dstMem = dstHandle.get();
       WritableMemory srcMem = srcHandle.get();
 
-      for (long i = 0; i < (longs); i++) {
+      for (long i = 0; i < longs; i++) {
         srcMem.putLong(i << 3, i); //load source with consecutive longs
       }
 
@@ -103,7 +103,7 @@ public class AllocateDirectWritableMapMemoryTest {
       dstHandle.force(); //push any remaining to the file
 
       //check end value
-      assertEquals(dstMem.getLong((longs - 1L) << 3), longs - 1L);
+      assertEquals(dstMem.getLong(longs - 1L << 3), longs - 1L);
     }
   }
 
@@ -130,6 +130,7 @@ public class AllocateDirectWritableMapMemoryTest {
     }
   }
 
+  @SuppressWarnings("resource")
   @Test(expectedExceptions = RuntimeException.class)
   public void testMapException() throws IOException {
     File dummy = createFile("dummy.txt", ""); //zero length

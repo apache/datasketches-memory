@@ -65,6 +65,7 @@ public class ExampleMemoryRequestServerTest {
     }
   }
 
+  @SuppressWarnings("resource")
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void checkZeroCapacity() {
     ExampleMemoryRequestServer svr = new ExampleMemoryRequestServer();
@@ -133,7 +134,7 @@ public class ExampleMemoryRequestServerTest {
     public void requestClose(WritableMemory memToRelease, WritableMemory newMemory) {
       if (memToRelease != null) {
         WritableHandle handle = map.get(memToRelease);
-        if ((handle != null) && (handle.get() == memToRelease)) {
+        if (handle != null && handle.get() == memToRelease) {
           handle.close();
         }
       }

@@ -32,7 +32,7 @@ import org.testng.annotations.Test;
 @SuppressWarnings("javadoc")
 public class ZeroCapacityTest {
 
-  @SuppressWarnings("unused")
+  @SuppressWarnings({ "unused", "resource" })
   @Test
   public void checkZeroCapacity() {
     WritableMemory wmem = WritableMemory.allocate(0);

@@ -152,7 +152,7 @@ public abstract class Buffer extends BaseBuffer {
    * @param offsetBytes the starting offset with respect to the origin of this <i>WritableBuffer</i>
    * @param capacityBytes the <i>capacity</i> of the returned region in bytes
    * @param byteOrder the given byte order
-   * @return a new <i>WritableBuffer</i> representing the defined writable region
+   * @return a new <i>Buffer</i> representing the defined writable region
    * based on the current <i>position</i>, <i>end</i> and byteOrder.
    */
   public abstract Buffer region(long offsetBytes, long capacityBytes,

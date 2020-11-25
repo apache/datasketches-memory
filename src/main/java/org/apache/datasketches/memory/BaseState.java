@@ -371,12 +371,12 @@ abstract class BaseState {
 
   final void assertValidAndBoundsForRead(final long offsetBytes, final long lengthBytes) {
     assertValid();
-    assertBounds(offsetBytes, lengthBytes, getCapacity());
+    assertBounds(offsetBytes, lengthBytes, capacityBytes_);
   }
 
   final void assertValidAndBoundsForWrite(final long offsetBytes, final long lengthBytes) {
     assertValid();
-    assertBounds(offsetBytes, lengthBytes, getCapacity());
+    assertBounds(offsetBytes, lengthBytes, capacityBytes_);
     assert !isReadOnly() : "Memory is read-only.";
   }
 

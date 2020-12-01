@@ -38,7 +38,7 @@ abstract class BaseState {
 
   //Byte Order related
   static final ByteOrder nativeByteOrder = ByteOrder.nativeOrder();
-  static final ByteOrder nonNativeByteOrder = (nativeByteOrder == ByteOrder.LITTLE_ENDIAN)
+  static final ByteOrder nonNativeByteOrder = nativeByteOrder == ByteOrder.LITTLE_ENDIAN
       ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
 
   //Monitoring
@@ -92,7 +92,7 @@ abstract class BaseState {
   BaseState(final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
       final long capacityBytes) {
     capacityBytes_ = capacityBytes;
-    cumBaseOffset_ = regionOffset + ((unsafeObj == null)
+    cumBaseOffset_ = regionOffset + (unsafeObj == null
         ? nativeBaseOffset
         : UnsafeUtil.getArrayBaseOffset(unsafeObj.getClass()));
   }
@@ -125,7 +125,7 @@ abstract class BaseState {
     if (byteOrder == null) {
       throw new IllegalArgumentException("ByteOrder parameter cannot be null.");
     }
-    return (BaseState.nativeByteOrder == byteOrder);
+    return BaseState.nativeByteOrder == byteOrder;
   }
 
   /**
@@ -137,7 +137,7 @@ abstract class BaseState {
    */
   public final boolean isByteOrderCompatible(final ByteOrder byteOrder) {
     final ByteOrder typeBO = getTypeByteOrder();
-    return ((typeBO == getNativeByteOrder()) && (typeBO == byteOrder));
+    return typeBO == getNativeByteOrder() && typeBO == byteOrder;
   }
 
   /**
@@ -148,8 +148,8 @@ abstract class BaseState {
   @Override
   public final boolean equals(final Object that) {
     if (this == that) { return true; }
-    return (that instanceof BaseState)
-      ? CompareAndCopy.equals(this, ((BaseState) that))
+    return that instanceof BaseState
+      ? CompareAndCopy.equals(this, (BaseState) that)
       : false;
   }
 
@@ -166,7 +166,7 @@ abstract class BaseState {
    */
   public final boolean equalTo(final long thisOffsetBytes, final Object that,
       final long thatOffsetBytes, final long lengthBytes) {
-    return (that instanceof BaseState)
+    return that instanceof BaseState
       ? CompareAndCopy.equals(this, thisOffsetBytes, (BaseState) that, thatOffsetBytes, lengthBytes)
       : false;
   }
@@ -231,7 +231,7 @@ abstract class BaseState {
    */
   public final long getRegionOffset() {
     final Object unsafeObj = getUnsafeObject();
-    return (unsafeObj == null)
+    return unsafeObj == null
         ? cumBaseOffset_ - getNativeBaseOffset()
         : cumBaseOffset_ - UnsafeUtil.getArrayBaseOffset(unsafeObj.getClass());
   }
@@ -281,7 +281,7 @@ abstract class BaseState {
    */
   @Override
   public final int hashCode() {
-    return (int) xxHash64(0, getCapacity(), 0);
+    return (int) xxHash64(0, capacityBytes_, 0); //xxHash64() calls checkValid()
   }
 
   /**
@@ -297,7 +297,7 @@ abstract class BaseState {
    */
   public final long xxHash64(final long offsetBytes, final long lengthBytes, final long seed) {
     checkValid();
-    return XxHash64.hash(getUnsafeObject(), getCumulativeOffset() + offsetBytes, lengthBytes, seed);
+    return XxHash64.hash(getUnsafeObject(), cumBaseOffset_ + offsetBytes, lengthBytes, seed);
   }
 
   /**
@@ -342,10 +342,10 @@ abstract class BaseState {
     that1.checkValid();
     if (this == that1) { return true; }
 
-    return (getCumulativeOffset() == that1.getCumulativeOffset())
-            && (getCapacity() == that1.getCapacity())
-            && (getUnsafeObject() == that1.getUnsafeObject())
-            && (getByteBuffer() == that1.getByteBuffer());
+    return cumBaseOffset_ == that1.cumBaseOffset_
+            && capacityBytes_ == that1.capacityBytes_
+            && getUnsafeObject() == that1.getUnsafeObject()
+            && getByteBuffer() == that1.getByteBuffer();
   }
 
   /**
@@ -371,12 +371,18 @@ abstract class BaseState {
 
   final void assertValidAndBoundsForRead(final long offsetBytes, final long lengthBytes) {
     assertValid();
-    assertBounds(offsetBytes, lengthBytes, getCapacity());
+    // capacityBytes_ is intentionally read directly instead of calling getCapacity()
+    // because the later can make JVM to not inline the assert code path (and entirely remove it)
+    // even though it does nothing in production code path.
+    assertBounds(offsetBytes, lengthBytes, capacityBytes_);
   }
 
   final void assertValidAndBoundsForWrite(final long offsetBytes, final long lengthBytes) {
     assertValid();
-    assertBounds(offsetBytes, lengthBytes, getCapacity());
+    // capacityBytes_ is intentionally read directly instead of calling getCapacity()
+    // because the later can make JVM to not inline the assert code path (and entirely remove it)
+    // even though it does nothing in production code path.
+    assertBounds(offsetBytes, lengthBytes, capacityBytes_);
     assert !isReadOnly() : "Memory is read-only.";
   }
 
@@ -389,12 +395,14 @@ abstract class BaseState {
    */
   public final void checkValidAndBounds(final long offsetBytes, final long lengthBytes) {
     checkValid();
-    checkBounds(offsetBytes, lengthBytes, getCapacity());
+    //read capacityBytes_ directly to eliminate extra checkValid() call
+    checkBounds(offsetBytes, lengthBytes, capacityBytes_);
   }
 
   final void checkValidAndBoundsForWrite(final long offsetBytes, final long lengthBytes) {
     checkValid();
-    checkBounds(offsetBytes, lengthBytes, getCapacity());
+    //read capacityBytes_ directly to eliminate extra checkValid() call
+    checkBounds(offsetBytes, lengthBytes, capacityBytes_);
     if (isReadOnly()) {
       throw new ReadOnlyException("Memory is read-only.");
     }
@@ -422,19 +430,19 @@ abstract class BaseState {
   }
 
   final boolean isHeapType() {
-    return ((getTypeId() >>> 3) & 3) == 0;
+    return (getTypeId() >>> 3 & 3) == 0;
   }
 
   final boolean isDirectType() {
-    return ((getTypeId() >>> 3) & 3) == 1;
+    return (getTypeId() >>> 3 & 3) == 1;
   }
 
   final boolean isMapType() {
-    return ((getTypeId() >>> 3) & 3) == 2;
+    return (getTypeId() >>> 3 & 3) == 2;
   }
 
   final boolean isBBType() {
-    return ((getTypeId() >>> 3) & 3) == 3;
+    return (getTypeId() >>> 3 & 3) == 3;
   }
 
   //MONITORING
@@ -521,10 +529,10 @@ abstract class BaseState {
       uObjHeader = UnsafeUtil.getArrayBaseOffset(uObj.getClass());
     }
     final ByteBuffer bb = state.getByteBuffer();
-    final String bbStr = (bb == null) ? "null"
+    final String bbStr = bb == null ? "null"
             : bb.getClass().getSimpleName() + ", " + (bb.hashCode() & 0XFFFFFFFFL);
     final MemoryRequestServer memReqSvr = state.getMemoryRequestServer();
-    final String memReqStr = (memReqSvr != null)
+    final String memReqStr = memReqSvr != null
         ? memReqSvr.getClass().getSimpleName() + ", " + (memReqSvr.hashCode() & 0XFFFFFFFFL)
         : "null";
     final long cumBaseOffset = state.getCumulativeOffset();
@@ -546,7 +554,7 @@ abstract class BaseState {
 
     for (long i = 0; i < lengthBytes; i++) {
       final int b = unsafe.getByte(uObj, cumBaseOffset + offsetBytes + i) & 0XFF;
-      if ((i % 8) == 0) { //row header
+      if (i % 8 == 0) { //row header
         sb.append(String.format("%n%20s: ", offsetBytes + i));
       }
       sb.append(String.format("%02x ", b));

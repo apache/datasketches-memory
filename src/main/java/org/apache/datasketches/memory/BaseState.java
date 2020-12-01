@@ -371,12 +371,18 @@ abstract class BaseState {
 
   final void assertValidAndBoundsForRead(final long offsetBytes, final long lengthBytes) {
     assertValid();
-    assertBounds(offsetBytes, lengthBytes, getCapacity());
+    // capacityBytes_ is intentionally read directly instead of calling getCapacity()
+    // because the later can make JVM to not inline the assert code path (and entirely remove it)
+    // even though it does nothing in production code path.
+    assertBounds(offsetBytes, lengthBytes, capacityBytes_);
   }
 
   final void assertValidAndBoundsForWrite(final long offsetBytes, final long lengthBytes) {
     assertValid();
-    assertBounds(offsetBytes, lengthBytes, getCapacity());
+    // capacityBytes_ is intentionally read directly instead of calling getCapacity()
+    // because the later can make JVM to not inline the assert code path (and entirely remove it)
+    // even though it does nothing in production code path.
+    assertBounds(offsetBytes, lengthBytes, capacityBytes_);
     assert !isReadOnly() : "Memory is read-only.";
   }
 

@@ -17,11 +17,11 @@
     under the License.
 -->
 
-[![Build Status](https://travis-ci.org/apache/incubator-datasketches-memory.svg?branch=master)](https://travis-ci.org/apache/incubator-datasketches-memory) 
+[![Build Status](https://travis-ci.org/apache/datasketches-memory.svg?branch=master)](https://travis-ci.org/apache/datasketches-memory) 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.datasketches/datasketches-memory/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.apache.datasketches/datasketches-memory) 
-[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/apache/incubator-datasketches-memory.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/apache/incubator-datasketches-memory/context:java)
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/apache/incubator-datasketches-memory.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/apache/incubator-datasketches-memory/alerts/)
-[![Coverage Status](https://coveralls.io/repos/github/apache/incubator-datasketches-memory/badge.svg?branch=master&service=github)](https://coveralls.io/github/apache/incubator-datasketches-memory?branch=master)
+[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/apache/datasketches-memory.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/apache/datasketches-memory/context:java)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/apache/datasketches-memory.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/apache/datasketches-memory/alerts/)
+[![Coverage Status](https://coveralls.io/repos/github/apache/datasketches-memory/badge.svg?branch=master&service=github)](https://coveralls.io/github/apache/datasketches-memory?branch=master)
 
 =================
 
@@ -63,11 +63,11 @@ To install jars built from the downloaded source:
 
 This will create the following Jars:
 
-* datasketches-memory-X.Y.Z-incubating.jar The compiled main class files.
-* datasketches-memory-X.Y.Z-incubating-tests.jar The compiled test class files.
-* datasketches-memory-X.Y.Z-incubating-sources.jar The main source files.
-* datasketches-memory-X.Y.Z-incubating-test-sources.jar The test source files
-* datasketches-memory-X.Y.Z-incubating-javadoc.jar  The compressed Javadocs.
+* datasketches-memory-X.Y.Z.jar The compiled main class files.
+* datasketches-memory-X.Y.Z-tests.jar The compiled test class files.
+* datasketches-memory-X.Y.Z-sources.jar The main source files.
+* datasketches-memory-X.Y.Z-test-sources.jar The test source files
+* datasketches-memory-X.Y.Z-javadoc.jar  The compressed Javadocs.
 
 ### Dependencies
 

@@ -96,7 +96,7 @@ under the License.
     <testng.version>7.1.0</testng.version>
 
     <!-- System-wide properties -->
-    <maven.version>3.0.0</maven.version>
+    <maven.version>3.5.0</maven.version>
     <java.version>1.8</java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -106,8 +106,11 @@ under the License.
     <project.build.resourceEncoding>${charset.encoding}</project.build.resourceEncoding>
     <project.reporting.outputEncoding>${charset.encoding}</project.reporting.outputEncoding>
 
-    <!-- org.codehaus.plexus used for strict profile testing-->
-    <plexus-compiler-javac-errorprone.version>2.8.8</plexus-compiler-javac-errorprone.version>
+    <!-- org.codehaus plugins -->
+    <!-- used for strict profile testing-->
+    <plexus-compiler-javac-errorprone.version>2.8.5</plexus-compiler-javac-errorprone.version>
+    <versions-maven-plugin.version>2.8.1</versions-maven-plugin.version>
+    
     <!--  Maven Plugins -->
     <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version> <!-- overrides parent -->
     <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version> <!-- overrides parent -->
@@ -198,6 +201,11 @@ under the License.
   <build>
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>versions-maven-plugin</artifactId>
+          <version>${versions-maven-plugin.version}</version>
+        </plugin>
         <plugin>
           <!-- We want to deploy the artifacts to a staging location for perusal -->
           <!-- Apache Parent pom: apache-release profile -->
@@ -464,7 +472,7 @@ under the License.
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-compiler-plugin</artifactId>
-              <version>${maven-compiler-plugin.version}</version>
+              <version>${maven-compiler-plugin.version}</version> <!-- 3.8.1 -->
               <dependencies>
                 <dependency>
                   <groupId>org.codehaus.plexus</groupId>
@@ -478,6 +486,7 @@ under the License.
                 <compilerId>javac-with-errorprone</compilerId>
                 <forceJavacCompilerUse>true</forceJavacCompilerUse>
               </configuration>
+
             </plugin>
           </plugins>
         </pluginManagement>

@@ -33,7 +33,7 @@ under the License.
 
   <!-- UNIQUE FOR THIS JAVA COMPONENT -->
   <artifactId>datasketches-memory</artifactId>
-  <version>1.3.0-SNAPSHOT</version>
+  <version>1.3.0</version>
   <description>High-performance native memory access.</description>
   <!-- END: UNIQUE FOR THIS JAVA COMPONENT -->
 

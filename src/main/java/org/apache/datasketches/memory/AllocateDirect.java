@@ -32,6 +32,7 @@ import sun.misc.Cleaner;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
+@SuppressWarnings({"restriction","synthetic-access"})
 final class AllocateDirect implements AutoCloseable {
   private static final Logger LOG = LoggerFactory.getLogger(AllocateDirect.class);
 
@@ -83,9 +84,9 @@ final class AllocateDirect implements AutoCloseable {
         // because the valid state is already changed.
         cleaner.clean();
         return true;
-      } else {
-        return false;
       }
+      return false;
+
     } finally {
       BaseState.reachabilityFence(this);
     }
@@ -135,9 +136,8 @@ final class AllocateDirect implements AutoCloseable {
         BaseState.currentDirectMemoryAllocations_.decrementAndGet();
         BaseState.currentDirectMemoryAllocated_.addAndGet(-capacity);
         return true;
-      } else {
-        return false;
-      }
+      } 
+      return false;
     }
   }
 

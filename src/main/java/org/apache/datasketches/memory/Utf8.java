@@ -45,6 +45,7 @@ import java.nio.CharBuffer;
  * @author Lee Rhodes
  * @author Roman Leventov
  */
+@SuppressWarnings({"restriction","synthetic-access"})
 final class Utf8 {
 
   private Utf8() { }

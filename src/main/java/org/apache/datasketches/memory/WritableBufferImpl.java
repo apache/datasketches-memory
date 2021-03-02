@@ -55,6 +55,7 @@ import static org.apache.datasketches.memory.UnsafeUtil.unsafe;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
+@SuppressWarnings({"restriction"})
 abstract class WritableBufferImpl extends BaseWritableBufferImpl {
 
   //Pass-through ctor

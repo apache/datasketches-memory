@@ -28,8 +28,7 @@ final class Ints {
     final int result = (int) v;
     if (result != v) {
       throw new IllegalArgumentException("Out of range: " + v);
-    } else {
-      return result;
-    }
+    } 
+    return result;
   }
 }

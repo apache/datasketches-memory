@@ -31,6 +31,7 @@ import static org.apache.datasketches.memory.UnsafeUtil.unsafe;
 /**
  * @author Lee Rhodes
  */
+@SuppressWarnings({"restriction"})
 final class CompareAndCopy {
 
   /**

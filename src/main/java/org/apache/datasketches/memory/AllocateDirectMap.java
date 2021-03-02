@@ -54,6 +54,7 @@ import sun.nio.ch.FileChannelImpl;
  * @author Lee Rhodes
  * @author Praveenkumar Venkatesan
  */
+@SuppressWarnings({"restriction","synthetic-access"})
 class AllocateDirectMap implements Map {
   private static final Logger LOG = LoggerFactory.getLogger(AllocateDirectMap.class);
 
@@ -162,9 +163,8 @@ class AllocateDirectMap implements Map {
         // because the valid state is already changed.
         cleaner.clean();
         return true;
-      } else {
-        return false;
-      }
+      } 
+      return false;
     } finally {
       BaseState.reachabilityFence(this);
     }
@@ -294,9 +294,8 @@ class AllocateDirectMap implements Map {
           BaseState.currentDirectMemoryMapAllocated_.addAndGet(-myCapacity);
         }
         return true;
-      } else {
-        return false;
-      }
+      } 
+      return false;
     }
 
     /**

@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author Lee Rhodes
  */
+@SuppressWarnings({"restriction"})
 final class NioBits {
   private static final Class<?> VM_CLASS;
   private static final Method VM_MAX_DIRECT_MEMORY_METHOD;

@@ -52,6 +52,7 @@ import java.nio.channels.WritableByteChannel;
  * Common base of native-ordered and non-native-ordered {@link WritableMemory} implementations.
  * Contains methods which are agnostic to the byte order.
  */
+@SuppressWarnings({"restriction"})
 abstract class BaseWritableMemoryImpl extends WritableMemory {
 
 

@@ -19,6 +19,7 @@
 
 package org.apache.datasketches.memory;
 
+@SuppressWarnings({"restriction"})
 final class JDK7Compatible {
 
   private JDK7Compatible() {}

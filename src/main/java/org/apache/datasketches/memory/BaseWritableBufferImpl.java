@@ -49,6 +49,7 @@ import java.nio.ByteOrder;
  * Common base of native-ordered and non-native-ordered {@link WritableBuffer} implementations.
  * Contains methods which are agnostic to the byte order.
  */
+@SuppressWarnings({"restriction"})
 abstract class BaseWritableBufferImpl extends WritableBuffer {
   final BaseWritableMemoryImpl originMemory;
 

@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author Lee Rhodes
  */
+@SuppressWarnings({"restriction"})
 abstract class BaseState {
 
   //Byte Order related

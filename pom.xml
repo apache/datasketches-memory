@@ -30,17 +30,14 @@ under the License.
   </parent>
 
   <groupId>org.apache.datasketches</groupId>
-
-  <!-- UNIQUE FOR THIS JAVA COMPONENT -->
   <artifactId>datasketches-memory</artifactId>
   <version>1.4.0-SNAPSHOT</version>
-  <description>High-performance native memory access.</description>
-  <!-- END: UNIQUE FOR THIS JAVA COMPONENT -->
+  <packaging>jar</packaging>
 
-  <url>https://datasketches.apache.org/</url>
   <name>${project.artifactId}</name>
+  <description>High-performance native memory access.</description>
+  <url>https://datasketches.apache.org/</url>
   <inceptionYear>2015</inceptionYear>
-  <packaging>jar</packaging> <!-- jar is the default -->
 
   <mailingLists>
     <mailingList>
@@ -128,6 +125,7 @@ under the License.
     <!-- org.jacoco Maven Plugins -->
     <jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
     <!-- org.eluder Maven Plugins -->
+    <coveralls-repo-token></coveralls-repo-token>
     <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
     <!-- other -->
     <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
@@ -231,12 +229,14 @@ under the License.
           <executions>
             <execution>
               <id>default-jar</id>
+              <phase>package</phase>
               <goals>
                 <goal>jar</goal>
               </goals>
             </execution>
             <execution>
               <id>default-test-jar</id>
+              <phase>package</phase>
               <goals>
                 <goal>test-jar</goal>
               </goals>
@@ -309,7 +309,9 @@ under the License.
             <useDefaultExcludes>true</useDefaultExcludes>
             <excludes>
               <!-- rat uses .gitignore for excludes by default -->
-              <exclude>.asf.yaml</exclude>
+              <exclude>**/*.yaml</exclude>
+              <exclude>**/*.yml</exclude>
+              <exclude>**/.*</exclude>
               <exclude>**/test/resources/**/*.txt</exclude>
               <exclude>LICENSE</exclude>
               <exclude>NOTICE</exclude>
@@ -356,11 +358,17 @@ under the License.
           <version>${jacoco-maven-plugin.version}</version>
           <executions>
             <execution>
-              <id>prepare-agent</id>
+              <id>default-prepare-agent</id>
               <goals>
                 <goal>prepare-agent</goal>
               </goals>
             </execution>
+            <execution>
+              <id>default-report</id>
+              <goals>
+                <goal>report</goal>
+              </goals>
+            </execution> 
           </executions>
         </plugin>
         <plugin>
@@ -369,7 +377,7 @@ under the License.
           <artifactId>coveralls-maven-plugin</artifactId>
           <version>${coveralls-maven-plugin.version}</version>
           <configuration>
-            <!-- Since we use Travis CI we do not have to put a Coveralls token here. -->
+            <repoToken>${coveralls-repo-token}</repoToken>
           </configuration>
         </plugin>
       </plugins>
@@ -472,7 +480,7 @@ under the License.
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-compiler-plugin</artifactId>
-              <version>${maven-compiler-plugin.version}</version> <!-- 3.8.1 -->
+              <version>${maven-compiler-plugin.version}</version>
               <dependencies>
                 <dependency>
                   <groupId>org.codehaus.plexus</groupId>

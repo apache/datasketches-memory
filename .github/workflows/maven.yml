@@ -1,0 +1,53 @@
+name: Java Test Coverage with Maven, Coveralls
+
+on:
+    pull_request:
+    push:
+        branches: [ master ]
+
+env:
+    MAVEN_OPTS: -Xmx4g -Xms1g
+    repo_token: ${{secrets.coveralls_token}}
+
+jobs:
+    build:
+        name: Build, Test, Coverage
+        runs-on: ubuntu-latest
+        
+        steps:
+        - name: "Checkout ${{ github.ref }} ( ${{ github.sha }} )"
+          uses: actions/checkout@v2
+          with:
+              persist-credentials: false
+
+        - name: Cache local Maven repository
+          uses: actions/cache@v2
+          with:
+              path: ~/.m2/repository
+              key: build-${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+              restore-keys: build-${{ runner.os }}-maven-
+
+        - name: Install JDK
+          uses: AdoptOpenJDK/install-jdk@v1
+          with:
+              version: '8'
+              architecture: x64
+              impl: hotspot
+              targets: 'JDK_8;JAVA_HOME'
+
+        - name: Install Dependencies
+          run: >
+              mvn clean install -B -V -q
+              -DskipTests=true
+              -Dmaven.javadoc.skip=true
+              -Dgpg.skip=true
+              --toolchains .github/workflows/.toolchains.xml
+
+        - name: Test & Report
+          if: ${{ success() }}
+          run: >
+              mvn verify coveralls:report -B -V -q
+              -Dcoveralls-repo-token=${repo_token}
+              -Dmaven.javadoc.skip=true
+              -Dgpg.skip=true
+              --toolchains .github/workflows/.toolchains.xml

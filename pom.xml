@@ -21,6 +21,7 @@ under the License.
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -107,7 +108,7 @@ under the License.
     <!-- used for strict profile testing-->
     <plexus-compiler-javac-errorprone.version>2.8.5</plexus-compiler-javac-errorprone.version>
     <versions-maven-plugin.version>2.8.1</versions-maven-plugin.version>
-    
+
     <!--  Maven Plugins -->
     <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version> <!-- overrides parent -->
     <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version> <!-- overrides parent -->
@@ -199,11 +200,13 @@ under the License.
   <build>
     <pluginManagement>
       <plugins>
+
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>versions-maven-plugin</artifactId>
           <version>${versions-maven-plugin.version}</version>
         </plugin>
+
         <plugin>
           <!-- We want to deploy the artifacts to a staging location for perusal -->
           <!-- Apache Parent pom: apache-release profile -->
@@ -215,12 +218,14 @@ under the License.
             <!-- see maven-install-plugin -->
           </configuration>
         </plugin>
+
         <plugin>
           <!-- Apache Parent pom, pluginManagement-->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
           <version>${maven-release-plugin.version}</version>
         </plugin>
+
         <plugin>
           <!-- Extends Apache Parent pom, pluginManagement-->
           <groupId>org.apache.maven.plugins</groupId>
@@ -243,6 +248,7 @@ under the License.
             </execution>
           </executions>
         </plugin>
+
         <plugin>
           <!-- Extends Apache Parent pom, apache-release profile -->
           <groupId>org.apache.maven.plugins</groupId>
@@ -260,6 +266,7 @@ under the License.
             </execution>
           </executions>
         </plugin>
+
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-enforcer-plugin</artifactId>
@@ -290,6 +297,7 @@ under the License.
             </execution>
           </executions>
         </plugin>
+
         <plugin>
           <!-- Apache Parent pom, pluginManagement-->
           <groupId>org.apache.rat</groupId>
@@ -318,6 +326,7 @@ under the License.
             </excludes>
           </configuration>
         </plugin>
+
         <plugin>
           <!-- Extends Apache Parent pom, apache-release profile -->
           <groupId>org.apache.maven.plugins</groupId>
@@ -340,6 +349,7 @@ under the License.
             </execution>
           </executions>
         </plugin>
+
         <plugin>
           <!-- Apache Parent pom, pluginManagement-->
           <groupId>org.apache.maven.plugins</groupId>
@@ -351,6 +361,7 @@ under the License.
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
           </configuration>
         </plugin>
+
         <plugin>
           <!-- Generates code coverage report from website. -->
           <groupId>org.jacoco</groupId>
@@ -368,9 +379,10 @@ under the License.
               <goals>
                 <goal>report</goal>
               </goals>
-            </execution> 
+            </execution>
           </executions>
         </plugin>
+
         <plugin>
           <!-- Submit code coverage report to Coveralls.io. -->
           <groupId>org.eluder.coveralls</groupId>
@@ -380,6 +392,7 @@ under the License.
             <repoToken>${coveralls-repo-token}</repoToken>
           </configuration>
         </plugin>
+
       </plugins>
     </pluginManagement>
     <plugins>
@@ -494,7 +507,6 @@ under the License.
                 <compilerId>javac-with-errorprone</compilerId>
                 <forceJavacCompilerUse>true</forceJavacCompilerUse>
               </configuration>
-
             </plugin>
           </plugins>
         </pluginManagement>

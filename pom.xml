@@ -388,7 +388,19 @@ under the License.
             <repoToken>${coveralls-repo-token}</repoToken>
           </configuration>
         </plugin>
-
+        
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>${lifecycle-mapping.version}</version>
+        </plugin>
+        
+        <plugin>
+          <groupId>pl.project13.maven</groupId>
+          <artifactId>git.commit-id-plugin</artifactId>
+          <version>${git-commit-id-plugin.version}</version>
+        </plugin>
+        
       </plugins>
     </pluginManagement>
     <plugins>
@@ -429,8 +441,16 @@ under the License.
         <artifactId>jacoco-maven-plugin</artifactId>
       </plugin>
       <plugin>
+        <groupId>org.eclipse.m2e</groupId>
+        <artifactId>lifecycle-mapping</artifactId>
+      </plugin>
+      <plugin>
         <groupId>org.eluder.coveralls</groupId>
         <artifactId>coveralls-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>pl.project13.maven</groupId>
+        <artifactId>git.commit-id-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

@@ -91,7 +91,7 @@ under the License.
     <!-- END:UNIQUE FOR THIS JAVA COMPONENT -->
 
     <!-- Test -->
-    <testng.version>7.1.0</testng.version>
+    <testng.version>7.4.0</testng.version>
 
     <!-- System-wide properties -->
     <maven.version>3.5.0</maven.version>
@@ -403,14 +403,8 @@ under the License.
         </plugin>
 
         <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>${lifecycle-mapping.version}</version>
-        </plugin>
-
-        <plugin>
           <groupId>pl.project13.maven</groupId>
-          <artifactId>git.commit-id-plugin</artifactId>
+          <artifactId>git-commit-id-plugin</artifactId>
           <version>${git-commit-id-plugin.version}</version>
         </plugin>
 
@@ -454,65 +448,16 @@ under the License.
         <artifactId>jacoco-maven-plugin</artifactId>
       </plugin>
       <plugin>
-        <groupId>org.eclipse.m2e</groupId>
-        <artifactId>lifecycle-mapping</artifactId>
-      </plugin>
-      <plugin>
         <groupId>org.eluder.coveralls</groupId>
         <artifactId>coveralls-maven-plugin</artifactId>
       </plugin>
       <plugin>
         <groupId>pl.project13.maven</groupId>
-        <artifactId>git.commit-id-plugin</artifactId>
+        <artifactId>git-commit-id-plugin</artifactId>
       </plugin>
     </plugins>
   </build>
   <profiles>
-    <!-- Ignore nuisance warning from Apache parent plugin:
-          "maven-remote-resources-plugin (goal "process") is ignored by m2e".
-          This also should fix the Maven warning that it can't find the lifecycle-mapping jar.
-          This profile is only active when the property "m2e.version" is set,
-          which is the case when building in Eclipse with m2e.
-          The ignore below tells m2eclipse to skip the execution.
-    -->
-    <profile>
-      <id>m2e</id>
-      <activation>
-        <property>
-          <name>m2e.version</name>
-        </property>
-      </activation>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.eclipse.m2e</groupId>
-              <artifactId>lifecycle-mapping</artifactId>
-              <version>${lifecycle-mapping.version}</version>
-              <configuration>
-                <lifecycleMappingMetadata>
-                  <pluginExecutions>
-                    <pluginExecution>
-                      <pluginExecutionFilter>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-remote-resources-plugin</artifactId>
-                        <versionRange>${maven-remote-resources-plugin.version}</versionRange>
-                        <goals>
-                          <goal>process</goal>
-                        </goals>
-                      </pluginExecutionFilter>
-                      <action>
-                        <ignore/>
-                      </action>
-                    </pluginExecution>
-                  </pluginExecutions>
-                </lifecycleMappingMetadata>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
 
     <profile>
       <id>strict</id>

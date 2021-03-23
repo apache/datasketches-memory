@@ -4,10 +4,40 @@
         <type>jdk</type>
         <provides>
             <version>8</version>
-            <vendor>openjdk</vendor>
+            <vendor>adoptopenjdk</vendor>
         </provides>
         <configuration>
             <jdkHome>${JAVA_HOME}</jdkHome>
+        </configuration>
+    </toolchain>
+    <toolchain>
+        <type>jdk</type>
+        <provides>
+            <version>11</version>
+            <vendor>adoptopenjdk</vendor>
+        </provides>
+        <configuration>
+            <jdkHome>${env.JAVA11_HOME}</jdkHome>
+        </configuration>
+    </toolchain>
+    <toolchain>
+        <type>jdk</type>
+        <provides>
+            <version>15</version>
+            <vendor>adoptopenjdk</vendor>
+        </provides>
+        <configuration>
+            <jdkHome>${env.JAVA15_HOME}</jdkHome>
+        </configuration>
+    </toolchain>
+    <toolchain>
+        <type>jdk</type>
+        <provides>
+            <version>16</version>
+            <vendor>adoptopenjdk</vendor>
+        </provides>
+        <configuration>
+            <jdkHome>${env.JAVA16_HOME}</jdkHome>
         </configuration>
     </toolchain>
 </toolchains>

@@ -41,13 +41,11 @@ import sun.nio.ch.FileChannelImpl;
  * (including those &gt; 2GB).
  *
  * <p>To understand how it works, reference native code for map0, unmap0:
- * <a href="http://hg.openjdk.java.net/jdk8u/jdk8u/jdk/file/f940e7a48b72/src/solaris/native/
- * sun/nio/ch/FileChannelImpl.c">
+ * <a href="http://hg.openjdk.java.net/jdk8u/jdk8u/jdk/file/f940e7a48b72/src/solaris/native/sun/nio/ch/FileChannelImpl.c">
  * FileChannelImpl.c</a></p>
  *
  * <p>To understand how it works, reference native code for load0(), isLoaded0(), and force0():
- * <a href="http://hg.openjdk.java.net/jdk8u/jdk8u/jdk/file/f940e7a48b72/src/solaris/native/
- * java/nio/MappedByteBuffer.c">
+ * <a href="http://hg.openjdk.java.net/jdk8u/jdk8u/jdk/file/f940e7a48b72/src/solaris/native/java/nio/MappedByteBuffer.c">
  * MappedByteBuffer.c</a></p>
  *
  * @author Roman Leventov

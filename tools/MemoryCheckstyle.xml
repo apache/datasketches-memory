@@ -124,10 +124,11 @@ under the License.
       <property name="scope" value="public"/>
     </module>
     <module name="JavadocParagraph"/>
+    <!--
     <module name="JavadocTagContinuationIndentation">
       <property name="severity" value="ignore"/>
       <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
-    </module>
+    </module> -->
     <module name="NonEmptyAtclauseDescription"/>
     <module name="SingleLineJavadoc">
       <property name="ignoreInlineTags" value="false"/>

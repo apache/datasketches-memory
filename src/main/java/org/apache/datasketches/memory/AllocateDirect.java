@@ -24,7 +24,7 @@ import static org.apache.datasketches.memory.UnsafeUtil.unsafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import sun.misc.Cleaner;
+import sun.misc.Cleaner; //JDK9+ moved to jdk.internal.ref.Cleaner;
 
 /**
  * Provides access to direct (native) memory.
@@ -37,7 +37,7 @@ final class AllocateDirect implements AutoCloseable {
   private static final Logger LOG = LoggerFactory.getLogger(AllocateDirect.class);
 
   private final Deallocator deallocator;
-  private final Cleaner cleaner; //TODO-JDK9 import jdk.internal.ref.Cleaner;
+  private final Cleaner cleaner; //JDK9+ moved to jdk.internal.ref.Cleaner;
   private final long nativeBaseOffset;
 
   /**

@@ -50,7 +50,7 @@ final class NioBits {
 
   static {
     try {
-      VM_CLASS = Class.forName("sun.misc.VM");
+      VM_CLASS = Class.forName("sun.misc.VM"); //JDK9+ moved to jdk.internal.misc.VM
       VM_MAX_DIRECT_MEMORY_METHOD =
           VM_CLASS.getDeclaredMethod("maxDirectMemory");
       VM_MAX_DIRECT_MEMORY_METHOD.setAccessible(true);
@@ -66,13 +66,15 @@ final class NioBits {
       NIO_BITS_CLASS = Class.forName("java.nio.Bits");
 
       NIO_BITS_RESERVE_MEMORY_METHOD = NIO_BITS_CLASS
-          .getDeclaredMethod("reserveMemory", long.class, int.class);
+          .getDeclaredMethod("reserveMemory", long.class, int.class); //JD16 requires (long, long)
       NIO_BITS_RESERVE_MEMORY_METHOD.setAccessible(true);
 
       NIO_BITS_UNRESERVE_MEMORY_METHOD = NIO_BITS_CLASS
-          .getDeclaredMethod("unreserveMemory", long.class, int.class);
+          .getDeclaredMethod("unreserveMemory", long.class, int.class); //JD16 requires (long, long)
       NIO_BITS_UNRESERVE_MEMORY_METHOD.setAccessible(true);
 
+      //JDK 8-10: "count", "reservedMemory", "totalCapacity"
+      //JDK 11-16: "COUNT", "RESERVE_MEMORY", "TOTAL_CAPACITY"
       final Field countField = NIO_BITS_CLASS.getDeclaredField("count");
       countField.setAccessible(true);
       nioBitsCount = (AtomicLong) (countField.get(null));
@@ -165,9 +167,9 @@ final class NioBits {
     while (capacity > 0) {
       final long chunk = Math.min(capacity, chunkSizeLimit);
       if (capacity == chunk) {
-        method.invoke(null, allocationSize, (int) capacity);
+        method.invoke(null, allocationSize, (int) capacity); //JDK 16 remove cast to int
       } else {
-        method.invoke(null, chunk, (int) chunk);
+        method.invoke(null, chunk, (int) chunk); //JDK 16 remove cast to int
       }
       capacity -= chunk;
       allocationSize -= chunk;

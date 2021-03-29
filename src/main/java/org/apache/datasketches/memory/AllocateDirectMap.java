@@ -33,7 +33,7 @@ import java.nio.channels.FileChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import sun.misc.Cleaner; //TODO-JDK9 jdk.internal.ref.Cleaner;
+import sun.misc.Cleaner; //JDK9+ moved to jdk.internal.ref.Cleaner;
 import sun.nio.ch.FileChannelImpl;
 
 /**
@@ -67,25 +67,27 @@ class AllocateDirectMap implements Map {
   static final Method MAPPED_BYTE_BUFFER_FORCE0_METHOD;
 
   static {
-    try {
+    try { //The FileChannelImpl methods map0 and unmap0 still exist in 16
       FILE_CHANNEL_IMPL_MAP0_METHOD = FileChannelImpl.class
-          .getDeclaredMethod("map0", int.class, long.class, long.class);
+          .getDeclaredMethod("map0", int.class, long.class, long.class); //JDK14 add boolean.class
       FILE_CHANNEL_IMPL_MAP0_METHOD.setAccessible(true);
 
       FILE_CHANNEL_IMPL_UNMAP0_METHOD = FileChannelImpl.class
-          .getDeclaredMethod("unmap0", long.class, long.class);
+          .getDeclaredMethod("unmap0", long.class, long.class); //OK through jDK16
       FILE_CHANNEL_IMPL_UNMAP0_METHOD.setAccessible(true);
 
+      
+      //The MappedByteBuffer methods load0, isLoaded0 and force0 are removed in 15
       MAPPED_BYTE_BUFFER_LOAD0_METHOD = MappedByteBuffer.class
-          .getDeclaredMethod("load0", long.class, long.class);
+          .getDeclaredMethod("load0", long.class, long.class); //JDK15 removed
       MAPPED_BYTE_BUFFER_LOAD0_METHOD.setAccessible(true);
 
       MAPPED_BYTE_BUFFER_ISLOADED0_METHOD = MappedByteBuffer.class
-          .getDeclaredMethod("isLoaded0", long.class, long.class, int.class);
+          .getDeclaredMethod("isLoaded0", long.class, long.class, int.class); //JDK15 removed
       MAPPED_BYTE_BUFFER_ISLOADED0_METHOD.setAccessible(true);
 
       MAPPED_BYTE_BUFFER_FORCE0_METHOD = MappedByteBuffer.class
-          .getDeclaredMethod("force0", FileDescriptor.class, long.class, long.class);
+          .getDeclaredMethod("force0", FileDescriptor.class, long.class, long.class); //JDK15 removed
       MAPPED_BYTE_BUFFER_FORCE0_METHOD.setAccessible(true);
     } catch (final Exception e) {
       throw new RuntimeException("Could not reflect static methods: " + e);
@@ -93,7 +95,7 @@ class AllocateDirectMap implements Map {
   }
 
   private final Deallocator deallocator;
-  private final Cleaner cleaner;
+  private final Cleaner cleaner;//JDK9+ moved to jdk.internal.ref.Cleaner;
 
   final long capacityBytes;
   final RandomAccessFile raf;
@@ -228,9 +230,10 @@ class AllocateDirectMap implements Map {
     final long mapPosition = position - pagePosition;
     final long mapSize = lengthBytes + pagePosition;
     final int mapMode = resourceReadOnly ? MAP_RO : MAP_RW;
+    //final boolean isSync = true; //required as of JDK14, but it is more complex
     try {
-      final long nativeBaseOffset =
-          (long) FILE_CHANNEL_IMPL_MAP0_METHOD.invoke(fileChannel, mapMode, mapPosition, mapSize);
+      final long nativeBaseOffset = //JDK14 add isSync
+        (long) FILE_CHANNEL_IMPL_MAP0_METHOD.invoke(fileChannel, mapMode, mapPosition, mapSize);
       return nativeBaseOffset;
     } catch (final InvocationTargetException e) {
       throw new RuntimeException("Exception while mapping", e.getTargetException());

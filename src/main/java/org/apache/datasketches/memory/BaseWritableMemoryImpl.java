@@ -55,11 +55,14 @@ import java.nio.channels.WritableByteChannel;
 @SuppressWarnings({"restriction"})
 abstract class BaseWritableMemoryImpl extends WritableMemory {
 
+  //1KB of empty bytes for speedy clear()
+  private final static byte[] EMPTY_BYTES;
 
   //Static variable for cases where byteBuf/array/direct sizes are zero
   final static BaseWritableMemoryImpl ZERO_SIZE_MEMORY;
 
   static {
+    EMPTY_BYTES = new byte[1024];
     ZERO_SIZE_MEMORY = new HeapWritableMemoryImpl(new byte[0], 0L, 0L, READONLY);
   }
 
@@ -415,12 +418,18 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
 
   @Override
   public final void clear() {
-    fill(0, getCapacity(), (byte) 0);
+    clear(0, getCapacity());
   }
 
   @Override
-  public final void clear(final long offsetBytes, final long lengthBytes) {
-    fill(offsetBytes, lengthBytes, (byte) 0);
+  public final void clear(final long offsetBytes, final long lengthBytes)
+  {
+    //No need to check bounds, since putByteArray calls checkValidAndBoundsForWrite
+
+    final long endBytes = offsetBytes + lengthBytes;
+    for (long i = offsetBytes; i < endBytes; i += EMPTY_BYTES.length) {
+      putByteArray(i, EMPTY_BYTES, 0, (int) Math.min(EMPTY_BYTES.length, endBytes - i));
+    }
   }
 
   @Override

@@ -127,6 +127,7 @@ under the License.
     <!-- org.jacoco Maven Plugins -->
     <jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
     <!-- org.eluder Maven Plugins -->
+    <coveralls-repo-token></coveralls-repo-token>
     <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
     <!-- other -->
     <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
@@ -400,6 +401,9 @@ under the License.
           <groupId>org.eluder.coveralls</groupId>
           <artifactId>coveralls-maven-plugin</artifactId>
           <version>${coveralls-maven-plugin.version}</version>
+          <configuration>
+            <repoToken>${coveralls-repo-token}</repoToken>
+          </configuration>
         </plugin>
 
         <plugin>

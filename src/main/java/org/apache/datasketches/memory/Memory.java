@@ -227,7 +227,7 @@ public abstract class Memory extends BaseState {
   public static Memory wrap(final boolean[] arr) {
     final long lengthBytes = arr.length << Prim.BOOLEAN.shift();
     return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, true,
-        BaseState.nativeByteOrder);
+        Util.nativeByteOrder);
   }
 
   /**
@@ -241,7 +241,7 @@ public abstract class Memory extends BaseState {
    * @return a new <i>Memory</i> for read operations
    */
   public static Memory wrap(final byte[] arr) {
-    return Memory.wrap(arr, 0, arr.length, BaseState.nativeByteOrder);
+    return Memory.wrap(arr, 0, arr.length, Util.nativeByteOrder);
   }
 
   /**
@@ -289,7 +289,7 @@ public abstract class Memory extends BaseState {
    */
   public static Memory wrap(final char[] arr) {
     final long lengthBytes = arr.length << Prim.CHAR.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, true, BaseState.nativeByteOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, true, Util.nativeByteOrder);
   }
 
   /**
@@ -303,7 +303,7 @@ public abstract class Memory extends BaseState {
    */
   public static Memory wrap(final short[] arr) {
     final long lengthBytes = arr.length << Prim.SHORT.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, true, BaseState.nativeByteOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, true, Util.nativeByteOrder);
   }
 
   /**
@@ -317,7 +317,7 @@ public abstract class Memory extends BaseState {
    */
   public static Memory wrap(final int[] arr) {
     final long lengthBytes = arr.length << Prim.INT.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, true, BaseState.nativeByteOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, true, Util.nativeByteOrder);
   }
 
   /**
@@ -332,7 +332,7 @@ public abstract class Memory extends BaseState {
    */
   public static Memory wrap(final long[] arr) {
     final long lengthBytes = arr.length << Prim.LONG.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, true, BaseState.nativeByteOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, true, Util.nativeByteOrder);
   }
 
   /**
@@ -347,7 +347,7 @@ public abstract class Memory extends BaseState {
    */
   public static Memory wrap(final float[] arr) {
     final long lengthBytes = arr.length << Prim.FLOAT.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, true, BaseState.nativeByteOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, true, Util.nativeByteOrder);
   }
 
   /**
@@ -362,7 +362,7 @@ public abstract class Memory extends BaseState {
    */
   public static Memory wrap(final double[] arr) {
     final long lengthBytes = arr.length << Prim.DOUBLE.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, true, BaseState.nativeByteOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, true, Util.nativeByteOrder);
   }
 
   //PRIMITIVE getX() and getXArray()

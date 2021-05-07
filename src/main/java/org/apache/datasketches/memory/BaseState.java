@@ -37,11 +37,6 @@ import java.util.concurrent.atomic.AtomicLong;
 @SuppressWarnings({"restriction"})
 abstract class BaseState {
 
-  //Byte Order related
-  static final ByteOrder nativeByteOrder = ByteOrder.nativeOrder();
-  static final ByteOrder nonNativeByteOrder = nativeByteOrder == ByteOrder.LITTLE_ENDIAN
-      ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
-
   //Monitoring
   static final AtomicLong currentDirectMemoryAllocations_ = new AtomicLong();
   static final AtomicLong currentDirectMemoryAllocated_ = new AtomicLong();
@@ -101,20 +96,12 @@ abstract class BaseState {
   //Byte Order Related
 
   /**
-   * Returns the Native Byte Order
-   * @return the Native Byte Order
-   */
-  public static final ByteOrder getNativeByteOrder() {
-    return nativeByteOrder;
-  }
-
-  /**
    * Gets the current Type ByteOrder.
    * This may be different from the ByteOrder of the backing resource and of the Native Byte Order.
    * @return the current Type ByteOrder.
    */
   public final ByteOrder getTypeByteOrder() {
-    return isNonNativeType() ? BaseState.nonNativeByteOrder : BaseState.nativeByteOrder;
+    return isNonNativeType() ? Util.nonNativeByteOrder : Util.nativeByteOrder;
   }
 
   /**
@@ -126,7 +113,7 @@ abstract class BaseState {
     if (byteOrder == null) {
       throw new IllegalArgumentException("ByteOrder parameter cannot be null.");
     }
-    return BaseState.nativeByteOrder == byteOrder;
+    return Util.nativeByteOrder == byteOrder;
   }
 
   /**
@@ -138,7 +125,7 @@ abstract class BaseState {
    */
   public final boolean isByteOrderCompatible(final ByteOrder byteOrder) {
     final ByteOrder typeBO = getTypeByteOrder();
-    return typeBO == getNativeByteOrder() && typeBO == byteOrder;
+    return typeBO == Util.nativeByteOrder && typeBO == byteOrder;
   }
 
   /**
@@ -364,7 +351,7 @@ abstract class BaseState {
     assert isValid() : "Memory not valid.";
   }
 
-  final void checkValid() {
+  void checkValid() {
     if (!isValid()) {
       throw new IllegalStateException("Memory not valid.");
     }
@@ -548,7 +535,7 @@ abstract class BaseState {
     sb.append("Valid               : ").append(state.isValid()).append(LS);
     sb.append("Read Only           : ").append(state.isReadOnly()).append(LS);
     sb.append("Type Byte Order     : ").append(state.getTypeByteOrder().toString()).append(LS);
-    sb.append("Native Byte Order   : ").append(nativeByteOrder.toString()).append(LS);
+    sb.append("Native Byte Order   : ").append(Util.nativeByteOrder.toString()).append(LS);
     sb.append("JDK Runtime Version : ").append(UnsafeUtil.JDK).append(LS);
     //Data detail
     sb.append("Data, littleEndian  :  0  1  2  3  4  5  6  7");

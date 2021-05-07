@@ -54,7 +54,7 @@ final class DirectNonNativeWritableBufferImpl extends NonNativeWritableBufferImp
   BaseWritableBufferImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
       final boolean readOnly, final ByteOrder byteOrder) {
     final int type = typeId | REGION | (readOnly ? READONLY : 0);
-    return isNativeByteOrder(byteOrder)
+    return Util.isNativeByteOrder(byteOrder)
         ? new DirectWritableBufferImpl(
             nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes,
             type, valid, memReqSvr, originMemory)
@@ -66,7 +66,7 @@ final class DirectNonNativeWritableBufferImpl extends NonNativeWritableBufferImp
   @Override
   BaseWritableBufferImpl toDuplicate(final boolean readOnly, final ByteOrder byteOrder) {
     final int type = typeId | DUPLICATE | (readOnly ? READONLY : 0);
-    return isNativeByteOrder(byteOrder)
+    return Util.isNativeByteOrder(byteOrder)
         ? new DirectWritableBufferImpl(
             nativeBaseOffset, getRegionOffset(), getCapacity(),
             type, valid, memReqSvr, originMemory)
@@ -96,4 +96,11 @@ final class DirectNonNativeWritableBufferImpl extends NonNativeWritableBufferImp
     return valid.get();
   }
 
+  @Override
+  void checkValid() {
+    if (!this.isValid()) {
+      throw new IllegalStateException("Memory not valid.");
+    }
+  }
+  
 }

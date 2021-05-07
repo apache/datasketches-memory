@@ -90,7 +90,7 @@ public abstract class WritableMemory extends Memory {
    * @throws IOException file not found or a RuntimeException.
    */
   public static WritableMapHandle map(final File file) throws IOException {
-    return map(file, 0, file.length(), BaseState.nativeByteOrder);
+    return map(file, 0, file.length(), Util.nativeByteOrder);
   }
 
   /**
@@ -157,7 +157,7 @@ public abstract class WritableMemory extends Memory {
    */
   public static WritableDirectHandle allocateDirect(final long capacityBytes,
       final MemoryRequestServer memReqSvr) {
-    return BaseWritableMemoryImpl.wrapDirect(capacityBytes, BaseState.nativeByteOrder, memReqSvr);
+    return BaseWritableMemoryImpl.wrapDirect(capacityBytes, Util.nativeByteOrder, memReqSvr);
   }
 
   //REGIONS
@@ -243,7 +243,7 @@ public abstract class WritableMemory extends Memory {
    */
   public static WritableMemory allocate(final int capacityBytes) {
     final byte[] arr = new byte[capacityBytes];
-    return wrap(arr, BaseState.nativeByteOrder);
+    return wrap(arr, Util.nativeByteOrder);
   }
 
   /**
@@ -272,7 +272,7 @@ public abstract class WritableMemory extends Memory {
    */
   public static WritableMemory wrap(final boolean[] arr) {
     final long lengthBytes = arr.length << Prim.BOOLEAN.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, BaseState.nativeByteOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, Util.nativeByteOrder);
   }
 
   /**
@@ -286,7 +286,7 @@ public abstract class WritableMemory extends Memory {
    * @return a new WritableMemory for write operations on the given primitive array.
    */
   public static WritableMemory wrap(final byte[] arr) {
-    return WritableMemory.wrap(arr, 0, arr.length, BaseState.nativeByteOrder);
+    return WritableMemory.wrap(arr, 0, arr.length, Util.nativeByteOrder);
   }
 
   /**
@@ -335,7 +335,7 @@ public abstract class WritableMemory extends Memory {
    */
   public static WritableMemory wrap(final char[] arr) {
     final long lengthBytes = arr.length << Prim.CHAR.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, BaseState.nativeByteOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, Util.nativeByteOrder);
   }
 
   /**
@@ -350,7 +350,7 @@ public abstract class WritableMemory extends Memory {
    */
   public static WritableMemory wrap(final short[] arr) {
     final long lengthBytes = arr.length << Prim.SHORT.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, BaseState.nativeByteOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, Util.nativeByteOrder);
   }
 
   /**
@@ -365,7 +365,7 @@ public abstract class WritableMemory extends Memory {
    */
   public static WritableMemory wrap(final int[] arr) {
     final long lengthBytes = arr.length << Prim.INT.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, BaseState.nativeByteOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, Util.nativeByteOrder);
   }
 
   /**
@@ -380,7 +380,7 @@ public abstract class WritableMemory extends Memory {
    */
   public static WritableMemory wrap(final long[] arr) {
     final long lengthBytes = arr.length << Prim.LONG.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, BaseState.nativeByteOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, Util.nativeByteOrder);
   }
 
   /**
@@ -395,7 +395,7 @@ public abstract class WritableMemory extends Memory {
    */
   public static WritableMemory wrap(final float[] arr) {
     final long lengthBytes = arr.length << Prim.FLOAT.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, BaseState.nativeByteOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, Util.nativeByteOrder);
   }
 
   /**
@@ -410,7 +410,7 @@ public abstract class WritableMemory extends Memory {
    */
   public static WritableMemory wrap(final double[] arr) {
     final long lengthBytes = arr.length << Prim.DOUBLE.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, BaseState.nativeByteOrder);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, Util.nativeByteOrder);
   }
   //END OF CONSTRUCTOR-TYPE METHODS
 
@@ -640,6 +640,7 @@ public abstract class WritableMemory extends Memory {
    */
   public abstract void setBits(long offsetBytes, byte bitMask);
 
+  
   //OTHER WRITABLE API METHODS
   /**
    * For Direct Memory only. Other types of backing resources will return null.
@@ -653,5 +654,5 @@ public abstract class WritableMemory extends Memory {
   public MemoryRequestServer getMemoryRequestServer() {
     return null;
   }
-
+  
 }

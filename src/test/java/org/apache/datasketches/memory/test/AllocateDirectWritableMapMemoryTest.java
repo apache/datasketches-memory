@@ -24,8 +24,8 @@
 package org.apache.datasketches.memory.test;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.apache.datasketches.memory.AllocateDirectMap.isFileReadOnly;
-import static org.apache.datasketches.memory.Util.getResourceFile;
+//import static org.apache.datasketches.memory.AllocateDirectMap.isFileReadOnly;
+import static org.apache.datasketches.memory.Util.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -35,12 +35,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.MapHandle;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.ReadOnlyException;
+import org.apache.datasketches.memory.Util;
 import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMapHandle;
 import org.apache.datasketches.memory.WritableMemory;
@@ -130,7 +132,7 @@ public class AllocateDirectWritableMapMemoryTest {
     file.deleteOnExit();  //comment out if you want to examine the file.
 
     final long bytes = 8;
-    try (WritableMapHandle h = WritableMemory.map(file, 0L, bytes, BaseState.nonNativeByteOrder)) {
+    try (WritableMapHandle h = WritableMemory.map(file, 0L, bytes, Util.nonNativeByteOrder)) {
       WritableMemory wmem = h.get();
       wmem.putChar(0, (char) 1);
       assertEquals(wmem.getByte(1), (byte) 1);
@@ -148,7 +150,15 @@ public class AllocateDirectWritableMapMemoryTest {
   @Test(expectedExceptions = ReadOnlyException.class)
   public void simpleMap2() throws IOException {
     File file = getResourceFile("GettysburgAddress.txt");
-    assertTrue(isFileReadOnly(file));
+    final Class<?> allocDirMapClass = ReflectUtil.getClass("org.apache.datasketches.memory.AllocateDirectMap");
+    final Method roMethod = ReflectUtil.getMethod(allocDirMapClass, "isFileReadOnly", file.getClass());
+    try {
+      assertTrue((boolean)roMethod.invoke(roMethod, file));
+      //assertTrue(isFileReadOnly(file));
+    } catch (final Exception e) {
+      if (e instanceof IllegalStateException || e instanceof InvocationTargetException) { } //OK
+      else { throw new RuntimeException(e); }
+    }
     try (WritableMapHandle rh = WritableMemory.map(file)) {
       //
     }
@@ -219,19 +229,38 @@ public class AllocateDirectWritableMapMemoryTest {
   public void checkExplicitClose() throws Exception {
     File file = getResourceFile("GettysburgAddress.txt");
     try (MapHandle wmh = Memory.map(file)) {
-      wmh.close(); //explicit close. Does the work of closing
-      wmh.dirMap.close(); //redundant
+      wmh.close(); //explicit close.
     } //end of scope call to Cleaner/Deallocator also will be redundant
   }
 
   @AfterClass
-  public void checkMapCounter() {
-    final long count = BaseState.getCurrentDirectMemoryMapAllocations();
-    if (count != 0) {
-      println(""+count);
-      fail();
+  public void checkDirectCounter() {
+    final Class<?> baseStateClass = ReflectUtil.getClass("org.apache.datasketches.memory.BaseState");
+    final Method currDirMemAllocMethod = 
+        ReflectUtil.getMethod(baseStateClass, "getCurrentDirectMemoryMapAllocations", (Class<?>[])null);
+    long count;
+    try {
+      count = (long) currDirMemAllocMethod.invoke(currDirMemAllocMethod, (Object[])null);
+      //final long count = BaseState.getCurrentDirectMemoryMapAllocations();
+      if (count != 0) {
+        println(""+count);
+        fail();
+      }
+    } catch (final Exception e) {
+      if (e instanceof IllegalStateException || e instanceof InvocationTargetException) { } //OK
+      else { throw new RuntimeException(e); }
     }
   }
+  
+  
+//  @AfterClass
+//  public void checkMapCounter() {
+//    final long count = BaseState.getCurrentDirectMemoryMapAllocations();
+//    if (count != 0) {
+//      println(""+count);
+//      fail();
+//    }
+//  }
 
   @Test
   public void printlnTest() {

@@ -24,9 +24,12 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.fail;
 
-import org.apache.datasketches.memory.BaseState;
-import org.apache.datasketches.memory.BaseWritableMemoryImpl;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.nio.ByteOrder;
+
 import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.Util;
 import org.apache.datasketches.memory.WritableDirectHandle;
 import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
@@ -35,23 +38,28 @@ import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")
 public class AllocateDirectMemoryTest {
-
+  
   @Test
   public void simpleAllocateDirect() {
     int longs = 32;
-    WritableMemory wMem1;
+    WritableMemory wMem;
     try (WritableHandle wh = WritableMemory.allocateDirect(longs << 3)) {
-      wMem1 = wh.get();
+      wMem = wh.get();
       for (int i = 0; i<longs; i++) {
-        wMem1.putLong(i << 3, i);
-        assertEquals(wMem1.getLong(i << 3), i);
+        wMem.putLong(i << 3, i);
+        assertEquals(wMem.getLong(i << 3), i);
       }
     }
+    //The TWR block has exited, so the memory should be invalid
     try {
-      wMem1.checkValid();
+      final Class<?> wMemClass = wMem.getClass();
+      Method method = ReflectUtil.getMethod(wMemClass, "checkValid", (Class<?>[])null);
+      method.invoke(wMem, (Object[]) null);
+      //wMem.checkValid();
       fail();
-    } catch (IllegalStateException e) {
-      //ok
+    } catch (final Exception e) {
+      if (e instanceof IllegalStateException || e instanceof InvocationTargetException) { } //OK
+      else { throw new RuntimeException(e); }
     }
   }
 
@@ -87,19 +95,24 @@ public class AllocateDirectMemoryTest {
     try (WritableHandle wh = WritableMemory.allocateDirect(128, null)) {
       WritableMemory wmem = wh.get();
       assertNotNull(wmem.getMemoryRequestServer());
-
-
     }
   }
 
 
   @Test
   public void checkNonNativeDirect() { //not allowed in public API
-    try (WritableDirectHandle h =
-        BaseWritableMemoryImpl.wrapDirect(8, BaseState.nonNativeByteOrder, null)) {
+    Class<?> bwMemImpl = ReflectUtil.getClass("org.apache.datasketches.memory.BaseWritableMemoryImpl");
+    Method wrapDirectMethod = 
+        ReflectUtil.getMethod(bwMemImpl, "wrapDirect", long.class, ByteOrder.class, MemoryRequestServer.class);
+    try (WritableDirectHandle h = (WritableDirectHandle) 
+        wrapDirectMethod.invoke(wrapDirectMethod, 8,  Util.nonNativeByteOrder, null)) {
+        //BaseWritableMemoryImpl.wrapDirect(8, Util.nonNativeByteOrder, null)) {
       WritableMemory wmem = h.get();
       wmem.putChar(0, (char) 1);
       assertEquals(wmem.getByte(1), (byte) 1);
+    } catch (final Exception e) {
+      if (e instanceof IllegalStateException || e instanceof InvocationTargetException) { } //OK
+      else { throw new RuntimeException(e); }
     }
   }
 
@@ -108,16 +121,25 @@ public class AllocateDirectMemoryTest {
     final long cap = 128;
     try (WritableDirectHandle wdh = WritableMemory.allocateDirect(cap)) {
       wdh.close(); //explicit close. Does the work of closing
-      wdh.direct.close(); //redundant
     } //end of scope call to Cleaner/Deallocator also will be redundant
   }
 
   @AfterClass
   public void checkDirectCounter() {
-    final long count = BaseState.getCurrentDirectMemoryAllocations();
-    if (count != 0) {
-      println(""+count);
-      fail();
+    final Class<?> baseStateClass = ReflectUtil.getClass("org.apache.datasketches.memory.BaseState");
+    final Method currDirMemAllocMethod = 
+        ReflectUtil.getMethod(baseStateClass, "getCurrentDirectMemoryAllocations", (Class<?>[])null);
+    long count;
+    try {
+      count = (long) currDirMemAllocMethod.invoke(currDirMemAllocMethod, (Object[])null);
+      //final long count = BaseState.getCurrentDirectMemoryAllocations();
+      if (count != 0) {
+        println(""+count);
+        fail();
+      }
+    } catch (final Exception e) {
+      if (e instanceof IllegalStateException || e instanceof InvocationTargetException) { } //OK
+      else { throw new RuntimeException(e); }
     }
   }
 

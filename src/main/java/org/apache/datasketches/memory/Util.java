@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Random;
@@ -34,10 +35,38 @@ import java.util.Random;
  * @author Lee Rhodes
  */
 public final class Util {
-  private static final String LS = System.getProperty("line.separator");
+  public static final String LS = System.getProperty("line.separator");
+  
+  //Byte Order related
+  public static final ByteOrder nativeByteOrder = ByteOrder.nativeOrder();
+  public static final ByteOrder nonNativeByteOrder = nativeByteOrder == ByteOrder.LITTLE_ENDIAN
+      ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
 
   private Util() { }
 
+  //Byte Order Related
+  
+  /**
+   * Returns the Native Byte Order
+   * @return the Native Byte Order
+   */
+  public static final ByteOrder getNativeByteOrder() {
+    return nativeByteOrder;
+  }
+
+  /**
+   * Returns true if the given byteOrder is the same as the native byte order.
+   * @param byteOrder the given byte order
+   * @return true if the given byteOrder is the same as the native byte order.
+   */
+  public static boolean isNativeByteOrder(final ByteOrder byteOrder) {
+    if (byteOrder == null) {
+      throw new IllegalArgumentException("ByteOrder parameter cannot be null.");
+    }
+    return Util.nativeByteOrder == byteOrder;
+  }
+  
+  
   /**
    * Searches a range of the specified array of longs for the specified value using the binary
    * search algorithm. The range must be sorted method) prior to making this call.

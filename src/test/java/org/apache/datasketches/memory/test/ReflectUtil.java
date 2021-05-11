@@ -19,20 +19,115 @@
 
 package org.apache.datasketches.memory.test;
 
+import java.io.File;
 import java.lang.reflect.*;
+import java.nio.ByteOrder;
 
-public class ReflectUtil {
+import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.WritableDirectHandle;
 
-  final static Class<?> BASE_STATE;
-  final static Class<?> BASE_WRITABLE_MEMORY_IMPL;
-  final static Class<?> ALLOCATE_DIRECT_MAP;
-  final static Class<?> NIO_BITS;
+public final class ReflectUtil {
+
+  private ReflectUtil() {}
+  
+  static final Class<?> BASE_STATE;
+  static final Class<?> BASE_WRITABLE_MEMORY_IMPL;
+  static final Class<?> ALLOCATE_DIRECT_MAP;
+  static final Class<?> NIO_BITS;
+  
+  static final Method CHECK_VALID; //BaseState  
+  static final Method GET_CURRENT_DIRECT_MEMORY_ALLOCATED; //BaseState
+  static final Method GET_CURRENT_DIRECT_MEMORY_ALLOCATIONS; //BaseState
+  static final Method GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATED; //BaseState
+  static final Method GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATIONS; //BaseState
+  static final Method GET_DIRECT_ALLOCATIONS_COUNT; //NioBits
+  static final Method GET_MAX_DIRECT_BYTE_BUFFER_MEMORY; //NioBits
+  static final Method GET_NATIVE_BASE_OFFSET; //BaseState
+  static final Method GET_RESERVED_MEMORY; //NioBits
+  static final Method GET_TOTAL_CAPACITY; //NioBits
+  static final Method GET_UNSAFE_OBJECT; //BaseState
+  static final Method IS_BB_TYPE; //BaseState
+  static final Method IS_BUFFER_TYPE; //BaseState
+  static final Method IS_DIRECT_TYPE; //BaseState
+  static final Method IS_DUPLICATE_TYPE; //BaseState
+  static final Method IS_FILE_READ_ONLY; //AllocateDirectMap
+  static final Method IS_HEAP_TYPE; //BaseState
+  static final Method IS_MAP_TYPE; //BaseState
+  static final Method IS_NON_NATIVE_TYPE; //BaseState
+  static final Method IS_PAGE_ALIGHED; //NioBits
+  static final Method IS_READ_ONLY_TYPE; //BaseState
+  static final Method IS_REGION_TYPE; //BaseState
+  static final Method PAGE_COUNT; //NioBits
+  static final Method PAGE_SIZE; //NioBits
+  static final Method RESERVE_MEMORY; //NioBits
+  static final Method UNRESERVE_MEMORY; //NioBits
+  static final Method WRAP_DIRECT; //BaseWritableMemoryImpl
   
   static {
-    BASE_STATE = getClass("org.apache.datasketches.memory.BaseState");
-    BASE_WRITABLE_MEMORY_IMPL = getClass("org.apache.datasketches.memory.BaseWritableMemoryImpl");
-    ALLOCATE_DIRECT_MAP = getClass("org.apache.datasketches.memory.AllocateDirectMap");
-    NIO_BITS = getClass("org.apache.datasketches.memory.NioBits");
+    BASE_STATE = 
+        getClass("org.apache.datasketches.memory.BaseState");
+    BASE_WRITABLE_MEMORY_IMPL = 
+        getClass("org.apache.datasketches.memory.BaseWritableMemoryImpl");
+    ALLOCATE_DIRECT_MAP = 
+        getClass("org.apache.datasketches.memory.AllocateDirectMap");
+    NIO_BITS = 
+        getClass("org.apache.datasketches.memory.NioBits");
+
+    CHECK_VALID =
+        getMethod(BASE_STATE, "checkValid", (Class<?>[])null); //not static
+    GET_CURRENT_DIRECT_MEMORY_ALLOCATED =
+        getMethod(BASE_STATE, "getCurrentDirectMemoryAllocated", (Class<?>[])null); //static
+    GET_CURRENT_DIRECT_MEMORY_ALLOCATIONS = 
+        getMethod(BASE_STATE, "getCurrentDirectMemoryAllocations", (Class<?>[])null); //static
+    GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATED =
+        getMethod(BASE_STATE, "getCurrentDirectMemoryMapAllocated", (Class<?>[])null); //static
+    GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATIONS = 
+        getMethod(BASE_STATE, "getCurrentDirectMemoryMapAllocations", (Class<?>[])null); //static
+    GET_DIRECT_ALLOCATIONS_COUNT =
+        getMethod(NIO_BITS, "getDirectAllocationsCount", (Class<?>[])null); //static
+    GET_MAX_DIRECT_BYTE_BUFFER_MEMORY =
+        getMethod(NIO_BITS, "getMaxDirectByteBufferMemory", (Class<?>[])null); //static
+    GET_NATIVE_BASE_OFFSET =
+        getMethod(BASE_STATE, "getNativeBaseOffset", (Class<?>[])null);
+    GET_RESERVED_MEMORY =
+        getMethod(NIO_BITS, "getReservedMemory", (Class<?>[])null); //static
+    GET_TOTAL_CAPACITY =
+        getMethod(NIO_BITS, "getTotalCapacity", (Class<?>[])null); //static
+    GET_UNSAFE_OBJECT = 
+        getMethod(BASE_STATE, "getUnsafeObject", (Class<?>[])null); //not static
+    IS_BB_TYPE =
+        getMethod(BASE_STATE, "isBBType", (Class<?>[])null); //not static
+    IS_BUFFER_TYPE =
+        getMethod(BASE_STATE, "isBufferType", (Class<?>[])null); //not static
+    IS_DIRECT_TYPE =
+        getMethod(BASE_STATE, "isDirectType", (Class<?>[])null); //not static
+    IS_DUPLICATE_TYPE =
+        getMethod(BASE_STATE, "isDuplicateType", (Class<?>[])null); //not static
+    IS_FILE_READ_ONLY =
+        getMethod(ALLOCATE_DIRECT_MAP, "isFileReadOnly", File.class);
+    IS_HEAP_TYPE =
+        getMethod(BASE_STATE, "isHeapType", (Class<?>[])null); //not static
+    IS_MAP_TYPE =
+        getMethod(BASE_STATE, "isMapType", (Class<?>[])null); //not static
+    IS_NON_NATIVE_TYPE =
+        getMethod(BASE_STATE, "isNonNativeType", (Class<?>[])null); //not static
+    IS_PAGE_ALIGHED =
+        getMethod(NIO_BITS, "isPageAligned", (Class<?>[])null); //static
+    IS_READ_ONLY_TYPE =
+        getMethod(BASE_STATE, "isReadOnlyType", (Class<?>[])null); //not static
+    IS_REGION_TYPE =
+        getMethod(BASE_STATE, "isRegionType", (Class<?>[])null); //not static
+    PAGE_COUNT =
+        getMethod(NIO_BITS, "pageCount", long.class); //static
+    PAGE_SIZE =
+        getMethod(NIO_BITS, "pageSize", (Class<?>[])null); //static
+    RESERVE_MEMORY =
+        getMethod(NIO_BITS, "reserveMemory", long.class, long.class); //static
+    UNRESERVE_MEMORY =
+        getMethod(NIO_BITS, "unreserveMemory", long.class, long.class); //static
+    WRAP_DIRECT =
+        getMethod(BASE_WRITABLE_MEMORY_IMPL, 
+            "wrapDirect", long.class, ByteOrder.class, MemoryRequestServer.class);  //static method
   }
   
   /**
@@ -81,7 +176,6 @@ public class ReflectUtil {
       throw new RuntimeException(e);
     }
   }
-  
   
   /**
    * Gets a declared field of the given the loaded owner class and field name. The accessible flag will be set true.
@@ -134,6 +228,167 @@ public class ReflectUtil {
     }
   }
   
+  static void checkValid(Object target) throws Exception {
+    //because method can throw an exception, all exceptions must be handled locally
+    CHECK_VALID.invoke(target);
+  }
+
+  static long getCurrentDirectMemoryAllocated() {
+    try {
+      return (long) GET_CURRENT_DIRECT_MEMORY_ALLOCATED.invoke(null);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
+  static long getCurrentDirectMemoryAllocations() {
+    try {
+      return (long) GET_CURRENT_DIRECT_MEMORY_ALLOCATIONS.invoke(null);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
+  static long getCurrentDirectMemoryMapAllocated() {
+    try {
+      return (long) GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATED.invoke(null);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
+  static long getCurrentDirectMemoryMapAllocations() {
+    try {
+      return (long) GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATIONS.invoke(null);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
+  static long getDirectAllocationsCount() {
+    try {
+      return (long) GET_DIRECT_ALLOCATIONS_COUNT.invoke(null);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
+  static long getMaxDirectByteBufferMemory() {
+    try {
+      return (long) GET_MAX_DIRECT_BYTE_BUFFER_MEMORY.invoke(null);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
+  static long getNativeBaseOffset(final Object target) {
+    try {
+      return (long) GET_NATIVE_BASE_OFFSET.invoke(target);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
+  static long getReservedMemory() {
+    try {
+      return (long) GET_RESERVED_MEMORY.invoke(null);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
+  static long getTotalCapacity() {
+    try {
+      return (long) GET_TOTAL_CAPACITY.invoke(null);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
+  static Object getUnsafeObject(Object target) {
+    try {
+      return GET_UNSAFE_OBJECT.invoke(target);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
+  static boolean isBBType(final Object target) {
+    try {
+      return (boolean) IS_BB_TYPE.invoke(target);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
+  static boolean isBufferType(final Object target) {
+    try {
+      return (boolean) IS_BUFFER_TYPE.invoke(target);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
+  static boolean isDirectType(final Object target) {
+    try {
+      return (boolean) IS_DIRECT_TYPE.invoke(target);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
+  static boolean isDuplicateType(final Object target) {
+    try {
+      return (boolean) IS_DUPLICATE_TYPE.invoke(target);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
+  static boolean isFileReadOnly(final File file) {
+    try {
+      return (boolean) IS_FILE_READ_ONLY.invoke(null, file);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
+  static boolean isHeapType(final Object target) {
+    try {
+      return (boolean) IS_HEAP_TYPE.invoke(target);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
+  static boolean isMapType(final Object target) {
+    try {
+      return (boolean) IS_MAP_TYPE.invoke(target);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
+  static boolean isNonNativeType(final Object target) {
+    try {
+      return (boolean) IS_NON_NATIVE_TYPE.invoke(target);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
+  static boolean isPageAligned() {
+    try {
+      return (boolean) IS_PAGE_ALIGHED.invoke(null);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
+  static boolean isReadOnlyType(final Object target) {
+    try {
+      return (boolean) IS_READ_ONLY_TYPE.invoke(target);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
+  static boolean isRegionType(final Object target) {
+    try {
+      return (boolean) IS_REGION_TYPE.invoke(target);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
+  static int pageCount(final long bytes) {
+    try {
+      return (int) PAGE_COUNT.invoke(null, bytes);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
+  static int pageSize() {
+    try {
+      return (int) PAGE_SIZE.invoke(null);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
+  static void reserveMemory(final long allocationSize, final long capacity) {
+    try {
+     RESERVE_MEMORY.invoke(null, allocationSize, capacity);
+    } catch (Exception e) { 
+      throw new RuntimeException(e); }
+  }
+
+  static void unreserveMemory(final long allocationSize, final long capacity) {
+    try {
+      UNRESERVE_MEMORY.invoke(null, allocationSize, capacity);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
+  static WritableDirectHandle wrapDirect(final long capacityBytes,
+      final ByteOrder byteOrder, final MemoryRequestServer memReqSvr) {
+    try {
+      return (WritableDirectHandle) WRAP_DIRECT.invoke(null, capacityBytes, byteOrder, memReqSvr);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
 }
-
-

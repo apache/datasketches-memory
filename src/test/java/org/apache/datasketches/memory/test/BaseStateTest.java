@@ -25,7 +25,6 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
-import java.lang.reflect.Method;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.Buffer;
@@ -39,19 +38,6 @@ import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")
 public class BaseStateTest {
-
-  static final Method GET_NATIVE_BASE_OFFSET;
-  
-  static {
-    GET_NATIVE_BASE_OFFSET =
-        ReflectUtil.getMethod(ReflectUtil.BASE_STATE, "getNativeBaseOffset", (Class<?>[])null);
-  }
-  
-  private static long getNativeBaseOffset(final Object owner) {
-    try {
-      return (long) GET_NATIVE_BASE_OFFSET.invoke(owner);
-    } catch (Exception e) { throw new RuntimeException(e); }
-  }
   
   @Test
   public void checkPrimOffset() {
@@ -105,7 +91,7 @@ public class BaseStateTest {
   @Test
   public void checkGetNativeBaseOffset_Heap() throws Exception {
     WritableMemory wmem = WritableMemory.allocate(8); //heap
-    final long offset = getNativeBaseOffset(wmem);
+    final long offset = ReflectUtil.getNativeBaseOffset(wmem);
     assertEquals(offset, 0L);
   }
 

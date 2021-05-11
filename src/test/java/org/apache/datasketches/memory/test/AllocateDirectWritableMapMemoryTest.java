@@ -24,7 +24,6 @@
 package org.apache.datasketches.memory.test;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-//import static org.apache.datasketches.memory.AllocateDirectMap.isFileReadOnly;
 import static org.apache.datasketches.memory.Util.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;

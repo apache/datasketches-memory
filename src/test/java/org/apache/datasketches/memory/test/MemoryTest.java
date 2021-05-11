@@ -31,7 +31,6 @@ import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
 import java.io.File;
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
@@ -50,46 +49,6 @@ import org.testng.collections.Lists;
 @SuppressWarnings("javadoc")
 public class MemoryTest {
   private static final String LS = System.getProperty("line.separator");
-
-  static final Method GET_CURRENT_DIRECT_MEMORY_ALLOCATIONS;
-  static final Method GET_CURRENT_DIRECT_MEMORY_ALLOCATED;
-  static final Method GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATIONS;
-  static final Method GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATED;
-  
-  static {
-    GET_CURRENT_DIRECT_MEMORY_ALLOCATIONS = 
-        ReflectUtil.getMethod(ReflectUtil.BASE_STATE, "getCurrentDirectMemoryAllocations", (Class<?>[])null); //static
-    GET_CURRENT_DIRECT_MEMORY_ALLOCATED =
-        ReflectUtil.getMethod(ReflectUtil.BASE_STATE, "getCurrentDirectMemoryAllocated", (Class<?>[])null); //static
-    GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATIONS = 
-        ReflectUtil.getMethod(ReflectUtil.BASE_STATE, "getCurrentDirectMemoryMapAllocations", (Class<?>[])null); //static
-    GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATED =
-        ReflectUtil.getMethod(ReflectUtil.BASE_STATE, "getCurrentDirectMemoryMapAllocated", (Class<?>[])null); //static
-  }
-  
-  private static long getCurrentDirectMemoryAllocations() {
-    try {
-      return (long) GET_CURRENT_DIRECT_MEMORY_ALLOCATIONS.invoke(null);
-    } catch (Exception e) { throw new RuntimeException(e); }
-  }
-  
-  private static long getCurrentDirectMemoryAllocated() {
-    try {
-      return (long) GET_CURRENT_DIRECT_MEMORY_ALLOCATED.invoke(null);
-    } catch (Exception e) { throw new RuntimeException(e); }
-  }
-  
-  private static long getCurrentDirectMemoryMapAllocations() {
-    try {
-      return (long) GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATIONS.invoke(null);
-    } catch (Exception e) { throw new RuntimeException(e); }
-  }
-  
-  private static long getCurrentDirectMemoryMapAllocated() {
-    try {
-      return (long) GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATED.invoke(null);
-    } catch (Exception e) { throw new RuntimeException(e); }
-  }
   
   @BeforeClass
   public void setReadOnly() {
@@ -430,17 +389,17 @@ public class MemoryTest {
     int bytes = 1024;
     WritableHandle wh1 = WritableMemory.allocateDirect(bytes);
     WritableHandle wh2 = WritableMemory.allocateDirect(bytes);
-    assertEquals(getCurrentDirectMemoryAllocations(), 2L);
-    assertEquals(getCurrentDirectMemoryAllocated(), 2 * bytes);
+    assertEquals(ReflectUtil.getCurrentDirectMemoryAllocations(), 2L);
+    assertEquals(ReflectUtil.getCurrentDirectMemoryAllocated(), 2 * bytes);
 
     wh1.close();
-    assertEquals(getCurrentDirectMemoryAllocations(), 1L);
-    assertEquals(getCurrentDirectMemoryAllocated(), bytes);
+    assertEquals(ReflectUtil.getCurrentDirectMemoryAllocations(), 1L);
+    assertEquals(ReflectUtil.getCurrentDirectMemoryAllocated(), bytes);
 
     wh2.close();
     wh2.close(); //check that it doesn't go negative.
-    assertEquals(getCurrentDirectMemoryAllocations(), 0L);
-    assertEquals(getCurrentDirectMemoryAllocated(), 0L);
+    assertEquals(ReflectUtil.getCurrentDirectMemoryAllocations(), 0L);
+    assertEquals(ReflectUtil.getCurrentDirectMemoryAllocated(), 0L);
   }
 
   @SuppressWarnings("resource")
@@ -452,17 +411,17 @@ public class MemoryTest {
     MapHandle mmh1 = Memory.map(file);
     MapHandle mmh2 = Memory.map(file);
 
-    assertEquals(getCurrentDirectMemoryMapAllocations(), 2L);
-    assertEquals(getCurrentDirectMemoryMapAllocated(), 2 * bytes);
+    assertEquals(ReflectUtil.getCurrentDirectMemoryMapAllocations(), 2L);
+    assertEquals(ReflectUtil.getCurrentDirectMemoryMapAllocated(), 2 * bytes);
 
     mmh1.close();
-    assertEquals(getCurrentDirectMemoryMapAllocations(), 1L);
-    assertEquals(getCurrentDirectMemoryMapAllocated(), bytes);
+    assertEquals(ReflectUtil.getCurrentDirectMemoryMapAllocations(), 1L);
+    assertEquals(ReflectUtil.getCurrentDirectMemoryMapAllocated(), bytes);
 
     mmh2.close();
     mmh2.close(); //check that it doesn't go negative.
-    assertEquals(getCurrentDirectMemoryMapAllocations(), 0L);
-    assertEquals(getCurrentDirectMemoryMapAllocated(), 0L);
+    assertEquals(ReflectUtil.getCurrentDirectMemoryMapAllocations(), 0L);
+    assertEquals(ReflectUtil.getCurrentDirectMemoryMapAllocated(), 0L);
   }
 
   @Test

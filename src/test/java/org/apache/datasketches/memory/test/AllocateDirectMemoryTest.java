@@ -25,8 +25,6 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.fail;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.Util;
@@ -38,34 +36,6 @@ import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")
 public class AllocateDirectMemoryTest {
-  
-  static final Method CHECK_VALID;
-  static final Method WRAP_DIRECT;
-  static final Method GET_CURRENT_DIRECT_MEMORY_ALLOCATIONS;
-  
-  static {
-    CHECK_VALID =
-        ReflectUtil.getMethod(ReflectUtil.BASE_STATE, "checkValid", (Class<?>[])null); //not static
-    WRAP_DIRECT =
-        ReflectUtil.getMethod(ReflectUtil.BASE_WRITABLE_MEMORY_IMPL, 
-            "wrapDirect", long.class, ByteOrder.class, MemoryRequestServer.class);  //static method
-    GET_CURRENT_DIRECT_MEMORY_ALLOCATIONS =
-        ReflectUtil.getMethod(ReflectUtil.BASE_STATE, 
-            "getCurrentDirectMemoryAllocations", (Class<?>[])null); //static method
-  }
-  
-  private static long getCurrentDirectMemoryAllocations() {
-    try {
-      return (long) GET_CURRENT_DIRECT_MEMORY_ALLOCATIONS.invoke(null);
-    } catch (Exception e) { throw new RuntimeException(e); }
-  }
-  
-  private static WritableDirectHandle wrapDirect(final long capacityBytes,
-      final ByteOrder byteOrder, final MemoryRequestServer memReqSvr) {
-    try {
-      return (WritableDirectHandle) WRAP_DIRECT.invoke(null, capacityBytes, byteOrder, memReqSvr);
-    } catch (Exception e) { throw new RuntimeException(e); }
-  }
   
   @Test
   public void simpleAllocateDirect() {
@@ -79,8 +49,7 @@ public class AllocateDirectMemoryTest {
       }
       //inside the TWR block the memory should be valid
       try {
-        CHECK_VALID.invoke(wMem);
-        //wMem.checkValid();
+        ReflectUtil.checkValid(wMem);
         //OK
       } catch (final Exception e) {
         throw new RuntimeException(e);
@@ -88,8 +57,7 @@ public class AllocateDirectMemoryTest {
     }
     //The TWR block has exited, so the memory should be invalid
     try {
-      CHECK_VALID.invoke(wMem);
-      //wMem.checkValid();
+      ReflectUtil.checkValid(wMem);
       fail();
     } catch (final Exception e) {
       if (e instanceof IllegalStateException || e instanceof InvocationTargetException) { } //OK
@@ -136,7 +104,7 @@ public class AllocateDirectMemoryTest {
 
   @Test
   public void checkNonNativeDirect() { //not allowed in public API
-    try (WritableDirectHandle h = wrapDirect(8,  Util.nonNativeByteOrder, null)) { 
+    try (WritableDirectHandle h = ReflectUtil.wrapDirect(8,  Util.nonNativeByteOrder, null)) { 
         //BaseWritableMemoryImpl.wrapDirect(8, Util.nonNativeByteOrder, null)) {
       WritableMemory wmem = h.get();
       wmem.putChar(0, (char) 1);
@@ -154,7 +122,7 @@ public class AllocateDirectMemoryTest {
 
   @AfterClass
   public void checkDirectCounter() {
-    long count = getCurrentDirectMemoryAllocations();
+    long count = ReflectUtil.getCurrentDirectMemoryAllocations();
     //final long count = BaseState.getCurrentDirectMemoryAllocations();
     if (count != 0) {
       println(""+count);

@@ -19,8 +19,6 @@
 
 package org.apache.datasketches.memory.test;
 
-import java.lang.reflect.Method;
-
 import static org.testng.Assert.assertEquals;
 
 import org.testng.annotations.Test;
@@ -31,96 +29,11 @@ import org.testng.annotations.Test;
 @SuppressWarnings("javadoc")
 public class NioBitsTest {
 
-  static final Method GET_MAX_DIRECT_BYTE_BUFFER_MEMORY;
-  static final Method IS_PAGE_ALIGHED;
-  static final Method PAGE_SIZE;
-  static final Method PAGE_COUNT;
-  static final Method GET_DIRECT_ALLOCATIONS_COUNT;
-  static final Method GET_RESERVED_MEMORY;
-  static final Method GET_TOTAL_CAPACITY;
-  static final Method RESERVE_MEMORY;
-  static final Method UNRESERVE_MEMORY;
-  
-  static {
-    GET_MAX_DIRECT_BYTE_BUFFER_MEMORY =
-        ReflectUtil.getMethod(ReflectUtil.NIO_BITS, "getMaxDirectByteBufferMemory", (Class<?>[])null); //static
-    IS_PAGE_ALIGHED =
-        ReflectUtil.getMethod(ReflectUtil.NIO_BITS, "isPageAligned", (Class<?>[])null); //static
-    PAGE_SIZE =
-        ReflectUtil.getMethod(ReflectUtil.NIO_BITS, "pageSize", (Class<?>[])null); //static
-    PAGE_COUNT =
-        ReflectUtil.getMethod(ReflectUtil.NIO_BITS, "pageCount", long.class); //static
-    GET_DIRECT_ALLOCATIONS_COUNT =
-        ReflectUtil.getMethod(ReflectUtil.NIO_BITS, "getDirectAllocationsCount", (Class<?>[])null); //static
-    GET_RESERVED_MEMORY =
-        ReflectUtil.getMethod(ReflectUtil.NIO_BITS, "getReservedMemory", (Class<?>[])null); //static
-    GET_TOTAL_CAPACITY =
-        ReflectUtil.getMethod(ReflectUtil.NIO_BITS, "getTotalCapacity", (Class<?>[])null); //static
-    RESERVE_MEMORY =
-        ReflectUtil.getMethod(ReflectUtil.NIO_BITS, "reserveMemory", long.class, long.class); //static
-    UNRESERVE_MEMORY =
-        ReflectUtil.getMethod(ReflectUtil.NIO_BITS, "unreserveMemory", long.class, long.class); //static
-  }
-
-  private static long getMaxDirectByteBufferMemory() {
-    try {
-      return (long) GET_MAX_DIRECT_BYTE_BUFFER_MEMORY.invoke(null);
-    } catch (Exception e) { throw new RuntimeException(e); }
-  }
-  
-  private static boolean isPageAligned() {
-    try {
-      return (boolean) IS_PAGE_ALIGHED.invoke(null);
-    } catch (Exception e) { throw new RuntimeException(e); }
-  }
-  
-  private static int pageSize() {
-    try {
-      return (int) PAGE_SIZE.invoke(null);
-    } catch (Exception e) { throw new RuntimeException(e); }
-  }
-  
-  private static int pageCount(final long bytes) {
-    try {
-      return (int) PAGE_COUNT.invoke(null, bytes);
-    } catch (Exception e) { throw new RuntimeException(e); }
-  }
-  
-  private static long getDirectAllocationsCount() {
-    try {
-      return (long) GET_DIRECT_ALLOCATIONS_COUNT.invoke(null);
-    } catch (Exception e) { throw new RuntimeException(e); }
-  }
-  
-  private static long getReservedMemory() {
-    try {
-      return (long) GET_RESERVED_MEMORY.invoke(null);
-    } catch (Exception e) { throw new RuntimeException(e); }
-  }
-  
-  private static long getTotalCapacity() {
-    try {
-      return (long) GET_TOTAL_CAPACITY.invoke(null);
-    } catch (Exception e) { throw new RuntimeException(e); }
-  }
-  
-  private static void reserveMemory(final long allocationSize, final long capacity) {
-    try {
-     RESERVE_MEMORY.invoke(null, allocationSize, capacity);
-    } catch (Exception e) { 
-      throw new RuntimeException(e); }
-  }
-  private static void unreserveMemory(final long allocationSize, final long capacity) {
-    try {
-      UNRESERVE_MEMORY.invoke(null, allocationSize, capacity);
-    } catch (Exception e) { throw new RuntimeException(e); }
-  }
-  
   @Test
   public void checkVMParams() {
-    println("Max Memory: " + getMaxDirectByteBufferMemory());
-    println("Page Aligned: " + isPageAligned());
-    println("Page Size: " + pageSize());
+    println("Max Memory: " + ReflectUtil.getMaxDirectByteBufferMemory());
+    println("Page Aligned: " + ReflectUtil.isPageAligned());
+    println("Page Size: " + ReflectUtil.pageSize());
   }
   
   @Test
@@ -129,27 +42,26 @@ public class NioBitsTest {
   public void checkGetAtomicFields() {
     long cap = 1024L + Integer.MAX_VALUE;
     printStats();
-    reserveMemory(cap, cap);
+    ReflectUtil.reserveMemory(cap, cap);
     printStats();
-    unreserveMemory(cap, cap);
+    ReflectUtil. unreserveMemory(cap, cap);
     printStats();
   }
 
   @Test
   public void checkPageCount() {
-    assertEquals(pageCount(0), 0);
-    assertEquals(pageCount(1), 1);
+    assertEquals(ReflectUtil.pageCount(0), 0);
+    assertEquals(ReflectUtil.pageCount(1), 1);
   }
 
   private static void printStats() {
-    long count = getDirectAllocationsCount();
-    long resMem = getReservedMemory();
-    long totCap = getTotalCapacity();
-    long maxDBBmem = getMaxDirectByteBufferMemory();
+    long count = ReflectUtil.getDirectAllocationsCount();
+    long resMem = ReflectUtil.getReservedMemory();
+    long totCap = ReflectUtil.getTotalCapacity();
+    long maxDBBmem = ReflectUtil.getMaxDirectByteBufferMemory();
     String s = String.format("%,10d\t%,15d\t%,15d\t%,15d", count, resMem, totCap, maxDBBmem);
     println(s);
   }
-
 
   @Test
   public void printlnTest() {

@@ -35,7 +35,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteOrder;
 
@@ -54,6 +53,28 @@ import org.testng.annotations.Test;
 public class AllocateDirectWritableMapMemoryTest {
   private static final String LS = System.getProperty("line.separator");
 
+  static final Method IS_FILE_READ_ONLY;
+  static final Method GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATIONS;
+  
+  static {
+    IS_FILE_READ_ONLY =
+        ReflectUtil.getMethod(ReflectUtil.ALLOCATE_DIRECT_MAP, "isFileReadOnly", File.class);
+    GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATIONS =
+        ReflectUtil.getMethod(ReflectUtil.BASE_STATE, "getCurrentDirectMemoryMapAllocations", (Class<?>[])null); //static
+  }
+  
+  private static boolean isFileReadOnly(final File file) {
+    try {
+      return (boolean) IS_FILE_READ_ONLY.invoke(null, file);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
+  private static long getCurrentDirectMemoryMapAllocations() {
+    try {
+      return (long) GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATIONS.invoke(null);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+  
   @BeforeClass
   public void setReadOnly() {
     UtilTest.setGettysburgAddressFileToReadOnly();
@@ -150,16 +171,8 @@ public class AllocateDirectWritableMapMemoryTest {
   @Test(expectedExceptions = ReadOnlyException.class)
   public void simpleMap2() throws IOException {
     File file = getResourceFile("GettysburgAddress.txt");
-    final Class<?> allocDirMapClass = ReflectUtil.getClass("org.apache.datasketches.memory.AllocateDirectMap");
-    final Method roMethod = ReflectUtil.getMethod(allocDirMapClass, "isFileReadOnly", file.getClass());
-    try {
-      assertTrue((boolean)roMethod.invoke(roMethod, file));
-      //assertTrue(isFileReadOnly(file));
-    } catch (final Exception e) {
-      if (e instanceof IllegalStateException || e instanceof InvocationTargetException) { } //OK
-      else { throw new RuntimeException(e); }
-    }
-    try (WritableMapHandle rh = WritableMemory.map(file)) {
+    assertTrue(isFileReadOnly(file));
+    try (WritableMapHandle rh = WritableMemory.map(file)) { //throws
       //
     }
   }
@@ -235,32 +248,13 @@ public class AllocateDirectWritableMapMemoryTest {
 
   @AfterClass
   public void checkDirectCounter() {
-    final Class<?> baseStateClass = ReflectUtil.getClass("org.apache.datasketches.memory.BaseState");
-    final Method currDirMemAllocMethod = 
-        ReflectUtil.getMethod(baseStateClass, "getCurrentDirectMemoryMapAllocations", (Class<?>[])null);
-    long count;
-    try {
-      count = (long) currDirMemAllocMethod.invoke(currDirMemAllocMethod, (Object[])null);
+    long count =  getCurrentDirectMemoryMapAllocations();
       //final long count = BaseState.getCurrentDirectMemoryMapAllocations();
       if (count != 0) {
         println(""+count);
         fail();
       }
-    } catch (final Exception e) {
-      if (e instanceof IllegalStateException || e instanceof InvocationTargetException) { } //OK
-      else { throw new RuntimeException(e); }
-    }
-  }
-  
-  
-//  @AfterClass
-//  public void checkMapCounter() {
-//    final long count = BaseState.getCurrentDirectMemoryMapAllocations();
-//    if (count != 0) {
-//      println(""+count);
-//      fail();
-//    }
-//  }
+    } 
 
   @Test
   public void printlnTest() {

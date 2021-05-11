@@ -25,7 +25,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.datasketches.memory.CompareAndCopy;
+import static org.apache.datasketches.memory.Util.UNSAFE_COPY_THRESHOLD_BYTES;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
@@ -41,8 +41,8 @@ public class MemoryWriteToTest {
     testWriteTo(createRandomBytesMemory(7));
     testWriteTo(createRandomBytesMemory(1023));
     testWriteTo(createRandomBytesMemory(10_000));
-    testWriteTo(createRandomBytesMemory(CompareAndCopy.UNSAFE_COPY_THRESHOLD_BYTES * 5));
-    testWriteTo(createRandomBytesMemory((CompareAndCopy.UNSAFE_COPY_THRESHOLD_BYTES * 5) + 10));
+    testWriteTo(createRandomBytesMemory(UNSAFE_COPY_THRESHOLD_BYTES * 5));
+    testWriteTo(createRandomBytesMemory((UNSAFE_COPY_THRESHOLD_BYTES * 5) + 10));
   }
 
   @Test
@@ -51,21 +51,21 @@ public class MemoryWriteToTest {
     testWriteTo(createRandomIntsMemory(7));
     testWriteTo(createRandomIntsMemory(1023));
     testWriteTo(createRandomIntsMemory(10_000));
-    testWriteTo(createRandomIntsMemory(CompareAndCopy.UNSAFE_COPY_THRESHOLD_BYTES * 5));
-    testWriteTo(createRandomIntsMemory((CompareAndCopy.UNSAFE_COPY_THRESHOLD_BYTES * 5) + 10));
+    testWriteTo(createRandomIntsMemory(UNSAFE_COPY_THRESHOLD_BYTES * 5));
+    testWriteTo(createRandomIntsMemory((UNSAFE_COPY_THRESHOLD_BYTES * 5) + 10));
   }
 
   @Test
   public void testOffHeap() throws IOException {
     try (WritableHandle handle =
-        WritableMemory.allocateDirect((CompareAndCopy.UNSAFE_COPY_THRESHOLD_BYTES * 5) + 10)) {
+        WritableMemory.allocateDirect((UNSAFE_COPY_THRESHOLD_BYTES * 5) + 10)) {
       WritableMemory mem = handle.get();
       testWriteTo(mem.region(0, 0));
       testOffHeap(mem, 7);
       testOffHeap(mem, 1023);
       testOffHeap(mem, 10_000);
-      testOffHeap(mem, CompareAndCopy.UNSAFE_COPY_THRESHOLD_BYTES * 5);
-      testOffHeap(mem, (CompareAndCopy.UNSAFE_COPY_THRESHOLD_BYTES * 5) + 10);
+      testOffHeap(mem, UNSAFE_COPY_THRESHOLD_BYTES * 5);
+      testOffHeap(mem, (UNSAFE_COPY_THRESHOLD_BYTES * 5) + 10);
     }
   }
 

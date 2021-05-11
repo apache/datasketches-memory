@@ -39,6 +39,34 @@ import org.testng.annotations.Test;
 @SuppressWarnings("javadoc")
 public class AllocateDirectMemoryTest {
   
+  static final Method CHECK_VALID;
+  static final Method WRAP_DIRECT;
+  static final Method GET_CURRENT_DIRECT_MEMORY_ALLOCATIONS;
+  
+  static {
+    CHECK_VALID =
+        ReflectUtil.getMethod(ReflectUtil.BASE_STATE, "checkValid", (Class<?>[])null); //not static
+    WRAP_DIRECT =
+        ReflectUtil.getMethod(ReflectUtil.BASE_WRITABLE_MEMORY_IMPL, 
+            "wrapDirect", long.class, ByteOrder.class, MemoryRequestServer.class);  //static method
+    GET_CURRENT_DIRECT_MEMORY_ALLOCATIONS =
+        ReflectUtil.getMethod(ReflectUtil.BASE_STATE, 
+            "getCurrentDirectMemoryAllocations", (Class<?>[])null); //static method
+  }
+  
+  private static long getCurrentDirectMemoryAllocations() {
+    try {
+      return (long) GET_CURRENT_DIRECT_MEMORY_ALLOCATIONS.invoke(null);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+  
+  private static WritableDirectHandle wrapDirect(final long capacityBytes,
+      final ByteOrder byteOrder, final MemoryRequestServer memReqSvr) {
+    try {
+      return (WritableDirectHandle) WRAP_DIRECT.invoke(null, capacityBytes, byteOrder, memReqSvr);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+  
   @Test
   public void simpleAllocateDirect() {
     int longs = 32;
@@ -49,16 +77,23 @@ public class AllocateDirectMemoryTest {
         wMem.putLong(i << 3, i);
         assertEquals(wMem.getLong(i << 3), i);
       }
+      //inside the TWR block the memory should be valid
+      try {
+        CHECK_VALID.invoke(wMem);
+        //wMem.checkValid();
+        //OK
+      } catch (final Exception e) {
+        throw new RuntimeException(e);
+      }
     }
     //The TWR block has exited, so the memory should be invalid
     try {
-      final Class<?> wMemClass = wMem.getClass();
-      Method method = ReflectUtil.getMethod(wMemClass, "checkValid", (Class<?>[])null);
-      method.invoke(wMem, (Object[]) null);
+      CHECK_VALID.invoke(wMem);
       //wMem.checkValid();
       fail();
     } catch (final Exception e) {
       if (e instanceof IllegalStateException || e instanceof InvocationTargetException) { } //OK
+      //if IllegalAccessException or IllegalArgumentException NOT OK
       else { throw new RuntimeException(e); }
     }
   }
@@ -101,19 +136,12 @@ public class AllocateDirectMemoryTest {
 
   @Test
   public void checkNonNativeDirect() { //not allowed in public API
-    Class<?> bwMemImpl = ReflectUtil.getClass("org.apache.datasketches.memory.BaseWritableMemoryImpl");
-    Method wrapDirectMethod = 
-        ReflectUtil.getMethod(bwMemImpl, "wrapDirect", long.class, ByteOrder.class, MemoryRequestServer.class);
-    try (WritableDirectHandle h = (WritableDirectHandle) 
-        wrapDirectMethod.invoke(wrapDirectMethod, 8,  Util.nonNativeByteOrder, null)) {
+    try (WritableDirectHandle h = wrapDirect(8,  Util.nonNativeByteOrder, null)) { 
         //BaseWritableMemoryImpl.wrapDirect(8, Util.nonNativeByteOrder, null)) {
       WritableMemory wmem = h.get();
       wmem.putChar(0, (char) 1);
       assertEquals(wmem.getByte(1), (byte) 1);
-    } catch (final Exception e) {
-      if (e instanceof IllegalStateException || e instanceof InvocationTargetException) { } //OK
-      else { throw new RuntimeException(e); }
-    }
+    } 
   }
 
   @Test
@@ -126,20 +154,11 @@ public class AllocateDirectMemoryTest {
 
   @AfterClass
   public void checkDirectCounter() {
-    final Class<?> baseStateClass = ReflectUtil.getClass("org.apache.datasketches.memory.BaseState");
-    final Method currDirMemAllocMethod = 
-        ReflectUtil.getMethod(baseStateClass, "getCurrentDirectMemoryAllocations", (Class<?>[])null);
-    long count;
-    try {
-      count = (long) currDirMemAllocMethod.invoke(currDirMemAllocMethod, (Object[])null);
-      //final long count = BaseState.getCurrentDirectMemoryAllocations();
-      if (count != 0) {
-        println(""+count);
-        fail();
-      }
-    } catch (final Exception e) {
-      if (e instanceof IllegalStateException || e instanceof InvocationTargetException) { } //OK
-      else { throw new RuntimeException(e); }
+    long count = getCurrentDirectMemoryAllocations();
+    //final long count = BaseState.getCurrentDirectMemoryAllocations();
+    if (count != 0) {
+      println(""+count);
+      fail();
     }
   }
 

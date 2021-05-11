@@ -19,18 +19,17 @@
 
 package org.apache.datasketches.memory.test;
 
-import static org.apache.datasketches.memory.BaseState.DUPLICATE;
-import static org.apache.datasketches.memory.BaseState.REGION;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 
-import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.memory.Util;
 import org.apache.datasketches.memory.WritableDirectHandle;
 import org.apache.datasketches.memory.WritableMapHandle;
 import org.apache.datasketches.memory.WritableMemory;
@@ -42,28 +41,115 @@ import org.testng.annotations.Test;
 @SuppressWarnings("javadoc")
 public class SpecificLeafTest {
 
+  static final Method IS_READ_ONLY_TYPE;
+  static final Method IS_BUFFER_TYPE;
+  static final Method IS_DUPLICATE_TYPE;
+  static final Method IS_REGION_TYPE;
+  static final Method IS_NON_NATIVE_TYPE;
+  static final Method IS_HEAP_TYPE;
+  static final Method IS_DIRECT_TYPE;
+  static final Method IS_MAP_TYPE;
+  static final Method IS_BB_TYPE;
+  
+  static {
+    IS_READ_ONLY_TYPE =
+        ReflectUtil.getMethod(ReflectUtil.BASE_STATE, "isReadOnlyType", (Class<?>[])null); //not static
+    IS_BUFFER_TYPE =
+        ReflectUtil.getMethod(ReflectUtil.BASE_STATE, "isBufferType", (Class<?>[])null); //not static
+    IS_DUPLICATE_TYPE =
+        ReflectUtil.getMethod(ReflectUtil.BASE_STATE, "isDuplicateType", (Class<?>[])null); //not static
+    IS_REGION_TYPE =
+        ReflectUtil.getMethod(ReflectUtil.BASE_STATE, "isRegionType", (Class<?>[])null); //not static
+    IS_NON_NATIVE_TYPE =
+        ReflectUtil.getMethod(ReflectUtil.BASE_STATE, "isNonNativeType", (Class<?>[])null); //not static
+    IS_HEAP_TYPE =
+        ReflectUtil.getMethod(ReflectUtil.BASE_STATE, "isHeapType", (Class<?>[])null); //not static
+    IS_DIRECT_TYPE =
+        ReflectUtil.getMethod(ReflectUtil.BASE_STATE, "isDirectType", (Class<?>[])null); //not static
+    IS_MAP_TYPE =
+        ReflectUtil.getMethod(ReflectUtil.BASE_STATE, "isMapType", (Class<?>[])null); //not static
+    IS_BB_TYPE =
+        ReflectUtil.getMethod(ReflectUtil.BASE_STATE, "isBBType", (Class<?>[])null); //not static
+  }
+  
+  private static boolean isReadOnlyType(final Object owner) {
+    try {
+      return (boolean) IS_READ_ONLY_TYPE.invoke(owner);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+  
+  private static boolean isBufferType(final Object owner) {
+    try {
+      return (boolean) IS_BUFFER_TYPE.invoke(owner);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+  
+  private static boolean isDuplicateType(final Object owner) {
+    try {
+      return (boolean) IS_DUPLICATE_TYPE.invoke(owner);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+  
+  private static boolean isRegionType(final Object owner) {
+    try {
+      return (boolean) IS_REGION_TYPE.invoke(owner);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+  
+  private static boolean isNonNativeType(final Object owner) {
+    try {
+      return (boolean) IS_NON_NATIVE_TYPE.invoke(owner);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+  
+  private static boolean isHeapType(final Object owner) {
+    try {
+      return (boolean) IS_HEAP_TYPE.invoke(owner);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+  
+  private static boolean isDirectType(final Object owner) {
+    try {
+      return (boolean) IS_DIRECT_TYPE.invoke(owner);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+  
+  private static boolean isMapType(final Object owner) {
+    try {
+      return (boolean) IS_MAP_TYPE.invoke(owner);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+  
+  private static boolean isBBType(final Object owner) {
+    try {
+      return (boolean) IS_BB_TYPE.invoke(owner);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+  
+  
+  
   @Test
   public void checkByteBufferLeafs() {
     int bytes = 128;
     ByteBuffer bb = ByteBuffer.allocate(bytes);
-    bb.order(BaseState.nativeByteOrder);
+    bb.order(Util.nativeByteOrder);
 
-    Memory mem = Memory.wrap(bb).region(0, bytes, BaseState.nativeByteOrder);
-    assertTrue(mem.isBBType());
+    Memory mem = Memory.wrap(bb).region(0, bytes, Util.nativeByteOrder);
+    assertTrue(isBBType(mem));
     assertTrue(mem.isReadOnly());
     checkCrossLeafTypeIds(mem);
-    Buffer buf = mem.asBuffer().region(0, bytes, BaseState.nativeByteOrder);
+    Buffer buf = mem.asBuffer().region(0, bytes, Util.nativeByteOrder);
 
-    bb.order(BaseState.nonNativeByteOrder);
-    Memory mem2 = Memory.wrap(bb).region(0, bytes, BaseState.nonNativeByteOrder);
-    Buffer buf2 = mem2.asBuffer().region(0, bytes, BaseState.nonNativeByteOrder);
+    bb.order(Util.nonNativeByteOrder);
+    Memory mem2 = Memory.wrap(bb).region(0, bytes, Util.nonNativeByteOrder);
+    Buffer buf2 = mem2.asBuffer().region(0, bytes, Util.nonNativeByteOrder);
     Buffer buf3 = buf2.duplicate();
 
-    assertTrue((mem.getTypeId() & REGION) > 0);
-    assertTrue((mem2.getTypeId() & REGION) > 0);
-    assertTrue((buf.getTypeId() & REGION) > 0);
-    assertTrue((buf2.getTypeId() & REGION) > 0);
-    assertTrue((buf3.getTypeId() & DUPLICATE) > 0);
+    assertTrue(isRegionType(mem));
+    assertTrue(isRegionType(mem2));
+    assertTrue(isRegionType(buf));
+    assertTrue(isRegionType(buf2));
+    assertTrue(isDuplicateType(buf3));
   }
 
   @Test
@@ -71,24 +157,24 @@ public class SpecificLeafTest {
     int bytes = 128;
     try (WritableDirectHandle h = WritableMemory.allocateDirect(bytes)) {
       WritableMemory wmem = h.get(); //native mem
-      assertTrue(wmem.isDirectType());
+      assertTrue(isDirectType(wmem));
       assertFalse(wmem.isReadOnly());
       checkCrossLeafTypeIds(wmem);
-      WritableMemory nnwmem = wmem.writableRegion(0, bytes, BaseState.nonNativeByteOrder);
+      WritableMemory nnwmem = wmem.writableRegion(0, bytes, Util.nonNativeByteOrder);
 
-      Memory mem = wmem.region(0, bytes, BaseState.nativeByteOrder);
-      Buffer buf = mem.asBuffer().region(0, bytes, BaseState.nativeByteOrder);
+      Memory mem = wmem.region(0, bytes, Util.nativeByteOrder);
+      Buffer buf = mem.asBuffer().region(0, bytes, Util.nativeByteOrder);
 
 
-      Memory mem2 = nnwmem.region(0, bytes, BaseState.nonNativeByteOrder);
-      Buffer buf2 = mem2.asBuffer().region(0, bytes, BaseState.nonNativeByteOrder);
+      Memory mem2 = nnwmem.region(0, bytes, Util.nonNativeByteOrder);
+      Buffer buf2 = mem2.asBuffer().region(0, bytes, Util.nonNativeByteOrder);
       Buffer buf3 = buf2.duplicate();
 
-      assertTrue((mem.getTypeId() & REGION) > 0);
-      assertTrue((mem2.getTypeId() & REGION) > 0);
-      assertTrue((buf.getTypeId() & REGION) > 0);
-      assertTrue((buf2.getTypeId() & REGION) > 0);
-      assertTrue((buf3.getTypeId() & DUPLICATE) > 0);
+      assertTrue(isRegionType(mem));
+      assertTrue(isRegionType(mem2));
+      assertTrue(isRegionType(buf));
+      assertTrue(isRegionType(buf2));
+      assertTrue(isDuplicateType(buf3));
     }
   }
 
@@ -109,27 +195,27 @@ public class SpecificLeafTest {
 
     final long bytes = 128;
 
-    try (WritableMapHandle h = WritableMemory.map(file, 0L, bytes, BaseState.nativeByteOrder)) {
+    try (WritableMapHandle h = WritableMemory.map(file, 0L, bytes, Util.nativeByteOrder)) {
       WritableMemory mem = h.get(); //native mem
-      assertTrue(mem.isMapType());
+      assertTrue(isMapType(mem));
       assertFalse(mem.isReadOnly());
       checkCrossLeafTypeIds(mem);
-      Memory nnreg = mem.region(0, bytes, BaseState.nonNativeByteOrder);
+      Memory nnreg = mem.region(0, bytes, Util.nonNativeByteOrder);
 
-      Memory reg = mem.region(0, bytes, BaseState.nativeByteOrder);
-      Buffer buf = reg.asBuffer().region(0, bytes, BaseState.nativeByteOrder);
+      Memory reg = mem.region(0, bytes, Util.nativeByteOrder);
+      Buffer buf = reg.asBuffer().region(0, bytes, Util.nativeByteOrder);
       Buffer buf4 = buf.duplicate();
 
-      Memory reg2 = nnreg.region(0, bytes, BaseState.nonNativeByteOrder);
-      Buffer buf2 = reg2.asBuffer().region(0, bytes, BaseState.nonNativeByteOrder);
+      Memory reg2 = nnreg.region(0, bytes, Util.nonNativeByteOrder);
+      Buffer buf2 = reg2.asBuffer().region(0, bytes, Util.nonNativeByteOrder);
       Buffer buf3 = buf2.duplicate();
 
-      assertTrue((reg.getTypeId() & REGION) > 0);
-      assertTrue((reg2.getTypeId() & REGION) > 0);
-      assertTrue((buf.getTypeId() & REGION) > 0);
-      assertTrue((buf2.getTypeId() & REGION) > 0);
-      assertTrue((buf3.getTypeId() & DUPLICATE) > 0);
-      assertTrue((buf4.getTypeId() & DUPLICATE) > 0);
+      assertTrue(isRegionType(reg));
+      assertTrue(isRegionType(reg2));
+      assertTrue(isRegionType(buf));
+      assertTrue(isRegionType(buf2));
+      assertTrue(isDuplicateType(buf3));
+      assertTrue(isDuplicateType(buf4));
     }
   }
 
@@ -137,56 +223,56 @@ public class SpecificLeafTest {
   public void checkHeapLeafs() {
     int bytes = 128;
     Memory mem = Memory.wrap(new byte[bytes]);
-    assertTrue(mem.isHeapType());
-    assertTrue(mem.isReadOnlyType());
+    assertTrue(isHeapType(mem));
+    assertTrue(isReadOnlyType(mem));
     checkCrossLeafTypeIds(mem);
-    Memory nnreg = mem.region(0, bytes, BaseState.nonNativeByteOrder);
+    Memory nnreg = mem.region(0, bytes, Util.nonNativeByteOrder);
 
-    Memory reg = mem.region(0, bytes, BaseState.nativeByteOrder);
-    Buffer buf = reg.asBuffer().region(0, bytes, BaseState.nativeByteOrder);
+    Memory reg = mem.region(0, bytes, Util.nativeByteOrder);
+    Buffer buf = reg.asBuffer().region(0, bytes, Util.nativeByteOrder);
     Buffer buf4 = buf.duplicate();
 
-    Memory reg2 = nnreg.region(0, bytes, BaseState.nonNativeByteOrder);
-    Buffer buf2 = reg2.asBuffer().region(0, bytes, BaseState.nonNativeByteOrder);
+    Memory reg2 = nnreg.region(0, bytes, Util.nonNativeByteOrder);
+    Buffer buf2 = reg2.asBuffer().region(0, bytes, Util.nonNativeByteOrder);
     Buffer buf3 = buf2.duplicate();
 
-    assertFalse((mem.getTypeId() & REGION) > 0);
-    assertTrue((reg2.getTypeId() & REGION) > 0);
-    assertTrue((buf.getTypeId() & REGION) > 0);
-    assertTrue((buf2.getTypeId() & REGION) > 0);
-    assertTrue((buf3.getTypeId() & DUPLICATE) > 0);
-    assertTrue((buf4.getTypeId() & DUPLICATE) > 0);
+    assertFalse(isRegionType(mem));
+    assertTrue(isRegionType(reg2));
+    assertTrue(isRegionType(buf));
+    assertTrue(isRegionType(buf2));
+    assertTrue(isDuplicateType(buf3));
+    assertTrue(isDuplicateType(buf4));
   }
 
   private static void checkCrossLeafTypeIds(Memory mem) {
     Memory reg1 = mem.region(0, mem.getCapacity());
-    assertTrue(reg1.isRegionType());
+    assertTrue(isRegionType(reg1));
 
     Buffer buf1 = reg1.asBuffer();
-    assertTrue(buf1.isRegionType());
-    assertTrue(buf1.isBufferType());
+    assertTrue(isRegionType(buf1));
+    assertTrue(isBufferType(buf1));
 
     Buffer buf2 = buf1.duplicate();
-    assertTrue(buf2.isRegionType());
-    assertTrue(buf2.isBufferType());
-    assertTrue(buf2.isDuplicateType());
+    assertTrue(isRegionType(buf2));
+    assertTrue(isBufferType(buf2));
+    assertTrue(isDuplicateType(buf2));
 
     Memory mem2 = buf1.asMemory();
-    assertTrue(mem2.isRegionType());
-    assertFalse(mem2.isBufferType());
-    assertFalse(mem2.isDuplicateType());
+    assertTrue(isRegionType(mem2));
+    assertFalse(isBufferType(mem2));
+    assertFalse(isDuplicateType(mem2));
 
-    Buffer buf3 = buf1.duplicate(BaseState.nonNativeByteOrder);
-    assertTrue(buf3.isRegionType());
-    assertTrue(buf3.isBufferType());
-    assertTrue(buf3.isDuplicateType());
-    assertTrue(buf3.isNonNativeType());
+    Buffer buf3 = buf1.duplicate(Util.nonNativeByteOrder);
+    assertTrue(isRegionType(buf3));
+    assertTrue(isBufferType(buf3));
+    assertTrue(isDuplicateType(buf3));
+    assertTrue(isNonNativeType(buf3));
 
     Memory mem3 = buf3.asMemory();
-    assertTrue(mem3.isRegionType());
-    assertFalse(mem3.isBufferType());
-    assertFalse(mem3.isDuplicateType());
-    assertFalse(mem3.isNonNativeType());
+    assertTrue(isRegionType(mem3));
+    assertFalse(isBufferType(mem3));
+    assertFalse(isDuplicateType(mem3));
+    assertFalse(isNonNativeType(mem3));
   }
 
 }

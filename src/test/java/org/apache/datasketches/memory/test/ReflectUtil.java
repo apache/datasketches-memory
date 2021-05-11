@@ -23,6 +23,18 @@ import java.lang.reflect.*;
 
 public class ReflectUtil {
 
+  final static Class<?> BASE_STATE;
+  final static Class<?> BASE_WRITABLE_MEMORY_IMPL;
+  final static Class<?> ALLOCATE_DIRECT_MAP;
+  final static Class<?> NIO_BITS;
+  
+  static {
+    BASE_STATE = getClass("org.apache.datasketches.memory.BaseState");
+    BASE_WRITABLE_MEMORY_IMPL = getClass("org.apache.datasketches.memory.BaseWritableMemoryImpl");
+    ALLOCATE_DIRECT_MAP = getClass("org.apache.datasketches.memory.AllocateDirectMap");
+    NIO_BITS = getClass("org.apache.datasketches.memory.NioBits");
+  }
+  
   /**
    * Gets a Class reference to the given class loaded by the SystemClassLoader. 
    * This will work for private, package-private and abstract classes. 
@@ -121,22 +133,6 @@ public class ReflectUtil {
       throw new RuntimeException(e);
     }
   }
-  
-//  /**
-//   * Invoke the given method along with its concreteOwnerClass and method argueents.
-//   * Any exception is returned to the caller.
-//   * @param method the given method
-//   * @param concreteOwnerInstance the concrete owning class instance
-//   * @param args the method arguments
-//   * @return the result of the invoked method.
-//   */
-//  public static Object invokeMethod(
-//      final Method method, 
-//      final Object concreteOwnerInstance, 
-//      Object... args) throws IllegalAccessException, InvocationTargetException, IllegalArgumentException {
-//      method.setAccessible(true);
-//      return method.invoke(concreteOwnerInstance, args);
-//  }
   
 }
 

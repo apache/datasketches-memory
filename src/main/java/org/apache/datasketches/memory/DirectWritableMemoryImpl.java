@@ -94,11 +94,4 @@ final class DirectWritableMemoryImpl extends WritableMemoryImpl {
     return valid.get();
   }
   
-  @Override
-  void checkValid() {
-    if (!this.isValid()) {
-      throw new IllegalStateException("Memory not valid.");
-    }
-  }
-  
 }

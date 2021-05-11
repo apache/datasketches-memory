@@ -31,13 +31,14 @@ import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
 
-import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.MapHandle;
 import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.memory.Util;
 import org.apache.datasketches.memory.WritableDirectHandle;
 import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
@@ -50,6 +51,46 @@ import org.testng.collections.Lists;
 public class MemoryTest {
   private static final String LS = System.getProperty("line.separator");
 
+  static final Method GET_CURRENT_DIRECT_MEMORY_ALLOCATIONS;
+  static final Method GET_CURRENT_DIRECT_MEMORY_ALLOCATED;
+  static final Method GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATIONS;
+  static final Method GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATED;
+  
+  static {
+    GET_CURRENT_DIRECT_MEMORY_ALLOCATIONS = 
+        ReflectUtil.getMethod(ReflectUtil.BASE_STATE, "getCurrentDirectMemoryAllocations", (Class<?>[])null); //static
+    GET_CURRENT_DIRECT_MEMORY_ALLOCATED =
+        ReflectUtil.getMethod(ReflectUtil.BASE_STATE, "getCurrentDirectMemoryAllocated", (Class<?>[])null); //static
+    GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATIONS = 
+        ReflectUtil.getMethod(ReflectUtil.BASE_STATE, "getCurrentDirectMemoryMapAllocations", (Class<?>[])null); //static
+    GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATED =
+        ReflectUtil.getMethod(ReflectUtil.BASE_STATE, "getCurrentDirectMemoryMapAllocated", (Class<?>[])null); //static
+  }
+  
+  private static long getCurrentDirectMemoryAllocations() {
+    try {
+      return (long) GET_CURRENT_DIRECT_MEMORY_ALLOCATIONS.invoke(null);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+  
+  private static long getCurrentDirectMemoryAllocated() {
+    try {
+      return (long) GET_CURRENT_DIRECT_MEMORY_ALLOCATED.invoke(null);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+  
+  private static long getCurrentDirectMemoryMapAllocations() {
+    try {
+      return (long) GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATIONS.invoke(null);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+  
+  private static long getCurrentDirectMemoryMapAllocated() {
+    try {
+      return (long) GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATED.invoke(null);
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+  
   @BeforeClass
   public void setReadOnly() {
     UtilTest.setGettysburgAddressFileToReadOnly();
@@ -212,7 +253,7 @@ public class MemoryTest {
     ByteBuffer bb = ByteBuffer.allocate(n * 8);
     bb.order(ByteOrder.BIG_ENDIAN);
     Memory mem = Memory.wrap(bb);
-    assertFalse(mem.getTypeByteOrder() == BaseState.nativeByteOrder);
+    assertFalse(mem.getTypeByteOrder() == Util.nativeByteOrder);
     assertEquals(mem.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
@@ -268,7 +309,7 @@ public class MemoryTest {
     long[] arr = new long[n];
     for (int i = 0; i < n; i++) { arr[i] = i; }
     Memory mem = Memory.wrap(arr);
-    Memory reg = mem.region(n2 * 8, n2 * 8, BaseState.nonNativeByteOrder); //top half
+    Memory reg = mem.region(n2 * 8, n2 * 8, Util.nonNativeByteOrder); //top half
     for (int i = 0; i < n2; i++) {
       long v = Long.reverseBytes(reg.getLong(i * 8));
       long e = i + n2;
@@ -308,7 +349,7 @@ public class MemoryTest {
       //println("" + wmem.getLong(i * 8));
     }
     //println("");
-    WritableMemory reg = wmem.writableRegion(n2 * 8, n2 * 8, BaseState.nonNativeByteOrder);
+    WritableMemory reg = wmem.writableRegion(n2 * 8, n2 * 8, Util.nonNativeByteOrder);
     for (int i = 0; i < n2; i++) { reg.putLong(i * 8, i); }
     for (int i = 0; i < n; i++) {
       long v = wmem.getLong(i * 8);
@@ -389,17 +430,17 @@ public class MemoryTest {
     int bytes = 1024;
     WritableHandle wh1 = WritableMemory.allocateDirect(bytes);
     WritableHandle wh2 = WritableMemory.allocateDirect(bytes);
-    assertEquals(BaseState.getCurrentDirectMemoryAllocations(), 2L);
-    assertEquals(BaseState.getCurrentDirectMemoryAllocated(), 2 * bytes);
+    assertEquals(getCurrentDirectMemoryAllocations(), 2L);
+    assertEquals(getCurrentDirectMemoryAllocated(), 2 * bytes);
 
     wh1.close();
-    assertEquals(BaseState.getCurrentDirectMemoryAllocations(), 1L);
-    assertEquals(BaseState.getCurrentDirectMemoryAllocated(), bytes);
+    assertEquals(getCurrentDirectMemoryAllocations(), 1L);
+    assertEquals(getCurrentDirectMemoryAllocated(), bytes);
 
     wh2.close();
     wh2.close(); //check that it doesn't go negative.
-    assertEquals(BaseState.getCurrentDirectMemoryAllocations(), 0L);
-    assertEquals(BaseState.getCurrentDirectMemoryAllocated(), 0L);
+    assertEquals(getCurrentDirectMemoryAllocations(), 0L);
+    assertEquals(getCurrentDirectMemoryAllocated(), 0L);
   }
 
   @SuppressWarnings("resource")
@@ -411,17 +452,17 @@ public class MemoryTest {
     MapHandle mmh1 = Memory.map(file);
     MapHandle mmh2 = Memory.map(file);
 
-    assertEquals(BaseState.getCurrentDirectMemoryMapAllocations(), 2L);
-    assertEquals(BaseState.getCurrentDirectMemoryMapAllocated(), 2 * bytes);
+    assertEquals(getCurrentDirectMemoryMapAllocations(), 2L);
+    assertEquals(getCurrentDirectMemoryMapAllocated(), 2 * bytes);
 
     mmh1.close();
-    assertEquals(BaseState.getCurrentDirectMemoryMapAllocations(), 1L);
-    assertEquals(BaseState.getCurrentDirectMemoryMapAllocated(), bytes);
+    assertEquals(getCurrentDirectMemoryMapAllocations(), 1L);
+    assertEquals(getCurrentDirectMemoryMapAllocated(), bytes);
 
     mmh2.close();
     mmh2.close(); //check that it doesn't go negative.
-    assertEquals(BaseState.getCurrentDirectMemoryMapAllocations(), 0L);
-    assertEquals(BaseState.getCurrentDirectMemoryMapAllocated(), 0L);
+    assertEquals(getCurrentDirectMemoryMapAllocations(), 0L);
+    assertEquals(getCurrentDirectMemoryMapAllocated(), 0L);
   }
 
   @Test

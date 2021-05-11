@@ -19,7 +19,7 @@
 
 package org.apache.datasketches.memory.test;
 
-import static org.apache.datasketches.memory.CompareAndCopy.UNSAFE_COPY_THRESHOLD_BYTES;
+import static org.apache.datasketches.memory.Util.UNSAFE_COPY_THRESHOLD_BYTES;
 import static org.testng.Assert.assertEquals;
 
 import java.util.concurrent.ThreadLocalRandom;

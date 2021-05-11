@@ -36,10 +36,6 @@ public final class ReflectUtil {
   static final Class<?> NIO_BITS;
   
   static final Method CHECK_VALID; //BaseState  
-  static final Method GET_CURRENT_DIRECT_MEMORY_ALLOCATED; //BaseState
-  static final Method GET_CURRENT_DIRECT_MEMORY_ALLOCATIONS; //BaseState
-  static final Method GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATED; //BaseState
-  static final Method GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATIONS; //BaseState
   static final Method GET_DIRECT_ALLOCATIONS_COUNT; //NioBits
   static final Method GET_MAX_DIRECT_BYTE_BUFFER_MEMORY; //NioBits
   static final Method GET_NATIVE_BASE_OFFSET; //BaseState
@@ -75,14 +71,6 @@ public final class ReflectUtil {
 
     CHECK_VALID =
         getMethod(BASE_STATE, "checkValid", (Class<?>[])null); //not static
-    GET_CURRENT_DIRECT_MEMORY_ALLOCATED =
-        getMethod(BASE_STATE, "getCurrentDirectMemoryAllocated", (Class<?>[])null); //static
-    GET_CURRENT_DIRECT_MEMORY_ALLOCATIONS = 
-        getMethod(BASE_STATE, "getCurrentDirectMemoryAllocations", (Class<?>[])null); //static
-    GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATED =
-        getMethod(BASE_STATE, "getCurrentDirectMemoryMapAllocated", (Class<?>[])null); //static
-    GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATIONS = 
-        getMethod(BASE_STATE, "getCurrentDirectMemoryMapAllocations", (Class<?>[])null); //static
     GET_DIRECT_ALLOCATIONS_COUNT =
         getMethod(NIO_BITS, "getDirectAllocationsCount", (Class<?>[])null); //static
     GET_MAX_DIRECT_BYTE_BUFFER_MEMORY =
@@ -233,29 +221,29 @@ public final class ReflectUtil {
     CHECK_VALID.invoke(target);
   }
 
-  static long getCurrentDirectMemoryAllocated() {
-    try {
-      return (long) GET_CURRENT_DIRECT_MEMORY_ALLOCATED.invoke(null);
-    } catch (Exception e) { throw new RuntimeException(e); }
-  }
-
-  static long getCurrentDirectMemoryAllocations() {
-    try {
-      return (long) GET_CURRENT_DIRECT_MEMORY_ALLOCATIONS.invoke(null);
-    } catch (Exception e) { throw new RuntimeException(e); }
-  }
-
-  static long getCurrentDirectMemoryMapAllocated() {
-    try {
-      return (long) GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATED.invoke(null);
-    } catch (Exception e) { throw new RuntimeException(e); }
-  }
-
-  static long getCurrentDirectMemoryMapAllocations() {
-    try {
-      return (long) GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATIONS.invoke(null);
-    } catch (Exception e) { throw new RuntimeException(e); }
-  }
+//  static long getCurrentDirectMemoryAllocated() {
+//    try {
+//      return (long) GET_CURRENT_DIRECT_MEMORY_ALLOCATED.invoke(null);
+//    } catch (Exception e) { throw new RuntimeException(e); }
+//  }
+//
+//  static long getCurrentDirectMemoryAllocations() {
+//    try {
+//      return (long) GET_CURRENT_DIRECT_MEMORY_ALLOCATIONS.invoke(null);
+//    } catch (Exception e) { throw new RuntimeException(e); }
+//  }
+//
+//  static long getCurrentDirectMemoryMapAllocated() {
+//    try {
+//      return (long) GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATED.invoke(null);
+//    } catch (Exception e) { throw new RuntimeException(e); }
+//  }
+//
+//  static long getCurrentDirectMemoryMapAllocations() {
+//    try {
+//      return (long) GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATIONS.invoke(null);
+//    } catch (Exception e) { throw new RuntimeException(e); }
+//  }
 
   static long getDirectAllocationsCount() {
     try {

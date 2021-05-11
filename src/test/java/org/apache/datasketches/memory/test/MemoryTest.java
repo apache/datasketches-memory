@@ -383,26 +383,28 @@ public class MemoryTest {
     }
   }
 
-  @SuppressWarnings("resource")
+  @SuppressWarnings({ "resource", "static-access" })
   @Test
   public void checkMonitorDirectStats() {
     int bytes = 1024;
     WritableHandle wh1 = WritableMemory.allocateDirect(bytes);
     WritableHandle wh2 = WritableMemory.allocateDirect(bytes);
-    assertEquals(ReflectUtil.getCurrentDirectMemoryAllocations(), 2L);
-    assertEquals(ReflectUtil.getCurrentDirectMemoryAllocated(), 2 * bytes);
+    WritableMemory wMem2 = wh2.get();
+    assertEquals(wMem2.getCurrentDirectMemoryAllocations(), 2L);
+    assertEquals(wMem2.getCurrentDirectMemoryAllocated(), 2 * bytes);
 
     wh1.close();
-    assertEquals(ReflectUtil.getCurrentDirectMemoryAllocations(), 1L);
-    assertEquals(ReflectUtil.getCurrentDirectMemoryAllocated(), bytes);
+    assertEquals(wMem2.getCurrentDirectMemoryAllocations(), 1L);
+    assertEquals(wMem2.getCurrentDirectMemoryAllocated(), bytes);
 
     wh2.close();
     wh2.close(); //check that it doesn't go negative.
-    assertEquals(ReflectUtil.getCurrentDirectMemoryAllocations(), 0L);
-    assertEquals(ReflectUtil.getCurrentDirectMemoryAllocated(), 0L);
+    //even though the handles are closed, these methods are static access
+    assertEquals(wMem2.getCurrentDirectMemoryAllocations(), 0L);
+    assertEquals(wMem2.getCurrentDirectMemoryAllocated(), 0L);
   }
 
-  @SuppressWarnings("resource")
+  @SuppressWarnings({ "resource", "static-access" })
   @Test
   public void checkMonitorDirectMapStats() throws Exception {
     File file = getResourceFile("GettysburgAddress.txt");
@@ -410,18 +412,20 @@ public class MemoryTest {
 
     MapHandle mmh1 = Memory.map(file);
     MapHandle mmh2 = Memory.map(file);
-
-    assertEquals(ReflectUtil.getCurrentDirectMemoryMapAllocations(), 2L);
-    assertEquals(ReflectUtil.getCurrentDirectMemoryMapAllocated(), 2 * bytes);
+    Memory wmem2 = mmh2.get();
+    
+    assertEquals(wmem2.getCurrentDirectMemoryMapAllocations(), 2L);
+    assertEquals(wmem2.getCurrentDirectMemoryMapAllocated(), 2 * bytes);
 
     mmh1.close();
-    assertEquals(ReflectUtil.getCurrentDirectMemoryMapAllocations(), 1L);
-    assertEquals(ReflectUtil.getCurrentDirectMemoryMapAllocated(), bytes);
+    assertEquals(wmem2.getCurrentDirectMemoryMapAllocations(), 1L);
+    assertEquals(wmem2.getCurrentDirectMemoryMapAllocated(), bytes);
 
     mmh2.close();
     mmh2.close(); //check that it doesn't go negative.
-    assertEquals(ReflectUtil.getCurrentDirectMemoryMapAllocations(), 0L);
-    assertEquals(ReflectUtil.getCurrentDirectMemoryMapAllocated(), 0L);
+    //even though the handles are closed, these methods are static access
+    assertEquals(wmem2.getCurrentDirectMemoryMapAllocations(), 0L);
+    assertEquals(wmem2.getCurrentDirectMemoryMapAllocated(), 0L);
   }
 
   @Test

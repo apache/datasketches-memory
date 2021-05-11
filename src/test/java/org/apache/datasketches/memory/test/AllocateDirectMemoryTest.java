@@ -120,10 +120,11 @@ public class AllocateDirectMemoryTest {
     } //end of scope call to Cleaner/Deallocator also will be redundant
   }
 
+  @SuppressWarnings("static-access")
   @AfterClass
   public void checkDirectCounter() {
-    long count = ReflectUtil.getCurrentDirectMemoryAllocations();
-    //final long count = BaseState.getCurrentDirectMemoryAllocations();
+    WritableMemory mem = WritableMemory.wrap(new byte[8]);
+    long count = mem.getCurrentDirectMemoryAllocations();
     if (count != 0) {
       println(""+count);
       fail();

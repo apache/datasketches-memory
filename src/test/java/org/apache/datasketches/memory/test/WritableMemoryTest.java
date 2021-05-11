@@ -19,7 +19,6 @@
 
 package org.apache.datasketches.memory.test;
 
-import static org.apache.datasketches.memory.CompareAndCopy.UNSAFE_COPY_THRESHOLD_BYTES;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -28,8 +27,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.memory.Util;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
@@ -143,7 +142,7 @@ public class WritableMemoryTest {
   public void checkLargeEquals() {
     // Size bigger than UNSAFE_COPY_MEMORY_THRESHOLD; size with "reminder" = 7, to test several
     // traits of the implementation
-    final int thresh = UNSAFE_COPY_THRESHOLD_BYTES;
+    final int thresh = Util.UNSAFE_COPY_THRESHOLD_BYTES;
     byte[] bytes1 = new byte[(thresh * 2) + 7];
     ThreadLocalRandom.current().nextBytes(bytes1);
     byte[] bytes2 = bytes1.clone();
@@ -162,11 +161,11 @@ public class WritableMemoryTest {
   @Test
   public void checkWrapWithBO() {
     WritableMemory wmem = WritableMemory.wrap(new byte[0], ByteOrder.BIG_ENDIAN);
-    boolean nativeBO = wmem.getTypeByteOrder() == BaseState.nativeByteOrder;
+    boolean nativeBO = wmem.getTypeByteOrder() == Util.nativeByteOrder;
     assertTrue(nativeBO); //remains true for ZeroSizeMemory
     println("" + nativeBO);
     wmem = WritableMemory.wrap(new byte[8], ByteOrder.BIG_ENDIAN);
-    nativeBO = wmem.getTypeByteOrder() == BaseState.nativeByteOrder;
+    nativeBO = wmem.getTypeByteOrder() == Util.nativeByteOrder;
     assertFalse(nativeBO);
     println("" + nativeBO);
   }

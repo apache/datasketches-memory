@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.datasketches.memory.Ints;
-import org.apache.datasketches.memory.JDK7Compatible;
 import org.apache.datasketches.memory.UnsafeUtil;
 import org.testng.annotations.Test;
 
@@ -39,22 +38,6 @@ import org.testng.annotations.Test;
 public class UnsafeUtilTest {
   long testField = 1; //Do not remove & cannot be static. Used in reflection check.
 
-  @Test
-  public void checkJDK7methods() {
-    try {
-      final byte[] byteArr = new byte[16];
-      byteArr[0] = (byte) 1;
-      final long one = JDK7Compatible.getAndAddLong(byteArr, 16, 1L);
-      assertEquals(one, 1L);
-
-      final long two = JDK7Compatible.getAndSetLong(byteArr, 16, 3L);
-      assertEquals(two, 2L);
-      assertEquals(byteArr[0], 3);
-
-    } catch (Exception e) {
-      throw new RuntimeException("Failed");
-    }
-  }
 
   @Test
   public void checkJdkString() {

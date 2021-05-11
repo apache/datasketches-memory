@@ -34,7 +34,6 @@ import com.google.protobuf.ByteString;
 
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.Utf8CodingException;
-import org.apache.datasketches.memory.Util;
 import org.apache.datasketches.memory.WritableMemory;
 import org.apache.datasketches.memory.Util.RandomCodePoints;
 

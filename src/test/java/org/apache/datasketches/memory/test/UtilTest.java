@@ -45,7 +45,6 @@ import java.nio.file.attribute.PosixFilePermissions;
 import org.apache.datasketches.memory.UnsafeUtil;
 import org.apache.datasketches.memory.Util;
 import org.apache.datasketches.memory.WritableMemory;
-import org.apache.datasketches.memory.Util.RandomCodePoints;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")

@@ -26,11 +26,11 @@ import static org.testng.Assert.assertTrue;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.ReadOnlyException;
 import org.apache.datasketches.memory.UnsafeUtil;
+import org.apache.datasketches.memory.Util;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
@@ -583,7 +583,7 @@ public class WritableBufferImplTest {
   public void checkDuplicateNonNative() {
     WritableMemory wmem = WritableMemory.allocate(64);
     wmem.putShort(0, (short) 1);
-    Buffer buf = wmem.asWritableBuffer().duplicate(BaseState.nonNativeByteOrder);
+    Buffer buf = wmem.asWritableBuffer().duplicate(Util.nonNativeByteOrder);
     assertEquals(buf.getShort(0), 256);
   }
 

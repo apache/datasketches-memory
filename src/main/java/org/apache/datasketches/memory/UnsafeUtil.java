@@ -129,7 +129,7 @@ public final class UnsafeUtil {
    * @param jdkVer the java version string from System.getProperty("java.version").
    * @return first two number groups of the java version string.
    */
-  static int[] parseJavaVersion(final String jdkVer) {
+  public static int[] parseJavaVersion(final String jdkVer) {
     final int p0, p1;
     try {
       String[] parts = jdkVer.trim().split("[^0-9\\.]");//grab only number groups and "."
@@ -143,14 +143,14 @@ public final class UnsafeUtil {
     return new int[] {p0, p1};
   }
 
-  static void checkJavaVersion(final String jdkVer, final int p0, final int p1) {
+  public static void checkJavaVersion(final String jdkVer, final int p0, final int p1) {
     if ( (p0 < 1) || ((p0 == 1) && (p1 < 8)) || (p0 >= 9)  ) {
       throw new ExceptionInInitializerError(
           "Unsupported JDK Major Version, must be 1.8: " + jdkVer);
     }
   }
 
-  static long getFieldOffset(final Class<?> c, final String fieldName) {
+  public static long getFieldOffset(final Class<?> c, final String fieldName) {
     try {
       return unsafe.objectFieldOffset(c.getDeclaredField(fieldName));
     } catch (final NoSuchFieldException e) {
@@ -162,7 +162,7 @@ public final class UnsafeUtil {
    * Like {@link Unsafe#arrayBaseOffset(Class)}, but caches return values for common array types.
    * Useful because calling {@link Unsafe#arrayBaseOffset(Class)} directly incurs more overhead.
    */
-  static long getArrayBaseOffset(final Class<?> c) {
+  public static long getArrayBaseOffset(final Class<?> c) {
     // Ordering here is roughly in order of what we expect to be most popular.
     if (c == byte[].class) {
       return ARRAY_BYTE_BASE_OFFSET;

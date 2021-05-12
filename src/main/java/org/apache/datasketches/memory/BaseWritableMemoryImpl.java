@@ -76,7 +76,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
       final long lengthBytes, final boolean localReadOnly, final ByteOrder byteOrder) {
     if (lengthBytes == 0) { return BaseWritableMemoryImpl.ZERO_SIZE_MEMORY; }
     final int typeId = localReadOnly ? READONLY : 0;
-    return isNativeByteOrder(byteOrder)
+    return Util.isNativeByteOrder(byteOrder)
         ? new HeapWritableMemoryImpl(arr, offsetBytes, lengthBytes, typeId)
         : new HeapNonNativeWritableMemoryImpl(arr, offsetBytes, lengthBytes, typeId);
   }
@@ -88,7 +88,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
       throw new ReadOnlyException("ByteBuffer is Read Only");
     }
     final int typeId = (abb.resourceReadOnly || localReadOnly) ? READONLY : 0;
-    return isNativeByteOrder(byteOrder)
+    return Util.isNativeByteOrder(byteOrder)
         ? new BBWritableMemoryImpl(abb.unsafeObj, abb.nativeBaseOffset,
             abb.regionOffset, abb.capacityBytes, typeId, byteBuf)
         : new BBNonNativeWritableMemoryImpl(abb.unsafeObj, abb.nativeBaseOffset,
@@ -106,7 +106,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
       throw new ReadOnlyException("File is Read Only");
     }
     final int typeId = (dirWMap.resourceReadOnly || localReadOnly) ? READONLY : 0;
-    final BaseWritableMemoryImpl wmem = isNativeByteOrder(byteOrder)
+    final BaseWritableMemoryImpl wmem = Util.isNativeByteOrder(byteOrder)
         ? new MapWritableMemoryImpl(dirWMap.nativeBaseOffset, 0L, capacityBytes,
             typeId, dirWMap.getValid())
         : new MapNonNativeWritableMemoryImpl(dirWMap.nativeBaseOffset, 0L, capacityBytes,
@@ -123,7 +123,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     }
     final AllocateDirect direct = new AllocateDirect(capacityBytes);
     final int typeId = 0; //direct is never read-only on construction
-    final BaseWritableMemoryImpl wmem = isNativeByteOrder(byteOrder)
+    final BaseWritableMemoryImpl wmem = Util.isNativeByteOrder(byteOrder)
         ? new DirectWritableMemoryImpl(direct.getNativeBaseOffset(), 0L, capacityBytes,
             typeId, direct.getValid(), memReqSvr)
         : new DirectNonNativeWritableMemoryImpl(direct.getNativeBaseOffset(), 0L, capacityBytes,
@@ -450,7 +450,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   public final void fill(long offsetBytes, long lengthBytes, final byte value) {
     checkValidAndBoundsForWrite(offsetBytes, lengthBytes);
     while (lengthBytes > 0) {
-      final long chunk = Math.min(lengthBytes, CompareAndCopy.UNSAFE_COPY_THRESHOLD_BYTES);
+      final long chunk = Math.min(lengthBytes, Util.UNSAFE_COPY_THRESHOLD_BYTES);
       unsafe.setMemory(getUnsafeObject(), getCumulativeOffset(offsetBytes), chunk, value);
       offsetBytes += chunk;
       lengthBytes -= chunk;
@@ -482,7 +482,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     // or file-backed WritableByteChannel implementations with direct ByteBuffer argument could
     // be subject of the same safepoint problems as in Unsafe.copyMemory and Unsafe.setMemory.
     while (lengthBytes > 0) {
-      final int chunk = (int) Math.min(CompareAndCopy.UNSAFE_COPY_THRESHOLD_BYTES, lengthBytes);
+      final int chunk = (int) Math.min(Util.UNSAFE_COPY_THRESHOLD_BYTES, lengthBytes);
       final ByteBuffer bufToWrite = AccessByteBuffer.getDummyReadOnlyDirectByteBuffer(addr, chunk);
       writeFully(bufToWrite, out);
       addr += chunk;

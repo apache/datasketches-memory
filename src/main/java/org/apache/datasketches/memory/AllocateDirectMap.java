@@ -242,13 +242,8 @@ class AllocateDirectMap implements Map {
     }
   }
 
-  static boolean isFileReadOnly(final File file) {
-    try (RandomAccessFile raf = new RandomAccessFile(file, "rw")) {
-      raf.close();
-      return false;
-    } catch (final SecurityException | IOException f) { //could not open for write
-      return true;
-    }
+  public static boolean isFileReadOnly(final File file) {
+    return (!file.canWrite());
   }
 
   private static final class Deallocator implements Runnable {

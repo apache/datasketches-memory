@@ -94,7 +94,7 @@ final class NioBits {
 
   private NioBits() { }
 
-  static long getDirectAllocationsCount() {
+  static long getDirectAllocationsCount() { //tested via reflection
     try {
       final long count = nioBitsCount.get();
       return count;
@@ -103,7 +103,7 @@ final class NioBits {
     }
   }
 
-  static long getReservedMemory() {
+  static long getReservedMemory() { //tested via reflection
     try {
       final long resMem = nioBitsReservedMemory.get();
       return resMem;
@@ -112,7 +112,7 @@ final class NioBits {
     }
   }
 
-  static long getTotalCapacity() {
+  static long getTotalCapacity() { //tested via reflection
     try {
       final long resMem = nioBitsTotalCapacity.get();
       return resMem;
@@ -129,7 +129,7 @@ final class NioBits {
     return (int)((bytes + pageSize()) - 1L) / pageSize();
   }
 
-  static long getMaxDirectByteBufferMemory() {
+  static long getMaxDirectByteBufferMemory() { //tested via reflection
     return maxDBBMemory;
   }
 

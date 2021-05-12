@@ -20,11 +20,11 @@
 package org.apache.datasketches.memory;
 
 /** Equivalent of Guava's Ints. */
-final class Ints {
+public final class Ints {
 
   private Ints() {}
 
-  static int checkedCast(final long v) {
+  public static int checkedCast(final long v) {
     final int result = (int) v;
     if (result != v) {
       throw new IllegalArgumentException("Out of range: " + v);

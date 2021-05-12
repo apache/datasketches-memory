@@ -52,7 +52,7 @@ import static org.apache.datasketches.memory.UnsafeUtil.SHORT_SHIFT;
  *
  * @author Lee Rhodes
  */
-enum Prim {
+public enum Prim {
   BOOLEAN(ARRAY_BOOLEAN_BASE_OFFSET, ARRAY_BOOLEAN_INDEX_SCALE, BOOLEAN_SHIFT),
   BYTE(ARRAY_BYTE_BASE_OFFSET, ARRAY_BYTE_INDEX_SCALE, BYTE_SHIFT),
   CHAR(ARRAY_CHAR_BASE_OFFSET, ARRAY_CHAR_INDEX_SCALE, CHAR_SHIFT),
@@ -73,15 +73,15 @@ enum Prim {
     this.sizeShift_ = sizeShift;
   }
 
-  long off() {
+  public long off() {
     return arrBaseOff_;
   }
 
-  long scale() {
+  public long scale() {
     return arrIdxScale_;
   }
 
-  long shift() {
+  public long shift() {
     return sizeShift_;
   }
 

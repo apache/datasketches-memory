@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
  *
  * @author Lee Rhodes
  */
-final class StepBoolean {
+public final class StepBoolean {
   private static final int FALSE = 0;
   private static final int TRUE = 1;
   private static final AtomicIntegerFieldUpdater<StepBoolean> STATE_FIELD_UPDATER =
@@ -35,7 +35,7 @@ final class StepBoolean {
   private final int initialState;
   private volatile int state;
 
-  StepBoolean(final boolean initialState) {
+  public StepBoolean(final boolean initialState) {
     this.initialState = initialState ? TRUE : FALSE;
     state = this.initialState;
   }
@@ -44,7 +44,7 @@ final class StepBoolean {
    * Gets the current state.
    * @return the current state.
    */
-  boolean get() {
+  public boolean get() {
     return state == TRUE;
   }
 
@@ -53,7 +53,7 @@ final class StepBoolean {
    * @return true if this call led to the change of the state; false if the state has already been
    * changed
    */
-  boolean change() {
+  public boolean change() {
     final int notInitialState = initialState == TRUE ? FALSE : TRUE;
     return STATE_FIELD_UPDATER.compareAndSet(this, initialState, notInitialState);
   }
@@ -62,7 +62,7 @@ final class StepBoolean {
    * Return true if the state has changed from the initial state
    * @return true if the state has changed from the initial state
    */
-  boolean hasChanged() {
+  public boolean hasChanged() {
     return state != initialState;
   }
 }

@@ -24,10 +24,10 @@ import static org.testng.Assert.fail;
 
 import java.nio.ByteBuffer;
 
-import org.apache.datasketches.memory.Buffer;
-import org.apache.datasketches.memory.WritableBuffer;
-import org.apache.datasketches.memory.WritableHandle;
-import org.apache.datasketches.memory.WritableMemory;
+import org.apache.datasketches.memory.internal.Buffer;
+import org.apache.datasketches.memory.internal.WritableBuffer;
+import org.apache.datasketches.memory.internal.WritableHandle;
+import org.apache.datasketches.memory.internal.WritableMemory;
 import org.testng.annotations.Test;
 
 /**

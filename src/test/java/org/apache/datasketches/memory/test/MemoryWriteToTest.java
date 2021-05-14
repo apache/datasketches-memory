@@ -19,16 +19,17 @@
 
 package org.apache.datasketches.memory.test;
 
+import static org.apache.datasketches.memory.internal.Util.UNSAFE_COPY_THRESHOLD_BYTES;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static org.apache.datasketches.memory.Util.UNSAFE_COPY_THRESHOLD_BYTES;
-import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.WritableHandle;
-import org.apache.datasketches.memory.WritableMemory;
+import org.apache.datasketches.memory.internal.Memory;
+import org.apache.datasketches.memory.internal.WritableHandle;
+import org.apache.datasketches.memory.internal.WritableMemory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

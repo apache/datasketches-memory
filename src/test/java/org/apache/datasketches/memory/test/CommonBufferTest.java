@@ -21,9 +21,9 @@ package org.apache.datasketches.memory.test;
 
 import static org.testng.Assert.assertEquals;
 
-import org.apache.datasketches.memory.WritableBuffer;
-import org.apache.datasketches.memory.WritableHandle;
-import org.apache.datasketches.memory.WritableMemory;
+import org.apache.datasketches.memory.internal.WritableBuffer;
+import org.apache.datasketches.memory.internal.WritableHandle;
+import org.apache.datasketches.memory.internal.WritableMemory;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")

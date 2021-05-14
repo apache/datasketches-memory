@@ -23,7 +23,7 @@
 
 package org.apache.datasketches.memory.test;
 
-import static org.apache.datasketches.memory.Util.*;
+import static org.apache.datasketches.memory.internal.Util.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -32,8 +32,8 @@ import static org.testng.Assert.fail;
 import java.io.File;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.MapHandle;
-import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.memory.internal.MapHandle;
+import org.apache.datasketches.memory.internal.Memory;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;

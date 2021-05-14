@@ -23,8 +23,8 @@ import static org.testng.Assert.assertEquals;
 
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.WritableMemory;
+import org.apache.datasketches.memory.internal.Memory;
+import org.apache.datasketches.memory.internal.WritableMemory;
 import org.testng.annotations.Test;
 
 /**

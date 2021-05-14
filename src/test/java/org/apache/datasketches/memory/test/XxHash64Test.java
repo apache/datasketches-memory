@@ -19,22 +19,15 @@
 
 package org.apache.datasketches.memory.test;
 
-import static org.apache.datasketches.memory.XxHash64.hashBooleans;
-import static org.apache.datasketches.memory.XxHash64.hashBytes;
-import static org.apache.datasketches.memory.XxHash64.hashChars;
-import static org.apache.datasketches.memory.XxHash64.hashDoubles;
-import static org.apache.datasketches.memory.XxHash64.hashFloats;
-import static org.apache.datasketches.memory.XxHash64.hashInts;
-import static org.apache.datasketches.memory.XxHash64.hashLongs;
-import static org.apache.datasketches.memory.XxHash64.*;
+import static org.apache.datasketches.memory.internal.XxHash64.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.WritableMemory;
+import org.apache.datasketches.memory.internal.Memory;
+import org.apache.datasketches.memory.internal.WritableMemory;
 import org.testng.annotations.Test;
 
 import net.openhft.hashing.LongHashFunction;

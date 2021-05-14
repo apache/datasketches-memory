@@ -30,11 +30,11 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.WritableBuffer;
-import org.apache.datasketches.memory.WritableDirectHandle;
-import org.apache.datasketches.memory.WritableMapHandle;
-import org.apache.datasketches.memory.WritableMemory;
-import org.apache.datasketches.memory.Util;
+import org.apache.datasketches.memory.internal.Util;
+import org.apache.datasketches.memory.internal.WritableBuffer;
+import org.apache.datasketches.memory.internal.WritableDirectHandle;
+import org.apache.datasketches.memory.internal.WritableMapHandle;
+import org.apache.datasketches.memory.internal.WritableMemory;
 import org.testng.annotations.Test;
 
 /**

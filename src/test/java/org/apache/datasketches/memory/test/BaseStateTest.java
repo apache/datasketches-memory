@@ -19,7 +19,7 @@
 
 package org.apache.datasketches.memory.test;
 
-import static org.apache.datasketches.memory.UnsafeUtil.ARRAY_DOUBLE_INDEX_SCALE;
+import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_DOUBLE_INDEX_SCALE;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -27,13 +27,13 @@ import static org.testng.Assert.fail;
 
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.Buffer;
-import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.Prim;
-import org.apache.datasketches.memory.StepBoolean;
-import org.apache.datasketches.memory.Util;
-import org.apache.datasketches.memory.WritableBuffer;
-import org.apache.datasketches.memory.WritableMemory;
+import org.apache.datasketches.memory.internal.Buffer;
+import org.apache.datasketches.memory.internal.Memory;
+import org.apache.datasketches.memory.internal.Prim;
+import org.apache.datasketches.memory.internal.StepBoolean;
+import org.apache.datasketches.memory.internal.Util;
+import org.apache.datasketches.memory.internal.WritableBuffer;
+import org.apache.datasketches.memory.internal.WritableMemory;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")

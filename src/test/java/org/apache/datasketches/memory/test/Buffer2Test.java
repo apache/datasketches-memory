@@ -26,11 +26,11 @@ import static org.testng.Assert.assertTrue;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.Buffer;
-import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.ReadOnlyException;
-import org.apache.datasketches.memory.WritableBuffer;
-import org.apache.datasketches.memory.WritableMemory;
+import org.apache.datasketches.memory.internal.Buffer;
+import org.apache.datasketches.memory.internal.Memory;
+import org.apache.datasketches.memory.internal.ReadOnlyException;
+import org.apache.datasketches.memory.internal.WritableBuffer;
+import org.apache.datasketches.memory.internal.WritableMemory;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")

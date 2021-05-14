@@ -19,7 +19,7 @@
 
 package org.apache.datasketches.memory.test;
 
-import org.apache.datasketches.memory.WritableMemory;
+import org.apache.datasketches.memory.internal.WritableMemory;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")

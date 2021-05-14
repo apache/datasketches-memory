@@ -23,13 +23,13 @@
 
 package org.apache.datasketches.memory.test;
 
-import static org.apache.datasketches.memory.Util.characterPad;
-import static org.apache.datasketches.memory.Util.getResourceFile;
-import static org.apache.datasketches.memory.Util.getResourceBytes;
-import static org.apache.datasketches.memory.Util.negativeCheck;
-import static org.apache.datasketches.memory.Util.nullCheck;
-import static org.apache.datasketches.memory.Util.zeroCheck;
-import static org.apache.datasketches.memory.Util.zeroPad;
+import static org.apache.datasketches.memory.internal.Util.characterPad;
+import static org.apache.datasketches.memory.internal.Util.getResourceBytes;
+import static org.apache.datasketches.memory.internal.Util.getResourceFile;
+import static org.apache.datasketches.memory.internal.Util.negativeCheck;
+import static org.apache.datasketches.memory.internal.Util.nullCheck;
+import static org.apache.datasketches.memory.internal.Util.zeroCheck;
+import static org.apache.datasketches.memory.internal.Util.zeroPad;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -42,9 +42,9 @@ import java.nio.file.attribute.PosixFileAttributeView;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermissions;
 
-import org.apache.datasketches.memory.UnsafeUtil;
-import org.apache.datasketches.memory.Util;
-import org.apache.datasketches.memory.WritableMemory;
+import org.apache.datasketches.memory.internal.UnsafeUtil;
+import org.apache.datasketches.memory.internal.Util;
+import org.apache.datasketches.memory.internal.WritableMemory;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")

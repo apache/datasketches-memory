@@ -23,8 +23,8 @@ import java.io.File;
 import java.lang.reflect.*;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.MemoryRequestServer;
-import org.apache.datasketches.memory.WritableDirectHandle;
+import org.apache.datasketches.memory.internal.MemoryRequestServer;
+import org.apache.datasketches.memory.internal.WritableDirectHandle;
 
 public final class ReflectUtil {
 
@@ -61,13 +61,13 @@ public final class ReflectUtil {
   
   static {
     BASE_STATE = 
-        getClass("org.apache.datasketches.memory.BaseState");
+        getClass("org.apache.datasketches.memory.internal.BaseState");
     BASE_WRITABLE_MEMORY_IMPL = 
-        getClass("org.apache.datasketches.memory.BaseWritableMemoryImpl");
+        getClass("org.apache.datasketches.memory.internal.BaseWritableMemoryImpl");
     ALLOCATE_DIRECT_MAP = 
-        getClass("org.apache.datasketches.memory.AllocateDirectMap");
+        getClass("org.apache.datasketches.memory.internal.AllocateDirectMap");
     NIO_BITS = 
-        getClass("org.apache.datasketches.memory.NioBits");
+        getClass("org.apache.datasketches.memory.internal.NioBits");
 
     CHECK_VALID =
         getMethod(BASE_STATE, "checkValid", (Class<?>[])null); //not static

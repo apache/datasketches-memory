@@ -28,14 +28,13 @@ import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.datasketches.memory.internal.Memory;
+import org.apache.datasketches.memory.internal.Utf8CodingException;
+import org.apache.datasketches.memory.internal.WritableMemory;
+import org.apache.datasketches.memory.internal.Util.RandomCodePoints;
 import org.testng.annotations.Test;
 
 import com.google.protobuf.ByteString;
-
-import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.Utf8CodingException;
-import org.apache.datasketches.memory.WritableMemory;
-import org.apache.datasketches.memory.Util.RandomCodePoints;
 
 /**
  * Adapted version of

@@ -26,8 +26,8 @@ import static org.testng.Assert.fail;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.datasketches.memory.Ints;
-import org.apache.datasketches.memory.UnsafeUtil;
+import org.apache.datasketches.memory.internal.Ints;
+import org.apache.datasketches.memory.internal.UnsafeUtil;
 import org.testng.annotations.Test;
 
 

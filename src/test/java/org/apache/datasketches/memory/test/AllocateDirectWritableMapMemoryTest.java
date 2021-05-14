@@ -24,7 +24,7 @@
 package org.apache.datasketches.memory.test;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.apache.datasketches.memory.Util.*;
+import static org.apache.datasketches.memory.internal.Util.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -37,13 +37,13 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.MapHandle;
-import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.ReadOnlyException;
-import org.apache.datasketches.memory.Util;
-import org.apache.datasketches.memory.WritableHandle;
-import org.apache.datasketches.memory.WritableMapHandle;
-import org.apache.datasketches.memory.WritableMemory;
+import org.apache.datasketches.memory.internal.MapHandle;
+import org.apache.datasketches.memory.internal.Memory;
+import org.apache.datasketches.memory.internal.ReadOnlyException;
+import org.apache.datasketches.memory.internal.Util;
+import org.apache.datasketches.memory.internal.WritableHandle;
+import org.apache.datasketches.memory.internal.WritableMapHandle;
+import org.apache.datasketches.memory.internal.WritableMemory;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;

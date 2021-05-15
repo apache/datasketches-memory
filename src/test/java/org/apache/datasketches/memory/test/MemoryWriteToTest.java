@@ -27,8 +27,8 @@ import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.internal.Memory;
-import org.apache.datasketches.memory.internal.WritableHandle;
 import org.apache.datasketches.memory.internal.WritableMemory;
 import org.testng.Assert;
 import org.testng.annotations.Test;

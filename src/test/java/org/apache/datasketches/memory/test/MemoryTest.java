@@ -35,11 +35,11 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
 
-import org.apache.datasketches.memory.internal.MapHandle;
+import org.apache.datasketches.memory.MapHandle;
+import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.internal.Memory;
 import org.apache.datasketches.memory.internal.Util;
 import org.apache.datasketches.memory.internal.WritableDirectHandle;
-import org.apache.datasketches.memory.internal.WritableHandle;
 import org.apache.datasketches.memory.internal.WritableMemory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;

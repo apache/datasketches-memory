@@ -32,7 +32,7 @@ import static org.testng.Assert.fail;
 import java.io.File;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.internal.MapHandle;
+import org.apache.datasketches.memory.MapHandle;
 import org.apache.datasketches.memory.internal.Memory;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;

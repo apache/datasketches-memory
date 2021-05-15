@@ -84,7 +84,7 @@
  *
  * <p>An access API is joined with
  * a resource either with a static factory method or in combination with a
- * {@link org.apache.datasketches.memory.internal.Handle}, which is used exclusively for resources that are
+ * {@link org.apache.datasketches.memory.Handle}, which is used exclusively for resources that are
  * external to the JVM, such as allocation of direct memory and memory-mapped files.</p>
  *
  * <p>The role of a Handle is to hold onto the reference of a resource that is outside the control
@@ -93,7 +93,7 @@
  * <p>When a handle is extended for an AutoCloseable resource and then joined with an access API
  * it becomes an <i>implementation handle</i>. There are 3 implementation handles:</p>
  *
- * <ul><li>{@link org.apache.datasketches.memory.internal.MapHandle}
+ * <ul><li>{@link org.apache.datasketches.memory.internal.MapHandleImpl}
  * for read-only access to a memory-mapped file</li>
  * <li>{@link org.apache.datasketches.memory.internal.WritableMapHandle}
  * for writable access to a memory-mapped file</li>

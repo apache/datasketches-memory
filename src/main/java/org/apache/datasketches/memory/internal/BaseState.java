@@ -28,6 +28,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.datasketches.memory.DefaultMemoryRequestServer;
+import org.apache.datasketches.memory.MemoryRequestServer;
+
 /**
  * Keeps key configuration state for Memory and Buffer plus some common static variables
  * and check methods.

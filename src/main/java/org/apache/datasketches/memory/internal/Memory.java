@@ -29,6 +29,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.WritableByteChannel;
 
+import org.apache.datasketches.memory.Handle;
+import org.apache.datasketches.memory.MapHandle;
+
 /**
  * Provides read-only primitive and primitive array methods to any of the four resources
  * mentioned in the package level documentation.

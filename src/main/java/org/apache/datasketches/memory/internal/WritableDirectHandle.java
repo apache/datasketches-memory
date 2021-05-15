@@ -19,6 +19,9 @@
 
 package org.apache.datasketches.memory.internal;
 
+import org.apache.datasketches.memory.Handle;
+import org.apache.datasketches.memory.WritableHandle;
+
 /**
  * A Handle for a writable direct memory resource.
  * Please read Javadocs for {@link Handle}.

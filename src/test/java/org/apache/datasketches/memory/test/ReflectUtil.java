@@ -23,7 +23,7 @@ import java.io.File;
 import java.lang.reflect.*;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.internal.MemoryRequestServer;
+import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.internal.WritableDirectHandle;
 
 public final class ReflectUtil {

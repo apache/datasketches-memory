@@ -17,7 +17,9 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory;
+
+import org.apache.datasketches.memory.internal.WritableMemory;
 
 /**
  * This is a simple implementation of the MemoryRequestServer that creates space on the Java heap

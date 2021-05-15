@@ -17,21 +17,21 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory;
 
 /**
- * A Handle for writable direct memory or a memory-mapped, writable file resource.
- * Please read Javadocs for {@link Handle}.
+ * Writable interface for a memory mapped file
  *
- * @author Lee Rhodes
  * @author Roman Leventov
+ * @author Lee Rhodes
+ * @author Praveenkumar Venkatesan
  */
-public interface WritableHandle extends Handle {
+public interface WritableMap extends Map {
 
   /**
-   * Gets a WritableMemory
-   * @return a WritableMemory
+   * @see <a href="https://docs.oracle.com/javase/8/docs/api/java/nio/MappedByteBuffer.html#force--">
+   * java/nio/MappedByteBuffer.force</a>
    */
-  @Override
-  WritableMemory get();
+  void force();
+
 }

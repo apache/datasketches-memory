@@ -26,13 +26,13 @@ import static org.testng.Assert.assertTrue;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.internal.Buffer;
 import org.apache.datasketches.memory.internal.Memory;
 import org.apache.datasketches.memory.internal.ReadOnlyException;
 import org.apache.datasketches.memory.internal.UnsafeUtil;
 import org.apache.datasketches.memory.internal.Util;
 import org.apache.datasketches.memory.internal.WritableBuffer;
-import org.apache.datasketches.memory.internal.WritableHandle;
 import org.apache.datasketches.memory.internal.WritableMemory;
 import org.testng.Assert;
 import org.testng.annotations.Test;

@@ -17,21 +17,8 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
-
 /**
- * Writable interface for a memory mapped file
+ * @author lrhodes
  *
- * @author Roman Leventov
- * @author Lee Rhodes
- * @author Praveenkumar Venkatesan
  */
-interface WritableMap extends Map {
-
-  /**
-   * @see <a href="https://docs.oracle.com/javase/8/docs/api/java/nio/MappedByteBuffer.html#force--">
-   * java/nio/MappedByteBuffer.force</a>
-   */
-  void force();
-
-}
+package org.apache.datasketches.memory;

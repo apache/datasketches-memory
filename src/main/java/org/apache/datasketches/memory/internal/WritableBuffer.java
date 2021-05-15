@@ -22,6 +22,9 @@ package org.apache.datasketches.memory.internal;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import org.apache.datasketches.memory.DefaultMemoryRequestServer;
+import org.apache.datasketches.memory.MemoryRequestServer;
+
 /**
  * Provides read and write, positional primitive and primitive array access to any of the four
  * resources mentioned at the package level.

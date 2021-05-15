@@ -21,6 +21,8 @@ package org.apache.datasketches.memory.internal;
 
 import java.nio.ByteOrder;
 
+import org.apache.datasketches.memory.MemoryRequestServer;
+
 /**
  * Implementation of {@link WritableMemory} for direct memory, native byte order.
  *

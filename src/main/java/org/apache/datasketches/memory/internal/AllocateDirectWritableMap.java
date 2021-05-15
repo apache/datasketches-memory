@@ -21,6 +21,8 @@ package org.apache.datasketches.memory.internal;
 
 import java.io.File;
 
+import org.apache.datasketches.memory.WritableMap;
+
 /**
  * Allocates direct memory used to memory map files for write operations
  * (including those &gt; 2GB).

@@ -30,6 +30,7 @@ import java.lang.reflect.Method;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
+import org.apache.datasketches.memory.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

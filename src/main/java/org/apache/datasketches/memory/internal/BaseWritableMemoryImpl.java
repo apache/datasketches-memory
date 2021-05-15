@@ -36,6 +36,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.WritableByteChannel;
 
+import org.apache.datasketches.memory.MemoryRequestServer;
+
 /*
  * Developer notes: The heavier methods, such as put/get arrays, duplicate, region, clear, fill,
  * compareTo, etc., use hard checks (checkValid*() and checkBounds()), which execute at runtime and

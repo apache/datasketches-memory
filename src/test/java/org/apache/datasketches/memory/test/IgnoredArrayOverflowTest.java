@@ -19,7 +19,7 @@
 
 package org.apache.datasketches.memory.test;
 
-import org.apache.datasketches.memory.internal.WritableHandle;
+import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.internal.WritableMemory;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;

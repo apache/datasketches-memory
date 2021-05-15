@@ -28,6 +28,11 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import org.apache.datasketches.memory.DefaultMemoryRequestServer;
+import org.apache.datasketches.memory.Handle;
+import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.WritableHandle;
+
 /**
  * Provides read and write primitive and primitive array access to any of the four resources
  * mentioned at the package level.

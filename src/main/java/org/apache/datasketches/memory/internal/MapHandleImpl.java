@@ -19,22 +19,17 @@
 
 package org.apache.datasketches.memory.internal;
 
-/**
- * A Handle for a memory-mapped, read-only file resource.
- * Please read Javadocs for {@link Handle}.
- *
- * @author Lee Rhodes
- * @author Roman Leventov
- */
-//Joins a Read-only Handle with an AutoCloseable Map resource.
-public class MapHandle implements Map, Handle {
+import org.apache.datasketches.memory.MapHandle;
+
+public class MapHandleImpl implements MapHandle {
+
   /**
    * Having at least one final field makes this class safe for concurrent publication.
    */
   final AllocateDirectMap dirMap;
   private BaseWritableMemoryImpl wMem;
 
-  MapHandle(final AllocateDirectMap dirMap, final BaseWritableMemoryImpl wMem) {
+  MapHandleImpl(final AllocateDirectMap dirMap, final BaseWritableMemoryImpl wMem) {
     this.dirMap = dirMap;
     this.wMem = wMem;
   }

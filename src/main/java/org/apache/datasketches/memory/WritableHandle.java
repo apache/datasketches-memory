@@ -17,34 +17,23 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory;
 
-import org.apache.datasketches.memory.Handle;
-import org.apache.datasketches.memory.WritableHandle;
-import org.apache.datasketches.memory.WritableMap;
+import org.apache.datasketches.memory.internal.WritableMemory;
 
 /**
- * A Handle for a memory-mapped, writable file resource.
+ * A Handle for writable direct memory or a memory-mapped, writable file resource.
  * Please read Javadocs for {@link Handle}.
  *
- * @author Roman Leventov
  * @author Lee Rhodes
+ * @author Roman Leventov
  */
-//Joins a WritableHandle with an AutoCloseable WritableMap resource
-public final class WritableMapHandle extends MapHandleImpl implements WritableMap, WritableHandle {
+public interface WritableHandle extends Handle {
 
-  WritableMapHandle(final AllocateDirectWritableMap dirWmap,
-      final BaseWritableMemoryImpl wMem) {
-    super(dirWmap, wMem);
-  }
-
+  /**
+   * Gets a WritableMemory
+   * @return a WritableMemory
+   */
   @Override
-  public WritableMemory get() {
-    return (WritableMemory) super.get();
-  }
-
-  @Override
-  public void force() {
-    ((AllocateDirectWritableMap)dirMap).force();
-  }
+  WritableMemory get();
 }

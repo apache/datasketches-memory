@@ -17,7 +17,9 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory;
+
+import org.apache.datasketches.memory.internal.Memory;
 
 /**
  * A handle for read-only resource.

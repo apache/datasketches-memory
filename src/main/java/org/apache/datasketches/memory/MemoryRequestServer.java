@@ -17,7 +17,10 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory;
+
+import org.apache.datasketches.memory.internal.WritableDirectHandle;
+import org.apache.datasketches.memory.internal.WritableMemory;
 
 /**
  * The MemoryRequestServer is a callback interface to provide a means for a direct (off-heap),

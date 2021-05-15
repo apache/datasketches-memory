@@ -24,8 +24,8 @@ import static org.testng.Assert.assertEquals;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.internal.Memory;
-import org.apache.datasketches.memory.internal.WritableHandle;
 import org.apache.datasketches.memory.internal.WritableMemory;
 import org.testng.Assert;
 import org.testng.annotations.Test;

@@ -25,7 +25,7 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.internal.MapHandle;
+import org.apache.datasketches.memory.MapHandle;
 import org.apache.datasketches.memory.internal.Memory;
 import org.apache.datasketches.memory.internal.ReadOnlyException;
 import org.apache.datasketches.memory.internal.WritableMemory;

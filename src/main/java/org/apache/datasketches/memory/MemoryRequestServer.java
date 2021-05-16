@@ -19,7 +19,6 @@
 
 package org.apache.datasketches.memory;
 
-import org.apache.datasketches.memory.internal.WritableDirectHandle;
 import org.apache.datasketches.memory.internal.WritableMemory;
 
 /**

@@ -42,8 +42,8 @@ import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.internal.Memory;
 import org.apache.datasketches.memory.internal.ReadOnlyException;
 import org.apache.datasketches.memory.internal.Util;
-import org.apache.datasketches.memory.internal.WritableMapHandle;
 import org.apache.datasketches.memory.internal.WritableMemory;
+import org.apache.datasketches.memory.WritableMapHandle;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -117,7 +117,7 @@ public class AllocateDirectWritableMapMemoryTest {
 
     try (
         WritableMapHandle dstHandle
-          = WritableMemory.map(file, 0, bytes, ByteOrder.nativeOrder());
+          = WritableMemory.writableMap(file, 0, bytes, ByteOrder.nativeOrder());
         WritableHandle srcHandle = WritableMemory.allocateDirect(bytes)) {
 
       WritableMemory dstMem = dstHandle.get();
@@ -152,7 +152,7 @@ public class AllocateDirectWritableMapMemoryTest {
     file.deleteOnExit();  //comment out if you want to examine the file.
 
     final long bytes = 8;
-    try (WritableMapHandle h = WritableMemory.map(file, 0L, bytes, Util.nonNativeByteOrder)) {
+    try (WritableMapHandle h = WritableMemory.writableMap(file, 0L, bytes, Util.nonNativeByteOrder)) {
       WritableMemory wmem = h.get();
       wmem.putChar(0, (char) 1);
       assertEquals(wmem.getByte(1), (byte) 1);
@@ -171,7 +171,7 @@ public class AllocateDirectWritableMapMemoryTest {
   public void simpleMap2() throws IOException {
     File file = getResourceFile("GettysburgAddress.txt");
     assertTrue(isFileReadOnly(file));
-    try (WritableMapHandle rh = WritableMemory.map(file)) { //throws
+    try (WritableMapHandle rh = WritableMemory.writableMap(file)) { //throws
       //
     }
   }
@@ -179,7 +179,7 @@ public class AllocateDirectWritableMapMemoryTest {
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void checkOverLength()  {
     File file = getResourceFile("GettysburgAddress.txt");
-    try (WritableMapHandle rh = WritableMemory.map(file, 0, 1 << 20, ByteOrder.nativeOrder())) {
+    try (WritableMapHandle rh = WritableMemory.writableMap(file, 0, 1 << 20, ByteOrder.nativeOrder())) {
       //
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -207,7 +207,7 @@ public class AllocateDirectWritableMapMemoryTest {
       assertEquals(bufStr, origStr);
     }
 
-    try (WritableMapHandle wrh = WritableMemory.map(origFile, 0, corrBytes,
+    try (WritableMapHandle wrh = WritableMemory.writableMap(origFile, 0, corrBytes,
         ByteOrder.nativeOrder())) {
       WritableMemory wMap = wrh.get();
       wrh.load();

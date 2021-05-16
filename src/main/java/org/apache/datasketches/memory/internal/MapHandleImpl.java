@@ -21,7 +21,7 @@ package org.apache.datasketches.memory.internal;
 
 import org.apache.datasketches.memory.MapHandle;
 
-public class MapHandleImpl implements MapHandle {
+class MapHandleImpl implements MapHandle {
 
   /**
    * Having at least one final field makes this class safe for concurrent publication.

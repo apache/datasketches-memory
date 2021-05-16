@@ -302,7 +302,7 @@ public class Utf8Test {
     String refStr = "Quizdeltagerne spiste jordb\u00e6r med fl\u00f8de, mens cirkusklovnen";
     byte[] refByteArr = refStr.getBytes(UTF_8);
     int addBytes = refByteArr.length;
-    WritableMemory refMem = WritableMemory.wrap(refByteArr);
+    WritableMemory refMem = WritableMemory.writableWrap(refByteArr);
     int decodedChars = refMem.getCharsFromUtf8(0, addBytes, sb);
     String finalStr = sb.toString();
     int finalChars = finalStr.toCharArray().length;

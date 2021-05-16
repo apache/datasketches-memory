@@ -32,6 +32,9 @@ import org.apache.datasketches.memory.DefaultMemoryRequestServer;
 import org.apache.datasketches.memory.Handle;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableHandle;
+import org.apache.datasketches.memory.WritableMapHandle;
+import org.apache.datasketches.memory.WritableDirectHandle;
+
 
 /**
  * Provides read and write primitive and primitive array access to any of the four resources
@@ -60,7 +63,7 @@ public abstract class WritableMemory extends Memory {
    * @param byteBuf the given ByteBuffer
    * @return a new WritableMemory for write operations on the given ByteBuffer.
    */
-  public static WritableMemory wrap(final ByteBuffer byteBuf) {
+  public static WritableMemory writableWrap(final ByteBuffer byteBuf) {
     return BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, false, byteBuf.order());
   }
 
@@ -77,15 +80,15 @@ public abstract class WritableMemory extends Memory {
    * state of the given ByteBuffer
    * @return a new WritableMemory for write operations on the given ByteBuffer.
    */
-  public static WritableMemory wrap(final ByteBuffer byteBuf, final ByteOrder byteOrder) {
+  public static WritableMemory writableWrap(final ByteBuffer byteBuf, final ByteOrder byteOrder) {
     return BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, false, byteOrder);
   }
 
   //MAP
   /**
-   * Maps the entire given file into native-ordered Memory for write operations
+   * Maps the entire given file into native-ordered WritableMemory for write operations
    * (including those &gt; 2GB). Calling this method is equivalent to calling
-   * {@link #map(File, long, long, ByteOrder) map(file, 0, file.length(), ByteOrder.nativeOrder())}.
+   * {@link #writableMap(File, long, long, ByteOrder) map(file, 0, file.length(), ByteOrder.nativeOrder())}.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>WritableMemory.map(...)</i>.
@@ -94,8 +97,8 @@ public abstract class WritableMemory extends Memory {
    * Please read Javadocs for {@link Handle}.
    * @throws IOException file not found or a RuntimeException.
    */
-  public static WritableMapHandle map(final File file) throws IOException {
-    return map(file, 0, file.length(), Util.nativeByteOrder);
+  public static WritableMapHandle writableMap(final File file) throws IOException {
+    return WritableMemory.writableMap(file, 0, file.length(), Util.nativeByteOrder);
   }
 
   /**
@@ -108,11 +111,11 @@ public abstract class WritableMemory extends Memory {
    * @param fileOffsetBytes the position in the given file in bytes. It may not be negative.
    * @param capacityBytes the size of the mapped Memory. It may not be negative or zero.
    * @param byteOrder the byte order to be used for the given file. It may not be null.
-   * @return WritableMapHandle for managing the mapped Memory.
+   * @return WritableMapHandleImpl for managing the mapped Memory.
    * Please read Javadocs for {@link Handle}.
    * @throws IOException file not found or RuntimeException, etc.
    */
-  public static WritableMapHandle map(final File file, final long fileOffsetBytes,
+  public static WritableMapHandle writableMap(final File file, final long fileOffsetBytes,
       final long capacityBytes, final ByteOrder byteOrder) throws IOException {
     zeroCheck(capacityBytes, "Capacity");
     nullCheck(file, "file is null");
@@ -137,7 +140,7 @@ public abstract class WritableMemory extends Memory {
    * and to call <i>close()</i> when done.</p>
    *
    * @param capacityBytes the size of the desired memory in bytes.
-   * @return WritableDirectHandle for this off-heap resource.
+   * @return WritableDirectHandleImpl for this off-heap resource.
    * Please read Javadocs for {@link Handle}.
    */
   public static WritableDirectHandle allocateDirect(final long capacityBytes) {
@@ -248,7 +251,7 @@ public abstract class WritableMemory extends Memory {
    */
   public static WritableMemory allocate(final int capacityBytes) {
     final byte[] arr = new byte[capacityBytes];
-    return wrap(arr, Util.nativeByteOrder);
+    return writableWrap(arr, Util.nativeByteOrder);
   }
 
   /**
@@ -261,7 +264,7 @@ public abstract class WritableMemory extends Memory {
    */
   public static WritableMemory allocate(final int capacityBytes, final ByteOrder byteOrder) {
     final byte[] arr = new byte[capacityBytes];
-    return wrap(arr, byteOrder);
+    return writableWrap(arr, byteOrder);
   }
 
   //ACCESS PRIMITIVE HEAP ARRAYS for write
@@ -275,7 +278,7 @@ public abstract class WritableMemory extends Memory {
    * @param arr the given primitive array.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
-  public static WritableMemory wrap(final boolean[] arr) {
+  public static WritableMemory writableWrap(final boolean[] arr) {
     final long lengthBytes = arr.length << Prim.BOOLEAN.shift();
     return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, Util.nativeByteOrder);
   }
@@ -290,8 +293,8 @@ public abstract class WritableMemory extends Memory {
    * @param arr the given primitive array.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
-  public static WritableMemory wrap(final byte[] arr) {
-    return WritableMemory.wrap(arr, 0, arr.length, Util.nativeByteOrder);
+  public static WritableMemory writableWrap(final byte[] arr) {
+    return WritableMemory.writableWrap(arr, 0, arr.length, Util.nativeByteOrder);
   }
 
   /**
@@ -305,8 +308,8 @@ public abstract class WritableMemory extends Memory {
    * @param byteOrder the byte order to be used
    * @return a new WritableMemory for write operations on the given primitive array.
    */
-  public static WritableMemory wrap(final byte[] arr, final ByteOrder byteOrder) {
-    return WritableMemory.wrap(arr, 0, arr.length, byteOrder);
+  public static WritableMemory writableWrap(final byte[] arr, final ByteOrder byteOrder) {
+    return WritableMemory.writableWrap(arr, 0, arr.length, byteOrder);
   }
 
   /**
@@ -322,7 +325,7 @@ public abstract class WritableMemory extends Memory {
    * @param byteOrder the byte order to be used
    * @return a new WritableMemory for write operations on the given primitive array.
    */
-  public static WritableMemory wrap(final byte[] arr, final int offsetBytes, final int lengthBytes,
+  public static WritableMemory writableWrap(final byte[] arr, final int offsetBytes, final int lengthBytes,
       final ByteOrder byteOrder) {
     UnsafeUtil.checkBounds(offsetBytes, lengthBytes, arr.length);
     return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, byteOrder);
@@ -338,7 +341,7 @@ public abstract class WritableMemory extends Memory {
    * @param arr the given primitive array.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
-  public static WritableMemory wrap(final char[] arr) {
+  public static WritableMemory writableWrap(final char[] arr) {
     final long lengthBytes = arr.length << Prim.CHAR.shift();
     return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, Util.nativeByteOrder);
   }
@@ -353,7 +356,7 @@ public abstract class WritableMemory extends Memory {
    * @param arr the given primitive array.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
-  public static WritableMemory wrap(final short[] arr) {
+  public static WritableMemory writableWrap(final short[] arr) {
     final long lengthBytes = arr.length << Prim.SHORT.shift();
     return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, Util.nativeByteOrder);
   }
@@ -368,7 +371,7 @@ public abstract class WritableMemory extends Memory {
    * @param arr the given primitive array.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
-  public static WritableMemory wrap(final int[] arr) {
+  public static WritableMemory writableWrap(final int[] arr) {
     final long lengthBytes = arr.length << Prim.INT.shift();
     return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, Util.nativeByteOrder);
   }
@@ -383,7 +386,7 @@ public abstract class WritableMemory extends Memory {
    * @param arr the given primitive array.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
-  public static WritableMemory wrap(final long[] arr) {
+  public static WritableMemory writableWrap(final long[] arr) {
     final long lengthBytes = arr.length << Prim.LONG.shift();
     return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, Util.nativeByteOrder);
   }
@@ -398,7 +401,7 @@ public abstract class WritableMemory extends Memory {
    * @param arr the given primitive array.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
-  public static WritableMemory wrap(final float[] arr) {
+  public static WritableMemory writableWrap(final float[] arr) {
     final long lengthBytes = arr.length << Prim.FLOAT.shift();
     return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, Util.nativeByteOrder);
   }
@@ -413,7 +416,7 @@ public abstract class WritableMemory extends Memory {
    * @param arr the given primitive array.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
-  public static WritableMemory wrap(final double[] arr) {
+  public static WritableMemory writableWrap(final double[] arr) {
     final long lengthBytes = arr.length << Prim.DOUBLE.shift();
     return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, Util.nativeByteOrder);
   }

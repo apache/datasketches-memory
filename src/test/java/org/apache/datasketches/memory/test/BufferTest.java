@@ -71,7 +71,7 @@ public class BufferTest {
   public void checkArrayWrap() {
     int n = 1024; //longs
     byte[] arr = new byte[n * 8];
-    WritableBuffer wbuf = WritableMemory.wrap(arr).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemory.writableWrap(arr).asWritableBuffer();
     for (int i = 0; i < n; i++) {
       wbuf.putLong(i);
     }
@@ -264,7 +264,7 @@ public class BufferTest {
     int n2 = n / 2;
     long[] arr = new long[n];
     for (int i = 0; i < n; i++) { arr[i] = i; }
-    WritableBuffer wbuf = WritableMemory.wrap(arr).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemory.writableWrap(arr).asWritableBuffer();
     for (int i = 0; i < n; i++) {
       assertEquals(wbuf.getLong(), i); //write all
       //println("" + wmem.getLong(i * 8));

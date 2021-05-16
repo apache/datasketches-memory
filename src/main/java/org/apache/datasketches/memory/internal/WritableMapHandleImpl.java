@@ -17,14 +17,34 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory;
+package org.apache.datasketches.memory.internal;
+
+import org.apache.datasketches.memory.Handle;
+import org.apache.datasketches.memory.WritableMapHandle;
 
 /**
- * A Handle for a memory-mapped, read-only file resource. This
- * joins a Read-only Handle with an AutoCloseable Map resource.
- * Please read Javadocs for {@link Handle}. 
+ * A Handle for a memory-mapped, writable file resource.
+ * Joins a WritableHandle with an AutoCloseable WritableMap resource
+ * Please read Javadocs for {@link Handle}.
  *
- * @author Lee Rhodes
  * @author Roman Leventov
+ * @author Lee Rhodes
  */
-public interface MapHandle extends Map, Handle { }
+public final class WritableMapHandleImpl extends MapHandleImpl 
+    implements WritableMapHandle {
+
+  WritableMapHandleImpl(final AllocateDirectWritableMap dirWmap,
+      final BaseWritableMemoryImpl wMem) {
+    super(dirWmap, wMem);
+  }
+
+  @Override
+  public WritableMemory get() {
+    return (WritableMemory) super.get();
+  }
+
+  @Override
+  public void force() {
+    ((AllocateDirectWritableMap)dirMap).force();
+  }
+}

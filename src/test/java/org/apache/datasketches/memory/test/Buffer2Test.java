@@ -408,7 +408,7 @@ public class Buffer2Test {
 
   @Test
   public void testWritableDuplicate() {
-    WritableMemory wmem = WritableMemory.wrap(new byte[1]);
+    WritableMemory wmem = WritableMemory.writableWrap(new byte[1]);
     WritableBuffer wbuf = wmem.asWritableBuffer();
     WritableBuffer wbuf2 = wbuf.writableDuplicate();
     assertEquals(wbuf2.getCapacity(), 1);

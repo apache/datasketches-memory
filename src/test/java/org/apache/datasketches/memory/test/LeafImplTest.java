@@ -30,11 +30,12 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import org.apache.datasketches.memory.WritableDirectHandle;
 import org.apache.datasketches.memory.internal.Util;
 import org.apache.datasketches.memory.internal.WritableBuffer;
-import org.apache.datasketches.memory.internal.WritableDirectHandle;
-import org.apache.datasketches.memory.internal.WritableMapHandle;
+
 import org.apache.datasketches.memory.internal.WritableMemory;
+import org.apache.datasketches.memory.WritableMapHandle;
 import org.testng.annotations.Test;
 
 /**
@@ -133,7 +134,7 @@ public class LeafImplTest {
     assertTrue(file.isFile());
     file.deleteOnExit();  //comment out if you want to examine the file.
 
-    try (WritableMapHandle wmh = WritableMemory.map(file, off, cap, Util.nativeByteOrder)) {
+    try (WritableMapHandle wmh = WritableMemory.writableMap(file, off, cap, Util.nativeByteOrder)) {
       WritableMemory mem = wmh.get();
       mem.putShort(0, (short) 1);
       assertEquals(mem.getByte(0), (byte) 1);
@@ -208,13 +209,13 @@ public class LeafImplTest {
     ByteBuffer bb = ByteBuffer.allocate((int)cap);
     bb.order(ByteOrder.nativeOrder());
     bb.putShort(0, (short) 1);
-    WritableMemory mem = WritableMemory.wrap(bb);
+    WritableMemory mem = WritableMemory.writableWrap(bb);
     checkByteBufferImpl(mem, off, cap, false);
 
     ByteBuffer dbb = ByteBuffer.allocateDirect((int)cap);
     dbb.order(ByteOrder.nativeOrder());
     dbb.putShort(0, (short) 1);
-    mem = WritableMemory.wrap(dbb);
+    mem = WritableMemory.writableWrap(dbb);
     checkByteBufferImpl(mem, off, cap, true);
   }
 

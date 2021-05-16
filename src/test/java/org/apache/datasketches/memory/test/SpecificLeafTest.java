@@ -29,9 +29,9 @@ import java.nio.ByteBuffer;
 import org.apache.datasketches.memory.internal.Buffer;
 import org.apache.datasketches.memory.internal.Memory;
 import org.apache.datasketches.memory.internal.Util;
-import org.apache.datasketches.memory.internal.WritableDirectHandle;
-import org.apache.datasketches.memory.internal.WritableMapHandle;
 import org.apache.datasketches.memory.internal.WritableMemory;
+import org.apache.datasketches.memory.WritableMapHandle;
+import org.apache.datasketches.memory.WritableDirectHandle;
 import org.testng.annotations.Test;
 
 /**
@@ -107,7 +107,7 @@ public class SpecificLeafTest {
 
     final long bytes = 128;
 
-    try (WritableMapHandle h = WritableMemory.map(file, 0L, bytes, Util.nativeByteOrder)) {
+    try (WritableMapHandle h = WritableMemory.writableMap(file, 0L, bytes, Util.nativeByteOrder)) {
       WritableMemory mem = h.get(); //native mem
       assertTrue(ReflectUtil.isMapType(mem));
       assertFalse(mem.isReadOnly());

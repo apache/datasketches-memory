@@ -27,9 +27,9 @@ import static org.testng.Assert.fail;
 import java.lang.reflect.InvocationTargetException;
 
 import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.WritableDirectHandle;
 import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.internal.Util;
-import org.apache.datasketches.memory.internal.WritableDirectHandle;
 import org.apache.datasketches.memory.internal.WritableMemory;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -123,7 +123,7 @@ public class AllocateDirectMemoryTest {
   @SuppressWarnings("static-access")
   @AfterClass
   public void checkDirectCounter() {
-    WritableMemory mem = WritableMemory.wrap(new byte[8]);
+    WritableMemory mem = WritableMemory.writableWrap(new byte[8]);
     long count = mem.getCurrentDirectMemoryAllocations();
     if (count != 0) {
       println(""+count);

@@ -93,11 +93,11 @@
  * <p>When a handle is extended for an AutoCloseable resource and then joined with an access API
  * it becomes an <i>implementation handle</i>. There are 3 implementation handles:</p>
  *
- * <ul><li>{@link org.apache.datasketches.memory.internal.MapHandleImpl}
+ * <ul><li>{@link org.apache.datasketches.memory.MapHandle}
  * for read-only access to a memory-mapped file</li>
- * <li>{@link org.apache.datasketches.memory.internal.WritableMapHandle}
+ * <li>{@link org.apache.datasketches.memory.WritableMapHandle}
  * for writable access to a memory-mapped file</li>
- * <li>{@link org.apache.datasketches.memory.internal.WritableDirectHandle}
+ * <li>{@link org.apache.datasketches.memory.WritableDirectHandle}
  * for writable access to off-heap memory.</li>
  * </ul>
  *
@@ -116,7 +116,7 @@
  *     }
  *
  *     //Using explicit close():
- *     WritableMapHandle handle = WritableMemory.map(File file);
+ *     WritableMapHandleImpl handle = WritableMemory.map(File file);
  *     WritableMemory wMem = handle.get();
  *     doWork(wMem) // read and write to memory mapped file.
  *     handle.close();
@@ -125,7 +125,7 @@
  * <p>Where it is desirable to pass ownership of the resource (and the {@code close()}
  * responsibility) one can not use the TWR block. Instead:</p>
  * <blockquote><pre>
- *     WritableMapHandle handler = WritableMemory.map(File file);
+ *     WritableMapHandleImpl handler = WritableMemory.map(File file);
  *     doWorkAndClose(handle); //passes the handle to object that closes the resource.
  * </pre></blockquote>
  *

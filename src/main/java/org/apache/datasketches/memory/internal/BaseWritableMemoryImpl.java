@@ -37,6 +37,8 @@ import java.nio.ByteOrder;
 import java.nio.channels.WritableByteChannel;
 
 import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.WritableMapHandle;
+import org.apache.datasketches.memory.WritableDirectHandle;
 
 /*
  * Developer notes: The heavier methods, such as put/get arrays, duplicate, region, clear, fill,
@@ -113,7 +115,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
             typeId, dirWMap.getValid())
         : new MapNonNativeWritableMemoryImpl(dirWMap.nativeBaseOffset, 0L, capacityBytes,
             typeId, dirWMap.getValid());
-    return new WritableMapHandle(dirWMap, wmem);
+    return new WritableMapHandleImpl(dirWMap, wmem);
   }
 
   @SuppressWarnings("resource")
@@ -131,7 +133,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
         : new DirectNonNativeWritableMemoryImpl(direct.getNativeBaseOffset(), 0L, capacityBytes,
             typeId, direct.getValid(), memReqSvr);
 
-    final WritableDirectHandle handle = new WritableDirectHandle(direct, wmem);
+    final WritableDirectHandle handle = new WritableDirectHandleImpl(direct, wmem);
     return handle;
   }
 

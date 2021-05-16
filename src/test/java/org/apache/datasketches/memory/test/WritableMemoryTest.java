@@ -39,7 +39,7 @@ public class WritableMemoryTest {
   @Test
   public void wrapBigEndian() {
     ByteBuffer bb = ByteBuffer.allocate(64); //big endian
-    WritableMemory wmem = WritableMemory.wrap(bb);
+    WritableMemory wmem = WritableMemory.writableWrap(bb);
     assertEquals(wmem.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
@@ -47,7 +47,7 @@ public class WritableMemoryTest {
   public void wrapBigEndianAsLittle() {
     ByteBuffer bb = ByteBuffer.allocate(64);
     bb.putChar(0, (char)1); //as BE
-    WritableMemory wmem = WritableMemory.wrap(bb, ByteOrder.LITTLE_ENDIAN);
+    WritableMemory wmem = WritableMemory.writableWrap(bb, ByteOrder.LITTLE_ENDIAN);
     assertEquals(wmem.getChar(0), 256);
   }
 
@@ -62,7 +62,7 @@ public class WritableMemoryTest {
   @Test
   public void checkGetArray() {
     byte[] byteArr = new byte[64];
-    WritableMemory wmem = WritableMemory.wrap(byteArr);
+    WritableMemory wmem = WritableMemory.writableWrap(byteArr);
     assertTrue(wmem.getArray() == byteArr);
     WritableBuffer wbuf = wmem.asWritableBuffer();
     assertTrue(wbuf.getArray() == byteArr);
@@ -71,7 +71,7 @@ public class WritableMemoryTest {
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void checkSelfArrayCopy() {
     byte[] srcAndDst = new byte[128];
-    WritableMemory wmem = WritableMemory.wrap(srcAndDst);
+    WritableMemory wmem = WritableMemory.writableWrap(srcAndDst);
     wmem.getByteArray(0, srcAndDst, 64, 64);  //non-overlapping
   }
 
@@ -160,11 +160,11 @@ public class WritableMemoryTest {
 
   @Test
   public void checkWrapWithBO() {
-    WritableMemory wmem = WritableMemory.wrap(new byte[0], ByteOrder.BIG_ENDIAN);
+    WritableMemory wmem = WritableMemory.writableWrap(new byte[0], ByteOrder.BIG_ENDIAN);
     boolean nativeBO = wmem.getTypeByteOrder() == Util.nativeByteOrder;
     assertTrue(nativeBO); //remains true for ZeroSizeMemory
     println("" + nativeBO);
-    wmem = WritableMemory.wrap(new byte[8], ByteOrder.BIG_ENDIAN);
+    wmem = WritableMemory.writableWrap(new byte[8], ByteOrder.BIG_ENDIAN);
     nativeBO = wmem.getTypeByteOrder() == Util.nativeByteOrder;
     assertFalse(nativeBO);
     println("" + nativeBO);

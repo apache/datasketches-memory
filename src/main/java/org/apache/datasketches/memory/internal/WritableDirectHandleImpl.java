@@ -20,17 +20,17 @@
 package org.apache.datasketches.memory.internal;
 
 import org.apache.datasketches.memory.Handle;
-import org.apache.datasketches.memory.WritableHandle;
+import org.apache.datasketches.memory.WritableDirectHandle;
 
 /**
  * A Handle for a writable direct memory resource.
+ * Joins a WritableMemory with a writable, AutoCloseable AllocateDirect resource.
  * Please read Javadocs for {@link Handle}.
  *
  * @author Lee Rhodes
  * @author Roman Leventov
  */
-//Joins a WritableMemory with a writable, AutoCloseable AllocateDirect resource
-public final class WritableDirectHandle implements WritableHandle {
+public final class WritableDirectHandleImpl implements WritableDirectHandle {
 
   /**
    * Having at least one final field makes this class safe for concurrent publication.
@@ -38,7 +38,7 @@ public final class WritableDirectHandle implements WritableHandle {
   final AllocateDirect direct;
   private WritableMemory wMem;
 
-  WritableDirectHandle(final AllocateDirect allocatedDirect, final WritableMemory wMem) {
+  WritableDirectHandleImpl(final AllocateDirect allocatedDirect, final WritableMemory wMem) {
     direct = allocatedDirect;
     this.wMem = wMem;
   }

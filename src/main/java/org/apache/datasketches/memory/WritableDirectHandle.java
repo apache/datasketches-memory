@@ -19,12 +19,14 @@
 
 package org.apache.datasketches.memory;
 
+
 /**
- * A Handle for a memory-mapped, read-only file resource. This
- * joins a Read-only Handle with an AutoCloseable Map resource.
- * Please read Javadocs for {@link Handle}. 
+ * A Handle for a writable direct memory resource.
+ * Joins a WritableMemory with a writable, AutoCloseable AllocateDirect resource.
+ * Please read Javadocs for {@link Handle}.
  *
  * @author Lee Rhodes
  * @author Roman Leventov
  */
-public interface MapHandle extends Map, Handle { }
+public interface WritableDirectHandle extends WritableHandle { } 
+

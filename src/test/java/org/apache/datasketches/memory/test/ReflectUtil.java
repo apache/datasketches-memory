@@ -24,7 +24,7 @@ import java.lang.reflect.*;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.MemoryRequestServer;
-import org.apache.datasketches.memory.internal.WritableDirectHandle;
+import org.apache.datasketches.memory.WritableDirectHandle;
 
 public final class ReflectUtil {
 

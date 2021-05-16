@@ -281,7 +281,7 @@ class AllocateDirectMap implements Map {
       if (valid.change()) {
         if (calledFromCleaner) {
           // Warn about non-deterministic resource cleanup.
-          LOG.warn("A WritableMapHandle was not closed manually");
+          LOG.warn("A WritableMapHandleImpl was not closed manually");
         }
         try {
           unmap();

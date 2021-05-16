@@ -70,7 +70,7 @@ public class WritableBufferImplTest {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
-    WritableBuffer wbuf = WritableMemory.wrap(srcArray).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
     wbuf.getBooleanArray(dstArray, 0, 8);
     for (int i=0; i<8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
@@ -89,7 +89,7 @@ public class WritableBufferImplTest {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
-    WritableBuffer wbuf = WritableMemory.wrap(srcArray).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
     wbuf.getByteArray(dstArray, 0, 8);
     for (int i=0; i<8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
@@ -107,7 +107,7 @@ public class WritableBufferImplTest {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
-    WritableBuffer wbuf = WritableMemory.wrap(srcArray).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
     wbuf.getCharArray(dstArray, 0, 8);
     for (int i=0; i<8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
@@ -125,7 +125,7 @@ public class WritableBufferImplTest {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
-    WritableBuffer wbuf = WritableMemory.wrap(srcArray).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
     wbuf.getShortArray(dstArray, 0, 8);
     for (int i=0; i<8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
@@ -143,7 +143,7 @@ public class WritableBufferImplTest {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
-    WritableBuffer wbuf = WritableMemory.wrap(srcArray).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
     wbuf.getIntArray(dstArray, 0, 8);
     for (int i=0; i<8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
@@ -161,7 +161,7 @@ public class WritableBufferImplTest {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
-    WritableBuffer wbuf = WritableMemory.wrap(srcArray).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
     wbuf.getLongArray(dstArray, 0, 8);
     for (int i=0; i<8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
@@ -179,7 +179,7 @@ public class WritableBufferImplTest {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
-    WritableBuffer wbuf = WritableMemory.wrap(srcArray).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
     wbuf.getFloatArray(dstArray, 0, 8);
     for (int i=0; i<8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
@@ -197,7 +197,7 @@ public class WritableBufferImplTest {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
-    WritableBuffer wbuf = WritableMemory.wrap(srcArray).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
     wbuf.getDoubleArray(dstArray, 0, 8);
     for (int i=0; i<8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
@@ -358,7 +358,7 @@ public class WritableBufferImplTest {
   public void checkIsReadOnly() {
     long[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
 
-    WritableBuffer wbuf = WritableMemory.wrap(srcArray).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
     assertFalse(wbuf.isReadOnly());
 
     Buffer buf = wbuf;
@@ -486,8 +486,8 @@ public class WritableBufferImplTest {
   @Test
   public void checkIsSameResource() {
     byte[] byteArr = new byte[64];
-    WritableBuffer wbuf1 = WritableMemory.wrap(byteArr).asWritableBuffer();
-    WritableBuffer wbuf2 = WritableMemory.wrap(byteArr).asWritableBuffer();
+    WritableBuffer wbuf1 = WritableMemory.writableWrap(byteArr).asWritableBuffer();
+    WritableBuffer wbuf2 = WritableMemory.writableWrap(byteArr).asWritableBuffer();
     assertTrue(wbuf1.isSameResource(wbuf2));
   }
 

@@ -129,7 +129,7 @@ final class AllocateDirect implements AutoCloseable {
       if (valid.change()) {
         if (calledFromCleaner) {
           // Warn about non-deterministic resource cleanup.
-          LOG.warn("A WritableDirectHandle was not closed manually");
+          LOG.warn("A WritableDirectHandleImpl was not closed manually");
         }
         unsafe.freeMemory(nativeAddress);
         NioBits.unreserveMemory(allocationSize, capacity);

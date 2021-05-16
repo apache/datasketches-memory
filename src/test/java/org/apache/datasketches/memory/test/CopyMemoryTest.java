@@ -124,7 +124,7 @@ public class CopyMemoryTest {
     ThreadLocalRandom.current().nextBytes(bytes);
     byte[] referenceBytes = bytes.clone();
     Memory referenceMem = Memory.wrap(referenceBytes);
-    WritableMemory mem = WritableMemory.wrap(bytes);
+    WritableMemory mem = WritableMemory.writableWrap(bytes);
     long copyLen = UNSAFE_COPY_THRESHOLD_BYTES * 2;
     mem.copyTo(0, mem, UNSAFE_COPY_THRESHOLD_BYTES / 2, copyLen);
     Assert.assertEquals(0, mem.compareTo(UNSAFE_COPY_THRESHOLD_BYTES / 2, copyLen, referenceMem, 0,
@@ -137,7 +137,7 @@ public class CopyMemoryTest {
     ThreadLocalRandom.current().nextBytes(bytes);
     byte[] referenceBytes = bytes.clone();
     Memory referenceMem = Memory.wrap(referenceBytes);
-    WritableMemory mem = WritableMemory.wrap(bytes);
+    WritableMemory mem = WritableMemory.writableWrap(bytes);
     long copyLen = UNSAFE_COPY_THRESHOLD_BYTES * 2;
     mem.copyTo(UNSAFE_COPY_THRESHOLD_BYTES / 2, mem, 0, copyLen);
     Assert.assertEquals(0, mem.compareTo(0, copyLen, referenceMem, UNSAFE_COPY_THRESHOLD_BYTES / 2,

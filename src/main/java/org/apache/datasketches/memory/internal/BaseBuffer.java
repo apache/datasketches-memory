@@ -36,7 +36,7 @@ package org.apache.datasketches.memory.internal;
  *
  * @author Lee Rhodes
  */
-public abstract class BaseBuffer extends BaseState {
+public abstract class BaseBuffer extends BaseStateImpl {
   private long capacity;
   private long start = 0;
   private long pos = 0;

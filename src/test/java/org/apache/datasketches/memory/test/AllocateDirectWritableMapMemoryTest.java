@@ -248,7 +248,7 @@ public class AllocateDirectWritableMapMemoryTest {
   @AfterClass
   public void checkDirectCounter() {
     long count =  getCurrentDirectMemoryMapAllocations();
-      //final long count = BaseState.getCurrentDirectMemoryMapAllocations();
+      //final long count = BaseStateImpl.getCurrentDirectMemoryMapAllocations();
       if (count != 0) {
         println(""+count);
         fail();

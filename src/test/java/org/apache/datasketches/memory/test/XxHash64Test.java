@@ -100,7 +100,7 @@ public class XxHash64Test {
   }
 
   /**
-   * This simple test compares the output of {@link BaseState#xxHash64(long, long, long)} with the
+   * This simple test compares the output of {@link BaseStateImpl#xxHash64(long, long, long)} with the
    * output of {@link net.openhft.hashing.LongHashFunction}, that itself is tested against the
    * reference implementation in C.  This increase confidence that the xxHash function implemented
    * in this package is in fact the same xxHash function implemented in C.

@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.datasketches.memory.DefaultMemoryRequestServer;
 import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.BaseState;
 
 /**
  * Keeps key configuration state for Memory and Buffer plus some common static variables
@@ -38,7 +39,7 @@ import org.apache.datasketches.memory.MemoryRequestServer;
  * @author Lee Rhodes
  */
 @SuppressWarnings({"restriction"})
-abstract class BaseState {
+public abstract class BaseStateImpl implements BaseState {
 
   //Monitoring
   static final AtomicLong currentDirectMemoryAllocations_ = new AtomicLong();
@@ -88,7 +89,7 @@ abstract class BaseState {
    * This offset does not include the size of an object array header, if there is one.
    * @param capacityBytes the capacity of this object. Used by all methods when checking bounds.
    */
-  BaseState(final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
+  BaseStateImpl(final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
       final long capacityBytes) {
     capacityBytes_ = capacityBytes;
     cumBaseOffset_ = regionOffset + (unsafeObj == null
@@ -98,11 +99,7 @@ abstract class BaseState {
 
   //Byte Order Related
 
-  /**
-   * Gets the current Type ByteOrder.
-   * This may be different from the ByteOrder of the backing resource and of the Native Byte Order.
-   * @return the current Type ByteOrder.
-   */
+  @Override
   public final ByteOrder getTypeByteOrder() {
     return isNonNativeType() ? Util.nonNativeByteOrder : Util.nativeByteOrder;
   }
@@ -119,88 +116,47 @@ abstract class BaseState {
     return Util.nativeByteOrder == byteOrder;
   }
 
-  /**
-   * Returns true if the Native ByteOrder is the same as the ByteOrder of the
-   * current Buffer or Memory and the same ByteOrder as the given byteOrder.
-   * @param byteOrder the given ByteOrder
-   * @return true if the Native ByteOrder is the same as the ByteOrder of the
-   * current Buffer or Memory and the same ByteOrder as the given byteOrder.
-   */
+  @Override
   public final boolean isByteOrderCompatible(final ByteOrder byteOrder) {
     final ByteOrder typeBO = getTypeByteOrder();
     return typeBO == Util.nativeByteOrder && typeBO == byteOrder;
   }
 
-  /**
-   * Returns true if the given object is an instance of this class and has equal data contents.
-   * @param that the given object
-   * @return true if the given Object is an instance of this class and has equal data contents.
-   */
   @Override
   public final boolean equals(final Object that) {
     if (this == that) { return true; }
-    return that instanceof BaseState
-      ? CompareAndCopy.equals(this, (BaseState) that)
+    return that instanceof BaseStateImpl
+      ? CompareAndCopy.equals(this, (BaseStateImpl) that)
       : false;
   }
 
-  /**
-   * Returns true if the given object is an instance of this class and has equal contents to
-   * this object in the given range of bytes. This will also check two distinct ranges within the
-   * same object for eauals.
-   * @param thisOffsetBytes the starting offset in bytes for this object.
-   * @param that the given object
-   * @param thatOffsetBytes the starting offset in bytes for the given object
-   * @param lengthBytes the size of the range in bytes
-   * @return true if the given object has equal contents to this object in the given range of
-   * bytes.
-   */
+  @Override
   public final boolean equalTo(final long thisOffsetBytes, final Object that,
       final long thatOffsetBytes, final long lengthBytes) {
-    return that instanceof BaseState
-      ? CompareAndCopy.equals(this, thisOffsetBytes, (BaseState) that, thatOffsetBytes, lengthBytes)
+    return that instanceof BaseStateImpl
+      ? CompareAndCopy.equals(this, thisOffsetBytes, (BaseStateImpl) that, thatOffsetBytes, lengthBytes)
       : false;
   }
 
-  /**
-   * Gets the backing ByteBuffer if it exists, otherwise returns null.
-   * @return the backing ByteBuffer if it exists, otherwise returns null.
-   */
   //Overridden by ByteBuffer Leafs
+  @Override
   public ByteBuffer getByteBuffer() {
     return null;
   }
 
-  /**
-   * Gets the capacity of this object in bytes
-   * @return the capacity of this object in bytes
-   */
+  @Override
   public final long getCapacity() {
     assertValid();
     return capacityBytes_;
   }
 
-  /**
-   * Gets the cumulative offset in bytes of this object from the backing resource.
-   * This offset may also include other offset components such as the native off-heap
-   * memory address, DirectByteBuffer split offsets, region offsets, and unsafe arrayBaseOffsets.
-   *
-   * @return the cumulative offset in bytes of this object from the backing resource.
-   */
+  @Override
   public final long getCumulativeOffset() {
     assertValid();
     return cumBaseOffset_;
   }
 
-  /**
-   * Gets the cumulative offset in bytes of this object from the backing resource including the given
-   * offsetBytes. This offset may also include other offset components such as the native off-heap
-   * memory address, DirectByteBuffer split offsets, region offsets, and unsafe arrayBaseOffsets.
-   *
-   * @param offsetBytes offset to be added to the cumulative offset.
-   * @return the cumulative offset in bytes of this object from the backing resource including the
-   * given offsetBytes.
-   */
+  @Override
   public final long getCumulativeOffset(final long offsetBytes) {
     assertValid();
     return cumBaseOffset_ + offsetBytes;
@@ -214,12 +170,7 @@ abstract class BaseState {
     return 0;
   }
 
-  /**
-   * Returns the offset of address zero of this object relative to the address zero of the
-   * backing resource but not including the size of any Java object header.
-   * @return the offset of address zero of this object relative to the address zero of the
-   * backing resource but not including the size of any Java object header.
-   */
+  @Override
   public final long getRegionOffset() {
     final Object unsafeObj = getUnsafeObject();
     return unsafeObj == null
@@ -227,15 +178,7 @@ abstract class BaseState {
         : cumBaseOffset_ - UnsafeUtil.getArrayBaseOffset(unsafeObj.getClass());
   }
 
-  /**
-   * Returns the offset of address zero of this object relative to the address zero of the
-   * backing resource plus the given offsetBytes but not including the size of any Java object
-   * header.
-   * @param offsetBytes the given offsetBytes
-   * @return the offset of address zero of this object relative to the address zero of the
-   * backing resource plus the given offsetBytes but not including the size of any Java object
-   * header.
-   */
+  @Override
   public final long getRegionOffset(final long offsetBytes) {
     return getRegionOffset() + offsetBytes;
   }
@@ -249,87 +192,45 @@ abstract class BaseState {
     return null;
   }
 
-  /**
-   * Returns true if this object is backed by an on-heap primitive array
-   * @return true if this object is backed by an on-heap primitive array
-   */
+  @Override
   public final boolean hasArray() {
     assertValid();
     return getUnsafeObject() != null;
   }
 
-  /**
-   * Returns the hashCode of this object.
-   *
-   * <p>The hash code of this object depends upon all of its contents.
-   * Because of this, it is inadvisable to use these objects as keys in hash maps
-   * or similar data structures unless it is known that their contents will not change.</p>
-   *
-   * <p>If it is desirable to use these objects in a hash map depending only on object identity,
-   * than the {@link java.util.IdentityHashMap} can be used.</p>
-   *
-   * @return the hashCode of this object.
-   */
   @Override
   public final int hashCode() {
     return (int) xxHash64(0, capacityBytes_, 0); //xxHash64() calls checkValid()
   }
 
-  /**
-   * Returns the 64-bit hash of the sequence of bytes in this object specified by
-   * <i>offsetBytes</i>, <i>lengthBytes</i> and a <i>seed</i>.  Note that the sequence of bytes is
-   * always processed in the same order independent of endianness.
-   *
-   * @param offsetBytes the given offset in bytes to the first byte of the byte sequence.
-   * @param lengthBytes the given length in bytes of the byte sequence.
-   * @param seed the given long seed.
-   * @return the 64-bit hash of the sequence of bytes in this object specified by
-   * <i>offsetBytes</i> and <i>lengthBytes</i>.
-   */
+  @Override
   public final long xxHash64(final long offsetBytes, final long lengthBytes, final long seed) {
     checkValid();
     return XxHash64.hash(getUnsafeObject(), cumBaseOffset_ + offsetBytes, lengthBytes, seed);
   }
 
-  /**
-   * Returns true if this Memory is backed by a ByteBuffer.
-   * @return true if this Memory is backed by a ByteBuffer.
-   */
+  @Override
   public final boolean hasByteBuffer() {
     assertValid();
     return getByteBuffer() != null;
   }
 
-  /**
-   * Returns true if the backing resource is direct (off-heap) memory.
-   * This is the case for allocated direct memory, memory mapped files,
-   * @return true if the backing resource is direct (off-heap) memory.
-   */
+  @Override
   public final boolean isDirect() {
     return getUnsafeObject() == null;
   }
 
-  /**
-   * Returns true if this object or the backing resource is read-only.
-   * @return true if this object or the backing resource is read-only.
-   */
+  @Override
   public final boolean isReadOnly() {
     assertValid();
     return isReadOnlyType();
   }
 
-  /**
-   * Returns true if the backing resource of <i>this</i> is identical with the backing resource
-   * of <i>that</i>. The capacities must be the same.  If <i>this</i> is a region,
-   * the region offset must also be the same.
-   * @param that A different non-null object
-   * @return true if the backing resource of <i>this</i> is the same as the backing resource
-   * of <i>that</i>.
-   */
+  @Override
   public final boolean isSameResource(final Object that) {
     checkValid();
     if (that == null) { return false; }
-    final BaseState that1 = (BaseState) that;
+    final BaseStateImpl that1 = (BaseStateImpl) that;
     that1.checkValid();
     if (this == that1) { return true; }
 
@@ -339,12 +240,8 @@ abstract class BaseState {
             && getByteBuffer() == that1.getByteBuffer();
   }
 
-  /**
-   * Returns true if this object is valid and has not been closed.
-   * This is relevant only for direct (off-heap) memory and Mapped Files.
-   * @return true if this object is valid and has not been closed.
-   */
   //Overridden by Direct and Map leafs
+  @Override
   public boolean isValid() {
     return true;
   }
@@ -377,13 +274,7 @@ abstract class BaseState {
     assert !isReadOnly() : "Memory is read-only.";
   }
 
-  /**
-   * Checks that the specified range of bytes is within bounds of this object, throws
-   * {@link IllegalArgumentException} if it's not: i. e. if offsetBytes &lt; 0, or length &lt; 0,
-   * or offsetBytes + length &gt; {@link #getCapacity()}.
-   * @param offsetBytes the given offset in bytes of this object
-   * @param lengthBytes the given length in bytes of this object
-   */
+  @Override
   public final void checkValidAndBounds(final long offsetBytes, final long lengthBytes) {
     checkValid();
     //read capacityBytes_ directly to eliminate extra checkValid() call
@@ -437,12 +328,13 @@ abstract class BaseState {
   }
 
   //MONITORING
+
   /**
    * Gets the current number of active direct memory allocations.
    * @return the current number of active direct memory allocations.
    */
   public static final long getCurrentDirectMemoryAllocations() {
-    return BaseState.currentDirectMemoryAllocations_.get();
+    return BaseStateImpl.currentDirectMemoryAllocations_.get();
   }
 
   /**
@@ -450,7 +342,7 @@ abstract class BaseState {
    * @return the current size of active direct memory allocated.
    */
   public static final long getCurrentDirectMemoryAllocated() {
-    return BaseState.currentDirectMemoryAllocated_.get();
+    return BaseStateImpl.currentDirectMemoryAllocated_.get();
   }
 
   /**
@@ -458,7 +350,7 @@ abstract class BaseState {
    * @return the current number of active direct memory map allocations.
    */
   public static final long getCurrentDirectMemoryMapAllocations() {
-    return BaseState.currentDirectMemoryMapAllocations_.get();
+    return BaseStateImpl.currentDirectMemoryMapAllocations_.get();
   }
 
   /**
@@ -466,21 +358,15 @@ abstract class BaseState {
    * @return the current size of active direct memory map allocated.
    */
   public static final long getCurrentDirectMemoryMapAllocated() {
-    return BaseState.currentDirectMemoryMapAllocated_.get();
+    return BaseStateImpl.currentDirectMemoryMapAllocated_.get();
   }
 
   //REACHABILITY FENCE
   static void reachabilityFence(@SuppressWarnings("unused") final Object obj) { }
 
   //TO STRING
-  /**
-   * Returns a formatted hex string of a range of this object.
-   * Used primarily for testing.
-   * @param header a descriptive header
-   * @param offsetBytes offset bytes relative to this object start
-   * @param lengthBytes number of bytes to convert to a hex string
-   * @return a formatted hex string in a human readable array
-   */
+
+  @Override
   public final String toHexString(final String header, final long offsetBytes,
       final int lengthBytes) {
     checkValid();
@@ -498,13 +384,13 @@ abstract class BaseState {
   /**
    * Returns a formatted hex string of an area of this object.
    * Used primarily for testing.
-   * @param state the BaseState
+   * @param state the BaseStateImpl
    * @param preamble a descriptive header
    * @param offsetBytes offset bytes relative to the Memory start
    * @param lengthBytes number of bytes to convert to a hex string
    * @return a formatted hex string in a human readable array
    */
-  static final String toHex(final BaseState state, final String preamble, final long offsetBytes,
+  static final String toHex(final BaseStateImpl state, final String preamble, final long offsetBytes,
       final int lengthBytes) {
     final long capacity = state.getCapacity();
     UnsafeUtil.checkBounds(offsetBytes, lengthBytes, capacity);

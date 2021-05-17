@@ -35,24 +35,24 @@ public final class ReflectUtil {
   static final Class<?> ALLOCATE_DIRECT_MAP;
   static final Class<?> NIO_BITS;
   
-  static final Method CHECK_VALID; //BaseState  
+  static final Method CHECK_VALID; //BaseStateImpl  
   static final Method GET_DIRECT_ALLOCATIONS_COUNT; //NioBits
   static final Method GET_MAX_DIRECT_BYTE_BUFFER_MEMORY; //NioBits
-  static final Method GET_NATIVE_BASE_OFFSET; //BaseState
+  static final Method GET_NATIVE_BASE_OFFSET; //BaseStateImpl
   static final Method GET_RESERVED_MEMORY; //NioBits
   static final Method GET_TOTAL_CAPACITY; //NioBits
-  static final Method GET_UNSAFE_OBJECT; //BaseState
-  static final Method IS_BB_TYPE; //BaseState
-  static final Method IS_BUFFER_TYPE; //BaseState
-  static final Method IS_DIRECT_TYPE; //BaseState
-  static final Method IS_DUPLICATE_TYPE; //BaseState
+  static final Method GET_UNSAFE_OBJECT; //BaseStateImpl
+  static final Method IS_BB_TYPE; //BaseStateImpl
+  static final Method IS_BUFFER_TYPE; //BaseStateImpl
+  static final Method IS_DIRECT_TYPE; //BaseStateImpl
+  static final Method IS_DUPLICATE_TYPE; //BaseStateImpl
   static final Method IS_FILE_READ_ONLY; //AllocateDirectMap
-  static final Method IS_HEAP_TYPE; //BaseState
-  static final Method IS_MAP_TYPE; //BaseState
-  static final Method IS_NON_NATIVE_TYPE; //BaseState
+  static final Method IS_HEAP_TYPE; //BaseStateImpl
+  static final Method IS_MAP_TYPE; //BaseStateImpl
+  static final Method IS_NON_NATIVE_TYPE; //BaseStateImpl
   static final Method IS_PAGE_ALIGHED; //NioBits
-  static final Method IS_READ_ONLY_TYPE; //BaseState
-  static final Method IS_REGION_TYPE; //BaseState
+  static final Method IS_READ_ONLY_TYPE; //BaseStateImpl
+  static final Method IS_REGION_TYPE; //BaseStateImpl
   static final Method PAGE_COUNT; //NioBits
   static final Method PAGE_SIZE; //NioBits
   static final Method RESERVE_MEMORY; //NioBits
@@ -61,7 +61,7 @@ public final class ReflectUtil {
   
   static {
     BASE_STATE = 
-        getClass("org.apache.datasketches.memory.internal.BaseState");
+        getClass("org.apache.datasketches.memory.internal.BaseStateImpl");
     BASE_WRITABLE_MEMORY_IMPL = 
         getClass("org.apache.datasketches.memory.internal.BaseWritableMemoryImpl");
     ALLOCATE_DIRECT_MAP = 

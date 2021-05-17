@@ -167,7 +167,7 @@ class AllocateDirectMap implements Map {
       } 
       return false;
     } finally {
-      BaseState.reachabilityFence(this);
+      BaseStateImpl.reachabilityFence(this);
     }
   }
 
@@ -257,8 +257,8 @@ class AllocateDirectMap implements Map {
 
     Deallocator(final long nativeBaseOffset, final long capacityBytes,
         final RandomAccessFile raf) {
-      BaseState.currentDirectMemoryMapAllocations_.incrementAndGet();
-      BaseState.currentDirectMemoryMapAllocated_.addAndGet(capacityBytes);
+      BaseStateImpl.currentDirectMemoryMapAllocations_.incrementAndGet();
+      BaseStateImpl.currentDirectMemoryMapAllocated_.addAndGet(capacityBytes);
       myRaf = raf;
       assert myRaf != null;
       myFc = myRaf.getChannel();
@@ -287,8 +287,8 @@ class AllocateDirectMap implements Map {
           unmap();
         }
         finally {
-          BaseState.currentDirectMemoryMapAllocations_.decrementAndGet();
-          BaseState.currentDirectMemoryMapAllocated_.addAndGet(-myCapacity);
+          BaseStateImpl.currentDirectMemoryMapAllocations_.decrementAndGet();
+          BaseStateImpl.currentDirectMemoryMapAllocated_.addAndGet(-myCapacity);
         }
         return true;
       } 

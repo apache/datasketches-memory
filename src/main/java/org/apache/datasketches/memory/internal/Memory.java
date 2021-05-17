@@ -41,7 +41,7 @@ import org.apache.datasketches.memory.MapHandle;
  *
  * @see org.apache.datasketches.memory.internal
  */
-public abstract class Memory extends BaseState {
+public abstract class Memory extends BaseStateImpl {
 
   //Pass-through ctor
   Memory(final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,

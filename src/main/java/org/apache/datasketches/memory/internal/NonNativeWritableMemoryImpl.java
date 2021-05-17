@@ -43,8 +43,8 @@ import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
  */
 
 /**
- * Implementation of {@link WritableMemory} for non-native endian byte order. Native variant is
- * {@link WritableMemoryImpl}.
+ * Implementation of {@link WritableMemoryImpl} for non-native endian byte order. Native variant is
+ * {@link NativeWritableMemoryImpl}.
  * @author Roman Leventov
  * @author Lee Rhodes
  */

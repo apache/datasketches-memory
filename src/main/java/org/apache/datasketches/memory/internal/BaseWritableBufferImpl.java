@@ -147,14 +147,14 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
 
   //MEMORY
   @Override
-  public Memory asMemory() {
+  public MemoryImpl asMemory() {
     return originMemory;
   }
 
   @Override
-  public WritableMemory asWritableMemory() {
+  public WritableMemoryImpl asWritableMemory() {
     if (isReadOnly()) {
-      throw new ReadOnlyException("Converting a read-only Buffer to a writable Memory is not allowed.");
+      throw new ReadOnlyException("Converting a read-only Buffer to a writable MemoryImpl is not allowed.");
     }
     return originMemory;
   }
@@ -271,7 +271,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
 
   /*
    * Develper notes: There is no copyTo for Buffers because of the ambiguity of what to do with
-   * the positional values. Switch to Memory view to do copyTo.
+   * the positional values. Switch to MemoryImpl view to do copyTo.
    */
 
   //PRIMITIVE putX() and putXArray()

@@ -28,12 +28,12 @@ import static org.testng.Assert.fail;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.internal.Buffer;
-import org.apache.datasketches.memory.internal.Memory;
+import org.apache.datasketches.memory.internal.MemoryImpl;
 import org.apache.datasketches.memory.internal.Prim;
 import org.apache.datasketches.memory.internal.StepBoolean;
 import org.apache.datasketches.memory.internal.Util;
 import org.apache.datasketches.memory.internal.WritableBuffer;
-import org.apache.datasketches.memory.internal.WritableMemory;
+import org.apache.datasketches.memory.internal.WritableMemoryImpl;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")
@@ -47,8 +47,8 @@ public class BaseStateTest {
 
   @Test
   public void checkIsSameResource() {
-    WritableMemory wmem = WritableMemory.allocate(16);
-    Memory mem = wmem;
+    WritableMemoryImpl wmem = WritableMemoryImpl.allocate(16);
+    MemoryImpl mem = wmem;
     assertFalse(wmem.isSameResource(null));
     assertTrue(wmem.isSameResource(mem));
 
@@ -61,7 +61,7 @@ public class BaseStateTest {
   @Test
   public void checkNotEqualTo() {
     byte[] arr = new byte[8];
-    Memory mem = Memory.wrap(arr);
+    MemoryImpl mem = MemoryImpl.wrap(arr);
     assertFalse(mem.equalTo(0, arr, 0, 8));
   }
 
@@ -90,14 +90,14 @@ public class BaseStateTest {
 
   @Test
   public void checkGetNativeBaseOffset_Heap() throws Exception {
-    WritableMemory wmem = WritableMemory.allocate(8); //heap
+    WritableMemoryImpl wmem = WritableMemoryImpl.allocate(8); //heap
     final long offset = ReflectUtil.getNativeBaseOffset(wmem);
     assertEquals(offset, 0L);
   }
 
   @Test
   public void checkIsByteOrderCompatible() {
-    WritableMemory wmem = WritableMemory.allocate(8);
+    WritableMemoryImpl wmem = WritableMemoryImpl.allocate(8);
     assertTrue(wmem.isByteOrderCompatible(ByteOrder.nativeOrder()));
   }
 

@@ -21,6 +21,7 @@ package org.apache.datasketches.memory.internal;
 
 import org.apache.datasketches.memory.Handle;
 import org.apache.datasketches.memory.WritableMapHandle;
+import org.apache.datasketches.memory.WritableMemory;
 
 /**
  * A Handle for a memory-mapped, writable file resource.
@@ -39,8 +40,8 @@ public final class WritableMapHandleImpl extends MapHandleImpl
   }
 
   @Override
-  public WritableMemory get() {
-    return (WritableMemory) super.get();
+  public WritableMemory getWritable() {
+    return wMem;
   }
 
   @Override

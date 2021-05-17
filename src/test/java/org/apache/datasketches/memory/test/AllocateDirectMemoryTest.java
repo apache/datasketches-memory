@@ -30,7 +30,7 @@ import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableDirectHandle;
 import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.internal.Util;
-import org.apache.datasketches.memory.internal.WritableMemory;
+import org.apache.datasketches.memory.internal.WritableMemoryImpl;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
@@ -40,8 +40,8 @@ public class AllocateDirectMemoryTest {
   @Test
   public void simpleAllocateDirect() {
     int longs = 32;
-    WritableMemory wMem;
-    try (WritableHandle wh = WritableMemory.allocateDirect(longs << 3)) {
+    WritableMemoryImpl wMem;
+    try (WritableHandle wh = WritableMemoryImpl.allocateDirect(longs << 3)) {
       wMem = wh.get();
       for (int i = 0; i<longs; i++) {
         wMem.putLong(i << 3, i);
@@ -70,8 +70,8 @@ public class AllocateDirectMemoryTest {
   public void checkDefaultMemoryRequestServer() {
     int longs1 = 32;
     int bytes1 = longs1 << 3;
-    try (WritableHandle wh = WritableMemory.allocateDirect(bytes1)) {
-      WritableMemory origWmem = wh.get();
+    try (WritableHandle wh = WritableMemoryImpl.allocateDirect(bytes1)) {
+      WritableMemoryImpl origWmem = wh.get();
       for (int i = 0; i<longs1; i++) { //puts data in wMem1
         origWmem.putLong(i << 3, i);
         assertEquals(origWmem.getLong(i << 3), i);
@@ -81,7 +81,7 @@ public class AllocateDirectMemoryTest {
       int longs2 = 64;
       int bytes2 = longs2 << 3;
       MemoryRequestServer memReqSvr = origWmem.getMemoryRequestServer();
-      WritableMemory newWmem = memReqSvr.request(bytes2);
+      WritableMemoryImpl newWmem = memReqSvr.request(bytes2);
       assertFalse(newWmem.isDirect()); //on heap by default
       for (int i = 0; i < longs2; i++) {
           newWmem.putLong(i << 3, i);
@@ -95,8 +95,8 @@ public class AllocateDirectMemoryTest {
 
   @Test
   public void checkNullMemoryRequestServer() {
-    try (WritableHandle wh = WritableMemory.allocateDirect(128, null)) {
-      WritableMemory wmem = wh.get();
+    try (WritableHandle wh = WritableMemoryImpl.allocateDirect(128, null)) {
+      WritableMemoryImpl wmem = wh.get();
       assertNotNull(wmem.getMemoryRequestServer());
     }
   }
@@ -106,7 +106,7 @@ public class AllocateDirectMemoryTest {
   public void checkNonNativeDirect() { //not allowed in public API
     try (WritableDirectHandle h = ReflectUtil.wrapDirect(8,  Util.nonNativeByteOrder, null)) { 
         //BaseWritableMemoryImpl.wrapDirect(8, Util.nonNativeByteOrder, null)) {
-      WritableMemory wmem = h.get();
+      WritableMemoryImpl wmem = h.get();
       wmem.putChar(0, (char) 1);
       assertEquals(wmem.getByte(1), (byte) 1);
     } 
@@ -115,7 +115,7 @@ public class AllocateDirectMemoryTest {
   @Test
   public void checkExplicitClose() {
     final long cap = 128;
-    try (WritableDirectHandle wdh = WritableMemory.allocateDirect(cap)) {
+    try (WritableDirectHandle wdh = WritableMemoryImpl.allocateDirect(cap)) {
       wdh.close(); //explicit close. Does the work of closing
     } //end of scope call to Cleaner/Deallocator also will be redundant
   }
@@ -123,7 +123,7 @@ public class AllocateDirectMemoryTest {
   @SuppressWarnings("static-access")
   @AfterClass
   public void checkDirectCounter() {
-    WritableMemory mem = WritableMemory.writableWrap(new byte[8]);
+    WritableMemoryImpl mem = WritableMemoryImpl.writableWrap(new byte[8]);
     long count = mem.getCurrentDirectMemoryAllocations();
     if (count != 0) {
       println(""+count);

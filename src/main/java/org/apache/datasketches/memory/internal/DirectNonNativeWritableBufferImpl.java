@@ -101,7 +101,7 @@ final class DirectNonNativeWritableBufferImpl extends NonNativeWritableBufferImp
   @Override
   void checkValid() {
     if (!this.isValid()) {
-      throw new IllegalStateException("Memory not valid.");
+      throw new IllegalStateException("MemoryImpl not valid.");
     }
   }
   

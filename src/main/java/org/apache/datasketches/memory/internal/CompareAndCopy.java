@@ -124,7 +124,7 @@ final class CompareAndCopy {
         lengthBytes);
   }
 
-  //Used by all of the get/put array methods in Buffer and Memory classes
+  //Used by all of the get/put array methods in Buffer and MemoryImpl classes
   static final void copyMemoryCheckingDifferentObject(final Object srcUnsafeObj,
       final long srcAdd, final Object dstUnsafeObj, final long dstAdd, final long lengthBytes) {
     if (srcUnsafeObj != dstUnsafeObj) {

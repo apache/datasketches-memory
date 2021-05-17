@@ -26,17 +26,17 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.MapHandle;
-import org.apache.datasketches.memory.internal.Memory;
+import org.apache.datasketches.memory.internal.MemoryImpl;
 import org.apache.datasketches.memory.internal.ReadOnlyException;
-import org.apache.datasketches.memory.internal.WritableMemory;
+import org.apache.datasketches.memory.internal.WritableMemoryImpl;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")
 public class MemoryReadWriteSafetyTest {
 
-  // Test various operations with read-only Memory
+  // Test various operations with read-only MemoryImpl
 
-  final WritableMemory mem = (WritableMemory) Memory.wrap(new byte[8]);
+  final WritableMemoryImpl mem = (WritableMemoryImpl) MemoryImpl.wrap(new byte[8]);
 
   @Test(expectedExceptions = AssertionError.class)
   public void testPutByte() {
@@ -122,73 +122,73 @@ public class MemoryReadWriteSafetyTest {
 
   @Test(expectedExceptions = AssertionError.class)
   public void testWritableMemoryRegion() {
-    WritableMemory mem1 = (WritableMemory) WritableMemory.allocate(8).region(0, 8);
+    WritableMemoryImpl mem1 = (WritableMemoryImpl) WritableMemoryImpl.allocate(8).region(0, 8);
     mem1.putInt(0, 1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testByteArrayWrap() {
-    WritableMemory mem1 = (WritableMemory) Memory.wrap(new byte[8]);
+    WritableMemoryImpl mem1 = (WritableMemoryImpl) MemoryImpl.wrap(new byte[8]);
     mem1.putInt(0, 1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testByteArrayWrapWithBO() {
-    WritableMemory mem1 = (WritableMemory) Memory.wrap(new byte[8], ByteOrder.nativeOrder());
+    WritableMemoryImpl mem1 = (WritableMemoryImpl) MemoryImpl.wrap(new byte[8], ByteOrder.nativeOrder());
     mem1.putInt(0, 1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testByteArrayWrapWithOffsetsAndBO() {
-    WritableMemory mem1 = (WritableMemory) Memory.wrap(new byte[8], 0, 4, ByteOrder.nativeOrder());
+    WritableMemoryImpl mem1 = (WritableMemoryImpl) MemoryImpl.wrap(new byte[8], 0, 4, ByteOrder.nativeOrder());
     mem1.putInt(0, 1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testBooleanArrayWrap() {
-    WritableMemory mem1 = (WritableMemory) Memory.wrap(new boolean[8]);
+    WritableMemoryImpl mem1 = (WritableMemoryImpl) MemoryImpl.wrap(new boolean[8]);
     mem1.putInt(0, 1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testShortArrayWrap() {
-    WritableMemory mem1 = (WritableMemory) Memory.wrap(new short[8]);
+    WritableMemoryImpl mem1 = (WritableMemoryImpl) MemoryImpl.wrap(new short[8]);
     mem1.putInt(0, 1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testCharArrayWrap() {
-    WritableMemory mem1 = (WritableMemory) Memory.wrap(new char[8]);
+    WritableMemoryImpl mem1 = (WritableMemoryImpl) MemoryImpl.wrap(new char[8]);
     mem1.putInt(0, 1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testIntArrayWrap() {
-    WritableMemory mem1 = (WritableMemory) Memory.wrap(new int[8]);
+    WritableMemoryImpl mem1 = (WritableMemoryImpl) MemoryImpl.wrap(new int[8]);
     mem1.putInt(0, 1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testLongArrayWrap() {
-    WritableMemory mem1 = (WritableMemory) Memory.wrap(new long[8]);
+    WritableMemoryImpl mem1 = (WritableMemoryImpl) MemoryImpl.wrap(new long[8]);
     mem1.putInt(0, 1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testFloatArrayWrap() {
-    WritableMemory mem1 = (WritableMemory) Memory.wrap(new float[8]);
+    WritableMemoryImpl mem1 = (WritableMemoryImpl) MemoryImpl.wrap(new float[8]);
     mem1.putInt(0, 1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testDoubleArrayWrap() {
-    WritableMemory mem1 = (WritableMemory) Memory.wrap(new double[8]);
+    WritableMemoryImpl mem1 = (WritableMemoryImpl) MemoryImpl.wrap(new double[8]);
     mem1.putInt(0, 1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testByteBufferWrap() {
-    WritableMemory mem1 = (WritableMemory) Memory.wrap(ByteBuffer.allocate(8));
+    WritableMemoryImpl mem1 = (WritableMemoryImpl) MemoryImpl.wrap(ByteBuffer.allocate(8));
     mem1.putInt(0, 1);
   }
 
@@ -200,8 +200,8 @@ public class MemoryReadWriteSafetyTest {
     try (RandomAccessFile raf = new RandomAccessFile(tempFile, "rw")) {
       raf.setLength(8);
       //System.out.println(UtilTest.getFileAttributes(tempFile));
-      try (MapHandle h = Memory.map(tempFile)) {
-        ((WritableMemory) h.get()).putInt(0, 1);
+      try (MapHandle h = MemoryImpl.map(tempFile)) {
+        ((WritableMemoryImpl) h.get()).putInt(0, 1);
       }
     }
   }
@@ -212,8 +212,8 @@ public class MemoryReadWriteSafetyTest {
     File tempFile = File.createTempFile("test", "test");
     tempFile.deleteOnExit();
     new RandomAccessFile(tempFile, "rw").setLength(8);
-    try (MapHandle h = Memory.map(tempFile, 0, 4, ByteOrder.nativeOrder())) {
-      ((WritableMemory) h.get()).putInt(0, 1);
+    try (MapHandle h = MemoryImpl.map(tempFile, 0, 4, ByteOrder.nativeOrder())) {
+      ((WritableMemoryImpl) h.get()).putInt(0, 1);
     }
   }
 
@@ -223,7 +223,7 @@ public class MemoryReadWriteSafetyTest {
     File tempFile = File.createTempFile("test", "test");
     tempFile.deleteOnExit();
     new RandomAccessFile(tempFile, "rw").setLength(8);
-    try (MapHandle unused = Memory.map(tempFile, 0, 16, ByteOrder.nativeOrder())) {
+    try (MapHandle unused = MemoryImpl.map(tempFile, 0, 16, ByteOrder.nativeOrder())) {
     }
   }
 }

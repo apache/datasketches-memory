@@ -23,7 +23,7 @@ import static org.testng.Assert.assertEquals;
 
 import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.internal.WritableBuffer;
-import org.apache.datasketches.memory.internal.WritableMemory;
+import org.apache.datasketches.memory.internal.WritableMemoryImpl;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")
@@ -32,8 +32,8 @@ public class CommonBufferTest {
   @Test
   public void checkSetGet() {
     int memCapacity = 60; //must be at least 60
-    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh.get();
+    try (WritableHandle wrh = WritableMemoryImpl.allocateDirect(memCapacity)) {
+      WritableMemoryImpl mem = wrh.get();
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
       setGetTests(buf);
@@ -134,8 +134,8 @@ public class CommonBufferTest {
   @Test
   public void checkSetGetArrays() {
     int memCapacity = 32;
-    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh.get();
+    try (WritableHandle wrh = WritableMemoryImpl.allocateDirect(memCapacity)) {
+      WritableMemoryImpl mem = wrh.get();
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
       setGetArraysTests(buf);
@@ -231,8 +231,8 @@ public class CommonBufferTest {
   @Test
   public void checkSetGetPartialArraysWithOffset() {
     int memCapacity = 32;
-    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh.get();
+    try (WritableHandle wrh = WritableMemoryImpl.allocateDirect(memCapacity)) {
+      WritableMemoryImpl mem = wrh.get();
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
       setGetPartialArraysWithOffsetTests(buf);
@@ -325,8 +325,8 @@ public class CommonBufferTest {
   @Test
   public void checkSetClearMemoryRegions() {
     int memCapacity = 64; //must be 64
-    try (WritableHandle wrh1 = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh1.get();
+    try (WritableHandle wrh1 = WritableMemoryImpl.allocateDirect(memCapacity)) {
+      WritableMemoryImpl mem = wrh1.get();
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
 
@@ -414,8 +414,8 @@ public class CommonBufferTest {
   @Test
   public void checkToHexStringAllMem() {
     int memCapacity = 48; //must be 48
-    try (WritableHandle wrh1 = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh1.get();
+    try (WritableHandle wrh1 = WritableMemoryImpl.allocateDirect(memCapacity)) {
+      WritableMemoryImpl mem = wrh1.get();
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
       toHexStringAllMemTests(buf); //requires println enabled to visually check

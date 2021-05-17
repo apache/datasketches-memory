@@ -26,8 +26,8 @@ import static org.testng.Assert.assertTrue;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.datasketches.memory.internal.Memory;
-import org.apache.datasketches.memory.internal.WritableMemory;
+import org.apache.datasketches.memory.internal.MemoryImpl;
+import org.apache.datasketches.memory.internal.WritableMemoryImpl;
 import org.testng.annotations.Test;
 
 import net.openhft.hashing.LongHashFunction;
@@ -46,7 +46,7 @@ public class XxHash64Test {
 
     long hash;
 
-    WritableMemory wmem = WritableMemory.allocate(cap);
+    WritableMemoryImpl wmem = WritableMemoryImpl.allocate(cap);
     for (int i = 0; i < cap; i++) { wmem.putByte(i, (byte)(-128 + i)); }
 
     for (int offset = 0; offset < 16; offset++) {
@@ -65,7 +65,7 @@ public class XxHash64Test {
     for (int j = 1; j < bytes; j++) {
       byte[] in = new byte[bytes];
 
-      WritableMemory wmem = WritableMemory.writableWrap(in);
+      WritableMemoryImpl wmem = WritableMemoryImpl.writableWrap(in);
       for (int i = 0; i < j; i++) { wmem.putByte(i, (byte) (-128 + i)); }
 
       long hash =wmem.xxHash64(offset, bytes, seed);
@@ -81,7 +81,7 @@ public class XxHash64Test {
    */
   @Test
   public void collisionTest() {
-    WritableMemory wmem = WritableMemory.allocate(128);
+    WritableMemoryImpl wmem = WritableMemoryImpl.allocate(128);
     wmem.putLong(0, 1);
     wmem.putLong(16, 42);
     wmem.putLong(32, 2);
@@ -115,7 +115,7 @@ public class XxHash64Test {
       byte[] bytes = new byte[len];
       for (int i = 0; i < 10; i++) {
         long zahXxHash = LongHashFunction.xx().hashBytes(bytes);
-        long memoryXxHash = Memory.wrap(bytes).xxHash64(0, len, 0);
+        long memoryXxHash = MemoryImpl.wrap(bytes).xxHash64(0, len, 0);
         assertEquals(memoryXxHash, zahXxHash);
         random.nextBytes(bytes);
       }
@@ -126,7 +126,7 @@ public class XxHash64Test {
 
   @Test
   public void testArrHashes() {
-    WritableMemory wmem = WritableMemory.writableWrap(barr);
+    WritableMemoryImpl wmem = WritableMemoryImpl.writableWrap(barr);
     long hash0 = wmem.xxHash64(8, 8, 0);
     long hash1 = hashBytes(barr, 8, 8, 0);
     assertEquals(hash1, hash0);

@@ -89,7 +89,7 @@ final class MapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   @Override
   void checkValid() {
     if (!this.isValid()) {
-      throw new IllegalStateException("Memory not valid.");
+      throw new IllegalStateException("MemoryImpl not valid.");
     }
   }
   

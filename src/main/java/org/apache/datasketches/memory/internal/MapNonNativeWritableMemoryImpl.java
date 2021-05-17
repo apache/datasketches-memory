@@ -22,7 +22,7 @@ package org.apache.datasketches.memory.internal;
 import java.nio.ByteOrder;
 
 /**
- * Implementation of {@link WritableMemory} for map memory, non-native byte order.
+ * Implementation of {@link WritableMemoryImpl} for map memory, non-native byte order.
  *
  * @author Roman Leventov
  * @author Lee Rhodes
@@ -88,7 +88,7 @@ final class MapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
   @Override
   void checkValid() {
     if (!this.isValid()) {
-      throw new IllegalStateException("Memory not valid.");
+      throw new IllegalStateException("MemoryImpl not valid.");
     }
   }
   

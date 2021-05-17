@@ -28,5 +28,5 @@ package org.apache.datasketches.memory;
  * @author Lee Rhodes
  * @author Roman Leventov
  */
-public interface WritableDirectHandle extends WritableHandle { } 
+public interface WritableDirectHandle extends WritableHandle { }
 

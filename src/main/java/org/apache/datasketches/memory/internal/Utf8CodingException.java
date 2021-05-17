@@ -63,7 +63,7 @@ public final class Utf8CodingException extends RuntimeException {
   }
 
   static Utf8CodingException shortUtf8EncodeByteLength(final int remaining) {
-    final String s = "Too few Memory bytes to encode a surrogate pair: " + remaining;
+    final String s = "Too few MemoryImpl bytes to encode a surrogate pair: " + remaining;
     return new Utf8CodingException(s);
   }
 

@@ -50,16 +50,16 @@ import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
  */
 
 /**
- * Implementation of {@link WritableMemory} for native endian byte order. Non-native variant is
+ * Implementation of {@link WritableMemoryImpl} for native endian byte order. Non-native variant is
  * {@link NonNativeWritableMemoryImpl}.
  * @author Roman Leventov
  * @author Lee Rhodes
  */
 @SuppressWarnings({"restriction"})
-abstract class WritableMemoryImpl extends BaseWritableMemoryImpl {
+abstract class NativeWritableMemoryImpl extends BaseWritableMemoryImpl {
 
   //Pass-through ctor
-  WritableMemoryImpl(final Object unsafeObj, final long nativeBaseOffset,
+  NativeWritableMemoryImpl(final Object unsafeObj, final long nativeBaseOffset,
       final long regionOffset, final long capacityBytes) {
     super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
   }

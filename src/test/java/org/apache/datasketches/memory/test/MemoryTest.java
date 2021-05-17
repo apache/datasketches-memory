@@ -38,9 +38,9 @@ import java.util.List;
 import org.apache.datasketches.memory.MapHandle;
 import org.apache.datasketches.memory.WritableDirectHandle;
 import org.apache.datasketches.memory.WritableHandle;
-import org.apache.datasketches.memory.internal.Memory;
+import org.apache.datasketches.memory.internal.MemoryImpl;
 import org.apache.datasketches.memory.internal.Util;
-import org.apache.datasketches.memory.internal.WritableMemory;
+import org.apache.datasketches.memory.internal.WritableMemoryImpl;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -58,8 +58,8 @@ public class MemoryTest {
   @Test
   public void checkDirectRoundTrip() {
     int n = 1024; //longs
-    try (WritableHandle wh = WritableMemory.allocateDirect(n * 8)) {
-      WritableMemory mem = wh.get();
+    try (WritableHandle wh = WritableMemoryImpl.allocateDirect(n * 8)) {
+      WritableMemoryImpl mem = wh.get();
       for (int i = 0; i < n; i++) {
         mem.putLong(i * 8, i);
       }
@@ -73,7 +73,7 @@ public class MemoryTest {
   @Test
   public void checkAutoHeapRoundTrip() {
     int n = 1024; //longs
-    WritableMemory wmem = WritableMemory.allocate(n * 8);
+    WritableMemoryImpl wmem = WritableMemoryImpl.allocate(n * 8);
     for (int i = 0; i < n; i++) {
       wmem.putLong(i * 8, i);
     }
@@ -87,7 +87,7 @@ public class MemoryTest {
   public void checkArrayWrap() {
     int n = 1024; //longs
     byte[] arr = new byte[n * 8];
-    WritableMemory wmem = WritableMemory.writableWrap(arr);
+    WritableMemoryImpl wmem = WritableMemoryImpl.writableWrap(arr);
     for (int i = 0; i < n; i++) {
       wmem.putLong(i * 8, i);
     }
@@ -95,20 +95,20 @@ public class MemoryTest {
       long v = wmem.getLong(i * 8);
       assertEquals(v, i);
     }
-    Memory mem = Memory.wrap(arr, ByteOrder.nativeOrder());
+    MemoryImpl mem = MemoryImpl.wrap(arr, ByteOrder.nativeOrder());
     for (int i = 0; i < n; i++) {
       long v = mem.getLong(i * 8);
       assertEquals(v, i);
     }
     // check 0 length array wraps
-    Memory memZeroLengthArrayBoolean = WritableMemory.writableWrap(new boolean[0]);
-    Memory memZeroLengthArrayByte = WritableMemory.writableWrap(new byte[0]);
-    Memory memZeroLengthArrayChar = WritableMemory.writableWrap(new char[0]);
-    Memory memZeroLengthArrayShort = WritableMemory.writableWrap(new short[0]);
-    Memory memZeroLengthArrayInt = WritableMemory.writableWrap(new int[0]);
-    Memory memZeroLengthArrayLong = WritableMemory.writableWrap(new long[0]);
-    Memory memZeroLengthArrayFloat = WritableMemory.writableWrap(new float[0]);
-    Memory memZeroLengthArrayDouble = WritableMemory.writableWrap(new double[0]);
+    MemoryImpl memZeroLengthArrayBoolean = WritableMemoryImpl.writableWrap(new boolean[0]);
+    MemoryImpl memZeroLengthArrayByte = WritableMemoryImpl.writableWrap(new byte[0]);
+    MemoryImpl memZeroLengthArrayChar = WritableMemoryImpl.writableWrap(new char[0]);
+    MemoryImpl memZeroLengthArrayShort = WritableMemoryImpl.writableWrap(new short[0]);
+    MemoryImpl memZeroLengthArrayInt = WritableMemoryImpl.writableWrap(new int[0]);
+    MemoryImpl memZeroLengthArrayLong = WritableMemoryImpl.writableWrap(new long[0]);
+    MemoryImpl memZeroLengthArrayFloat = WritableMemoryImpl.writableWrap(new float[0]);
+    MemoryImpl memZeroLengthArrayDouble = WritableMemoryImpl.writableWrap(new double[0]);
     assertEquals(memZeroLengthArrayBoolean.getCapacity(), 0);
     assertEquals(memZeroLengthArrayByte.getCapacity(), 0);
     assertEquals(memZeroLengthArrayChar.getCapacity(), 0);
@@ -119,28 +119,28 @@ public class MemoryTest {
     assertEquals(memZeroLengthArrayDouble.getCapacity(), 0);
 
     // check 0 length array wraps
-    List<Memory> memoryToCheck = Lists.newArrayList();
-    memoryToCheck.add(WritableMemory.allocate(0));
-    memoryToCheck.add(WritableMemory.writableWrap(ByteBuffer.allocate(0)));
-    memoryToCheck.add(WritableMemory.writableWrap(new boolean[0]));
-    memoryToCheck.add(WritableMemory.writableWrap(new byte[0]));
-    memoryToCheck.add(WritableMemory.writableWrap(new char[0]));
-    memoryToCheck.add(WritableMemory.writableWrap(new short[0]));
-    memoryToCheck.add(WritableMemory.writableWrap(new int[0]));
-    memoryToCheck.add(WritableMemory.writableWrap(new long[0]));
-    memoryToCheck.add(WritableMemory.writableWrap(new float[0]));
-    memoryToCheck.add(WritableMemory.writableWrap(new double[0]));
-    memoryToCheck.add(Memory.wrap(ByteBuffer.allocate(0)));
-    memoryToCheck.add(Memory.wrap(new boolean[0]));
-    memoryToCheck.add(Memory.wrap(new byte[0]));
-    memoryToCheck.add(Memory.wrap(new char[0]));
-    memoryToCheck.add(Memory.wrap(new short[0]));
-    memoryToCheck.add(Memory.wrap(new int[0]));
-    memoryToCheck.add(Memory.wrap(new long[0]));
-    memoryToCheck.add(Memory.wrap(new float[0]));
-    memoryToCheck.add(Memory.wrap(new double[0]));
-    //Check the Memory lengths
-    for (Memory memory : memoryToCheck) {
+    List<MemoryImpl> memoryToCheck = Lists.newArrayList();
+    memoryToCheck.add(WritableMemoryImpl.allocate(0));
+    memoryToCheck.add(WritableMemoryImpl.writableWrap(ByteBuffer.allocate(0)));
+    memoryToCheck.add(WritableMemoryImpl.writableWrap(new boolean[0]));
+    memoryToCheck.add(WritableMemoryImpl.writableWrap(new byte[0]));
+    memoryToCheck.add(WritableMemoryImpl.writableWrap(new char[0]));
+    memoryToCheck.add(WritableMemoryImpl.writableWrap(new short[0]));
+    memoryToCheck.add(WritableMemoryImpl.writableWrap(new int[0]));
+    memoryToCheck.add(WritableMemoryImpl.writableWrap(new long[0]));
+    memoryToCheck.add(WritableMemoryImpl.writableWrap(new float[0]));
+    memoryToCheck.add(WritableMemoryImpl.writableWrap(new double[0]));
+    memoryToCheck.add(MemoryImpl.wrap(ByteBuffer.allocate(0)));
+    memoryToCheck.add(MemoryImpl.wrap(new boolean[0]));
+    memoryToCheck.add(MemoryImpl.wrap(new byte[0]));
+    memoryToCheck.add(MemoryImpl.wrap(new char[0]));
+    memoryToCheck.add(MemoryImpl.wrap(new short[0]));
+    memoryToCheck.add(MemoryImpl.wrap(new int[0]));
+    memoryToCheck.add(MemoryImpl.wrap(new long[0]));
+    memoryToCheck.add(MemoryImpl.wrap(new float[0]));
+    memoryToCheck.add(MemoryImpl.wrap(new double[0]));
+    //Check the MemoryImpl lengths
+    for (MemoryImpl memory : memoryToCheck) {
       assertEquals(memory.getCapacity(), 0);
     }
   }
@@ -151,7 +151,7 @@ public class MemoryTest {
     byte[] arr = new byte[n * 8];
     ByteBuffer bb = ByteBuffer.wrap(arr);
     bb.order(ByteOrder.nativeOrder());
-    WritableMemory wmem = WritableMemory.writableWrap(bb);
+    WritableMemoryImpl wmem = WritableMemoryImpl.writableWrap(bb);
     for (int i = 0; i < n; i++) { //write to wmem
       wmem.putLong(i * 8, i);
     }
@@ -163,13 +163,13 @@ public class MemoryTest {
       long v = bb.getLong(i * 8);
       assertEquals(v, i);
     }
-    Memory mem1 = Memory.wrap(arr);
+    MemoryImpl mem1 = MemoryImpl.wrap(arr);
     for (int i = 0; i < n; i++) { //read from wrapped arr
       long v = mem1.getLong(i * 8);
       assertEquals(v, i);
     }
     //convert to RO
-    Memory mem = wmem;
+    MemoryImpl mem = wmem;
     for (int i = 0; i < n; i++) {
       long v = mem.getLong(i * 8);
       assertEquals(v, i);
@@ -181,7 +181,7 @@ public class MemoryTest {
     int n = 1024; //longs
     ByteBuffer bb = ByteBuffer.allocateDirect(n * 8);
     bb.order(ByteOrder.nativeOrder());
-    WritableMemory wmem = WritableMemory.writableWrap(bb);
+    WritableMemoryImpl wmem = WritableMemoryImpl.writableWrap(bb);
     for (int i = 0; i < n; i++) { //write to wmem
       wmem.putLong(i * 8, i);
     }
@@ -193,13 +193,13 @@ public class MemoryTest {
       long v = bb.getLong(i * 8);
       assertEquals(v, i);
     }
-    Memory mem1 = Memory.wrap(bb);
+    MemoryImpl mem1 = MemoryImpl.wrap(bb);
     for (int i = 0; i < n; i++) { //read from wrapped bb RO
       long v = mem1.getLong(i * 8);
       assertEquals(v, i);
     }
     //convert to RO
-    Memory mem = wmem;
+    MemoryImpl mem = wmem;
     for (int i = 0; i < n; i++) {
       long v = mem.getLong(i * 8);
       assertEquals(v, i);
@@ -211,7 +211,7 @@ public class MemoryTest {
     int n = 1024; //longs
     ByteBuffer bb = ByteBuffer.allocate(n * 8);
     bb.order(ByteOrder.BIG_ENDIAN);
-    Memory mem = Memory.wrap(bb);
+    MemoryImpl mem = MemoryImpl.wrap(bb);
     assertFalse(mem.getTypeByteOrder() == Util.nativeByteOrder);
     assertEquals(mem.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
   }
@@ -224,7 +224,7 @@ public class MemoryTest {
     bb.position(64);
     ByteBuffer slice = bb.slice().asReadOnlyBuffer();
     slice.order(ByteOrder.nativeOrder());
-    Memory mem = Memory.wrap(slice);
+    MemoryImpl mem = MemoryImpl.wrap(slice);
     for (int i = 0; i < 64; i++) {
       assertEquals(mem.getByte(i), 64 + i);
     }
@@ -237,7 +237,7 @@ public class MemoryTest {
     int n = 1024; //longs
     long[] arr = new long[n];
     for (int i = 0; i < n; i++) { arr[i] = i; }
-    WritableMemory wmem = WritableMemory.allocate(n * 8);
+    WritableMemoryImpl wmem = WritableMemoryImpl.allocate(n * 8);
     wmem.putLongArray(0, arr, 0, n);
     long[] arr2 = new long[n];
     wmem.getLongArray(0, arr2, 0, n);
@@ -252,8 +252,8 @@ public class MemoryTest {
     int n2 = n / 2;
     long[] arr = new long[n];
     for (int i = 0; i < n; i++) { arr[i] = i; }
-    Memory mem = Memory.wrap(arr);
-    Memory reg = mem.region(n2 * 8, n2 * 8); //top half
+    MemoryImpl mem = MemoryImpl.wrap(arr);
+    MemoryImpl reg = mem.region(n2 * 8, n2 * 8); //top half
     for (int i = 0; i < n2; i++) {
       long v = reg.getLong(i * 8);
       long e = i + n2;
@@ -267,8 +267,8 @@ public class MemoryTest {
     int n2 = n / 2;
     long[] arr = new long[n];
     for (int i = 0; i < n; i++) { arr[i] = i; }
-    Memory mem = Memory.wrap(arr);
-    Memory reg = mem.region(n2 * 8, n2 * 8, Util.nonNativeByteOrder); //top half
+    MemoryImpl mem = MemoryImpl.wrap(arr);
+    MemoryImpl reg = mem.region(n2 * 8, n2 * 8, Util.nonNativeByteOrder); //top half
     for (int i = 0; i < n2; i++) {
       long v = Long.reverseBytes(reg.getLong(i * 8));
       long e = i + n2;
@@ -282,13 +282,13 @@ public class MemoryTest {
     int n2 = n / 2;
     long[] arr = new long[n];
     for (int i = 0; i < n; i++) { arr[i] = i; }
-    WritableMemory wmem = WritableMemory.writableWrap(arr);
+    WritableMemoryImpl wmem = WritableMemoryImpl.writableWrap(arr);
     for (int i = 0; i < n; i++) {
       assertEquals(wmem.getLong(i * 8), i);
       //println("" + wmem.getLong(i * 8));
     }
     //println("");
-    WritableMemory reg = wmem.writableRegion(n2 * 8, n2 * 8);
+    WritableMemoryImpl reg = wmem.writableRegion(n2 * 8, n2 * 8);
     for (int i = 0; i < n2; i++) { reg.putLong(i * 8, i); }
     for (int i = 0; i < n; i++) {
       assertEquals(wmem.getLong(i * 8), i % 8);
@@ -302,13 +302,13 @@ public class MemoryTest {
     int n2 = n / 2;
     long[] arr = new long[n];
     for (int i = 0; i < n; i++) { arr[i] = i; }
-    WritableMemory wmem = WritableMemory.writableWrap(arr);
+    WritableMemoryImpl wmem = WritableMemoryImpl.writableWrap(arr);
     for (int i = 0; i < n; i++) {
       assertEquals(wmem.getLong(i * 8), i);
       //println("" + wmem.getLong(i * 8));
     }
     //println("");
-    WritableMemory reg = wmem.writableRegion(n2 * 8, n2 * 8, Util.nonNativeByteOrder);
+    WritableMemoryImpl reg = wmem.writableRegion(n2 * 8, n2 * 8, Util.nonNativeByteOrder);
     for (int i = 0; i < n2; i++) { reg.putLong(i * 8, i); }
     for (int i = 0; i < n; i++) {
       long v = wmem.getLong(i * 8);
@@ -325,10 +325,10 @@ public class MemoryTest {
   public void checkParentUseAfterFree() {
     int bytes = 64 * 8;
     @SuppressWarnings("resource") //intentionally not using try-with-resouces here
-    WritableHandle wh = WritableMemory.allocateDirect(bytes);
-    WritableMemory wmem = wh.get();
+    WritableHandle wh = WritableMemoryImpl.allocateDirect(bytes);
+    WritableMemoryImpl wmem = wh.get();
     wh.close();
-    //with -ea assert: Memory not valid.
+    //with -ea assert: MemoryImpl not valid.
     //with -da sometimes segfaults, sometimes passes!
     wmem.getLong(0);
   }
@@ -337,36 +337,36 @@ public class MemoryTest {
   public void checkRegionUseAfterFree() {
     int bytes = 64;
     @SuppressWarnings("resource") //intentionally not using try-with-resouces here
-    WritableHandle wh = WritableMemory.allocateDirect(bytes);
-    Memory wmem = wh.get();
-    Memory region = wmem.region(0L, bytes);
+    WritableHandle wh = WritableMemoryImpl.allocateDirect(bytes);
+    MemoryImpl wmem = wh.get();
+    MemoryImpl region = wmem.region(0L, bytes);
     wh.close();
-    //with -ea assert: Memory not valid.
+    //with -ea assert: MemoryImpl not valid.
     //with -da sometimes segfaults, sometimes passes!
     region.getByte(0);
   }
 
   @Test
   public void checkUnsafeByteBufferView() {
-    try (WritableDirectHandle wmemDirectHandle = WritableMemory.allocateDirect(2)) {
-      WritableMemory wmemDirect = wmemDirectHandle.get();
+    try (WritableDirectHandle wmemDirectHandle = WritableMemoryImpl.allocateDirect(2)) {
+      WritableMemoryImpl wmemDirect = wmemDirectHandle.get();
       wmemDirect.putByte(0, (byte) 1);
       wmemDirect.putByte(1, (byte) 2);
       checkUnsafeByteBufferView(wmemDirect);
     }
 
-    checkUnsafeByteBufferView(Memory.wrap(new byte[] {1, 2}));
+    checkUnsafeByteBufferView(MemoryImpl.wrap(new byte[] {1, 2}));
 
     try {
       @SuppressWarnings("unused")
-      ByteBuffer unused = Memory.wrap(new int[]{1}).unsafeByteBufferView(0, 1);
+      ByteBuffer unused = MemoryImpl.wrap(new int[]{1}).unsafeByteBufferView(0, 1);
       Assert.fail();
     } catch (UnsupportedOperationException ingore) {
       // expected
     }
   }
 
-  private static void checkUnsafeByteBufferView(final Memory mem) {
+  private static void checkUnsafeByteBufferView(final MemoryImpl mem) {
     ByteBuffer emptyByteBuffer = mem.unsafeByteBufferView(0, 0);
     Assert.assertEquals(emptyByteBuffer.capacity(), 0);
     ByteBuffer bb = mem.unsafeByteBufferView(1, 1);
@@ -387,9 +387,9 @@ public class MemoryTest {
   @Test
   public void checkMonitorDirectStats() {
     int bytes = 1024;
-    WritableHandle wh1 = WritableMemory.allocateDirect(bytes);
-    WritableHandle wh2 = WritableMemory.allocateDirect(bytes);
-    WritableMemory wMem2 = wh2.get();
+    WritableHandle wh1 = WritableMemoryImpl.allocateDirect(bytes);
+    WritableHandle wh2 = WritableMemoryImpl.allocateDirect(bytes);
+    WritableMemoryImpl wMem2 = wh2.get();
     assertEquals(wMem2.getCurrentDirectMemoryAllocations(), 2L);
     assertEquals(wMem2.getCurrentDirectMemoryAllocated(), 2 * bytes);
 
@@ -410,9 +410,9 @@ public class MemoryTest {
     File file = getResourceFile("GettysburgAddress.txt");
     long bytes = file.length();
 
-    MapHandle mmh1 = Memory.map(file);
-    MapHandle mmh2 = Memory.map(file);
-    Memory wmem2 = mmh2.get();
+    MapHandle mmh1 = MemoryImpl.map(file);
+    MapHandle mmh2 = MemoryImpl.map(file);
+    MemoryImpl wmem2 = mmh2.get();
     
     assertEquals(wmem2.getCurrentDirectMemoryMapAllocations(), 2L);
     assertEquals(wmem2.getCurrentDirectMemoryMapAllocated(), 2 * bytes);
@@ -430,10 +430,10 @@ public class MemoryTest {
 
   @Test
   public void checkNullMemReqSvr() {
-    WritableMemory wmem = WritableMemory.writableWrap(new byte[16]);
+    WritableMemoryImpl wmem = WritableMemoryImpl.writableWrap(new byte[16]);
     assertNull(wmem.getMemoryRequestServer());
-    try (WritableDirectHandle wdh = WritableMemory.allocateDirect(16)) {
-      WritableMemory wmem2 = wdh.get();
+    try (WritableDirectHandle wdh = WritableMemoryImpl.allocateDirect(16)) {
+      WritableMemoryImpl wmem2 = wdh.get();
       assertNotNull(wmem2.getMemoryRequestServer());
     }
     println(wmem.toHexString("Test", 0, 16));
@@ -441,7 +441,7 @@ public class MemoryTest {
 
   @Test
   public void checkHashCode() {
-    WritableMemory wmem = WritableMemory.allocate(32 + 7);
+    WritableMemoryImpl wmem = WritableMemoryImpl.allocate(32 + 7);
     int hc = wmem.hashCode();
     assertEquals(hc, -1895166923);
   }
@@ -449,7 +449,7 @@ public class MemoryTest {
   @Test
   public void checkSelfEqualsToAndCompareTo() {
     int len = 64;
-    WritableMemory wmem = WritableMemory.allocate(len);
+    WritableMemoryImpl wmem = WritableMemoryImpl.allocate(len);
     for (int i = 0; i < len; i++) { wmem.putByte(i, (byte) i); }
     assertTrue(wmem.equalTo(0, wmem, 0, len));
     assertFalse(wmem.equalTo(0, wmem, len/2, len/2));
@@ -461,7 +461,7 @@ public class MemoryTest {
   public void wrapBigEndianAsLittle() {
     ByteBuffer bb = ByteBuffer.allocate(64);
     bb.putChar(0, (char)1); //as BE
-    Memory mem = Memory.wrap(bb, ByteOrder.LITTLE_ENDIAN);
+    MemoryImpl mem = MemoryImpl.wrap(bb, ByteOrder.LITTLE_ENDIAN);
     assertEquals(mem.getChar(0), 256);
   }
 

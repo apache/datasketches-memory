@@ -19,8 +19,6 @@
 
 package org.apache.datasketches.memory;
 
-import org.apache.datasketches.memory.internal.Memory;
-
 /**
  * A handle for read-only resource.
  *
@@ -58,6 +56,4 @@ public interface Handle extends AutoCloseable {
    */
   Memory get();
 
-  @Override
-  void close();
 }

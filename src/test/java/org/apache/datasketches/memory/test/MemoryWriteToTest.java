@@ -28,8 +28,8 @@ import java.nio.channels.WritableByteChannel;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.datasketches.memory.WritableHandle;
-import org.apache.datasketches.memory.internal.Memory;
-import org.apache.datasketches.memory.internal.WritableMemory;
+import org.apache.datasketches.memory.internal.MemoryImpl;
+import org.apache.datasketches.memory.internal.WritableMemoryImpl;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -59,8 +59,8 @@ public class MemoryWriteToTest {
   @Test
   public void testOffHeap() throws IOException {
     try (WritableHandle handle =
-        WritableMemory.allocateDirect((UNSAFE_COPY_THRESHOLD_BYTES * 5) + 10)) {
-      WritableMemory mem = handle.get();
+        WritableMemoryImpl.allocateDirect((UNSAFE_COPY_THRESHOLD_BYTES * 5) + 10)) {
+      WritableMemoryImpl mem = handle.get();
       testWriteTo(mem.region(0, 0));
       testOffHeap(mem, 7);
       testOffHeap(mem, 1023);
@@ -70,28 +70,28 @@ public class MemoryWriteToTest {
     }
   }
 
-  private static void testOffHeap(WritableMemory mem, int size) throws IOException {
+  private static void testOffHeap(WritableMemoryImpl mem, int size) throws IOException {
     createRandomBytesMemory(size).copyTo(0, mem, 0, size);
     testWriteTo(mem.region(0, size));
   }
 
-  private static Memory createRandomBytesMemory(int size) {
+  private static MemoryImpl createRandomBytesMemory(int size) {
     byte[] bytes = new byte[size];
     ThreadLocalRandom.current().nextBytes(bytes);
-    return Memory.wrap(bytes);
+    return MemoryImpl.wrap(bytes);
   }
 
-  private static Memory createRandomIntsMemory(int size) {
+  private static MemoryImpl createRandomIntsMemory(int size) {
     int[] ints = ThreadLocalRandom.current().ints(size).toArray();
-    return Memory.wrap(ints);
+    return MemoryImpl.wrap(ints);
   }
 
-  private static void testWriteTo(Memory mem) throws IOException {
+  private static void testWriteTo(MemoryImpl mem) throws IOException {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     try (WritableByteChannel out = Channels.newChannel(baos)) {
       mem.writeTo(0, mem.getCapacity(), out);
     }
     byte[] result = baos.toByteArray();
-    Assert.assertTrue(mem.equals(Memory.wrap(result)));
+    Assert.assertTrue(mem.equals(MemoryImpl.wrap(result)));
   }
 }

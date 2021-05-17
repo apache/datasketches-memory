@@ -19,8 +19,6 @@
 
 package org.apache.datasketches.memory;
 
-import org.apache.datasketches.memory.internal.WritableMemory;
-
 /**
  * A Handle for writable direct memory or a memory-mapped, writable file resource.
  * Please read Javadocs for {@link Handle}.
@@ -34,6 +32,5 @@ public interface WritableHandle extends Handle {
    * Gets a WritableMemory
    * @return a WritableMemory
    */
-  @Override
-  WritableMemory get();
+  WritableMemory getWritable();
 }

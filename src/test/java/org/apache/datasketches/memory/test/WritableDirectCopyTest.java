@@ -23,8 +23,8 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
 import org.apache.datasketches.memory.WritableHandle;
-import org.apache.datasketches.memory.internal.Memory;
-import org.apache.datasketches.memory.internal.WritableMemory;
+import org.apache.datasketches.memory.internal.MemoryImpl;
+import org.apache.datasketches.memory.internal.WritableMemoryImpl;
 import org.testng.annotations.Test;
 
 /**
@@ -39,8 +39,8 @@ public class WritableDirectCopyTest {
   public void checkCopyWithinNativeSmall() {
     int memCapacity = 64;
     int half = memCapacity / 2;
-    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh.get();
+    try (WritableHandle wrh = WritableMemoryImpl.allocateDirect(memCapacity)) {
+      WritableMemoryImpl mem = wrh.get();
       mem.clear();
 
       for (int i = 0; i < half; i++) { //fill first half
@@ -61,8 +61,8 @@ public class WritableDirectCopyTest {
     int memCapLongs = memCapacity / 8;
     int halfBytes = memCapacity / 2;
     int halfLongs = memCapLongs / 2;
-    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh.get();
+    try (WritableHandle wrh = WritableMemoryImpl.allocateDirect(memCapacity)) {
+      WritableMemoryImpl mem = wrh.get();
       mem.clear();
 
       for (int i = 0; i < halfLongs; i++) {
@@ -80,8 +80,8 @@ public class WritableDirectCopyTest {
   @Test
   public void checkCopyWithinNativeOverlap() {
     int memCapacity = 64;
-    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh.get();
+    try (WritableHandle wrh = WritableMemoryImpl.allocateDirect(memCapacity)) {
+      WritableMemoryImpl mem = wrh.get();
       mem.clear();
       //println(mem.toHexString("Clear 64", 0, memCapacity));
 
@@ -96,8 +96,8 @@ public class WritableDirectCopyTest {
   @Test
   public void checkCopyWithinNativeSrcBound() {
     int memCapacity = 64;
-    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh.get();
+    try (WritableHandle wrh = WritableMemoryImpl.allocateDirect(memCapacity)) {
+      WritableMemoryImpl mem = wrh.get();
       mem.copyTo(32, mem, 32, 33);  //hit source bound check
       fail("Did Not Catch Assertion Error: source bound");
     } catch (IllegalArgumentException e) {
@@ -108,8 +108,8 @@ public class WritableDirectCopyTest {
   @Test
   public void checkCopyWithinNativeDstBound() {
     int memCapacity = 64;
-    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh.get();
+    try (WritableHandle wrh = WritableMemoryImpl.allocateDirect(memCapacity)) {
+      WritableMemoryImpl mem = wrh.get();
       mem.copyTo(0, mem, 32, 33);  //hit dst bound check
       fail("Did Not Catch Assertion Error: dst bound");
     } catch (IllegalArgumentException e) {
@@ -121,10 +121,10 @@ public class WritableDirectCopyTest {
   public void checkCopyCrossNativeSmall() {
     int memCapacity = 64;
 
-    try (WritableHandle wrh1 = WritableMemory.allocateDirect(memCapacity);
-         WritableHandle wrh2 = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem1 = wrh1.get();
-      WritableMemory mem2 = wrh2.get();
+    try (WritableHandle wrh1 = WritableMemoryImpl.allocateDirect(memCapacity);
+         WritableHandle wrh2 = WritableMemoryImpl.allocateDirect(memCapacity)) {
+      WritableMemoryImpl mem1 = wrh1.get();
+      WritableMemoryImpl mem2 = wrh2.get();
 
       for (int i = 0; i < memCapacity; i++) {
         mem1.putByte(i, (byte) i);
@@ -145,10 +145,10 @@ public class WritableDirectCopyTest {
     int memCapacity = (2 << 20) + 64;
     int memCapLongs = memCapacity / 8;
 
-    try (WritableHandle wrh1 = WritableMemory.allocateDirect(memCapacity);
-         WritableHandle wrh2 = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem1 = wrh1.get();
-      WritableMemory mem2 = wrh2.get();
+    try (WritableHandle wrh1 = WritableMemoryImpl.allocateDirect(memCapacity);
+         WritableHandle wrh2 = WritableMemoryImpl.allocateDirect(memCapacity)) {
+      WritableMemoryImpl mem1 = wrh1.get();
+      WritableMemoryImpl mem2 = wrh2.get();
 
       for (int i = 0; i < memCapLongs; i++) {
         mem1.putLong(i * 8, i);
@@ -166,14 +166,14 @@ public class WritableDirectCopyTest {
   @Test
   public void checkCopyCrossNativeAndByteArray() {
     int memCapacity = 64;
-    try (WritableHandle wrh1 = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem1 = wrh1.get();
+    try (WritableHandle wrh1 = WritableMemoryImpl.allocateDirect(memCapacity)) {
+      WritableMemoryImpl mem1 = wrh1.get();
 
       for (int i = 0; i < mem1.getCapacity(); i++) {
         mem1.putByte(i, (byte) i);
       }
 
-      WritableMemory mem2 = WritableMemory.allocate(memCapacity);
+      WritableMemoryImpl mem2 = WritableMemoryImpl.allocate(memCapacity);
       mem1.copyTo(8, mem2, 16, 16);
 
       for (int i = 0; i < 16; i++) {
@@ -187,18 +187,18 @@ public class WritableDirectCopyTest {
   public void checkCopyCrossRegionsSameNative() {
     int memCapacity = 128;
 
-    try (WritableHandle wrh1 = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem1 = wrh1.get();
+    try (WritableHandle wrh1 = WritableMemoryImpl.allocateDirect(memCapacity)) {
+      WritableMemoryImpl mem1 = wrh1.get();
 
       for (int i = 0; i < mem1.getCapacity(); i++) {
         mem1.putByte(i, (byte) i);
       }
       //println(mem1.toHexString("Mem1", 0, (int)mem1.getCapacity()));
 
-      Memory reg1 = mem1.region(8, 16);
+      MemoryImpl reg1 = mem1.region(8, 16);
       //println(reg1.toHexString("Reg1", 0, (int)reg1.getCapacity()));
 
-      WritableMemory reg2 = mem1.writableRegion(24, 16);
+      WritableMemoryImpl reg2 = mem1.writableRegion(24, 16);
       //println(reg2.toHexString("Reg2", 0, (int)reg2.getCapacity()));
       reg1.copyTo(0, reg2, 0, 16);
 
@@ -213,22 +213,22 @@ public class WritableDirectCopyTest {
   @Test
   public void checkCopyCrossNativeArrayAndHierarchicalRegions() {
     int memCapacity = 64;
-    try (WritableHandle wrh1 = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem1 = wrh1.get();
+    try (WritableHandle wrh1 = WritableMemoryImpl.allocateDirect(memCapacity)) {
+      WritableMemoryImpl mem1 = wrh1.get();
 
       for (int i = 0; i < mem1.getCapacity(); i++) { //fill with numbers
         mem1.putByte(i, (byte) i);
       }
       //println(mem1.toHexString("Mem1", 0, (int)mem1.getCapacity()));
 
-      WritableMemory mem2 = WritableMemory.allocate(memCapacity);
+      WritableMemoryImpl mem2 = WritableMemoryImpl.allocate(memCapacity);
 
-      Memory reg1 = mem1.region(8, 32);
-      Memory reg1B = reg1.region(8, 16);
+      MemoryImpl reg1 = mem1.region(8, 32);
+      MemoryImpl reg1B = reg1.region(8, 16);
       //println(reg1.toHexString("Reg1", 0, (int)reg1.getCapacity()));
       //println(reg1B.toHexString("Reg1B", 0, (int)reg1B.getCapacity()));
 
-      WritableMemory reg2 = mem2.writableRegion(32, 16);
+      WritableMemoryImpl reg2 = mem2.writableRegion(32, 16);
       reg1B.copyTo(0, reg2, 0, 16);
       //println(reg2.toHexString("Reg2", 0, (int)reg2.getCapacity()));
 

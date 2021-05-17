@@ -28,12 +28,12 @@ import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.internal.Buffer;
-import org.apache.datasketches.memory.internal.Memory;
+import org.apache.datasketches.memory.internal.MemoryImpl;
 import org.apache.datasketches.memory.internal.ReadOnlyException;
 import org.apache.datasketches.memory.internal.UnsafeUtil;
 import org.apache.datasketches.memory.internal.Util;
 import org.apache.datasketches.memory.internal.WritableBuffer;
-import org.apache.datasketches.memory.internal.WritableMemory;
+import org.apache.datasketches.memory.internal.WritableMemoryImpl;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -46,8 +46,8 @@ public class WritableBufferImplTest {
   @Test
   public void checkNativeCapacityAndClose() {
     int memCapacity = 64;
-    WritableHandle wmh = WritableMemory.allocateDirect(memCapacity);
-    WritableMemory wmem = wmh.get();
+    WritableHandle wmh = WritableMemoryImpl.allocateDirect(memCapacity);
+    WritableMemoryImpl wmem = wmh.get();
     WritableBuffer wbuf = wmem.asWritableBuffer();
     assertEquals(wbuf.getCapacity(), memCapacity);
 
@@ -64,13 +64,13 @@ public class WritableBufferImplTest {
     boolean[] srcArray = { true, false, true, false, false, true, true, false };
     boolean[] dstArray = new boolean[8];
 
-    Buffer buf = Memory.wrap(srcArray).asBuffer();
+    Buffer buf = MemoryImpl.wrap(srcArray).asBuffer();
     buf.getBooleanArray(dstArray, 0, 8);
     for (int i=0; i<8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
-    WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemoryImpl.writableWrap(srcArray).asWritableBuffer();
     wbuf.getBooleanArray(dstArray, 0, 8);
     for (int i=0; i<8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
@@ -83,13 +83,13 @@ public class WritableBufferImplTest {
     byte[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
     byte[] dstArray = new byte[8];
 
-    Buffer buf = Memory.wrap(srcArray).asBuffer();
+    Buffer buf = MemoryImpl.wrap(srcArray).asBuffer();
     buf.getByteArray(dstArray, 0, 8);
     for (int i=0; i<8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
-    WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemoryImpl.writableWrap(srcArray).asWritableBuffer();
     wbuf.getByteArray(dstArray, 0, 8);
     for (int i=0; i<8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
@@ -101,13 +101,13 @@ public class WritableBufferImplTest {
     char[] srcArray = { 1, 2, 3, 4, 5, 6, 7, 8 };
     char[] dstArray = new char[8];
 
-    Buffer buf = Memory.wrap(srcArray).asBuffer();
+    Buffer buf = MemoryImpl.wrap(srcArray).asBuffer();
     buf.getCharArray(dstArray, 0, 8);
     for (int i=0; i<8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
-    WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemoryImpl.writableWrap(srcArray).asWritableBuffer();
     wbuf.getCharArray(dstArray, 0, 8);
     for (int i=0; i<8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
@@ -119,13 +119,13 @@ public class WritableBufferImplTest {
     short[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
     short[] dstArray = new short[8];
 
-    Buffer buf = Memory.wrap(srcArray).asBuffer();
+    Buffer buf = MemoryImpl.wrap(srcArray).asBuffer();
     buf.getShortArray(dstArray, 0, 8);
     for (int i=0; i<8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
-    WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemoryImpl.writableWrap(srcArray).asWritableBuffer();
     wbuf.getShortArray(dstArray, 0, 8);
     for (int i=0; i<8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
@@ -137,13 +137,13 @@ public class WritableBufferImplTest {
     int[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
     int[] dstArray = new int[8];
 
-    Buffer buf = Memory.wrap(srcArray).asBuffer();
+    Buffer buf = MemoryImpl.wrap(srcArray).asBuffer();
     buf.getIntArray(dstArray, 0, 8);
     for (int i=0; i<8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
-    WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemoryImpl.writableWrap(srcArray).asWritableBuffer();
     wbuf.getIntArray(dstArray, 0, 8);
     for (int i=0; i<8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
@@ -155,13 +155,13 @@ public class WritableBufferImplTest {
     long[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
     long[] dstArray = new long[8];
 
-    Buffer buf = Memory.wrap(srcArray).asBuffer();
+    Buffer buf = MemoryImpl.wrap(srcArray).asBuffer();
     buf.getLongArray(dstArray, 0, 8);
     for (int i=0; i<8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
-    WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemoryImpl.writableWrap(srcArray).asWritableBuffer();
     wbuf.getLongArray(dstArray, 0, 8);
     for (int i=0; i<8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
@@ -173,13 +173,13 @@ public class WritableBufferImplTest {
     float[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
     float[] dstArray = new float[8];
 
-    Buffer buf = Memory.wrap(srcArray).asBuffer();
+    Buffer buf = MemoryImpl.wrap(srcArray).asBuffer();
     buf.getFloatArray(dstArray, 0, 8);
     for (int i=0; i<8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
-    WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemoryImpl.writableWrap(srcArray).asWritableBuffer();
     wbuf.getFloatArray(dstArray, 0, 8);
     for (int i=0; i<8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
@@ -191,13 +191,13 @@ public class WritableBufferImplTest {
     double[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
     double[] dstArray = new double[8];
 
-    Buffer buf = Memory.wrap(srcArray).asBuffer();
+    Buffer buf = MemoryImpl.wrap(srcArray).asBuffer();
     buf.getDoubleArray(dstArray, 0, 8);
     for (int i=0; i<8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
-    WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemoryImpl.writableWrap(srcArray).asWritableBuffer();
     wbuf.getDoubleArray(dstArray, 0, 8);
     for (int i=0; i<8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
@@ -207,8 +207,8 @@ public class WritableBufferImplTest {
   @Test
   public void checkNativeBaseBound() {
     int memCapacity = 64;
-    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory wmem = wrh.get();
+    try (WritableHandle wrh = WritableMemoryImpl.allocateDirect(memCapacity)) {
+      WritableMemoryImpl wmem = wrh.get();
       WritableBuffer wbuf = wmem.asWritableBuffer();
       wbuf.toHexString("Force Assertion Error", memCapacity, 8);
     } catch (IllegalArgumentException e) {
@@ -219,8 +219,8 @@ public class WritableBufferImplTest {
   @Test
   public void checkNativeSrcArrayBound() {
     long memCapacity = 64;
-    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory wmem = wrh.get();
+    try (WritableHandle wrh = WritableMemoryImpl.allocateDirect(memCapacity)) {
+      WritableMemoryImpl wmem = wrh.get();
       WritableBuffer wbuf = wmem.asWritableBuffer();
       byte[] srcArray = { 1, -2, 3, -4 };
       wbuf.putByteArray(srcArray, 0, 5); //wrong!
@@ -233,8 +233,8 @@ public class WritableBufferImplTest {
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void checkRegionBounds() {
     int memCapacity = 64;
-    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory wmem = wrh.get();
+    try (WritableHandle wrh = WritableMemoryImpl.allocateDirect(memCapacity)) {
+      WritableMemoryImpl wmem = wrh.get();
       WritableBuffer wbuf = wmem.asWritableBuffer();
       wbuf.writableRegion(1, 64, wbuf.getTypeByteOrder()); //wrong!
     }
@@ -344,10 +344,10 @@ public class WritableBufferImplTest {
   @Test
   public void checkIsDirect() {
     int memCapacity = 64;
-    WritableBuffer mem = WritableMemory.allocate(memCapacity).asWritableBuffer();
+    WritableBuffer mem = WritableMemoryImpl.allocate(memCapacity).asWritableBuffer();
     assertFalse(mem.isDirect());
-    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem2 = wrh.get();
+    try (WritableHandle wrh = WritableMemoryImpl.allocateDirect(memCapacity)) {
+      WritableMemoryImpl mem2 = wrh.get();
       WritableBuffer wbuf = mem2.asWritableBuffer();
       assertTrue(wbuf.isDirect());
       wrh.close();
@@ -358,7 +358,7 @@ public class WritableBufferImplTest {
   public void checkIsReadOnly() {
     long[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
 
-    WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemoryImpl.writableWrap(srcArray).asWritableBuffer();
     assertFalse(wbuf.isReadOnly());
 
     Buffer buf = wbuf;
@@ -380,9 +380,9 @@ public class WritableBufferImplTest {
     byte[] arr2 = new byte[] {0, 1, 2, 4};
     byte[] arr3 = new byte[] {0, 1, 2, 3, 4};
 
-    Buffer buf1 = Memory.wrap(arr1).asBuffer();
-    Buffer buf2 = Memory.wrap(arr2).asBuffer();
-    Buffer buf3 = Memory.wrap(arr3).asBuffer();
+    Buffer buf1 = MemoryImpl.wrap(arr1).asBuffer();
+    Buffer buf2 = MemoryImpl.wrap(arr2).asBuffer();
+    Buffer buf3 = MemoryImpl.wrap(arr3).asBuffer();
 
     int comp = buf1.compareTo(0, 3, buf2, 0, 3);
     assertEquals(comp, 0);
@@ -403,17 +403,17 @@ public class WritableBufferImplTest {
     byte[] arr2 = new byte[] {0, 1, 2, 4};
     byte[] arr3 = new byte[] {0, 1, 2, 3, 4};
 
-    try (WritableHandle h1 = WritableMemory.allocateDirect(4);
-        WritableHandle h2 = WritableMemory.allocateDirect(4);
-        WritableHandle h3 = WritableMemory.allocateDirect(5))
+    try (WritableHandle h1 = WritableMemoryImpl.allocateDirect(4);
+        WritableHandle h2 = WritableMemoryImpl.allocateDirect(4);
+        WritableHandle h3 = WritableMemoryImpl.allocateDirect(5))
     {
-      WritableMemory mem1 = h1.get();
+      WritableMemoryImpl mem1 = h1.get();
       mem1.putByteArray(0, arr1, 0, 4);
 
-      WritableMemory mem2 = h2.get();
+      WritableMemoryImpl mem2 = h2.get();
       mem2.putByteArray(0, arr2, 0, 4);
 
-      WritableMemory mem3 = h3.get();
+      WritableMemoryImpl mem3 = h3.get();
       mem3.putByteArray(0, arr3, 0, 5);
 
       Buffer buf1 = mem1.asBuffer();
@@ -436,7 +436,7 @@ public class WritableBufferImplTest {
 
   @Test
   public void checkAsBuffer() {
-    WritableMemory wmem = WritableMemory.allocate(64);
+    WritableMemoryImpl wmem = WritableMemoryImpl.allocate(64);
     WritableBuffer wbuf = wmem.asWritableBuffer();
     wbuf.setPosition(32);
     for (int i = 32; i < 64; i++) { wbuf.putByte((byte)i); }
@@ -451,7 +451,7 @@ public class WritableBufferImplTest {
 
   @Test
   public void checkDuplicate() {
-    WritableMemory wmem = WritableMemory.allocate(64);
+    WritableMemoryImpl wmem = WritableMemoryImpl.allocate(64);
     for (int i = 0; i < 64; i++) { wmem.putByte(i, (byte)i); }
 
     WritableBuffer wbuf = wmem.asWritableBuffer().writableDuplicate();
@@ -464,18 +464,18 @@ public class WritableBufferImplTest {
       assertEquals(buf.getByte(), i);
     }
 
-    WritableMemory wmem2 = wbuf.asWritableMemory();
+    WritableMemoryImpl wmem2 = wbuf.asWritableMemory();
     for (int i = 0; i < 64; i++) {
       assertEquals(wmem2.getByte(i), i);
     }
-    WritableMemory wmem3 = wbuf.asWritableMemory();
+    WritableMemoryImpl wmem3 = wbuf.asWritableMemory();
     wmem3.checkValidAndBounds(0, 64);
   }
 
   @Test
   public void checkCumAndRegionOffset() {
-    WritableMemory wmem = WritableMemory.allocate(64);
-    WritableMemory reg = wmem.writableRegion(32, 32);
+    WritableMemoryImpl wmem = WritableMemoryImpl.allocate(64);
+    WritableMemoryImpl reg = wmem.writableRegion(32, 32);
     WritableBuffer buf = reg.asWritableBuffer();
     assertEquals(buf.getRegionOffset(), 32);
     assertEquals(buf.getRegionOffset(0), 32);
@@ -486,14 +486,14 @@ public class WritableBufferImplTest {
   @Test
   public void checkIsSameResource() {
     byte[] byteArr = new byte[64];
-    WritableBuffer wbuf1 = WritableMemory.writableWrap(byteArr).asWritableBuffer();
-    WritableBuffer wbuf2 = WritableMemory.writableWrap(byteArr).asWritableBuffer();
+    WritableBuffer wbuf1 = WritableMemoryImpl.writableWrap(byteArr).asWritableBuffer();
+    WritableBuffer wbuf2 = WritableMemoryImpl.writableWrap(byteArr).asWritableBuffer();
     assertTrue(wbuf1.isSameResource(wbuf2));
   }
 
   @Test
   public void checkDegenerateRegionReturn() {
-    Memory mem = Memory.wrap(new byte[0]);
+    MemoryImpl mem = MemoryImpl.wrap(new byte[0]);
     Buffer buf = mem.asBuffer();
     Buffer reg = buf.region();
     assertEquals(reg.getCapacity(), 0);
@@ -504,13 +504,13 @@ public class WritableBufferImplTest {
     ByteBuffer bb = ByteBuffer.allocate(64);
     WritableBuffer wbuf = WritableBuffer.wrap(bb);
     @SuppressWarnings("unused")
-    WritableMemory wmem = wbuf.asWritableMemory();
+    WritableMemoryImpl wmem = wbuf.asWritableMemory();
 
     try {
       Buffer buf = Buffer.wrap(bb);
       wbuf = (WritableBuffer) buf;
       @SuppressWarnings("unused")
-      WritableMemory wmem2 = wbuf.asWritableMemory();
+      WritableMemoryImpl wmem2 = wbuf.asWritableMemory();
       Assert.fail();
     } catch (ReadOnlyException expected) {
       // expected
@@ -573,7 +573,7 @@ public class WritableBufferImplTest {
 
   @Test
   public void checkZeroBuffer() {
-    WritableMemory wmem = WritableMemory.allocate(8);
+    WritableMemoryImpl wmem = WritableMemoryImpl.allocate(8);
     WritableBuffer wbuf = wmem.asWritableBuffer();
     WritableBuffer reg = wbuf.writableRegion(0, 0, wbuf.getTypeByteOrder());
     assertEquals(reg.getCapacity(), 0);
@@ -581,7 +581,7 @@ public class WritableBufferImplTest {
 
   @Test
   public void checkDuplicateNonNative() {
-    WritableMemory wmem = WritableMemory.allocate(64);
+    WritableMemoryImpl wmem = WritableMemoryImpl.allocate(64);
     wmem.putShort(0, (short) 1);
     Buffer buf = wmem.asWritableBuffer().duplicate(Util.nonNativeByteOrder);
     assertEquals(buf.getShort(0), 256);

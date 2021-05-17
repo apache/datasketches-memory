@@ -31,7 +31,7 @@ import org.apache.datasketches.memory.WritableMap;
  * @author Roman Leventov
  * @author Praveenkumar Venkatesan
  */
-//Called from WritableMemory, implements combo of WritableMemory with WritableMap resource
+//Called from WritableMemoryImpl, implements combo of WritableMemoryImpl with WritableMap resource
 final class AllocateDirectWritableMap extends AllocateDirectMap implements WritableMap {
 
   AllocateDirectWritableMap(final File file, final long fileOffsetBytes,
@@ -39,10 +39,12 @@ final class AllocateDirectWritableMap extends AllocateDirectMap implements Writa
     super(file, fileOffsetBytes, capacityBytes, localReadOnly);
   }
 
+  //Added by WritableMap Interface
+  
   @Override
   public void force() {
     if (resourceReadOnly) {
-      throw new ReadOnlyException("Memory Mapped File is Read Only.");
+      throw new ReadOnlyException("MemoryImpl Mapped File is Read Only.");
     }
     try {
       MAPPED_BYTE_BUFFER_FORCE0_METHOD

@@ -44,7 +44,7 @@ final class AllocateDirect implements AutoCloseable {
    * Base Constructor for allocate native memory.
    *
    * <p>Allocates and provides access to capacityBytes directly in native (off-heap) memory
-   * leveraging the Memory interface.
+   * leveraging the MemoryImpl interface.
    * The allocated memory will be 8-byte aligned, but may not be page aligned.
    * @param capacityBytes the the requested capacity of off-heap memory. Cannot be zero.
    */

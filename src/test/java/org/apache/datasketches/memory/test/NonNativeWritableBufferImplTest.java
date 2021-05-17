@@ -25,7 +25,7 @@ import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.internal.Buffer;
 import org.apache.datasketches.memory.internal.WritableBuffer;
-import org.apache.datasketches.memory.internal.WritableMemory;
+import org.apache.datasketches.memory.internal.WritableMemoryImpl;
 import org.testng.annotations.Test;
 
 /**
@@ -41,7 +41,7 @@ public class NonNativeWritableBufferImplTest {
     int m = Character.BYTES;
     byte[] arr1 = new byte[n * m]; //non-native
     //put & get
-    WritableMemory wmem = WritableMemory.writableWrap(arr1, ByteOrder.BIG_ENDIAN);
+    WritableMemoryImpl wmem = WritableMemoryImpl.writableWrap(arr1, ByteOrder.BIG_ENDIAN);
     WritableBuffer wbuf = wmem.asWritableBuffer();
     char ch = 'a';
     for (int i = 0; i < n; i++) { wbuf.putChar(i * m, ch++); }
@@ -62,7 +62,7 @@ public class NonNativeWritableBufferImplTest {
     wbuf.setPosition(0);
     wbuf.getCharArray(cArr, 0, n); //wmem is non-native
     byte[] arr2 = new byte[n * m];
-    WritableMemory wmem2 = WritableMemory.writableWrap(arr2, ByteOrder.BIG_ENDIAN);
+    WritableMemoryImpl wmem2 = WritableMemoryImpl.writableWrap(arr2, ByteOrder.BIG_ENDIAN);
     WritableBuffer wbuf2 = wmem2.asWritableBuffer();
     wbuf2.putCharArray(cArr, 0, n);
     assertEquals(arr2, arr1);
@@ -74,7 +74,7 @@ public class NonNativeWritableBufferImplTest {
     int m = Double.BYTES;
     byte[] arr1 = new byte[n * m]; //non-native
     //put & get
-    WritableMemory wmem = WritableMemory.writableWrap(arr1, ByteOrder.BIG_ENDIAN);
+    WritableMemoryImpl wmem = WritableMemoryImpl.writableWrap(arr1, ByteOrder.BIG_ENDIAN);
     WritableBuffer wbuf = wmem.asWritableBuffer();
     double dbl = 1.0;
     for (int i = 0; i < n; i++) { wbuf.putDouble(i * m, dbl++); }
@@ -95,7 +95,7 @@ public class NonNativeWritableBufferImplTest {
     wbuf.setPosition(0);
     wbuf.getDoubleArray(dblArr, 0, n); //wmem is non-native
     byte[] arr2 = new byte[n * m];
-    WritableMemory wmem2 = WritableMemory.writableWrap(arr2, ByteOrder.BIG_ENDIAN);
+    WritableMemoryImpl wmem2 = WritableMemoryImpl.writableWrap(arr2, ByteOrder.BIG_ENDIAN);
     WritableBuffer wbuf2 = wmem2.asWritableBuffer();
     wbuf2.putDoubleArray(dblArr, 0, n);
     assertEquals(arr2, arr1);
@@ -107,7 +107,7 @@ public class NonNativeWritableBufferImplTest {
     int m = Float.BYTES;
     byte[] arr1 = new byte[n * m]; //non-native
     //put & get
-    WritableMemory wmem = WritableMemory.writableWrap(arr1, ByteOrder.BIG_ENDIAN);
+    WritableMemoryImpl wmem = WritableMemoryImpl.writableWrap(arr1, ByteOrder.BIG_ENDIAN);
     WritableBuffer wbuf = wmem.asWritableBuffer();
     float flt = 1.0F;
     for (int i = 0; i < n; i++) { wbuf.putFloat(i * m, flt++); }
@@ -128,7 +128,7 @@ public class NonNativeWritableBufferImplTest {
     wbuf.setPosition(0);
     wbuf.getFloatArray(fltArr, 0, n); //wmem is non-native
     byte[] arr2 = new byte[n * m];
-    WritableMemory wmem2 = WritableMemory.writableWrap(arr2, ByteOrder.BIG_ENDIAN);
+    WritableMemoryImpl wmem2 = WritableMemoryImpl.writableWrap(arr2, ByteOrder.BIG_ENDIAN);
     WritableBuffer wbuf2 = wmem2.asWritableBuffer();
     wbuf2.putFloatArray(fltArr, 0, n);
     assertEquals(arr2, arr1);
@@ -140,7 +140,7 @@ public class NonNativeWritableBufferImplTest {
     int m = Integer.BYTES;
     byte[] arr1 = new byte[n * m]; //non-native
     //put & get
-    WritableMemory wmem = WritableMemory.writableWrap(arr1, ByteOrder.BIG_ENDIAN);
+    WritableMemoryImpl wmem = WritableMemoryImpl.writableWrap(arr1, ByteOrder.BIG_ENDIAN);
     WritableBuffer wbuf = wmem.asWritableBuffer();
     int intg = 1;
     for (int i = 0; i < n; i++) { wbuf.putInt(i * m, intg++); }
@@ -161,7 +161,7 @@ public class NonNativeWritableBufferImplTest {
     wbuf.setPosition(0);
     wbuf.getIntArray(intArr, 0, n); //wmem is non-native
     byte[] arr2 = new byte[n * m];
-    WritableMemory wmem2 = WritableMemory.writableWrap(arr2, ByteOrder.BIG_ENDIAN);
+    WritableMemoryImpl wmem2 = WritableMemoryImpl.writableWrap(arr2, ByteOrder.BIG_ENDIAN);
     WritableBuffer wbuf2 = wmem2.asWritableBuffer();
     wbuf2.putIntArray(intArr, 0, n);
     assertEquals(arr2, arr1);
@@ -173,7 +173,7 @@ public class NonNativeWritableBufferImplTest {
     int m = Long.BYTES;
     byte[] arr1 = new byte[n * m]; //non-native
     //put & get
-    WritableMemory wmem = WritableMemory.writableWrap(arr1, ByteOrder.BIG_ENDIAN);
+    WritableMemoryImpl wmem = WritableMemoryImpl.writableWrap(arr1, ByteOrder.BIG_ENDIAN);
     WritableBuffer wbuf = wmem.asWritableBuffer();
     long lng = 1;
     for (int i = 0; i < n; i++) { wbuf.putLong(i * m, lng++); }
@@ -194,7 +194,7 @@ public class NonNativeWritableBufferImplTest {
     wbuf.setPosition(0);
     wbuf.getLongArray(longArr, 0, n); //wmem is non-native
     byte[] arr2 = new byte[n * m];
-    WritableMemory wmem2 = WritableMemory.writableWrap(arr2, ByteOrder.BIG_ENDIAN);
+    WritableMemoryImpl wmem2 = WritableMemoryImpl.writableWrap(arr2, ByteOrder.BIG_ENDIAN);
     WritableBuffer wbuf2 = wmem2.asWritableBuffer();
     wbuf2.putLongArray(longArr, 0, n);
     assertEquals(arr2, arr1);
@@ -206,7 +206,7 @@ public class NonNativeWritableBufferImplTest {
     int m = Short.BYTES;
     byte[] arr1 = new byte[n * m]; //non-native
     //put & get
-    WritableMemory wmem = WritableMemory.writableWrap(arr1, ByteOrder.BIG_ENDIAN);
+    WritableMemoryImpl wmem = WritableMemoryImpl.writableWrap(arr1, ByteOrder.BIG_ENDIAN);
     WritableBuffer wbuf = wmem.asWritableBuffer();
     short sht = 1;
     for (int i = 0; i < n; i++) { wbuf.putShort(i * m, sht++); }
@@ -227,7 +227,7 @@ public class NonNativeWritableBufferImplTest {
     wbuf.setPosition(0);
     wbuf.getShortArray(shortArr, 0, n); //wmem is non-native
     byte[] arr2 = new byte[n * m];
-    WritableMemory wmem2 = WritableMemory.writableWrap(arr2, ByteOrder.BIG_ENDIAN);
+    WritableMemoryImpl wmem2 = WritableMemoryImpl.writableWrap(arr2, ByteOrder.BIG_ENDIAN);
     WritableBuffer wbuf2 = wmem2.asWritableBuffer();
     wbuf2.putShortArray(shortArr, 0, n);
     assertEquals(arr2, arr1);
@@ -237,7 +237,7 @@ public class NonNativeWritableBufferImplTest {
   @Test
   public void checkDuplicate() {
     byte[] bArr = new byte[8];
-    WritableMemory wmem = WritableMemory.writableWrap(bArr, ByteOrder.BIG_ENDIAN);
+    WritableMemoryImpl wmem = WritableMemoryImpl.writableWrap(bArr, ByteOrder.BIG_ENDIAN);
     WritableBuffer wbuf = wmem.asWritableBuffer();
     WritableBuffer wdup = wbuf.writableDuplicate();
     assertEquals(wdup.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
@@ -249,7 +249,7 @@ public class NonNativeWritableBufferImplTest {
   @Test
   public void checkDuplicateZeros() {
     byte[] bArr = new byte[0];
-    WritableMemory wmem = WritableMemory.writableWrap(bArr, ByteOrder.BIG_ENDIAN);
+    WritableMemoryImpl wmem = WritableMemoryImpl.writableWrap(bArr, ByteOrder.BIG_ENDIAN);
     Buffer buf = wmem.asBuffer();
     Buffer dup = buf.duplicate();
     assertEquals(dup.getTypeByteOrder(), ByteOrder.LITTLE_ENDIAN);

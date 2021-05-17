@@ -29,8 +29,8 @@ import java.nio.BufferOverflowException;
 import java.nio.CharBuffer;
 
 /**
- * Encoding and decoding implementations of {@link WritableMemory#putCharsToUtf8} and
- * {@link Memory#getCharsFromUtf8}.
+ * Encoding and decoding implementations of {@link WritableMemoryImpl#putCharsToUtf8} and
+ * {@link MemoryImpl#getCharsFromUtf8}.
  *
  * <p>This is specifically designed to reduce the production of intermediate objects (garbage),
  * thus significantly reducing pressure on the JVM Garbage Collector.
@@ -345,7 +345,7 @@ final class Utf8 {
         //    characters remaining, at least 4 bytes of memory space remaining, and the next 2
         //    characters must be a valid surrogate pair.
         //
-        // 2) There is insufficient Memory space to encode the current character from one of the
+        // 2) There is insufficient MemoryImpl space to encode the current character from one of the
         //    ifs above.
         //
         // We proceed assuming (1). If the following test fails, we move to an exception.
@@ -379,7 +379,7 @@ final class Utf8 {
           }
 
           if (bIdx > (byteLimit - 4)) {
-            //4 Memory bytes required to encode a surrogate pair.
+            //4 MemoryImpl bytes required to encode a surrogate pair.
             final int remaining = (int) ((bIdx - byteLimit) + 4L);
             throw Utf8CodingException.shortUtf8EncodeByteLength(remaining);
           }

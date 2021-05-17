@@ -122,6 +122,8 @@ class AllocateDirectMap implements Map {
     cleaner = Cleaner.create(this, deallocator);
   }
 
+  //Map Interface
+  
   @Override
   public void load() {
     madvise();
@@ -150,7 +152,8 @@ class AllocateDirectMap implements Map {
               String.format("Encountered %s exception while loading", e.getClass()));
     }
   }
-
+  // End Map Interface
+  
   @Override
   public void close() {
     doClose();

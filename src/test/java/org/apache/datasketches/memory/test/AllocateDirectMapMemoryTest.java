@@ -33,7 +33,7 @@ import java.io.File;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.MapHandle;
-import org.apache.datasketches.memory.internal.Memory;
+import org.apache.datasketches.memory.internal.MemoryImpl;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -51,7 +51,7 @@ public class AllocateDirectMapMemoryTest {
   @Test
   public void simpleMap() throws Exception {
     File file = getResourceFile("GettysburgAddress.txt");
-    try (MapHandle rh = Memory.map(file)) {
+    try (MapHandle rh = MemoryImpl.map(file)) {
       rh.close();
     }
   }
@@ -59,13 +59,13 @@ public class AllocateDirectMapMemoryTest {
   @Test
   public void testIllegalArguments() throws Exception {
     File file = getResourceFile("GettysburgAddress.txt");
-    try (MapHandle rh = Memory.map(file, -1, Integer.MAX_VALUE, ByteOrder.nativeOrder())) {
+    try (MapHandle rh = MemoryImpl.map(file, -1, Integer.MAX_VALUE, ByteOrder.nativeOrder())) {
       fail("Failed: testIllegalArgumentException: Position was negative.");
     } catch (IllegalArgumentException e) {
       //ok
     }
 
-    try (MapHandle rh = Memory.map(file, 0, -1, ByteOrder.nativeOrder())) {
+    try (MapHandle rh = MemoryImpl.map(file, 0, -1, ByteOrder.nativeOrder())) {
       fail("Failed: testIllegalArgumentException: Size was negative.");
     } catch (IllegalArgumentException e) {
       //ok
@@ -76,8 +76,8 @@ public class AllocateDirectMapMemoryTest {
   public void testMapAndMultipleClose() throws Exception {
     File file = getResourceFile("GettysburgAddress.txt");
     long memCapacity = file.length();
-    try (MapHandle rh = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
-      Memory map = rh.get();
+    try (MapHandle rh = MemoryImpl.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
+      MemoryImpl map = rh.get();
       assertEquals(memCapacity, map.getCapacity());
       rh.close();
       rh.close();
@@ -91,8 +91,8 @@ public class AllocateDirectMapMemoryTest {
   public void testReadFailAfterClose() throws Exception {
     File file = getResourceFile("GettysburgAddress.txt");
     long memCapacity = file.length();
-    try (MapHandle rh = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
-      Memory mmf = rh.get();
+    try (MapHandle rh = MemoryImpl.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
+      MemoryImpl mmf = rh.get();
       rh.close();
       mmf.getByte(0);
     } catch (AssertionError e) {
@@ -104,7 +104,7 @@ public class AllocateDirectMapMemoryTest {
   public void testLoad() throws Exception {
     File file = getResourceFile("GettysburgAddress.txt");
     long memCapacity = file.length();
-    try (MapHandle rh = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
+    try (MapHandle rh = MemoryImpl.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
       rh.load();
       assertTrue(rh.isLoaded());
       rh.close();
@@ -115,8 +115,8 @@ public class AllocateDirectMapMemoryTest {
   public void testHandlerHandoffWithTWR() throws Exception {
     File file = getResourceFile("GettysburgAddress.txt");
     long memCapacity = file.length();
-    Memory mem;
-    try (MapHandle rh = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
+    MemoryImpl mem;
+    try (MapHandle rh = MemoryImpl.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
       rh.load();
       assertTrue(rh.isLoaded());
       hand = rh;
@@ -130,7 +130,7 @@ public class AllocateDirectMapMemoryTest {
   public void testHandoffWithoutClose() throws Exception {
     File file = getResourceFile("GettysburgAddress.txt");
     long memCapacity = file.length();
-    MapHandle rh = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder());
+    MapHandle rh = MemoryImpl.map(file, 0, memCapacity, ByteOrder.nativeOrder());
     rh.load();
     assertTrue(rh.isLoaded());
     hand = rh;
@@ -140,7 +140,7 @@ public class AllocateDirectMapMemoryTest {
   @AfterClass
   public void afterAllTests() {
       if (hand != null) {
-      Memory mem = hand.get();
+      MemoryImpl mem = hand.get();
       if ((mem != null) && mem.isValid()) {
         hand.close();
         assertFalse(mem.isValid());

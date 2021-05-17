@@ -47,7 +47,7 @@ public final class Util {
    * threshold, because internally it doesn't have safepoint polls, that may cause long
    * "Time To Safe Point" pauses in the application. This has been fixed in JDK 9 (see
    * https://bugs.openjdk.java.net/browse/JDK-8149596 and
-   * https://bugs.openjdk.java.net/browse/JDK-8141491), but not in JDK 8, so the Memory library
+   * https://bugs.openjdk.java.net/browse/JDK-8141491), but not in JDK 8, so the MemoryImpl library
    * should keep having this boilerplate as long as it supports Java 8.
    *
    * <p>A reference to this can be found in java.nio.Bits.</p>
@@ -84,7 +84,7 @@ public final class Util {
    * search algorithm. The range must be sorted method) prior to making this call.
    * If it is not sorted, the results are undefined. If the range contains
    * multiple elements with the specified value, there is no guarantee which one will be found.
-   * @param mem the Memory to be searched
+   * @param mem the MemoryImpl to be searched
    * @param fromLongIndex the index of the first element (inclusive) to be searched
    * @param toLongIndex the index of the last element (exclusive) to be searched
    * @param key the value to be searched for
@@ -94,7 +94,7 @@ public final class Util {
    * than the key, or toIndex if all elements in the range are less than the specified key.
    * Note that this guarantees that the return value will be &ge; 0 if and only if the key is found.
    */
-  public static long binarySearchLongs(final Memory mem, final long fromLongIndex,
+  public static long binarySearchLongs(final MemoryImpl mem, final long fromLongIndex,
       final long toLongIndex, final long key) {
     checkBounds(fromLongIndex << 3, (toLongIndex - fromLongIndex) << 3, mem.getCapacity());
     long low = fromLongIndex;

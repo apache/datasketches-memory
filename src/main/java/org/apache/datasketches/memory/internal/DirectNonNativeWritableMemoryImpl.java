@@ -24,7 +24,7 @@ import java.nio.ByteOrder;
 import org.apache.datasketches.memory.MemoryRequestServer;
 
 /**
- * Implementation of {@link WritableMemory} for direct memory, non-native byte order.
+ * Implementation of {@link WritableMemoryImpl} for direct memory, non-native byte order.
  *
  * @author Roman Leventov
  * @author Lee Rhodes
@@ -99,7 +99,7 @@ final class DirectNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImp
   @Override
   void checkValid() {
     if (!this.isValid()) {
-      throw new IllegalStateException("Memory not valid.");
+      throw new IllegalStateException("MemoryImpl not valid.");
     }
   }
   

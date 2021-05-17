@@ -22,12 +22,12 @@ package org.apache.datasketches.memory.internal;
 import java.nio.ByteOrder;
 
 /**
- * Implementation of {@link WritableMemory} for heap-based, native byte order.
+ * Implementation of {@link WritableMemoryImpl} for heap-based, native byte order.
  *
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-final class HeapWritableMemoryImpl extends WritableMemoryImpl {
+final class HeapWritableMemoryImpl extends NativeWritableMemoryImpl {
   private static final int id = MEMORY | NATIVE | HEAP;
   private final Object unsafeObj;
   private final byte typeId;

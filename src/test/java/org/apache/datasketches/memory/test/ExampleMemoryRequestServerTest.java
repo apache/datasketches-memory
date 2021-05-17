@@ -25,7 +25,7 @@ import java.util.IdentityHashMap;
 
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableHandle;
-import org.apache.datasketches.memory.internal.WritableMemory;
+import org.apache.datasketches.memory.internal.WritableMemoryImpl;
 import org.testng.annotations.Test;
 
 /**
@@ -43,7 +43,7 @@ public class ExampleMemoryRequestServerTest {
   public void checkExampleMemoryRequestServer1() {
     int bytes = 8;
     ExampleMemoryRequestServer svr = new ExampleMemoryRequestServer();
-    WritableMemory wMem = svr.request(bytes);
+    WritableMemoryImpl wMem = svr.request(bytes);
     MemoryClient client = new MemoryClient(wMem);
     client.process();
     svr.cleanup();
@@ -60,8 +60,8 @@ public class ExampleMemoryRequestServerTest {
   public void checkExampleMemoryRequestServer2() {
     int bytes = 8;
     ExampleMemoryRequestServer svr = new ExampleMemoryRequestServer();
-    try (WritableHandle handle = WritableMemory.allocateDirect(bytes, svr)) {
-      WritableMemory wMem = handle.get();
+    try (WritableHandle handle = WritableMemoryImpl.allocateDirect(bytes, svr)) {
+      WritableMemoryImpl wMem = handle.get();
       MemoryClient client = new MemoryClient(wMem);
       client.process();
       svr.cleanup();
@@ -72,7 +72,7 @@ public class ExampleMemoryRequestServerTest {
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void checkZeroCapacity() {
     ExampleMemoryRequestServer svr = new ExampleMemoryRequestServer();
-    WritableMemory.allocateDirect(0, svr);
+    WritableMemoryImpl.allocateDirect(0, svr);
   }
 
   /**
@@ -83,10 +83,10 @@ public class ExampleMemoryRequestServerTest {
    * <p>In reality, these memory requests should be quite rare.</p>
    */
   static class MemoryClient {
-    WritableMemory smallMem;
+    WritableMemoryImpl smallMem;
     MemoryRequestServer svr;
 
-    MemoryClient(WritableMemory wmem) {
+    MemoryClient(WritableMemoryImpl wmem) {
       smallMem = wmem;
       svr = wmem.getMemoryRequestServer();
     }
@@ -96,7 +96,7 @@ public class ExampleMemoryRequestServerTest {
       smallMem.fill((byte) 1);                //fill it, but not big enough
       println(smallMem.toHexString("Small", 0, (int)cap1));
 
-      WritableMemory bigMem = svr.request(2 * cap1); //get bigger mem
+      WritableMemoryImpl bigMem = svr.request(2 * cap1); //get bigger mem
       long cap2 = bigMem.getCapacity();
       smallMem.copyTo(0, bigMem, 0, cap1);    //copy data from small to big
       svr.requestClose(smallMem, bigMem);                  //done with smallMem, release it
@@ -104,7 +104,7 @@ public class ExampleMemoryRequestServerTest {
       bigMem.fill(cap1, cap1, (byte) 2);      //fill the rest of bigMem, still not big enough
       println(bigMem.toHexString("Big", 0, (int)cap2));
 
-      WritableMemory giantMem = svr.request(2 * cap2); //get giant mem
+      WritableMemoryImpl giantMem = svr.request(2 * cap2); //get giant mem
       long cap3 = giantMem.getCapacity();
       bigMem.copyTo(0, giantMem, 0, cap2);    //copy data from small to big
       svr.requestClose(bigMem, giantMem);                    //done with bigMem, release it
@@ -120,13 +120,13 @@ public class ExampleMemoryRequestServerTest {
    * possibly manage the continuous requests for larger memory.
    */
   public static class ExampleMemoryRequestServer implements MemoryRequestServer {
-    IdentityHashMap<WritableMemory, WritableHandle> map = new IdentityHashMap<>();
+    IdentityHashMap<WritableMemoryImpl, WritableHandle> map = new IdentityHashMap<>();
 
     @SuppressWarnings("resource")
     @Override
-    public WritableMemory request(long capacityBytes) {
-     WritableHandle handle = WritableMemory.allocateDirect(capacityBytes, this);
-     WritableMemory wmem = handle.get();
+    public WritableMemoryImpl request(long capacityBytes) {
+     WritableHandle handle = WritableMemoryImpl.allocateDirect(capacityBytes, this);
+     WritableMemoryImpl wmem = handle.get();
      map.put(wmem, handle); //We track the newly allocated memory and its handle.
      return wmem;
     }
@@ -134,7 +134,7 @@ public class ExampleMemoryRequestServerTest {
     @SuppressWarnings("resource")
     @Override
     //here we actually release it, in reality it might be a lot more complex.
-    public void requestClose(WritableMemory memToRelease, WritableMemory newMemory) {
+    public void requestClose(WritableMemoryImpl memToRelease, WritableMemoryImpl newMemory) {
       if (memToRelease != null) {
         WritableHandle handle = map.get(memToRelease);
         if (handle != null && handle.get() == memToRelease) {

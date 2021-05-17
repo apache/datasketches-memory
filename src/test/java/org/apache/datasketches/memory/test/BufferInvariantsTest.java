@@ -27,7 +27,7 @@ import java.nio.ByteBuffer;
 import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.internal.Buffer;
 import org.apache.datasketches.memory.internal.WritableBuffer;
-import org.apache.datasketches.memory.internal.WritableMemory;
+import org.apache.datasketches.memory.internal.WritableMemoryImpl;
 import org.testng.annotations.Test;
 
 /**
@@ -93,7 +93,7 @@ public class BufferInvariantsTest {
   @Test
   public void testBuf() {
     int n = 25;
-    WritableBuffer buf = WritableMemory.allocate(n).asWritableBuffer();
+    WritableBuffer buf = WritableMemoryImpl.allocate(n).asWritableBuffer();
     for (byte i = 0; i < n; i++) { buf.putByte(i); }
     buf.setPosition(0);
     assertEquals(buf.getPosition(), 0);
@@ -162,8 +162,8 @@ public class BufferInvariantsTest {
 
   @Test
   public void checkLimitsDirect() {
-    try (WritableHandle hand = WritableMemory.allocateDirect(100)) {
-      WritableMemory wmem = hand.get();
+    try (WritableHandle hand = WritableMemoryImpl.allocateDirect(100)) {
+      WritableMemoryImpl wmem = hand.get();
       Buffer buf = wmem.asBuffer();
       buf.setStartPositionEnd(40, 45, 50);
       buf.setStartPositionEnd(0, 0, 100);
@@ -233,8 +233,8 @@ public class BufferInvariantsTest {
   @Test
   public void testBufDirect() {
     int n = 25;
-    try (WritableHandle whand = WritableMemory.allocateDirect(n)) {
-    WritableMemory wmem = whand.get();
+    try (WritableHandle whand = WritableMemoryImpl.allocateDirect(n)) {
+    WritableMemoryImpl wmem = whand.get();
     WritableBuffer buf = wmem.asWritableBuffer();
     for (byte i = 0; i < n; i++) { buf.putByte(i); }
     buf.setPosition(0);

@@ -23,8 +23,8 @@ import static org.testng.Assert.assertEquals;
 
 import java.nio.ByteBuffer;
 
-import org.apache.datasketches.memory.internal.Memory;
-import org.apache.datasketches.memory.internal.WritableMemory;
+import org.apache.datasketches.memory.internal.MemoryImpl;
+import org.apache.datasketches.memory.internal.WritableMemoryImpl;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -37,15 +37,15 @@ public class ZeroCapacityTest {
   @SuppressWarnings({ "unused", "resource" })
   @Test
   public void checkZeroCapacity() {
-    WritableMemory wmem = WritableMemory.allocate(0);
+    WritableMemoryImpl wmem = WritableMemoryImpl.allocate(0);
     assertEquals(wmem.getCapacity(), 0);
 
-    Memory mem1 = Memory.wrap(new byte[0]);
-    Memory mem2 = Memory.wrap(ByteBuffer.allocate(0));
-    Memory mem3 = Memory.wrap(ByteBuffer.allocateDirect(0));
-    Memory reg = mem3.region(0, 0);
+    MemoryImpl mem1 = MemoryImpl.wrap(new byte[0]);
+    MemoryImpl mem2 = MemoryImpl.wrap(ByteBuffer.allocate(0));
+    MemoryImpl mem3 = MemoryImpl.wrap(ByteBuffer.allocateDirect(0));
+    MemoryImpl reg = mem3.region(0, 0);
     try {
-      WritableMemory.allocateDirect(0);
+      WritableMemoryImpl.allocateDirect(0);
       Assert.fail();
     } catch (IllegalArgumentException ignore) {
       // expected

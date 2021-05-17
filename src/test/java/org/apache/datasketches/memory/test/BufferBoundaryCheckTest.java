@@ -19,13 +19,13 @@
 
 package org.apache.datasketches.memory.test;
 
-import org.apache.datasketches.memory.internal.WritableMemory;
+import org.apache.datasketches.memory.internal.WritableMemoryImpl;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")
 public class BufferBoundaryCheckTest {
 
-  private final WritableMemory writableMemory = WritableMemory.allocate(8);
+  private final WritableMemoryImpl writableMemory = WritableMemoryImpl.allocate(8);
 
   @Test
   public void testGetBoolean() {

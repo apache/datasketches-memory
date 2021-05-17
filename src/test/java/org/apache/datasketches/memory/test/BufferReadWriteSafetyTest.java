@@ -24,7 +24,7 @@ import java.nio.ByteBuffer;
 import org.apache.datasketches.memory.internal.Buffer;
 import org.apache.datasketches.memory.internal.ReadOnlyException;
 import org.apache.datasketches.memory.internal.WritableBuffer;
-import org.apache.datasketches.memory.internal.WritableMemory;
+import org.apache.datasketches.memory.internal.WritableMemoryImpl;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")
@@ -158,19 +158,19 @@ public class BufferReadWriteSafetyTest {
 
   @Test(expectedExceptions = AssertionError.class)
   public void testWritableMemoryAsBuffer() {
-    WritableBuffer buf1 = (WritableBuffer) WritableMemory.allocate(8).asBuffer();
+    WritableBuffer buf1 = (WritableBuffer) WritableMemoryImpl.allocate(8).asBuffer();
     buf1.putInt(1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testWritableBufferRegion() {
-    WritableBuffer buf1 = (WritableBuffer) WritableMemory.allocate(8).asWritableBuffer().region();
+    WritableBuffer buf1 = (WritableBuffer) WritableMemoryImpl.allocate(8).asWritableBuffer().region();
     buf1.putInt(1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testWritableBufferDuplicate() {
-    WritableBuffer buf1 = (WritableBuffer) WritableMemory.allocate(8).asWritableBuffer().duplicate();
+    WritableBuffer buf1 = (WritableBuffer) WritableMemoryImpl.allocate(8).asWritableBuffer().duplicate();
     buf1.putInt(1);
   }
 }

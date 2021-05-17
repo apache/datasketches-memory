@@ -27,9 +27,9 @@ import java.util.List;
 
 import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.internal.Buffer;
-import org.apache.datasketches.memory.internal.Memory;
+import org.apache.datasketches.memory.internal.MemoryImpl;
 import org.apache.datasketches.memory.internal.WritableBuffer;
-import org.apache.datasketches.memory.internal.WritableMemory;
+import org.apache.datasketches.memory.internal.WritableMemoryImpl;
 import org.testng.annotations.Test;
 import org.testng.collections.Lists;
 
@@ -39,8 +39,8 @@ public class BufferTest {
   @Test
   public void checkDirectRoundTrip() {
     int n = 1024; //longs
-    try (WritableHandle wh = WritableMemory.allocateDirect(n * 8)) {
-      WritableMemory wmem = wh.get();
+    try (WritableHandle wh = WritableMemoryImpl.allocateDirect(n * 8)) {
+      WritableMemoryImpl wmem = wh.get();
       WritableBuffer wbuf = wmem.asWritableBuffer();
       for (int i = 0; i < n; i++) {
         wbuf.putLong(i);
@@ -56,7 +56,7 @@ public class BufferTest {
   @Test
   public void checkAutoHeapRoundTrip() {
     int n = 1024; //longs
-    WritableBuffer wbuf = WritableMemory.allocate(n * 8).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemoryImpl.allocate(n * 8).asWritableBuffer();
     for (int i = 0; i < n; i++) {
       wbuf.putLong(i);
     }
@@ -71,7 +71,7 @@ public class BufferTest {
   public void checkArrayWrap() {
     int n = 1024; //longs
     byte[] arr = new byte[n * 8];
-    WritableBuffer wbuf = WritableMemory.writableWrap(arr).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemoryImpl.writableWrap(arr).asWritableBuffer();
     for (int i = 0; i < n; i++) {
       wbuf.putLong(i);
     }
@@ -80,29 +80,29 @@ public class BufferTest {
       long v = wbuf.getLong();
       assertEquals(v, i);
     }
-    Buffer buf = Memory.wrap(arr).asBuffer();
+    Buffer buf = MemoryImpl.wrap(arr).asBuffer();
     buf.resetPosition();
     for (int i = 0; i < n; i++) {
       long v = buf.getLong();
       assertEquals(v, i);
     }
     // Check Zero length array wraps
-    Memory mem = Memory.wrap(new byte[0]);
+    MemoryImpl mem = MemoryImpl.wrap(new byte[0]);
     Buffer buffZeroLengthArrayWrap = mem.asBuffer();
     assertEquals(buffZeroLengthArrayWrap.getCapacity(), 0);
     // check 0 length array wraps
     List<Buffer> buffersToCheck = Lists.newArrayList();
-    buffersToCheck.add(WritableMemory.allocate(0).asBuffer());
+    buffersToCheck.add(WritableMemoryImpl.allocate(0).asBuffer());
     buffersToCheck.add(WritableBuffer.wrap(ByteBuffer.allocate(0)));
     buffersToCheck.add(Buffer.wrap(ByteBuffer.allocate(0)));
-    buffersToCheck.add(Memory.wrap(new boolean[0]).asBuffer());
-    buffersToCheck.add(Memory.wrap(new byte[0]).asBuffer());
-    buffersToCheck.add(Memory.wrap(new char[0]).asBuffer());
-    buffersToCheck.add(Memory.wrap(new short[0]).asBuffer());
-    buffersToCheck.add(Memory.wrap(new int[0]).asBuffer());
-    buffersToCheck.add(Memory.wrap(new long[0]).asBuffer());
-    buffersToCheck.add(Memory.wrap(new float[0]).asBuffer());
-    buffersToCheck.add(Memory.wrap(new double[0]).asBuffer());
+    buffersToCheck.add(MemoryImpl.wrap(new boolean[0]).asBuffer());
+    buffersToCheck.add(MemoryImpl.wrap(new byte[0]).asBuffer());
+    buffersToCheck.add(MemoryImpl.wrap(new char[0]).asBuffer());
+    buffersToCheck.add(MemoryImpl.wrap(new short[0]).asBuffer());
+    buffersToCheck.add(MemoryImpl.wrap(new int[0]).asBuffer());
+    buffersToCheck.add(MemoryImpl.wrap(new long[0]).asBuffer());
+    buffersToCheck.add(MemoryImpl.wrap(new float[0]).asBuffer());
+    buffersToCheck.add(MemoryImpl.wrap(new double[0]).asBuffer());
     //Check the buffer lengths
     for (Buffer buffer : buffersToCheck) {
       assertEquals(buffer.getCapacity(), 0);
@@ -151,7 +151,7 @@ public class BufferTest {
       long v = bb.getLong(i * 8);
       assertEquals(v, i);
     }
-    Buffer buf1 = Memory.wrap(arr).asBuffer();
+    Buffer buf1 = MemoryImpl.wrap(arr).asBuffer();
     for (int i = 0; i < n; i++) { //read from wrapped arr
       long v = buf1.getLong();
       assertEquals(v, i);
@@ -231,7 +231,7 @@ public class BufferTest {
     long[] arr = new long[n];
     for (int i = 0; i < n; i++) { arr[i] = i; }
 
-    WritableBuffer wbuf = WritableMemory.allocate(n * 8).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemoryImpl.allocate(n * 8).asWritableBuffer();
     wbuf.putLongArray(arr, 0, n);
     long[] arr2 = new long[n];
     wbuf.resetPosition();
@@ -248,7 +248,7 @@ public class BufferTest {
     long[] arr = new long[n];
     for (int i = 0; i < n; i++) { arr[i] = i; }
 
-    Buffer buf = Memory.wrap(arr).asBuffer();
+    Buffer buf = MemoryImpl.wrap(arr).asBuffer();
     buf.setPosition(n2 * 8);
     Buffer reg = buf.region();
     for (int i = 0; i < n2; i++) {
@@ -264,7 +264,7 @@ public class BufferTest {
     int n2 = n / 2;
     long[] arr = new long[n];
     for (int i = 0; i < n; i++) { arr[i] = i; }
-    WritableBuffer wbuf = WritableMemory.writableWrap(arr).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemoryImpl.writableWrap(arr).asWritableBuffer();
     for (int i = 0; i < n; i++) {
       assertEquals(wbuf.getLong(), i); //write all
       //println("" + wmem.getLong(i * 8));
@@ -284,11 +284,11 @@ public class BufferTest {
   public void checkParentUseAfterFree() {
     int bytes = 64 * 8;
     @SuppressWarnings("resource") //intentionally not using try-with-resources here
-    WritableHandle wh = WritableMemory.allocateDirect(bytes);
-    WritableMemory wmem = wh.get();
+    WritableHandle wh = WritableMemoryImpl.allocateDirect(bytes);
+    WritableMemoryImpl wmem = wh.get();
     WritableBuffer wbuf = wmem.asWritableBuffer();
     wh.close();
-    //with -ea assert: Memory not valid.
+    //with -ea assert: MemoryImpl not valid.
     //with -da sometimes segfaults, sometimes passes!
     wbuf.getLong();
   }
@@ -297,19 +297,19 @@ public class BufferTest {
   @Test(expectedExceptions = AssertionError.class)
   public void checkRegionUseAfterFree() {
     int bytes = 64;
-    WritableHandle wh = WritableMemory.allocateDirect(bytes);
-    Memory wmem = wh.get();
+    WritableHandle wh = WritableMemoryImpl.allocateDirect(bytes);
+    MemoryImpl wmem = wh.get();
 
     Buffer reg = wmem.asBuffer().region();
     wh.close();
-    //with -ea assert: Memory not valid.
+    //with -ea assert: MemoryImpl not valid.
     //with -da sometimes segfaults, sometimes passes!
     reg.getByte();
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void checkBaseBufferInvariants() {
-    WritableBuffer wbuf = WritableMemory.allocate(64).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemoryImpl.allocate(64).asWritableBuffer();
     wbuf.setStartPositionEnd(1, 0, 2); //out of order
   }
 

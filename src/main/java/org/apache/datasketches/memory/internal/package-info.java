@@ -26,8 +26,8 @@
  *
  * <p>In addition, this package provides:</p>
  *
- * <ul><li>Two different access APIs: read-only {@link org.apache.datasketches.memory.internal.Memory} and
- * {@link org.apache.datasketches.memory.internal.WritableMemory} for absolute offset access,
+ * <ul><li>Two different access APIs: read-only {@link org.apache.datasketches.memory.internal.MemoryImpl} and
+ * {@link org.apache.datasketches.memory.internal.WritableMemoryImpl} for absolute offset access,
  * and read-only {@link org.apache.datasketches.memory.internal.Buffer} and
  * {@link org.apache.datasketches.memory.internal.WritableBuffer}
  * for relative positional access (similar to ByteBuffer).</li>
@@ -38,8 +38,8 @@
  * <li>The conversion from Writable to read-only is just a cast, so no unnecessary objects are
  * created. For example:
  * <blockquote><pre>
- *     WritableMemory wMem = ...
- *     Memory mem = wMem;
+ *     WritableMemoryImpl wMem = ...
+ *     MemoryImpl mem = wMem;
  * </pre></blockquote>
  * </li>
  *
@@ -51,7 +51,7 @@
  * This virtually eliminates the possibility of accidentally writing into the memory space
  * previously owned by a closed resource.</li>
  *
- * <li>Improved performance over the prior Memory implementation.</li>
+ * <li>Improved performance over the prior MemoryImpl implementation.</li>
  *
  * <li>Cleaner internal architecture, which will make it easier to extend in the future.</li>
  *
@@ -64,13 +64,13 @@
  * byte-level read and write access. The four resources are:</p>
  *
  * <ul><li>Direct (a.k.a. Native) off-heap memory allocated by the user.</li>
- * <li>Memory-mapped files, both writable and read-only.</li>
+ * <li>MemoryImpl-mapped files, both writable and read-only.</li>
  * <li>{@code ByteBuffers}, both heap-based and direct, writable and read-only.</li>
  * <li>Heap-based primitive arrays, which can be accessed as writable or read-only.</li>
  * </ul>
  *
  * <p>The two different access APIs are:</p>
- * <ul><li><i>Memory, WritableMemory</i>: Absolute offset addressing into a resource.</li>
+ * <ul><li><i>MemoryImpl, WritableMemoryImpl</i>: Absolute offset addressing into a resource.</li>
  * <li><i>Buffer, WritableBuffer</i>: Position relative addressing into a resource.</li>
  * </ul>
  *
@@ -110,14 +110,14 @@
  * The resource can also be explicitly closed by the user by calling {@code Handle.close()}.</p>
  * <blockquote><pre>
  *     //Using try-with-resources block:
- *     try (WritableyMapHandle handle = WritableMemory.map(File file)) {
- *       WritableMemory wMem = handle.get();
+ *     try (WritableyMapHandle handle = WritableMemoryImpl.map(File file)) {
+ *       WritableMemoryImpl wMem = handle.get();
  *       doWork(wMem) // read and write to memory mapped file.
  *     }
  *
  *     //Using explicit close():
- *     WritableMapHandleImpl handle = WritableMemory.map(File file);
- *     WritableMemory wMem = handle.get();
+ *     WritableMapHandleImpl handle = WritableMemoryImpl.map(File file);
+ *     WritableMemoryImpl wMem = handle.get();
  *     doWork(wMem) // read and write to memory mapped file.
  *     handle.close();
  * </pre></blockquote>
@@ -125,7 +125,7 @@
  * <p>Where it is desirable to pass ownership of the resource (and the {@code close()}
  * responsibility) one can not use the TWR block. Instead:</p>
  * <blockquote><pre>
- *     WritableMapHandleImpl handler = WritableMemory.map(File file);
+ *     WritableMapHandleImpl handler = WritableMemoryImpl.map(File file);
  *     doWorkAndClose(handle); //passes the handle to object that closes the resource.
  * </pre></blockquote>
  *
@@ -149,20 +149,20 @@
  * hard-to-find bug.</li>
  * </ul>
  *
- *<p>Moving back and forth between <i>Memory</i> and <i>Buffer</i>:</p>
+ *<p>Moving back and forth between <i>MemoryImpl</i> and <i>Buffer</i>:</p>
  *<blockquote><pre>
- *    Memory mem = ...
+ *    MemoryImpl mem = ...
  *    Buffer buf = mem.asBuffer();
  *    ...
- *    Memory mem2 = buf.asMemory();
+ *    MemoryImpl mem2 = buf.asMemory();
  *    ...
  * </pre></blockquote>
  *
  * <p>Hierarchical memory regions can be easily created:</p>
  * <blockquote><pre>
- *     WritableMemory wMem = ...
- *     WritableMemory wReg = wMem.writableRegion(offset, length); //OR
- *     Memory reg = wMem.region(offset, length);
+ *     WritableMemoryImpl wMem = ...
+ *     WritableMemoryImpl wReg = wMem.writableRegion(offset, length); //OR
+ *     MemoryImpl reg = wMem.region(offset, length);
  * </pre></blockquote>
  *
  * <p>With asserts enabled in the JVM, all methods are checked for bounds and

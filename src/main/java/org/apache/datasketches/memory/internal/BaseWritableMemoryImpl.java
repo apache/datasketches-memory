@@ -36,8 +36,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.WritableByteChannel;
 
+import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableMapHandle;
+import org.apache.datasketches.memory.WritableMemory;
 import org.apache.datasketches.memory.WritableDirectHandle;
 
 /*
@@ -53,11 +55,11 @@ import org.apache.datasketches.memory.WritableDirectHandle;
  */
 
 /**
- * Common base of native-ordered and non-native-ordered {@link WritableMemory} implementations.
+ * Common base of native-ordered and non-native-ordered {@link WritableMemoryImpl} implementations.
  * Contains methods which are agnostic to the byte order.
  */
 @SuppressWarnings({"restriction"})
-abstract class BaseWritableMemoryImpl extends WritableMemory {
+abstract class BaseWritableMemoryImpl extends WritableMemoryImpl {
 
   //1KB of empty bytes for speedy clear()
   private final static byte[] EMPTY_BYTES;
@@ -152,7 +154,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
           .slice().asReadOnlyBuffer();
     } else {
       throw new UnsupportedOperationException(
-          "This Memory object is the result of wrapping a "
+          "This MemoryImpl object is the result of wrapping a "
               + unsafeObj.getClass().getSimpleName()
               + " array, it could not be viewed as a ByteBuffer.");
     }
@@ -162,31 +164,31 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
 
   //REGIONS
   @Override
-  public Memory region(final long offsetBytes, final long capacityBytes) {
+  public MemoryImpl region(final long offsetBytes, final long capacityBytes) {
     return writableRegionImpl(offsetBytes, capacityBytes, true, getTypeByteOrder());
   }
 
   @Override
-  public Memory region(final long offsetBytes, final long capacityBytes, final ByteOrder byteOrder) {
+  public MemoryImpl region(final long offsetBytes, final long capacityBytes, final ByteOrder byteOrder) {
     return writableRegionImpl(offsetBytes, capacityBytes, true, byteOrder);
   }
 
   @Override
-  public WritableMemory writableRegion(final long offsetBytes, final long capacityBytes) {
+  public WritableMemoryImpl writableRegion(final long offsetBytes, final long capacityBytes) {
     return writableRegionImpl(offsetBytes, capacityBytes, false, getTypeByteOrder());
   }
 
   @Override
-  public WritableMemory writableRegion(final long offsetBytes, final long capacityBytes,
+  public WritableMemoryImpl writableRegion(final long offsetBytes, final long capacityBytes,
       final ByteOrder byteOrder) {
     return writableRegionImpl(offsetBytes, capacityBytes, false, byteOrder);
   }
 
-  WritableMemory writableRegionImpl(final long offsetBytes, final long capacityBytes,
+  WritableMemoryImpl writableRegionImpl(final long offsetBytes, final long capacityBytes,
       final boolean localReadOnly, final ByteOrder byteOrder) {
     if (capacityBytes == 0) { return ZERO_SIZE_MEMORY; }
     if (isReadOnly() && !localReadOnly) {
-      throw new ReadOnlyException("Writable region of a read-only Memory is not allowed.");
+      throw new ReadOnlyException("Writable region of a read-only MemoryImpl is not allowed.");
     }
     final boolean readOnly = isReadOnly() || localReadOnly;
     checkValidAndBounds(offsetBytes, capacityBytes);
@@ -220,7 +222,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   WritableBuffer asWritableBufferImpl(final boolean localReadOnly, final ByteOrder byteOrder) {
     if (isReadOnly() && !localReadOnly) {
       throw new ReadOnlyException(
-          "Converting a read-only Memory to a writable Buffer is not allowed.");
+          "Converting a read-only MemoryImpl to a writable Buffer is not allowed.");
     }
     final boolean readOnly = isReadOnly() || localReadOnly;
     final WritableBuffer wbuf = toWritableBuffer(readOnly, byteOrder);
@@ -316,14 +318,14 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
   @Override
   public final int compareTo(final long thisOffsetBytes, final long thisLengthBytes,
       final Memory thatMem, final long thatOffsetBytes, final long thatLengthBytes) {
-    return CompareAndCopy.compare(this, thisOffsetBytes, thisLengthBytes,
-        thatMem, thatOffsetBytes, thatLengthBytes);
+    return CompareAndCopy.compare((BaseStateImpl)this, thisOffsetBytes, thisLengthBytes,
+        (BaseStateImpl)thatMem, thatOffsetBytes, thatLengthBytes);
   }
 
   @Override
   public final void copyTo(final long srcOffsetBytes, final WritableMemory destination,
       final long dstOffsetBytes, final long lengthBytes) {
-    CompareAndCopy.copy(this, srcOffsetBytes, destination,
+    CompareAndCopy.copy((BaseStateImpl)this, srcOffsetBytes, (BaseStateImpl)destination,
         dstOffsetBytes, lengthBytes);
   }
 
@@ -336,7 +338,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemory {
     } else if (getUnsafeObject() == null) {
       writeDirectMemoryTo(offsetBytes, lengthBytes, out);
     } else {
-      // Memory is backed by some array that is not byte[], for example int[], long[], etc.
+      // MemoryImpl is backed by some array that is not byte[], for example int[], long[], etc.
       // We don't have other choice as to do extra intermediate copy.
       writeToWithExtraCopy(offsetBytes, lengthBytes, out);
     }

@@ -72,10 +72,10 @@ public abstract class WritableBuffer extends Buffer {
   }
 
   //MAP
-  //Use WritableMemory for mapping files and then asWritableBuffer()
+  //Use WritableMemoryImpl for mapping files and then asWritableBuffer()
 
   //ALLOCATE DIRECT
-  //Use WritableMemory to allocate direct memory and then asWritableBuffer().
+  //Use WritableMemoryImpl to allocate direct memory and then asWritableBuffer().
 
   //DUPLICATES
   /**
@@ -152,7 +152,7 @@ public abstract class WritableBuffer extends Buffer {
    * the backing storage and byte order are unspecified.
    *
    * <p><b>Note: </b><i>asWritableMemory()</i> and <i>asMemory()</i>
-   * will return the originating <i>Memory</i> byte order.</p>
+   * will return the originating <i>MemoryImpl</i> byte order.</p>
    * @param offsetBytes the starting offset with respect to the origin of this <i>WritableBuffer</i>
    * @param capacityBytes the <i>capacity</i> of the returned region in bytes
    * @param byteOrder the given byte order
@@ -164,15 +164,15 @@ public abstract class WritableBuffer extends Buffer {
 
   //AS MEMORY
   /**
-   * Convert this WritableBuffer to a WritableMemory.
+   * Convert this WritableBuffer to a WritableMemoryImpl.
    * If this object's capacity is zero, the returned object is effectively immutable and
    * the backing storage and byte order are unspecified.
-   * @return WritableMemory
+   * @return WritableMemoryImpl
    */
-  public abstract WritableMemory asWritableMemory();
+  public abstract WritableMemoryImpl asWritableMemory();
 
   //ACCESS PRIMITIVE HEAP ARRAYS for write
-  //use WritableMemory and then asWritableBuffer().
+  //use WritableMemoryImpl and then asWritableBuffer().
   //END OF CONSTRUCTOR-TYPE METHODS
 
   //PRIMITIVE putX() and putXArray()
@@ -186,7 +186,7 @@ public abstract class WritableBuffer extends Buffer {
   /**
    * Puts the boolean value at the given offset.
    * This does not change the position.
-   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start.
+   * @param offsetBytes offset bytes relative to this <i>WritableMemoryImpl</i> start.
    * @param value the value to put
    */
   public abstract void putBoolean(long offsetBytes, boolean value);
@@ -211,7 +211,7 @@ public abstract class WritableBuffer extends Buffer {
   /**
    * Puts the byte value at the given offset.
    * This does not change the position.
-   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param offsetBytes offset bytes relative to this <i>WritableMemoryImpl</i> start
    * @param value the value to put
    */
   public abstract void putByte(long offsetBytes, byte value);
@@ -235,7 +235,7 @@ public abstract class WritableBuffer extends Buffer {
   /**
    * Puts the char value at the given offset.
    * This does not change the position.
-   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param offsetBytes offset bytes relative to this <i>WritableMemoryImpl</i> start
    * @param value the value to put
    */
   public abstract void putChar(long offsetBytes, char value);
@@ -259,7 +259,7 @@ public abstract class WritableBuffer extends Buffer {
   /**
    * Puts the double value at the given offset.
    * This does not change the position.
-   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param offsetBytes offset bytes relative to this <i>WritableMemoryImpl</i> start
    * @param value the value to put
    */
   public abstract void putDouble(long offsetBytes, double value);
@@ -283,7 +283,7 @@ public abstract class WritableBuffer extends Buffer {
   /**
    * Puts the float value at the given offset.
    * This does not change the position.
-   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param offsetBytes offset bytes relative to this <i>WritableMemoryImpl</i> start
    * @param value the value to put
    */
   public abstract void putFloat(long offsetBytes, float value);
@@ -307,7 +307,7 @@ public abstract class WritableBuffer extends Buffer {
   /**
    * Puts the int value at the given offset.
    * This does not change the position.
-   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param offsetBytes offset bytes relative to this <i>WritableMemoryImpl</i> start
    * @param value the value to put
    */
   public abstract void putInt(long offsetBytes, int value);
@@ -331,7 +331,7 @@ public abstract class WritableBuffer extends Buffer {
   /**
    * Puts the long value at the given offset.
    * This does not change the position.
-   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param offsetBytes offset bytes relative to this <i>WritableMemoryImpl</i> start
    * @param value the value to put
    */
   public abstract void putLong(long offsetBytes, long value);
@@ -355,7 +355,7 @@ public abstract class WritableBuffer extends Buffer {
   /**
    * Puts the short value at the given offset.
    * This does not change the position.
-   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param offsetBytes offset bytes relative to this <i>WritableMemoryImpl</i> start
    * @param value the value to put
    */
   public abstract void putShort(long offsetBytes, short value);
@@ -390,10 +390,10 @@ public abstract class WritableBuffer extends Buffer {
 
   //OTHER WRITABLE API METHODS
   /**
-   * For Direct Memory only. Other types of backing resources will return null.
+   * For Direct MemoryImpl only. Other types of backing resources will return null.
    * Gets the MemoryRequestServer object used by dynamic off-heap (Direct) memory objects
    * to request additional memory.
-   * Set using {@link WritableMemory#allocateDirect(long, MemoryRequestServer)}.
+   * Set using {@link WritableMemoryImpl#allocateDirect(long, MemoryRequestServer)}.
    * If not explicity set, this returns the {@link DefaultMemoryRequestServer}.
    * @return the MemoryRequestServer object (if direct memory) or null.
    */

@@ -70,7 +70,7 @@ public abstract class Buffer extends BaseBuffer {
   }
 
   //MAP
-  //Use Memory for mapping files and the asBuffer()
+  //Use MemoryImpl for mapping files and the asBuffer()
 
   //DUPLICATES
   /**
@@ -146,8 +146,8 @@ public abstract class Buffer extends BaseBuffer {
    * If this object's capacity is zero, the returned object is effectively immutable and
    * the backing storage and byte order are unspecified.
    *
-   * <p><b>Note: The Memory returned with </b><i>asMemory()</i> will have the originating
-   * <i>Memory</i> byte order.</p>
+   * <p><b>Note: The MemoryImpl returned with </b><i>asMemory()</i> will have the originating
+   * <i>MemoryImpl</i> byte order.</p>
    *
    * @param offsetBytes the starting offset with respect to the origin of this <i>WritableBuffer</i>
    * @param capacityBytes the <i>capacity</i> of the returned region in bytes
@@ -160,16 +160,16 @@ public abstract class Buffer extends BaseBuffer {
 
   //MEMORY
   /**
-   * Convert this Buffer to a Memory. The current <i>start</i>, <i>position</i> and <i>end</i>
+   * Convert this Buffer to a MemoryImpl. The current <i>start</i>, <i>position</i> and <i>end</i>
    * are ignored.
    * If this object's capacity is zero, the returned object is effectively immutable and
    * the backing resource and byte order are unspecified.
-   * @return Memory
+   * @return MemoryImpl
    */
-  public abstract Memory asMemory();
+  public abstract MemoryImpl asMemory();
 
   //ACCESS PRIMITIVE HEAP ARRAYS for readOnly
-  // use Memory or WritableMemory and then asBuffer().
+  // use MemoryImpl or WritableMemoryImpl and then asBuffer().
   //END OF CONSTRUCTOR-TYPE METHODS
 
   //PRIMITIVE getX() and getXArray()
@@ -183,7 +183,7 @@ public abstract class Buffer extends BaseBuffer {
   /**
    * Gets the boolean value at the given offset.
    * This does not change the position.
-   * @param offsetBytes offset bytes relative to this Memory start
+   * @param offsetBytes offset bytes relative to this MemoryImpl start
    * @return the boolean at the given offset
    */
   public abstract boolean getBoolean(long offsetBytes);
@@ -208,7 +208,7 @@ public abstract class Buffer extends BaseBuffer {
   /**
    * Gets the byte value at the given offset.
    * This does not change the position.
-   * @param offsetBytes offset bytes relative to this Memory start
+   * @param offsetBytes offset bytes relative to this MemoryImpl start
    * @return the byte at the given offset
    */
   public abstract byte getByte(long offsetBytes);
@@ -232,7 +232,7 @@ public abstract class Buffer extends BaseBuffer {
   /**
    * Gets the char value at the given offset.
    * This does not change the position.
-   * @param offsetBytes offset bytes relative to this Memory start
+   * @param offsetBytes offset bytes relative to this MemoryImpl start
    * @return the char at the given offset
    */
   public abstract char getChar(long offsetBytes);
@@ -256,7 +256,7 @@ public abstract class Buffer extends BaseBuffer {
   /**
    * Gets the double value at the given offset.
    * This does not change the position.
-   * @param offsetBytes offset bytes relative to this Memory start
+   * @param offsetBytes offset bytes relative to this MemoryImpl start
    * @return the double at the given offset
    */
   public abstract double getDouble(long offsetBytes);
@@ -280,7 +280,7 @@ public abstract class Buffer extends BaseBuffer {
   /**
    * Gets the float value at the given offset.
    * This does not change the position.
-   * @param offsetBytes offset bytes relative to this Memory start
+   * @param offsetBytes offset bytes relative to this MemoryImpl start
    * @return the float at the given offset
    */
   public abstract float getFloat(long offsetBytes);
@@ -304,7 +304,7 @@ public abstract class Buffer extends BaseBuffer {
   /**
    * Gets the int value at the given offset.
    * This does not change the position.
-   * @param offsetBytes offset bytes relative to this Memory start
+   * @param offsetBytes offset bytes relative to this MemoryImpl start
    * @return the int at the given offset
    */
   public abstract int getInt(long offsetBytes);
@@ -328,7 +328,7 @@ public abstract class Buffer extends BaseBuffer {
   /**
    * Gets the long value at the given offset.
    * This does not change the position.
-   * @param offsetBytes offset bytes relative to this Memory start
+   * @param offsetBytes offset bytes relative to this MemoryImpl start
    * @return the long at the given offset
    */
   public abstract long getLong(long offsetBytes);
@@ -352,7 +352,7 @@ public abstract class Buffer extends BaseBuffer {
   /**
    * Gets the short value at the given offset.
    * This does not change the position.
-   * @param offsetBytes offset bytes relative to this Memory start
+   * @param offsetBytes offset bytes relative to this MemoryImpl start
    * @return the short at the given offset
    */
   public abstract short getShort(long offsetBytes);

@@ -33,7 +33,7 @@ import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.BaseState;
 
 /**
- * Keeps key configuration state for Memory and Buffer plus some common static variables
+ * Keeps key configuration state for MemoryImpl and Buffer plus some common static variables
  * and check methods.
  *
  * @author Lee Rhodes
@@ -73,8 +73,8 @@ public abstract class BaseStateImpl implements BaseState {
 
   /**
    * This becomes the base offset used by all Unsafe calls. It is cumulative in that in includes
-   * all offsets from regions, user-defined offsets when creating Memory, and the array object
-   * header offset when creating Memory from primitive arrays.
+   * all offsets from regions, user-defined offsets when creating MemoryImpl, and the array object
+   * header offset when creating MemoryImpl from primitive arrays.
    */
   private final long cumBaseOffset_;
 
@@ -162,7 +162,7 @@ public abstract class BaseStateImpl implements BaseState {
     return cumBaseOffset_ + offsetBytes;
   }
 
-  //made public in WritableMemory and WritableBuffer, only implemented in Direct Leafs
+  //made public in WritableMemoryImpl and WritableBuffer, only implemented in Direct Leafs
   abstract MemoryRequestServer getMemoryRequestServer();
 
   //Overridden by ByteBuffer, Direct and Map leafs
@@ -186,7 +186,7 @@ public abstract class BaseStateImpl implements BaseState {
   //Overridden by all leafs
   abstract int getTypeId();
 
-  //Overridden by Heap and ByteBuffer Leafs. Made public as getArray() in WritableMemory and
+  //Overridden by Heap and ByteBuffer Leafs. Made public as getArray() in WritableMemoryImpl and
   // WritableBuffer
   Object getUnsafeObject() {
     return null;
@@ -248,12 +248,12 @@ public abstract class BaseStateImpl implements BaseState {
 
   //ASSERTS AND CHECKS
   final void assertValid() {
-    assert isValid() : "Memory not valid.";
+    assert isValid() : "MemoryImpl not valid.";
   }
 
   void checkValid() {
     if (!isValid()) {
-      throw new IllegalStateException("Memory not valid.");
+      throw new IllegalStateException("MemoryImpl not valid.");
     }
   }
 
@@ -271,7 +271,7 @@ public abstract class BaseStateImpl implements BaseState {
     // because the later can make JVM to not inline the assert code path (and entirely remove it)
     // even though it does nothing in production code path.
     assertBounds(offsetBytes, lengthBytes, capacityBytes_);
-    assert !isReadOnly() : "Memory is read-only.";
+    assert !isReadOnly() : "MemoryImpl is read-only.";
   }
 
   @Override
@@ -286,7 +286,7 @@ public abstract class BaseStateImpl implements BaseState {
     //read capacityBytes_ directly to eliminate extra checkValid() call
     checkBounds(offsetBytes, lengthBytes, capacityBytes_);
     if (isReadOnly()) {
-      throw new ReadOnlyException("Memory is read-only.");
+      throw new ReadOnlyException("MemoryImpl is read-only.");
     }
   }
 
@@ -386,7 +386,7 @@ public abstract class BaseStateImpl implements BaseState {
    * Used primarily for testing.
    * @param state the BaseStateImpl
    * @param preamble a descriptive header
-   * @param offsetBytes offset bytes relative to the Memory start
+   * @param offsetBytes offset bytes relative to the MemoryImpl start
    * @param lengthBytes number of bytes to convert to a hex string
    * @return a formatted hex string in a human readable array
    */

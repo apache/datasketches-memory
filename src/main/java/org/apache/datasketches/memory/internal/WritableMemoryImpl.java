@@ -19,311 +19,648 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_CHAR_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_DOUBLE_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_DOUBLE_INDEX_SCALE;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_FLOAT_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_FLOAT_INDEX_SCALE;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_INT_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_LONG_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_LONG_INDEX_SCALE;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_SHORT_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.CHAR_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.DOUBLE_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.FLOAT_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.INT_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.LONG_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.SHORT_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.checkBounds;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
+import static org.apache.datasketches.memory.internal.Util.negativeCheck;
+import static org.apache.datasketches.memory.internal.Util.nullCheck;
+import static org.apache.datasketches.memory.internal.Util.zeroCheck;
 
-/*
- * Developer notes: The heavier methods, such as put/get arrays, duplicate, region, clear, fill,
- * compareTo, etc., use hard checks (checkValid*() and checkBounds()), which execute at runtime and
- * throw exceptions if violated. The cost of the runtime checks are minor compared to the rest of
- * the work these methods are doing.
- *
- * <p>The light weight methods, such as put/get primitives, use asserts (assertValid*()), which only
- * execute when asserts are enabled and JIT will remove them entirely from production runtime code.
- * The light weight methods will simplify to a single unsafe call, which is further simplified by
- * JIT to an intrinsic that is often a single CPU instruction.
- */
+import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
+import org.apache.datasketches.memory.DefaultMemoryRequestServer;
+import org.apache.datasketches.memory.Handle;
+import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.WritableHandle;
+import org.apache.datasketches.memory.WritableMapHandle;
+import org.apache.datasketches.memory.WritableDirectHandle;
+
 
 /**
- * Implementation of {@link WritableMemory} for native endian byte order. Non-native variant is
- * {@link NonNativeWritableMemoryImpl}.
+ * Provides read and write primitive and primitive array access to any of the four resources
+ * mentioned at the package level.
+ *
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-@SuppressWarnings({"restriction"})
-abstract class WritableMemoryImpl extends BaseWritableMemoryImpl {
+public abstract class WritableMemory extends Memory {
 
   //Pass-through ctor
-  WritableMemoryImpl(final Object unsafeObj, final long nativeBaseOffset,
-      final long regionOffset, final long capacityBytes) {
+  WritableMemory(final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
+      final long capacityBytes) {
     super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
   }
 
-  ///PRIMITIVE getX() and getXArray()
-  @Override
-  public char getChar(final long offsetBytes) {
-    return getNativeOrderedChar(offsetBytes);
+  //BYTE BUFFER
+  /**
+   * Accesses the given ByteBuffer for write operations. The returned WritableMemory object has
+   * the same byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is
+   * zero, then byte order of the returned WritableMemory object, as well as backing storage and
+   * read-only status are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.wrap(...)</i>.
+   * @param byteBuf the given ByteBuffer
+   * @return a new WritableMemory for write operations on the given ByteBuffer.
+   */
+  public static WritableMemory writableWrap(final ByteBuffer byteBuf) {
+    return BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, false, byteBuf.order());
   }
 
-  @Override
-  public void getCharArray(final long offsetBytes, final char[] dstArray, final int dstOffsetChars,
-      final int lengthChars) {
-    final long copyBytes = ((long) lengthChars) << CHAR_SHIFT;
-    checkValidAndBounds(offsetBytes, copyBytes);
-    checkBounds(dstOffsetChars, lengthChars, dstArray.length);
-    CompareAndCopy.copyMemoryCheckingDifferentObject(
-        getUnsafeObject(),
-        getCumulativeOffset(offsetBytes),
-        dstArray,
-        ARRAY_CHAR_BASE_OFFSET + (((long) dstOffsetChars) << CHAR_SHIFT),
-        copyBytes);
+  /**
+   * Accesses the given ByteBuffer for write operations. The returned WritableMemory object has
+   * the given byte order, ignoring the byte order of the given ByteBuffer. If the capacity of
+   * the given ByteBuffer is zero the byte order of the returned WritableMemory object
+   * (as well as backing storage) is unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.wrap(...)</i>.
+   * @param byteBuf the given ByteBuffer, must not be null
+   * @param byteOrder the byte order to be used, which may be independent of the byte order
+   * state of the given ByteBuffer
+   * @return a new WritableMemory for write operations on the given ByteBuffer.
+   */
+  public static WritableMemory writableWrap(final ByteBuffer byteBuf, final ByteOrder byteOrder) {
+    return BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, false, byteOrder);
   }
 
-  @Override
-  public double getDouble(final long offsetBytes) {
-    assertValidAndBoundsForRead(offsetBytes, ARRAY_DOUBLE_INDEX_SCALE);
-    return unsafe.getDouble(getUnsafeObject(), getCumulativeOffset(offsetBytes));
+  //MAP
+  /**
+   * Maps the entire given file into native-ordered WritableMemory for write operations
+   * (including those &gt; 2GB). Calling this method is equivalent to calling
+   * {@link #writableMap(File, long, long, ByteOrder) map(file, 0, file.length(), ByteOrder.nativeOrder())}.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.map(...)</i>.
+   * @param file the given file to map
+   * @return WritableMapHandle for managing the mapped Memory.
+   * Please read Javadocs for {@link Handle}.
+   * @throws IOException file not found or a RuntimeException.
+   */
+  public static WritableMapHandle writableMap(final File file) throws IOException {
+    return WritableMemory.writableMap(file, 0, file.length(), Util.nativeByteOrder);
   }
 
-  @Override
-  public void getDoubleArray(final long offsetBytes, final double[] dstArray,
-      final int dstOffsetDoubles, final int lengthDoubles) {
-    final long copyBytes = ((long) lengthDoubles) << DOUBLE_SHIFT;
-    checkValidAndBounds(offsetBytes, copyBytes);
-    checkBounds(dstOffsetDoubles, lengthDoubles, dstArray.length);
-    CompareAndCopy.copyMemoryCheckingDifferentObject(
-        getUnsafeObject(),
-        getCumulativeOffset(offsetBytes),
-        dstArray,
-        ARRAY_DOUBLE_BASE_OFFSET + (((long) dstOffsetDoubles) << DOUBLE_SHIFT),
-        copyBytes);
+  /**
+   * Maps the specified portion of the given file into Memory for write operations
+   * (including those &gt; 2GB).
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.map(...)</i>.
+   * @param file the given file to map. It may not be null.
+   * @param fileOffsetBytes the position in the given file in bytes. It may not be negative.
+   * @param capacityBytes the size of the mapped Memory. It may not be negative or zero.
+   * @param byteOrder the byte order to be used for the given file. It may not be null.
+   * @return WritableMapHandleImpl for managing the mapped Memory.
+   * Please read Javadocs for {@link Handle}.
+   * @throws IOException file not found or RuntimeException, etc.
+   */
+  public static WritableMapHandle writableMap(final File file, final long fileOffsetBytes,
+      final long capacityBytes, final ByteOrder byteOrder) throws IOException {
+    zeroCheck(capacityBytes, "Capacity");
+    nullCheck(file, "file is null");
+    negativeCheck(fileOffsetBytes, "File offset is negative");
+    return BaseWritableMemoryImpl
+        .wrapMap(file, fileOffsetBytes, capacityBytes, false, byteOrder);
   }
 
-  @Override
-  public float getFloat(final long offsetBytes) {
-    assertValidAndBoundsForRead(offsetBytes, ARRAY_FLOAT_INDEX_SCALE);
-    return unsafe.getFloat(getUnsafeObject(), getCumulativeOffset(offsetBytes));
+  //ALLOCATE DIRECT
+  /**
+   * Allocates and provides access to capacityBytes directly in native (off-heap) memory
+   * leveraging the WritableMemory API. Native byte order is assumed.
+   * The allocated memory will be 8-byte aligned, but may not be page aligned.
+   * If capacityBytes is zero, byte order, backing storage and read-only status
+   * of the WritableMemory object, returned from {@link WritableHandle#get()} are unspecified.
+   *
+   * <p>The default MemoryRequestServer, which allocates any request for memory onto the heap,
+   * will be used.</p>
+   *
+   * <p><b>NOTE:</b> Native/Direct memory acquired using Unsafe may have garbage in it.
+   * It is the responsibility of the using class to clear this memory, if required,
+   * and to call <i>close()</i> when done.</p>
+   *
+   * @param capacityBytes the size of the desired memory in bytes.
+   * @return WritableDirectHandleImpl for this off-heap resource.
+   * Please read Javadocs for {@link Handle}.
+   */
+  public static WritableDirectHandle allocateDirect(final long capacityBytes) {
+    return allocateDirect(capacityBytes, null);
   }
 
-  @Override
-  public void getFloatArray(final long offsetBytes, final float[] dstArray,
-      final int dstOffsetFloats, final int lengthFloats) {
-    final long copyBytes = ((long) lengthFloats) << FLOAT_SHIFT;
-    checkValidAndBounds(offsetBytes, copyBytes);
-    checkBounds(dstOffsetFloats, lengthFloats, dstArray.length);
-    CompareAndCopy.copyMemoryCheckingDifferentObject(
-        getUnsafeObject(),
-        getCumulativeOffset(offsetBytes),
-        dstArray,
-        ARRAY_FLOAT_BASE_OFFSET + (((long) dstOffsetFloats) << FLOAT_SHIFT),
-        copyBytes);
+  /**
+   * Allocates and provides access to capacityBytes directly in native (off-heap) memory
+   * leveraging the WritableMemory API. The allocated memory will be 8-byte aligned, but may not
+   * be page aligned. If capacityBytes is zero, byte order, backing storage and read-only status
+   * of the WritableMemory object, returned from {@link WritableHandle#get()} are unspecified.
+   *
+   * <p><b>NOTE:</b> Native/Direct memory acquired using Unsafe may have garbage in it.
+   * It is the responsibility of the using class to clear this memory, if required,
+   * and to call <i>close()</i> when done.</p>
+   *
+   * @param capacityBytes the size of the desired memory in bytes.
+   * @param memReqSvr A user-specified MemoryRequestServer.
+   * This is a callback mechanism for a user client of direct memory to request more memory.
+   * @return WritableHandle for this off-heap resource.
+   * Please read Javadocs for {@link Handle}.
+   */
+  public static WritableDirectHandle allocateDirect(final long capacityBytes,
+      final MemoryRequestServer memReqSvr) {
+    return BaseWritableMemoryImpl.wrapDirect(capacityBytes, Util.nativeByteOrder, memReqSvr);
   }
 
-  @Override
-  public int getInt(final long offsetBytes) {
-    return getNativeOrderedInt(offsetBytes);
+  //REGIONS
+  /**
+   * A writable region is a writable view of this object.
+   * This returns a new <i>WritableMemory</i> representing the defined writable region with the
+   * given offsetBytes and capacityBytes.
+   * <ul>
+   * <li>Returned object's origin = this objects' origin + <i>offsetBytes</i></li>
+   * <li>Returned object's capacity = <i>capacityBytes</i></li>
+   * </ul>
+   * If the given capacityBytes is zero, the returned object is effectively immutable and
+   * the backing storage and byte order are unspecified.
+   *
+   * @param offsetBytes the starting offset with respect to this object.
+   * @param capacityBytes the capacity of the returned object in bytes.
+   * @return a new <i>WritableMemory</i> representing the defined writable region.
+   */
+  public abstract WritableMemory writableRegion(long offsetBytes, long capacityBytes);
+
+  /**
+   * A writable region is a writable view of this object.
+   * This returns a new <i>WritableMemory</i> representing the defined writable region with the
+   * given offsetBytes, capacityBytes and byte order.
+   * <ul>
+   * <li>Returned object's origin = this objects' origin + <i>offsetBytes</i></li>
+   * <li>Returned object's capacity = <i>capacityBytes</i></li>
+   * <li>Returned object's byte order = <i>byteOrder</i></li>
+   * </ul>
+   * If the given capacityBytes is zero, the returned object is effectively immutable and
+   * the backing storage and byte order are unspecified.
+   *
+   * @param offsetBytes the starting offset with respect to this object.
+   * @param capacityBytes the capacity of the returned object in bytes.
+   * @param byteOrder the given byte order
+   * @return a new <i>WritableMemory</i> representing the defined writable region.
+   */
+  public abstract WritableMemory writableRegion(long offsetBytes, long capacityBytes,
+      ByteOrder byteOrder);
+
+  //AS BUFFER
+  /**
+   * Returns a new <i>WritableBuffer</i> with a writable view of this object.
+   * <ul>
+   * <li>Returned object's origin = this object's origin</li>
+   * <li>Returned object's <i>start</i> = 0</li>
+   * <li>Returned object's <i>position</i> = 0</li>
+   * <li>Returned object's <i>end</i> = this object's capacity</li>
+   * <li>Returned object's <i>capacity</i> = this object's capacity</li>
+   * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable</li>
+   * </ul>
+   * If this object's capacity is zero, the returned object is effectively immutable and
+   * the backing storage and byte order are unspecified.
+   * @return a new <i>WritableBuffer</i> with a view of this WritableMemory
+   */
+  public abstract WritableBuffer asWritableBuffer();
+
+  /**
+   * Returns a new <i>WritableBuffer</i> with a writable view of this object
+   * with the given byte order.
+   * <ul>
+   * <li>Returned object's origin = this object's origin</li>
+   * <li>Returned object's <i>start</i> = 0</li>
+   * <li>Returned object's <i>position</i> = 0</li>
+   * <li>Returned object's <i>end</i> = this object's capacity</li>
+   * <li>Returned object's <i>capacity</i> = this object's capacity</li>
+   * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable</li>
+   * </ul>
+   * If this object's capacity is zero, the returned object is effectively immutable and
+   * the backing storage and byte order are unspecified.
+   * @param byteOrder the given byte order
+   * @return a new <i>WritableBuffer</i> with a view of this WritableMemory
+   */
+  public abstract WritableBuffer asWritableBuffer(ByteOrder byteOrder);
+
+  //ALLOCATE HEAP VIA AUTOMATIC BYTE ARRAY
+  /**
+   * Creates on-heap WritableMemory with the given capacity and the native byte order. If the given
+   * capacityBytes is zero, backing storage, byte order and read-only status of the returned
+   * WritableMemory object are unspecified.
+   * @param capacityBytes the given capacity in bytes.
+   * @return a new WritableMemory for write operations on a new byte array.
+   */
+  public static WritableMemory allocate(final int capacityBytes) {
+    final byte[] arr = new byte[capacityBytes];
+    return writableWrap(arr, Util.nativeByteOrder);
   }
 
-  @Override
-  public void getIntArray(final long offsetBytes, final int[] dstArray, final int dstOffsetInts,
-      final int lengthInts) {
-    final long copyBytes = ((long) lengthInts) << INT_SHIFT;
-    checkValidAndBounds(offsetBytes, copyBytes);
-    checkBounds(dstOffsetInts, lengthInts, dstArray.length);
-    CompareAndCopy.copyMemoryCheckingDifferentObject(
-        getUnsafeObject(),
-        getCumulativeOffset(offsetBytes),
-        dstArray,
-        ARRAY_INT_BASE_OFFSET + (((long) dstOffsetInts) << INT_SHIFT),
-        copyBytes);
+  /**
+   * Creates on-heap WritableMemory with the given capacity and the given byte order. If the given
+   * capacityBytes is zero, backing storage, byte order and read-only status of the returned
+   * WritableMemory object are unspecified.
+   * @param capacityBytes the given capacity in bytes.
+   * @param byteOrder the given byte order to allocate new Memory object with.
+   * @return a new WritableMemory for write operations on a new byte array.
+   */
+  public static WritableMemory allocate(final int capacityBytes, final ByteOrder byteOrder) {
+    final byte[] arr = new byte[capacityBytes];
+    return writableWrap(arr, byteOrder);
   }
 
-  @Override
-  public long getLong(final long offsetBytes) {
-    return getNativeOrderedLong(offsetBytes);
+  //ACCESS PRIMITIVE HEAP ARRAYS for write
+  /**
+   * Wraps the given primitive array for write operations assuming native byte order. If the array
+   * size is zero, backing storage, byte order and read-only status of the returned WritableMemory
+   * object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.wrap(...)</i>.
+   * @param arr the given primitive array.
+   * @return a new WritableMemory for write operations on the given primitive array.
+   */
+  public static WritableMemory writableWrap(final boolean[] arr) {
+    final long lengthBytes = arr.length << Prim.BOOLEAN.shift();
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, Util.nativeByteOrder);
   }
 
-  @Override
-  public void getLongArray(final long offsetBytes, final long[] dstArray,
-      final int dstOffsetLongs, final int lengthLongs) {
-    final long copyBytes = ((long) lengthLongs) << LONG_SHIFT;
-    checkValidAndBounds(offsetBytes, copyBytes);
-    checkBounds(dstOffsetLongs, lengthLongs, dstArray.length);
-    CompareAndCopy.copyMemoryCheckingDifferentObject(
-        getUnsafeObject(),
-        getCumulativeOffset(offsetBytes),
-        dstArray,
-        ARRAY_LONG_BASE_OFFSET + (((long) dstOffsetLongs) << LONG_SHIFT),
-        copyBytes);
+  /**
+   * Wraps the given primitive array for write operations assuming native byte order. If the array
+   * size is zero, backing storage, byte order and read-only status of the returned WritableMemory
+   * object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.wrap(...)</i>.
+   * @param arr the given primitive array.
+   * @return a new WritableMemory for write operations on the given primitive array.
+   */
+  public static WritableMemory writableWrap(final byte[] arr) {
+    return WritableMemory.writableWrap(arr, 0, arr.length, Util.nativeByteOrder);
   }
 
-  @Override
-  public short getShort(final long offsetBytes) {
-    return getNativeOrderedShort(offsetBytes);
+  /**
+   * Wraps the given primitive array for write operations with the given byte order. If the array
+   * size is zero, backing storage, byte order and read-only status of the returned WritableMemory
+   * object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.wrap(...)</i>.
+   * @param arr the given primitive array.
+   * @param byteOrder the byte order to be used
+   * @return a new WritableMemory for write operations on the given primitive array.
+   */
+  public static WritableMemory writableWrap(final byte[] arr, final ByteOrder byteOrder) {
+    return WritableMemory.writableWrap(arr, 0, arr.length, byteOrder);
   }
 
-  @Override
-  public void getShortArray(final long offsetBytes, final short[] dstArray,
-      final int dstOffsetShorts, final int lengthShorts) {
-    final long copyBytes = ((long) lengthShorts) << SHORT_SHIFT;
-    checkValidAndBounds(offsetBytes, copyBytes);
-    checkBounds(dstOffsetShorts, lengthShorts, dstArray.length);
-    CompareAndCopy.copyMemoryCheckingDifferentObject(
-        getUnsafeObject(),
-        getCumulativeOffset(offsetBytes),
-        dstArray,
-        ARRAY_SHORT_BASE_OFFSET + (((long) dstOffsetShorts) << SHORT_SHIFT),
-        copyBytes);
+  /**
+   * Wraps the given primitive array for write operations with the given byte order. If the given
+   * lengthBytes is zero, backing storage, byte order and read-only status of the returned
+   * WritableMemory object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.wrap(...)</i>.
+   * @param arr the given primitive array.
+   * @param offsetBytes the byte offset into the given array
+   * @param lengthBytes the number of bytes to include from the given array
+   * @param byteOrder the byte order to be used
+   * @return a new WritableMemory for write operations on the given primitive array.
+   */
+  public static WritableMemory writableWrap(final byte[] arr, final int offsetBytes, final int lengthBytes,
+      final ByteOrder byteOrder) {
+    UnsafeUtil.checkBounds(offsetBytes, lengthBytes, arr.length);
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, byteOrder);
   }
 
-  //PRIMITIVE putX() and putXArray() implementations
-  @Override
-  public void putChar(final long offsetBytes, final char value) {
-    putNativeOrderedChar(offsetBytes, value);
+  /**
+   * Wraps the given primitive array for write operations assuming native byte order. If the array
+   * size is zero, backing storage, byte order and read-only status of the returned WritableMemory
+   * object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.wrap(...)</i>.
+   * @param arr the given primitive array.
+   * @return a new WritableMemory for write operations on the given primitive array.
+   */
+  public static WritableMemory writableWrap(final char[] arr) {
+    final long lengthBytes = arr.length << Prim.CHAR.shift();
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, Util.nativeByteOrder);
   }
 
-  @Override
-  public void putCharArray(final long offsetBytes, final char[] srcArray,
-      final int srcOffsetChars, final int lengthChars) {
-    final long copyBytes = ((long) lengthChars) << CHAR_SHIFT;
-    checkValidAndBoundsForWrite(offsetBytes, copyBytes);
-    checkBounds(srcOffsetChars, lengthChars, srcArray.length);
-    CompareAndCopy.copyMemoryCheckingDifferentObject(
-        srcArray,
-        ARRAY_CHAR_BASE_OFFSET + (((long) srcOffsetChars) << CHAR_SHIFT),
-        getUnsafeObject(),
-        getCumulativeOffset(offsetBytes),
-        copyBytes
-    );
+  /**
+   * Wraps the given primitive array for write operations assuming native byte order. If the array
+   * size is zero, backing storage, byte order and read-only status of the returned WritableMemory
+   * object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.wrap(...)</i>.
+   * @param arr the given primitive array.
+   * @return a new WritableMemory for write operations on the given primitive array.
+   */
+  public static WritableMemory writableWrap(final short[] arr) {
+    final long lengthBytes = arr.length << Prim.SHORT.shift();
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, Util.nativeByteOrder);
   }
 
-  @Override
-  public void putDouble(final long offsetBytes, final double value) {
-    assertValidAndBoundsForWrite(offsetBytes, ARRAY_DOUBLE_INDEX_SCALE);
-    unsafe.putDouble(getUnsafeObject(), getCumulativeOffset(offsetBytes), value);
+  /**
+   * Wraps the given primitive array for write operations assuming native byte order. If the array
+   * size is zero, backing storage, byte order and read-only status of the returned WritableMemory
+   * object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.wrap(...)</i>.
+   * @param arr the given primitive array.
+   * @return a new WritableMemory for write operations on the given primitive array.
+   */
+  public static WritableMemory writableWrap(final int[] arr) {
+    final long lengthBytes = arr.length << Prim.INT.shift();
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, Util.nativeByteOrder);
   }
 
-  @Override
-  public void putDoubleArray(final long offsetBytes, final double[] srcArray,
-      final int srcOffsetDoubles, final int lengthDoubles) {
-    final long copyBytes = ((long) lengthDoubles) << DOUBLE_SHIFT;
-    checkValidAndBoundsForWrite(offsetBytes, copyBytes);
-    checkBounds(srcOffsetDoubles, lengthDoubles, srcArray.length);
-    CompareAndCopy.copyMemoryCheckingDifferentObject(
-        srcArray,
-        ARRAY_DOUBLE_BASE_OFFSET + (((long) srcOffsetDoubles) << DOUBLE_SHIFT),
-        getUnsafeObject(),
-        getCumulativeOffset(offsetBytes),
-        copyBytes
-    );
+  /**
+   * Wraps the given primitive array for write operations assuming native byte order. If the array
+   * size is zero, backing storage, byte order and read-only status of the returned WritableMemory
+   * object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.wrap(...)</i>.
+   * @param arr the given primitive array.
+   * @return a new WritableMemory for write operations on the given primitive array.
+   */
+  public static WritableMemory writableWrap(final long[] arr) {
+    final long lengthBytes = arr.length << Prim.LONG.shift();
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, Util.nativeByteOrder);
   }
 
-  @Override
-  public void putFloat(final long offsetBytes, final float value) {
-    assertValidAndBoundsForWrite(offsetBytes, ARRAY_FLOAT_INDEX_SCALE);
-    unsafe.putFloat(getUnsafeObject(), getCumulativeOffset(offsetBytes), value);
+  /**
+   * Wraps the given primitive array for write operations assuming native byte order. If the array
+   * size is zero, backing storage, byte order and read-only status of the returned WritableMemory
+   * object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.wrap(...)</i>.
+   * @param arr the given primitive array.
+   * @return a new WritableMemory for write operations on the given primitive array.
+   */
+  public static WritableMemory writableWrap(final float[] arr) {
+    final long lengthBytes = arr.length << Prim.FLOAT.shift();
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, Util.nativeByteOrder);
   }
 
-  @Override
-  public void putFloatArray(final long offsetBytes, final float[] srcArray,
-      final int srcOffsetFloats, final int lengthFloats) {
-    final long copyBytes = ((long) lengthFloats) << FLOAT_SHIFT;
-    checkValidAndBoundsForWrite(offsetBytes, copyBytes);
-    checkBounds(srcOffsetFloats, lengthFloats, srcArray.length);
-    CompareAndCopy.copyMemoryCheckingDifferentObject(
-        srcArray,
-        ARRAY_FLOAT_BASE_OFFSET + (((long) srcOffsetFloats) << FLOAT_SHIFT),
-        getUnsafeObject(),
-        getCumulativeOffset(offsetBytes),
-        copyBytes
-    );
+  /**
+   * Wraps the given primitive array for write operations assuming native byte order. If the array
+   * size is zero, backing storage, byte order and read-only status of the returned WritableMemory
+   * object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.wrap(...)</i>.
+   * @param arr the given primitive array.
+   * @return a new WritableMemory for write operations on the given primitive array.
+   */
+  public static WritableMemory writableWrap(final double[] arr) {
+    final long lengthBytes = arr.length << Prim.DOUBLE.shift();
+    return BaseWritableMemoryImpl.wrapHeapArray(arr, 0L, lengthBytes, false, Util.nativeByteOrder);
   }
+  //END OF CONSTRUCTOR-TYPE METHODS
 
+  //PRIMITIVE putX() and putXArray()
+  /**
+   * Puts the boolean value at the given offset
+   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param value the value to put
+   */
+  public abstract void putBoolean(long offsetBytes, boolean value);
+
+  /**
+   * Puts the boolean array at the given offset
+   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param srcArray The source array.
+   * @param srcOffsetBooleans offset in array units
+   * @param lengthBooleans number of array units to transfer
+   */
+  public abstract void putBooleanArray(long offsetBytes, boolean[] srcArray, int srcOffsetBooleans,
+          int lengthBooleans);
+
+  /**
+   * Puts the byte value at the given offset
+   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param value the value to put
+   */
+  public abstract void putByte(long offsetBytes, byte value);
+
+  /**
+   * Puts the byte array at the given offset
+   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param srcArray The source array.
+   * @param srcOffsetBytes offset in array units
+   * @param lengthBytes number of array units to transfer
+   */
+  public abstract void putByteArray(long offsetBytes, byte[] srcArray, int srcOffsetBytes,
+          int lengthBytes);
+
+  /**
+   * Puts the char value at the given offset
+   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param value the value to put
+   */
+  public abstract void putChar(long offsetBytes, char value);
+
+  /**
+   * Puts the char array at the given offset
+   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param srcArray The source array.
+   * @param srcOffsetChars offset in array units
+   * @param lengthChars number of array units to transfer
+   */
+  public abstract void putCharArray(long offsetBytes, char[] srcArray, int srcOffsetChars,
+          int lengthChars);
+
+  /**
+   * Encodes characters from the given CharSequence into UTF-8 bytes and puts them into this
+   * <i>WritableMemory</i> begining at the given offsetBytes.
+   * This is specifically designed to reduce the production of intermediate objects (garbage),
+   * thus significantly reducing pressure on the JVM Garbage Collector.
+   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param src The source CharSequence to be encoded and put into this WritableMemory. It is
+   * the responsibility of the caller to provide sufficient capacity in this
+   * <i>WritableMemory</i> for the encoded Utf8 bytes. Characters outside the ASCII range can
+   * require 2, 3 or 4 bytes per character to encode.
+   * @return the number of bytes encoded
+   */
+  public abstract long putCharsToUtf8(long offsetBytes, CharSequence src);
+
+  /**
+   * Puts the double value at the given offset
+   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param value the value to put
+   */
+  public abstract void putDouble(long offsetBytes, double value);
+
+  /**
+   * Puts the double array at the given offset
+   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param srcArray The source array.
+   * @param srcOffsetDoubles offset in array units
+   * @param lengthDoubles number of array units to transfer
+   */
+  public abstract void putDoubleArray(long offsetBytes, double[] srcArray,
+          final int srcOffsetDoubles, final int lengthDoubles);
+
+  /**
+   * Puts the float value at the given offset
+   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param value the value to put
+   */
+  public abstract void putFloat(long offsetBytes, float value);
+
+  /**
+   * Puts the float array at the given offset
+   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param srcArray The source array.
+   * @param srcOffsetFloats offset in array units
+   * @param lengthFloats number of array units to transfer
+   */
+  public abstract void putFloatArray(long offsetBytes, float[] srcArray,
+          final int srcOffsetFloats, final int lengthFloats);
+
+  /**
+   * Puts the int value at the given offset
+   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param value the value to put
+   */
+  public abstract void putInt(long offsetBytes, int value);
+
+  /**
+   * Puts the int array at the given offset
+   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param srcArray The source array.
+   * @param srcOffsetInts offset in array units
+   * @param lengthInts number of array units to transfer
+   */
+  public abstract void putIntArray(long offsetBytes, int[] srcArray,
+          final int srcOffsetInts, final int lengthInts);
+
+  /**
+   * Puts the long value at the given offset
+   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param value the value to put
+   */
+  public abstract void putLong(long offsetBytes, long value);
+
+  /**
+   * Puts the long array at the given offset
+   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param srcArray The source array.
+   * @param srcOffsetLongs offset in array units
+   * @param lengthLongs number of array units to transfer
+   */
+  public abstract void putLongArray(long offsetBytes, long[] srcArray,
+          final int srcOffsetLongs, final int lengthLongs);
+
+  /**
+   * Puts the short value at the given offset
+   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param value the value to put
+   */
+  public abstract void putShort(long offsetBytes, short value);
+
+  /**
+   * Puts the short array at the given offset
+   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param srcArray The source array.
+   * @param srcOffsetShorts offset in array units
+   * @param lengthShorts number of array units to transfer
+   */
+  public abstract void putShortArray(long offsetBytes, short[] srcArray,
+          final int srcOffsetShorts, final int lengthShorts);
+
+  //Atomic Methods
+  /**
+   * Atomically adds the given value to the long located at offsetBytes.
+   * @param offsetBytes offset bytes relative to this Memory start
+   * @param delta the amount to add
+   * @return the the previous value
+   */
+  public abstract long getAndAddLong(long offsetBytes, long delta);
+
+  /**
+   * Atomically sets the current value at the memory location to the given updated value
+   * if and only if the current value {@code ==} the expected value.
+   * @param offsetBytes offset bytes relative to this Memory start
+   * @param expect the expected value
+   * @param update the new value
+   * @return {@code true} if successful. False return indicates that
+   * the current value at the memory location was not equal to the expected value.
+   */
+  public abstract boolean compareAndSwapLong(long offsetBytes, long expect, long update);
+
+  /**
+   * Atomically exchanges the given value with the current value located at offsetBytes.
+   * @param offsetBytes offset bytes relative to this Memory start
+   * @param newValue new value
+   * @return the previous value
+   */
+  public abstract long getAndSetLong(long offsetBytes, long newValue);
+
+  //OTHER WRITE METHODS
+  /**
+   * Returns the primitive backing array, otherwise null.
+   * @return the primitive backing array, otherwise null.
+   */
+  public abstract Object getArray();
+
+  /**
+   * Clears all bytes of this Memory to zero
+   */
+  public abstract void clear();
+
+  /**
+   * Clears a portion of this Memory to zero.
+   * @param offsetBytes offset bytes relative to this Memory start
+   * @param lengthBytes the length in bytes
+   */
+  public abstract void clear(long offsetBytes, long lengthBytes);
+
+  /**
+   * Clears the bits defined by the bitMask
+   * @param offsetBytes offset bytes relative to this Memory start.
+   * @param bitMask the bits set to one will be cleared
+   */
+  public abstract void clearBits(long offsetBytes, byte bitMask);
+
+  /**
+   * Fills all bytes of this Memory region to the given byte value.
+   * @param value the given byte value
+   */
+  public abstract void fill(byte value);
+
+  /**
+   * Fills a portion of this Memory region to the given byte value.
+   * @param offsetBytes offset bytes relative to this Memory start
+   * @param lengthBytes the length in bytes
+   * @param value the given byte value
+   */
+  public abstract void fill(long offsetBytes, long lengthBytes, byte value);
+
+  /**
+   * Sets the bits defined by the bitMask
+   * @param offsetBytes offset bytes relative to this Memory start
+   * @param bitMask the bits set to one will be set
+   */
+  public abstract void setBits(long offsetBytes, byte bitMask);
+
+  
+  //OTHER WRITABLE API METHODS
+  /**
+   * For Direct Memory only. Other types of backing resources will return null.
+   * Gets the MemoryRequestServer object used by dynamic off-heap (Direct) memory objects
+   * to request additional memory.
+   * Set using {@link WritableMemory#allocateDirect(long, MemoryRequestServer)}.
+   * If not explicity set, this returns the {@link DefaultMemoryRequestServer}.
+   * @return the MemoryRequestServer object (if direct memory) or null.
+   */
   @Override
-  public void putInt(final long offsetBytes, final int value) {
-    putNativeOrderedInt(offsetBytes, value);
+  public MemoryRequestServer getMemoryRequestServer() {
+    return null;
   }
-
-  @Override
-  public void putIntArray(final long offsetBytes, final int[] srcArray, final int srcOffsetInts,
-      final int lengthInts) {
-    final long copyBytes = ((long) lengthInts) << INT_SHIFT;
-    checkValidAndBoundsForWrite(offsetBytes, copyBytes);
-    checkBounds(srcOffsetInts, lengthInts, srcArray.length);
-    CompareAndCopy.copyMemoryCheckingDifferentObject(
-        srcArray,
-        ARRAY_INT_BASE_OFFSET + (((long) srcOffsetInts) << INT_SHIFT),
-        getUnsafeObject(),
-        getCumulativeOffset(offsetBytes),
-        copyBytes
-    );
-  }
-
-  @Override
-  public void putLong(final long offsetBytes, final long value) {
-    putNativeOrderedLong(offsetBytes, value);
-  }
-
-  @Override
-  public void putLongArray(final long offsetBytes, final long[] srcArray, final int srcOffsetLongs,
-      final int lengthLongs) {
-    final long copyBytes = ((long) lengthLongs) << LONG_SHIFT;
-    checkValidAndBoundsForWrite(offsetBytes, copyBytes);
-    checkBounds(srcOffsetLongs, lengthLongs, srcArray.length);
-    CompareAndCopy.copyMemoryCheckingDifferentObject(
-        srcArray,
-        ARRAY_LONG_BASE_OFFSET + (((long) srcOffsetLongs) << LONG_SHIFT),
-        getUnsafeObject(),
-        getCumulativeOffset(offsetBytes),
-        copyBytes
-    );
-  }
-
-  @Override
-  public void putShort(final long offsetBytes, final short value) {
-    putNativeOrderedShort(offsetBytes, value);
-  }
-
-  @Override
-  public void putShortArray(final long offsetBytes, final short[] srcArray,
-      final int srcOffsetShorts, final int lengthShorts) {
-    final long copyBytes = ((long) lengthShorts) << SHORT_SHIFT;
-    checkValidAndBoundsForWrite(offsetBytes, copyBytes);
-    checkBounds(srcOffsetShorts, lengthShorts, srcArray.length);
-    CompareAndCopy.copyMemoryCheckingDifferentObject(
-        srcArray,
-        ARRAY_SHORT_BASE_OFFSET + (((long) srcOffsetShorts) << SHORT_SHIFT),
-        getUnsafeObject(),
-        getCumulativeOffset(offsetBytes),
-        copyBytes
-    );
-  }
-
-  //Atomic Write Methods
-  @Override
-  public long getAndAddLong(final long offsetBytes, final long delta) { //JDK 8+
-    assertValidAndBoundsForWrite(offsetBytes, ARRAY_LONG_INDEX_SCALE);
-    final long addr = getCumulativeOffset(offsetBytes);
-    return unsafe.getAndAddLong(getUnsafeObject(), addr, delta);
-  }
-
-  @Override
-  public long getAndSetLong(final long offsetBytes, final long newValue) { //JDK 8+
-    assertValidAndBoundsForWrite(offsetBytes, ARRAY_LONG_INDEX_SCALE);
-    final long addr = getCumulativeOffset(offsetBytes);
-    return unsafe.getAndSetLong(getUnsafeObject(), addr, newValue);
-  }
-
-  @Override
-  public boolean compareAndSwapLong(final long offsetBytes, final long expect, final long update) {
-    assertValidAndBoundsForWrite(offsetBytes, ARRAY_LONG_INDEX_SCALE);
-    return unsafe.compareAndSwapLong(
-        getUnsafeObject(), getCumulativeOffset(offsetBytes), expect, update);
-  }
-
+  
 }

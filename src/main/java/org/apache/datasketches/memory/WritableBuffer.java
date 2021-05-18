@@ -25,7 +25,7 @@ import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.internal.WritableBufferImpl;
 
-public interface WritableBuffer {
+public interface WritableBuffer extends Buffer {
 
   //BYTE BUFFER
   /**

@@ -25,9 +25,9 @@ import static org.testng.Assert.fail;
 import java.nio.ByteBuffer;
 
 import org.apache.datasketches.memory.WritableHandle;
-import org.apache.datasketches.memory.internal.BufferImpl;
-import org.apache.datasketches.memory.internal.WritableBufferImpl;
-import org.apache.datasketches.memory.internal.WritableMemoryImpl;
+import org.apache.datasketches.memory.Buffer;
+import org.apache.datasketches.memory.WritableBuffer;
+import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
 /**
@@ -40,10 +40,10 @@ public class BufferInvariantsTest {
   public void testRegion() {
     ByteBuffer byteBuffer = ByteBuffer.allocate(10);
     byteBuffer.limit(7);
-    BufferImpl buff = BufferImpl.wrap(byteBuffer); //assuming buff has cap of 8
+    Buffer buff = Buffer.wrap(byteBuffer); //assuming buff has cap of 8
     assertEquals(buff.getCapacity(), 10); //wrong should be 8
     buff.getByte(); //pos moves to 1
-    BufferImpl copyBuff = buff.region(); //pos: 0, start: 0, end: 6: cap: 7
+    Buffer copyBuff = buff.region(); //pos: 0, start: 0, end: 6: cap: 7
     assertEquals(copyBuff.getEnd(), 6);
     assertEquals(copyBuff.getCapacity(), 6);
     assertEquals(copyBuff.getStart(), 0);
@@ -51,7 +51,7 @@ public class BufferInvariantsTest {
 
     buff.setStartPositionEnd(1, 1, 5);
     buff.getByte();
-    BufferImpl copyBuff2 = buff.region();
+    Buffer copyBuff2 = buff.region();
     assertEquals(copyBuff2.getEnd(), 3);
     assertEquals(copyBuff2.getCapacity(), 3);
     assertEquals(copyBuff2.getStart(), 0);
@@ -93,7 +93,7 @@ public class BufferInvariantsTest {
   @Test
   public void testBuf() {
     int n = 25;
-    WritableBufferImpl buf = WritableMemoryImpl.allocate(n).asWritableBuffer();
+    WritableBuffer buf = WritableMemory.allocate(n).asWritableBuffer();
     for (byte i = 0; i < n; i++) { buf.putByte(i); }
     buf.setPosition(0);
     assertEquals(buf.getPosition(), 0);
@@ -110,7 +110,7 @@ public class BufferInvariantsTest {
 //    print("Set   : ");
 //    printbuf(buf);
 
-    BufferImpl dup = buf.duplicate();
+    Buffer dup = buf.duplicate();
     assertEquals(dup.getRemaining(), 15);
     assertEquals(dup.getCapacity(), 25);
     assertEquals(dup.getByte(), 5);
@@ -119,7 +119,7 @@ public class BufferInvariantsTest {
 //    printbuf(dup);
 
 
-    BufferImpl reg = buf.region();
+    Buffer reg = buf.region();
     assertEquals(reg.getPosition(), 0);
     assertEquals(reg.getEnd(), 15);
     assertEquals(reg.getRemaining(), 15);
@@ -139,7 +139,7 @@ public class BufferInvariantsTest {
     bb.position(5);
     bb.limit(20);
 
-    BufferImpl buf = BufferImpl.wrap(bb);
+    Buffer buf = Buffer.wrap(bb);
     assertEquals(buf.getPosition(), 5);
     assertEquals(buf.getEnd(), 20);
     assertEquals(buf.getRemaining(), 15);
@@ -149,7 +149,7 @@ public class BufferInvariantsTest {
 //    print("Buf.wrap: ");
 //    printbuf(buf);
 
-    BufferImpl reg = buf.region();
+    Buffer reg = buf.region();
     assertEquals(reg.getPosition(), 0);
     assertEquals(reg.getEnd(), 15);
     assertEquals(reg.getRemaining(), 15);
@@ -161,10 +161,10 @@ public class BufferInvariantsTest {
   }
 
   @Test
-  public void checkLimitsDirect() {
-    try (WritableHandle hand = WritableMemoryImpl.allocateDirect(100)) {
-      WritableMemoryImpl wmem = hand.get();
-      BufferImpl buf = wmem.asBuffer();
+  public void checkLimitsDirect() throws Exception {
+    try (WritableHandle hand = WritableMemory.allocateDirect(100)) {
+      WritableMemory wmem = hand.getWritable();
+      Buffer buf = wmem.asBuffer();
       buf.setStartPositionEnd(40, 45, 50);
       buf.setStartPositionEnd(0, 0, 100);
       try {
@@ -180,10 +180,10 @@ public class BufferInvariantsTest {
   public void testRegionDirect() {
     ByteBuffer byteBuffer = ByteBuffer.allocate(10);
     byteBuffer.limit(7);
-    BufferImpl buff = BufferImpl.wrap(byteBuffer); //assuming buff has cap of 8
+    Buffer buff = Buffer.wrap(byteBuffer); //assuming buff has cap of 8
     assertEquals(buff.getCapacity(), 10); //wrong should be 8
     buff.getByte(); //pos moves to 1
-    BufferImpl copyBuff = buff.region(); //pos: 0, start: 0, end: 6: cap: 7
+    Buffer copyBuff = buff.region(); //pos: 0, start: 0, end: 6: cap: 7
     assertEquals(copyBuff.getEnd(), 6);
     assertEquals(copyBuff.getCapacity(), 6);
     assertEquals(copyBuff.getStart(), 0);
@@ -191,7 +191,7 @@ public class BufferInvariantsTest {
 
     buff.setStartPositionEnd(1, 1, 5);
     buff.getByte();
-    BufferImpl copyBuff2 = buff.region();
+    Buffer copyBuff2 = buff.region();
     assertEquals(copyBuff2.getEnd(), 3);
     assertEquals(copyBuff2.getCapacity(), 3);
     assertEquals(copyBuff2.getStart(), 0);
@@ -231,11 +231,11 @@ public class BufferInvariantsTest {
   }
 
   @Test
-  public void testBufDirect() {
+  public void testBufDirect() throws Exception {
     int n = 25;
-    try (WritableHandle whand = WritableMemoryImpl.allocateDirect(n)) {
-    WritableMemoryImpl wmem = whand.get();
-    WritableBufferImpl buf = wmem.asWritableBuffer();
+    try (WritableHandle whand = WritableMemory.allocateDirect(n)) {
+    WritableMemory wmem = whand.getWritable();
+    WritableBuffer buf = wmem.asWritableBuffer();
     for (byte i = 0; i < n; i++) { buf.putByte(i); }
     buf.setPosition(0);
     assertEquals(buf.getPosition(), 0);
@@ -252,7 +252,7 @@ public class BufferInvariantsTest {
 //    print("Set   : ");
 //    printbuf(buf);
 
-    BufferImpl dup = buf.duplicate();
+    Buffer dup = buf.duplicate();
     assertEquals(dup.getRemaining(), 15);
     assertEquals(dup.getCapacity(), 25);
     assertEquals(dup.getByte(), 5);
@@ -261,7 +261,7 @@ public class BufferInvariantsTest {
 //    printbuf(dup);
 
 
-    BufferImpl reg = buf.region();
+    Buffer reg = buf.region();
     assertEquals(reg.getPosition(), 0);
     assertEquals(reg.getEnd(), 15);
     assertEquals(reg.getRemaining(), 15);
@@ -282,7 +282,7 @@ public class BufferInvariantsTest {
     bb.position(5);
     bb.limit(20);
 
-    BufferImpl buf = BufferImpl.wrap(bb);
+    Buffer buf = Buffer.wrap(bb);
     assertEquals(buf.getPosition(), 5);
     assertEquals(buf.getEnd(), 20);
     assertEquals(buf.getRemaining(), 15);
@@ -292,7 +292,7 @@ public class BufferInvariantsTest {
 //    print("Buf.wrap: ");
 //    printbuf(buf);
 
-    BufferImpl reg = buf.region();
+    Buffer reg = buf.region();
     assertEquals(reg.getPosition(), 0);
     assertEquals(reg.getEnd(), 15);
     assertEquals(reg.getRemaining(), 15);
@@ -315,7 +315,7 @@ public class BufferInvariantsTest {
     println(bb.get(i + pos) + "\n");
   }
 
-  static void printbuf(BufferImpl buf) {
+  static void printbuf(Buffer buf) {
     println("pos: " + buf.getPosition() + ", end: " + buf.getEnd() + ", cap: " + buf.getCapacity());
     long rem = buf.getRemaining();
     long pos = buf.getPosition();

@@ -44,7 +44,7 @@ import java.nio.file.attribute.PosixFilePermissions;
 
 import org.apache.datasketches.memory.internal.UnsafeUtil;
 import org.apache.datasketches.memory.internal.Util;
-import org.apache.datasketches.memory.internal.WritableMemoryImpl;
+import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")
@@ -55,7 +55,7 @@ public class UtilTest {
   @Test
   public void checkBinarySearch() {
     int k = 1024; //longs
-    WritableMemoryImpl wMem = WritableMemoryImpl.allocate(k << 3); //1024 longs
+    WritableMemory wMem = WritableMemory.allocate(k << 3); //1024 longs
     for (int i = 0; i < k; i++) { wMem.putLong(i << 3, i); }
     long idx = Util.binarySearchLongs(wMem, 0, k - 1, k / 2);
     long val = wMem.getLong(idx << 3);

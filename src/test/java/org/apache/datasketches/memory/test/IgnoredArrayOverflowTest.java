@@ -20,27 +20,26 @@
 package org.apache.datasketches.memory.test;
 
 import org.apache.datasketches.memory.WritableHandle;
-import org.apache.datasketches.memory.internal.WritableMemoryImpl;
+import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
-@Ignore("Test causes OutOfMemoryError in Travis CI, run only locally")
 @SuppressWarnings("javadoc")
 public class IgnoredArrayOverflowTest {
 
   private WritableHandle h;
-  private WritableMemoryImpl memory;
+  private WritableMemory memory;
+  private static final long MAX_SIZE = (1L << 10); // use 1L << 31 to test int overrange
 
   @BeforeClass
   public void allocate() {
-    h = WritableMemoryImpl.allocateDirect(Integer.MAX_VALUE + 100L);
-    memory = h.get();
+    h = WritableMemory.allocateDirect(MAX_SIZE);
+    memory = h.getWritable();
   }
 
   @AfterClass
-  public void close() {
+  public void close() throws Exception {
     h.close();
   }
 

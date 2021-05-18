@@ -27,13 +27,13 @@ import static org.testng.Assert.fail;
 
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.internal.BufferImpl;
-import org.apache.datasketches.memory.internal.MemoryImpl;
+import org.apache.datasketches.memory.Buffer;
+import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.internal.Prim;
 import org.apache.datasketches.memory.internal.StepBoolean;
 import org.apache.datasketches.memory.internal.Util;
-import org.apache.datasketches.memory.internal.WritableBufferImpl;
-import org.apache.datasketches.memory.internal.WritableMemoryImpl;
+import org.apache.datasketches.memory.WritableBuffer;
+import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")
@@ -47,13 +47,13 @@ public class BaseStateTest {
 
   @Test
   public void checkIsSameResource() {
-    WritableMemoryImpl wmem = WritableMemoryImpl.allocate(16);
-    MemoryImpl mem = wmem;
+    WritableMemory wmem = WritableMemory.allocate(16);
+    Memory mem = wmem;
     assertFalse(wmem.isSameResource(null));
     assertTrue(wmem.isSameResource(mem));
 
-    WritableBufferImpl wbuf = wmem.asWritableBuffer();
-    BufferImpl buf = wbuf;
+    WritableBuffer wbuf = wmem.asWritableBuffer();
+    Buffer buf = wbuf;
     assertFalse(wbuf.isSameResource(null));
     assertTrue(wbuf.isSameResource(buf));
   }
@@ -61,7 +61,7 @@ public class BaseStateTest {
   @Test
   public void checkNotEqualTo() {
     byte[] arr = new byte[8];
-    MemoryImpl mem = MemoryImpl.wrap(arr);
+    Memory mem = Memory.wrap(arr);
     assertFalse(mem.equalTo(0, arr, 0, 8));
   }
 
@@ -90,14 +90,14 @@ public class BaseStateTest {
 
   @Test
   public void checkGetNativeBaseOffset_Heap() throws Exception {
-    WritableMemoryImpl wmem = WritableMemoryImpl.allocate(8); //heap
+    WritableMemory wmem = WritableMemory.allocate(8); //heap
     final long offset = ReflectUtil.getNativeBaseOffset(wmem);
     assertEquals(offset, 0L);
   }
 
   @Test
   public void checkIsByteOrderCompatible() {
-    WritableMemoryImpl wmem = WritableMemoryImpl.allocate(8);
+    WritableMemory wmem = WritableMemory.allocate(8);
     assertTrue(wmem.isByteOrderCompatible(ByteOrder.nativeOrder()));
   }
 

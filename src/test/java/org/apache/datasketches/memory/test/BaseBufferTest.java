@@ -22,9 +22,9 @@ package org.apache.datasketches.memory.test;
 import static org.testng.Assert.fail;
 
 import org.apache.datasketches.memory.WritableHandle;
-import org.apache.datasketches.memory.internal.BufferImpl;
-import org.apache.datasketches.memory.internal.MemoryImpl;
-import org.apache.datasketches.memory.internal.WritableMemoryImpl;
+import org.apache.datasketches.memory.Buffer;
+import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
 /**
@@ -35,7 +35,7 @@ public class BaseBufferTest {
 
   @Test
   public void checkLimits() {
-    BufferImpl buf = MemoryImpl.wrap(new byte[100]).asBuffer();
+    Buffer buf = Memory.wrap(new byte[100]).asBuffer();
     buf.setStartPositionEnd(40, 45, 50);
     buf.setStartPositionEnd(0, 0, 100);
     try {
@@ -48,7 +48,7 @@ public class BaseBufferTest {
 
   @Test
   public void checkLimitsAndCheck() {
-    BufferImpl buf = MemoryImpl.wrap(new byte[100]).asBuffer();
+    Buffer buf = Memory.wrap(new byte[100]).asBuffer();
     buf.setAndCheckStartPositionEnd(40, 45, 50);
     buf.setAndCheckStartPositionEnd(0, 0, 100);
     try {
@@ -75,14 +75,14 @@ public class BaseBufferTest {
   }
 
   @Test
-  public void checkCheckValid() {
-    WritableMemoryImpl wmem;
-    BufferImpl buf;
-    try (WritableHandle hand = WritableMemoryImpl.allocateDirect(100)) {
-      wmem = hand.get();
+  public void checkCheckValid() throws Exception {
+    WritableMemory wmem;
+    Buffer buf;
+    try (WritableHandle hand = WritableMemory.allocateDirect(100)) {
+      wmem = hand.getWritable();
       buf = wmem.asBuffer();
     }
     @SuppressWarnings("unused")
-    MemoryImpl mem = buf.asMemory();
+    Memory mem = buf.asMemory();
   }
 }

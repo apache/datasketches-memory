@@ -22,8 +22,8 @@ package org.apache.datasketches.memory.test;
 import static org.testng.Assert.assertEquals;
 
 import org.apache.datasketches.memory.WritableHandle;
-import org.apache.datasketches.memory.internal.MemoryImpl;
-import org.apache.datasketches.memory.internal.WritableMemoryImpl;
+import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
 /**
@@ -33,7 +33,7 @@ import org.testng.annotations.Test;
 public class CopyMemoryOverlapTest {
 
   @Test
-  public void checkOverlapUsingMemory() {
+  public void checkOverlapUsingMemory() throws Exception {
     long copyLongs = 1 << 20;
     double overlap = 0.5;
     long start_mS = System.currentTimeMillis();
@@ -49,7 +49,7 @@ public class CopyMemoryOverlapTest {
   }
 
   @Test
-  public void checkOverlapUsingRegions() {
+  public void checkOverlapUsingRegions() throws Exception {
     long copyLongs = 1 << 20;
     double overlap = 0.5;
     long start_mS = System.currentTimeMillis();
@@ -64,8 +64,8 @@ public class CopyMemoryOverlapTest {
     println("CopyDn Time Sec: " + ((end2_mS - end1_mS)/1000.0));
   }
 
-  private static final void copyUsingDirectMemory(long copyLongs, double overlap, boolean copyUp) {
-    println("Copy Using Direct MemoryImpl");
+  private static final void copyUsingDirectMemory(long copyLongs, double overlap, boolean copyUp) throws Exception {
+    println("Copy Using Direct Memory");
     long overlapLongs = (long) (overlap * copyLongs);
     long backingLongs = (2 * copyLongs) - overlapLongs;
 
@@ -93,8 +93,8 @@ public class CopyMemoryOverlapTest {
     println("CopyUp       : " + copyUp);
     println("Backing longs: " + backingLongs + "\t bytes: " + backingBytes);
 
-    try (WritableHandle backHandle = WritableMemoryImpl.allocateDirect(backingBytes)) {
-      WritableMemoryImpl backingMem = backHandle.get();
+    try (WritableHandle backHandle = WritableMemory.allocateDirect(backingBytes)) {
+      WritableMemory backingMem = backHandle.getWritable();
       fill(backingMem); //fill mem with 0 thru copyLongs -1
       //listMem(backingMem, "Original");
       backingMem.copyTo(fromOffsetBytes, backingMem, toOffsetBytes, copyBytes);
@@ -104,8 +104,8 @@ public class CopyMemoryOverlapTest {
     println("");
   }
 
-  private static final void copyUsingDirectRegions(long copyLongs, double overlap, boolean copyUp) {
-    println("Copy Using Direct MemoryImpl");
+  private static final void copyUsingDirectRegions(long copyLongs, double overlap, boolean copyUp) throws Exception {
+    println("Copy Using Direct Memory");
     long overlapLongs = (long) (overlap * copyLongs);
     long backingLongs = (2 * copyLongs) - overlapLongs;
 
@@ -133,12 +133,12 @@ public class CopyMemoryOverlapTest {
     println("CopyUp       : " + copyUp);
     println("Backing longs: " + backingLongs + "\t bytes: " + backingBytes);
 
-    try (WritableHandle backHandle = WritableMemoryImpl.allocateDirect(backingBytes)) {
-      WritableMemoryImpl backingMem = backHandle.get();
+    try (WritableHandle backHandle = WritableMemory.allocateDirect(backingBytes)) {
+      WritableMemory backingMem = backHandle.getWritable();
       fill(backingMem); //fill mem with 0 thru copyLongs -1
       //listMem(backingMem, "Original");
-      WritableMemoryImpl reg1 = backingMem.writableRegion(fromOffsetBytes, copyBytes);
-      WritableMemoryImpl reg2 = backingMem.writableRegion(toOffsetBytes, copyBytes);
+      WritableMemory reg1 = backingMem.writableRegion(fromOffsetBytes, copyBytes);
+      WritableMemory reg2 = backingMem.writableRegion(toOffsetBytes, copyBytes);
 
       reg1.copyTo(0, reg2, 0, copyBytes);
       //listMem(backingMem, "After");
@@ -147,13 +147,13 @@ public class CopyMemoryOverlapTest {
     println("");
   }
 
-  private static final void fill(WritableMemoryImpl wmem) {
+  private static final void fill(WritableMemory wmem) {
     long longs = wmem.getCapacity() >>> 3;
     for (long i = 0; i < longs; i++) { wmem.putLong(i << 3, i); } //fill with 0 .. (longs - 1)
     //checkMemLongs(wmem, 0L, 0L, longs);
   }
 
-  private static final void checkMemLongs(MemoryImpl mem, long fromOffsetLongs, long toOffsetLongs, long copyLongs) {
+  private static final void checkMemLongs(Memory mem, long fromOffsetLongs, long toOffsetLongs, long copyLongs) {
     for (long i = 0; i < copyLongs; i++) {
       long memVal = mem.getLong((toOffsetLongs + i) << 3);
       assertEquals(memVal, fromOffsetLongs + i);
@@ -161,7 +161,7 @@ public class CopyMemoryOverlapTest {
   }
 
   @SuppressWarnings("unused")
-  private static final void listMem(MemoryImpl mem, String comment) {
+  private static final void listMem(Memory mem, String comment) {
     println(comment);
     println("Idx\tValue");
     long longs = mem.getCapacity() >>> 3;

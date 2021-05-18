@@ -59,7 +59,7 @@ final class AllocateDirect implements AutoCloseable {
       nativeAddress = unsafe.allocateMemory(allocationSize);
     } catch (final OutOfMemoryError err) {
       NioBits.unreserveMemory(allocationSize, capacityBytes);
-      throw err;
+      throw new RuntimeException(err);
     }
     if (pageAligned && ((nativeAddress % pageSize) != 0)) {
       //Round up to page boundary

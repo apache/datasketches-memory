@@ -19,7 +19,7 @@
 
 package org.apache.datasketches.memory;
 
-public interface BaseBuffer {
+public interface BaseBuffer extends BaseState {
 
   /**
    * Increments the current position by the given increment.

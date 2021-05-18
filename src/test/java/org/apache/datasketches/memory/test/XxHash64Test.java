@@ -26,8 +26,8 @@ import static org.testng.Assert.assertTrue;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.datasketches.memory.internal.MemoryImpl;
-import org.apache.datasketches.memory.internal.WritableMemoryImpl;
+import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
 import net.openhft.hashing.LongHashFunction;
@@ -46,7 +46,7 @@ public class XxHash64Test {
 
     long hash;
 
-    WritableMemoryImpl wmem = WritableMemoryImpl.allocate(cap);
+    WritableMemory wmem = WritableMemory.allocate(cap);
     for (int i = 0; i < cap; i++) { wmem.putByte(i, (byte)(-128 + i)); }
 
     for (int offset = 0; offset < 16; offset++) {
@@ -65,7 +65,7 @@ public class XxHash64Test {
     for (int j = 1; j < bytes; j++) {
       byte[] in = new byte[bytes];
 
-      WritableMemoryImpl wmem = WritableMemoryImpl.writableWrap(in);
+      WritableMemory wmem = WritableMemory.writableWrap(in);
       for (int i = 0; i < j; i++) { wmem.putByte(i, (byte) (-128 + i)); }
 
       long hash =wmem.xxHash64(offset, bytes, seed);
@@ -81,7 +81,7 @@ public class XxHash64Test {
    */
   @Test
   public void collisionTest() {
-    WritableMemoryImpl wmem = WritableMemoryImpl.allocate(128);
+    WritableMemory wmem = WritableMemory.allocate(128);
     wmem.putLong(0, 1);
     wmem.putLong(16, 42);
     wmem.putLong(32, 2);
@@ -100,7 +100,7 @@ public class XxHash64Test {
   }
 
   /**
-   * This simple test compares the output of {@link BaseStateImpl#xxHash64(long, long, long)} with the
+   * This simple test compares the output of {@link BaseState#xxHash64(long, long, long)} with the
    * output of {@link net.openhft.hashing.LongHashFunction}, that itself is tested against the
    * reference implementation in C.  This increase confidence that the xxHash function implemented
    * in this package is in fact the same xxHash function implemented in C.
@@ -115,7 +115,7 @@ public class XxHash64Test {
       byte[] bytes = new byte[len];
       for (int i = 0; i < 10; i++) {
         long zahXxHash = LongHashFunction.xx().hashBytes(bytes);
-        long memoryXxHash = MemoryImpl.wrap(bytes).xxHash64(0, len, 0);
+        long memoryXxHash = Memory.wrap(bytes).xxHash64(0, len, 0);
         assertEquals(memoryXxHash, zahXxHash);
         random.nextBytes(bytes);
       }
@@ -126,7 +126,7 @@ public class XxHash64Test {
 
   @Test
   public void testArrHashes() {
-    WritableMemoryImpl wmem = WritableMemoryImpl.writableWrap(barr);
+    WritableMemory wmem = WritableMemory.writableWrap(barr);
     long hash0 = wmem.xxHash64(8, 8, 0);
     long hash1 = hashBytes(barr, 8, 8, 0);
     assertEquals(hash1, hash0);

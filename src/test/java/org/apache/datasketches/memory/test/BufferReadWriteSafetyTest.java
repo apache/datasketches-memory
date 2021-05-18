@@ -21,18 +21,18 @@ package org.apache.datasketches.memory.test;
 
 import java.nio.ByteBuffer;
 
-import org.apache.datasketches.memory.internal.BufferImpl;
+import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.internal.ReadOnlyException;
-import org.apache.datasketches.memory.internal.WritableBufferImpl;
-import org.apache.datasketches.memory.internal.WritableMemoryImpl;
+import org.apache.datasketches.memory.WritableBuffer;
+import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")
 public class BufferReadWriteSafetyTest {
 
-  // Test various operations with read-only BufferImpl
+  // Test various operations with read-only Buffer
 
-  private final WritableBufferImpl buf = (WritableBufferImpl) BufferImpl.wrap(ByteBuffer.allocate(8));
+  private final WritableBuffer buf = (WritableBuffer) Buffer.wrap(ByteBuffer.allocate(8));
 
   @Test(expectedExceptions = AssertionError.class)
   public void testPutByte() {
@@ -158,19 +158,19 @@ public class BufferReadWriteSafetyTest {
 
   @Test(expectedExceptions = AssertionError.class)
   public void testWritableMemoryAsBuffer() {
-    WritableBufferImpl buf1 = (WritableBufferImpl) WritableMemoryImpl.allocate(8).asBuffer();
+    WritableBuffer buf1 = (WritableBuffer) WritableMemory.allocate(8).asBuffer();
     buf1.putInt(1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testWritableBufferRegion() {
-    WritableBufferImpl buf1 = (WritableBufferImpl) WritableMemoryImpl.allocate(8).asWritableBuffer().region();
+    WritableBuffer buf1 = (WritableBuffer) WritableMemory.allocate(8).asWritableBuffer().region();
     buf1.putInt(1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testWritableBufferDuplicate() {
-    WritableBufferImpl buf1 = (WritableBufferImpl) WritableMemoryImpl.allocate(8).asWritableBuffer().duplicate();
+    WritableBuffer buf1 = (WritableBuffer) WritableMemory.allocate(8).asWritableBuffer().duplicate();
     buf1.putInt(1);
   }
 }

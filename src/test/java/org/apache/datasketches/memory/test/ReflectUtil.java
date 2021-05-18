@@ -221,30 +221,6 @@ public final class ReflectUtil {
     CHECK_VALID.invoke(target);
   }
 
-//  static long getCurrentDirectMemoryAllocated() {
-//    try {
-//      return (long) GET_CURRENT_DIRECT_MEMORY_ALLOCATED.invoke(null);
-//    } catch (Exception e) { throw new RuntimeException(e); }
-//  }
-//
-//  static long getCurrentDirectMemoryAllocations() {
-//    try {
-//      return (long) GET_CURRENT_DIRECT_MEMORY_ALLOCATIONS.invoke(null);
-//    } catch (Exception e) { throw new RuntimeException(e); }
-//  }
-//
-//  static long getCurrentDirectMemoryMapAllocated() {
-//    try {
-//      return (long) GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATED.invoke(null);
-//    } catch (Exception e) { throw new RuntimeException(e); }
-//  }
-//
-//  static long getCurrentDirectMemoryMapAllocations() {
-//    try {
-//      return (long) GET_CURRENT_DIRECT_MEMORY_MAP_ALLOCATIONS.invoke(null);
-//    } catch (Exception e) { throw new RuntimeException(e); }
-//  }
-
   static long getDirectAllocationsCount() {
     try {
       return (long) GET_DIRECT_ALLOCATIONS_COUNT.invoke(null);

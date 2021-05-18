@@ -22,7 +22,7 @@ package org.apache.datasketches.memory.test;
 import static org.testng.Assert.assertEquals;
 
 import org.apache.datasketches.memory.WritableHandle;
-import org.apache.datasketches.memory.internal.WritableBuffer;
+import org.apache.datasketches.memory.internal.WritableBufferImpl;
 import org.apache.datasketches.memory.internal.WritableMemoryImpl;
 import org.testng.annotations.Test;
 
@@ -34,14 +34,14 @@ public class CommonBufferTest {
     int memCapacity = 60; //must be at least 60
     try (WritableHandle wrh = WritableMemoryImpl.allocateDirect(memCapacity)) {
       WritableMemoryImpl mem = wrh.get();
-      WritableBuffer buf = mem.asWritableBuffer();
+      WritableBufferImpl buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
       setGetTests(buf);
       setGetTests2(buf);
     }
   }
 
-  public static void setGetTests(WritableBuffer buf) {
+  public static void setGetTests(WritableBufferImpl buf) {
     buf.putBoolean(true);
     buf.putBoolean(false);
     buf.putByte((byte) -1);
@@ -95,7 +95,7 @@ public class CommonBufferTest {
     assertEquals(buf.getDouble(), Double.MIN_VALUE);
   }
 
-  public static void setGetTests2(WritableBuffer buf) {
+  public static void setGetTests2(WritableBufferImpl buf) {
     buf.putBoolean(0, true);
     buf.putBoolean(1, false);
     buf.putByte(2, (byte) -1);
@@ -136,13 +136,13 @@ public class CommonBufferTest {
     int memCapacity = 32;
     try (WritableHandle wrh = WritableMemoryImpl.allocateDirect(memCapacity)) {
       WritableMemoryImpl mem = wrh.get();
-      WritableBuffer buf = mem.asWritableBuffer();
+      WritableBufferImpl buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
       setGetArraysTests(buf);
     }
   }
 
-  public static void setGetArraysTests(WritableBuffer buf) {
+  public static void setGetArraysTests(WritableBufferImpl buf) {
     int words = 4;
 
     boolean[] srcArray1 = {true, false, true, false};
@@ -233,13 +233,13 @@ public class CommonBufferTest {
     int memCapacity = 32;
     try (WritableHandle wrh = WritableMemoryImpl.allocateDirect(memCapacity)) {
       WritableMemoryImpl mem = wrh.get();
-      WritableBuffer buf = mem.asWritableBuffer();
+      WritableBufferImpl buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
       setGetPartialArraysWithOffsetTests(buf);
     }
   }
 
-  public static void setGetPartialArraysWithOffsetTests(WritableBuffer buf) {
+  public static void setGetPartialArraysWithOffsetTests(WritableBufferImpl buf) {
     int items= 4;
     boolean[] srcArray1 = {true, false, true, false};
     boolean[] dstArray1 = new boolean[items];
@@ -327,7 +327,7 @@ public class CommonBufferTest {
     int memCapacity = 64; //must be 64
     try (WritableHandle wrh1 = WritableMemoryImpl.allocateDirect(memCapacity)) {
       WritableMemoryImpl mem = wrh1.get();
-      WritableBuffer buf = mem.asWritableBuffer();
+      WritableBufferImpl buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
 
       setClearMemoryRegionsTests(buf); //requires println enabled to visually check
@@ -339,7 +339,7 @@ public class CommonBufferTest {
   }
 
   //enable println statements to visually check
-  public static void setClearMemoryRegionsTests(WritableBuffer buf) {
+  public static void setClearMemoryRegionsTests(WritableBufferImpl buf) {
     int accessCapacity = (int)buf.getCapacity();
 
   //define regions
@@ -416,14 +416,14 @@ public class CommonBufferTest {
     int memCapacity = 48; //must be 48
     try (WritableHandle wrh1 = WritableMemoryImpl.allocateDirect(memCapacity)) {
       WritableMemoryImpl mem = wrh1.get();
-      WritableBuffer buf = mem.asWritableBuffer();
+      WritableBufferImpl buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
       toHexStringAllMemTests(buf); //requires println enabled to visually check
     }
   }
 
   //enable println to visually check
-  public static void toHexStringAllMemTests(WritableBuffer buf) {
+  public static void toHexStringAllMemTests(WritableBufferImpl buf) {
     int memCapacity = (int)buf.getCapacity();
 
     for (int i=0; i<memCapacity; i++) {

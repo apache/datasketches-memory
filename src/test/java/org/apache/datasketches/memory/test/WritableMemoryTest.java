@@ -29,7 +29,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.datasketches.memory.internal.MemoryImpl;
 import org.apache.datasketches.memory.internal.Util;
-import org.apache.datasketches.memory.internal.WritableBuffer;
+import org.apache.datasketches.memory.internal.WritableBufferImpl;
 import org.apache.datasketches.memory.internal.WritableMemoryImpl;
 import org.testng.annotations.Test;
 
@@ -64,7 +64,7 @@ public class WritableMemoryTest {
     byte[] byteArr = new byte[64];
     WritableMemoryImpl wmem = WritableMemoryImpl.writableWrap(byteArr);
     assertTrue(wmem.getArray() == byteArr);
-    WritableBuffer wbuf = wmem.asWritableBuffer();
+    WritableBufferImpl wbuf = wmem.asWritableBuffer();
     assertTrue(wbuf.getArray() == byteArr);
   }
 

@@ -26,7 +26,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.WritableByteChannel;
 
-import org.apache.datasketches.memory.internal.Buffer;
 import org.apache.datasketches.memory.internal.MemoryImpl;
 import org.apache.datasketches.memory.internal.Utf8CodingException;
 import org.apache.datasketches.memory.internal.Util;
@@ -36,7 +35,7 @@ public interface Memory extends BaseState {
   //BYTE BUFFER
   
   /**
-   * Accesses the given ByteBuffer for read-only operations. The returned <i>MemoryImpl</i> object has
+   * Accesses the given ByteBuffer for read-only operations. The returned <i>Memory</i> object has
    * the same byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is
    * zero, then byte order of the returned <i>Memory</i> object (as well as backing storage) is
    * unspecified.
@@ -46,7 +45,7 @@ public interface Memory extends BaseState {
    * @param byteBuf the given ByteBuffer, must not be null
    * @return a new <i>Memory</i> for read-only operations on the given ByteBuffer.
    */
-  static Memory wrap(final ByteBuffer byteBuf) {
+  static Memory wrap(ByteBuffer byteBuf) {
     return MemoryImpl.wrap(byteBuf);
   }
   
@@ -63,7 +62,7 @@ public interface Memory extends BaseState {
    * state of the given ByteBuffer.
    * @return a new <i>Memory</i> for read-only operations on the given ByteBuffer.
    */
-  static Memory wrap(final ByteBuffer byteBuf, final ByteOrder byteOrder) {
+  static Memory wrap(ByteBuffer byteBuf, ByteOrder byteOrder) {
     return MemoryImpl.wrap(byteBuf, byteOrder);
   }
   
@@ -80,7 +79,7 @@ public interface Memory extends BaseState {
    * @return <i>MapHandle</i> for managing the mapped Memory.
    * Please read Javadocs for {@link Handle}.
    */
-  static MapHandle map(final File file) {
+  static MapHandle map(File file) {
     return MemoryImpl.map(file, 0, file.length(), ByteOrder.nativeOrder());
   }
   
@@ -97,8 +96,7 @@ public interface Memory extends BaseState {
    * @return <i>MapHandle</i> for managing the mapped Memory.
    * Please read Javadocs for {@link Handle}.
    */
-  static MapHandle map(final File file, final long fileOffsetBytes, final long capacityBytes,
-      final ByteOrder byteOrder) {
+  static MapHandle map(File file, long fileOffsetBytes, long capacityBytes, ByteOrder byteOrder) {
     return MemoryImpl.map(file, fileOffsetBytes, capacityBytes, byteOrder);
   }
   
@@ -116,7 +114,7 @@ public interface Memory extends BaseState {
    * @return a new <i>Memory</i> representing the defined region based on the given
    * offsetBytes and capacityBytes.
    */
-  MemoryImpl region(long offsetBytes, long capacityBytes);
+  Memory region(long offsetBytes, long capacityBytes);
   
   /**
    * A region is a read-only view of this object.
@@ -133,7 +131,7 @@ public interface Memory extends BaseState {
    * @return a new <i>Memory</i> representing the defined region based on the given
    * offsetBytes, capacityBytes and byteOrder.
    */
-  MemoryImpl region(long offsetBytes, long capacityBytes, ByteOrder byteOrder);
+  Memory region(long offsetBytes, long capacityBytes, ByteOrder byteOrder);
   
   //AS BUFFER
   /**
@@ -206,13 +204,13 @@ public interface Memory extends BaseState {
    * @param arr the given primitive array.
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(final boolean[] arr) {
+  static Memory wrap(boolean[] arr) {
     return MemoryImpl.wrap(arr);
   }
   
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and byte order of the returned <i>MemoryImpl</i> object are
+   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are
    * unspecified.
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
@@ -220,7 +218,7 @@ public interface Memory extends BaseState {
    * @param arr the given primitive array.
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(final byte[] arr) {
+  static Memory wrap(byte[] arr) {
     return MemoryImpl.wrap(arr, 0, arr.length, Util.nativeByteOrder);
   }
   
@@ -235,7 +233,7 @@ public interface Memory extends BaseState {
    * @param byteOrder the byte order to be used
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(final byte[] arr, final ByteOrder byteOrder) {
+  static Memory wrap(byte[] arr, ByteOrder byteOrder) {
     return MemoryImpl.wrap(arr, 0, arr.length, byteOrder);
   }
   
@@ -252,8 +250,8 @@ public interface Memory extends BaseState {
    * @param byteOrder the byte order to be used
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(final byte[] arr, final int offsetBytes, final int lengthBytes,
-      final ByteOrder byteOrder) {
+  static Memory wrap(byte[] arr, int offsetBytes, int lengthBytes,
+      ByteOrder byteOrder) {
     return MemoryImpl.wrap(arr, offsetBytes, lengthBytes, byteOrder);
   }
   
@@ -266,7 +264,7 @@ public interface Memory extends BaseState {
    * @param arr the given primitive array.
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(final char[] arr) {
+  static Memory wrap(char[] arr) {
     return MemoryImpl.wrap(arr);
   }
   
@@ -279,7 +277,7 @@ public interface Memory extends BaseState {
    * @param arr the given primitive array.
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(final short[] arr) {
+  static Memory wrap(short[] arr) {
     return MemoryImpl.wrap(arr);
   }
   
@@ -292,7 +290,7 @@ public interface Memory extends BaseState {
    * @param arr the given primitive array.
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(final int[] arr) {
+  static Memory wrap(int[] arr) {
     return MemoryImpl.wrap(arr);
   }
   
@@ -306,7 +304,7 @@ public interface Memory extends BaseState {
    * @param arr the given primitive array.
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(final long[] arr) {
+  static Memory wrap(long[] arr) {
     return MemoryImpl.wrap(arr);
   }
   
@@ -320,7 +318,7 @@ public interface Memory extends BaseState {
    * @param arr the given primitive array.
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(final float[] arr) {
+  static Memory wrap(float[] arr) {
     return MemoryImpl.wrap(arr);
   }
   
@@ -334,7 +332,7 @@ public interface Memory extends BaseState {
    * @param arr the given primitive array.
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(final double[] arr) {
+  static Memory wrap(double[] arr) {
     return MemoryImpl.wrap(arr);
   }
   
@@ -421,8 +419,8 @@ public interface Memory extends BaseState {
    * @return the number of characters decoded.
    * @throws Utf8CodingException in case of malformed or illegal UTF-8 input
    */
-  int getCharsFromUtf8(final long offsetBytes, final int utf8LengthBytes,
-      final StringBuilder dst) throws Utf8CodingException;
+  int getCharsFromUtf8(long offsetBytes, int utf8LengthBytes, StringBuilder dst) 
+      throws Utf8CodingException;
 
   /**
    * Gets the double value at the given offset

@@ -22,7 +22,7 @@ package org.apache.datasketches.memory.internal;
 import java.nio.ByteOrder;
 
 /**
- * Implementation of {@link WritableBuffer} for map memory, non-native byte order.
+ * Implementation of {@link WritableBufferImpl} for map memory, non-native byte order.
  *
  * @author Roman Leventov
  * @author Lee Rhodes

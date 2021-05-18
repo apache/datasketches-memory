@@ -22,12 +22,12 @@ package org.apache.datasketches.memory.internal;
 import java.nio.ByteOrder;
 
 /**
- * Implementation of {@link WritableBuffer} for map memory, native byte order.
+ * Implementation of {@link WritableBufferImpl} for map memory, native byte order.
  *
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-final class MapWritableBufferImpl extends WritableBufferImpl {
+final class MapWritableBufferImpl extends NativeWritableBufferImpl {
   private static final int id = BUFFER | NATIVE | MAP;
   private final long nativeBaseOffset; //used to compute cumBaseOffset
   private final StepBoolean valid; //a reference only

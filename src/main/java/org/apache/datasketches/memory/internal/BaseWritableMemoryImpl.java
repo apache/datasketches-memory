@@ -200,32 +200,32 @@ abstract class BaseWritableMemoryImpl extends WritableMemoryImpl {
 
   //AS BUFFER
   @Override
-  public Buffer asBuffer() {
-    return asWritableBufferImpl(true, getTypeByteOrder());
+  public BufferImpl asBuffer() {
+    return asWritableBuffer(true, getTypeByteOrder());
   }
 
   @Override
-  public Buffer asBuffer(final ByteOrder byteOrder) {
-    return asWritableBufferImpl(true, byteOrder);
+  public BufferImpl asBuffer(final ByteOrder byteOrder) {
+    return asWritableBuffer(true, byteOrder);
   }
 
   @Override
-  public WritableBuffer asWritableBuffer() {
-    return asWritableBufferImpl(false, getTypeByteOrder());
+  public WritableBufferImpl asWritableBuffer() {
+    return asWritableBuffer(false, getTypeByteOrder());
   }
 
   @Override
-  public WritableBuffer asWritableBuffer(final ByteOrder byteOrder) {
-    return asWritableBufferImpl(false, byteOrder);
+  public WritableBufferImpl asWritableBuffer(final ByteOrder byteOrder) {
+    return asWritableBuffer(false, byteOrder);
   }
 
-  WritableBuffer asWritableBufferImpl(final boolean localReadOnly, final ByteOrder byteOrder) {
+  WritableBufferImpl asWritableBuffer(final boolean localReadOnly, final ByteOrder byteOrder) {
     if (isReadOnly() && !localReadOnly) {
       throw new ReadOnlyException(
-          "Converting a read-only MemoryImpl to a writable Buffer is not allowed.");
+          "Converting a read-only MemoryImpl to a writable BufferImpl is not allowed.");
     }
     final boolean readOnly = isReadOnly() || localReadOnly;
-    final WritableBuffer wbuf = toWritableBuffer(readOnly, byteOrder);
+    final WritableBufferImpl wbuf = toWritableBuffer(readOnly, byteOrder);
     wbuf.setStartPositionEnd(0, 0, getCapacity());
     return wbuf;
   }

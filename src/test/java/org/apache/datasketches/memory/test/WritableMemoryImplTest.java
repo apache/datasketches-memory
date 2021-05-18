@@ -28,12 +28,12 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.WritableHandle;
-import org.apache.datasketches.memory.internal.Buffer;
+import org.apache.datasketches.memory.internal.BufferImpl;
 import org.apache.datasketches.memory.internal.MemoryImpl;
 import org.apache.datasketches.memory.internal.ReadOnlyException;
 import org.apache.datasketches.memory.internal.UnsafeUtil;
 import org.apache.datasketches.memory.internal.Util;
-import org.apache.datasketches.memory.internal.WritableBuffer;
+import org.apache.datasketches.memory.internal.WritableBufferImpl;
 import org.apache.datasketches.memory.internal.WritableMemoryImpl;
 import org.testng.annotations.Test;
 
@@ -642,12 +642,12 @@ public class WritableMemoryImplTest {
   @Test
   public void checkAsBuffer() {
     WritableMemoryImpl wmem = WritableMemoryImpl.allocate(64);
-    WritableBuffer wbuf = wmem.asWritableBuffer();
+    WritableBufferImpl wbuf = wmem.asWritableBuffer();
     wbuf.setPosition(32);
     for (int i = 32; i < 64; i++) { wbuf.putByte((byte)i); }
     //println(wbuf.toHexString("Buf", 0, (int)wbuf.getCapacity()));
 
-    Buffer buf = wmem.asBuffer();
+    BufferImpl buf = wmem.asBuffer();
     buf.setPosition(32);
     for (int i = 32; i < 64; i++) {
       assertEquals(buf.getByte(), i);
@@ -678,7 +678,7 @@ public class WritableMemoryImplTest {
     byteBuf.position(16);
     byteBuf.limit(48);
     WritableMemoryImpl wmem = WritableMemoryImpl.writableWrap(byteBuf);
-    WritableBuffer wbuf = wmem.asWritableBuffer();
+    WritableBufferImpl wbuf = wmem.asWritableBuffer();
     assertEquals(wbuf.getCapacity(), 64);
     assertEquals(wbuf.getPosition(), 0);
     assertEquals(wbuf.getEnd(), 64);
@@ -708,7 +708,7 @@ public class WritableMemoryImplTest {
   public void checkAsBufferNonNative() {
     WritableMemoryImpl wmem = WritableMemoryImpl.allocate(64);
     wmem.putShort(0, (short) 1);
-    Buffer buf = wmem.asBuffer(Util.nonNativeByteOrder);
+    BufferImpl buf = wmem.asBuffer(Util.nonNativeByteOrder);
     assertEquals(buf.getShort(0), 256);
   }
 

@@ -28,8 +28,8 @@
  *
  * <ul><li>Two different access APIs: read-only {@link org.apache.datasketches.memory.internal.MemoryImpl} and
  * {@link org.apache.datasketches.memory.internal.WritableMemoryImpl} for absolute offset access,
- * and read-only {@link org.apache.datasketches.memory.internal.Buffer} and
- * {@link org.apache.datasketches.memory.internal.WritableBuffer}
+ * and read-only {@link org.apache.datasketches.memory.internal.BufferImpl} and
+ * {@link org.apache.datasketches.memory.internal.WritableBufferImpl}
  * for relative positional access (similar to ByteBuffer).</li>
  *
  * <li>Clean separation of Read-only API from Writable API, which makes writable versus read-only
@@ -71,7 +71,7 @@
  *
  * <p>The two different access APIs are:</p>
  * <ul><li><i>MemoryImpl, WritableMemoryImpl</i>: Absolute offset addressing into a resource.</li>
- * <li><i>Buffer, WritableBuffer</i>: Position relative addressing into a resource.</li>
+ * <li><i>BufferImpl, WritableBufferImpl</i>: Position relative addressing into a resource.</li>
  * </ul>
  *
  * <p>In addition, all combinations of access APIs and backing resources can be accessed via
@@ -149,10 +149,10 @@
  * hard-to-find bug.</li>
  * </ul>
  *
- *<p>Moving back and forth between <i>MemoryImpl</i> and <i>Buffer</i>:</p>
+ *<p>Moving back and forth between <i>MemoryImpl</i> and <i>BufferImpl</i>:</p>
  *<blockquote><pre>
  *    MemoryImpl mem = ...
- *    Buffer buf = mem.asBuffer();
+ *    BufferImpl buf = mem.asBuffer();
  *    ...
  *    MemoryImpl mem2 = buf.asMemory();
  *    ...

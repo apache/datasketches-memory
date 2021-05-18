@@ -51,7 +51,7 @@ import org.apache.datasketches.memory.internal.WritableMemoryImpl;
  *       moveAndResize(mem, newMem);
  *
  *       //You are done with the old memory, so request close.
- *       //Note that it is up to the owner of the WritableDirectHandleImpl whether or not to
+ *       //Note that it is up to the owner of the WritableDirectHandle whether or not to
  *       // actually close the resource.
  *       memReqSvr.requestClose(mem, newMem);
  *

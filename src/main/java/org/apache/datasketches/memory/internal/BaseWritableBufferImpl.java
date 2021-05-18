@@ -30,6 +30,8 @@ import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_SHORT_IND
 import static org.apache.datasketches.memory.internal.UnsafeUtil.checkBounds;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
 
+import org.apache.datasketches.memory.Buffer;
+
 import java.nio.ByteOrder;
 
 /*
@@ -46,15 +48,15 @@ import java.nio.ByteOrder;
  */
 
 /**
- * Common base of native-ordered and non-native-ordered {@link WritableBuffer} implementations.
+ * Common base of native-ordered and non-native-ordered {@link WritableBufferImpl} implementations.
  * Contains methods which are agnostic to the byte order.
  */
 @SuppressWarnings({"restriction"})
-abstract class BaseWritableBufferImpl extends WritableBuffer {
+abstract class BaseWritableBufferImpl extends WritableBufferImpl {
   final BaseWritableMemoryImpl originMemory;
 
   //Static variable for cases where byteBuf/array sizes are zero
-  final static WritableBufferImpl ZERO_SIZE_BUFFER;
+  final static NativeWritableBufferImpl ZERO_SIZE_BUFFER;
 
   static {
     final BaseWritableMemoryImpl mem = BaseWritableMemoryImpl.ZERO_SIZE_MEMORY;
@@ -71,40 +73,40 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
 
   //REGIONS
   @Override
-  public Buffer region() {
+  public BufferImpl region() {
     return writableRegionImpl(getPosition(), getEnd() - getPosition(), true, getTypeByteOrder());
   }
 
   @Override
-  public Buffer region(final long offsetBytes, final long capacityBytes,
+  public BufferImpl region(final long offsetBytes, final long capacityBytes,
       final ByteOrder byteOrder) {
-    final Buffer buf = writableRegionImpl(offsetBytes, capacityBytes, true, byteOrder);
+    final BufferImpl buf = writableRegionImpl(offsetBytes, capacityBytes, true, byteOrder);
     buf.setAndCheckStartPositionEnd(0, 0, capacityBytes);
     return buf;
   }
 
   @Override
-  public WritableBuffer writableRegion() {
+  public WritableBufferImpl writableRegion() {
     return writableRegionImpl(getPosition(), getEnd() - getPosition(), false, getTypeByteOrder());
   }
 
   @Override
-  public WritableBuffer writableRegion(final long offsetBytes, final long capacityBytes,
+  public WritableBufferImpl writableRegion(final long offsetBytes, final long capacityBytes,
       final ByteOrder byteOrder) {
-    final WritableBuffer wbuf = writableRegionImpl(offsetBytes, capacityBytes, false, byteOrder);
+    final WritableBufferImpl wbuf = writableRegionImpl(offsetBytes, capacityBytes, false, byteOrder);
     wbuf.setAndCheckStartPositionEnd(0, 0, capacityBytes);
     return wbuf;
   }
 
-  WritableBuffer writableRegionImpl(final long offsetBytes, final long capacityBytes,
+  WritableBufferImpl writableRegionImpl(final long offsetBytes, final long capacityBytes,
       final boolean localReadOnly, final ByteOrder byteOrder) {
     if (capacityBytes == 0) { return ZERO_SIZE_BUFFER; }
     if (isReadOnly() && !localReadOnly) {
-      throw new ReadOnlyException("Writable region of a read-only Buffer is not allowed.");
+      throw new ReadOnlyException("Writable region of a read-only BufferImpl is not allowed.");
     }
     checkValidAndBounds(offsetBytes, capacityBytes);
     final boolean readOnly = isReadOnly() || localReadOnly;
-    final WritableBuffer wbuf = toWritableRegion(offsetBytes, capacityBytes, readOnly, byteOrder);
+    final WritableBufferImpl wbuf = toWritableRegion(offsetBytes, capacityBytes, readOnly, byteOrder);
     wbuf.setStartPositionEnd(0, 0, capacityBytes);
     return wbuf;
   }
@@ -114,31 +116,31 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
 
   //DUPLICATES
   @Override
-  public Buffer duplicate() {
+  public BufferImpl duplicate() {
     return writableDuplicateImpl(true, getTypeByteOrder());
   }
 
   @Override
-  public Buffer duplicate(final ByteOrder byteOrder) {
+  public BufferImpl duplicate(final ByteOrder byteOrder) {
     return writableDuplicateImpl(true, byteOrder);
   }
 
   @Override
-  public WritableBuffer writableDuplicate() {
+  public WritableBufferImpl writableDuplicate() {
     return writableDuplicateImpl(false, getTypeByteOrder());
   }
 
   @Override
-  public WritableBuffer writableDuplicate(final ByteOrder byteOrder) {
+  public WritableBufferImpl writableDuplicate(final ByteOrder byteOrder) {
     return writableDuplicateImpl(false, byteOrder);
   }
 
-  WritableBuffer writableDuplicateImpl(final boolean localReadOnly, final ByteOrder byteOrder) {
+  WritableBufferImpl writableDuplicateImpl(final boolean localReadOnly, final ByteOrder byteOrder) {
     if (isReadOnly() && !localReadOnly) {
-      throw new ReadOnlyException("Writable duplicate of a read-only Buffer is not allowed.");
+      throw new ReadOnlyException("Writable duplicate of a read-only BufferImpl is not allowed.");
     }
     final boolean readOnly = isReadOnly() || localReadOnly;
-    final WritableBuffer wbuf = toDuplicate(readOnly, byteOrder);
+    final WritableBufferImpl wbuf = toDuplicate(readOnly, byteOrder);
     wbuf.setStartPositionEnd(getStart(), getPosition(), getEnd());
     return wbuf;
   }
@@ -154,7 +156,7 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   @Override
   public WritableMemoryImpl asWritableMemory() {
     if (isReadOnly()) {
-      throw new ReadOnlyException("Converting a read-only Buffer to a writable MemoryImpl is not allowed.");
+      throw new ReadOnlyException("Converting a read-only BufferImpl to a writable MemoryImpl is not allowed.");
     }
     return originMemory;
   }
@@ -265,8 +267,8 @@ abstract class BaseWritableBufferImpl extends WritableBuffer {
   @Override
   public final int compareTo(final long thisOffsetBytes, final long thisLengthBytes,
       final Buffer thatBuf, final long thatOffsetBytes, final long thatLengthBytes) {
-    return CompareAndCopy.compare(this, thisOffsetBytes, thisLengthBytes,
-        thatBuf, thatOffsetBytes, thatLengthBytes);
+    return CompareAndCopy.compare((BaseStateImpl)this, thisOffsetBytes, thisLengthBytes,
+        (BaseStateImpl)thatBuf, thatOffsetBytes, thatLengthBytes);
   }
 
   /*

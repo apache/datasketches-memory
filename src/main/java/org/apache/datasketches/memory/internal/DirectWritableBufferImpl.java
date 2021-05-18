@@ -24,12 +24,12 @@ import java.nio.ByteOrder;
 import org.apache.datasketches.memory.MemoryRequestServer;
 
 /**
- * Implementation of {@link WritableBuffer} for direct memory, native byte order.
+ * Implementation of {@link WritableBufferImpl} for direct memory, native byte order.
  *
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-final class DirectWritableBufferImpl extends WritableBufferImpl {
+final class DirectWritableBufferImpl extends NativeWritableBufferImpl {
   private static final int id = BUFFER | NATIVE | DIRECT;
   private final long nativeBaseOffset; //used to compute cumBaseOffset
   private final StepBoolean valid; //a reference only

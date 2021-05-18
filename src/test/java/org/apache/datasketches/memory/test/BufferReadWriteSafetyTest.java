@@ -21,18 +21,18 @@ package org.apache.datasketches.memory.test;
 
 import java.nio.ByteBuffer;
 
-import org.apache.datasketches.memory.internal.Buffer;
+import org.apache.datasketches.memory.internal.BufferImpl;
 import org.apache.datasketches.memory.internal.ReadOnlyException;
-import org.apache.datasketches.memory.internal.WritableBuffer;
+import org.apache.datasketches.memory.internal.WritableBufferImpl;
 import org.apache.datasketches.memory.internal.WritableMemoryImpl;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")
 public class BufferReadWriteSafetyTest {
 
-  // Test various operations with read-only Buffer
+  // Test various operations with read-only BufferImpl
 
-  private final WritableBuffer buf = (WritableBuffer) Buffer.wrap(ByteBuffer.allocate(8));
+  private final WritableBufferImpl buf = (WritableBufferImpl) BufferImpl.wrap(ByteBuffer.allocate(8));
 
   @Test(expectedExceptions = AssertionError.class)
   public void testPutByte() {
@@ -158,19 +158,19 @@ public class BufferReadWriteSafetyTest {
 
   @Test(expectedExceptions = AssertionError.class)
   public void testWritableMemoryAsBuffer() {
-    WritableBuffer buf1 = (WritableBuffer) WritableMemoryImpl.allocate(8).asBuffer();
+    WritableBufferImpl buf1 = (WritableBufferImpl) WritableMemoryImpl.allocate(8).asBuffer();
     buf1.putInt(1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testWritableBufferRegion() {
-    WritableBuffer buf1 = (WritableBuffer) WritableMemoryImpl.allocate(8).asWritableBuffer().region();
+    WritableBufferImpl buf1 = (WritableBufferImpl) WritableMemoryImpl.allocate(8).asWritableBuffer().region();
     buf1.putInt(1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testWritableBufferDuplicate() {
-    WritableBuffer buf1 = (WritableBuffer) WritableMemoryImpl.allocate(8).asWritableBuffer().duplicate();
+    WritableBufferImpl buf1 = (WritableBufferImpl) WritableMemoryImpl.allocate(8).asWritableBuffer().duplicate();
     buf1.putInt(1);
   }
 }

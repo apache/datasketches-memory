@@ -27,12 +27,12 @@ import static org.testng.Assert.fail;
 
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.internal.Buffer;
+import org.apache.datasketches.memory.internal.BufferImpl;
 import org.apache.datasketches.memory.internal.MemoryImpl;
 import org.apache.datasketches.memory.internal.Prim;
 import org.apache.datasketches.memory.internal.StepBoolean;
 import org.apache.datasketches.memory.internal.Util;
-import org.apache.datasketches.memory.internal.WritableBuffer;
+import org.apache.datasketches.memory.internal.WritableBufferImpl;
 import org.apache.datasketches.memory.internal.WritableMemoryImpl;
 import org.testng.annotations.Test;
 
@@ -52,8 +52,8 @@ public class BaseStateTest {
     assertFalse(wmem.isSameResource(null));
     assertTrue(wmem.isSameResource(mem));
 
-    WritableBuffer wbuf = wmem.asWritableBuffer();
-    Buffer buf = wbuf;
+    WritableBufferImpl wbuf = wmem.asWritableBuffer();
+    BufferImpl buf = wbuf;
     assertFalse(wbuf.isSameResource(null));
     assertTrue(wbuf.isSameResource(buf));
   }

@@ -33,7 +33,7 @@ import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.BaseState;
 
 /**
- * Keeps key configuration state for MemoryImpl and Buffer plus some common static variables
+ * Keeps key configuration state for MemoryImpl and BufferImpl plus some common static variables
  * and check methods.
  *
  * @author Lee Rhodes
@@ -162,7 +162,7 @@ public abstract class BaseStateImpl implements BaseState {
     return cumBaseOffset_ + offsetBytes;
   }
 
-  //made public in WritableMemoryImpl and WritableBuffer, only implemented in Direct Leafs
+  //made public in WritableMemoryImpl and WritableBufferImpl, only implemented in Direct Leafs
   abstract MemoryRequestServer getMemoryRequestServer();
 
   //Overridden by ByteBuffer, Direct and Map leafs
@@ -187,7 +187,7 @@ public abstract class BaseStateImpl implements BaseState {
   abstract int getTypeId();
 
   //Overridden by Heap and ByteBuffer Leafs. Made public as getArray() in WritableMemoryImpl and
-  // WritableBuffer
+  // WritableBufferImpl
   Object getUnsafeObject() {
     return null;
   }

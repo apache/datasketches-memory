@@ -17,27 +17,15 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+
+package org.apache.datasketches.memory;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-/**
- * Provides read-only, positional primitive and primitive array methods to any of the four resources
- * mentioned in the package level documentation.
- *
- * @author Roman Leventov
- * @author Lee Rhodes
- *
- * @see org.apache.datasketches.memory.internal
- */
-public abstract class Buffer extends BaseBuffer {
+import org.apache.datasketches.memory.internal.BufferImpl;
 
-  //Pass-through ctor
-  Buffer(final Object unsafeObj, final long nativeBaseOffset,
-      final long regionOffset, final long capacityBytes) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
-  }
+public interface Buffer extends BaseBuffer {
 
   //BYTE BUFFER
   /**
@@ -47,8 +35,8 @@ public abstract class Buffer extends BaseBuffer {
    * @param byteBuf the given ByteBuffer, must not be null.
    * @return a new Buffer for read-only operations on the given ByteBuffer.
    */
-  public static Buffer wrap(final ByteBuffer byteBuf) {
-    return wrap(byteBuf, byteBuf.order());
+  static Buffer wrap(ByteBuffer byteBuf) {
+    return BufferImpl.wrap(byteBuf);
   }
 
   /**
@@ -61,17 +49,10 @@ public abstract class Buffer extends BaseBuffer {
    * state of the given ByteBuffer
    * @return a new Buffer for read-only operations on the given ByteBuffer.
    */
-  public static Buffer wrap(final ByteBuffer byteBuf, final ByteOrder byteOrder) {
-    final BaseWritableMemoryImpl wmem =
-        BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, true, byteOrder);
-    final WritableBuffer wbuf = wmem.asWritableBufferImpl(true, byteOrder);
-    wbuf.setStartPositionEnd(0, byteBuf.position(), byteBuf.limit());
-    return wbuf;
+  static Buffer wrap(ByteBuffer byteBuf, ByteOrder byteOrder) {
+    return BufferImpl.wrap(byteBuf, byteOrder);
   }
-
-  //MAP
-  //Use MemoryImpl for mapping files and the asBuffer()
-
+  
   //DUPLICATES
   /**
    * Returns a read-only duplicate view of this Buffer with the same but independent values of
@@ -90,7 +71,7 @@ public abstract class Buffer extends BaseBuffer {
    * @return a read-only duplicate view of this Buffer with the same but independent values of
    * <i>start</i>, <i>position</i> and <i>end</i>.
    */
-  public abstract Buffer duplicate();
+  Buffer duplicate();
 
   /**
    * Returns a read-only duplicate view of this Buffer with the same but independent values of
@@ -110,7 +91,7 @@ public abstract class Buffer extends BaseBuffer {
    * @return a read-only duplicate view of this Buffer with the same but independent values of
    * <i>start</i>, <i>position</i> and <i>end</i>.
    */
-  public abstract Buffer duplicate(ByteOrder byteOrder);
+  Buffer duplicate(ByteOrder byteOrder);
 
   //REGIONS
   /**
@@ -129,7 +110,7 @@ public abstract class Buffer extends BaseBuffer {
    * @return a new <i>Buffer</i> representing the defined region based on the current
    * <i>position</i> and <i>end</i>.
    */
-  public abstract Buffer region();
+  Buffer region();
 
   /**
    * A region is a read-only view of this object.
@@ -146,8 +127,8 @@ public abstract class Buffer extends BaseBuffer {
    * If this object's capacity is zero, the returned object is effectively immutable and
    * the backing storage and byte order are unspecified.
    *
-   * <p><b>Note: The MemoryImpl returned with </b><i>asMemory()</i> will have the originating
-   * <i>MemoryImpl</i> byte order.</p>
+   * <p><b>Note: The Memory returned with </b><i>asMemory()</i> will have the originating
+   * <i>Memory</i> byte order.</p>
    *
    * @param offsetBytes the starting offset with respect to the origin of this <i>WritableBuffer</i>
    * @param capacityBytes the <i>capacity</i> of the returned region in bytes
@@ -155,22 +136,18 @@ public abstract class Buffer extends BaseBuffer {
    * @return a new <i>Buffer</i> representing the defined writable region
    * based on the current <i>position</i>, <i>end</i> and byteOrder.
    */
-  public abstract Buffer region(long offsetBytes, long capacityBytes,
+  Buffer region(long offsetBytes, long capacityBytes,
       ByteOrder byteOrder);
 
   //MEMORY
   /**
-   * Convert this Buffer to a MemoryImpl. The current <i>start</i>, <i>position</i> and <i>end</i>
+   * Convert this Buffer to a Memory. The current <i>start</i>, <i>position</i> and <i>end</i>
    * are ignored.
    * If this object's capacity is zero, the returned object is effectively immutable and
    * the backing resource and byte order are unspecified.
-   * @return MemoryImpl
+   * @return Memory
    */
-  public abstract MemoryImpl asMemory();
-
-  //ACCESS PRIMITIVE HEAP ARRAYS for readOnly
-  // use MemoryImpl or WritableMemoryImpl and then asBuffer().
-  //END OF CONSTRUCTOR-TYPE METHODS
+  Memory asMemory();
 
   //PRIMITIVE getX() and getXArray()
   /**
@@ -178,15 +155,15 @@ public abstract class Buffer extends BaseBuffer {
    * Increments the position by 1.
    * @return the boolean at the current position
    */
-  public abstract boolean getBoolean();
+  boolean getBoolean();
 
   /**
    * Gets the boolean value at the given offset.
    * This does not change the position.
-   * @param offsetBytes offset bytes relative to this MemoryImpl start
+   * @param offsetBytes offset bytes relative to this Memory start
    * @return the boolean at the given offset
    */
-  public abstract boolean getBoolean(long offsetBytes);
+  boolean getBoolean(long offsetBytes);
 
   /**
    * Gets the boolean array at the current position.
@@ -195,7 +172,7 @@ public abstract class Buffer extends BaseBuffer {
    * @param dstOffsetBooleans offset in array units
    * @param lengthBooleans number of array units to transfer
    */
-  public abstract void getBooleanArray(boolean[] dstArray, int dstOffsetBooleans,
+  void getBooleanArray(boolean[] dstArray, int dstOffsetBooleans,
       int lengthBooleans);
 
   /**
@@ -203,15 +180,15 @@ public abstract class Buffer extends BaseBuffer {
    * Increments the position by <i>Byte.BYTES</i>.
    * @return the byte at the current position
    */
-  public abstract byte getByte();
+  byte getByte();
 
   /**
    * Gets the byte value at the given offset.
    * This does not change the position.
-   * @param offsetBytes offset bytes relative to this MemoryImpl start
+   * @param offsetBytes offset bytes relative to this Memory start
    * @return the byte at the given offset
    */
-  public abstract byte getByte(long offsetBytes);
+  byte getByte(long offsetBytes);
 
   /**
    * Gets the byte array at the current position.
@@ -220,22 +197,22 @@ public abstract class Buffer extends BaseBuffer {
    * @param dstOffsetBytes offset in array units
    * @param lengthBytes number of array units to transfer
    */
-  public abstract void getByteArray(byte[] dstArray, int dstOffsetBytes, int lengthBytes);
+  void getByteArray(byte[] dstArray, int dstOffsetBytes, int lengthBytes);
 
   /**
    * Gets the char value at the current position.
    * Increments the position by <i>Character.BYTES</i>.
    * @return the char at the current position
    */
-  public abstract char getChar();
+  char getChar();
 
   /**
    * Gets the char value at the given offset.
    * This does not change the position.
-   * @param offsetBytes offset bytes relative to this MemoryImpl start
+   * @param offsetBytes offset bytes relative to this Memory start
    * @return the char at the given offset
    */
-  public abstract char getChar(long offsetBytes);
+  char getChar(long offsetBytes);
 
   /**
    * Gets the char array at the current position.
@@ -244,22 +221,22 @@ public abstract class Buffer extends BaseBuffer {
    * @param dstOffsetChars offset in array units
    * @param lengthChars number of array units to transfer
    */
-  public abstract void getCharArray(char[] dstArray, int dstOffsetChars, int lengthChars);
+  void getCharArray(char[] dstArray, int dstOffsetChars, int lengthChars);
 
   /**
    * Gets the double value at the current position.
    * Increments the position by <i>Double.BYTES</i>.
    * @return the double at the current position
    */
-  public abstract double getDouble();
+  double getDouble();
 
   /**
    * Gets the double value at the given offset.
    * This does not change the position.
-   * @param offsetBytes offset bytes relative to this MemoryImpl start
+   * @param offsetBytes offset bytes relative to this Memory start
    * @return the double at the given offset
    */
-  public abstract double getDouble(long offsetBytes);
+  double getDouble(long offsetBytes);
 
   /**
    * Gets the double array at the current position.
@@ -268,22 +245,22 @@ public abstract class Buffer extends BaseBuffer {
    * @param dstOffsetDoubles offset in array units
    * @param lengthDoubles number of array units to transfer
    */
-  public abstract void getDoubleArray(double[] dstArray, int dstOffsetDoubles, int lengthDoubles);
+  void getDoubleArray(double[] dstArray, int dstOffsetDoubles, int lengthDoubles);
 
   /**
    * Gets the float value at the current position.
    * Increments the position by <i>Float.BYTES</i>.
    * @return the float at the current position
    */
-  public abstract float getFloat();
+  float getFloat();
 
   /**
    * Gets the float value at the given offset.
    * This does not change the position.
-   * @param offsetBytes offset bytes relative to this MemoryImpl start
+   * @param offsetBytes offset bytes relative to this Memory start
    * @return the float at the given offset
    */
-  public abstract float getFloat(long offsetBytes);
+  float getFloat(long offsetBytes);
 
   /**
    * Gets the float array at the current position.
@@ -292,22 +269,22 @@ public abstract class Buffer extends BaseBuffer {
    * @param dstOffsetFloats offset in array units
    * @param lengthFloats number of array units to transfer
    */
-  public abstract void getFloatArray(float[] dstArray, int dstOffsetFloats, int lengthFloats);
+  void getFloatArray(float[] dstArray, int dstOffsetFloats, int lengthFloats);
 
   /**
    * Gets the int value at the current position.
    * Increments the position by <i>Integer.BYTES</i>.
    * @return the int at the current position
    */
-  public abstract int getInt();
+  int getInt();
 
   /**
    * Gets the int value at the given offset.
    * This does not change the position.
-   * @param offsetBytes offset bytes relative to this MemoryImpl start
+   * @param offsetBytes offset bytes relative to this Memory start
    * @return the int at the given offset
    */
-  public abstract int getInt(long offsetBytes);
+  int getInt(long offsetBytes);
 
   /**
    * Gets the int array at the current position.
@@ -316,22 +293,22 @@ public abstract class Buffer extends BaseBuffer {
    * @param dstOffsetInts offset in array units
    * @param lengthInts number of array units to transfer
    */
-  public abstract void getIntArray(int[] dstArray, int dstOffsetInts, int lengthInts);
+  void getIntArray(int[] dstArray, int dstOffsetInts, int lengthInts);
 
   /**
    * Gets the long value at the current position.
    * Increments the position by <i>Long.BYTES</i>.
    * @return the long at the current position
    */
-  public abstract long getLong();
+  long getLong();
 
   /**
    * Gets the long value at the given offset.
    * This does not change the position.
-   * @param offsetBytes offset bytes relative to this MemoryImpl start
+   * @param offsetBytes offset bytes relative to this Memory start
    * @return the long at the given offset
    */
-  public abstract long getLong(long offsetBytes);
+  long getLong(long offsetBytes);
 
   /**
    * Gets the long array at the current position.
@@ -340,22 +317,22 @@ public abstract class Buffer extends BaseBuffer {
    * @param dstOffsetLongs offset in array units
    * @param lengthLongs number of array units to transfer
    */
-  public abstract void getLongArray(long[] dstArray, int dstOffsetLongs, int lengthLongs);
+  void getLongArray(long[] dstArray, int dstOffsetLongs, int lengthLongs);
 
   /**
    * Gets the short value at the current position.
    * Increments the position by <i>Short.BYTES</i>.
    * @return the short at the current position
    */
-  public abstract short getShort();
+  short getShort();
 
   /**
    * Gets the short value at the given offset.
    * This does not change the position.
-   * @param offsetBytes offset bytes relative to this MemoryImpl start
+   * @param offsetBytes offset bytes relative to this Memory start
    * @return the short at the given offset
    */
-  public abstract short getShort(long offsetBytes);
+  short getShort(long offsetBytes);
 
   /**
    * Gets the short array at the current position.
@@ -364,7 +341,7 @@ public abstract class Buffer extends BaseBuffer {
    * @param dstOffsetShorts offset in array units
    * @param lengthShorts number of array units to transfer
    */
-  public abstract void getShortArray(short[] dstArray, int dstOffsetShorts, int lengthShorts);
+  void getShortArray(short[] dstArray, int dstOffsetShorts, int lengthShorts);
 
   //SPECIAL PRIMITIVE READ METHODS: compareTo
   /**
@@ -382,7 +359,7 @@ public abstract class Buffer extends BaseBuffer {
    * @return <i>(this &lt; that) ? (some negative value) : (this &gt; that) ? (some positive value)
    * : 0;</i>
    */
-  public abstract int compareTo(long thisOffsetBytes, long thisLengthBytes, Buffer that,
+  int compareTo(long thisOffsetBytes, long thisLengthBytes, Buffer that,
           long thatOffsetBytes, long thatLengthBytes);
 
 }

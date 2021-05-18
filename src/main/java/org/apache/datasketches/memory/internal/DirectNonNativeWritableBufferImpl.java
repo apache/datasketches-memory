@@ -24,7 +24,7 @@ import java.nio.ByteOrder;
 import org.apache.datasketches.memory.MemoryRequestServer;
 
 /**
- * Implementation of {@link WritableBuffer} for direct memory, non-native byte order.
+ * Implementation of {@link WritableBufferImpl} for direct memory, non-native byte order.
  *
  * @author Roman Leventov
  * @author Lee Rhodes

@@ -49,7 +49,7 @@ public interface BaseState {
    * @return true if the Native ByteOrder is the same as the ByteOrder of the
    * current Buffer or Memory and the same ByteOrder as the given byteOrder.
    */
-  boolean isByteOrderCompatible(final ByteOrder byteOrder);
+  boolean isByteOrderCompatible(ByteOrder byteOrder);
   
   /**
    * Returns true if the given object is an instance of this class and has equal data contents.
@@ -57,7 +57,7 @@ public interface BaseState {
    * @return true if the given Object is an instance of this class and has equal data contents.
    */
   @Override
-  boolean equals(final Object that);
+  boolean equals(Object that);
   
   /**
    * Returns true if the given object is an instance of this class and has equal contents to
@@ -70,8 +70,8 @@ public interface BaseState {
    * @return true if the given object has equal contents to this object in the given range of
    * bytes.
    */
-  boolean equalTo(final long thisOffsetBytes, final Object that,
-      final long thatOffsetBytes, final long lengthBytes);
+  boolean equalTo(long thisOffsetBytes, Object that,
+      long thatOffsetBytes, long lengthBytes);
   
   /**
    * Gets the backing ByteBuffer if it exists, otherwise returns null.
@@ -103,7 +103,7 @@ public interface BaseState {
    * @return the cumulative offset in bytes of this object from the backing resource including the
    * given offsetBytes.
    */
-  long getCumulativeOffset(final long offsetBytes);
+  long getCumulativeOffset(long offsetBytes);
   
   /**
    * Returns the offset of address zero of this object relative to the address zero of the
@@ -122,7 +122,7 @@ public interface BaseState {
    * backing resource plus the given offsetBytes but not including the size of any Java object
    * header.
    */
-  long getRegionOffset(final long offsetBytes);
+  long getRegionOffset(long offsetBytes);
   
   /**
    * Returns true if this object is backed by an on-heap primitive array
@@ -156,7 +156,7 @@ public interface BaseState {
    * @return the 64-bit hash of the sequence of bytes in this object specified by
    * <i>offsetBytes</i> and <i>lengthBytes</i>.
    */
-  long xxHash64(final long offsetBytes, final long lengthBytes, final long seed);
+  long xxHash64(long offsetBytes, long lengthBytes, long seed);
   
   /**
    * Returns true if this Memory is backed by a ByteBuffer.
@@ -185,7 +185,7 @@ public interface BaseState {
    * @return true if the backing resource of <i>this</i> is the same as the backing resource
    * of <i>that</i>.
    */
-  boolean isSameResource(final Object that);
+  boolean isSameResource(Object that);
   
   /**
    * Returns true if this object is valid and has not been closed.
@@ -201,7 +201,7 @@ public interface BaseState {
    * @param offsetBytes the given offset in bytes of this object
    * @param lengthBytes the given length in bytes of this object
    */
-  void checkValidAndBounds(final long offsetBytes, final long lengthBytes);
+  void checkValidAndBounds(long offsetBytes, long lengthBytes);
   
   //Monitoring
   
@@ -247,7 +247,6 @@ public interface BaseState {
    * @param lengthBytes number of bytes to convert to a hex string
    * @return a formatted hex string in a human readable array
    */
-  String toHexString(final String header, final long offsetBytes,
-      final int lengthBytes);
+  String toHexString(String header, long offsetBytes, int lengthBytes);
   
 }

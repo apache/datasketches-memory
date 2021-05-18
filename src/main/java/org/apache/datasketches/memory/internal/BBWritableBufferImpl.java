@@ -23,12 +23,12 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
- * Implementation of {@link WritableBuffer} for ByteBuffer, native byte order.
+ * Implementation of {@link WritableBufferImpl} for ByteBuffer, native byte order.
  *
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-final class BBWritableBufferImpl extends WritableBufferImpl {
+final class BBWritableBufferImpl extends NativeWritableBufferImpl {
   private static final int id = BUFFER | NATIVE | BYTEBUF;
   private final Object unsafeObj;
   private final long nativeBaseOffset; //used to compute cumBaseOffset

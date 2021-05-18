@@ -23,7 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
- * Implementation of {@link WritableBuffer} for ByteBuffer, non-native byte order.
+ * Implementation of {@link WritableBufferImpl} for ByteBuffer, non-native byte order.
  *
  * @author Roman Leventov
  * @author Lee Rhodes

@@ -91,10 +91,10 @@ public abstract class WritableMemoryImpl extends MemoryImpl implements WritableM
 
   //AS BUFFER
   @Override
-  public abstract WritableBuffer asWritableBuffer();
+  public abstract WritableBufferImpl asWritableBuffer();
 
   @Override
-  public abstract WritableBuffer asWritableBuffer(ByteOrder byteOrder);
+  public abstract WritableBufferImpl asWritableBuffer(ByteOrder byteOrder);
 
   //ALLOCATE HEAP VIA AUTOMATIC BYTE ARRAY
   public static WritableMemoryImpl allocate(final int capacityBytes) {

@@ -81,10 +81,10 @@ public abstract class MemoryImpl extends BaseStateImpl implements Memory {
 
   //AS BUFFER
   @Override
-  public abstract Buffer asBuffer();
+  public abstract BufferImpl asBuffer();
 
   @Override
-  public abstract Buffer asBuffer(ByteOrder byteOrder);
+  public abstract BufferImpl asBuffer(ByteOrder byteOrder);
 
   //UNSAFE BYTE BUFFER VIEW
   @Override

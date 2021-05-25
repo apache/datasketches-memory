@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.internal.Utf8CodingException;
+import org.apache.datasketches.memory.Utf8CodingException;
 import org.apache.datasketches.memory.WritableMemory;
 import org.apache.datasketches.memory.internal.Util.RandomCodePoints;
 import org.testng.annotations.Test;

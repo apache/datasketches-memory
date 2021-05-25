@@ -27,7 +27,6 @@ import java.nio.ByteOrder;
 import java.nio.channels.WritableByteChannel;
 
 import org.apache.datasketches.memory.internal.MemoryImpl;
-import org.apache.datasketches.memory.internal.Utf8CodingException;
 import org.apache.datasketches.memory.internal.Util;
 
 public interface Memory extends BaseState {

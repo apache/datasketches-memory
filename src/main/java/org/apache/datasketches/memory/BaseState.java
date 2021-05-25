@@ -62,7 +62,7 @@ public interface BaseState {
   /**
    * Returns true if the given object is an instance of this class and has equal contents to
    * this object in the given range of bytes. This will also check two distinct ranges within the
-   * same object for eauals.
+   * same object for equals.
    * @param thisOffsetBytes the starting offset in bytes for this object.
    * @param that the given object
    * @param thatOffsetBytes the starting offset in bytes for the given object

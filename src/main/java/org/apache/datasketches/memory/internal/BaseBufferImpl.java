@@ -129,6 +129,8 @@ public abstract class BaseBufferImpl extends BaseStateImpl implements BaseBuffer
   }
 
   //RESTRICTED
+  //Position checks are only used for Buffers
+  //asserts are used for primitives, not used at runtime
   final void incrementAndAssertPositionForRead(final long position, final long increment) {
     assertValid();
     final long newPos = position + increment;
@@ -144,6 +146,7 @@ public abstract class BaseBufferImpl extends BaseStateImpl implements BaseBuffer
     pos = newPos;
   }
 
+  //checks are used for arrays and apply at runtime
   final void incrementAndCheckPositionForRead(final long position, final long increment) {
     checkValid();
     final long newPos = position + increment;

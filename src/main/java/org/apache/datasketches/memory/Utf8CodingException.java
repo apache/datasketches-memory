@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory;
 
 /**
  * This exception will be thrown for errors encountered during either the encoding of characters
@@ -38,36 +38,36 @@ public final class Utf8CodingException extends RuntimeException {
   }
 
   //Decode
-  static Utf8CodingException shortUtf8DecodeByteSequence(final byte leadByte, final long address,
+  public static Utf8CodingException shortUtf8DecodeByteSequence(final byte leadByte, final long address,
       final long limit, final int required) {
     final String s = "Too few Utf8 decode bytes remaining given the leading byte. "
         + shortSeq(leadByte, address, limit, required);
     return new Utf8CodingException(s);
   }
 
-  static Utf8CodingException illegalUtf8DecodeByteSequence(final byte[] bytes) {
+  public static Utf8CodingException illegalUtf8DecodeByteSequence(final byte[] bytes) {
     final String s = "Invalid UTF-8 decode byte sequence: " + badBytes(bytes);
     return new Utf8CodingException(s);
   }
 
   //Encode
-  static Utf8CodingException outOfMemory() {
+  public static Utf8CodingException outOfMemory() {
     final String s = "Out-of-memory with characters remaining to be encoded";
     return new Utf8CodingException(s);
   }
 
-  static Utf8CodingException unpairedSurrogate(final char c) {
+  public static Utf8CodingException unpairedSurrogate(final char c) {
     final String s = "Last char to encode is an unpaired surrogate: 0X"
         + Integer.toHexString(c & 0XFFFF);
     return new Utf8CodingException(s);
   }
 
-  static Utf8CodingException shortUtf8EncodeByteLength(final int remaining) {
+  public static Utf8CodingException shortUtf8EncodeByteLength(final int remaining) {
     final String s = "Too few MemoryImpl bytes to encode a surrogate pair: " + remaining;
     return new Utf8CodingException(s);
   }
 
-  static Utf8CodingException illegalSurrogatePair(final char c1, final char c2) {
+  public static Utf8CodingException illegalSurrogatePair(final char c1, final char c2) {
     final String s = "Illegal Surrogate Pair: Char 1: " + Integer.toHexString(c1 & 0XFFFF)
       + ", Char 2: " + Integer.toHexString(c2 & 0XFFFF);
     return new Utf8CodingException(s);

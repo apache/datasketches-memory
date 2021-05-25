@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.nio.BufferOverflowException;
 import java.nio.CharBuffer;
 
+import org.apache.datasketches.memory.Utf8CodingException;
+
 /**
  * Encoding and decoding implementations of {@link WritableMemoryImpl#putCharsToUtf8} and
  * {@link MemoryImpl#getCharsFromUtf8}.

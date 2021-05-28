@@ -56,6 +56,4 @@ public interface Handle extends AutoCloseable {
    */
   Memory get();
 
-  @Override
-  void close();
 }

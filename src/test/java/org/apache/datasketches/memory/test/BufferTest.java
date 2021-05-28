@@ -25,10 +25,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
 
+import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableBuffer;
-import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 import org.testng.collections.Lists;
@@ -37,10 +37,10 @@ import org.testng.collections.Lists;
 public class BufferTest {
 
   @Test
-  public void checkDirectRoundTrip() {
+  public void checkDirectRoundTrip() throws Exception {
     int n = 1024; //longs
     try (WritableHandle wh = WritableMemory.allocateDirect(n * 8)) {
-      WritableMemory wmem = wh.get();
+      WritableMemory wmem = wh.getWritable();
       WritableBuffer wbuf = wmem.asWritableBuffer();
       for (int i = 0; i < n; i++) {
         wbuf.putLong(i);
@@ -71,7 +71,7 @@ public class BufferTest {
   public void checkArrayWrap() {
     int n = 1024; //longs
     byte[] arr = new byte[n * 8];
-    WritableBuffer wbuf = WritableMemory.wrap(arr).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemory.writableWrap(arr).asWritableBuffer();
     for (int i = 0; i < n; i++) {
       wbuf.putLong(i);
     }
@@ -93,7 +93,7 @@ public class BufferTest {
     // check 0 length array wraps
     List<Buffer> buffersToCheck = Lists.newArrayList();
     buffersToCheck.add(WritableMemory.allocate(0).asBuffer());
-    buffersToCheck.add(WritableBuffer.wrap(ByteBuffer.allocate(0)));
+    buffersToCheck.add(WritableBuffer.writableWrap(ByteBuffer.allocate(0)));
     buffersToCheck.add(Buffer.wrap(ByteBuffer.allocate(0)));
     buffersToCheck.add(Memory.wrap(new boolean[0]).asBuffer());
     buffersToCheck.add(Memory.wrap(new byte[0]).asBuffer());
@@ -116,7 +116,7 @@ public class BufferTest {
     ByteBuffer bb = ByteBuffer.wrap(arr);
     bb.order(ByteOrder.nativeOrder());
 
-    WritableBuffer wbuf = WritableBuffer.wrap(bb);
+    WritableBuffer wbuf = WritableBuffer.writableWrap(bb);
     for (int i = 0; i < n; i++) { //write to wbuf
       wbuf.putLong(i);
     }
@@ -138,7 +138,7 @@ public class BufferTest {
     ByteBuffer bb = ByteBuffer.wrap(arr);
     bb.order(ByteOrder.nativeOrder());
 
-    WritableBuffer wbuf = WritableBuffer.wrap(bb);
+    WritableBuffer wbuf = WritableBuffer.writableWrap(bb);
     for (int i = 0; i < n; i++) { //write to wbuf
       wbuf.putLong(i);
     }
@@ -171,7 +171,7 @@ public class BufferTest {
     ByteBuffer bb = ByteBuffer.allocateDirect(n * 8);
     bb.order(ByteOrder.nativeOrder());
 
-    WritableBuffer wbuf = WritableBuffer.wrap(bb);
+    WritableBuffer wbuf = WritableBuffer.writableWrap(bb);
     for (int i = 0; i < n; i++) { //write to wmem
       wbuf.putLong(i);
     }
@@ -264,7 +264,7 @@ public class BufferTest {
     int n2 = n / 2;
     long[] arr = new long[n];
     for (int i = 0; i < n; i++) { arr[i] = i; }
-    WritableBuffer wbuf = WritableMemory.wrap(arr).asWritableBuffer();
+    WritableBuffer wbuf = WritableMemory.writableWrap(arr).asWritableBuffer();
     for (int i = 0; i < n; i++) {
       assertEquals(wbuf.getLong(), i); //write all
       //println("" + wmem.getLong(i * 8));
@@ -281,11 +281,11 @@ public class BufferTest {
   }
 
   @Test(expectedExceptions = AssertionError.class)
-  public void checkParentUseAfterFree() {
+  public void checkParentUseAfterFree() throws Exception {
     int bytes = 64 * 8;
     @SuppressWarnings("resource") //intentionally not using try-with-resources here
     WritableHandle wh = WritableMemory.allocateDirect(bytes);
-    WritableMemory wmem = wh.get();
+    WritableMemory wmem = wh.getWritable();
     WritableBuffer wbuf = wmem.asWritableBuffer();
     wh.close();
     //with -ea assert: Memory not valid.
@@ -295,7 +295,7 @@ public class BufferTest {
 
   @SuppressWarnings("resource")
   @Test(expectedExceptions = AssertionError.class)
-  public void checkRegionUseAfterFree() {
+  public void checkRegionUseAfterFree() throws Exception {
     int bytes = 64;
     WritableHandle wh = WritableMemory.allocateDirect(bytes);
     Memory wmem = wh.get();

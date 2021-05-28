@@ -32,6 +32,5 @@ public interface WritableHandle extends Handle {
    * Gets a WritableMemory
    * @return a WritableMemory
    */
-  @Override
-  WritableMemory get();
+  WritableMemory getWritable();
 }

@@ -23,7 +23,7 @@
 
 package org.apache.datasketches.memory.test;
 
-import static org.apache.datasketches.memory.Util.*;
+import static org.apache.datasketches.memory.internal.Util.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -51,6 +51,7 @@ public class AllocateDirectMapMemoryTest {
   @Test
   public void simpleMap() throws Exception {
     File file = getResourceFile("GettysburgAddress.txt");
+    assertTrue(ReflectUtil.isFileReadOnly(file));
     try (MapHandle rh = Memory.map(file)) {
       rh.close();
     }
@@ -138,7 +139,7 @@ public class AllocateDirectMapMemoryTest {
   }
 
   @AfterClass
-  public void afterAllTests() {
+  public void afterAllTests() throws Exception {
       if (hand != null) {
       Memory mem = hand.get();
       if ((mem != null) && mem.isValid()) {

@@ -21,8 +21,8 @@ package org.apache.datasketches.memory.test;
 
 import static org.testng.Assert.assertEquals;
 
-import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableHandle;
+import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
@@ -33,7 +33,7 @@ import org.testng.annotations.Test;
 public class CopyMemoryOverlapTest {
 
   @Test
-  public void checkOverlapUsingMemory() {
+  public void checkOverlapUsingMemory() throws Exception {
     long copyLongs = 1 << 20;
     double overlap = 0.5;
     long start_mS = System.currentTimeMillis();
@@ -49,7 +49,7 @@ public class CopyMemoryOverlapTest {
   }
 
   @Test
-  public void checkOverlapUsingRegions() {
+  public void checkOverlapUsingRegions() throws Exception {
     long copyLongs = 1 << 20;
     double overlap = 0.5;
     long start_mS = System.currentTimeMillis();
@@ -64,7 +64,7 @@ public class CopyMemoryOverlapTest {
     println("CopyDn Time Sec: " + ((end2_mS - end1_mS)/1000.0));
   }
 
-  private static final void copyUsingDirectMemory(long copyLongs, double overlap, boolean copyUp) {
+  private static final void copyUsingDirectMemory(long copyLongs, double overlap, boolean copyUp) throws Exception {
     println("Copy Using Direct Memory");
     long overlapLongs = (long) (overlap * copyLongs);
     long backingLongs = (2 * copyLongs) - overlapLongs;
@@ -94,7 +94,7 @@ public class CopyMemoryOverlapTest {
     println("Backing longs: " + backingLongs + "\t bytes: " + backingBytes);
 
     try (WritableHandle backHandle = WritableMemory.allocateDirect(backingBytes)) {
-      WritableMemory backingMem = backHandle.get();
+      WritableMemory backingMem = backHandle.getWritable();
       fill(backingMem); //fill mem with 0 thru copyLongs -1
       //listMem(backingMem, "Original");
       backingMem.copyTo(fromOffsetBytes, backingMem, toOffsetBytes, copyBytes);
@@ -104,7 +104,7 @@ public class CopyMemoryOverlapTest {
     println("");
   }
 
-  private static final void copyUsingDirectRegions(long copyLongs, double overlap, boolean copyUp) {
+  private static final void copyUsingDirectRegions(long copyLongs, double overlap, boolean copyUp) throws Exception {
     println("Copy Using Direct Memory");
     long overlapLongs = (long) (overlap * copyLongs);
     long backingLongs = (2 * copyLongs) - overlapLongs;
@@ -134,7 +134,7 @@ public class CopyMemoryOverlapTest {
     println("Backing longs: " + backingLongs + "\t bytes: " + backingBytes);
 
     try (WritableHandle backHandle = WritableMemory.allocateDirect(backingBytes)) {
-      WritableMemory backingMem = backHandle.get();
+      WritableMemory backingMem = backHandle.getWritable();
       fill(backingMem); //fill mem with 0 thru copyLongs -1
       //listMem(backingMem, "Original");
       WritableMemory reg1 = backingMem.writableRegion(fromOffsetBytes, copyBytes);

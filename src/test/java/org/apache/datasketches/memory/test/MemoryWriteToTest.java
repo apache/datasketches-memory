@@ -19,15 +19,16 @@
 
 package org.apache.datasketches.memory.test;
 
+import static org.apache.datasketches.memory.internal.Util.UNSAFE_COPY_THRESHOLD_BYTES;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static org.apache.datasketches.memory.Util.UNSAFE_COPY_THRESHOLD_BYTES;
-import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableHandle;
+import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -56,10 +57,10 @@ public class MemoryWriteToTest {
   }
 
   @Test
-  public void testOffHeap() throws IOException {
+  public void testOffHeap() throws Exception {
     try (WritableHandle handle =
         WritableMemory.allocateDirect((UNSAFE_COPY_THRESHOLD_BYTES * 5) + 10)) {
-      WritableMemory mem = handle.get();
+      WritableMemory mem = handle.getWritable();
       testWriteTo(mem.region(0, 0));
       testOffHeap(mem, 7);
       testOffHeap(mem, 1023);

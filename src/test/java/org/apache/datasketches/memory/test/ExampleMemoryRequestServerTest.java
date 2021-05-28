@@ -55,13 +55,14 @@ public class ExampleMemoryRequestServerTest {
    * by the MemoryClient when it is done with the new memory allocations.
    * The initial allocation stays open until the end where it is closed at the end of the
    * TWR scope.
+   * @throws Exception 
    */
   @Test
-  public void checkExampleMemoryRequestServer2() {
+  public void checkExampleMemoryRequestServer2() throws Exception {
     int bytes = 8;
     ExampleMemoryRequestServer svr = new ExampleMemoryRequestServer();
     try (WritableHandle handle = WritableMemory.allocateDirect(bytes, svr)) {
-      WritableMemory wMem = handle.get();
+      WritableMemory wMem = handle.getWritable();
       MemoryClient client = new MemoryClient(wMem);
       client.process();
       svr.cleanup();
@@ -126,7 +127,7 @@ public class ExampleMemoryRequestServerTest {
     @Override
     public WritableMemory request(long capacityBytes) {
      WritableHandle handle = WritableMemory.allocateDirect(capacityBytes, this);
-     WritableMemory wmem = handle.get();
+     WritableMemory wmem = handle.getWritable();
      map.put(wmem, handle); //We track the newly allocated memory and its handle.
      return wmem;
     }
@@ -137,8 +138,12 @@ public class ExampleMemoryRequestServerTest {
     public void requestClose(WritableMemory memToRelease, WritableMemory newMemory) {
       if (memToRelease != null) {
         WritableHandle handle = map.get(memToRelease);
-        if (handle != null && handle.get() == memToRelease) {
-          handle.close();
+        if (handle != null && handle.getWritable() == memToRelease) {
+          try {
+            handle.close();
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
         }
       }
     }
@@ -146,7 +151,11 @@ public class ExampleMemoryRequestServerTest {
     public void cleanup() {
       map.forEach((k,v) -> {
         assertFalse(k.isValid()); //all entries in the map should be invalid
-        v.close(); //harmless
+        try {
+          v.close();
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        } //harmless
       });
     }
   }

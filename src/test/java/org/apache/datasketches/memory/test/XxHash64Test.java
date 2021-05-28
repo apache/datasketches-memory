@@ -19,14 +19,7 @@
 
 package org.apache.datasketches.memory.test;
 
-import static org.apache.datasketches.memory.XxHash64.hashBooleans;
-import static org.apache.datasketches.memory.XxHash64.hashBytes;
-import static org.apache.datasketches.memory.XxHash64.hashChars;
-import static org.apache.datasketches.memory.XxHash64.hashDoubles;
-import static org.apache.datasketches.memory.XxHash64.hashFloats;
-import static org.apache.datasketches.memory.XxHash64.hashInts;
-import static org.apache.datasketches.memory.XxHash64.hashLongs;
-import static org.apache.datasketches.memory.XxHash64.*;
+import static org.apache.datasketches.memory.internal.XxHash64.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -72,7 +65,7 @@ public class XxHash64Test {
     for (int j = 1; j < bytes; j++) {
       byte[] in = new byte[bytes];
 
-      WritableMemory wmem = WritableMemory.wrap(in);
+      WritableMemory wmem = WritableMemory.writableWrap(in);
       for (int i = 0; i < j; i++) { wmem.putByte(i, (byte) (-128 + i)); }
 
       long hash =wmem.xxHash64(offset, bytes, seed);
@@ -133,7 +126,7 @@ public class XxHash64Test {
 
   @Test
   public void testArrHashes() {
-    WritableMemory wmem = WritableMemory.wrap(barr);
+    WritableMemory wmem = WritableMemory.writableWrap(barr);
     long hash0 = wmem.xxHash64(8, 8, 0);
     long hash1 = hashBytes(barr, 8, 8, 0);
     assertEquals(hash1, hash0);

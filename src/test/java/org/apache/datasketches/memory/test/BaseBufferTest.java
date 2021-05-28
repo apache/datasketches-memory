@@ -21,9 +21,9 @@ package org.apache.datasketches.memory.test;
 
 import static org.testng.Assert.fail;
 
+import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
@@ -75,11 +75,11 @@ public class BaseBufferTest {
   }
 
   @Test
-  public void checkCheckValid() {
+  public void checkCheckValid() throws Exception {
     WritableMemory wmem;
     Buffer buf;
     try (WritableHandle hand = WritableMemory.allocateDirect(100)) {
-      wmem = hand.get();
+      wmem = hand.getWritable();
       buf = wmem.asBuffer();
     }
     @SuppressWarnings("unused")

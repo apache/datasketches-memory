@@ -17,25 +17,15 @@
  * under the License.
  */
 
+
 package org.apache.datasketches.memory;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-/**
- * Provides read and write, positional primitive and primitive array access to any of the four
- * resources mentioned at the package level.
- *
- * @author Roman Leventov
- * @author Lee Rhodes
- */
-public abstract class WritableBuffer extends Buffer {
+import org.apache.datasketches.memory.internal.WritableBufferImpl;
 
-  //Pass-through ctor
-  WritableBuffer(final Object unsafeObj, final long nativeBaseOffset,
-      final long regionOffset, final long capacityBytes) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
-  }
+public interface WritableBuffer extends Buffer {
 
   //BYTE BUFFER
   /**
@@ -46,8 +36,8 @@ public abstract class WritableBuffer extends Buffer {
    * @param byteBuf the given ByteBuffer, must not be null.
    * @return a new WritableBuffer for write operations on the given ByteBuffer.
    */
-  public static WritableBuffer wrap(final ByteBuffer byteBuf) {
-    return wrap(byteBuf, byteBuf.order());
+  static WritableBuffer writableWrap(ByteBuffer byteBuf) {
+    return WritableBufferImpl.writableWrap(byteBuf, byteBuf.order());
   }
 
   /**
@@ -60,20 +50,10 @@ public abstract class WritableBuffer extends Buffer {
    * state of the given ByteBuffer
    * @return a new WritableBuffer for write operations on the given ByteBuffer.
    */
-  public static WritableBuffer wrap(final ByteBuffer byteBuf, final ByteOrder byteOrder) {
-    final BaseWritableMemoryImpl wmem =
-        BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, false, byteOrder);
-    final WritableBuffer wbuf = wmem.asWritableBufferImpl(false, byteOrder);
-    wbuf.setStartPositionEnd(0, byteBuf.position(), byteBuf.limit());
-    return wbuf;
-  }
-
-  //MAP
-  //Use WritableMemory for mapping files and then asWritableBuffer()
-
-  //ALLOCATE DIRECT
-  //Use WritableMemory to allocate direct memory and then asWritableBuffer().
-
+  static WritableBuffer writableWrap(ByteBuffer byteBuf, ByteOrder byteOrder) {
+    return WritableBufferImpl.writableWrap(byteBuf, byteOrder);
+  }  
+  
   //DUPLICATES
   /**
    * Returns a duplicate writable view of this Buffer with the same but independent values of
@@ -92,7 +72,7 @@ public abstract class WritableBuffer extends Buffer {
    * @return a duplicate writable view of this Buffer with the same but independent values of
    * <i>start</i>, <i>position</i> and <i>end</i>.
    */
-  public abstract WritableBuffer writableDuplicate();
+  WritableBuffer writableDuplicate();
 
   /**
    * Returns a duplicate writable view of this Buffer with the same but independent values of
@@ -112,7 +92,7 @@ public abstract class WritableBuffer extends Buffer {
    * @return a duplicate writable view of this Buffer with the same but independent values of
    * <i>start</i>, <i>position</i> and <i>end</i>.
    */
-  public abstract WritableBuffer writableDuplicate(ByteOrder byteOrder);
+  WritableBuffer writableDuplicate(ByteOrder byteOrder);
 
 
   //REGIONS
@@ -131,7 +111,7 @@ public abstract class WritableBuffer extends Buffer {
    * the backing storage and byte order are unspecified.
    * @return a new <i>WritableBuffer</i> representing the defined writable region.
    */
-  public abstract WritableBuffer writableRegion();
+  WritableBuffer writableRegion();
 
   /**
    * A writable region is a writable view of this object.
@@ -156,7 +136,7 @@ public abstract class WritableBuffer extends Buffer {
    * @return a new <i>WritableBuffer</i> representing the defined writable region
    * with the given offsetBytes, capacityBytes and byte order.
    */
-  public abstract WritableBuffer writableRegion(long offsetBytes, long capacityBytes,
+  WritableBuffer writableRegion(long offsetBytes, long capacityBytes,
       ByteOrder byteOrder);
 
   //AS MEMORY
@@ -166,11 +146,7 @@ public abstract class WritableBuffer extends Buffer {
    * the backing storage and byte order are unspecified.
    * @return WritableMemory
    */
-  public abstract WritableMemory asWritableMemory();
-
-  //ACCESS PRIMITIVE HEAP ARRAYS for write
-  //use WritableMemory and then asWritableBuffer().
-  //END OF CONSTRUCTOR-TYPE METHODS
+  WritableMemory asWritableMemory();
 
   //PRIMITIVE putX() and putXArray()
   /**
@@ -178,7 +154,7 @@ public abstract class WritableBuffer extends Buffer {
    * Increments the position by 1.
    * @param value the value to put
    */
-  public abstract void putBoolean(boolean value);
+  void putBoolean(boolean value);
 
   /**
    * Puts the boolean value at the given offset.
@@ -186,7 +162,7 @@ public abstract class WritableBuffer extends Buffer {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start.
    * @param value the value to put
    */
-  public abstract void putBoolean(long offsetBytes, boolean value);
+  void putBoolean(long offsetBytes, boolean value);
 
   /**
    * Puts the boolean array at the current position.
@@ -195,7 +171,7 @@ public abstract class WritableBuffer extends Buffer {
    * @param srcOffsetBooleans offset in array units
    * @param lengthBooleans number of array units to transfer
    */
-  public abstract void putBooleanArray(boolean[] srcArray, int srcOffsetBooleans,
+  void putBooleanArray(boolean[] srcArray, int srcOffsetBooleans,
       int lengthBooleans);
 
   /**
@@ -203,7 +179,7 @@ public abstract class WritableBuffer extends Buffer {
    * Increments the position by <i>Byte.BYTES</i>.
    * @param value the value to put
    */
-  public abstract void putByte(byte value);
+  void putByte(byte value);
 
   /**
    * Puts the byte value at the given offset.
@@ -211,7 +187,7 @@ public abstract class WritableBuffer extends Buffer {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param value the value to put
    */
-  public abstract void putByte(long offsetBytes, byte value);
+  void putByte(long offsetBytes, byte value);
 
   /**
    * Puts the byte array at the current position.
@@ -220,14 +196,14 @@ public abstract class WritableBuffer extends Buffer {
    * @param srcOffsetBytes offset in array units
    * @param lengthBytes number of array units to transfer
    */
-  public abstract void putByteArray(byte[] srcArray, int srcOffsetBytes, int lengthBytes);
+  void putByteArray(byte[] srcArray, int srcOffsetBytes, int lengthBytes);
 
   /**
    * Puts the char value at the current position.
    * Increments the position by <i>Character.BYTES</i>.
    * @param value the value to put
    */
-  public abstract void putChar(char value);
+  void putChar(char value);
 
   /**
    * Puts the char value at the given offset.
@@ -235,7 +211,7 @@ public abstract class WritableBuffer extends Buffer {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param value the value to put
    */
-  public abstract void putChar(long offsetBytes, char value);
+  void putChar(long offsetBytes, char value);
 
   /**
    * Puts the char array at the current position.
@@ -244,14 +220,14 @@ public abstract class WritableBuffer extends Buffer {
    * @param srcOffsetChars offset in array units
    * @param lengthChars number of array units to transfer
    */
-  public abstract void putCharArray(char[] srcArray, int srcOffsetChars, int lengthChars);
+  void putCharArray(char[] srcArray, int srcOffsetChars, int lengthChars);
 
   /**
    * Puts the double value at the current position.
    * Increments the position by <i>Double.BYTES</i>.
    * @param value the value to put
    */
-  public abstract void putDouble(double value);
+  void putDouble(double value);
 
   /**
    * Puts the double value at the given offset.
@@ -259,7 +235,7 @@ public abstract class WritableBuffer extends Buffer {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param value the value to put
    */
-  public abstract void putDouble(long offsetBytes, double value);
+  void putDouble(long offsetBytes, double value);
 
   /**
    * Puts the double array at the current position.
@@ -268,14 +244,14 @@ public abstract class WritableBuffer extends Buffer {
    * @param srcOffsetDoubles offset in array units
    * @param lengthDoubles number of array units to transfer
    */
-  public abstract void putDoubleArray(double[] srcArray, int srcOffsetDoubles, int lengthDoubles);
+  void putDoubleArray(double[] srcArray, int srcOffsetDoubles, int lengthDoubles);
 
   /**
    * Puts the float value at the current position.
    * Increments the position by <i>Float.BYTES</i>.
    * @param value the value to put
    */
-  public abstract void putFloat(float value);
+  void putFloat(float value);
 
   /**
    * Puts the float value at the given offset.
@@ -283,7 +259,7 @@ public abstract class WritableBuffer extends Buffer {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param value the value to put
    */
-  public abstract void putFloat(long offsetBytes, float value);
+  void putFloat(long offsetBytes, float value);
 
   /**
    * Puts the float array at the current position.
@@ -292,14 +268,14 @@ public abstract class WritableBuffer extends Buffer {
    * @param srcOffsetFloats offset in array units
    * @param lengthFloats number of array units to transfer
    */
-  public abstract void putFloatArray(float[] srcArray, int srcOffsetFloats, int lengthFloats);
+  void putFloatArray(float[] srcArray, int srcOffsetFloats, int lengthFloats);
 
   /**
    * Puts the int value at the current position.
    * Increments the position by <i>Integer.BYTES</i>.
    * @param value the value to put
    */
-  public abstract void putInt(int value);
+  void putInt(int value);
 
   /**
    * Puts the int value at the given offset.
@@ -307,7 +283,7 @@ public abstract class WritableBuffer extends Buffer {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param value the value to put
    */
-  public abstract void putInt(long offsetBytes, int value);
+  void putInt(long offsetBytes, int value);
 
   /**
    * Puts the int array at the current position.
@@ -316,14 +292,14 @@ public abstract class WritableBuffer extends Buffer {
    * @param srcOffsetInts offset in array units
    * @param lengthInts number of array units to transfer
    */
-  public abstract void putIntArray(int[] srcArray, int srcOffsetInts, int lengthInts);
+  void putIntArray(int[] srcArray, int srcOffsetInts, int lengthInts);
 
   /**
    * Puts the long value at the current position.
    * Increments the position by <i>Long.BYTES</i>.
    * @param value the value to put
    */
-  public abstract void putLong(long value);
+  void putLong(long value);
 
   /**
    * Puts the long value at the given offset.
@@ -331,7 +307,7 @@ public abstract class WritableBuffer extends Buffer {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param value the value to put
    */
-  public abstract void putLong(long offsetBytes, long value);
+  void putLong(long offsetBytes, long value);
 
   /**
    * Puts the long array at the current position.
@@ -340,14 +316,14 @@ public abstract class WritableBuffer extends Buffer {
    * @param srcOffsetLongs offset in array units
    * @param lengthLongs number of array units to transfer
    */
-  public abstract void putLongArray(long[] srcArray, int srcOffsetLongs, int lengthLongs);
+  void putLongArray(long[] srcArray, int srcOffsetLongs, int lengthLongs);
 
   /**
    * Puts the short value at the current position.
    * Increments the position by <i>Short.BYTES</i>.
    * @param value the value to put
    */
-  public abstract void putShort(short value);
+  void putShort(short value);
 
   /**
    * Puts the short value at the given offset.
@@ -355,7 +331,7 @@ public abstract class WritableBuffer extends Buffer {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param value the value to put
    */
-  public abstract void putShort(long offsetBytes, short value);
+  void putShort(long offsetBytes, short value);
 
   /**
    * Puts the short array at the current position.
@@ -364,26 +340,26 @@ public abstract class WritableBuffer extends Buffer {
    * @param srcOffsetShorts offset in array units
    * @param lengthShorts number of array units to transfer
    */
-  public abstract void putShortArray(short[] srcArray, int srcOffsetShorts, int lengthShorts);
+  void putShortArray(short[] srcArray, int srcOffsetShorts, int lengthShorts);
 
   //OTHER WRITE METHODS
   /**
    * Returns the primitive backing array, otherwise null.
    * @return the primitive backing array, otherwise null.
    */
-  public abstract Object getArray();
+  Object getArray();
 
   /**
    * Clears all bytes of this Buffer from position to end to zero. The position will be set to end.
    */
-  public abstract void clear();
+  void clear();
 
   /**
    * Fills this Buffer from position to end with the given byte value.
    * The position will be set to <i>end</i>.
    * @param value the given byte value
    */
-  public abstract void fill(byte value);
+  void fill(byte value);
 
   //OTHER WRITABLE API METHODS
   /**
@@ -394,9 +370,6 @@ public abstract class WritableBuffer extends Buffer {
    * If not explicity set, this returns the {@link DefaultMemoryRequestServer}.
    * @return the MemoryRequestServer object (if direct memory) or null.
    */
-  @Override
-  public MemoryRequestServer getMemoryRequestServer() {
-    return null;
-  }
+  public MemoryRequestServer getMemoryRequestServer();
 
 }

@@ -20,14 +20,13 @@
 package org.apache.datasketches.memory.test;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.MapHandle;
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.ReadOnlyException;
+import org.apache.datasketches.memory.internal.ReadOnlyException;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
@@ -194,7 +193,7 @@ public class MemoryReadWriteSafetyTest {
 
   //@SuppressWarnings("resource")
   @Test(expectedExceptions = AssertionError.class)
-  public void testMapFile() throws IOException {
+  public void testMapFile() throws Exception {
     File tempFile = File.createTempFile("test", null);
     tempFile.deleteOnExit();
     try (RandomAccessFile raf = new RandomAccessFile(tempFile, "rw")) {
@@ -208,7 +207,7 @@ public class MemoryReadWriteSafetyTest {
 
   @SuppressWarnings("resource")
   @Test(expectedExceptions = AssertionError.class)
-  public void testMapFileWithOffsetsAndBO() throws IOException {
+  public void testMapFileWithOffsetsAndBO() throws Exception {
     File tempFile = File.createTempFile("test", "test");
     tempFile.deleteOnExit();
     new RandomAccessFile(tempFile, "rw").setLength(8);
@@ -219,7 +218,7 @@ public class MemoryReadWriteSafetyTest {
 
   @SuppressWarnings("resource")
   @Test(expectedExceptions = IllegalArgumentException.class)
-  public void testMapFileBeyondTheFileSize() throws IOException {
+  public void testMapFileBeyondTheFileSize() throws Exception {
     File tempFile = File.createTempFile("test", "test");
     tempFile.deleteOnExit();
     new RandomAccessFile(tempFile, "rw").setLength(8);

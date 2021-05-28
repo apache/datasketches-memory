@@ -28,14 +28,13 @@ import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.testng.annotations.Test;
-
-import com.google.protobuf.ByteString;
-
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.Utf8CodingException;
 import org.apache.datasketches.memory.WritableMemory;
-import org.apache.datasketches.memory.Util.RandomCodePoints;
+import org.apache.datasketches.memory.internal.Util.RandomCodePoints;
+import org.testng.annotations.Test;
+
+import com.google.protobuf.ByteString;
 
 /**
  * Adapted version of
@@ -303,7 +302,7 @@ public class Utf8Test {
     String refStr = "Quizdeltagerne spiste jordb\u00e6r med fl\u00f8de, mens cirkusklovnen";
     byte[] refByteArr = refStr.getBytes(UTF_8);
     int addBytes = refByteArr.length;
-    WritableMemory refMem = WritableMemory.wrap(refByteArr);
+    WritableMemory refMem = WritableMemory.writableWrap(refByteArr);
     int decodedChars = refMem.getCharsFromUtf8(0, addBytes, sb);
     String finalStr = sb.toString();
     int finalChars = finalStr.toCharArray().length;

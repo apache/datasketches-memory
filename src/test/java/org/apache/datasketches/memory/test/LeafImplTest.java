@@ -30,11 +30,12 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableDirectHandle;
-import org.apache.datasketches.memory.WritableMapHandle;
+import org.apache.datasketches.memory.internal.Util;
+import org.apache.datasketches.memory.WritableBuffer;
+
 import org.apache.datasketches.memory.WritableMemory;
-import org.apache.datasketches.memory.Util;
+import org.apache.datasketches.memory.WritableMapHandle;
 import org.testng.annotations.Test;
 
 /**
@@ -46,17 +47,17 @@ public class LeafImplTest {
   static final ByteOrder BE = ByteOrder.BIG_ENDIAN;
   
   @Test
-  public void checkDirectLeafs() {
+  public void checkDirectLeafs() throws Exception {
     long off = 0;
     long cap = 128;
     try (WritableDirectHandle wdh = WritableMemory.allocateDirect(cap)) {
-      WritableMemory memLE = wdh.get();
+      WritableMemory memLE = wdh.getWritable();
       memLE.putShort(0, (short) 1);
-      checkDirectImpl(memLE, off, cap);
+      checkDirect(memLE, off, cap);
     }
   }
   
-  private static void checkDirectImpl(WritableMemory mem, long off, long cap) {
+  private static void checkDirect(WritableMemory mem, long off, long cap) {
     assertEquals(mem.writableRegion(off, cap, LE).getShort(0), 1);
     assertEquals(mem.writableRegion(off, cap, BE).getShort(0), 256);
     assertEquals(mem.asWritableBuffer(LE).getShort(0), 1);
@@ -117,7 +118,7 @@ public class LeafImplTest {
   }
 
   @Test
-  public void checkMapLeafs() throws IOException {
+  public void checkMapLeafs() throws Exception {
     long off = 0;
     long cap = 128;
     File file = new File("TestFile2.bin");
@@ -133,15 +134,15 @@ public class LeafImplTest {
     assertTrue(file.isFile());
     file.deleteOnExit();  //comment out if you want to examine the file.
 
-    try (WritableMapHandle wmh = WritableMemory.map(file, off, cap, Util.nativeByteOrder)) {
-      WritableMemory mem = wmh.get();
+    try (WritableMapHandle wmh = WritableMemory.writableMap(file, off, cap, Util.nativeByteOrder)) {
+      WritableMemory mem = wmh.getWritable();
       mem.putShort(0, (short) 1);
       assertEquals(mem.getByte(0), (byte) 1);
-      checkMapImpl(mem, off, cap);
+      checkMap(mem, off, cap);
     }
   }
 
-  private static void checkMapImpl(WritableMemory mem, long off, long cap) {
+  private static void checkMap(WritableMemory mem, long off, long cap) {
     assertEquals(mem.writableRegion(off, cap, LE).getShort(0), 1);
     assertEquals(mem.writableRegion(off, cap, BE).getShort(0), 256);
     assertEquals(mem.asWritableBuffer(LE).getShort(0), 1);
@@ -208,17 +209,17 @@ public class LeafImplTest {
     ByteBuffer bb = ByteBuffer.allocate((int)cap);
     bb.order(ByteOrder.nativeOrder());
     bb.putShort(0, (short) 1);
-    WritableMemory mem = WritableMemory.wrap(bb);
-    checkByteBufferImpl(mem, off, cap, false);
+    WritableMemory mem = WritableMemory.writableWrap(bb);
+    checkByteBuffer(mem, off, cap, false);
 
     ByteBuffer dbb = ByteBuffer.allocateDirect((int)cap);
     dbb.order(ByteOrder.nativeOrder());
     dbb.putShort(0, (short) 1);
-    mem = WritableMemory.wrap(dbb);
-    checkByteBufferImpl(mem, off, cap, true);
+    mem = WritableMemory.writableWrap(dbb);
+    checkByteBuffer(mem, off, cap, true);
   }
 
-  private static void checkByteBufferImpl(WritableMemory mem, long off, long cap, boolean direct) {
+  private static void checkByteBuffer(WritableMemory mem, long off, long cap, boolean direct) {
     assertEquals(mem.writableRegion(off, cap, LE).getShort(0), 1);
     assertEquals(mem.writableRegion(off, cap, BE).getShort(0), 256);
     assertEquals(mem.asWritableBuffer(LE).getShort(0), 1);
@@ -308,10 +309,10 @@ public class LeafImplTest {
     long cap = 128;
     WritableMemory mem = WritableMemory.allocate((int)cap);
     mem.putShort(0, (short) 1);
-    checkHeapImpl(mem, off, cap);
+    checkHeap(mem, off, cap);
   }
 
-  private static void checkHeapImpl(WritableMemory mem, long off, long cap) {
+  private static void checkHeap(WritableMemory mem, long off, long cap) {
     assertEquals(mem.writableRegion(off, cap, LE).getShort(0), 1);
     assertEquals(mem.writableRegion(off, cap, BE).getShort(0), 256);
     assertEquals(mem.asWritableBuffer(LE).getShort(0), 1);

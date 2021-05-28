@@ -19,6 +19,8 @@
 
 package org.apache.datasketches.memory;
 
+import org.apache.datasketches.memory.internal.WritableMemoryImpl;
+
 /**
  * This is a simple implementation of the MemoryRequestServer that creates space on the Java heap
  * for the requesting application. This capability is only available for direct, off-heap
@@ -73,7 +75,7 @@ public final class DefaultMemoryRequestServer implements MemoryRequestServer {
    */
   @Override
   public WritableMemory request(final long capacityBytes) {
-    final WritableMemory wmem = WritableMemory.allocate((int)capacityBytes);
+    final WritableMemory wmem = WritableMemoryImpl.allocate((int)capacityBytes);
     return wmem;
   }
 

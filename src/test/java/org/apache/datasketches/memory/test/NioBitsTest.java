@@ -31,7 +31,7 @@ public class NioBitsTest {
 
   @Test
   public void checkVMParams() {
-    println("Max Memory: " + ReflectUtil.getMaxDirectByteBufferMemory());
+    println("Max MemoryImpl: " + ReflectUtil.getMaxDirectByteBufferMemory());
     println("Page Aligned: " + ReflectUtil.isPageAligned());
     println("Page Size: " + ReflectUtil.pageSize());
   }

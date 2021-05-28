@@ -19,13 +19,13 @@
 
 package org.apache.datasketches.memory.test;
 
-import static org.apache.datasketches.memory.Util.UNSAFE_COPY_THRESHOLD_BYTES;
+import static org.apache.datasketches.memory.internal.Util.UNSAFE_COPY_THRESHOLD_BYTES;
 import static org.testng.Assert.assertEquals;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableHandle;
+import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -56,11 +56,11 @@ public class CopyMemoryTest {
   }
 
   @Test
-  public void directWSource() {
+  public void directWSource() throws Exception {
     int k1 = 1 << 20; //longs
     int k2 = 2 * k1;
     try (WritableHandle wrh = genWRH(k1, false)) {
-      WritableMemory srcMem = wrh.get();
+      WritableMemory srcMem = wrh.getWritable();
       WritableMemory dstMem = genMem(k2, true);
       srcMem.copyTo(0, dstMem, k1 << 3, k1 << 3);
       check(dstMem, k1, k1, 1);
@@ -68,7 +68,7 @@ public class CopyMemoryTest {
   }
 
   @Test
-  public void directROSource() {
+  public void directROSource() throws Exception {
     int k1 = 1 << 20; //longs
     int k2 = 2 * k1;
     try (WritableHandle wrh = genWRH(k1, false)) {
@@ -105,7 +105,7 @@ public class CopyMemoryTest {
   }
 
   @Test
-  public void directROSrcRegion() {
+  public void directROSrcRegion() throws Exception {
     int k1 = 1 << 20; //longs
     //gen baseMem of k1 longs w data, direct
     try (WritableHandle wrh = genWRH(k1, false)) {
@@ -124,7 +124,7 @@ public class CopyMemoryTest {
     ThreadLocalRandom.current().nextBytes(bytes);
     byte[] referenceBytes = bytes.clone();
     Memory referenceMem = Memory.wrap(referenceBytes);
-    WritableMemory mem = WritableMemory.wrap(bytes);
+    WritableMemory mem = WritableMemory.writableWrap(bytes);
     long copyLen = UNSAFE_COPY_THRESHOLD_BYTES * 2;
     mem.copyTo(0, mem, UNSAFE_COPY_THRESHOLD_BYTES / 2, copyLen);
     Assert.assertEquals(0, mem.compareTo(UNSAFE_COPY_THRESHOLD_BYTES / 2, copyLen, referenceMem, 0,
@@ -137,7 +137,7 @@ public class CopyMemoryTest {
     ThreadLocalRandom.current().nextBytes(bytes);
     byte[] referenceBytes = bytes.clone();
     Memory referenceMem = Memory.wrap(referenceBytes);
-    WritableMemory mem = WritableMemory.wrap(bytes);
+    WritableMemory mem = WritableMemory.writableWrap(bytes);
     long copyLen = UNSAFE_COPY_THRESHOLD_BYTES * 2;
     mem.copyTo(UNSAFE_COPY_THRESHOLD_BYTES / 2, mem, 0, copyLen);
     Assert.assertEquals(0, mem.compareTo(0, copyLen, referenceMem, UNSAFE_COPY_THRESHOLD_BYTES / 2,
@@ -153,7 +153,7 @@ public class CopyMemoryTest {
 
   private static WritableHandle genWRH(int longs, boolean empty) {
     WritableHandle wrh = WritableMemory.allocateDirect(longs << 3);
-    WritableMemory mem = wrh.get();
+    WritableMemory mem = wrh.getWritable();
     if (empty) {
       mem.clear();
     } else {

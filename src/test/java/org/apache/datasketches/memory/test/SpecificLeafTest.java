@@ -28,10 +28,10 @@ import java.nio.ByteBuffer;
 
 import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.Util;
-import org.apache.datasketches.memory.WritableDirectHandle;
-import org.apache.datasketches.memory.WritableMapHandle;
+import org.apache.datasketches.memory.internal.Util;
 import org.apache.datasketches.memory.WritableMemory;
+import org.apache.datasketches.memory.WritableMapHandle;
+import org.apache.datasketches.memory.WritableDirectHandle;
 import org.testng.annotations.Test;
 
 /**
@@ -65,10 +65,10 @@ public class SpecificLeafTest {
   }
 
   @Test
-  public void checkDirectLeafs() {
+  public void checkDirectLeafs() throws Exception {
     int bytes = 128;
     try (WritableDirectHandle h = WritableMemory.allocateDirect(bytes)) {
-      WritableMemory wmem = h.get(); //native mem
+      WritableMemory wmem = h.getWritable(); //native mem
       assertTrue(ReflectUtil.isDirectType(wmem));
       assertFalse(wmem.isReadOnly());
       checkCrossLeafTypeIds(wmem);
@@ -91,7 +91,7 @@ public class SpecificLeafTest {
   }
 
   @Test
-  public void checkMapLeafs() throws IOException {
+  public void checkMapLeafs() throws Exception {
     File file = new File("TestFile2.bin");
     if (file.exists()) {
       try {
@@ -107,8 +107,8 @@ public class SpecificLeafTest {
 
     final long bytes = 128;
 
-    try (WritableMapHandle h = WritableMemory.map(file, 0L, bytes, Util.nativeByteOrder)) {
-      WritableMemory mem = h.get(); //native mem
+    try (WritableMapHandle h = WritableMemory.writableMap(file, 0L, bytes, Util.nativeByteOrder)) {
+      WritableMemory mem = h.getWritable(); //native mem
       assertTrue(ReflectUtil.isMapType(mem));
       assertFalse(mem.isReadOnly());
       checkCrossLeafTypeIds(mem);

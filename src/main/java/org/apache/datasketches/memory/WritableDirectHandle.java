@@ -19,38 +19,14 @@
 
 package org.apache.datasketches.memory;
 
+
 /**
  * A Handle for a writable direct memory resource.
+ * Joins a WritableMemory with a writable, AutoCloseable AllocateDirect resource.
  * Please read Javadocs for {@link Handle}.
  *
  * @author Lee Rhodes
  * @author Roman Leventov
  */
-//Joins a WritableMemory with a writable, AutoCloseable AllocateDirect resource
-public final class WritableDirectHandle implements WritableHandle {
+public interface WritableDirectHandle extends WritableHandle { }
 
-  /**
-   * Having at least one final field makes this class safe for concurrent publication.
-   */
-  final AllocateDirect direct;
-  private WritableMemory wMem;
-
-  WritableDirectHandle(final AllocateDirect allocatedDirect, final WritableMemory wMem) {
-    direct = allocatedDirect;
-    this.wMem = wMem;
-  }
-
-  @Override
-  public WritableMemory get() {
-    return wMem;
-  }
-
-  //AutoCloseable
-
-  @Override
-  public void close() {
-    if (direct.doClose()) {
-      wMem = null;
-    }
-  }
-}

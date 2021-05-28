@@ -19,35 +19,7 @@
 
 package org.apache.datasketches.memory;
 
-/**
- * A new positional API. This is different from and simpler than Java Buffer positional approach.
- * <ul><li>All based on longs instead of ints.</li>
- * <li>Eliminated "mark". Rarely used and confusing with its silent side effects.</li>
- * <li>The invariants are {@code 0 <= start <= position <= end <= capacity}.</li>
- * <li>It always starts up as (0, 0, capacity, capacity).</li>
- * <li>You set (start, position, end) in one call with
- * {@link #setStartPositionEnd(long, long, long)}</li>
- * <li>Position can be set directly or indirectly when using the positional get/put methods.
- * <li>Added incrementPosition(long), which is much easier when you know the increment.</li>
- * <li>This approach eliminated a number of methods and checks, and has no unseen side effects,
- * e.g., mark being invalidated.</li>
- * <li>Clearer method naming (IMHO).</li>
- * </ul>
- *
- * @author Lee Rhodes
- */
-public abstract class BaseBuffer extends BaseState {
-  private long capacity;
-  private long start = 0;
-  private long pos = 0;
-  private long end;
-
-  //Pass-through ctor
-  BaseBuffer(final Object unsafeObj, final long nativeBaseOffset,
-      final long regionOffset, final long capacityBytes) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
-    capacity = end = capacityBytes;
-  }
+public interface BaseBuffer extends BaseState {
 
   /**
    * Increments the current position by the given increment.
@@ -56,11 +28,8 @@ public abstract class BaseBuffer extends BaseState {
    * @param increment the given increment
    * @return BaseBuffer
    */
-  public final BaseBuffer incrementPosition(final long increment) {
-    incrementAndAssertPositionForRead(pos, increment);
-    return this;
-  }
-
+  BaseBuffer incrementPosition(long increment);
+  
   /**
    * Increments the current position by the given increment.
    * Checks that the resource is valid and that the positional invariants are not violated,
@@ -68,60 +37,44 @@ public abstract class BaseBuffer extends BaseState {
    * @param increment the given increment
    * @return BaseBuffer
    */
-  public final BaseBuffer incrementAndCheckPosition(final long increment) {
-    incrementAndCheckPositionForRead(pos, increment);
-    return this;
-  }
-
+  BaseBuffer incrementAndCheckPosition(final long increment);
+  
   /**
    * Gets the end position
    * @return the end position
    */
-  public final long getEnd() {
-    return end;
-  }
+  long getEnd();
 
   /**
    * Gets the current position
    * @return the current position
    */
-  public final long getPosition() {
-    return pos;
-  }
+  long getPosition();
 
   /**
    * Gets start position
    * @return start position
    */
-  public final long getStart() {
-    return start;
-  }
+  long getStart();
 
   /**
    * The number of elements remaining between the current position and the end position
    * @return {@code (end - position)}
    */
-  public final long getRemaining()  {
-    return end - pos;
-  }
+  long getRemaining();
 
   /**
    * Returns true if there are elements remaining between the current position and the end position
    * @return {@code (end - position) > 0}
    */
-  public final boolean hasRemaining() {
-    return (end - pos) > 0;
-  }
+  boolean hasRemaining();
 
   /**
    * Resets the current position to the start position,
    * This does not modify any data.
    * @return BaseBuffer
    */
-  public final BaseBuffer resetPosition() {
-    pos = start;
-    return this;
-  }
+  BaseBuffer resetPosition();
 
   /**
    * Sets the current position.
@@ -130,11 +83,7 @@ public abstract class BaseBuffer extends BaseState {
    * @param position the given current position.
    * @return BaseBuffer
    */
-  public final BaseBuffer setPosition(final long position) {
-    assertInvariants(start, position, end, capacity);
-    pos = position;
-    return this;
-  }
+  BaseBuffer setPosition(long position);
 
   /**
    * Sets the current position.
@@ -143,11 +92,7 @@ public abstract class BaseBuffer extends BaseState {
    * @param position the given current position.
    * @return BaseBuffer
    */
-  public final BaseBuffer setAndCheckPosition(final long position) {
-    checkInvariants(start, position, end, capacity);
-    pos = position;
-    return this;
-  }
+  BaseBuffer setAndCheckPosition(long position);
 
   /**
    * Sets start position, current position, and end position.
@@ -158,14 +103,7 @@ public abstract class BaseBuffer extends BaseState {
    * @param end the end position in the buffer
    * @return BaseBuffer
    */
-  public final BaseBuffer setStartPositionEnd(final long start, final long position,
-      final long end) {
-    assertInvariants(start, position, end, capacity);
-    this.start = start;
-    this.end = end;
-    pos = position;
-    return this;
-  }
+  BaseBuffer setStartPositionEnd(long start, long position, long end);
 
   /**
    * Sets start position, current position, and end position.
@@ -176,96 +114,13 @@ public abstract class BaseBuffer extends BaseState {
    * @param end the end position in the buffer
    * @return BaseBuffer
    */
-  public final BaseBuffer setAndCheckStartPositionEnd(final long start, final long position,
-      final long end) {
-    checkInvariants(start, position, end, capacity);
-    this.start = start;
-    this.end = end;
-    pos = position;
-    return this;
-  }
-
-  //RESTRICTED
-  final void incrementAndAssertPositionForRead(final long position, final long increment) {
-    assertValid();
-    final long newPos = position + increment;
-    assertInvariants(start, newPos, end, capacity);
-    pos = newPos;
-  }
-
-  final void incrementAndAssertPositionForWrite(final long position, final long increment) {
-    assertValid();
-    assert !isReadOnly() : "Buffer is read-only.";
-    final long newPos = position + increment;
-    assertInvariants(start, newPos, end, capacity);
-    pos = newPos;
-  }
-
-  final void incrementAndCheckPositionForRead(final long position, final long increment) {
-    checkValid();
-    final long newPos = position + increment;
-    checkInvariants(start, newPos, end, capacity);
-    pos = newPos;
-  }
-
-  final void incrementAndCheckPositionForWrite(final long position, final long increment) {
-    checkValidForWrite();
-    final long newPos = position + increment;
-    checkInvariants(start, newPos, end, capacity);
-    pos = newPos;
-  }
-
-  final void checkValidForWrite() {
-    checkValid();
-    if (isReadOnly()) {
-      throw new ReadOnlyException("Buffer is read-only.");
-    }
-  }
-
-  /**
-   * The invariants equation is: {@code 0 <= start <= position <= end <= capacity}.
-   * If this equation is violated and assertions are enabled,
-   * an <i>AssertionError</i> will be thrown.
-   * @param start the lowest start position
-   * @param pos the current position
-   * @param end the highest position
-   * @param cap the capacity of the backing buffer.
-   */
-  static final void assertInvariants(final long start, final long pos, final long end,
-      final long cap) {
-    assert (start | pos | end | cap | (pos - start) | (end - pos) | (cap - end) ) >= 0L
-        : "Violation of Invariants: "
-        + "start: " + start
-        + " <= pos: " + pos
-        + " <= end: " + end
-        + " <= cap: " + cap
-        + "; (pos - start): " + (pos - start)
-        + ", (end - pos): " + (end - pos)
-        + ", (cap - end): " + (cap - end);
-  }
-
-  /**
-   * The invariants equation is: {@code 0 <= start <= position <= end <= capacity}.
-   * If this equation is violated an <i>IllegalArgumentException</i> will be thrown.
-   * @param start the lowest start position
-   * @param pos the current position
-   * @param end the highest position
-   * @param cap the capacity of the backing buffer.
-   */
-  static final void checkInvariants(final long start, final long pos, final long end,
-        final long cap) {
-    if ((start | pos | end | cap | (pos - start) | (end - pos) | (cap - end) ) < 0L) {
-      throw new IllegalArgumentException(
-          "Violation of Invariants: "
-              + "start: " + start
-              + " <= pos: " + pos
-              + " <= end: " + end
-              + " <= cap: " + cap
-              + "; (pos - start): " + (pos - start)
-              + ", (end - pos): " + (end - pos)
-              + ", (cap - end): " + (cap - end)
-      );
-    }
-  }
-
+  BaseBuffer setAndCheckStartPositionEnd(long start, long position, long end);
+  
+  
+  
+  
+  
+  
+  
+  
 }

@@ -23,7 +23,7 @@
 
 package org.apache.datasketches.memory.test;
 
-import static org.apache.datasketches.memory.Util.*;
+import static org.apache.datasketches.memory.internal.Util.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
@@ -35,11 +35,12 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
 
+import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.MapHandle;
-import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.Util;
 import org.apache.datasketches.memory.WritableDirectHandle;
 import org.apache.datasketches.memory.WritableHandle;
+import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.memory.internal.Util;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -56,10 +57,10 @@ public class MemoryTest {
   }
 
   @Test
-  public void checkDirectRoundTrip() {
+  public void checkDirectRoundTrip() throws Exception {
     int n = 1024; //longs
     try (WritableHandle wh = WritableMemory.allocateDirect(n * 8)) {
-      WritableMemory mem = wh.get();
+      WritableMemory mem = wh.getWritable();
       for (int i = 0; i < n; i++) {
         mem.putLong(i * 8, i);
       }
@@ -87,7 +88,7 @@ public class MemoryTest {
   public void checkArrayWrap() {
     int n = 1024; //longs
     byte[] arr = new byte[n * 8];
-    WritableMemory wmem = WritableMemory.wrap(arr);
+    WritableMemory wmem = WritableMemory.writableWrap(arr);
     for (int i = 0; i < n; i++) {
       wmem.putLong(i * 8, i);
     }
@@ -101,14 +102,14 @@ public class MemoryTest {
       assertEquals(v, i);
     }
     // check 0 length array wraps
-    Memory memZeroLengthArrayBoolean = WritableMemory.wrap(new boolean[0]);
-    Memory memZeroLengthArrayByte = WritableMemory.wrap(new byte[0]);
-    Memory memZeroLengthArrayChar = WritableMemory.wrap(new char[0]);
-    Memory memZeroLengthArrayShort = WritableMemory.wrap(new short[0]);
-    Memory memZeroLengthArrayInt = WritableMemory.wrap(new int[0]);
-    Memory memZeroLengthArrayLong = WritableMemory.wrap(new long[0]);
-    Memory memZeroLengthArrayFloat = WritableMemory.wrap(new float[0]);
-    Memory memZeroLengthArrayDouble = WritableMemory.wrap(new double[0]);
+    Memory memZeroLengthArrayBoolean = WritableMemory.writableWrap(new boolean[0]);
+    Memory memZeroLengthArrayByte = WritableMemory.writableWrap(new byte[0]);
+    Memory memZeroLengthArrayChar = WritableMemory.writableWrap(new char[0]);
+    Memory memZeroLengthArrayShort = WritableMemory.writableWrap(new short[0]);
+    Memory memZeroLengthArrayInt = WritableMemory.writableWrap(new int[0]);
+    Memory memZeroLengthArrayLong = WritableMemory.writableWrap(new long[0]);
+    Memory memZeroLengthArrayFloat = WritableMemory.writableWrap(new float[0]);
+    Memory memZeroLengthArrayDouble = WritableMemory.writableWrap(new double[0]);
     assertEquals(memZeroLengthArrayBoolean.getCapacity(), 0);
     assertEquals(memZeroLengthArrayByte.getCapacity(), 0);
     assertEquals(memZeroLengthArrayChar.getCapacity(), 0);
@@ -121,15 +122,15 @@ public class MemoryTest {
     // check 0 length array wraps
     List<Memory> memoryToCheck = Lists.newArrayList();
     memoryToCheck.add(WritableMemory.allocate(0));
-    memoryToCheck.add(WritableMemory.wrap(ByteBuffer.allocate(0)));
-    memoryToCheck.add(WritableMemory.wrap(new boolean[0]));
-    memoryToCheck.add(WritableMemory.wrap(new byte[0]));
-    memoryToCheck.add(WritableMemory.wrap(new char[0]));
-    memoryToCheck.add(WritableMemory.wrap(new short[0]));
-    memoryToCheck.add(WritableMemory.wrap(new int[0]));
-    memoryToCheck.add(WritableMemory.wrap(new long[0]));
-    memoryToCheck.add(WritableMemory.wrap(new float[0]));
-    memoryToCheck.add(WritableMemory.wrap(new double[0]));
+    memoryToCheck.add(WritableMemory.writableWrap(ByteBuffer.allocate(0)));
+    memoryToCheck.add(WritableMemory.writableWrap(new boolean[0]));
+    memoryToCheck.add(WritableMemory.writableWrap(new byte[0]));
+    memoryToCheck.add(WritableMemory.writableWrap(new char[0]));
+    memoryToCheck.add(WritableMemory.writableWrap(new short[0]));
+    memoryToCheck.add(WritableMemory.writableWrap(new int[0]));
+    memoryToCheck.add(WritableMemory.writableWrap(new long[0]));
+    memoryToCheck.add(WritableMemory.writableWrap(new float[0]));
+    memoryToCheck.add(WritableMemory.writableWrap(new double[0]));
     memoryToCheck.add(Memory.wrap(ByteBuffer.allocate(0)));
     memoryToCheck.add(Memory.wrap(new boolean[0]));
     memoryToCheck.add(Memory.wrap(new byte[0]));
@@ -151,7 +152,7 @@ public class MemoryTest {
     byte[] arr = new byte[n * 8];
     ByteBuffer bb = ByteBuffer.wrap(arr);
     bb.order(ByteOrder.nativeOrder());
-    WritableMemory wmem = WritableMemory.wrap(bb);
+    WritableMemory wmem = WritableMemory.writableWrap(bb);
     for (int i = 0; i < n; i++) { //write to wmem
       wmem.putLong(i * 8, i);
     }
@@ -181,7 +182,7 @@ public class MemoryTest {
     int n = 1024; //longs
     ByteBuffer bb = ByteBuffer.allocateDirect(n * 8);
     bb.order(ByteOrder.nativeOrder());
-    WritableMemory wmem = WritableMemory.wrap(bb);
+    WritableMemory wmem = WritableMemory.writableWrap(bb);
     for (int i = 0; i < n; i++) { //write to wmem
       wmem.putLong(i * 8, i);
     }
@@ -282,7 +283,7 @@ public class MemoryTest {
     int n2 = n / 2;
     long[] arr = new long[n];
     for (int i = 0; i < n; i++) { arr[i] = i; }
-    WritableMemory wmem = WritableMemory.wrap(arr);
+    WritableMemory wmem = WritableMemory.writableWrap(arr);
     for (int i = 0; i < n; i++) {
       assertEquals(wmem.getLong(i * 8), i);
       //println("" + wmem.getLong(i * 8));
@@ -302,7 +303,7 @@ public class MemoryTest {
     int n2 = n / 2;
     long[] arr = new long[n];
     for (int i = 0; i < n; i++) { arr[i] = i; }
-    WritableMemory wmem = WritableMemory.wrap(arr);
+    WritableMemory wmem = WritableMemory.writableWrap(arr);
     for (int i = 0; i < n; i++) {
       assertEquals(wmem.getLong(i * 8), i);
       //println("" + wmem.getLong(i * 8));
@@ -326,8 +327,12 @@ public class MemoryTest {
     int bytes = 64 * 8;
     @SuppressWarnings("resource") //intentionally not using try-with-resouces here
     WritableHandle wh = WritableMemory.allocateDirect(bytes);
-    WritableMemory wmem = wh.get();
-    wh.close();
+    WritableMemory wmem = wh.getWritable();
+    try {
+      wh.close();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
     //with -ea assert: Memory not valid.
     //with -da sometimes segfaults, sometimes passes!
     wmem.getLong(0);
@@ -340,16 +345,20 @@ public class MemoryTest {
     WritableHandle wh = WritableMemory.allocateDirect(bytes);
     Memory wmem = wh.get();
     Memory region = wmem.region(0L, bytes);
-    wh.close();
+    try {
+      wh.close();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
     //with -ea assert: Memory not valid.
     //with -da sometimes segfaults, sometimes passes!
     region.getByte(0);
   }
 
   @Test
-  public void checkUnsafeByteBufferView() {
+  public void checkUnsafeByteBufferView() throws Exception {
     try (WritableDirectHandle wmemDirectHandle = WritableMemory.allocateDirect(2)) {
-      WritableMemory wmemDirect = wmemDirectHandle.get();
+      WritableMemory wmemDirect = wmemDirectHandle.getWritable();
       wmemDirect.putByte(0, (byte) 1);
       wmemDirect.putByte(1, (byte) 2);
       checkUnsafeByteBufferView(wmemDirect);
@@ -385,23 +394,22 @@ public class MemoryTest {
 
   @SuppressWarnings({ "resource", "static-access" })
   @Test
-  public void checkMonitorDirectStats() {
+  public void checkMonitorDirectStats() throws Exception {
     int bytes = 1024;
     WritableHandle wh1 = WritableMemory.allocateDirect(bytes);
     WritableHandle wh2 = WritableMemory.allocateDirect(bytes);
-    WritableMemory wMem2 = wh2.get();
-    assertEquals(wMem2.getCurrentDirectMemoryAllocations(), 2L);
-    assertEquals(wMem2.getCurrentDirectMemoryAllocated(), 2 * bytes);
+    assertEquals(BaseState.getCurrentDirectMemoryAllocations(), 2L);
+    assertEquals(BaseState.getCurrentDirectMemoryAllocated(), 2 * bytes);
 
     wh1.close();
-    assertEquals(wMem2.getCurrentDirectMemoryAllocations(), 1L);
-    assertEquals(wMem2.getCurrentDirectMemoryAllocated(), bytes);
+    assertEquals(BaseState.getCurrentDirectMemoryAllocations(), 1L);
+    assertEquals(BaseState.getCurrentDirectMemoryAllocated(), bytes);
 
     wh2.close();
     wh2.close(); //check that it doesn't go negative.
     //even though the handles are closed, these methods are static access
-    assertEquals(wMem2.getCurrentDirectMemoryAllocations(), 0L);
-    assertEquals(wMem2.getCurrentDirectMemoryAllocated(), 0L);
+    assertEquals(BaseState.getCurrentDirectMemoryAllocations(), 0L);
+    assertEquals(BaseState.getCurrentDirectMemoryAllocated(), 0L);
   }
 
   @SuppressWarnings({ "resource", "static-access" })
@@ -412,28 +420,27 @@ public class MemoryTest {
 
     MapHandle mmh1 = Memory.map(file);
     MapHandle mmh2 = Memory.map(file);
-    Memory wmem2 = mmh2.get();
     
-    assertEquals(wmem2.getCurrentDirectMemoryMapAllocations(), 2L);
-    assertEquals(wmem2.getCurrentDirectMemoryMapAllocated(), 2 * bytes);
+    assertEquals(BaseState.getCurrentDirectMemoryMapAllocations(), 2L);
+    assertEquals(BaseState.getCurrentDirectMemoryMapAllocated(), 2 * bytes);
 
     mmh1.close();
-    assertEquals(wmem2.getCurrentDirectMemoryMapAllocations(), 1L);
-    assertEquals(wmem2.getCurrentDirectMemoryMapAllocated(), bytes);
+    assertEquals(BaseState.getCurrentDirectMemoryMapAllocations(), 1L);
+    assertEquals(BaseState.getCurrentDirectMemoryMapAllocated(), bytes);
 
     mmh2.close();
     mmh2.close(); //check that it doesn't go negative.
     //even though the handles are closed, these methods are static access
-    assertEquals(wmem2.getCurrentDirectMemoryMapAllocations(), 0L);
-    assertEquals(wmem2.getCurrentDirectMemoryMapAllocated(), 0L);
+    assertEquals(BaseState.getCurrentDirectMemoryMapAllocations(), 0L);
+    assertEquals(BaseState.getCurrentDirectMemoryMapAllocated(), 0L);
   }
 
   @Test
-  public void checkNullMemReqSvr() {
-    WritableMemory wmem = WritableMemory.wrap(new byte[16]);
+  public void checkNullMemReqSvr() throws Exception {
+    WritableMemory wmem = WritableMemory.writableWrap(new byte[16]);
     assertNull(wmem.getMemoryRequestServer());
     try (WritableDirectHandle wdh = WritableMemory.allocateDirect(16)) {
-      WritableMemory wmem2 = wdh.get();
+      WritableMemory wmem2 = wdh.getWritable();
       assertNotNull(wmem2.getMemoryRequestServer());
     }
     println(wmem.toHexString("Test", 0, 16));

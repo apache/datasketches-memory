@@ -28,7 +28,7 @@ import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.ReadOnlyException;
+import org.apache.datasketches.memory.internal.ReadOnlyException;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
@@ -408,7 +408,7 @@ public class Buffer2Test {
 
   @Test
   public void testWritableDuplicate() {
-    WritableMemory wmem = WritableMemory.wrap(new byte[1]);
+    WritableMemory wmem = WritableMemory.writableWrap(new byte[1]);
     WritableBuffer wbuf = wmem.asWritableBuffer();
     WritableBuffer wbuf2 = wbuf.writableDuplicate();
     assertEquals(wbuf2.getCapacity(), 1);

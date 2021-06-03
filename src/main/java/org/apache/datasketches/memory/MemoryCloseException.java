@@ -17,41 +17,25 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory;
 
-import org.apache.datasketches.memory.MapHandle;
-import org.apache.datasketches.memory.Memory;
-
-class MapHandleImpl implements MapHandle {
-
-  final AllocateDirectMap dirMap;
-  BaseWritableMemoryImpl wMem;
-
-  MapHandleImpl(final AllocateDirectMap dirMap, final BaseWritableMemoryImpl wMem) {
-    this.dirMap = dirMap;
-    this.wMem = wMem;
+/**
+ * Specific RuntimeException for the AutoCloseable.close() method. 
+ * 
+ * @author Lee Rhodes
+ *
+ */
+public class MemoryCloseException extends MemoryException {
+  private static final long serialVersionUID = 2L;
+  
+  public MemoryCloseException() {
+    super("The associated resource failed to close.");
   }
-
-  @Override
-  public Memory get() {
-    return wMem;
-  }
-
-  @Override
-  public void close() {
-    if (dirMap.doClose("MapHandle")) {
-      wMem = null;
-    }
-  }
-
-  @Override
-  public void load() {
-    dirMap.load();
-  }
-
-  @Override
-  public boolean isLoaded() {
-    return dirMap.isLoaded();
+  
+  public MemoryCloseException(String resource) {
+    super("The associated resource, " + resource + ", failed to close");
   }
 
 }
+
+

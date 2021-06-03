@@ -31,6 +31,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
 import org.apache.datasketches.memory.Map;
+import org.apache.datasketches.memory.MemoryCloseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -156,10 +157,10 @@ class AllocateDirectMap implements Map {
   
   @Override
   public void close() {
-    doClose();
+    doClose("AllocateDirectMap");
   }
 
-  boolean doClose() {
+  boolean doClose(String resource) {
     try {
       if (deallocator.deallocate(false)) {
         // This Cleaner.clean() call effectively just removes the Cleaner from the internal linked
@@ -169,6 +170,8 @@ class AllocateDirectMap implements Map {
         return true;
       } 
       return false;
+    } catch (final Exception e) {
+      throw new MemoryCloseException(resource);
     } finally {
       BaseStateImpl.reachabilityFence(this);
     }

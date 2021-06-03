@@ -59,7 +59,7 @@ public final class WritableDirectHandleImpl implements WritableDirectHandle {
 
   @Override
   public void close() {
-    if (direct.doClose()) {
+    if (direct.doClose("WritableDirectHandle")) {
       wMem = null;
     }
   }

@@ -21,6 +21,7 @@ package org.apache.datasketches.memory.internal;
 
 import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
 
+import org.apache.datasketches.memory.MemoryCloseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,10 +74,10 @@ final class AllocateDirect implements AutoCloseable {
 
   @Override
   public void close() {
-    doClose();
+    doClose("AllocateDirect");
   }
 
-  boolean doClose() {
+  boolean doClose(String resource) {
     try {
       if (deallocator.deallocate(false)) {
         // This Cleaner.clean() call effectively just removes the Cleaner from the internal linked
@@ -86,7 +87,8 @@ final class AllocateDirect implements AutoCloseable {
         return true;
       }
       return false;
-
+    } catch (final Exception e) {
+      throw new MemoryCloseException(resource);
     } finally {
       BaseStateImpl.reachabilityFence(this);
     }

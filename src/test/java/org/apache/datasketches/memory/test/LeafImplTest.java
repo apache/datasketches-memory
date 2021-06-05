@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.WritableDirectHandle;
+import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.internal.Util;
 import org.apache.datasketches.memory.WritableBuffer;
 
@@ -50,7 +50,7 @@ public class LeafImplTest {
   public void checkDirectLeafs() throws Exception {
     long off = 0;
     long cap = 128;
-    try (WritableDirectHandle wdh = WritableMemory.allocateDirect(cap)) {
+    try (WritableHandle wdh = WritableMemory.allocateDirect(cap)) {
       WritableMemory memLE = wdh.getWritable();
       memLE.putShort(0, (short) 1);
       checkDirect(memLE, off, cap);

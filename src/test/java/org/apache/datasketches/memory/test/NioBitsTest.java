@@ -37,10 +37,11 @@ public class NioBitsTest {
   }
   
   @Test
-  //testing this beyond 2GB may not work on JVMs < 8GB.
-  //This must be checked manually
   public void checkGetAtomicFields() {
-    long cap = 1024L + Integer.MAX_VALUE;
+    //testing this beyond 2GB may not work on JVMs < 8GB.
+    //This should be checked manually
+   // long cap = 1024L + Integer.MAX_VALUE;
+    long cap = 1L << 10;
     printStats();
     ReflectUtil.reserveMemory(cap, cap);
     printStats();

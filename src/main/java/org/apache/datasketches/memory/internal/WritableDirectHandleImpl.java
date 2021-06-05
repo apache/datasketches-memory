@@ -21,7 +21,7 @@ package org.apache.datasketches.memory.internal;
 
 import org.apache.datasketches.memory.Handle;
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.WritableDirectHandle;
+import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
 
 /**
@@ -32,7 +32,7 @@ import org.apache.datasketches.memory.WritableMemory;
  * @author Lee Rhodes
  * @author Roman Leventov
  */
-public final class WritableDirectHandleImpl implements WritableDirectHandle {
+public final class WritableDirectHandleImpl implements WritableHandle {
 
   /**
    * Having at least one final field makes this class safe for concurrent publication.
@@ -59,8 +59,10 @@ public final class WritableDirectHandleImpl implements WritableDirectHandle {
 
   @Override
   public void close() {
-    if (direct.doClose("WritableDirectHandle")) {
+    if (direct.doClose()) {
       wMem = null;
+      
     }
+    
   }
 }

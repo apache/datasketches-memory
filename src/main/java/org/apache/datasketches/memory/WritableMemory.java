@@ -100,7 +100,7 @@ public interface WritableMemory extends Memory {
    * leveraging the WritableMemory API. Native byte order is assumed.
    * The allocated memory will be 8-byte aligned, but may not be page aligned.
    * If capacityBytes is zero, byte order, backing storage and read-only status
-   * of the WritableMemory object, returned from {@link WritableHandle#get()} are unspecified.
+   * of the WritableMemory object, returned from {@link WritableHandle#getWritable()} are unspecified.
    *
    * <p>The default MemoryRequestServer, which allocates any request for memory onto the heap,
    * will be used.</p>
@@ -110,10 +110,10 @@ public interface WritableMemory extends Memory {
    * and to call <i>close()</i> when done.</p>
    *
    * @param capacityBytes the size of the desired memory in bytes.
-   * @return WritableDirectHandle for this off-heap resource.
+   * @return WritableHandle for this off-heap resource.
    * Please read Javadocs for {@link Handle}.
    */
-  static WritableDirectHandle allocateDirect(long capacityBytes) {
+  static WritableHandle allocateDirect(long capacityBytes) {
     return WritableMemoryImpl.allocateDirect(capacityBytes);
   }
   
@@ -133,7 +133,7 @@ public interface WritableMemory extends Memory {
    * @return WritableHandle for this off-heap resource.
    * Please read Javadocs for {@link Handle}.
    */
-  static WritableDirectHandle allocateDirect(long capacityBytes, MemoryRequestServer memReqSvr) {
+  static WritableHandle allocateDirect(long capacityBytes, MemoryRequestServer memReqSvr) {
     return WritableMemoryImpl.allocateDirect(capacityBytes, memReqSvr);
   }
   

@@ -22,7 +22,7 @@ package org.apache.datasketches.memory;
 /**
  * The MemoryRequestServer is a callback interface to provide a means for a direct (off-heap),
  * dynamic WritableMemory object to request more memory from the owner of the
- * {@link WritableDirectHandle}. Refer to {@link DefaultMemoryRequestServer} for how this can be
+ * {@link WritableHandle}. Refer to {@link DefaultMemoryRequestServer} for how this can be
  * used.
  *
  * @author Lee Rhodes

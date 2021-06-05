@@ -21,7 +21,6 @@ package org.apache.datasketches.memory.internal;
 
 import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
 
-import org.apache.datasketches.memory.MemoryCloseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +33,7 @@ import sun.misc.Cleaner; //JDK9+ moved to jdk.internal.ref.Cleaner;
  * @author Lee Rhodes
  */
 @SuppressWarnings({"restriction","synthetic-access"})
-final class AllocateDirect implements AutoCloseable {
+final class AllocateDirect {
   private static final Logger LOG = LoggerFactory.getLogger(AllocateDirect.class);
 
   private final Deallocator deallocator;
@@ -72,12 +71,7 @@ final class AllocateDirect implements AutoCloseable {
     cleaner = Cleaner.create(this, deallocator);
   }
 
-  @Override
-  public void close() {
-    doClose("AllocateDirect");
-  }
-
-  boolean doClose(String resource) {
+  boolean doClose() {
     try {
       if (deallocator.deallocate(false)) {
         // This Cleaner.clean() call effectively just removes the Cleaner from the internal linked
@@ -87,8 +81,6 @@ final class AllocateDirect implements AutoCloseable {
         return true;
       }
       return false;
-    } catch (final Exception e) {
-      throw new MemoryCloseException(resource);
     } finally {
       BaseStateImpl.reachabilityFence(this);
     }
@@ -131,7 +123,7 @@ final class AllocateDirect implements AutoCloseable {
       if (valid.change()) {
         if (calledFromCleaner) {
           // Warn about non-deterministic resource cleanup.
-          LOG.warn("A WritableDirectHandleImpl was not closed manually");
+          LOG.warn("A WritableHandle was not closed manually");
         }
         unsafe.freeMemory(nativeAddress);
         NioBits.unreserveMemory(allocationSize, capacity);

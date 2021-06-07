@@ -322,33 +322,25 @@ public class MemoryTest {
   }
 
   @Test(expectedExceptions = AssertionError.class)
-  public void checkParentUseAfterFree() {
+  public void checkParentUseAfterFree() throws Exception {
     int bytes = 64 * 8;
     @SuppressWarnings("resource") //intentionally not using try-with-resouces here
     WritableHandle wh = WritableMemory.allocateDirect(bytes);
     WritableMemory wmem = wh.getWritable();
-    try {
-      wh.close();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
+    wh.close();
     //with -ea assert: Memory not valid.
     //with -da sometimes segfaults, sometimes passes!
     wmem.getLong(0);
   }
 
   @Test(expectedExceptions = AssertionError.class)
-  public void checkRegionUseAfterFree() {
+  public void checkRegionUseAfterFree() throws Exception {
     int bytes = 64;
     @SuppressWarnings("resource") //intentionally not using try-with-resouces here
     WritableHandle wh = WritableMemory.allocateDirect(bytes);
     Memory wmem = wh.get();
     Memory region = wmem.region(0L, bytes);
-    try {
-      wh.close();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
+    wh.close();
     //with -ea assert: Memory not valid.
     //with -da sometimes segfaults, sometimes passes!
     region.getByte(0);

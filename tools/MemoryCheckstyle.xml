@@ -212,7 +212,7 @@ under the License.
     <module name="JavadocTagContinuationIndentation">
       <property name="severity" value="ignore"/>
       <property name="offset" value="0"/>
-      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+      <!-- <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/> -->
     </module>
         
     <module name="NonEmptyAtclauseDescription"/>

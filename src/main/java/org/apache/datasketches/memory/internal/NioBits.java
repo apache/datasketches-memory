@@ -129,37 +129,32 @@ final class NioBits {
   // -XX:MaxDirectMemorySize limits the total capacity rather than the
   // actual memory usage, which will differ when buffers are page aligned.
   static void reserveMemory(final long allocationSize, final long capacity) {
-    try {
-      reserveUnreserve(allocationSize, capacity, NIO_BITS_RESERVE_MEMORY_METHOD);
-    } catch (final Exception e) {
-      throw new RuntimeException("Could not invoke java.nio.Bits.reserveMemory(...): "
-          + "allocationSize = " + allocationSize + ", capacity = " + capacity, e);
-    }
+    reserveUnreserve(allocationSize, capacity, NIO_BITS_RESERVE_MEMORY_METHOD);
   }
 
   static void unreserveMemory(final long allocationSize, final long capacity) {
-    try {
-      reserveUnreserve(allocationSize, capacity, NIO_BITS_UNRESERVE_MEMORY_METHOD);
-    } catch (final Exception e) {
-      throw new RuntimeException("Could not invoke java.nio.Bits.unreserveMemory(...): "
-          + "allocationSize = " + allocationSize + ", capacity = " + capacity, e);
-    }
+    reserveUnreserve(allocationSize, capacity, NIO_BITS_UNRESERVE_MEMORY_METHOD);
   }
 
-  private static void reserveUnreserve(long allocationSize, long capacity, final Method method)
-      throws Exception {
+  private static void reserveUnreserve(long allocationSize, long capacity, final Method method) {
     Util.zeroCheck(capacity, "capacity");
     // 1GB is a pretty "safe" limit.
     final long chunkSizeLimit = 1L << 30;
-    while (capacity > 0) {
-      final long chunk = Math.min(capacity, chunkSizeLimit);
-      if (capacity == chunk) {
-        method.invoke(null, allocationSize, (int) capacity); //JDK 16 remove cast to int
-      } else {
-        method.invoke(null, chunk, (int) chunk); //JDK 16 remove cast to int
+    try {
+      while (capacity > 0) {
+        final long chunk = Math.min(capacity, chunkSizeLimit);
+        if (capacity == chunk) {
+          method.invoke(null, allocationSize, (int) capacity); //JDK 16 remove cast to int
+        } else {
+          method.invoke(null, chunk, (int) chunk); //JDK 16 remove cast to int
+        }
+        capacity -= chunk;
+        allocationSize -= chunk;
       }
-      capacity -= chunk;
-      allocationSize -= chunk;
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(
+          "Could not invoke java.nio.Bits.unreserveMemory(...) OR java.nio.Bits.reserveMemory(...): "
+          + "allocationSize = " + allocationSize + ", capacity = " + capacity, e);
     }
   }
 }

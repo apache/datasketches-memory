@@ -58,7 +58,7 @@ public class UnsafeUtilTest {
       p = UnsafeUtil.parseJavaVersion(jdkVer);
       UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]);
       fail();
-    } catch (Exception e) {
+    } catch (IllegalArgumentException e) {
       println("" + e);
     }
 
@@ -67,7 +67,7 @@ public class UnsafeUtilTest {
       p = UnsafeUtil.parseJavaVersion(jdkVer);
       UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]);
       fail();
-    } catch (Exception e) {
+    } catch (IllegalArgumentException e) {
       println("" + e);
     }
     try {
@@ -75,7 +75,7 @@ public class UnsafeUtilTest {
       p = UnsafeUtil.parseJavaVersion(jdkVer);
       UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]); //throws
       fail();
-    } catch (Exception e) {
+    } catch (IllegalArgumentException e) {
       println("" + e);
     }
     try {
@@ -83,7 +83,7 @@ public class UnsafeUtilTest {
       p = UnsafeUtil.parseJavaVersion(jdkVer);
       UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]); //throws
       fail();
-    } catch (Exception e) {
+    } catch (IllegalArgumentException e) {
       println("" + e);
     }
     try {
@@ -91,7 +91,7 @@ public class UnsafeUtilTest {
       p = UnsafeUtil.parseJavaVersion(jdkVer);
       UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]); //throws
       fail();
-    } catch (Exception e) {
+    } catch (IllegalArgumentException e) {
       println("" + e);
     }
   }

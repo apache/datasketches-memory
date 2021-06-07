@@ -136,10 +136,10 @@ public final class UnsafeUtil {
       parts = parts[0].split("\\."); //split out the number groups
       p0 = Integer.parseInt(parts[0]); //the first number group
       p1 = (parts.length > 1) ? Integer.parseInt(parts[1]) : 0; //2nd number group, or 0
-    } catch (final NumberFormatException e) {
-      throw new RuntimeException("Improper Java -version string: " + jdkVer + "\n" + e);
+    } catch (final NumberFormatException | ArrayIndexOutOfBoundsException  e) {
+      throw new IllegalArgumentException("Improper Java -version string: " + jdkVer + "\n" + e);
     }
-    //checkJavaVersion(jdkVer, p0, p1);
+    //checkJavaVersion(jdkVer, p0, p1); //TODO Optional to omit this.
     return new int[] {p0, p1};
   }
 

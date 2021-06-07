@@ -20,7 +20,10 @@
 package org.apache.datasketches.memory.test;
 
 import java.io.File;
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.MemoryRequestServer;
@@ -125,9 +128,9 @@ public final class ReflectUtil {
    * a concrete class, but allows access to constructors, static fields and static methods.
    * @return the Class object of the given class.
    */
-  public static Class<?> getClass(String fullyQualifiedBinaryName) {
+  public static Class<?> getClass(final String fullyQualifiedBinaryName) {
     try {
-      ClassLoader scl = ClassLoader.getSystemClassLoader();
+      final ClassLoader scl = ClassLoader.getSystemClassLoader();
       return scl.loadClass(fullyQualifiedBinaryName);
     } catch (final ClassNotFoundException e) {
       throw new RuntimeException(e);
@@ -142,7 +145,7 @@ public final class ReflectUtil {
    */
   public static Constructor<?> getConstructor(final Class<?> ownerClass, final Class<?>... parameterTypes ) {
     try {
-      Constructor<?> ctor = ownerClass.getDeclaredConstructor(parameterTypes);
+      final Constructor<?> ctor = ownerClass.getDeclaredConstructor(parameterTypes);
       ctor.setAccessible(true);
       return ctor;
     } catch (final NoSuchMethodException | SecurityException e) {
@@ -174,7 +177,7 @@ public final class ReflectUtil {
    */
   public static Field getField(final Class<?> ownerClass, final String fieldName) {
     try {
-      Field field = ownerClass.getDeclaredField(fieldName);
+      final Field field = ownerClass.getDeclaredField(fieldName);
       field.setAccessible(true);
       return field;
     } catch (final NoSuchFieldException | SecurityException e) {
@@ -205,9 +208,10 @@ public final class ReflectUtil {
    * @param parameterTypes the list of parameter types
    * @return the desired method.
    */
-  public static Method getMethod(final Class<?> ownerClass, final String methodName, final Class<?>... parameterTypes ) {
+  public static Method getMethod(
+      final Class<?> ownerClass, final String methodName, final Class<?>... parameterTypes ) {
     try {
-      Method method = (parameterTypes == null) 
+      final Method method = (parameterTypes == null) 
           ? ownerClass.getDeclaredMethod(methodName)
           : ownerClass.getDeclaredMethod(methodName, parameterTypes);
       method.setAccessible(true);
@@ -217,7 +221,7 @@ public final class ReflectUtil {
     }
   }
   
-  static void checkValid(Object target) {
+  static void checkValid(final Object target) {
     try {
       CHECK_VALID.invoke(target);
     } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
@@ -265,7 +269,7 @@ public final class ReflectUtil {
     }
   }
 
-  static Object getUnsafeObject(Object target) {
+  static Object getUnsafeObject(final Object target) {
     try {
       return GET_UNSAFE_OBJECT.invoke(target);
     } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {

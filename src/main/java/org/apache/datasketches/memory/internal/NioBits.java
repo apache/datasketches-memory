@@ -22,6 +22,7 @@ package org.apache.datasketches.memory.internal;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -87,7 +88,8 @@ final class NioBits {
       totalCapacityField.setAccessible(true);
       nioBitsTotalCapacity = (AtomicLong) (totalCapacityField.get(null));
 
-    } catch (final Exception e) {
+    } catch (final ClassNotFoundException | NoSuchMethodException |  IllegalAccessException 
+        | IllegalArgumentException | InvocationTargetException | SecurityException |  NoSuchFieldException e) {
       throw new RuntimeException("Could not acquire java.nio.Bits class: " + e.getClass());
     }
   }
@@ -95,30 +97,15 @@ final class NioBits {
   private NioBits() { }
 
   static long getDirectAllocationsCount() { //tested via reflection
-    try {
-      final long count = nioBitsCount.get();
-      return count;
-    } catch (final Exception e) {
-      throw new RuntimeException("Cannot read Bits.count " + e);
-    }
+    return nioBitsCount.get();
   }
 
   static long getReservedMemory() { //tested via reflection
-    try {
-      final long resMem = nioBitsReservedMemory.get();
-      return resMem;
-    } catch (final Exception e) {
-      throw new RuntimeException("Cannot read Bits.reservedMemory " + e);
-    }
+    return nioBitsReservedMemory.get();
   }
 
   static long getTotalCapacity() { //tested via reflection
-    try {
-      final long resMem = nioBitsTotalCapacity.get();
-      return resMem;
-    } catch (final Exception e) {
-      throw new RuntimeException("Cannot read Bits.totalCapacity " + e);
-    }
+    return nioBitsTotalCapacity.get();
   }
 
   static int pageSize() {

@@ -23,7 +23,7 @@ package org.apache.datasketches.memory.test;
  * Stripped down version of
  * https://github.com/protocolbuffers/protobuf/blob/master/java/core/src/test/java/com/google/protobuf/IsValidUtf8TestUtil.java
  *
- * Copyright 2008 Google Inc.  All rights reserved.
+ * <p>Copyright 2008 Google Inc.  All rights reserved.
  * https://developers.google.com/protocol-buffers/
  * See LICENSE.
  */
@@ -41,9 +41,9 @@ public class IsValidUtf8TestUtil {
   // 18,304
   static final long EXPECTED_TWO_BYTE_ROUNDTRIPPABLE_COUNT =
       // Both bytes are one byte characters
-      (long) Math.pow(EXPECTED_ONE_BYTE_ROUNDTRIPPABLE_COUNT, 2) +
+      (long) Math.pow(EXPECTED_ONE_BYTE_ROUNDTRIPPABLE_COUNT, 2)
       // The possible number of two byte characters
-      TWO_BYTE_ROUNDTRIPPABLE_CHARACTERS;
+      + TWO_BYTE_ROUNDTRIPPABLE_CHARACTERS;
 
   // 2048
   static final long THREE_BYTE_SURROGATES = 2 * 1024;
@@ -55,10 +55,10 @@ public class IsValidUtf8TestUtil {
   // 2,650,112
   static final long EXPECTED_THREE_BYTE_ROUNDTRIPPABLE_COUNT =
       // All one byte characters
-      (long) Math.pow(EXPECTED_ONE_BYTE_ROUNDTRIPPABLE_COUNT, 3) +
-      (// One two byte character and a one byte character
-      2 * TWO_BYTE_ROUNDTRIPPABLE_CHARACTERS * ONE_BYTE_ROUNDTRIPPABLE_CHARACTERS) +
+      (long) Math.pow(EXPECTED_ONE_BYTE_ROUNDTRIPPABLE_COUNT, 3)
+      // One two byte character and a one byte character
+      + (2 * TWO_BYTE_ROUNDTRIPPABLE_CHARACTERS * ONE_BYTE_ROUNDTRIPPABLE_CHARACTERS)
       // Three byte characters
-      THREE_BYTE_ROUNDTRIPPABLE_CHARACTERS;
+      + THREE_BYTE_ROUNDTRIPPABLE_CHARACTERS;
 
 }

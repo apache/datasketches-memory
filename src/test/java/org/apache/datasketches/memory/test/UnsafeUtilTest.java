@@ -43,10 +43,10 @@ public class UnsafeUtilTest {
   public void checkJdkString() {
     String jdkVer;
     int[] p = new int[2];
-    String[] good1_8Strings = {"1.8.0_121", "1.8.0_162"};
-    int len = good1_8Strings.length;
+    String[] good1_Strings = {"1.8.0_121", "8", "9", "10", "11", "12", "13"};
+    int len = good1_Strings.length;
     for (int i = 0; i < len; i++) {
-      jdkVer = good1_8Strings[i];
+      jdkVer = good1_Strings[i];
       p = UnsafeUtil.parseJavaVersion(jdkVer);
       UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]);
       int jdkMajor = (p[0] == 1) ? p[1] : p[0]; //model the actual JDK_MAJOR
@@ -54,10 +54,11 @@ public class UnsafeUtilTest {
       if (p[0] > 1 ) { assertTrue(jdkMajor == p[0]); }
     }
     try {
-      jdkVer = "9.0.4"; //ver 9 string
+      jdkVer = "14.0.4"; //ver 14 string
       p = UnsafeUtil.parseJavaVersion(jdkVer);
       UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]);
-    } catch (Error e) {
+      fail();
+    } catch (Exception e) {
       println("" + e);
     }
 
@@ -65,7 +66,8 @@ public class UnsafeUtilTest {
       jdkVer = "1.7.0_80"; //1.7 string
       p = UnsafeUtil.parseJavaVersion(jdkVer);
       UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]);
-    } catch (Error e) {
+      fail();
+    } catch (Exception e) {
       println("" + e);
     }
     try {
@@ -73,7 +75,7 @@ public class UnsafeUtilTest {
       p = UnsafeUtil.parseJavaVersion(jdkVer);
       UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]); //throws
       fail();
-    } catch (Error e) {
+    } catch (Exception e) {
       println("" + e);
     }
     try {
@@ -81,7 +83,7 @@ public class UnsafeUtilTest {
       p = UnsafeUtil.parseJavaVersion(jdkVer);
       UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]); //throws
       fail();
-    } catch (Exception | Error e) {
+    } catch (Exception e) {
       println("" + e);
     }
     try {
@@ -89,7 +91,7 @@ public class UnsafeUtilTest {
       p = UnsafeUtil.parseJavaVersion(jdkVer);
       UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]); //throws
       fail();
-    } catch (Exception | Error e) {
+    } catch (Exception e) {
       println("" + e);
     }
   }

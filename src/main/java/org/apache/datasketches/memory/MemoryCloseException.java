@@ -32,7 +32,7 @@ public class MemoryCloseException extends MemoryException {
     super("The associated resource failed to close.");
   }
   
-  public MemoryCloseException(String resource) {
+  public MemoryCloseException(final String resource) {
     super("The associated resource, " + resource + ", failed to close");
   }
 

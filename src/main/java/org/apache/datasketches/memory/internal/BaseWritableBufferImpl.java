@@ -30,9 +30,9 @@ import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_SHORT_IND
 import static org.apache.datasketches.memory.internal.UnsafeUtil.checkBounds;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
 
-import org.apache.datasketches.memory.Buffer;
-
 import java.nio.ByteOrder;
+
+import org.apache.datasketches.memory.Buffer;
 
 /*
  * Developer notes: The heavier methods, such as put/get arrays, duplicate, region, clear, fill,

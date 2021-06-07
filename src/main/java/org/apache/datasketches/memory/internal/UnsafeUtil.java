@@ -136,17 +136,17 @@ public final class UnsafeUtil {
       parts = parts[0].split("\\."); //split out the number groups
       p0 = Integer.parseInt(parts[0]); //the first number group
       p1 = (parts.length > 1) ? Integer.parseInt(parts[1]) : 0; //2nd number group, or 0
-    } catch (final Exception e) {
-      throw new ExceptionInInitializerError("Improper Java -version string: " + jdkVer + "\n" + e);
+    } catch (final NumberFormatException e) {
+      throw new RuntimeException("Improper Java -version string: " + jdkVer + "\n" + e);
     }
     //checkJavaVersion(jdkVer, p0, p1);
     return new int[] {p0, p1};
   }
 
   public static void checkJavaVersion(final String jdkVer, final int p0, final int p1) {
-    if ( (p0 < 1) || ((p0 == 1) && (p1 < 8)) || (p0 >= 9)  ) {
-      throw new ExceptionInInitializerError(
-          "Unsupported JDK Major Version, must be 1.8: " + jdkVer);
+    if ( (p0 < 1) || ((p0 == 1) && (p1 < 8)) || (p0 > 13)  ) {
+      throw new IllegalArgumentException(
+          "Unsupported JDK Major Version, must be one of 1.8, 8, 9, 10, 11, 12, 13: " + jdkVer);
     }
   }
 
@@ -161,6 +161,8 @@ public final class UnsafeUtil {
   /**
    * Like {@link Unsafe#arrayBaseOffset(Class)}, but caches return values for common array types.
    * Useful because calling {@link Unsafe#arrayBaseOffset(Class)} directly incurs more overhead.
+   * @param c The given Class<?>.
+   * @return the base-offset
    */
   public static long getArrayBaseOffset(final Class<?> c) {
     // Ordering here is roughly in order of what we expect to be most popular.

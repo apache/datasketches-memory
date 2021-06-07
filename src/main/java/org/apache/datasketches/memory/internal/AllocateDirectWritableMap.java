@@ -20,6 +20,8 @@
 package org.apache.datasketches.memory.internal;
 
 import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 import org.apache.datasketches.memory.WritableMap;
 
@@ -53,9 +55,8 @@ final class AllocateDirectWritableMap extends AllocateDirectMap implements Writa
               raf.getFD(),
               nativeBaseOffset,
               capacityBytes);
-    } catch (final Exception e) {
-      throw new RuntimeException(String.format("Encountered %s exception in force. "
-          + e.getClass()));
+    } catch (final IOException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(String.format("Encountered %s exception in force. " + e.getClass()));
     }
   }
 }

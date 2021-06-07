@@ -91,7 +91,7 @@ class AllocateDirectMap implements Map {
       MAPPED_BYTE_BUFFER_FORCE0_METHOD = MappedByteBuffer.class
           .getDeclaredMethod("force0", FileDescriptor.class, long.class, long.class); //JDK15 removed
       MAPPED_BYTE_BUFFER_FORCE0_METHOD.setAccessible(true);
-    } catch (final Exception e) {
+    } catch (final SecurityException | NoSuchMethodException e) {
       throw new RuntimeException("Could not reflect static methods: " + e);
     }
   }
@@ -148,7 +148,7 @@ class AllocateDirectMap implements Map {
               nativeBaseOffset,
               capacityBytes,
               pageCount);
-    } catch (final Exception e) {
+    } catch (final  IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(
               String.format("Encountered %s exception while loading", e.getClass()));
     }
@@ -160,7 +160,7 @@ class AllocateDirectMap implements Map {
     doClose("AllocateDirectMap");
   }
 
-  boolean doClose(String resource) {
+  boolean doClose(final String resource) {
     try {
       if (deallocator.deallocate(false)) {
         // This Cleaner.clean() call effectively just removes the Cleaner from the internal linked
@@ -171,7 +171,7 @@ class AllocateDirectMap implements Map {
       } 
       return false;
     } catch (final Exception e) {
-      throw new MemoryCloseException(resource);
+        throw new MemoryCloseException(resource);
     } finally {
       BaseStateImpl.reachabilityFence(this);
     }
@@ -194,7 +194,7 @@ class AllocateDirectMap implements Map {
         .invoke(AccessByteBuffer.ZERO_READ_ONLY_DIRECT_BYTE_BUFFER,
             nativeBaseOffset,
             capacityBytes);
-    } catch (final Exception e) {
+    } catch (final  IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(
           String.format("Encountered %s exception while loading", e.getClass()));
     }
@@ -309,7 +309,7 @@ class AllocateDirectMap implements Map {
       try {
         FILE_CHANNEL_IMPL_UNMAP0_METHOD.invoke(myFc, actualNativeBaseOffset, myCapacity);
         myRaf.close();
-      } catch (final Exception e) {
+      } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException | IOException e) {
         throw new RuntimeException(
             String.format("Encountered %s exception while freeing memory", e.getClass()));
       }

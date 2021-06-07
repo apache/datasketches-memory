@@ -39,9 +39,9 @@ import java.nio.channels.WritableByteChannel;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.Utf8CodingException;
+import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMapHandle;
 import org.apache.datasketches.memory.WritableMemory;
-import org.apache.datasketches.memory.WritableHandle;
 
 /*
  * Developer notes: The heavier methods, such as put/get arrays, duplicate, region, clear, fill,

@@ -37,7 +37,6 @@ import java.util.List;
 
 import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.MapHandle;
-import org.apache.datasketches.memory.WritableDirectHandle;
 import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.internal.Util;
@@ -323,33 +322,25 @@ public class MemoryTest {
   }
 
   @Test(expectedExceptions = AssertionError.class)
-  public void checkParentUseAfterFree() {
+  public void checkParentUseAfterFree() throws Exception {
     int bytes = 64 * 8;
     @SuppressWarnings("resource") //intentionally not using try-with-resouces here
     WritableHandle wh = WritableMemory.allocateDirect(bytes);
     WritableMemory wmem = wh.getWritable();
-    try {
-      wh.close();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
+    wh.close();
     //with -ea assert: Memory not valid.
     //with -da sometimes segfaults, sometimes passes!
     wmem.getLong(0);
   }
 
   @Test(expectedExceptions = AssertionError.class)
-  public void checkRegionUseAfterFree() {
+  public void checkRegionUseAfterFree() throws Exception {
     int bytes = 64;
     @SuppressWarnings("resource") //intentionally not using try-with-resouces here
     WritableHandle wh = WritableMemory.allocateDirect(bytes);
     Memory wmem = wh.get();
     Memory region = wmem.region(0L, bytes);
-    try {
-      wh.close();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
+    wh.close();
     //with -ea assert: Memory not valid.
     //with -da sometimes segfaults, sometimes passes!
     region.getByte(0);
@@ -357,11 +348,11 @@ public class MemoryTest {
 
   @Test
   public void checkUnsafeByteBufferView() throws Exception {
-    try (WritableDirectHandle wmemDirectHandle = WritableMemory.allocateDirect(2)) {
-      WritableMemory wmemDirect = wmemDirectHandle.getWritable();
-      wmemDirect.putByte(0, (byte) 1);
-      wmemDirect.putByte(1, (byte) 2);
-      checkUnsafeByteBufferView(wmemDirect);
+    try ( WritableHandle wh = WritableMemory.allocateDirect(2)) {
+      WritableMemory wmem = wh.getWritable();
+      wmem.putByte(0, (byte) 1);
+      wmem.putByte(1, (byte) 2);
+      checkUnsafeByteBufferView(wmem);
     }
 
     checkUnsafeByteBufferView(Memory.wrap(new byte[] {1, 2}));
@@ -439,7 +430,7 @@ public class MemoryTest {
   public void checkNullMemReqSvr() throws Exception {
     WritableMemory wmem = WritableMemory.writableWrap(new byte[16]);
     assertNull(wmem.getMemoryRequestServer());
-    try (WritableDirectHandle wdh = WritableMemory.allocateDirect(16)) {
+    try (WritableHandle wdh = WritableMemory.allocateDirect(16)) {
       WritableMemory wmem2 = wdh.getWritable();
       assertNotNull(wmem2.getMemoryRequestServer());
     }

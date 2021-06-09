@@ -20,11 +20,14 @@
 package org.apache.datasketches.memory.test;
 
 import java.io.File;
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.MemoryRequestServer;
-import org.apache.datasketches.memory.WritableDirectHandle;
+import org.apache.datasketches.memory.WritableHandle;
 
 public final class ReflectUtil {
 
@@ -125,11 +128,11 @@ public final class ReflectUtil {
    * a concrete class, but allows access to constructors, static fields and static methods.
    * @return the Class object of the given class.
    */
-  public static Class<?> getClass(String fullyQualifiedBinaryName) {
+  public static Class<?> getClass(final String fullyQualifiedBinaryName) {
     try {
-      ClassLoader scl = ClassLoader.getSystemClassLoader();
+      final ClassLoader scl = ClassLoader.getSystemClassLoader();
       return scl.loadClass(fullyQualifiedBinaryName);
-    } catch (final Exception e) {
+    } catch (final ClassNotFoundException e) {
       throw new RuntimeException(e);
     }
   }
@@ -142,10 +145,10 @@ public final class ReflectUtil {
    */
   public static Constructor<?> getConstructor(final Class<?> ownerClass, final Class<?>... parameterTypes ) {
     try {
-      Constructor<?> ctor = ownerClass.getDeclaredConstructor(parameterTypes);
+      final Constructor<?> ctor = ownerClass.getDeclaredConstructor(parameterTypes);
       ctor.setAccessible(true);
       return ctor;
-    } catch (final Exception e) {
+    } catch (final NoSuchMethodException | SecurityException e) {
       throw new RuntimeException(e);
     }
   }
@@ -160,7 +163,8 @@ public final class ReflectUtil {
     try {
       constructor.setAccessible(true);
       return constructor.newInstance(initargs);
-    } catch (final Exception e) {
+    } catch (final InstantiationException | IllegalAccessException | IllegalArgumentException 
+          | InvocationTargetException | SecurityException e) {
       throw new RuntimeException(e);
     }
   }
@@ -173,10 +177,10 @@ public final class ReflectUtil {
    */
   public static Field getField(final Class<?> ownerClass, final String fieldName) {
     try {
-      Field field = ownerClass.getDeclaredField(fieldName);
+      final Field field = ownerClass.getDeclaredField(fieldName);
       field.setAccessible(true);
       return field;
-    } catch (final Exception e) {
+    } catch (final NoSuchFieldException | SecurityException e) {
       throw new RuntimeException(e);
     }
   }
@@ -191,7 +195,7 @@ public final class ReflectUtil {
     try {
       field.setAccessible(true);
       return field.get(ownerClass);
-    } catch (final Exception e) {
+    } catch (final IllegalAccessException | SecurityException | IllegalArgumentException e) {
       throw new RuntimeException(e);
     }
   }
@@ -204,155 +208,202 @@ public final class ReflectUtil {
    * @param parameterTypes the list of parameter types
    * @return the desired method.
    */
-  public static Method getMethod(final Class<?> ownerClass, final String methodName, final Class<?>... parameterTypes ) {
+  public static Method getMethod(
+      final Class<?> ownerClass, final String methodName, final Class<?>... parameterTypes ) {
     try {
-      Method method = (parameterTypes == null) 
+      final Method method = (parameterTypes == null) 
           ? ownerClass.getDeclaredMethod(methodName)
           : ownerClass.getDeclaredMethod(methodName, parameterTypes);
       method.setAccessible(true);
       return method;
-    } catch (final Exception e) {
+    } catch (final NoSuchMethodException | SecurityException e) {
       throw new RuntimeException(e);
     }
   }
   
-  static void checkValid(Object target) throws Exception {
-    //because method can throw an exception, all exceptions must be handled locally
-    CHECK_VALID.invoke(target);
+  static void checkValid(final Object target) {
+    try {
+      CHECK_VALID.invoke(target);
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   static long getDirectAllocationsCount() {
     try {
       return (long) GET_DIRECT_ALLOCATIONS_COUNT.invoke(null);
-    } catch (Exception e) { throw new RuntimeException(e); }
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) { 
+      throw new RuntimeException(e); 
+    }
   }
 
   static long getMaxDirectByteBufferMemory() {
     try {
       return (long) GET_MAX_DIRECT_BYTE_BUFFER_MEMORY.invoke(null);
-    } catch (Exception e) { throw new RuntimeException(e); }
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   static long getNativeBaseOffset(final Object target) {
     try {
       return (long) GET_NATIVE_BASE_OFFSET.invoke(target);
-    } catch (Exception e) { throw new RuntimeException(e); }
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   static long getReservedMemory() {
     try {
       return (long) GET_RESERVED_MEMORY.invoke(null);
-    } catch (Exception e) { throw new RuntimeException(e); }
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   static long getTotalCapacity() {
     try {
       return (long) GET_TOTAL_CAPACITY.invoke(null);
-    } catch (Exception e) { throw new RuntimeException(e); }
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
   }
 
-  static Object getUnsafeObject(Object target) {
+  static Object getUnsafeObject(final Object target) {
     try {
       return GET_UNSAFE_OBJECT.invoke(target);
-    } catch (Exception e) { throw new RuntimeException(e); }
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   static boolean isBBType(final Object target) {
     try {
       return (boolean) IS_BB_TYPE.invoke(target);
-    } catch (Exception e) { throw new RuntimeException(e); }
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   static boolean isBufferType(final Object target) {
     try {
       return (boolean) IS_BUFFER_TYPE.invoke(target);
-    } catch (Exception e) { throw new RuntimeException(e); }
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   static boolean isDirectType(final Object target) {
     try {
       return (boolean) IS_DIRECT_TYPE.invoke(target);
-    } catch (Exception e) { throw new RuntimeException(e); }
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   static boolean isDuplicateType(final Object target) {
     try {
       return (boolean) IS_DUPLICATE_TYPE.invoke(target);
-    } catch (Exception e) { throw new RuntimeException(e); }
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   static boolean isFileReadOnly(final File file) {
     try {
       return (boolean) IS_FILE_READ_ONLY.invoke(null, file);
-    } catch (Exception e) { throw new RuntimeException(e); }
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   static boolean isHeapType(final Object target) {
     try {
       return (boolean) IS_HEAP_TYPE.invoke(target);
-    } catch (Exception e) { throw new RuntimeException(e); }
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   static boolean isMapType(final Object target) {
     try {
       return (boolean) IS_MAP_TYPE.invoke(target);
-    } catch (Exception e) { throw new RuntimeException(e); }
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   static boolean isNonNativeType(final Object target) {
     try {
       return (boolean) IS_NON_NATIVE_TYPE.invoke(target);
-    } catch (Exception e) { throw new RuntimeException(e); }
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   static boolean isPageAligned() {
     try {
       return (boolean) IS_PAGE_ALIGHED.invoke(null);
-    } catch (Exception e) { throw new RuntimeException(e); }
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   static boolean isReadOnlyType(final Object target) {
     try {
       return (boolean) IS_READ_ONLY_TYPE.invoke(target);
-    } catch (Exception e) { throw new RuntimeException(e); }
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   static boolean isRegionType(final Object target) {
     try {
       return (boolean) IS_REGION_TYPE.invoke(target);
-    } catch (Exception e) { throw new RuntimeException(e); }
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   static int pageCount(final long bytes) {
     try {
       return (int) PAGE_COUNT.invoke(null, bytes);
-    } catch (Exception e) { throw new RuntimeException(e); }
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   static int pageSize() {
     try {
       return (int) PAGE_SIZE.invoke(null);
-    } catch (Exception e) { throw new RuntimeException(e); }
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   static void reserveMemory(final long allocationSize, final long capacity) {
     try {
      RESERVE_MEMORY.invoke(null, allocationSize, capacity);
-    } catch (Exception e) { 
-      throw new RuntimeException(e); }
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   static void unreserveMemory(final long allocationSize, final long capacity) {
     try {
       UNRESERVE_MEMORY.invoke(null, allocationSize, capacity);
-    } catch (Exception e) { throw new RuntimeException(e); }
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
   }
 
-  static WritableDirectHandle wrapDirect(final long capacityBytes,
+  static WritableHandle wrapDirect(final long capacityBytes,
       final ByteOrder byteOrder, final MemoryRequestServer memReqSvr) {
     try {
-      return (WritableDirectHandle) WRAP_DIRECT.invoke(null, capacityBytes, byteOrder, memReqSvr);
-    } catch (Exception e) { throw new RuntimeException(e); }
+      return (WritableHandle) WRAP_DIRECT.invoke(null, capacityBytes, byteOrder, memReqSvr);
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
   }
 
 }

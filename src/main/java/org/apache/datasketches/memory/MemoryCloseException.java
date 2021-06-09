@@ -19,14 +19,23 @@
 
 package org.apache.datasketches.memory;
 
-
 /**
- * A Handle for a writable direct memory resource.
- * Joins a WritableMemory with a writable, AutoCloseable AllocateDirect resource.
- * Please read Javadocs for {@link Handle}.
- *
+ * Specific RuntimeException for the AutoCloseable.close() method. 
+ * 
  * @author Lee Rhodes
- * @author Roman Leventov
+ *
  */
-public interface WritableDirectHandle extends WritableHandle { }
+public class MemoryCloseException extends MemoryException {
+  private static final long serialVersionUID = 2L;
+  
+  public MemoryCloseException() {
+    super("The associated resource failed to close.");
+  }
+  
+  public MemoryCloseException(final String resource) {
+    super("The associated resource, " + resource + ", failed to close");
+  }
+
+}
+
 

@@ -143,7 +143,7 @@ public class UtilTest {
         attrs.group().getName(),
         PosixFilePermissions.toString(attrs.permissions()));
     return s;
-    } catch (Exception e) {
+    } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }

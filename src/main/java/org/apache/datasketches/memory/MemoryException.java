@@ -17,41 +17,28 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory;
 
-import org.apache.datasketches.memory.MapHandle;
-import org.apache.datasketches.memory.Memory;
-
-class MapHandleImpl implements MapHandle {
-
-  final AllocateDirectMap dirMap;
-  BaseWritableMemoryImpl wMem;
-
-  MapHandleImpl(final AllocateDirectMap dirMap, final BaseWritableMemoryImpl wMem) {
-    this.dirMap = dirMap;
-    this.wMem = wMem;
+/**
+ * Specific RuntimeExceptions for the datasketches-memory component.
+ * 
+ * @author Lee Rhodes
+ *
+ */
+public class MemoryException extends RuntimeException {
+  private static final long serialVersionUID = 1L;
+  
+  /**
+   * Constructs a new runtime exception with the specified detail message. The cause is not
+   * initialized, and may subsequently be initialized by a call to
+   * Throwable.initCause(java.lang.Throwable).
+   * 
+   * @param message the detail message. The detail message is saved for later retrieval by the
+   * Throwable.getMessage() method.
+   */
+  public MemoryException(final String message) {
+    super(message);
   }
-
-  @Override
-  public Memory get() {
-    return wMem;
-  }
-
-  @Override
-  public void close() {
-    if (dirMap.doClose("MapHandle")) {
-      wMem = null;
-    }
-  }
-
-  @Override
-  public void load() {
-    dirMap.load();
-  }
-
-  @Override
-  public boolean isLoaded() {
-    return dirMap.isLoaded();
-  }
-
 }
+
+

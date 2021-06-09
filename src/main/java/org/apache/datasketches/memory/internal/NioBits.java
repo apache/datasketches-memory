@@ -22,6 +22,7 @@ package org.apache.datasketches.memory.internal;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -87,7 +88,8 @@ final class NioBits {
       totalCapacityField.setAccessible(true);
       nioBitsTotalCapacity = (AtomicLong) (totalCapacityField.get(null));
 
-    } catch (final Exception e) {
+    } catch (final ClassNotFoundException | NoSuchMethodException |  IllegalAccessException 
+        | IllegalArgumentException | InvocationTargetException | SecurityException |  NoSuchFieldException e) {
       throw new RuntimeException("Could not acquire java.nio.Bits class: " + e.getClass());
     }
   }
@@ -95,30 +97,15 @@ final class NioBits {
   private NioBits() { }
 
   static long getDirectAllocationsCount() { //tested via reflection
-    try {
-      final long count = nioBitsCount.get();
-      return count;
-    } catch (final Exception e) {
-      throw new RuntimeException("Cannot read Bits.count " + e);
-    }
+    return nioBitsCount.get();
   }
 
   static long getReservedMemory() { //tested via reflection
-    try {
-      final long resMem = nioBitsReservedMemory.get();
-      return resMem;
-    } catch (final Exception e) {
-      throw new RuntimeException("Cannot read Bits.reservedMemory " + e);
-    }
+    return nioBitsReservedMemory.get();
   }
 
   static long getTotalCapacity() { //tested via reflection
-    try {
-      final long resMem = nioBitsTotalCapacity.get();
-      return resMem;
-    } catch (final Exception e) {
-      throw new RuntimeException("Cannot read Bits.totalCapacity " + e);
-    }
+    return nioBitsTotalCapacity.get();
   }
 
   static int pageSize() {
@@ -142,37 +129,32 @@ final class NioBits {
   // -XX:MaxDirectMemorySize limits the total capacity rather than the
   // actual memory usage, which will differ when buffers are page aligned.
   static void reserveMemory(final long allocationSize, final long capacity) {
-    try {
-      reserveUnreserve(allocationSize, capacity, NIO_BITS_RESERVE_MEMORY_METHOD);
-    } catch (final Exception e) {
-      throw new RuntimeException("Could not invoke java.nio.Bits.reserveMemory(...): "
-          + "allocationSize = " + allocationSize + ", capacity = " + capacity, e);
-    }
+    reserveUnreserve(allocationSize, capacity, NIO_BITS_RESERVE_MEMORY_METHOD);
   }
 
   static void unreserveMemory(final long allocationSize, final long capacity) {
-    try {
-      reserveUnreserve(allocationSize, capacity, NIO_BITS_UNRESERVE_MEMORY_METHOD);
-    } catch (final Exception e) {
-      throw new RuntimeException("Could not invoke java.nio.Bits.unreserveMemory(...): "
-          + "allocationSize = " + allocationSize + ", capacity = " + capacity, e);
-    }
+    reserveUnreserve(allocationSize, capacity, NIO_BITS_UNRESERVE_MEMORY_METHOD);
   }
 
-  private static void reserveUnreserve(long allocationSize, long capacity, final Method method)
-      throws Exception {
+  private static void reserveUnreserve(long allocationSize, long capacity, final Method method) {
     Util.zeroCheck(capacity, "capacity");
     // 1GB is a pretty "safe" limit.
     final long chunkSizeLimit = 1L << 30;
-    while (capacity > 0) {
-      final long chunk = Math.min(capacity, chunkSizeLimit);
-      if (capacity == chunk) {
-        method.invoke(null, allocationSize, (int) capacity); //JDK 16 remove cast to int
-      } else {
-        method.invoke(null, chunk, (int) chunk); //JDK 16 remove cast to int
+    try {
+      while (capacity > 0) {
+        final long chunk = Math.min(capacity, chunkSizeLimit);
+        if (capacity == chunk) {
+          method.invoke(null, allocationSize, (int) capacity); //JDK 16 remove cast to int
+        } else {
+          method.invoke(null, chunk, (int) chunk); //JDK 16 remove cast to int
+        }
+        capacity -= chunk;
+        allocationSize -= chunk;
       }
-      capacity -= chunk;
-      allocationSize -= chunk;
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(
+          "Could not invoke java.nio.Bits.unreserveMemory(...) OR java.nio.Bits.reserveMemory(...): "
+          + "allocationSize = " + allocationSize + ", capacity = " + capacity, e);
     }
   }
 }

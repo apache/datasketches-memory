@@ -34,6 +34,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteOrder;
 
@@ -63,7 +64,9 @@ public class AllocateDirectWritableMapMemoryTest {
   private static boolean isFileReadOnly(final File file) {
     try {
       return (boolean) IS_FILE_READ_ONLY.invoke(null, file);
-    } catch (Exception e) { throw new RuntimeException(e); }
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) { 
+      throw new RuntimeException(e); 
+    }
   }
   
   @BeforeClass

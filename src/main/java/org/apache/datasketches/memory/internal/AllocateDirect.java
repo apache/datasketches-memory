@@ -33,7 +33,7 @@ import sun.misc.Cleaner; //JDK9+ moved to jdk.internal.ref.Cleaner;
  * @author Lee Rhodes
  */
 @SuppressWarnings({"restriction","synthetic-access"})
-final class AllocateDirect implements AutoCloseable {
+final class AllocateDirect {
   private static final Logger LOG = LoggerFactory.getLogger(AllocateDirect.class);
 
   private final Deallocator deallocator;
@@ -71,11 +71,6 @@ final class AllocateDirect implements AutoCloseable {
     cleaner = Cleaner.create(this, deallocator);
   }
 
-  @Override
-  public void close() {
-    doClose();
-  }
-
   boolean doClose() {
     try {
       if (deallocator.deallocate(false)) {
@@ -86,7 +81,6 @@ final class AllocateDirect implements AutoCloseable {
         return true;
       }
       return false;
-
     } finally {
       BaseStateImpl.reachabilityFence(this);
     }
@@ -129,7 +123,7 @@ final class AllocateDirect implements AutoCloseable {
       if (valid.change()) {
         if (calledFromCleaner) {
           // Warn about non-deterministic resource cleanup.
-          LOG.warn("A WritableDirectHandleImpl was not closed manually");
+          LOG.warn("A WritableHandle was not closed manually");
         }
         unsafe.freeMemory(nativeAddress);
         NioBits.unreserveMemory(allocationSize, capacity);

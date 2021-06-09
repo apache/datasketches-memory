@@ -97,7 +97,7 @@
  * for read-only access to a memory-mapped file</li>
  * <li>{@link org.apache.datasketches.memory.WritableMapHandle}
  * for writable access to a memory-mapped file</li>
- * <li>{@link org.apache.datasketches.memory.WritableDirectHandle}
+ * <li>{@link org.apache.datasketches.memory.WritableHandle}
  * for writable access to off-heap memory.</li>
  * </ul>
  *

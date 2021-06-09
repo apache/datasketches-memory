@@ -39,9 +39,9 @@ import java.nio.channels.WritableByteChannel;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.Utf8CodingException;
+import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMapHandle;
 import org.apache.datasketches.memory.WritableMemory;
-import org.apache.datasketches.memory.WritableDirectHandle;
 
 /*
  * Developer notes: The heavier methods, such as put/get arrays, duplicate, region, clear, fill,
@@ -122,7 +122,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemoryImpl {
   }
 
   @SuppressWarnings("resource")
-  static WritableDirectHandle wrapDirect(final long capacityBytes,
+  static WritableHandle wrapDirect(final long capacityBytes,
       final ByteOrder byteOrder, final MemoryRequestServer memReqSvr) {
     if (capacityBytes <= 0) {
       throw new IllegalArgumentException(
@@ -136,7 +136,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemoryImpl {
         : new DirectNonNativeWritableMemoryImpl(direct.getNativeBaseOffset(), 0L, capacityBytes,
             typeId, direct.getValid(), memReqSvr);
 
-    final WritableDirectHandle handle = new WritableDirectHandleImpl(direct, wmem);
+    final WritableHandle handle = new WritableDirectHandleImpl(direct, wmem);
     return handle;
   }
 

@@ -28,7 +28,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.MemoryRequestServer;
-import org.apache.datasketches.memory.WritableDirectHandle;
+import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMapHandle;
 import org.apache.datasketches.memory.WritableMemory;
 
@@ -72,11 +72,11 @@ public abstract class WritableMemoryImpl extends MemoryImpl implements WritableM
   }
 
   //ALLOCATE DIRECT
-  public static WritableDirectHandle allocateDirect(final long capacityBytes) {
+  public static WritableHandle allocateDirect(final long capacityBytes) {
     return allocateDirect(capacityBytes, null);
   }
 
-  public static WritableDirectHandle allocateDirect(final long capacityBytes,
+  public static WritableHandle allocateDirect(final long capacityBytes,
       final MemoryRequestServer memReqSvr) {
     return BaseWritableMemoryImpl.wrapDirect(capacityBytes, Util.nativeByteOrder, memReqSvr);
   }

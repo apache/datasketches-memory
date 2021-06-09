@@ -24,11 +24,8 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.fail;
 
-import java.lang.reflect.InvocationTargetException;
-
 import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.MemoryRequestServer;
-import org.apache.datasketches.memory.WritableDirectHandle;
 import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
 import org.apache.datasketches.memory.internal.Util;
@@ -49,21 +46,15 @@ public class AllocateDirectMemoryTest {
         assertEquals(wMem.getLong(i << 3), i);
       }
       //inside the TWR block the memory should be valid
-      try {
-        ReflectUtil.checkValid(wMem);
-        //OK
-      } catch (final Exception e) {
-        throw new RuntimeException(e);
-      }
-    }
+      ReflectUtil.checkValid(wMem);
+      //OK
+    } 
     //The TWR block has exited, so the memory should be invalid
     try {
       ReflectUtil.checkValid(wMem);
       fail();
-    } catch (final Exception e) {
-      if (e instanceof IllegalStateException || e instanceof InvocationTargetException) { } //OK
-      //if IllegalAccessException or IllegalArgumentException NOT OK
-      else { throw new RuntimeException(e); }
+    } catch (final RuntimeException e) {
+      //OK
     }
   }
 
@@ -89,8 +80,8 @@ public class AllocateDirectMemoryTest {
           assertEquals(newWmem.getLong(i << 3), i);
       }
       memReqSvr.requestClose(origWmem, newWmem);
-      //The default MRS doesn't actually release because it could be misused.
-      // so we let the TWR release it.
+      //The default MRS doesn't actually release because it could be easily misused.
+      // So we let the TWR release it.
     }
   }
 
@@ -105,7 +96,7 @@ public class AllocateDirectMemoryTest {
 
   @Test
   public void checkNonNativeDirect() throws Exception { //not allowed in public API
-    try (WritableDirectHandle h = ReflectUtil.wrapDirect(8,  Util.nonNativeByteOrder, null)) { 
+    try (WritableHandle h = ReflectUtil.wrapDirect(8,  Util.nonNativeByteOrder, null)) { 
         //BaseWritableMemory.wrapDirect(8, Util.nonNativeByteOrder, null)) {
       WritableMemory wmem = h.getWritable();
       wmem.putChar(0, (char) 1);
@@ -116,7 +107,7 @@ public class AllocateDirectMemoryTest {
   @Test
   public void checkExplicitClose() throws Exception {
     final long cap = 128;
-    try (WritableDirectHandle wdh = WritableMemory.allocateDirect(cap)) {
+    try (WritableHandle wdh = WritableMemory.allocateDirect(cap)) {
       wdh.close(); //explicit close. Does the work of closing
     } //end of scope call to Cleaner/Deallocator also will be redundant
   }

@@ -26,7 +26,7 @@ import org.apache.datasketches.memory.WritableMemory;
 
 /**
  * A Handle for a writable direct memory resource.
- * Joins a WritableMemoryImpl with a writable, AutoCloseable AllocateDirect resource.
+ * Joins an AutoCloseable WritableHandle with a WritableMemory and AllocateDirect resource.
  * Please read Javadocs for {@link Handle}.
  *
  * @author Lee Rhodes
@@ -61,7 +61,6 @@ public final class WritableDirectHandleImpl implements WritableHandle {
   public void close() {
     if (direct.doClose()) {
       wMem = null;
-      
     }
     
   }

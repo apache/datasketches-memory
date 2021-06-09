@@ -23,14 +23,13 @@ under the License.
 -->
 
 <!--
-  MemoryCheckstyle.xml
+  DataSketcchesCheckstyle.xml
 
   Checkstyle is very configurable. Be sure to read the documentation at
   http://checkstyle.sourceforge.net (or in your downloaded distribution).
 
-  To completely disable a check, just comment it out or delete it from the file.
-
-  Authors: Max Vetrenko, Ruslan Diachenko, Roman Ivanov.
+  To completely disable a check, comment it out, delete it, or set
+  property name="severity" value="ignore".
 -->
 
 <module name="Checker">
@@ -39,7 +38,7 @@ under the License.
   <property name="fileExtensions" value="java"/>
 
   <module name="BeforeExecutionExclusionFileFilter">
-    <property name="fileNamePattern" value=".*Test\.java$"/>
+    <property name="fileNamePattern" value="src[\\/]test[\\/]java[\\/].+$|module\-info\.java.+$"/>
   </module>
 
   <module name="FileTabCharacter">
@@ -211,8 +210,7 @@ under the License.
     
     <module name="JavadocTagContinuationIndentation">
       <property name="severity" value="ignore"/>
-      <property name="offset" value="0"/>
-      <!-- <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/> -->
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
         
     <module name="NonEmptyAtclauseDescription"/>
@@ -223,7 +221,7 @@ under the License.
     
     <module name="SummaryJavadocCheck">
       <property name="severity" value="ignore"/>
-      <!-- <property name="forbiddenSummaryFragments" value="^@return the *|^This method returns |^A [{]@code [a-zA-Z0-9]+[}]( is a )"/> -->
+      <property name="forbiddenSummaryFragments" value="^@return the *|^This method returns |^A [{]@code [a-zA-Z0-9]+[}]( is a )"/>
       <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
     
@@ -264,7 +262,6 @@ under the License.
     <module name="TodoComment">
       <property name="severity" value="ignore"/>
       <property name="format" value="(//TODO)|(//FIXME)"/>
-      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
     
     <module name="UpperEll">
@@ -350,7 +347,6 @@ under the License.
       <property name="illegalPattern" value="true"/>
       <property name="message" value="Trailing whitespace"/>
       <property name="ignoreComments" value="true"/>
-      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
     
     <!-- Whitespace -->

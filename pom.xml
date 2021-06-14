@@ -31,9 +31,10 @@ under the License.
   </parent>
 
   <groupId>org.apache.datasketches</groupId>
-  <artifactId>datasketches-memory</artifactId>
+  <artifactId>datasketches-memory-root</artifactId>
   <version>2.0.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <!-- Required for multi-module project -->
+  <packaging>pom</packaging>
 
   <name>${project.artifactId}</name>
   <description>High-performance native memory access.</description>
@@ -655,4 +656,14 @@ under the License.
       </build>
     </profile>
   </profiles>
+
+  <!-- This Maven project is divided into an aggregator project (the root), that manages a group of submodules that
+       inherit configuration from this root module.
+       A multi-module project is used to target different version-specific features of the Java language APIs.
+       Furthermore, it is a structure that is supported in most IDEs allowing minimal disruption to developers that
+       contribute to this project -->
+  <modules>
+    <module>datasketches-memory-java8</module>
+  </modules>
+
 </project>

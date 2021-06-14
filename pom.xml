@@ -254,6 +254,7 @@ under the License.
           <version>${maven-javadoc-plugin.version}</version>
           <configuration>
             <docfilessubdirs>true</docfilessubdirs>
+            <doclint>none</doclint>
           </configuration>
           <executions>
             <execution>
@@ -319,6 +320,7 @@ under the License.
               <exclude>**/*.yml</exclude>
               <exclude>**/.*</exclude>
               <exclude>**/test/resources/**/*.txt</exclude>
+              <exclude>**/docs/*.md</exclude>
               <exclude>LICENSE</exclude>
               <exclude>NOTICE</exclude>
             </excludes>
@@ -664,6 +666,7 @@ under the License.
        contribute to this project -->
   <modules>
     <module>datasketches-memory-java8</module>
+    <module>datasketches-memory-java8-tests</module>
   </modules>
 
 </project>

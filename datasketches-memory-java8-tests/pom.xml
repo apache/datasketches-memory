@@ -28,7 +28,16 @@
     <version>2.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>datasketches-memory-java8</artifactId>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.datasketches</groupId>
+      <artifactId>datasketches-memory-java8</artifactId>
+      <version>${project.parent.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <artifactId>datasketches-memory-java8-tests</artifactId>
   <name>${project.artifactId}</name>
 
 </project>

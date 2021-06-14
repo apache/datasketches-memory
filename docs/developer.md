@@ -12,4 +12,5 @@ contribute to this project.
 
 This project has been divided into the following submodules:
 
-- datasketches-memory-java8 (base version of the JVM that is currently supported)
+* datasketches-memory-java8 (base version of the JVM that is currently supported)
+* datasketches-memory-java8-tests

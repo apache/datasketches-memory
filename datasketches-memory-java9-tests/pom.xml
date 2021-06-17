@@ -20,22 +20,30 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.apache.datasketches</groupId>
-    <artifactId>datasketches-memory-root</artifactId>
-    <version>2.0.0-SNAPSHOT</version>
-  </parent>
+    <parent>
+        <groupId>org.apache.datasketches</groupId>
+        <artifactId>datasketches-memory-root</artifactId>
+        <version>2.0.0-SNAPSHOT</version>
+    </parent>
 
-  <artifactId>datasketches-memory-java8</artifactId>
-  <name>${project.artifactId}</name>
+    <dependencies>
+<!--        <dependency>-->
+<!--            <groupId>org.apache.datasketches</groupId>-->
+<!--            <artifactId>datasketches-memory-java9</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>-->
+    </dependencies>
 
-  <properties>
-    <maven.install.skip>true</maven.install.skip>
-    <java.version>1.8</java.version>
-    <maven.compiler.source>${java.version}</maven.compiler.source>
-    <maven.compiler.target>${java.version}</maven.compiler.target>
-  </properties>
+    <artifactId>datasketches-memory-java9-tests</artifactId>
+    <name>${project.artifactId}</name>
+
+    <properties>
+        <maven.install.skip>true</maven.install.skip>
+        <java.version>9</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+    </properties>
 
 </project>

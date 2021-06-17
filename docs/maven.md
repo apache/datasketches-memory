@@ -33,3 +33,16 @@ The following jars are assembled by the `datasketches-memory` module:
 * datasketches-memory-X.Y.Z-sources.jar The main source files.
 * datasketches-memory-X.Y.Z-test-sources.jar The test source files
 * datasketches-memory-X.Y.Z-javadoc.jar  The compressed Javadocs.
+
+Toolchains
+----------
+
+From the [maven-toolchain-plugin documentation](https://maven.apache.org/plugins/maven-toolchains-plugin/usage.html):
+> A Toolchain is an object that Maven plugins can use to retrieve preconfigured tools (including location and
+other information).
+With the jdk toolchain, for example, instead of being stuck with the JDK used to run Maven, all plugins 
+can use the same other JDK instance without hardcoding absolute paths into the pom.xml and without configuring
+every plugin that require a path to JDK tools.
+
+Since this project targets version-specific Java API's, toolchains are used in different maven modules to ensure
+that the correct Java compiler version is used when compiling source files.

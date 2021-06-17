@@ -281,7 +281,7 @@ under the License.
               <configuration>
                 <rules>
                   <requireJavaVersion>
-                    <version>${java.version}</version>
+                    <version>[1.8,1.9),[9,14)</version>
                   </requireJavaVersion>
                   <requireMavenVersion>
                     <version>${maven.version},</version>
@@ -370,7 +370,9 @@ under the License.
           <version>${maven-toolchains-plugin.version}</version>
           <configuration>
             <toolchains>
-              <jdk><version>8</version></jdk>
+              <jdk>
+                <version>[1.8,1.9),[9,14)</version>
+              </jdk>
             </toolchains>
           </configuration>
           <executions>
@@ -419,10 +421,12 @@ under the License.
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-install-plugin</artifactId>
-          <version>${maven-install-plugin.version}</version>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven-compiler-plugin.version}</version>
           <configuration>
-            <skip>true</skip>
+            <jdkToolchain>
+              <version>${java.version}</version>
+            </jdkToolchain>
           </configuration>
         </plugin>
 
@@ -482,24 +486,18 @@ under the License.
       <build>
         <pluginManagement>
           <plugins>
+
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-compiler-plugin</artifactId>
               <version>${maven-compiler-plugin.version}</version>
-              <dependencies>
-                <dependency>
-                  <groupId>org.codehaus.plexus</groupId>
-                  <artifactId>plexus-compiler-javac-errorprone</artifactId>
-                  <version>${plexus-compiler-javac-errorprone.version}</version>
-                </dependency>
-              </dependencies>
               <configuration>
-                <source>${maven.compiler.source}</source>
-                <target>${maven.compiler.target}</target>
-                <compilerId>javac-with-errorprone</compilerId>
-                <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                <jdkToolchain>
+                  <version>${java.version}</version>
+                </jdkToolchain>
               </configuration>
             </plugin>
+
           </plugins>
         </pluginManagement>
       </build>
@@ -632,6 +630,8 @@ under the License.
   <modules>
     <module>datasketches-memory-java8</module>
     <module>datasketches-memory-java8-tests</module>
+    <module>datasketches-memory-java9</module>
+    <module>datasketches-memory-java9-tests</module>
     <module>datasketches-memory</module>
   </modules>
 

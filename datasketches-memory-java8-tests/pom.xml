@@ -40,4 +40,11 @@
   <artifactId>datasketches-memory-java8-tests</artifactId>
   <name>${project.artifactId}</name>
 
+  <properties>
+    <maven.install.skip>true</maven.install.skip>
+    <java.version>1.8</java.version>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
+  </properties>
+
 </project>

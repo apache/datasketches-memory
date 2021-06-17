@@ -33,6 +33,11 @@
   <artifactId>datasketches-memory</artifactId>
   <name>${project.artifactId}</name>
 
+  <properties>
+    <maven.source.skip>true</maven.source.skip>
+    <maven.install.skip>false</maven.install.skip>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.datasketches</groupId>
@@ -145,29 +150,6 @@
           </execution>
 
         </executions>
-      </plugin>
-
-      <!-- Extends Apache Parent pom, apache-release profile.
-           Disable source plugin since the sources are assembled by the assembly plugin -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <version>${maven-source-plugin.version}</version>
-        <configuration>
-          <skipSource>true</skipSource>
-        </configuration>
-      </plugin>
-
-      <!-- Enable installation of the assembled jars built during packaging.
-           This is disabled by default in the parent pom for all other modules,
-           as these modules are not useful on their own. -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-install-plugin</artifactId>
-        <version>${maven-install-plugin.version}</version>
-        <configuration>
-          <skip>false</skip>
-        </configuration>
       </plugin>
 
     </plugins>

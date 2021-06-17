@@ -43,9 +43,9 @@
 
     <profile>
       <id>strict</id>
-      <!-- The error prone compiler is currently disabled for compilation in JDK 9+ -->
+      <!-- The error prone compiler is only currently supported for compilation in JDK 8 -->
       <activation>
-        <jdk>1.8</jdk>
+        <jdk>[1.8, 1.9],8</jdk>
       </activation>
       <build>
         <pluginManagement>

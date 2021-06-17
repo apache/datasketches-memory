@@ -51,9 +51,6 @@
   <properties>
     <maven.install.skip>true</maven.install.skip>
     <maven.javadoc.skip>true</maven.javadoc.skip>
-    <jdk-toolchain.version>11</jdk-toolchain.version>
-    <maven.compiler.source>${java.version}</maven.compiler.source>
-    <maven.compiler.target>${java.version}</maven.compiler.target>
   </properties>
 
   <!-- The tests in the following profiles run against the assembled MR-JAR.  Hence, they
@@ -65,8 +62,15 @@
     <profile>
       <id>java8</id>
       <activation>
-        <jdk>11</jdk>
+        <jdk>[1.8,1.9),8</jdk>
       </activation>
+
+      <properties>
+        <jdk-toolchain.version>1.8</jdk-toolchain.version>
+        <java.version>8</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+      </properties>
 
       <build>
         <pluginManagement>
@@ -84,61 +88,263 @@
                   <goals>
                     <goal>test</goal>
                   </goals>
+                  <!-- does not provide JPMS runtime arguments -->
                   <configuration>
                     <skip>false</skip>
                     <dependenciesToScan>
                       <dependency>org.apache.datasketches:datasketches-memory-java8-tests</dependency>
                     </dependenciesToScan>
+                    <argLine />
                   </configuration>
                 </execution>
               </executions>
             </plugin>
+
           </plugins>
         </pluginManagement>
       </build>
     </profile>
 
     <profile>
-      <id>java9to14</id>
+      <id>java9</id>
       <activation>
-        <jdk>[9,14)</jdk>
+        <jdk>9</jdk>
       </activation>
 
-      <build>
-        <pluginManagement>
-          <plugins>
+      <properties>
+        <jdk-toolchain.version>9</jdk-toolchain.version>
+        <java.version>9</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+      </properties>
 
-            <plugin>
-              <!-- Apache Parent pom, pluginManagement-->
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-surefire-plugin</artifactId>
-              <version>${maven-surefire-plugin.version}</version>
-              <executions>
-                <execution>
-                  <id>package-test</id>
-                  <phase>package</phase>
-                  <goals>
-                    <goal>test</goal>
-                  </goals>
-                  <configuration>
-                    <skip>false</skip>
-                    <argLine>
-                      --add-opens java.base/java.nio=ALL-UNNAMED
-                      --add-opens java.base/jdk.internal.misc=ALL-UNNAMED
-                      --add-opens java.base/jdk.internal.ref=ALL-UNNAMED
-                      --add-opens org.apache.datasketches.memory/org.apache.datasketches.memory.internal=ALL-UNNAMED
-                    </argLine>
-                    <dependenciesToScan>
-                      <dependency>org.apache.datasketches:datasketches-memory-java8-tests</dependency>
-                    </dependenciesToScan>
-                  </configuration>
-                </execution>
-              </executions>
-            </plugin>
-          </plugins>
-        </pluginManagement>
+      <build>
+        <plugins>
+
+          <plugin>
+            <!-- Apache Parent pom, pluginManagement-->
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>${maven-surefire-plugin.version}</version>
+            <executions>
+              <execution>
+                <id>package-test</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <configuration>
+                  <skip>false</skip>
+                  <argLine>
+                    --add-opens java.base/java.nio=ALL-UNNAMED
+                    --add-opens java.base/jdk.internal.misc=ALL-UNNAMED
+                    --add-opens java.base/jdk.internal.ref=ALL-UNNAMED
+                    --add-opens org.apache.datasketches.memory/org.apache.datasketches.memory.internal=ALL-UNNAMED
+                  </argLine>
+                  <dependenciesToScan>
+                    <dependency>org.apache.datasketches:datasketches-memory-java8-tests</dependency>
+                  </dependenciesToScan>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+        </plugins>
       </build>
     </profile>
-  </profiles>
 
+    <profile>
+      <id>java10</id>
+      <activation>
+        <jdk>10</jdk>
+      </activation>
+
+      <properties>
+        <jdk-toolchain.version>10</jdk-toolchain.version>
+        <java.version>10</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+      </properties>
+
+      <build>
+        <plugins>
+
+          <plugin>
+            <!-- Apache Parent pom, pluginManagement-->
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>${maven-surefire-plugin.version}</version>
+            <executions>
+              <execution>
+                <id>package-test</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <configuration>
+                  <skip>false</skip>
+                  <argLine>
+                    --add-opens java.base/java.nio=ALL-UNNAMED
+                    --add-opens java.base/jdk.internal.misc=ALL-UNNAMED
+                    --add-opens java.base/jdk.internal.ref=ALL-UNNAMED
+                    --add-opens org.apache.datasketches.memory/org.apache.datasketches.memory.internal=ALL-UNNAMED
+                  </argLine>
+                  <dependenciesToScan>
+                    <dependency>org.apache.datasketches:datasketches-memory-java8-tests</dependency>
+                  </dependenciesToScan>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>java11</id>
+      <activation>
+        <jdk>11</jdk>
+      </activation>
+
+      <properties>
+        <jdk-toolchain.version>11</jdk-toolchain.version>
+        <java.version>11</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+      </properties>
+
+      <build>
+        <plugins>
+
+          <plugin>
+            <!-- Apache Parent pom, pluginManagement-->
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>${maven-surefire-plugin.version}</version>
+            <executions>
+              <execution>
+                <id>package-test</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <configuration>
+                  <skip>false</skip>
+                  <argLine>
+                    --add-opens java.base/java.nio=ALL-UNNAMED
+                    --add-opens java.base/jdk.internal.misc=ALL-UNNAMED
+                    --add-opens java.base/jdk.internal.ref=ALL-UNNAMED
+                    --add-opens org.apache.datasketches.memory/org.apache.datasketches.memory.internal=ALL-UNNAMED
+                  </argLine>
+                  <dependenciesToScan>
+                    <dependency>org.apache.datasketches:datasketches-memory-java8-tests</dependency>
+                  </dependenciesToScan>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>java12</id>
+      <activation>
+        <jdk>12</jdk>
+      </activation>
+
+      <properties>
+        <jdk-toolchain.version>12</jdk-toolchain.version>
+        <java.version>12</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+      </properties>
+
+      <build>
+        <plugins>
+
+          <plugin>
+            <!-- Apache Parent pom, pluginManagement-->
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>${maven-surefire-plugin.version}</version>
+            <executions>
+              <execution>
+                <id>package-test</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <configuration>
+                  <skip>false</skip>
+                  <argLine>
+                    --add-opens java.base/java.nio=ALL-UNNAMED
+                    --add-opens java.base/jdk.internal.misc=ALL-UNNAMED
+                    --add-opens java.base/jdk.internal.ref=ALL-UNNAMED
+                    --add-opens org.apache.datasketches.memory/org.apache.datasketches.memory.internal=ALL-UNNAMED
+                  </argLine>
+                  <dependenciesToScan>
+                    <dependency>org.apache.datasketches:datasketches-memory-java8-tests</dependency>
+                  </dependenciesToScan>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+        </plugins>
+      </build>
+    </profile>
+
+
+    <profile>
+      <id>java13</id>
+      <activation>
+        <jdk>13</jdk>
+      </activation>
+
+      <properties>
+        <jdk-toolchain.version>13</jdk-toolchain.version>
+        <java.version>13</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+      </properties>
+
+      <build>
+        <plugins>
+
+          <plugin>
+            <!-- Apache Parent pom, pluginManagement-->
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>${maven-surefire-plugin.version}</version>
+            <executions>
+              <execution>
+                <id>package-test</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <configuration>
+                  <skip>false</skip>
+                  <argLine>
+                    --add-opens java.base/java.nio=ALL-UNNAMED
+                    --add-opens java.base/jdk.internal.misc=ALL-UNNAMED
+                    --add-opens java.base/jdk.internal.ref=ALL-UNNAMED
+                    --add-opens org.apache.datasketches.memory/org.apache.datasketches.memory.internal=ALL-UNNAMED
+                  </argLine>
+                  <dependenciesToScan>
+                    <dependency>org.apache.datasketches:datasketches-memory-java8-tests</dependency>
+                  </dependenciesToScan>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+        </plugins>
+      </build>
+    </profile>
+
+  </profiles>
 </project>

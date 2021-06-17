@@ -74,7 +74,7 @@ final class NioBits {
 
     } catch (final ClassNotFoundException | NoSuchMethodException |  IllegalAccessException 
         | IllegalArgumentException | SecurityException |  NoSuchFieldException e) {
-      throw new RuntimeException("Could not acquire java.nio.Bits class: " + e.getClass());
+      throw new RuntimeException("Could not acquire java.nio.Bits class: " + e.getClass() + "exception: " + e.getMessage());
     }
   }
 

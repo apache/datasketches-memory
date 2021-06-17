@@ -28,6 +28,7 @@
 
   <!-- Compiled java classes from dependency modules -->
   <moduleSets>
+    <!-- java8 -->
     <moduleSet>
       <useAllReactorProjects>true</useAllReactorProjects>
       <includes>
@@ -42,6 +43,23 @@
           </fileSet>
         </fileSets>
       </sources>
+    </moduleSet>
+    <!-- java9 -->
+    <moduleSet>
+      <useAllReactorProjects>true</useAllReactorProjects>
+      <includes>
+        <include>org.apache.datasketches:datasketches-memory-java9</include>
+      </includes>
+      <binaries>
+        <outputDirectory>META-INF/versions/9</outputDirectory>
+        <unpack>true</unpack>
+        <includeDependencies>false</includeDependencies>
+        <unpackOptions>
+          <excludes>
+            <exclude>/META-INF/**</exclude>
+          </excludes>
+        </unpackOptions>
+      </binaries>
     </moduleSet>
   </moduleSets>
 

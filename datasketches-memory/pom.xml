@@ -110,7 +110,7 @@
         </configuration>
         <executions>
 
-          <!-- primary jar -->
+          <!-- multi-release (MR) jar -->
           <execution>
             <id>assemble-jar</id>
             <phase>package</phase>
@@ -121,7 +121,7 @@
               <appendAssemblyId>false</appendAssemblyId>
               <attach>true</attach>
               <descriptors>
-                <descriptor>src/assembly/assemble-jar.xml</descriptor>
+                <descriptor>src/assembly/assemble-mr-jar.xml</descriptor>
               </descriptors>
             </configuration>
           </execution>

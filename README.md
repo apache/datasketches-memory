@@ -69,6 +69,13 @@ This will create the following Jars:
 * datasketches-memory-X.Y.Z-test-sources.jar The test source files
 * datasketches-memory-X.Y.Z-javadoc.jar  The compressed Javadocs.
 
+### Further documentation for contributors
+
+For more information on the project configuration, the following topics are discussed in more detail:
+
+* [Maven configuration](docs/maven.md)
+* [Multi-release jar](docs/multi-release-jar.md)
+
 ### Dependencies
 
 #### Run-time

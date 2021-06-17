@@ -381,12 +381,6 @@ under the License.
                 <goal>prepare-agent</goal>
               </goals>
             </execution>
-            <execution>
-              <id>default-report</id>
-              <goals>
-                <goal>report</goal>
-              </goals>
-            </execution>
           </executions>
         </plugin>
 
@@ -396,7 +390,10 @@ under the License.
           <artifactId>coveralls-maven-plugin</artifactId>
           <version>${coveralls-maven-plugin.version}</version>
           <configuration>
+            <!--suppress UnresolvedMavenProperty -->
             <repoToken>${coveralls-repo-token}</repoToken>
+            <!--suppress UnresolvedMavenProperty -->
+            <jacocoReports>${maven.multiModuleProjectDirectory}/datasketches-memory/target/site/jacoco-aggregate/jacoco.xml</jacocoReports>
           </configuration>
         </plugin>
 

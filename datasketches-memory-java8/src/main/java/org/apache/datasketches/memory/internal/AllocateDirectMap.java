@@ -29,13 +29,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.logging.Logger;
 
 import org.apache.datasketches.memory.Map;
 import org.apache.datasketches.memory.MemoryCloseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import sun.misc.Cleaner; //JDK9+ moved to jdk.internal.ref.Cleaner;
 import sun.nio.ch.FileChannelImpl;
 
 /**
@@ -56,7 +54,7 @@ import sun.nio.ch.FileChannelImpl;
  */
 @SuppressWarnings({"restriction","synthetic-access"})
 class AllocateDirectMap implements Map {
-  private static final Logger LOG = LoggerFactory.getLogger(AllocateDirectMap.class);
+  private static final Logger LOG = Logger.getLogger(AllocateDirectMap.class.getCanonicalName());
 
   private static final int MAP_RO = 0;
   private static final int MAP_RW = 1;
@@ -287,7 +285,7 @@ class AllocateDirectMap implements Map {
       if (valid.change()) {
         if (calledFromCleaner) {
           // Warn about non-deterministic resource cleanup.
-          LOG.warn("A WritableMapHandleImpl was not closed manually");
+          LOG.warning("A WritableMapHandleImpl was not closed manually");
         }
         try {
           unmap();

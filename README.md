@@ -120,10 +120,7 @@ For example, to run normal unit tests:
 
 ### Dependencies
 
-#### Run-time
-There is one run-time dependency: 
-
-* org.slf4j:slf4j-api
+There are no run-time dependencies.
 
 #### Testing
 See the pom.xml file for test dependencies.

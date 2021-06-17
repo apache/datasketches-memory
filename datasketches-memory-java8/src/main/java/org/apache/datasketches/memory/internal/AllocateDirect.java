@@ -21,8 +21,7 @@ package org.apache.datasketches.memory.internal;
 
 import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Logger;
 
 import sun.misc.Cleaner; //JDK9+ moved to jdk.internal.ref.Cleaner;
 
@@ -34,7 +33,7 @@ import sun.misc.Cleaner; //JDK9+ moved to jdk.internal.ref.Cleaner;
  */
 @SuppressWarnings({"restriction","synthetic-access"})
 final class AllocateDirect {
-  private static final Logger LOG = LoggerFactory.getLogger(AllocateDirect.class);
+  private static final Logger LOG = Logger.getLogger(AllocateDirect.class.getCanonicalName());
 
   private final Deallocator deallocator;
   private final long nativeBaseOffset;
@@ -123,7 +122,7 @@ final class AllocateDirect {
       if (valid.change()) {
         if (calledFromCleaner) {
           // Warn about non-deterministic resource cleanup.
-          LOG.warn("A WritableHandle was not closed manually");
+          LOG.warning("A WritableHandle was not closed manually");
         }
         unsafe.freeMemory(nativeAddress);
         NioBits.unreserveMemory(allocationSize, capacity);

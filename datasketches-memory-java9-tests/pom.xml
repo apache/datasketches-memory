@@ -67,9 +67,6 @@
                         --add-opens java.base/jdk.internal.misc=org.apache.datasketches.memory
                         --add-exports org.apache.datasketches.memory.tests/org.apache.datasketches.memory.test=org.testng
                     </argLine>
-                    <jdkToolchain>
-                        <version>9</version>
-                    </jdkToolchain>
                 </configuration>
             </plugin>
 

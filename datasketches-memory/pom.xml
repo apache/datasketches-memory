@@ -123,6 +123,12 @@
               <descriptors>
                 <descriptor>src/assembly/assemble-mr-jar.xml</descriptor>
               </descriptors>
+              <!-- The class loader requires this to be set in a multi-release JAR's manifest -->
+              <archive>
+                <manifestEntries>
+                  <Multi-Release>true</Multi-Release>
+                </manifestEntries>
+              </archive>
             </configuration>
           </execution>
 

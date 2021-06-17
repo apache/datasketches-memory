@@ -1,54 +1,97 @@
 name: Java Test Coverage with Maven, Coveralls
 
 on:
-    pull_request:
-    push:
-        branches: [ master ]
-    workflow_dispatch:
+  pull_request:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
 
 env:
-    MAVEN_OPTS: -Xmx4g -Xms1g
-    repo_token: ${{secrets.coveralls_token}}
+  MAVEN_OPTS: -Xmx4g -Xms1g
+  repo_token: ${{secrets.coveralls_token}}
+  RUNNER_TEMP: /tmp
 
 jobs:
-    build:
-        name: Build, Test, Coverage
-        runs-on: ubuntu-latest
-        
-        steps:
-        - name: "Checkout ${{ github.ref }} ( ${{ github.sha }} )"
-          uses: actions/checkout@v2
-          with:
-              persist-credentials: false
+  build:
+    name: Build, Test, Coverage
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        jdk: [8,9,11]
 
-        - name: Cache local Maven repository
-          uses: actions/cache@v2
-          with:
-              path: ~/.m2/repository
-              key: build-${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-              restore-keys: build-${{ runner.os }}-maven-
+    env:
+      JDK_VERSION: ${{ matrix.jdk }}
 
-        - name: Install JDK
-          uses: AdoptOpenJDK/install-jdk@v1
-          with:
-              version: '8'
-              architecture: x64
-              impl: hotspot
-              targets: 'JDK_8;JAVA_HOME'
+    steps:
+      - name: "Checkout ${{ github.ref }} ( ${{ github.sha }} )"
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
 
-        - name: Install Dependencies
-          run: >
-              mvn clean install -B -V -q
-              -DskipTests=true
-              -Dmaven.javadoc.skip=true
-              -Dgpg.skip=true
-              --toolchains .github/workflows/.toolchains.xml
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: build-${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: build-${{ runner.os }}-maven-
 
-        - name: Test & Report
-          if: ${{ success() }}
-          run: >
-              mvn verify coveralls:report -B -V -q
-              -Dcoveralls-repo-token=${repo_token}
-              -Dmaven.javadoc.skip=true
-              -Dgpg.skip=true
-              --toolchains .github/workflows/.toolchains.xml
+      - name: Install JDK 8
+        uses: AdoptOpenJDK/install-jdk@v1
+        with:
+          version: '8'
+          architecture: x64
+          impl: hotspot
+          targets: 'JAVA8_HOME'
+
+      - name: Install JDK 9
+        uses: AdoptOpenJDK/install-jdk@v1
+        with:
+          version: '9'
+          architecture: x64
+          impl: hotspot
+          targets: 'JAVA9_HOME'
+
+      - name: Install JDK 11
+        uses: AdoptOpenJDK/install-jdk@v1
+        with:
+          version: '11'
+          architecture: x64
+          impl: hotspot
+          targets: 'JAVA11_HOME'
+
+      - name: Install Matrix JDK
+        uses: AdoptOpenJDK/install-jdk@v1
+        with:
+          version: ${{ matrix.jdk }}
+          architecture: x64
+          impl: hotspot
+          targets: 'JAVA_HOME'
+
+      - name: Echo Java Version
+        run: >
+          java -version
+
+      - name: Install Dependencies
+        run: >
+          mvn clean install
+          -DskipTests=true
+          -Dmaven.javadoc.skip=true
+          -Dgpg.skip=true
+          --toolchains .github/workflows/.toolchains.xml
+
+      - name: Package
+        run: >
+          mvn package
+          -Dmaven.javadoc.skip=true
+          -Dgpg.skip=true
+          --toolchains .github/workflows/.toolchains.xml
+
+      - name: Test & Report
+        if: ${{ matrix.jdk == 8 && success() }}
+        run: >
+          mvn verify coveralls:report -B -V
+          -Dcoveralls-repo-token=${repo_token}
+          -Dmaven.javadoc.skip=true
+          -Dgpg.skip=true
+          --toolchains .github/workflows/.toolchains.xml

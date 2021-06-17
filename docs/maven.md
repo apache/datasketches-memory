@@ -1,8 +1,8 @@
 # Maven multi-module project
 
 This project is a multi-module Maven project. A multi-module Maven project consists of an aggregator project 
-(the root project), together with a set of submodules.  The aggregator's configuration is inherited by each
-submodule, thus reducing duplication.
+(the `datasketches-memory-root` project), together with a set of submodules.  The aggregator's configuration is inherited
+by each submodule, thus reducing duplication.
 
 `datasketches-memory` makes use of some features of the Java platform, namely `Unsafe`, which have evolved in
 Java versions 9 and above.   Therefore, a multi-module project allows us to add support for later versions of
@@ -13,7 +13,10 @@ This project has been divided into the following submodules:
 
 * datasketches-memory-java8 (base version of the JVM that is currently supported)
 * datasketches-memory-java8-tests
+* datasketches-memory-java9 (Java9 equivalent of some platform specific classes in datasketches-memory-java8)
+* datasketches-memory-java9-tests
 * datasketches-memory (JAR assembly, does not contain source files)
+* datasketches-memory-tests (Runs test suite against assembled JAR)
 
 ### Artifact assembly
 

@@ -252,6 +252,9 @@ under the License.
           <configuration>
             <docfilessubdirs>true</docfilessubdirs>
             <doclint>none</doclint>
+            <jdkToolchain>
+              <version>${jdk-toolchain.version}</version>
+            </jdkToolchain>
           </configuration>
           <executions>
             <execution>
@@ -610,6 +613,7 @@ under the License.
     <module>datasketches-memory-java9</module>
     <module>datasketches-memory-java9-tests</module>
     <module>datasketches-memory</module>
+    <module>datasketches-memory-tests</module>
   </modules>
 
 </project>

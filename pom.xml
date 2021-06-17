@@ -92,11 +92,13 @@ under the License.
     <!-- END:UNIQUE FOR THIS JAVA COMPONENT -->
 
     <!-- Test -->
-    <testng.version>7.4.0</testng.version>
+    <!-- Version 7.4.0 fails to locate jquery.min.js for reporting on debian systems -->
+    <testng.version>7.1.0</testng.version>
 
     <!-- System-wide properties -->
     <maven.version>3.5.0</maven.version>
     <java.version>1.8</java.version>
+    <jdk-toolchain.version>8</jdk-toolchain.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <argLine>-Xmx4g -Duser.language=en -Duser.country=US -Dfile.encoding=UTF-8</argLine>
@@ -192,13 +194,6 @@ under the License.
     </dependency>
     <!-- END: UNIQUE FOR THIS JAVA COMPONENT -->
 
-    <!-- Test Scope -->
-    <dependency>
-      <groupId>org.testng</groupId>
-      <artifactId>testng</artifactId>
-      <version>${testng.version}</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>
@@ -361,6 +356,9 @@ under the License.
             <trimStackTrace>false</trimStackTrace>
             <useManifestOnlyJar>false</useManifestOnlyJar>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            <jdkToolchain>
+              <version>${jdk-toolchain.version}</version>
+            </jdkToolchain>
           </configuration>
         </plugin>
 
@@ -425,7 +423,7 @@ under the License.
           <version>${maven-compiler-plugin.version}</version>
           <configuration>
             <jdkToolchain>
-              <version>${java.version}</version>
+              <version>${jdk-toolchain.version}</version>
             </jdkToolchain>
           </configuration>
         </plugin>
@@ -479,29 +477,8 @@ under the License.
       </plugin>
     </plugins>
   </build>
+
   <profiles>
-
-    <profile>
-      <id>strict</id>
-      <build>
-        <pluginManagement>
-          <plugins>
-
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-compiler-plugin</artifactId>
-              <version>${maven-compiler-plugin.version}</version>
-              <configuration>
-                <jdkToolchain>
-                  <version>${java.version}</version>
-                </jdkToolchain>
-              </configuration>
-            </plugin>
-
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
 
     <!--  This profile is used to release signed jars to the Apache Nexus repository.
           This must be executed from a git repository set at the proper Release branch (e.g., 1.1.X)

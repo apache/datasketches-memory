@@ -1,5 +1,4 @@
-Maven multi-module project
-==========================
+# Maven multi-module project
 
 This project is a multi-module Maven project. A multi-module Maven project consists of an aggregator project 
 (the root project), together with a set of submodules.  The aggregator's configuration is inherited by each
@@ -16,15 +15,13 @@ This project has been divided into the following submodules:
 * datasketches-memory-java8-tests
 * datasketches-memory (JAR assembly, does not contain source files)
 
-Artifact assembly
------------------
+### Artifact assembly
 
-The maven assembly plugin builds all artifacts for this project from the other modules within the project.  These
-modules are complementary and not standalone.  Therefore, they are not installed and downloaded independently by
-the end user.
+The [Maven assembly plugin](https://maven.apache.org/plugins/maven-assembly-plugin/) builds all artifacts for this
+project from the other modules within the project.  These modules are complementary and not standalone. 
+Therefore, they are not installed and downloaded independently by the end user.
 
-Instead, the maven-assembly plugin builds all jars, and hides the multi-module
-configuration from the end user.
+Instead, the Maven assembly plugin builds all jars, and hides the multi-module configuration from the end user.
 
 The following jars are assembled by the `datasketches-memory` module:
 
@@ -34,8 +31,7 @@ The following jars are assembled by the `datasketches-memory` module:
 * datasketches-memory-X.Y.Z-test-sources.jar The test source files
 * datasketches-memory-X.Y.Z-javadoc.jar  The compressed Javadocs.
 
-Toolchains
-----------
+### Toolchains
 
 From the [maven-toolchain-plugin documentation](https://maven.apache.org/plugins/maven-toolchains-plugin/usage.html):
 > A Toolchain is an object that Maven plugins can use to retrieve preconfigured tools (including location and

@@ -35,6 +35,11 @@
       <version>${project.parent.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <version>${testng.version}</version>
+    </dependency>
   </dependencies>
 
   <artifactId>datasketches-memory-java8-tests</artifactId>
@@ -43,6 +48,7 @@
   <properties>
     <maven.install.skip>true</maven.install.skip>
     <java.version>1.8</java.version>
+    <jdk-toolchain.version>8</jdk-toolchain.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
   </properties>

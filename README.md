@@ -38,11 +38,47 @@ If you are interested in making contributions to this site please see our [Commu
 
 ---
 
+## Java Support
+
+Datasketches memory currently supports Java 8 up to and including Java 13.
+
+In order to use the library in Java 9 and above, you must provide the following runtime arguments to the JVM:
+
+```shell
+    --add-opens java.base/java.nio=org.apache.datasketches.memory \
+    --add-opens java.base/jdk.internal.misc=org.apache.datasketches.memory \
+    --add-opens java.base/jdk.internal.ref=org.apache.datasketches.memory
+```
+
+For example, to run your local application with full compatibility for the Java module system, you might use the following command:
+```shell
+  $JAVA \
+    --module-path mods \
+    --add-opens java.base/java.nio=org.apache.datasketches.memory \
+    --add-opens java.base/jdk.internal.misc=org.apache.datasketches.memory \
+    --add-opens java.base/jdk.internal.ref=org.apache.datasketches.memory \
+    --module my.main.application.module
+```
+
+where `mods` is your module path and `my.main.application.module` is your own JPMS module:
+
+```java
+module datasketches.memory.multirelease.test {
+    requires org.apache.datasketches.memory;
+}
+```
+
+
+---
+
 ## Build Instructions
 __NOTE:__ This component accesses resource files for testing. As a result, the directory elements of the full absolute path of the target installation directory must qualify as Java identifiers. In other words, the directory elements must not have any space characters (or non-Java identifier characters) in any of the path elements. This is required by the Oracle Java Specification in order to ensure location-independent access to resources: [See Oracle Location-Independent Access to Resources](https://docs.oracle.com/javase/8/docs/technotes/guides/lang/resources.html)
 
-### JDK8/Hotspot is required to compile
-This DataSketches component is pure Java and you must compile using JDK 8 with Hotspot.
+### JDK versions required to compile
+This DataSketches component is pure Java and requires the following JDKs to compile:
+- JDK8/Hotspot
+- JDK9/Hotspot
+- JDK11/Hotspot
 
 ### Recommended Build Tool
 This DataSketches component is structured as a Maven project and Maven is the recommended Build Tool.
@@ -69,12 +105,18 @@ This will create the following Jars:
 * datasketches-memory-X.Y.Z-test-sources.jar The test source files
 * datasketches-memory-X.Y.Z-javadoc.jar  The compressed Javadocs.
 
-### Further documentation for contributors
+### Toolchains
 
-For more information on the project configuration, the following topics are discussed in more detail:
+This project makes use of Maven toolchains to ensure that the correct Java compiler version is used when compiling source files.
 
-* [Maven configuration](docs/maven.md)
-* [Multi-release jar](docs/multi-release-jar.md)
+The reference toolchains.xml can be found in .github/workflows/.toolchains.xml, and can be copied to your local maven home
+directory e.g. `~/.m2/toolchains.xml`.
+
+Alternatively, the maven commands above can be supplemented with: `--toolchains .github/workflows/.toolchains.xml`
+
+For example, to run normal unit tests:
+
+    $ mvn clean test --toolchains .github/workflows/.toolchains.xml
 
 ### Dependencies
 
@@ -85,3 +127,15 @@ There is one run-time dependency:
 
 #### Testing
 See the pom.xml file for test dependencies.
+
+---
+
+## Further documentation for contributors
+
+For more information on the project configuration, the following topics are discussed in more detail:
+
+* [Maven configuration](docs/maven.md)
+* [Multi-release jar](docs/multi-release-jar.md)
+* [Java Platform Module System](docs/module-system.md)
+
+In order to build and contribute to this project, please read the [development setup documentation](docs/development.md).

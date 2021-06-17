@@ -29,11 +29,16 @@
     </parent>
 
     <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>org.apache.datasketches</groupId>-->
-<!--            <artifactId>datasketches-memory-java9</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.apache.datasketches</groupId>
+            <artifactId>datasketches-memory-java9</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
+        </dependency>
     </dependencies>
 
     <artifactId>datasketches-memory-java9-tests</artifactId>
@@ -41,9 +46,34 @@
 
     <properties>
         <maven.install.skip>true</maven.install.skip>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
         <java.version>9</java.version>
+        <jdk-toolchain.version>9</jdk-toolchain.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
     </properties>
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <!-- Apache Parent pom, pluginManagement-->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <argLine>
+                        --add-opens java.base/jdk.internal.ref=org.apache.datasketches.memory
+                        --add-opens java.base/jdk.internal.misc=org.apache.datasketches.memory
+                        --add-exports org.apache.datasketches.memory.tests/org.apache.datasketches.memory.test=org.testng
+                    </argLine>
+                    <jdkToolchain>
+                        <version>9</version>
+                    </jdkToolchain>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
 
 </project>

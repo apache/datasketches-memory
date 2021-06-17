@@ -17,4 +17,4 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.tests;
+package org.apache.datasketches.memory.internal;

@@ -37,8 +37,8 @@ final class AllocateDirect {
   private static final Logger LOG = LoggerFactory.getLogger(AllocateDirect.class);
 
   private final Deallocator deallocator;
-  private final Cleaner cleaner; //JDK9+ moved to jdk.internal.ref.Cleaner;
   private final long nativeBaseOffset;
+  private final MemoryCleaner cleaner;
 
   /**
    * Base Constructor for allocate native memory.
@@ -68,7 +68,7 @@ final class AllocateDirect {
       nativeBaseOffset = nativeAddress;
     }
     deallocator = new Deallocator(nativeAddress, allocationSize, capacityBytes);
-    cleaner = Cleaner.create(this, deallocator);
+    cleaner = new MemoryCleaner(this, deallocator);
   }
 
   boolean doClose() {

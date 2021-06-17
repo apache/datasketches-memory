@@ -33,10 +33,6 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 @SuppressWarnings({"restriction"})
 final class NioBits {
-  private static final Class<?> VM_CLASS;
-  private static final Method VM_MAX_DIRECT_MEMORY_METHOD;
-  private static final Method VM_IS_DIRECT_MEMORY_PAGE_ALIGNED_METHOD;
-
   private static final Class<?> NIO_BITS_CLASS;
   private static final Method NIO_BITS_RESERVE_MEMORY_METHOD;
   private static final Method NIO_BITS_UNRESERVE_MEMORY_METHOD;
@@ -51,18 +47,8 @@ final class NioBits {
 
   static {
     try {
-      VM_CLASS = Class.forName("sun.misc.VM"); //JDK9+ moved to jdk.internal.misc.VM
-      VM_MAX_DIRECT_MEMORY_METHOD =
-          VM_CLASS.getDeclaredMethod("maxDirectMemory");
-      VM_MAX_DIRECT_MEMORY_METHOD.setAccessible(true);
-      maxDBBMemory = (long)VM_MAX_DIRECT_MEMORY_METHOD
-          .invoke(null); //static method
-
-      VM_IS_DIRECT_MEMORY_PAGE_ALIGNED_METHOD =
-          VM_CLASS.getDeclaredMethod("isDirectMemoryPageAligned");
-      VM_IS_DIRECT_MEMORY_PAGE_ALIGNED_METHOD.setAccessible(true);
-      isPageAligned = (boolean)VM_IS_DIRECT_MEMORY_PAGE_ALIGNED_METHOD
-          .invoke(null); //static method
+      isPageAligned = VirtualMachineMemory.getIsPageAligned();
+      maxDBBMemory = VirtualMachineMemory.getMaxDBBMemory();
 
       NIO_BITS_CLASS = Class.forName("java.nio.Bits");
 
@@ -74,22 +60,20 @@ final class NioBits {
           .getDeclaredMethod("unreserveMemory", long.class, int.class); //JD16 requires (long, long)
       NIO_BITS_UNRESERVE_MEMORY_METHOD.setAccessible(true);
 
-      //JDK 8-10: "count", "reservedMemory", "totalCapacity"
-      //JDK 11-16: "COUNT", "RESERVE_MEMORY", "TOTAL_CAPACITY"
-      final Field countField = NIO_BITS_CLASS.getDeclaredField("count");
+      final Field countField = NIO_BITS_CLASS.getDeclaredField(NioBitsFields.COUNT_FIELD_NAME);
       countField.setAccessible(true);
       nioBitsCount = (AtomicLong) (countField.get(null));
 
-      final Field reservedMemoryField = NIO_BITS_CLASS.getDeclaredField("reservedMemory");
+      final Field reservedMemoryField = NIO_BITS_CLASS.getDeclaredField(NioBitsFields.RESERVED_MEMORY_FIELD_NAME);
       reservedMemoryField.setAccessible(true);
       nioBitsReservedMemory = (AtomicLong) (reservedMemoryField.get(null));
 
-      final Field totalCapacityField = NIO_BITS_CLASS.getDeclaredField("totalCapacity");
+      final Field totalCapacityField = NIO_BITS_CLASS.getDeclaredField(NioBitsFields.TOTAL_CAPACITY_FIELD_NAME);
       totalCapacityField.setAccessible(true);
       nioBitsTotalCapacity = (AtomicLong) (totalCapacityField.get(null));
 
     } catch (final ClassNotFoundException | NoSuchMethodException |  IllegalAccessException 
-        | IllegalArgumentException | InvocationTargetException | SecurityException |  NoSuchFieldException e) {
+        | IllegalArgumentException | SecurityException |  NoSuchFieldException e) {
       throw new RuntimeException("Could not acquire java.nio.Bits class: " + e.getClass());
     }
   }

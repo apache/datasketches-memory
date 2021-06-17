@@ -17,11 +17,22 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory;
+package org.apache.datasketches.memory.test;
 
-public class PlaceHolder {
-    @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
+import org.apache.datasketches.memory.internal.VirtualMachineMemory;
+import org.testng.annotations.Test;
+
+@SuppressWarnings("javadoc")
+public class VirtualMachineMemoryTest {
+
+    @Test
+    public void maxDirectBufferMemory() {
+       assert(VirtualMachineMemory.getMaxDBBMemory() >= 0);
+    }
+
+    @Test
+    public void inertPageAlignment() {
+        System.out.println("VM page alignment:" + VirtualMachineMemory.getIsPageAligned());
+        assert(true);
     }
 }

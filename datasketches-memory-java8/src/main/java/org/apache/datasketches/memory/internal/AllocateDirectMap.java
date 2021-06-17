@@ -97,7 +97,7 @@ class AllocateDirectMap implements Map {
   }
 
   private final Deallocator deallocator;
-  private final Cleaner cleaner;//JDK9+ moved to jdk.internal.ref.Cleaner;
+  private final MemoryCleaner cleaner;
 
   final long capacityBytes;
   final RandomAccessFile raf;
@@ -120,7 +120,7 @@ class AllocateDirectMap implements Map {
     raf = mapper(file, fileOffsetBytes, capacityBytes, resourceReadOnly);
     nativeBaseOffset = map(raf.getChannel(), resourceReadOnly, fileOffsetBytes, capacityBytes);
     deallocator = new Deallocator(nativeBaseOffset, capacityBytes, raf);
-    cleaner = Cleaner.create(this, deallocator);
+    cleaner = new MemoryCleaner(this, deallocator);
   }
 
   //Map Interface

@@ -26,9 +26,7 @@ import jdk.internal.ref.Cleaner;
  * a standalone class. The package name for Cleaner has changed in
  * later versions. The appropriate class will be loaded by the class loader
  * depending on the Java version that is used.
- *
- * For more information, see:
- * https://openjdk.java.net/jeps/238
+ * For more information, see: https://openjdk.java.net/jeps/238
  */
 public class MemoryCleaner {
     private final Cleaner cleaner;
@@ -39,7 +37,7 @@ public class MemoryCleaner {
      * @param deallocator - the cleanup code to be run when the cleaner is invoked.
      * return MemoryCleaner
      */
-    public MemoryCleaner(Object referent, Runnable deallocator) {
+    public MemoryCleaner(final Object referent, final Runnable deallocator) {
         cleaner = Cleaner.create(referent, deallocator);
     }
 

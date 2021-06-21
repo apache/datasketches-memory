@@ -27,9 +27,7 @@ import java.lang.reflect.Method;
  * a standalone class. The package name for VM has changed in
  * later versions. The appropriate class will be loaded by the class loader
  * depending on the Java version that is used.
- *
- * For more information, see:
- * https://openjdk.java.net/jeps/238
+ * For more information, see: https://openjdk.java.net/jeps/238
  */
 public final class VirtualMachineMemory {
 

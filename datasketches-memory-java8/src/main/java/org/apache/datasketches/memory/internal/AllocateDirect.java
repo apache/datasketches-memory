@@ -23,8 +23,6 @@ import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
 
 import java.util.logging.Logger;
 
-import sun.misc.Cleaner; //JDK9+ moved to jdk.internal.ref.Cleaner;
-
 /**
  * Provides access to direct (native) memory.
  *

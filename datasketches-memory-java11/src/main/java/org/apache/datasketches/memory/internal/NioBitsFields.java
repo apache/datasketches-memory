@@ -24,9 +24,7 @@ package org.apache.datasketches.memory.internal;
  * Some field names in the VM internal class have changed in
  * later versions. The appropriate class will be loaded by the class loader
  * depending on the Java version that is used.
- *
- * For more information, see:
- * https://openjdk.java.net/jeps/238
+ * For more information, see: https://openjdk.java.net/jeps/238
  */
 class NioBitsFields {
     static String COUNT_FIELD_NAME = "COUNT";

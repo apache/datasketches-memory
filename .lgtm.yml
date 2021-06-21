@@ -36,7 +36,7 @@ extraction:
       maven:
         # Specify the path of a Maven toolchains file.
         # Default: Maven uses a toolchains file in the default location, if it exists.
-        toolchains_file: .github/workflows/toolchains.xml
+        toolchains_file: .github/workflows/.toolchains.xml
 
   # Define settings for JavaScript analysis
   ##########################################

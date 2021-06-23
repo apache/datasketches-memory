@@ -197,4 +197,14 @@
     </plugins>
   </build>
 
+  <profiles>
+    <profile>
+      <id>nexus-jars</id>
+      <properties>
+        <!-- only deploy artifacts from this module to nexus -->
+        <maven.deploy.skip>false</maven.deploy.skip>
+      </properties>
+    </profile>
+  </profiles>
+
 </project>

@@ -477,6 +477,12 @@ under the License.
     -->
     <profile>
       <id>nexus-jars</id>
+      <properties>
+        <!-- Skip deployment for all artifacts to nexus by default.
+             Note: this flag is overriden in the datasketches-memory
+             submodule - the assembly output jars _should_ be deployed. -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+      </properties>
       <build>
         <pluginManagement>
           <plugins>

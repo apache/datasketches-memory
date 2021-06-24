@@ -82,6 +82,15 @@ under the License.
     </developer>
   </developers>
 
+  <!--
+       NOTE:
+       The datasketches-memory submodule uses the Maven project-aggregation feature and does not inherit
+       from this root module as a parent; so that there is no runtime dependency on the parent project (root module).
+       As a result, some properties from this POM (including the version) are duplicated in the datasketches-memory
+       module for inclusion in the assembled artifacts.  For more information, see:
+       https://maven.apache.org/guides/introduction/introduction-to-the-pom.html#Project_Aggregation -->
+
+
   <properties>
     <!-- UNIQUE FOR THIS JAVA COMPONENT -->
     <protobuf-java.version>4.0.0-rc-2</protobuf-java.version>
@@ -111,11 +120,9 @@ under the License.
     <versions-maven-plugin.version>2.8.1</versions-maven-plugin.version>
 
     <!--  Maven Plugins -->
-    <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version> <!-- overrides parent -->
     <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version> <!-- overrides parent -->
     <maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version> <!-- overrides parent -->
     <maven-enforcer-plugin.version>3.0.0-M3</maven-enforcer-plugin.version> <!-- overrides parent -->
-    <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version> <!-- overrides parent -->
     <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version> <!-- overrides parent -->
     <maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version> <!-- overrides parent -->
     <maven-release-plugin.version>3.0.0-M1</maven-release-plugin.version> <!-- overrides parent -->
@@ -124,7 +131,6 @@ under the License.
     <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version> <!-- overrides parent -->
     <maven-toolchains-plugin.version>3.0.0</maven-toolchains-plugin.version>
     <maven-install-plugin.version>3.0.0-M1</maven-install-plugin.version>
-    <maven-help-plugin.version>3.2.0</maven-help-plugin.version>
     <!-- Apache Plugins -->
     <apache-rat-plugin.version>0.13</apache-rat-plugin.version> <!-- overrides parent -->
     <!-- org.jacoco Maven Plugins -->
@@ -134,7 +140,6 @@ under the License.
     <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
     <!-- other -->
     <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
-    <git-commit-id-plugin.version>4.0.4</git-commit-id-plugin.version>
   </properties>
 
   <repositories>
@@ -179,7 +184,6 @@ under the License.
       <scope>test</scope>
     </dependency>
     <!-- END: UNIQUE FOR THIS JAVA COMPONENT -->
-
   </dependencies>
 
   <build>
@@ -398,12 +402,6 @@ under the License.
         </plugin>
 
         <plugin>
-          <groupId>pl.project13.maven</groupId>
-          <artifactId>git-commit-id-plugin</artifactId>
-          <version>${git-commit-id-plugin.version}</version>
-        </plugin>
-
-        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>${maven-compiler-plugin.version}</version>
@@ -457,117 +455,12 @@ under the License.
         <groupId>org.eluder.coveralls</groupId>
         <artifactId>coveralls-maven-plugin</artifactId>
       </plugin>
-      <plugin>
-        <groupId>pl.project13.maven</groupId>
-        <artifactId>git-commit-id-plugin</artifactId>
-      </plugin>
     </plugins>
   </build>
 
   <profiles>
 
-    <!--  This profile is used to release signed jars to the Apache Nexus repository.
-          This must be executed from a git repository set at the proper Release branch (e.g., 1.1.X)
-          and at a Release Candidate tag (e.g., 1.1.0-RC1).
-          The pom version in the release branch must be properly set to something like: "1.1.0".
-          The pom version in the master would be set to something like: "1.2.0-SNAPSHOT".
-          Test Command: mvn clean verify -Pnexus-jars -DskipTests=true
-          Command: mvn clean deploy -Dnexus-jars
-          Verify Command (from terminal): gpg -v &#45;&#45;verify $ASC $FILE # dashdashverify
-    -->
-    <profile>
-      <id>nexus-jars</id>
-      <properties>
-        <!-- Skip deployment for all artifacts to nexus by default.
-             Note: this flag is overriden in the datasketches-memory
-             submodule - the assembly output jars _should_ be deployed. -->
-        <maven.deploy.skip>true</maven.deploy.skip>
-      </properties>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>pl.project13.maven</groupId>
-              <artifactId>git-commit-id-plugin</artifactId>
-              <version>${git-commit-id-plugin.version}</version>
-              <executions>
-                <execution>
-                  <goals>
-                    <goal>revision</goal>
-                  </goals>
-                  <phase>initialize</phase>
-                </execution>
-              </executions>
-              <configuration>
-                <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
-                <dateFormatTimeZone>UTC</dateFormatTimeZone>
-                <verbose>false</verbose>
-                <skipPoms>false</skipPoms>
-                <format>json</format>
-                <generateGitPropertiesFile>true</generateGitPropertiesFile>
-                <generateGitPropertiesFilename>${project.build.directory}/git.properties</generateGitPropertiesFilename>
-                <failOnNoGitDirectory>true</failOnNoGitDirectory>
-                <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
-                <commitIdGenerationMode>full</commitIdGenerationMode>
-                <includeOnlyProperties>
-                  <includeProperty>git.branch</includeProperty>
-                  <includeProperty>git.commit.id.full</includeProperty>
-                  <includeProperty>git.commit.time</includeProperty>
-                  <includeProperty>git.commit.user.email</includeProperty>
-                  <includeProperty>git.tags</includeProperty>
-                </includeOnlyProperties>
-                <gitDescribe>
-                  <skip>false</skip>
-                  <always>true</always>
-                  <abbrev>7</abbrev>
-                  <dirty>-dirty</dirty>
-                  <tags>true</tags>
-                  <forceLongFormat>true</forceLongFormat>
-                </gitDescribe>
-              </configuration>
-            </plugin>
 
-            <!-- We want to sign the artifacts, POM, and all attached artifacts -->
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-gpg-plugin</artifactId>
-              <version>${maven-gpg-plugin.version}</version>
-              <executions>
-                <execution>
-                  <id>sign-artifacts</id>
-                  <phase>verify</phase>
-                  <goals>
-                    <goal>sign</goal>
-                  </goals>
-                </execution>
-              </executions>
-              <configuration>
-                <gpgArguments>
-                  <arg>--verbose</arg>
-                  <!-- prints the algorithm used -->
-                  <arg>--personal-digest-preferences=SHA512</arg>
-                </gpgArguments>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-
-        <plugins>
-          <plugin>
-            <groupId>pl.project13.maven</groupId>
-            <artifactId>git-commit-id-plugin</artifactId>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-jar-plugin</artifactId>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
 
     <!-- Disable source release assembly for 'apache-release' profile.
              This is performed from a script outside Maven

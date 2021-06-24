@@ -40,7 +40,6 @@
     <name>${project.artifactId}</name>
 
     <properties>
-        <maven.install.skip>true</maven.install.skip>
         <maven.javadoc.skip>true</maven.javadoc.skip>
         <java.version>9</java.version>
         <jdk-toolchain.version>9</jdk-toolchain.version>

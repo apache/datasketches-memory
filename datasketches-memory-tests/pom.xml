@@ -49,7 +49,6 @@
   <name>${project.artifactId}</name>
 
   <properties>
-    <maven.install.skip>true</maven.install.skip>
     <maven.javadoc.skip>true</maven.javadoc.skip>
   </properties>
 

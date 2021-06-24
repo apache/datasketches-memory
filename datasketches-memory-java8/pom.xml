@@ -32,7 +32,6 @@
   <name>${project.artifactId}</name>
 
   <properties>
-    <maven.install.skip>true</maven.install.skip>
     <java.version>1.8</java.version>
     <jdk-toolchain.version>8</jdk-toolchain.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>

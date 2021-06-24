@@ -25,50 +25,139 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.apache.datasketches</groupId>
-    <artifactId>datasketches-memory-root</artifactId>
-    <version>2.0.0-SNAPSHOT</version>
+    <groupId>org.apache</groupId>
+    <artifactId>apache</artifactId>
+    <version>23</version>
   </parent>
 
+  <!-- datasketches-memory assembly module
+
+       NOTE:
+       This uses the Maven project-aggregation feature and does not inherit from the parent
+       so that there is no runtime dependency on the parent project (root module).
+       As a result, some properties from the root POM are duplicated here for inclusion in
+       the assembled artifacts.  For more information, see:
+       https://maven.apache.org/guides/introduction/introduction-to-the-pom.html#Project_Aggregation -->
+
+  <groupId>org.apache.datasketches</groupId>
   <artifactId>datasketches-memory</artifactId>
+  <version>2.0.0-SNAPSHOT</version>
+
   <name>${project.artifactId}</name>
+  <description>High-performance native memory access.</description>
+  <url>https://datasketches.apache.org/</url>
+  <inceptionYear>2015</inceptionYear>
+
+  <mailingLists>
+    <mailingList>
+      <name>DataSketches Developers</name>
+      <subscribe>dev-subscribe@datasketches.apache.org</subscribe>
+      <unsubscribe>dev-unsubscribe@datasketches.apache.org</unsubscribe>
+      <post>dev@datasketches.apache.org</post>
+      <archive>https://mail-archives.apache.org/mod_mbox/datasketches-dev</archive>
+    </mailingList>
+    <mailingList>
+      <name>sketches-user</name>
+      <archive>https://groups.google.com/forum/#!forum/sketches-user</archive>
+      <subscribe>mailto:sketches-user%2Bsubscribe@googlegroups.com</subscribe>
+      <unsubscribe>mailto:sketches-user%2Bunsubscribe@googlegroups.com</unsubscribe>
+      <post>mailto:sketches-user@googlegroups.com</post>
+    </mailingList>
+  </mailingLists>
+
+  <scm>
+    <connection>scm:git:ssh://git@github.com/apache/${project.artifactId}.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/apache/${project.artifactId}.git</developerConnection>
+    <url>https://github.com/apache/${project.artifactId}</url>
+    <tag>HEAD</tag>
+  </scm>
+
+  <issueManagement>
+    <!-- <system>jira</system>
+      <url>https://issues.apache.org/jira/browse/DATASKETCHES</url> -->
+    <system>GitHub</system>
+    <url>https://github.com/apache/${project.artifactId}/issues</url>
+  </issueManagement>
+
+  <developers>
+    <developer>
+      <name>The Apache DataSketches Team</name>
+      <email>dev@datasketches.apache.org</email>
+      <url>https://datasketches.apache.org</url>
+      <organization>Apache Software Foundation</organization>
+      <organizationUrl>http://www.apache.org</organizationUrl>
+    </developer>
+  </developers>
 
   <properties>
+    <!-- UNIQUE FOR THIS JAVA COMPONENT -->
     <maven.source.skip>true</maven.source.skip>
-    <maven.install.skip>false</maven.install.skip>
+
+    <protobuf-java.version>4.0.0-rc-2</protobuf-java.version>
+    <!-- Used for UTF8 testing -->
+    <zero-allocation-hashing.version>0.15</zero-allocation-hashing.version>
+    <!-- END:UNIQUE FOR THIS JAVA COMPONENT -->
+
+    <!-- Test -->
+    <!-- Version 7.4.0 fails to locate jquery.min.js for reporting on debian systems -->
+    <testng.version>7.1.0</testng.version>
+
+    <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version> <!-- overrides parent -->
+    <git-commit-id-plugin.version>4.0.4</git-commit-id-plugin.version>
+    <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version> <!-- overrides parent -->
+    <!-- org.jacoco Maven Plugins -->
+    <jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
+    <maven-help-plugin.version>3.2.0</maven-help-plugin.version>
   </properties>
 
   <dependencies>
+    <!-- These dependencies are required during assembly but not runtime -->
     <dependency>
       <groupId>org.apache.datasketches</groupId>
       <artifactId>datasketches-memory-java8</artifactId>
-      <version>${project.parent.version}</version>
+      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.datasketches</groupId>
       <artifactId>datasketches-memory-java9</artifactId>
-      <version>${project.parent.version}</version>
+      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.datasketches</groupId>
       <artifactId>datasketches-memory-java11</artifactId>
-      <version>${project.parent.version}</version>
+      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
+    <!-- Test Scope -->
     <dependency>
       <groupId>org.apache.datasketches</groupId>
       <artifactId>datasketches-memory-java8-tests</artifactId>
-      <version>${project.parent.version}</version>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.datasketches</groupId>
       <artifactId>datasketches-memory-java9-tests</artifactId>
-      <version>${project.parent.version}</version>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <!-- Used for UTF8 testing -->
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>${protobuf-java.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- Used for xxHash testing -->
+      <groupId>net.openhft</groupId>
+      <artifactId>zero-allocation-hashing</artifactId>
+      <version>${zero-allocation-hashing.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- END: UNIQUE FOR THIS JAVA COMPONENT -->
 
   </dependencies>
 
@@ -81,7 +170,7 @@
         <version>${maven-help-plugin.version}</version>
         <executions>
           <execution>
-            <phase>package</phase>
+            <phase>generate-resources</phase>
             <goals>
               <goal>effective-pom</goal>
             </goals>
@@ -194,17 +283,114 @@
         </executions>
       </plugin>
 
+      <plugin>
+        <groupId>pl.project13.maven</groupId>
+        <artifactId>git-commit-id-plugin</artifactId>
+        <version>${git-commit-id-plugin.version}</version>
+      </plugin>
+
     </plugins>
   </build>
 
   <profiles>
+
+    <!--  This profile is used to release signed jars to the Apache Nexus repository.
+         This must be executed from a git repository set at the proper Release branch (e.g., 1.1.X)
+         and at a Release Candidate tag (e.g., 1.1.0-RC1).
+         The pom version in the release branch must be properly set to something like: "1.1.0".
+         The pom version in the master would be set to something like: "1.2.0-SNAPSHOT".
+         Test Command: mvn clean verify -Pnexus-jars -DskipTests=true
+         Command: mvn clean deploy -Dnexus-jars
+         Verify Command (from terminal): gpg -v &#45;&#45;verify $ASC $FILE # dashdashverify
+   -->
     <profile>
       <id>nexus-jars</id>
-      <properties>
-        <!-- only deploy artifacts from this module to nexus -->
-        <maven.deploy.skip>false</maven.deploy.skip>
-      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>pl.project13.maven</groupId>
+              <artifactId>git-commit-id-plugin</artifactId>
+              <version>${git-commit-id-plugin.version}</version>
+              <executions>
+                <execution>
+                  <goals>
+                    <goal>revision</goal>
+                  </goals>
+                  <phase>initialize</phase>
+                </execution>
+              </executions>
+              <configuration>
+                <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+                <dateFormatTimeZone>UTC</dateFormatTimeZone>
+                <verbose>false</verbose>
+                <skipPoms>false</skipPoms>
+                <format>json</format>
+                <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                <generateGitPropertiesFilename>${project.build.directory}/git.properties</generateGitPropertiesFilename>
+                <failOnNoGitDirectory>true</failOnNoGitDirectory>
+                <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
+                <commitIdGenerationMode>full</commitIdGenerationMode>
+                <includeOnlyProperties>
+                  <includeProperty>git.branch</includeProperty>
+                  <includeProperty>git.commit.id.full</includeProperty>
+                  <includeProperty>git.commit.time</includeProperty>
+                  <includeProperty>git.commit.user.email</includeProperty>
+                  <includeProperty>git.tags</includeProperty>
+                </includeOnlyProperties>
+                <gitDescribe>
+                  <skip>false</skip>
+                  <always>true</always>
+                  <abbrev>7</abbrev>
+                  <dirty>-dirty</dirty>
+                  <tags>true</tags>
+                  <forceLongFormat>true</forceLongFormat>
+                </gitDescribe>
+              </configuration>
+            </plugin>
+
+            <!-- We want to sign the artifacts, POM, and all attached artifacts -->
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-gpg-plugin</artifactId>
+              <version>${maven-gpg-plugin.version}</version>
+              <executions>
+                <execution>
+                  <id>sign-artifacts</id>
+                  <phase>verify</phase>
+                  <goals>
+                    <goal>sign</goal>
+                  </goals>
+                </execution>
+              </executions>
+              <configuration>
+                <gpgArguments>
+                  <arg>--verbose</arg>
+                  <!-- prints the algorithm used -->
+                  <arg>--personal-digest-preferences=SHA512</arg>
+                </gpgArguments>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+
+        <plugins>
+          <plugin>
+            <groupId>pl.project13.maven</groupId>
+            <artifactId>git-commit-id-plugin</artifactId>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
+
   </profiles>
 
 </project>

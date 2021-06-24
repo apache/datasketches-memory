@@ -158,6 +158,7 @@
       </activation>
 
       <properties>
+        <jdk-toolchain.version>10</jdk-toolchain.version>
         <java.version>10</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -251,6 +252,7 @@
       </activation>
 
       <properties>
+        <jdk-toolchain.version>12</jdk-toolchain.version>
         <java.version>12</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -298,6 +300,7 @@
       </activation>
 
       <properties>
+        <jdk-toolchain.version>13</jdk-toolchain.version>
         <java.version>13</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>

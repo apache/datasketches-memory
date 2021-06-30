@@ -43,14 +43,30 @@
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <version>${testng.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- Used for UTF8 testing -->
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>${protobuf-java.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- Used for xxHash testing -->
+      <groupId>net.openhft</groupId>
+      <artifactId>zero-allocation-hashing</artifactId>
+      <version>${zero-allocation-hashing.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <artifactId>datasketches-memory-tests</artifactId>
   <name>${project.artifactId}</name>
-
-  <properties>
-    <maven.javadoc.skip>true</maven.javadoc.skip>
-  </properties>
 
   <!-- The tests in the following profiles run against the assembled MR-JAR.  Hence, they
        only run during the Maven package phase. Different profiles are selected based on

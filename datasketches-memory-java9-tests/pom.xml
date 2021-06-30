@@ -38,6 +38,7 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>${testng.version}</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -45,7 +46,6 @@
     <name>${project.artifactId}</name>
 
     <properties>
-        <maven.javadoc.skip>true</maven.javadoc.skip>
         <java.version>9</java.version>
         <jdk-toolchain.version>9</jdk-toolchain.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>

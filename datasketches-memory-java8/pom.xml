@@ -36,6 +36,8 @@
     <jdk-toolchain.version>8</jdk-toolchain.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
+    <!-- override javadoc for this module only -->
+    <maven.javadoc.skip>false</maven.javadoc.skip>
   </properties>
 
   <profiles>
@@ -66,6 +68,30 @@
                 <compilerId>javac-with-errorprone</compilerId>
                 <forceJavacCompilerUse>true</forceJavacCompilerUse>
               </configuration>
+            </plugin>
+            <!-- Javadoc aggregate in a multi-module project can be unreliable on first builds, see:
+                 https://issues.apache.org/jira/browse/MJAVADOC-437 -->
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-javadoc-plugin</artifactId>
+              <configuration>
+                <jdkToolchain>
+                  <version>${jdk-toolchain.version}</version>
+                </jdkToolchain>
+              </configuration>
+              <executions>
+                <execution>
+                  <id>javadoc-aggregate</id>
+                  <phase>package</phase>
+                  <goals>
+                    <goal>javadoc-no-fork</goal>
+                  </goals>
+                  <configuration>
+                    <includeDependencySources>true</includeDependencySources>
+                    <includeTransitiveDependencySources>true</includeTransitiveDependencySources>
+                  </configuration>
+                </execution>
+              </executions>
             </plugin>
           </plugins>
         </pluginManagement>

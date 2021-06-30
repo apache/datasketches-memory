@@ -17,8 +17,8 @@
     under the License.
 -->
 
-[![Build Status](https://travis-ci.org/apache/datasketches-memory.svg?branch=master)](https://travis-ci.org/apache/datasketches-memory) 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.datasketches/datasketches-memory/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.apache.datasketches/datasketches-memory) 
+[![Build Status](https://travis-ci.org/apache/datasketches-memory.svg?branch=master)](https://travis-ci.org/apache/datasketches-memory)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.datasketches/datasketches-memory/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.apache.datasketches/datasketches-memory)
 [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/apache/datasketches-memory.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/apache/datasketches-memory/context:java)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/apache/datasketches-memory.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/apache/datasketches-memory/alerts/)
 [![Coverage Status](https://coveralls.io/repos/github/apache/datasketches-memory/badge.svg?branch=master)](https://coveralls.io/github/apache/datasketches-memory?branch=master)
@@ -32,7 +32,7 @@
  runtime dependencies and can be used in any application that needs to manage data structures outside
  the Java heap.
 
-Please visit the main [DataSketches website](https://datasketches.apache.org) for more information. 
+Please visit the main [DataSketches website](https://datasketches.apache.org) for more information.
 
 If you are interested in making contributions to this site please see our [Community](https://datasketches.apache.org/docs/Community/) page for how to contact us.
 
@@ -83,7 +83,7 @@ This DataSketches component is pure Java and requires the following JDKs to comp
 ### Recommended Build Tool
 This DataSketches component is structured as a Maven project and Maven is the recommended Build Tool.
 
-There are two types of tests: normal unit tests and tests run by the strict profile.  
+There are two types of tests: normal unit tests and tests run by the strict profile.
 
 To run normal unit tests:
 
@@ -92,6 +92,12 @@ To run normal unit tests:
 To run the strict profile tests:
 
     $ mvn clean test -P strict
+
+To run javadoc on this multi-module project, use:
+
+    $ mvn clean package javadoc:javadoc -DskipTests=true
+
+* There are sometimes problems resolving module deps, e.g. see https://issues.apache.org/jira/browse/MJAVADOC-437
 
 To install jars built from the downloaded source:
 

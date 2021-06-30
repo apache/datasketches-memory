@@ -124,7 +124,7 @@ under the License.
     <maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version> <!-- overrides parent -->
     <maven-enforcer-plugin.version>3.0.0-M3</maven-enforcer-plugin.version> <!-- overrides parent -->
     <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version> <!-- overrides parent -->
-    <maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version> <!-- overrides parent -->
+    <maven-javadoc-plugin.version>3.3.0</maven-javadoc-plugin.version> <!-- overrides parent -->
     <maven-release-plugin.version>3.0.0-M1</maven-release-plugin.version> <!-- overrides parent -->
     <maven-remote-resources-plugin.version>[1.7.0,)</maven-remote-resources-plugin.version> <!-- overrides parent -->
     <maven-source-plugin.version>3.2.1</maven-source-plugin.version> <!-- overrides parent -->
@@ -140,6 +140,9 @@ under the License.
     <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
     <!-- other -->
     <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
+    <maven.deploy.skip>true</maven.deploy.skip>
+    <maven.install.skip>true</maven.install.skip>
+    <maven.javadoc.skip>true</maven.javadoc.skip>
   </properties>
 
   <repositories>
@@ -167,24 +170,30 @@ under the License.
     </repository>
   </repositories>
 
-  <dependencies>
-    <!-- Test Scope -->
-    <dependency>
-      <!-- Used for UTF8 testing -->
-      <groupId>com.google.protobuf</groupId>
-      <artifactId>protobuf-java</artifactId>
-      <version>${protobuf-java.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <!-- Used for xxHash testing -->
-      <groupId>net.openhft</groupId>
-      <artifactId>zero-allocation-hashing</artifactId>
-      <version>${zero-allocation-hashing.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- END: UNIQUE FOR THIS JAVA COMPONENT -->
-  </dependencies>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.testng</groupId>
+        <artifactId>testng</artifactId>
+        <version>${testng.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <!-- Used for UTF8 testing -->
+        <groupId>com.google.protobuf</groupId>
+        <artifactId>protobuf-java</artifactId>
+        <version>${protobuf-java.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <!-- Used for xxHash testing -->
+        <groupId>net.openhft</groupId>
+        <artifactId>zero-allocation-hashing</artifactId>
+        <version>${zero-allocation-hashing.version}</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <build>
     <pluginManagement>
@@ -249,6 +258,7 @@ under the License.
           <executions>
             <execution>
               <id>attach-javadocs</id>
+              <phase>package</phase>
               <goals>
                 <goal>jar</goal>
               </goals>

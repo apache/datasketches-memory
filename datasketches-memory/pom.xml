@@ -108,6 +108,10 @@
     <!-- org.jacoco Maven Plugins -->
     <jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
     <maven-help-plugin.version>3.2.0</maven-help-plugin.version>
+    <!-- deploy artifacts to nexus from this module only -->
+    <maven.deploy.skip>false</maven.deploy.skip>
+    <maven.install.skip>false</maven.install.skip>
+    <maven.javadoc.skip>true</maven.javadoc.skip>
   </properties>
 
   <dependencies>

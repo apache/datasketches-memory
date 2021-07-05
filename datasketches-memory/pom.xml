@@ -107,7 +107,6 @@
     <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version> <!-- overrides parent -->
     <!-- org.jacoco Maven Plugins -->
     <jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
-    <maven-help-plugin.version>3.2.0</maven-help-plugin.version>
     <!-- deploy artifacts to nexus from this module only -->
     <maven.deploy.skip>false</maven.deploy.skip>
     <maven.install.skip>false</maven.install.skip>
@@ -167,23 +166,6 @@
 
   <build>
     <plugins>
-
-      <!-- Generates an effective pom for the packaged jars -->
-      <plugin>
-        <artifactId>maven-help-plugin</artifactId>
-        <version>${maven-help-plugin.version}</version>
-        <executions>
-          <execution>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>effective-pom</goal>
-            </goals>
-            <configuration>
-              <output>${project.build.directory}/maven-archiver/pom.xml</output>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
 
       <!-- The assembly plugin builds all artifacts for this project from the other modules
            within the project.  These modules are complementary and not standalone.  Therefore,

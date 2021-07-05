@@ -86,11 +86,19 @@
       <directory>${project.build.outputDirectory}/META-INF</directory>
       <outputDirectory>META-INF</outputDirectory>
     </fileSet>
-    <!-- Maven descriptors: pom.properties and effective pom.xml-->
-    <fileSet>
-      <directory>${project.build.directory}/maven-archiver</directory>
-      <outputDirectory>META-INF/maven/org.apache.datasketches/datasketches-memory</outputDirectory>
-    </fileSet>
   </fileSets>
+  <!-- maven artifacts -->
+  <files>
+    <!-- pom.properties -->
+    <file>
+      <source>${project.build.directory}/maven-archiver/pom.properties</source>
+      <outputDirectory>META-INF/maven/org.apache.datasketches/datasketches-memory</outputDirectory>
+    </file>
+    <!-- pom.xml -->
+    <file>
+      <source>${project.basedir}/pom.xml</source>
+      <outputDirectory>META-INF/maven/org.apache.datasketches/datasketches-memory</outputDirectory>
+    </file>
+  </files>
 
 </assembly>

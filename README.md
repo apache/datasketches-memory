@@ -17,8 +17,8 @@
     under the License.
 -->
 
-[![Build Status](https://travis-ci.org/apache/datasketches-memory.svg?branch=master)](https://travis-ci.org/apache/datasketches-memory) 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.datasketches/datasketches-memory/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.apache.datasketches/datasketches-memory) 
+[![Build Status](https://travis-ci.org/apache/datasketches-memory.svg?branch=master)](https://travis-ci.org/apache/datasketches-memory)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.datasketches/datasketches-memory/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.apache.datasketches/datasketches-memory)
 [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/apache/datasketches-memory.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/apache/datasketches-memory/context:java)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/apache/datasketches-memory.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/apache/datasketches-memory/alerts/)
 [![Coverage Status](https://coveralls.io/repos/github/apache/datasketches-memory/badge.svg?branch=master)](https://coveralls.io/github/apache/datasketches-memory?branch=master)
@@ -32,22 +32,58 @@
  runtime dependencies and can be used in any application that needs to manage data structures outside
  the Java heap.
 
-Please visit the main [DataSketches website](https://datasketches.apache.org) for more information. 
+Please visit the main [DataSketches website](https://datasketches.apache.org) for more information.
 
 If you are interested in making contributions to this site please see our [Community](https://datasketches.apache.org/docs/Community/) page for how to contact us.
+
+---
+
+## Java Support
+
+Datasketches memory currently supports Java 8 up to and including Java 13.
+
+In order to use the library in Java 9 and above, you must provide the following runtime arguments to the JVM:
+
+```shell
+    --add-opens java.base/java.nio=org.apache.datasketches.memory \
+    --add-opens java.base/jdk.internal.misc=org.apache.datasketches.memory \
+    --add-opens java.base/jdk.internal.ref=org.apache.datasketches.memory
+```
+
+For example, to run your local application with full compatibility for the Java module system, you might use the following command:
+```shell
+  $JAVA \
+    --module-path mods \
+    --add-opens java.base/java.nio=org.apache.datasketches.memory \
+    --add-opens java.base/jdk.internal.misc=org.apache.datasketches.memory \
+    --add-opens java.base/jdk.internal.ref=org.apache.datasketches.memory \
+    --module my.main.application.module
+```
+
+where `mods` is your module path and `my.main.application.module` is your own JPMS module:
+
+```java
+module datasketches.memory.multirelease.test {
+    requires org.apache.datasketches.memory;
+}
+```
+
 
 ---
 
 ## Build Instructions
 __NOTE:__ This component accesses resource files for testing. As a result, the directory elements of the full absolute path of the target installation directory must qualify as Java identifiers. In other words, the directory elements must not have any space characters (or non-Java identifier characters) in any of the path elements. This is required by the Oracle Java Specification in order to ensure location-independent access to resources: [See Oracle Location-Independent Access to Resources](https://docs.oracle.com/javase/8/docs/technotes/guides/lang/resources.html)
 
-### JDK8/Hotspot is required to compile
-This DataSketches component is pure Java and you must compile using JDK 8 with Hotspot.
+### JDK versions required to compile
+This DataSketches component is pure Java and requires the following JDKs to compile:
+- JDK8/Hotspot
+- JDK9/Hotspot
+- JDK11/Hotspot
 
 ### Recommended Build Tool
 This DataSketches component is structured as a Maven project and Maven is the recommended Build Tool.
 
-There are two types of tests: normal unit tests and tests run by the strict profile.  
+There are two types of tests: normal unit tests and tests run by the strict profile.
 
 To run normal unit tests:
 
@@ -56,6 +92,12 @@ To run normal unit tests:
 To run the strict profile tests:
 
     $ mvn clean test -P strict
+
+To run javadoc on this multi-module project, use:
+
+    $ mvn clean package javadoc:javadoc -DskipTests=true
+
+* There are sometimes problems resolving module deps, e.g. see https://issues.apache.org/jira/browse/MJAVADOC-437
 
 To install jars built from the downloaded source:
 
@@ -69,12 +111,34 @@ This will create the following Jars:
 * datasketches-memory-X.Y.Z-test-sources.jar The test source files
 * datasketches-memory-X.Y.Z-javadoc.jar  The compressed Javadocs.
 
+### Toolchains
+
+This project makes use of Maven toolchains to ensure that the correct Java compiler version is used when compiling source files.
+
+The reference toolchains.xml can be found in .github/workflows/.toolchains.xml, and can be copied to your local maven home
+directory e.g. `~/.m2/toolchains.xml`.
+
+Alternatively, the maven commands above can be supplemented with: `--toolchains .github/workflows/.toolchains.xml`
+
+For example, to run normal unit tests:
+
+    $ mvn clean test --toolchains .github/workflows/.toolchains.xml
+
 ### Dependencies
 
-#### Run-time
-There is one run-time dependency: 
-
-* org.slf4j:slf4j-api
+There are no run-time dependencies.
 
 #### Testing
 See the pom.xml file for test dependencies.
+
+---
+
+## Further documentation for contributors
+
+For more information on the project configuration, the following topics are discussed in more detail:
+
+* [Maven configuration](docs/maven.md)
+* [Multi-release jar](docs/multi-release-jar.md)
+* [Java Platform Module System](docs/module-system.md)
+
+In order to build and contribute to this project, please read the [development setup documentation](docs/development.md).

@@ -3,18 +3,48 @@
     <toolchain>
         <type>jdk</type>
         <provides>
-            <version>8</version>
-            <vendor>adoptopenjdk</vendor>
+            <version>1.8</version>
+            <vendor>openjdk</vendor>
         </provides>
         <configuration>
-            <jdkHome>${JAVA_HOME}</jdkHome>
+            <jdkHome>${env.JAVA8_HOME}</jdkHome>
+        </configuration>
+    </toolchain>
+    <toolchain>
+        <type>jdk</type>
+        <provides>
+            <version>8</version>
+            <vendor>openjdk</vendor>
+        </provides>
+        <configuration>
+            <jdkHome>${env.JAVA8_HOME}</jdkHome>
+        </configuration>
+    </toolchain>
+    <toolchain>
+        <type>jdk</type>
+        <provides>
+            <version>9</version>
+            <vendor>openjdk</vendor>
+        </provides>
+        <configuration>
+            <jdkHome>${env.JAVA9_HOME}</jdkHome>
+        </configuration>
+    </toolchain>
+    <toolchain>
+        <type>jdk</type>
+        <provides>
+            <version>10</version>
+            <vendor>openjdk</vendor>
+        </provides>
+        <configuration>
+            <jdkHome>${env.JAVA10_HOME}</jdkHome>
         </configuration>
     </toolchain>
     <toolchain>
         <type>jdk</type>
         <provides>
             <version>11</version>
-            <vendor>adoptopenjdk</vendor>
+            <vendor>openjdk</vendor>
         </provides>
         <configuration>
             <jdkHome>${env.JAVA11_HOME}</jdkHome>
@@ -23,21 +53,21 @@
     <toolchain>
         <type>jdk</type>
         <provides>
-            <version>15</version>
-            <vendor>adoptopenjdk</vendor>
+            <version>12</version>
+            <vendor>openjdk</vendor>
         </provides>
         <configuration>
-            <jdkHome>${env.JAVA15_HOME}</jdkHome>
+            <jdkHome>${env.JAVA12_HOME}</jdkHome>
         </configuration>
     </toolchain>
     <toolchain>
         <type>jdk</type>
         <provides>
-            <version>16</version>
-            <vendor>adoptopenjdk</vendor>
+            <version>13</version>
+            <vendor>openjdk</vendor>
         </provides>
         <configuration>
-            <jdkHome>${env.JAVA16_HOME}</jdkHome>
+            <jdkHome>${env.JAVA13_HOME}</jdkHome>
         </configuration>
     </toolchain>
 </toolchains>

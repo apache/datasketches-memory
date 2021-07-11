@@ -74,6 +74,8 @@ module datasketches.memory.multirelease.test {
 ## Build Instructions
 __NOTE:__ This component accesses resource files for testing. As a result, the directory elements of the full absolute path of the target installation directory must qualify as Java identifiers. In other words, the directory elements must not have any space characters (or non-Java identifier characters) in any of the path elements. This is required by the Oracle Java Specification in order to ensure location-independent access to resources: [See Oracle Location-Independent Access to Resources](https://docs.oracle.com/javase/8/docs/technotes/guides/lang/resources.html)
 
+__IMPORTANT:__ This project is structured as a maven multi-module project.  Building this project might affect plugins that require early dependency resolution, such as the javadoc and eclipse plugins.  The build instructions below have been modified to use the `process-classes` phase (instead of `compile`) for these use cases.  For more information, see [this Maven Reactor issue](https://issues.apache.org/jira/browse/MNG-3283).
+
 ### JDK versions required to compile
 This DataSketches component is pure Java and requires the following JDKs to compile:
 - JDK8/Hotspot
@@ -95,9 +97,11 @@ To run the strict profile tests:
 
 To run javadoc on this multi-module project, use:
 
-    $ mvn clean package javadoc:javadoc -DskipTests=true
+    $ mvn clean process-classes javadoc:javadoc -DskipTests=true
 
-* There are sometimes problems resolving module deps, e.g. see https://issues.apache.org/jira/browse/MJAVADOC-437
+To run the eclipse plugin on this multi-module project, use:
+
+    $ mvn clean process-classes eclipse:eclipse -DskipTests=true
 
 To install jars built from the downloaded source:
 
@@ -115,14 +119,14 @@ This will create the following Jars:
 
 This project makes use of Maven toolchains to ensure that the correct Java compiler version is used when compiling source files.
 
-The reference toolchains.xml can be found in .github/workflows/.toolchains.xml, and can be copied to your local maven home
+The reference toolchains.xml can be found in `tools/toolchains.xml`, and can be copied to your local maven home
 directory e.g. `~/.m2/toolchains.xml`.
 
-Alternatively, the maven commands above can be supplemented with: `--toolchains .github/workflows/.toolchains.xml`
+Alternatively, the maven commands above can be supplemented with: `--toolchains tools/toolchains.xml`
 
 For example, to run normal unit tests:
 
-    $ mvn clean test --toolchains .github/workflows/.toolchains.xml
+    $ mvn clean test --toolchains tools/toolchains.xml
 
 ### Dependencies
 

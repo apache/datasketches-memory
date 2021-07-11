@@ -38,6 +38,7 @@
 
     <artifactId>datasketches-memory-java9</artifactId>
     <name>${project.artifactId}</name>
+    <packaging>jar</packaging>
 
     <properties>
         <java.version>9</java.version>

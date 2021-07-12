@@ -175,7 +175,6 @@
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <!--suppress MavenModelInspection -->
-        <version>${maven-assembly-plugin.version}</version>
         <configuration>
           <archive>
             <manifest>

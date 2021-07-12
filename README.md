@@ -118,15 +118,7 @@ This will create the following Jars:
 ### Toolchains
 
 This project makes use of Maven toolchains to ensure that the correct Java compiler version is used when compiling source files.
-
-The reference toolchains.xml can be found in `tools/toolchains.xml`, and can be copied to your local maven home
-directory e.g. `~/.m2/toolchains.xml`.
-
-Alternatively, the maven commands above can be supplemented with: `--toolchains tools/toolchains.xml`
-
-For example, to run normal unit tests:
-
-    $ mvn clean test --toolchains tools/toolchains.xml
+Ensure that your local environment has been configured according to the [toolchain documentation](docs/maven-toolchains.md).
 
 ### Dependencies
 
@@ -142,7 +134,11 @@ See the pom.xml file for test dependencies.
 For more information on the project configuration, the following topics are discussed in more detail:
 
 * [Maven configuration](docs/maven.md)
+* [Maven toolchain configuration](docs/maven-toolchains.md)
 * [Multi-release jar](docs/multi-release-jar.md)
 * [Java Platform Module System](docs/module-system.md)
 
-In order to build and contribute to this project, please read the [development setup documentation](docs/development.md).
+In order to build and contribute to this project, please read the relevant IDE documentation:
+
+- [Eclipse IDE](docs/eclipse.md)
+- [IntelliJ IDE](docs/intellij.md)

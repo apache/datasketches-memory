@@ -33,7 +33,7 @@ public class MemoryCleanerTest {
     @Test
     public void cleanerDeallocates() {
        SimpleDeallocator deallocator = new SimpleDeallocator();
-       org.apache.datasketches.memory.internal.MemoryCleaner cleaner = new org.apache.datasketches.memory.internal.MemoryCleaner(this, deallocator);
+       MemoryCleaner cleaner = new MemoryCleaner(this, deallocator);
        cleaner.clean();
        assertTrue(deallocator.getHasRun());
     }
@@ -41,7 +41,7 @@ public class MemoryCleanerTest {
     @Test
     public void noDeallocation() {
         SimpleDeallocator deallocator = new SimpleDeallocator();
-        org.apache.datasketches.memory.internal.MemoryCleaner cleaner = new MemoryCleaner(this, deallocator);
+        new MemoryCleaner(this, deallocator);
         assertFalse(deallocator.getHasRun());
     }
 

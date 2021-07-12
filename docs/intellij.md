@@ -1,4 +1,4 @@
-# Development environment setup
+# IntelliJ IDE setup
 
 The use of Maven submodules to build a Multi Release JAR was motivated by its compatibility with popular IDEs.
 
@@ -35,8 +35,6 @@ compiler.  These are usually synchronised with the `pom.xml` configuration:
 
 ---
 
-## IntelliJ configuration
-
 Note that the following configuration was verified using IntelliJ IDEA 2021.1.2 (Community Edition).
 
 #### Java compiler versions
@@ -50,21 +48,3 @@ Ensure that the correct SDK is used for each module using the IntelliJ project s
 Ensure that the required JPMS arguments are set for the compiler (Java 9 only)
 
 ![IntelliJ java compiler arguments](img/intellij-java-compiler-arguments.png "Intellij project compiler arguments")
-
----
-
-## Eclipse configuration
-
-Note that the following configuration was verified using Eclipse Version: 2020-12 (4.18.0)
-
-#### Java compiler versions
-
-Ensure that the correct SDK is used for each module using the Eclipse build path dialog:
-
-![Eclipse project structure dialog](img/eclipse-project-structure.png "Eclipse project structure dialogue")
-
-#### Compiler arguments for JPMS
-
-Ensure that the required JPMS arguments are set for the compiler (Java 9 only)
-
-![Eclipse java compiler arguments](img/eclipse-java-compiler-arguments.png "Eclipse project compiler arguments")

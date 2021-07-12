@@ -1,7 +1,10 @@
+# ignore .gitignore in sub module projects
+datasketches-memory*/.gitignore
+
 # Eclipse project files 
 .classpath
 .project
-.settings/
+**/.settings/**
 .checkstyle
 
 # IntelliJ project files
@@ -11,14 +14,14 @@
 *.iws
 
 # Additional tools
-.clover/
+.clover
 
 #OSX files
 .DS_Store
 
 # Compiler output, class files
 *.class
-bin/
+bin
 
 # Log file
 *.log
@@ -45,10 +48,10 @@ test-output/
 local/
 reports/
 .pmd
-tmp/
+tmp
 
 # Build artifacts
-target/
+**/target/**
 out/
 build/
 jarsIn/

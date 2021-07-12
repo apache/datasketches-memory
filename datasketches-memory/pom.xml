@@ -141,12 +141,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.datasketches</groupId>
-      <artifactId>datasketches-memory-java9-tests</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <!-- Used for UTF8 testing -->
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java</artifactId>

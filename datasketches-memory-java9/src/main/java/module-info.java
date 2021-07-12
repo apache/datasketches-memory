@@ -23,5 +23,4 @@ module org.apache.datasketches.memory {
     requires jdk.unsupported;
 
     exports org.apache.datasketches.memory;
-    exports org.apache.datasketches.memory.internal to org.apache.datasketches.memory.tests;
 }

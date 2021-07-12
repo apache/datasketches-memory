@@ -14,7 +14,6 @@ This project has been divided into the following submodules:
 * datasketches-memory-java8 (base version of the JVM that is currently supported)
 * datasketches-memory-java8-tests
 * datasketches-memory-java9 (Java9 equivalent of some platform specific classes in datasketches-memory-java8)
-* datasketches-memory-java9-tests
 * datasketches-memory-java11 (Java11 equivalent of some platform specific classes in datasketches-memory-java8)
 * datasketches-memory-java11-tests
 * datasketches-memory (JAR assembly, does not contain source files)

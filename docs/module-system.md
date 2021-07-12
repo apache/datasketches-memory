@@ -87,19 +87,6 @@ The following runtime arguments should be provided when using the library:
     --add-opens java.base/jdk.internal.ref=org.apache.datasketches.memory
 ```
 
-In order to run unit tests, the Maven surefire plugin also requires similar runtime arguments in the
-`datasketches-memory-java9-tests Maven submodule pom.xml:
-
-```xml
-    <configuration>
-        <argLine>
-            --add-opens java.base/jdk.internal.ref=org.apache.datasketches.memory
-            --add-opens java.base/jdk.internal.misc=org.apache.datasketches.memory
-            --add-exports org.apache.datasketches.memory.tests/org.apache.datasketches.memory.test=org.testng
-        </argLine>
-    </configuration>
-```
-
 ### JPMS and Java 8
 
 Java 8 does not support module declarations and the JPMS module system.

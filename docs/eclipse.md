@@ -16,7 +16,6 @@ should be set as follows:
 | datasketches-memory-java8			|  8  |
 | datasketches-memory-java8-tests	|  8  |
 | datasketches-memory-java9		    |  9  |
-| datasketches-memory-java9-tests	|  9  |
 | datasketches-memory-java11		|  11 |
 
 #### Compiler arguments for JPMS

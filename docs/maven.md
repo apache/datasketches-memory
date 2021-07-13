@@ -6,7 +6,7 @@ by each submodule, thus reducing duplication.
 
 `datasketches-memory` makes use of some features of the Java platform, namely `Unsafe`, which have evolved in
 Java versions 9 and above.   Therefore, a multi-module project allows us to add support for later versions of
-Java by using indepent Maven modules to target platform-specific APIs.  For example, to deallocate references
+Java by using independent Maven modules to target platform-specific APIs.  For example, to deallocate references
 a `sun.misc.Cleaner` may be used in Java8, but the `jdk.internal.ref.Cleaner` is used in Java 9.
 
 This project has been divided into the following submodules:

@@ -38,7 +38,6 @@ import org.apache.datasketches.memory.MemoryRequestServer;
  *
  * @author Lee Rhodes
  */
-@SuppressWarnings({"restriction"})
 public abstract class BaseStateImpl implements BaseState {
 
   //Monitoring

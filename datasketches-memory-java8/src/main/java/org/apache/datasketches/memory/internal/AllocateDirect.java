@@ -29,9 +29,8 @@ import java.util.logging.Logger;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-@SuppressWarnings({"restriction","synthetic-access"})
 final class AllocateDirect {
-  private static final Logger LOG = Logger.getLogger(AllocateDirect.class.getCanonicalName());
+  static final Logger LOG = Logger.getLogger(AllocateDirect.class.getCanonicalName());
 
   private final Deallocator deallocator;
   private final long nativeBaseOffset;
@@ -91,14 +90,14 @@ final class AllocateDirect {
     return deallocator.getValid();
   }
 
-  private static final class Deallocator implements Runnable {
+  static final class Deallocator implements Runnable {
     //This is the only place the actual native address is kept for use by unsafe.freeMemory();
     private final long nativeAddress;
     private final long allocationSize;
     private final long capacity;
     private final StepBoolean valid = new StepBoolean(true); //only place for this
 
-    private Deallocator(final long nativeAddress, final long allocationSize, final long capacity) {
+    Deallocator(final long nativeAddress, final long allocationSize, final long capacity) {
       BaseStateImpl.currentDirectMemoryAllocations_.incrementAndGet();
       BaseStateImpl.currentDirectMemoryAllocated_.addAndGet(capacity);
       this.nativeAddress = nativeAddress;

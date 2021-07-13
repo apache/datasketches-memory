@@ -52,15 +52,14 @@ import sun.nio.ch.FileChannelImpl;
  * @author Lee Rhodes
  * @author Praveenkumar Venkatesan
  */
-@SuppressWarnings({"restriction","synthetic-access"})
 class AllocateDirectMap implements Map {
-  private static final Logger LOG = Logger.getLogger(AllocateDirectMap.class.getCanonicalName());
+  static final Logger LOG = Logger.getLogger(AllocateDirectMap.class.getCanonicalName());
 
   private static final int MAP_RO = 0;
   private static final int MAP_RW = 1;
 
   private static final Method FILE_CHANNEL_IMPL_MAP0_METHOD;
-  private static final Method FILE_CHANNEL_IMPL_UNMAP0_METHOD;
+  static final Method FILE_CHANNEL_IMPL_UNMAP0_METHOD;
 
   private static final Method MAPPED_BYTE_BUFFER_LOAD0_METHOD;
   private static final Method MAPPED_BYTE_BUFFER_ISLOADED0_METHOD;

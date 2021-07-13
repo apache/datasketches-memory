@@ -48,7 +48,6 @@ import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-@SuppressWarnings({"restriction"})
 abstract class NonNativeWritableMemoryImpl extends BaseWritableMemoryImpl {
 
   //Pass-through ctor

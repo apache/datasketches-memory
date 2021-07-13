@@ -31,7 +31,6 @@ import java.nio.ByteOrder;
  * @author Praveenkumar Venkatesan
  * @author Roman Leventov
  */
-@SuppressWarnings({"restriction"})
 final class AccessByteBuffer {
 
   static final ByteBuffer ZERO_READ_ONLY_DIRECT_BYTE_BUFFER =

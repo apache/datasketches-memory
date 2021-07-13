@@ -53,7 +53,6 @@ import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
  *
  * @author Lee Rhodes
  */
-@SuppressWarnings({"restriction"})
 public class XxHash64 {
   // Unsigned, 64-bit primes
   private static final long P1 = -7046029288634856825L;

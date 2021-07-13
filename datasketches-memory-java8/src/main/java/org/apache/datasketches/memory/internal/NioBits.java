@@ -31,7 +31,6 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author Lee Rhodes
  */
-@SuppressWarnings({"restriction"})
 final class NioBits {
   private static final Class<?> NIO_BITS_CLASS;
   private static final Method NIO_BITS_RESERVE_MEMORY_METHOD;

@@ -92,6 +92,9 @@
   <properties>
     <!-- UNIQUE FOR THIS JAVA COMPONENT -->
     <maven.source.skip>true</maven.source.skip>
+    <java.version>1.8</java.version>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
 
     <protobuf-java.version>4.0.0-rc-2</protobuf-java.version>
     <!-- Used for UTF8 testing -->

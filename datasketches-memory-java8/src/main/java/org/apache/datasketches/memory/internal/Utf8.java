@@ -47,7 +47,6 @@ import org.apache.datasketches.memory.Utf8CodingException;
  * @author Lee Rhodes
  * @author Roman Leventov
  */
-@SuppressWarnings({"restriction","synthetic-access"})
 final class Utf8 {
 
   private Utf8() { }
@@ -422,7 +421,7 @@ final class Utf8 {
      * @param b the byte being tested
      * @return true if this is a single-byte UTF-8 encoding, i.e., b is &ge; 0.
      */
-    private static boolean isOneByte(final byte b) {
+    static boolean isOneByte(final byte b) {
       return b >= 0;
     }
 
@@ -443,7 +442,7 @@ final class Utf8 {
      * @param b the byte being tested
      * @return true if this is the start of a two-byte UTF-8 encoding.
      */
-    private static boolean isTwoBytes(final byte b) {
+    static boolean isTwoBytes(final byte b) {
       return b < (byte) 0xE0;
     }
 
@@ -465,7 +464,7 @@ final class Utf8 {
      * @param b the byte being tested
      * @return true if this is the start of a three-byte UTF-8 encoding, i.e., b &ge; 0XF0.
      */
-    private static boolean isThreeBytes(final byte b) {
+    static boolean isThreeBytes(final byte b) {
       return b < (byte) 0xF0;
     }
 
@@ -484,7 +483,7 @@ final class Utf8 {
      * </ul>
      */
 
-    private static void handleTwoBytes(
+    static void handleTwoBytes(
         final byte byte1, final byte byte2,
         final Appendable dst)
         throws IOException, Utf8CodingException {
@@ -498,7 +497,7 @@ final class Utf8 {
       dst.append((char) (((byte1 & 0x1F) << 6) | trailingByteValue(byte2)));
     }
 
-    private static void handleTwoBytesCharBuffer(
+    static void handleTwoBytesCharBuffer(
         final byte byte1, final byte byte2,
         final CharBuffer cb, final char[] ca, final int cp)
         throws Utf8CodingException {
@@ -513,7 +512,7 @@ final class Utf8 {
       ca[cp] = (char) (((byte1 & 0x1F) << 6) | trailingByteValue(byte2));
     }
 
-    private static void handleThreeBytes(
+    static void handleThreeBytes(
         final byte byte1, final byte byte2, final byte byte3,
         final Appendable dst)
         throws IOException, Utf8CodingException {
@@ -530,7 +529,7 @@ final class Utf8 {
           (((byte1 & 0x0F) << 12) | (trailingByteValue(byte2) << 6) | trailingByteValue(byte3)));
     }
 
-    private static void handleThreeBytesCharBuffer(
+    static void handleThreeBytesCharBuffer(
         final byte byte1, final byte byte2, final byte byte3,
         final CharBuffer cb, final char[] ca, final int cp)
         throws Utf8CodingException {
@@ -548,7 +547,7 @@ final class Utf8 {
               (((byte1 & 0x0F) << 12) | (trailingByteValue(byte2) << 6) | trailingByteValue(byte3));
     }
 
-    private static void handleFourBytes(
+    static void handleFourBytes(
         final byte byte1, final byte byte2, final byte byte3, final byte byte4,
         final Appendable dst)
         throws IOException, Utf8CodingException {
@@ -574,7 +573,7 @@ final class Utf8 {
       dst.append(DecodeUtil.lowSurrogate(codepoint));
     }
 
-    private static void handleFourBytesCharBuffer(
+    static void handleFourBytesCharBuffer(
         final byte byte1, final byte byte2, final byte byte3, final byte byte4,
         final CharBuffer cb, final char[] ca, final int cp)
         throws Utf8CodingException {

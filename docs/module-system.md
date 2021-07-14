@@ -69,8 +69,6 @@ to the Maven compiler plugin in the module's pom.xml file:
     <compilerArgs>
         <arg>--add-exports</arg>
         <arg>java.base/jdk.internal.ref=org.apache.datasketches.memory</arg>
-        <arg>--add-exports</arg>
-        <arg>java.base/jdk.internal.misc=org.apache.datasketches.memory</arg>
     </compilerArgs>
 ```
 

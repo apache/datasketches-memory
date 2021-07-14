@@ -17,6 +17,7 @@ should be set as follows:
 | datasketches-memory-java8-tests	|  8  |
 | datasketches-memory-java9		    |  9  |
 | datasketches-memory-java11		|  11 |
+| datasketches-memory-resources     |  8  |
 
 #### Compiler arguments for JPMS
 
@@ -27,8 +28,6 @@ compiler.  These are usually synchronised with the `pom.xml` configuration:
     <compilerArgs>
         <arg>--add-exports</arg>
         <arg>java.base/jdk.internal.ref=org.apache.datasketches.memory</arg>
-        <arg>--add-exports</arg>
-        <arg>java.base/jdk.internal.misc=org.apache.datasketches.memory</arg>
     </compilerArgs>
 ```
 
@@ -42,8 +41,10 @@ Ensure that the correct SDK is used for each module using the IntelliJ project s
 
 ![IntelliJ project structure dialog](img/intellij-project-structure.png "Intellij project structure dialogue")
 
+---
+
 #### Compiler arguments for JPMS
 
-Ensure that the required JPMS arguments are set for the compiler (Java 9 only)
+Ensure that the required JPMS arguments are set for the compiler (Java 9 only).  These should be detected and set automatically based on the `pom.xml` configuration.
 
 ![IntelliJ java compiler arguments](img/intellij-java-compiler-arguments.png "Intellij project compiler arguments")

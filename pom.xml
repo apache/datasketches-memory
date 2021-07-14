@@ -505,7 +505,7 @@ under the License.
     <module>datasketches-memory-java9</module>
     <module>datasketches-memory-java11</module>
     <module>datasketches-memory</module>
-    <module>datasketches-memory-tests</module>
+    <module>datasketches-memory-resources</module>
   </modules>
 
 </project>

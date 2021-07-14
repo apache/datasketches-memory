@@ -55,7 +55,7 @@
     </dependency>
   </dependencies>
 
-  <artifactId>datasketches-memory-tests</artifactId>
+  <artifactId>datasketches-memory-resources</artifactId>
   <name>${project.artifactId}</name>
 
   <!-- The tests in the following profiles run against the assembled MR-JAR.  Hence, they

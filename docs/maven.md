@@ -7,7 +7,7 @@ by each submodule, thus reducing duplication.
 `datasketches-memory` makes use of some features of the Java platform, namely `Unsafe`, which have evolved in
 Java versions 9 and above.   Therefore, a multi-module project allows us to add support for later versions of
 Java by using independent Maven modules to target platform-specific APIs.  For example, to deallocate references
-a `sun.misc.Cleaner` may be used in Java8, but the `jdk.internal.ref.Cleaner` is used in Java 9.
+a `sun.misc.Cleaner` will be used in Java8, but the `jdk.internal.ref.Cleaner` is used in Java 9.
 
 This project has been divided into the following submodules:
 
@@ -17,7 +17,7 @@ This project has been divided into the following submodules:
 * datasketches-memory-java11 (Java11 equivalent of some platform specific classes in datasketches-memory-java8)
 * datasketches-memory-java11-tests
 * datasketches-memory (JAR assembly, does not contain source files)
-* datasketches-memory-tests (Runs test suite against assembled JAR)
+* datasketches-memory-resources (Runs test suite against assembled JAR)
 
 ### Artifact assembly
 

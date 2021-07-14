@@ -58,8 +58,6 @@
                         <compilerArgs>
                             <arg>--add-exports</arg>
                             <arg>java.base/jdk.internal.ref=org.apache.datasketches.memory</arg>
-                            <arg>--add-exports</arg>
-                            <arg>java.base/jdk.internal.misc=org.apache.datasketches.memory</arg>
                         </compilerArgs>
                     </configuration>
                 </plugin>

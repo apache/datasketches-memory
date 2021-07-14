@@ -4,7 +4,7 @@ datasketches-memory*/.gitignore
 # Eclipse project files 
 .classpath
 .project
-**/.settings/**
+.settings/
 .checkstyle
 
 # IntelliJ project files
@@ -51,7 +51,7 @@ reports/
 tmp
 
 # Build artifacts
-**/target/**
+target/
 out/
 build/
 jarsIn/

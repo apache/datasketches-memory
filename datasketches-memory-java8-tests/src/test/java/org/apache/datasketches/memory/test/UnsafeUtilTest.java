@@ -113,6 +113,7 @@ public class UnsafeUtilTest {
     Ints.checkedCast(1L << 32);
   }
 
+  @SuppressWarnings("restriction")
   @Test
   public void checkArrayBaseOffset()
   {

@@ -29,6 +29,7 @@ import java.util.logging.Logger;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
+@SuppressWarnings("restriction")
 final class AllocateDirect {
   static final Logger LOG = Logger.getLogger(AllocateDirect.class.getCanonicalName());
 

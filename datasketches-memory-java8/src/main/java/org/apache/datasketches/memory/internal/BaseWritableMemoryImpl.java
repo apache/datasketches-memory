@@ -59,6 +59,7 @@ import org.apache.datasketches.memory.WritableMemory;
  * Common base of native-ordered and non-native-ordered {@link WritableMemoryImpl} implementations.
  * Contains methods which are agnostic to the byte order.
  */
+@SuppressWarnings("restriction")
 abstract class BaseWritableMemoryImpl extends WritableMemoryImpl {
 
   //1KB of empty bytes for speedy clear()

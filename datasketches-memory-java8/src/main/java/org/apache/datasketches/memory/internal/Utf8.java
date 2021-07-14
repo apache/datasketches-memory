@@ -47,6 +47,7 @@ import org.apache.datasketches.memory.Utf8CodingException;
  * @author Lee Rhodes
  * @author Roman Leventov
  */
+@SuppressWarnings("restriction")
 final class Utf8 {
 
   private Utf8() { }

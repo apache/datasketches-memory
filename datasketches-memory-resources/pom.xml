@@ -114,6 +114,8 @@
                       <dependency>org.apache.datasketches:datasketches-memory-java8-tests</dependency>
                     </dependenciesToScan>
                     <argLine />
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <outputDirectory>${basedir}/target/test-output</outputDirectory>
                   </configuration>
                 </execution>
               </executions>
@@ -176,6 +178,8 @@
                   <dependenciesToScan>
                     <dependency>org.apache.datasketches:datasketches-memory-java8-tests</dependency>
                   </dependenciesToScan>
+                  <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                  <outputDirectory>${basedir}/target/test-output</outputDirectory>
                 </configuration>
               </execution>
             </executions>
@@ -237,6 +241,8 @@
                   <dependenciesToScan>
                     <dependency>org.apache.datasketches:datasketches-memory-java8-tests</dependency>
                   </dependenciesToScan>
+                  <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                  <outputDirectory>${basedir}/target/test-output</outputDirectory>
                 </configuration>
               </execution>
             </executions>
@@ -298,6 +304,8 @@
                   <dependenciesToScan>
                     <dependency>org.apache.datasketches:datasketches-memory-java8-tests</dependency>
                   </dependenciesToScan>
+                  <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                  <outputDirectory>${basedir}/target/test-output</outputDirectory>
                 </configuration>
               </execution>
             </executions>
@@ -359,6 +367,8 @@
                   <dependenciesToScan>
                     <dependency>org.apache.datasketches:datasketches-memory-java8-tests</dependency>
                   </dependenciesToScan>
+                  <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                  <outputDirectory>${basedir}/target/test-output</outputDirectory>
                 </configuration>
               </execution>
             </executions>
@@ -421,6 +431,8 @@
                   <dependenciesToScan>
                     <dependency>org.apache.datasketches:datasketches-memory-java8-tests</dependency>
                   </dependenciesToScan>
+                  <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                  <outputDirectory>${basedir}/target/test-output</outputDirectory>
                 </configuration>
               </execution>
             </executions>

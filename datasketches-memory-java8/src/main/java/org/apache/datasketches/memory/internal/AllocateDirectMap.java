@@ -52,6 +52,7 @@ import sun.nio.ch.FileChannelImpl;
  * @author Lee Rhodes
  * @author Praveenkumar Venkatesan
  */
+@SuppressWarnings("restriction")
 class AllocateDirectMap implements Map {
   static final Logger LOG = Logger.getLogger(AllocateDirectMap.class.getCanonicalName());
 

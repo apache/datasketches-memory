@@ -32,6 +32,7 @@ import static org.apache.datasketches.memory.internal.Util.UNSAFE_COPY_THRESHOLD
 /**
  * @author Lee Rhodes
  */
+@SuppressWarnings("restriction")
 final class CompareAndCopy {
 
   private CompareAndCopy() { }

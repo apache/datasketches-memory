@@ -32,7 +32,8 @@ public class VirtualMachineMemoryTest {
 
     @Test
     public void inertPageAlignment() {
-        System.out.println("VM page alignment:" + VirtualMachineMemory.getIsPageAligned());
-        assert(true);
+      boolean result = VirtualMachineMemory.getIsPageAligned();
+      //System.out.println("VM page alignment:" + result);
+      assert(true); //no exception was thrown
     }
 }

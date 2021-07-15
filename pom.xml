@@ -359,7 +359,6 @@ under the License.
             <trimStackTrace>false</trimStackTrace>
             <useManifestOnlyJar>false</useManifestOnlyJar>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
-            <outputDirectory>${basedir}/target/test-output</outputDirectory>
             <jdkToolchain>
               <version>${jdk-toolchain.version}</version>
             </jdkToolchain>

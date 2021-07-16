@@ -17,22 +17,23 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.test.internal;
+package org.apache.datasketches.memory.test;
 
 import org.apache.datasketches.memory.internal.VirtualMachineMemory;
 import org.testng.annotations.Test;
 
-@SuppressWarnings("javadoc")
+@SuppressWarnings({"javadoc","unused"})
 public class VirtualMachineMemoryTest {
 
     @Test
     public void maxDirectBufferMemory() {
-       assert(org.apache.datasketches.memory.internal.VirtualMachineMemory.getMaxDBBMemory() >= 0);
+       assert(VirtualMachineMemory.getMaxDBBMemory() >= 0);
     }
 
     @Test
     public void inertPageAlignment() {
-        System.out.println("VM page alignment:" + VirtualMachineMemory.getIsPageAligned());
-        assert(true);
+      boolean result = VirtualMachineMemory.getIsPageAligned();
+      //System.out.println("VM page alignment:" + result);
+      assert(true); //no exception was thrown
     }
 }

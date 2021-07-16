@@ -111,6 +111,7 @@ jobs:
           mvn package
           -Dmaven.javadoc.skip=true
           -Dgpg.skip=true
+          -Denvironment=ci
           --toolchains .github/workflows/.toolchains.xml
 
       - name: Test & Report

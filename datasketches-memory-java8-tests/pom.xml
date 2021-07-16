@@ -39,27 +39,25 @@
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
-      <version>${testng.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <!-- Used for UTF8 testing -->
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java</artifactId>
-      <version>${protobuf-java.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <!-- Used for xxHash testing -->
       <groupId>net.openhft</groupId>
       <artifactId>zero-allocation-hashing</artifactId>
-      <version>${zero-allocation-hashing.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
 
   <artifactId>datasketches-memory-java8-tests</artifactId>
   <name>${project.artifactId}</name>
+  <packaging>jar</packaging>
 
   <properties>
     <java.version>1.8</java.version>

@@ -92,6 +92,9 @@
   <properties>
     <!-- UNIQUE FOR THIS JAVA COMPONENT -->
     <maven.source.skip>true</maven.source.skip>
+    <java.version>1.8</java.version>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
 
     <protobuf-java.version>4.0.0-rc-2</protobuf-java.version>
     <!-- Used for UTF8 testing -->
@@ -141,12 +144,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.datasketches</groupId>
-      <artifactId>datasketches-memory-java9-tests</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <!-- Used for UTF8 testing -->
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java</artifactId>
@@ -175,7 +172,6 @@
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <!--suppress MavenModelInspection -->
-        <version>${maven-assembly-plugin.version}</version>
         <configuration>
           <archive>
             <manifest>

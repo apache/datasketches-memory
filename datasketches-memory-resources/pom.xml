@@ -37,35 +37,25 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.datasketches</groupId>
-      <artifactId>datasketches-memory-java8-tests</artifactId>
-      <version>${project.version}</version>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
-      <version>${testng.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <!-- Used for UTF8 testing -->
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java</artifactId>
-      <version>${protobuf-java.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <!-- Used for xxHash testing -->
       <groupId>net.openhft</groupId>
       <artifactId>zero-allocation-hashing</artifactId>
-      <version>${zero-allocation-hashing.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
 
-  <artifactId>datasketches-memory-tests</artifactId>
+  <artifactId>datasketches-memory-resources</artifactId>
   <name>${project.artifactId}</name>
 
   <!-- The tests in the following profiles run against the assembled MR-JAR.  Hence, they
@@ -78,6 +68,10 @@
       <id>java8</id>
       <activation>
         <jdk>[1.8,1.9),8</jdk>
+        <property>
+          <name>environment</name>
+          <value>ci</value>
+        </property>
       </activation>
 
       <properties>
@@ -86,6 +80,16 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
       </properties>
+
+      <dependencies>
+        <dependency>
+          <groupId>org.apache.datasketches</groupId>
+          <artifactId>datasketches-memory-java8-tests</artifactId>
+          <version>${project.version}</version>
+          <classifier>tests</classifier>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
 
       <build>
         <pluginManagement>
@@ -124,6 +128,10 @@
       <id>java9</id>
       <activation>
         <jdk>9</jdk>
+        <property>
+          <name>environment</name>
+          <value>ci</value>
+        </property>
       </activation>
 
       <properties>
@@ -132,6 +140,16 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
       </properties>
+
+      <dependencies>
+        <dependency>
+          <groupId>org.apache.datasketches</groupId>
+          <artifactId>datasketches-memory-java8-tests</artifactId>
+          <version>${project.version}</version>
+          <classifier>tests</classifier>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
 
       <build>
         <plugins>
@@ -171,6 +189,10 @@
       <id>java10</id>
       <activation>
         <jdk>10</jdk>
+        <property>
+          <name>environment</name>
+          <value>ci</value>
+        </property>
       </activation>
 
       <properties>
@@ -179,6 +201,16 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
       </properties>
+
+      <dependencies>
+        <dependency>
+          <groupId>org.apache.datasketches</groupId>
+          <artifactId>datasketches-memory-java8-tests</artifactId>
+          <version>${project.version}</version>
+          <classifier>tests</classifier>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
 
       <build>
         <plugins>
@@ -218,6 +250,10 @@
       <id>java11</id>
       <activation>
         <jdk>11</jdk>
+        <property>
+          <name>environment</name>
+          <value>ci</value>
+        </property>
       </activation>
 
       <properties>
@@ -226,6 +262,16 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
       </properties>
+
+      <dependencies>
+        <dependency>
+          <groupId>org.apache.datasketches</groupId>
+          <artifactId>datasketches-memory-java8-tests</artifactId>
+          <version>${project.version}</version>
+          <classifier>tests</classifier>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
 
       <build>
         <plugins>
@@ -265,6 +311,10 @@
       <id>java12</id>
       <activation>
         <jdk>12</jdk>
+        <property>
+          <name>environment</name>
+          <value>ci</value>
+        </property>
       </activation>
 
       <properties>
@@ -273,6 +323,16 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
       </properties>
+
+      <dependencies>
+        <dependency>
+          <groupId>org.apache.datasketches</groupId>
+          <artifactId>datasketches-memory-java8-tests</artifactId>
+          <version>${project.version}</version>
+          <classifier>tests</classifier>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
 
       <build>
         <plugins>
@@ -313,6 +373,10 @@
       <id>java13</id>
       <activation>
         <jdk>13</jdk>
+        <property>
+          <name>environment</name>
+          <value>ci</value>
+        </property>
       </activation>
 
       <properties>
@@ -321,6 +385,16 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
       </properties>
+
+      <dependencies>
+        <dependency>
+          <groupId>org.apache.datasketches</groupId>
+          <artifactId>datasketches-memory-java8-tests</artifactId>
+          <version>${project.version}</version>
+          <classifier>tests</classifier>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
 
       <build>
         <plugins>

@@ -38,6 +38,7 @@
 
     <artifactId>datasketches-memory-java9</artifactId>
     <name>${project.artifactId}</name>
+    <packaging>jar</packaging>
 
     <properties>
         <java.version>9</java.version>
@@ -57,8 +58,6 @@
                         <compilerArgs>
                             <arg>--add-exports</arg>
                             <arg>java.base/jdk.internal.ref=org.apache.datasketches.memory</arg>
-                            <arg>--add-exports</arg>
-                            <arg>java.base/jdk.internal.misc=org.apache.datasketches.memory</arg>
                         </compilerArgs>
                     </configuration>
                 </plugin>

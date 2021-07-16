@@ -383,7 +383,7 @@ public class MemoryTest {
     }
   }
 
-  @SuppressWarnings({ "resource", "static-access" })
+  @SuppressWarnings({ "resource"})
   @Test
   public void checkMonitorDirectStats() throws Exception {
     int bytes = 1024;
@@ -403,7 +403,7 @@ public class MemoryTest {
     assertEquals(BaseState.getCurrentDirectMemoryAllocated(), 0L);
   }
 
-  @SuppressWarnings({ "resource", "static-access" })
+  @SuppressWarnings({ "resource"})
   @Test
   public void checkMonitorDirectMapStats() throws Exception {
     File file = getResourceFile("GettysburgAddress.txt");

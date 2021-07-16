@@ -30,6 +30,7 @@
 
     <artifactId>datasketches-memory-java11</artifactId>
     <name>${project.artifactId}</name>
+    <packaging>jar</packaging>
 
     <properties>
         <java.version>11</java.version>

@@ -51,7 +51,7 @@ import org.apache.datasketches.memory.Buffer;
  * Common base of native-ordered and non-native-ordered {@link WritableBufferImpl} implementations.
  * Contains methods which are agnostic to the byte order.
  */
-@SuppressWarnings({"restriction"})
+@SuppressWarnings("restriction")
 abstract class BaseWritableBufferImpl extends WritableBufferImpl {
   final BaseWritableMemoryImpl originMemory;
 

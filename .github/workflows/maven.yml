@@ -98,6 +98,13 @@ jobs:
         run: >
           java -version
 
+      - name: Compile
+        run: >
+          mvn clean compile
+          -Dmaven.javadoc.skip=true
+          -Dgpg.skip=true
+          --toolchains .github/workflows/.toolchains.xml
+
       - name: Install Dependencies
         run: >
           mvn clean install

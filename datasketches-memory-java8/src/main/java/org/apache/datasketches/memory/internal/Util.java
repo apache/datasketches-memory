@@ -19,8 +19,6 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.UnsafeUtil.checkBounds;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -98,7 +96,7 @@ public final class Util {
    */
   public static long binarySearchLongs(final Memory mem, final long fromLongIndex,
       final long toLongIndex, final long key) {
-    checkBounds(fromLongIndex << 3, (toLongIndex - fromLongIndex) << 3, mem.getCapacity());
+    UnsafeUtil.checkBounds(fromLongIndex << 3, (toLongIndex - fromLongIndex) << 3, mem.getCapacity());
     long low = fromLongIndex;
     long high = toLongIndex - 1L;
 

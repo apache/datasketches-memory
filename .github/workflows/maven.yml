@@ -112,6 +112,7 @@ jobs:
           -Dmaven.javadoc.skip=true
           -Dgpg.skip=true
           -Denvironment=ci
+          -Dmatrix.jdk.version=${{matrix.jdk}}
           --toolchains .github/workflows/.toolchains.xml
 
       - name: Test & Report
@@ -121,4 +122,5 @@ jobs:
           -Dcoveralls-repo-token=${repo_token}
           -Dmaven.javadoc.skip=true
           -Dgpg.skip=true
+          -Dmatrix.jdk.version=${{matrix.jdk}}
           --toolchains .github/workflows/.toolchains.xml

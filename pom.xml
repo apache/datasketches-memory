@@ -421,7 +421,7 @@ under the License.
             </jdkToolchain>
           </configuration>
         </plugin>
-
+        
       </plugins>
     </pluginManagement>
     <plugins>
@@ -469,9 +469,6 @@ under the License.
   </build>
 
   <profiles>
-
-
-
     <!-- Disable source release assembly for 'apache-release' profile.
              This is performed from a script outside Maven
     -->
@@ -492,6 +489,33 @@ under the License.
         </plugins>
       </build>
     </profile>
+
+    <profile>
+      <id>only-eclipse</id>
+      <activation>
+        <property>
+          <name>m2e.version</name>
+        </property>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-remote-resources-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>process-resource-bundles</id>
+                  <phase>none</phase>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+
+  
   </profiles>
 
   <!-- This Maven project is divided into an aggregator project (the root), that manages a group of submodules that

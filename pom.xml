@@ -315,10 +315,10 @@ under the License.
             <consoleOutput>true</consoleOutput>
             <useDefaultExcludes>true</useDefaultExcludes>
             <excludes>
-              <!-- rat uses .gitignore for excludes by default -->
               <exclude>**/*.yaml</exclude>
               <exclude>**/*.yml</exclude>
-              <exclude>**/.*</exclude>
+              <exclude>**/.*/**/*</exclude>
+              <exclude>**/.clover/**/*</exclude>
               <exclude>**/test/resources/**/*.txt</exclude>
               <exclude>**/docs/*.md</exclude>
               <exclude>LICENSE</exclude>

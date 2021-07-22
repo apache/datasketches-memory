@@ -14,7 +14,7 @@ datasketches-memory*/.gitignore
 *.iws
 
 # Additional tools
-.clover
+.clover/
 
 #OSX files
 .DS_Store

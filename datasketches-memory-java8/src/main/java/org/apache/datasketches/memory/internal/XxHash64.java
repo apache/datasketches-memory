@@ -171,6 +171,25 @@ public class XxHash64 {
     return finalize(hash);
   }
 
+  /**
+   * Returns a 64-bit hash from a single long. This method has been optimized for speed when only
+   * a single hash of a long is required.
+   * @param in A long.
+   * @param seed A long valued seed.
+   * @return the hash.
+   */
+  public static long hash(final long in, final long seed) {
+    long hash = seed + P5;
+    hash += 8;
+    long k1 = in;
+    k1 *= P2;
+    k1 = Long.rotateLeft(k1, 31);
+    k1 *= P1;
+    hash ^= k1;
+    hash = (Long.rotateLeft(hash, 27) * P1) + P4;
+    return finalize(hash);
+  }
+  
   private static long finalize(long hash) {
     hash ^= hash >>> 33;
     hash *= P2;
@@ -180,6 +199,8 @@ public class XxHash64 {
     return hash;
   }
 
+  
+  
   /**
    * Hash the given arr starting at the given offset and continuing for the given length using the
    * given seed.

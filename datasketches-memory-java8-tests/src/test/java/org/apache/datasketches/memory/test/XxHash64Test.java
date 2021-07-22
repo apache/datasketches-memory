@@ -19,7 +19,7 @@
 
 package org.apache.datasketches.memory.test;
 
-import static org.apache.datasketches.memory.internal.XxHash64.*;
+import static org.apache.datasketches.memory.XxHash.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -75,7 +75,8 @@ public class XxHash64Test {
 
   /*
    * This test is adapted from
-   * <a href="https://github.com/OpenHFT/Zero-Allocation-Hashing/blob/master/src/test/java/net/openhft/hashing/XxHashCollisionTest.java">
+   * <a href="https://github.com/OpenHFT/Zero-Allocation-Hashing/blob/master/
+   * src/test/java/net/openhft/hashing/XxHashCollisionTest.java">
    * OpenHFT/Zero-Allocation-Hashing</a> to test hash compatibility with that implementation.
    * It is licensed under Apache License, version 2.0. See LICENSE.
    */
@@ -128,42 +129,45 @@ public class XxHash64Test {
   public void testArrHashes() {
     WritableMemory wmem = WritableMemory.writableWrap(barr);
     long hash0 = wmem.xxHash64(8, 8, 0);
-    long hash1 = hashBytes(barr, 8, 8, 0);
+    long hash1 = hashByteArr(barr, 8, 8, 0);
     assertEquals(hash1, hash0);
 
     char[] carr = new char[8];
     wmem.getCharArray(0, carr, 0, 8);
-    hash1 = hashChars(carr, 4, 4, 0);
+    hash1 = hashCharArr(carr, 4, 4, 0);
     assertEquals(hash1, hash0);
 
     short[] sarr = new short[8];
     wmem.getShortArray(0, sarr, 0, 8);
-    hash1 = hashShorts(sarr, 4, 4, 0);
+    hash1 = hashShortArr(sarr, 4, 4, 0);
     assertEquals(hash1, hash0);
 
     int[] iarr = new int[4];
     wmem.getIntArray(0, iarr, 0, 4);
-    hash1 = hashInts(iarr, 2, 2, 0);
+    hash1 = hashIntArr(iarr, 2, 2, 0);
     assertEquals(hash1, hash0);
 
     float[] farr = new float[4];
     wmem.getFloatArray(0, farr, 0, 4);
-    hash1 = hashFloats(farr, 2, 2, 0);
+    hash1 = hashFloatArr(farr, 2, 2, 0);
     assertEquals(hash1, hash0);
 
     long[] larr = new long[2];
     wmem.getLongArray(0, larr, 0, 2);
-    hash1 = hashLongs(larr, 1, 1, 0);
+    hash1 = hashLongArr(larr, 1, 1, 0);
+    long in = wmem.getLong(8);
+    long hash2 = hashLong(in, 00); //tests the single long hash
     assertEquals(hash1, hash0);
+    assertEquals(hash2, hash0);
 
     double[] darr = new double[2];
     wmem.getDoubleArray(0, darr, 0, 2);
-    hash1 = hashDoubles(darr, 1, 1, 0);
+    hash1 = hashDoubleArr(darr, 1, 1, 0);
     assertEquals(hash1, hash0);
 
     boolean[] blarr = new boolean[16];
     wmem.getBooleanArray(0, blarr, 0, 16); //any byte != 0 is true
-    hash1 = hashBooleans(blarr, 8, 8, 0);
+    hash1 = hashBooleanArr(blarr, 8, 8, 0);
     assertEquals(hash1, hash0);
   }
 
@@ -172,7 +176,7 @@ public class XxHash64Test {
     String s = "Now is the time for all good men to come to the aid of their country.";
     char[] arr = s.toCharArray();
     long hash0 = hashString(s, 0, s.length(), 0);
-    long hash1 = hashChars(arr, 0, arr.length, 0);
+    long hash1 = hashCharArr(arr, 0, arr.length, 0);
     assertEquals(hash1, hash0);
   }
 

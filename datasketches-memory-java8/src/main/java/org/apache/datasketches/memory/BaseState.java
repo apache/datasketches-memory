@@ -159,6 +159,15 @@ public interface BaseState {
   long xxHash64(long offsetBytes, long lengthBytes, long seed);
   
   /**
+   * Returns a 64-bit hash from a single long. This method has been optimized for speed when only
+   * a single hash of a long is required.
+   * @param in A long.
+   * @param seed A long valued seed.
+   * @return the hash.
+   */
+  long xxHash64(long in, long seed);
+  
+  /**
    * Returns true if this Memory is backed by a ByteBuffer.
    * @return true if this Memory is backed by a ByteBuffer.
    */

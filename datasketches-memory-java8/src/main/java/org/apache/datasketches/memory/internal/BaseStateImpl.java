@@ -210,6 +210,11 @@ public abstract class BaseStateImpl implements BaseState {
   }
 
   @Override
+  public final long xxHash64(final long in, final long seed) {
+    return XxHash64.hash(in, seed);
+  }
+  
+  @Override
   public final boolean hasByteBuffer() {
     assertValid();
     return getByteBuffer() != null;

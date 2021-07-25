@@ -1,4 +1,4 @@
-# Multi-release JAR
+# Multi-Release JAR
 
 The `datasketches-memory` module assembles a JAR for release that consists of multiple Java-release-specific versions
 of class files to coexist in a single archive (the MR-JAR).

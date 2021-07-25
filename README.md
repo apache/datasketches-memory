@@ -119,7 +119,7 @@ This will create the following Jars:
 ### Toolchains
 
 This project makes use of Maven toolchains to ensure that the correct Java compiler version is used when compiling source files.
-Ensure that your local environment has been configured according to the [toolchain documentation](docs/maven-toolchains.md).
+Ensure that your local environment has been configured according to the [Maven toolchain configuration](docs/maven-toolchains.md).
 
 ### Dependencies
 

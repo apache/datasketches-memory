@@ -42,7 +42,7 @@ If you are interested in making contributions to this site please see our [Commu
 
 Datasketches memory currently supports Java 8 up to and including Java 13.
 
-In order to use the library in Java 9 and above, you must provide the following runtime arguments to the JVM:
+In order to allocate off-heap memory using the library in Java 9 and above, you must provide the following runtime arguments to the JVM:
 
 ```shell
     --add-opens java.base/java.nio=org.apache.datasketches.memory \
@@ -69,6 +69,7 @@ module datasketches.memory.multirelease.test {
 }
 ```
 
+Note that the `add-opens` arguments are not required for cases where memory is allocated on the heap.
 
 ---
 
@@ -82,6 +83,8 @@ This DataSketches component is pure Java and requires the following JDKs to comp
 - JDK8/Hotspot
 - JDK9/Hotspot
 - JDK11/Hotspot
+
+Ensure that your local environment has been configured according to the [Maven toolchain configuration](docs/maven-toolchains.md).
 
 ### Recommended Build Tool
 This DataSketches component is structured as a Maven project and Maven is the recommended Build Tool.
@@ -119,7 +122,7 @@ This will create the following Jars:
 ### Toolchains
 
 This project makes use of Maven toolchains to ensure that the correct Java compiler version is used when compiling source files.
-Ensure that your local environment has been configured according to the [Maven toolchain configuration](docs/maven-toolchains.md).
+See the [Maven toolchain configuration](docs/maven-toolchains.md) for more details.
 
 ### Dependencies
 

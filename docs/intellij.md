@@ -33,9 +33,11 @@ compiler.  These are usually synchronised with the `pom.xml` configuration:
 
 ---
 
+## Running Datasketches-Memory in IntelljJ-IDEA
+
 Note that the following configuration was verified using IntelliJ IDEA 2021.1.2 (Community Edition).
 
-#### Java compiler versions
+### Java compiler versions
 
 Ensure that the correct SDK is used for each module using the IntelliJ project structure dialog:
 
@@ -43,7 +45,7 @@ Ensure that the correct SDK is used for each module using the IntelliJ project s
 
 ---
 
-#### Compiler arguments for JPMS
+### Compiler arguments for JPMS
 
 Ensure that the required JPMS arguments are set for the compiler (Java 9 only).  These should be detected and set automatically based on the `pom.xml` configuration.
 

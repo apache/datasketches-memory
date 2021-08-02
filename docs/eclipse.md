@@ -1,12 +1,11 @@
 # Eclipse IDE setup
 
-The use of Maven submodules to build a Multi Release JAR was motivated by its compatibility with popular IDEs.
+The use of Maven submodules to build a Multi Release JAR was motivated by its compatibility with popular IDEs. There are two configuration properties to be aware of when 
+configuring your local development environment:
 
-There are two configuration properties to be aware of when configuring your local development environment:
+### Java compiler versions
 
-#### Java compiler versions
-
-Settings are usually synchronised with maven toolchain configuration, otherwise the Java version for a maven module
+Settings are usually synchronised with Maven Toolchain configuration, otherwise the Java version for a Maven module
 should be set as follows:
 
 | Maven submodule                   | JDK |
@@ -19,7 +18,7 @@ should be set as follows:
 | datasketches-memory-java11		|  11 |
 | datasketches-memory-resources     |  8  |
 
-#### Compiler arguments for JPMS
+### Compiler arguments for JPMS
 
 In order to compile Maven modules in Java versions 9 and above, it is necessary to provide the following arguments to the
 compiler.  These are usually synchronised with the `pom.xml` configuration:
@@ -33,11 +32,11 @@ compiler.  These are usually synchronised with the `pom.xml` configuration:
 
 ---
 
-## Eclipse configuration
+## Running Datasketches-Memory in Eclipse
 
 Note that the following configuration was verified using Eclipse Version: 2020-12 (4.18.0)
 
-#### The eclipse maven plugin
+### The eclipse maven plugin
 
 The [Eclipse Maven plugin](https://maven.apache.org/plugins/maven-eclipse-plugin/) is used to generate Eclipse IDE files.  In order to run the eclipse plugin use:
 
@@ -49,16 +48,31 @@ Please note that this plugin is retired and no longer maintained!
 
 ---
 
-#### Required - Compiler arguments for JPMS
+### Importing the project into eclipse
+
+From the **Package Explorer** View:
+
+- Right click on a blank space in the view
+- Select **Import/Maven/Existing Maven Projects**
+- Select **Next**, and browse to the project directory
+- Click **Open**
+
+---
+
+### Setting compiler arguments for JPMS
 
 Although these should be set automatically, the Eclipse IDE does not currently configure these settings according to the `pom.xml` - see this [Eclipse Bug](https://github.com/eclipse-m2e/m2e-core/issues/129).
 Ensure that the required JPMS arguments are set for the compiler (Java 9 only).
 
-First, open the project properties dialog for the `datasketches-memory-java9` project, and click on `Java Build Path`. Next, open the `Module Dependencies` tab and add an export for `java.base/jdk.internal.ref`:
+- First, right-click on the `datasketches-memory-java9` project, and select **Properties/Java Build Path**. 
+- Next, open the **Module Dependencies** tab and select the `java.base` package.
+- Click on **Configured details**, followed by **Expose package**.
+- In the dialog box, enter package: ```jdk.internal.ref```, and `org.apache.datasketches.memory` as the target module.
+- Ensure that the **exports** checkbox is selected.
 
 ![Eclipse java compiler arguments](img/eclipse-java-compiler-arguments-1.png "Eclipse project compiler arguments")
 
-Finally, click `Apply and Close`:
+- Finally, click **Apply and Close**:
 
 ![Eclipse java compiler arguments](img/eclipse-java-compiler-arguments-2.png "Eclipse project compiler arguments")
 
@@ -66,11 +80,11 @@ Note: These arguments need only be supplied for `datasketches-memory-java9`.
 
 ---
 
-#### Verify - Java compiler settings
+### Setting Java compiler settings
 
 This should be set automatically by the IDE.  However, you may ensure that the correct Java compliance level is set for each module by using the Eclipse `Java Compiler` dialog.
 
-Open the `Java Compiler` dialog, and ensure `Enable project specific settings` is checked:
+- Open the **Java Compiler** dialog, and ensure **Enable project specific settings** is checked:
 
 ![Eclipse compiler level](img/eclipse-compiler-level.png "Eclipse Java Compiler Settings")
 
@@ -82,18 +96,26 @@ You might need to verify this for each module, making sure the correct complianc
 
 ---
 
-#### Verify - JRE library versions
+### Setting JRE library versions
 
-This should be set automatically by the IDE.  However, you may ensure that the correct JRE is used for each module by using the Eclipse `Java Build Path` dialog.
+This should be set automatically by the IDE.  However, you may ensure that the correct JRE is used for each module by using the Eclipse **Java Build Path** dialog.
 
-First, open the project properties dialog for the `datasketches-memory-java9` project, and click on `Java Build Path`. Next, open the `Libraries` tab and select the `JRE System Library` under `Modulepath`.  Click `Edit` and ensure that the `Execution Environment` is selected and set to Java 9:
+- First, open the project properties dialog for the `datasketches-memory-java9` project, and click on **Java Build Path**. 
+- Next, open the **Libraries** tab and select the **JRE System Library** under **Modulepath**.
+- Click **Edit** and ensure that the **Execution Environment** is selected and set to Java 9:
 
 ![Eclipse build path](img/eclipse-build-path-1.png "Java 9 Eclipse project build path")
 
-Follow a similar process for `datasketches-memory-java11`, and verify that `Execution Environment` is selected and set to Java 11:
+- Follow a similar process for `datasketches-memory-java11`, and verify that **Execution Environment** is selected and set to Java 11:
 
 ![Eclipse build path](img/eclipse-build-path-2.png "Java 11 Eclipse project build path")
 
-Lastly, for all other modules, verify that the `Execution Environment` is selected and set to the Java 8 JRE:
+- Lastly, for all other modules, verify that the **Execution Environment** is selected and set to the Java 8 JRE:
 
 ![Eclipse build path](img/eclipse-build-path-3.png "Java 8 Eclipse project build path")
+
+### Running unit tests
+
+- Under the `datasketches-memory-java-8-tests` module, right-click on the `src/test/java` directory.
+- Select **Run-As** / **TestNG Test**
+- It should open a new window and run over 400 tests without error.

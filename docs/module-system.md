@@ -72,18 +72,21 @@ to the Maven compiler plugin in the module's pom.xml file:
     </compilerArgs>
 ```
 
-### Runtime arguments
+### Runtime arguments (off-heap memory only)
 
-Reflection is used by the datasketches memory library in cases where fields and methods that do not have `public` visibility
+When allocating off-heap memory, reflection is used by the datasketches memory library in cases where fields and methods that do not have `public` visibility
 in a class.  Reflective access requires additional arguments to be provided by the user at runtime, in order to use the 
 `datasketches-memory` JPMS module in Java versions 9 and above.
 
-The following runtime arguments should be provided when using the library:
+The following runtime arguments should be provided when allocating memory off-heap:
+
 ```shell
     --add-opens java.base/java.nio=org.apache.datasketches.memory \
     --add-opens java.base/jdk.internal.misc=org.apache.datasketches.memory \
     --add-opens java.base/jdk.internal.ref=org.apache.datasketches.memory
 ```
+
+Note that these arguments are not required for cases where memory is allocated on the heap.
 
 ### JPMS and Java 8
 

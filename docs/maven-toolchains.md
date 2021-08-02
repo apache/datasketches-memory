@@ -42,15 +42,15 @@ For example, if you are using [SDKMAN!](https://sdkman.io/), your environment mi
 - JAVA11_HOME: `/Users/me/.sdkman/candidates/java/11.0.10.hs-adpt`
 
 #### For MacOS or Linux variants
-Users can discover what JDKs have been loaded into their enviornment by using the following command:
+Users can discover what JDKs have been loaded into their environment by using the following command:
 
 - /usr/libexec/java_home -V
 
 
 ### Eclipse configuration
 
-If you are an Eclipse user, you may need further configuration for your IDE to use the appropriate JDK for each module - see the [eclipse IDE setup](eclipse.md).
+If you are an Eclipse user, you may need further configuration for your IDE to use the appropriate JDK for each module - see the [Eclipse IDE setup](eclipse.md).
 
 ### IntelliJ configuration
 
-Similarly, if you are an Eclipse user, you may need further configuration for your IDE to use the appropriate JDK for each module - see the [eclipse IDE setup](eclipse.md).
+Similarly, if you are an Eclipse user, you may need further configuration for your IDE to use the appropriate JDK for each module - see the [IntelliJ IDE setup](intellij.md).

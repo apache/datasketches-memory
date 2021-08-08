@@ -29,7 +29,6 @@ import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.datasketches.memory.BaseState;
-import org.apache.datasketches.memory.DefaultMemoryRequestServer;
 import org.apache.datasketches.memory.MemoryRequestServer;
 
 /**
@@ -47,7 +46,7 @@ public abstract class BaseStateImpl implements BaseState {
   static final AtomicLong currentDirectMemoryMapAllocations_ = new AtomicLong();
   static final AtomicLong currentDirectMemoryMapAllocated_ = new AtomicLong();
 
-  static final MemoryRequestServer defaultMemReqSvr = new DefaultMemoryRequestServer();
+  
 
   //class type IDs. Do not change the bit orders
   // 0000 0XXX

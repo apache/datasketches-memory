@@ -21,6 +21,8 @@ package org.apache.datasketches.memory.internal;
 
 import java.nio.ByteOrder;
 
+import org.apache.datasketches.memory.MemoryRequestServer;
+
 /**
  * Implementation of {@link WritableBufferImpl} for map memory, native byte order.
  *
@@ -72,6 +74,11 @@ final class MapWritableBufferImpl extends NativeWritableBufferImpl {
   }
 
   @Override
+  public MemoryRequestServer getMemoryRequestServer() {
+    return null;
+  }
+  
+  @Override
   long getNativeBaseOffset() {
     return nativeBaseOffset;
   }
@@ -86,11 +93,4 @@ final class MapWritableBufferImpl extends NativeWritableBufferImpl {
     return valid.get();
   }
 
-  @Override
-  void checkValid() {
-    if (!this.isValid()) {
-      throw new IllegalStateException("MemoryImpl not valid.");
-    }
-  }
-  
 }

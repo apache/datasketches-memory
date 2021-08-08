@@ -89,7 +89,8 @@ abstract class BaseWritableMemoryImpl extends WritableMemoryImpl {
   }
 
   static BaseWritableMemoryImpl wrapByteBuffer(
-      final ByteBuffer byteBuf, final boolean localReadOnly, final ByteOrder byteOrder) {
+      final ByteBuffer byteBuf, final boolean localReadOnly, final ByteOrder byteOrder, 
+      final MemoryRequestServer memReqSvr) {
     final AccessByteBuffer abb = new AccessByteBuffer(byteBuf);
     if (abb.resourceReadOnly && !localReadOnly) {
       throw new ReadOnlyException("ByteBuffer is Read Only");
@@ -97,9 +98,9 @@ abstract class BaseWritableMemoryImpl extends WritableMemoryImpl {
     final int typeId = (abb.resourceReadOnly || localReadOnly) ? READONLY : 0;
     return Util.isNativeByteOrder(byteOrder)
         ? new BBWritableMemoryImpl(abb.unsafeObj, abb.nativeBaseOffset,
-            abb.regionOffset, abb.capacityBytes, typeId, byteBuf)
+            abb.regionOffset, abb.capacityBytes, typeId, byteBuf, memReqSvr)
         : new BBNonNativeWritableMemoryImpl(abb.unsafeObj, abb.nativeBaseOffset,
-            abb.regionOffset, abb.capacityBytes,  typeId, byteBuf);
+            abb.regionOffset, abb.capacityBytes,  typeId, byteBuf, memReqSvr);
   }
 
   @SuppressWarnings("resource")

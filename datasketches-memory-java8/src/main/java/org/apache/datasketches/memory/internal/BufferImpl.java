@@ -48,14 +48,14 @@ public abstract class BufferImpl extends BaseBufferImpl implements Buffer {
 
   public static BufferImpl wrap(final ByteBuffer byteBuf, final ByteOrder byteOrder) {
     final BaseWritableMemoryImpl wmem =
-        BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, true, byteOrder);
+        BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, true, byteOrder, defaultMemReqSvr);
     final WritableBufferImpl wbuf = wmem.asWritableBuffer(true, byteOrder);
     wbuf.setStartPositionEnd(0, byteBuf.position(), byteBuf.limit());
     return wbuf;
   }
 
   //MAP
-  //Use MemoryImpl for mapping files and the asBuffer()
+  //Use MemoryImpl for mapping files and then call asBuffer()
 
   //DUPLICATES
   @Override

@@ -21,6 +21,8 @@ package org.apache.datasketches.memory.internal;
 
 import java.nio.ByteOrder;
 
+import org.apache.datasketches.memory.MemoryRequestServer;
+
 /**
  * Implementation of {@link WritableMemoryImpl} for heap-based, non-native byte order.
  *
@@ -68,6 +70,11 @@ final class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl 
   }
 
   @Override
+  public MemoryRequestServer getMemoryRequestServer() {
+    return null;
+  }
+  
+  @Override
   int getTypeId() {
     return typeId & 0xff;
   }
@@ -76,5 +83,5 @@ final class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl 
   Object getUnsafeObject() {
     return unsafeObj;
   }
-
+  
 }

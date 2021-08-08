@@ -227,7 +227,7 @@ public class LeafImplTest {
 
     assertTrue(mem.getByteBuffer() != null);
     assertTrue(mem.getTypeByteOrder() == Util.nativeByteOrder);
-    assertTrue(mem.getMemoryRequestServer() == null);
+    assertNotNull(mem.getMemoryRequestServer());
     Object obj = ReflectUtil.getUnsafeObject(mem);
     //Object obj = mem.getUnsafeObject();
     if (direct) {
@@ -269,7 +269,7 @@ public class LeafImplTest {
 
     assertTrue(nnMem.getByteBuffer() != null);
     assertTrue(nnMem.getTypeByteOrder() == Util.nonNativeByteOrder);
-    assertTrue(nnMem.getMemoryRequestServer() == null);
+    assertNotNull(nnMem.getMemoryRequestServer());
     obj = ReflectUtil.getUnsafeObject(nnMem);
     //obj = nnMem.getUnsafeObject();
     if (direct) {

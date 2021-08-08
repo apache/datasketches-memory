@@ -22,6 +22,8 @@ package org.apache.datasketches.memory.internal;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import org.apache.datasketches.memory.MemoryRequestServer;
+
 /**
  * Implementation of {@link WritableBufferImpl} for ByteBuffer, native byte order.
  *
@@ -33,6 +35,7 @@ final class BBWritableBufferImpl extends NativeWritableBufferImpl {
   private final Object unsafeObj;
   private final long nativeBaseOffset; //used to compute cumBaseOffset
   private final ByteBuffer byteBuf; //holds a reference to a ByteBuffer until we are done with it.
+  private MemoryRequestServer memReqSvr = null; //cannot be final;
   private final byte typeId;
 
   BBWritableBufferImpl(
@@ -81,6 +84,12 @@ final class BBWritableBufferImpl extends NativeWritableBufferImpl {
     return byteBuf;
   }
 
+  @Override
+  public MemoryRequestServer getMemoryRequestServer() {
+    assertValid();
+    return memReqSvr; //cannot be null
+  }
+  
   @Override
   long getNativeBaseOffset() {
     return nativeBaseOffset;

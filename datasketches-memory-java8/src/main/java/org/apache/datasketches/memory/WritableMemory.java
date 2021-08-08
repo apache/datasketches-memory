@@ -34,14 +34,11 @@ public interface WritableMemory extends Memory {
    * the same byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is
    * zero, then byte order of the returned WritableMemory object, as well as backing storage and
    * read-only status are unspecified.
-   *
-   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
-   * <i>WritableMemory.wrap(...)</i>.
    * @param byteBuf the given ByteBuffer
    * @return a new WritableMemory for write operations on the given ByteBuffer.
    */
   static WritableMemory writableWrap(ByteBuffer byteBuf) {
-    return WritableMemoryImpl.writableWrap(byteBuf, byteBuf.order());
+    return WritableMemoryImpl.writableWrap(byteBuf);
   }
   
   /**
@@ -49,16 +46,16 @@ public interface WritableMemory extends Memory {
    * the given byte order, ignoring the byte order of the given ByteBuffer. If the capacity of
    * the given ByteBuffer is zero the byte order of the returned WritableMemory object
    * (as well as backing storage) is unspecified.
-   *
-   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
-   * <i>WritableMemory.wrap(...)</i>.
    * @param byteBuf the given ByteBuffer, must not be null
    * @param byteOrder the byte order to be used, which may be independent of the byte order
    * state of the given ByteBuffer
+   * @param memReqSvr A user-specified MemoryRequestServer. If null, the DefaultMemoryRequestServer is used.
+   * This is a callback mechanism for a user client to request a larger Memory.
    * @return a new WritableMemory for write operations on the given ByteBuffer.
    */
-  static WritableMemory writableWrap(ByteBuffer byteBuf, ByteOrder byteOrder) {
-    return WritableMemoryImpl.writableWrap(byteBuf, byteOrder);
+  static WritableMemory writableWrap(ByteBuffer byteBuf, ByteOrder byteOrder, MemoryRequestServer memReqSvr) {
+    MemoryRequestServer mReqSvr = (memReqSvr == null) ? defaultMemReqSvr : memReqSvr;
+    return WritableMemoryImpl.writableWrap(byteBuf, byteOrder, mReqSvr);
   }
   
   //MAP
@@ -134,7 +131,8 @@ public interface WritableMemory extends Memory {
    * Please read Javadocs for {@link Handle}.
    */
   static WritableHandle allocateDirect(long capacityBytes, MemoryRequestServer memReqSvr) {
-    return WritableMemoryImpl.allocateDirect(capacityBytes, memReqSvr);
+    MemoryRequestServer mReqSvr = (memReqSvr == null) ? defaultMemReqSvr : memReqSvr;
+    return WritableMemoryImpl.allocateDirect(capacityBytes, mReqSvr);
   }
   
   //REGIONS
@@ -602,10 +600,11 @@ public interface WritableMemory extends Memory {
   
   //OTHER WRITABLE API METHODS
   /**
-   * For Direct Memory only. Other types of backing resources will return null.
-   * Gets the MemoryRequestServer object used by dynamic off-heap (Direct) memory objects
-   * to request additional memory.
-   * Set using {@link WritableMemory#allocateDirect(long, MemoryRequestServer)}.
+   * For ByteBuffer and Direct Memory backed resources only. Heap and Map backed resources will return null.
+   * Gets the MemoryRequestServer object used by dynamic Memory-backed objects
+   * to request additional memory.  To customize the actions of the MemoryRequestServer, 
+   * extend the MemoryRequestServer interfact and 
+   * set using {@link WritableMemory#allocateDirect(long, MemoryRequestServer)}.
    * If not explicity set, this returns the {@link DefaultMemoryRequestServer}.
    * @return the MemoryRequestServer object (if direct memory) or null.
    */

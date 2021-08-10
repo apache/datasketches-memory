@@ -42,12 +42,13 @@ public abstract class WritableBufferImpl extends BufferImpl implements WritableB
 
   //BYTE BUFFER
   public static WritableBufferImpl writableWrap(final ByteBuffer byteBuf) {
-    return writableWrap(byteBuf, byteBuf.order());
+    return writableWrap(byteBuf, byteBuf.order(), defaultMemReqSvr);
   }
 
-  public static WritableBufferImpl writableWrap(final ByteBuffer byteBuf, final ByteOrder byteOrder) {
+  public static WritableBufferImpl writableWrap(final ByteBuffer byteBuf, final ByteOrder byteOrder,
+      final MemoryRequestServer memReqSvr) {
     final BaseWritableMemoryImpl wmem =
-        BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, false, byteOrder);
+        BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, false, byteOrder, memReqSvr);
     final WritableBufferImpl wbuf = wmem.asWritableBuffer(false, byteOrder);
     wbuf.setStartPositionEnd(0, byteBuf.position(), byteBuf.limit());
     return wbuf;
@@ -165,11 +166,5 @@ public abstract class WritableBufferImpl extends BufferImpl implements WritableB
 
   @Override
   public abstract void fill(byte value);
-
-  //OTHER WRITABLE API METHODS
-  @Override
-  public MemoryRequestServer getMemoryRequestServer() {
-    return null;
-  }
 
 }

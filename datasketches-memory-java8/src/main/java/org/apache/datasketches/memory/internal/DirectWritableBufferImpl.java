@@ -98,10 +98,4 @@ final class DirectWritableBufferImpl extends NativeWritableBufferImpl {
     return valid.get();
   }
 
-  @Override
-  void checkValid() {
-    if (!this.isValid()) {
-      throw new IllegalStateException("MemoryImpl not valid.");
-    }
-  }
 }

@@ -22,6 +22,8 @@ package org.apache.datasketches.memory.internal;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import org.apache.datasketches.memory.MemoryRequestServer;
+
 /**
  * Implementation of {@link WritableMemoryImpl} for ByteBuffer, native byte order.
  *
@@ -33,6 +35,7 @@ final class BBWritableMemoryImpl extends NativeWritableMemoryImpl {
   private final Object unsafeObj;
   private final long nativeBaseOffset; //used to compute cumBaseOffset
   private final ByteBuffer byteBuf; //holds a reference to a ByteBuffer until we are done with it.
+  private MemoryRequestServer memReqSvr = null; //cannot be final;
   private final byte typeId;
 
   BBWritableMemoryImpl(
@@ -41,11 +44,13 @@ final class BBWritableMemoryImpl extends NativeWritableMemoryImpl {
       final long regionOffset,
       final long capacityBytes,
       final int typeId,
-      final ByteBuffer byteBuf) {
+      final ByteBuffer byteBuf,
+      final MemoryRequestServer memReqSvr) {
     super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
     this.unsafeObj = unsafeObj;
     this.nativeBaseOffset = nativeBaseOffset;
     this.byteBuf = byteBuf;
+    this.memReqSvr = (memReqSvr == null) ? defaultMemReqSvr : memReqSvr;
     this.typeId = (byte) (id | (typeId & 0x7));
   }
 
@@ -56,10 +61,10 @@ final class BBWritableMemoryImpl extends NativeWritableMemoryImpl {
     return Util.isNativeByteOrder(byteOrder)
         ? new BBWritableMemoryImpl(
             unsafeObj, nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes,
-            type, getByteBuffer())
+            type, getByteBuffer(), memReqSvr)
         : new BBNonNativeWritableMemoryImpl(
             unsafeObj, nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes,
-            type, getByteBuffer());
+            type, getByteBuffer(), memReqSvr);
   }
 
   @Override
@@ -68,16 +73,22 @@ final class BBWritableMemoryImpl extends NativeWritableMemoryImpl {
     return Util.isNativeByteOrder(byteOrder)
         ? new BBWritableBufferImpl(
             unsafeObj, nativeBaseOffset, getRegionOffset(), getCapacity(),
-            type, byteBuf, this)
+            type, byteBuf, memReqSvr, this)
         : new BBNonNativeWritableBufferImpl(
             unsafeObj, nativeBaseOffset, getRegionOffset(), getCapacity(),
-            type, byteBuf, this);
+            type, byteBuf, memReqSvr, this);
   }
 
   @Override
   public ByteBuffer getByteBuffer() {
     assertValid();
     return byteBuf;
+  }
+
+  @Override
+  public MemoryRequestServer getMemoryRequestServer() {
+    assertValid();
+    return memReqSvr; //cannot be null
   }
 
   @Override

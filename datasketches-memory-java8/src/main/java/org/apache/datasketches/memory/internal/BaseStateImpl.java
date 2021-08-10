@@ -29,7 +29,6 @@ import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.datasketches.memory.BaseState;
-import org.apache.datasketches.memory.DefaultMemoryRequestServer;
 import org.apache.datasketches.memory.MemoryRequestServer;
 
 /**
@@ -47,7 +46,7 @@ public abstract class BaseStateImpl implements BaseState {
   static final AtomicLong currentDirectMemoryMapAllocations_ = new AtomicLong();
   static final AtomicLong currentDirectMemoryMapAllocated_ = new AtomicLong();
 
-  static final MemoryRequestServer defaultMemReqSvr = new DefaultMemoryRequestServer();
+
 
   //class type IDs. Do not change the bit orders
   // 0000 0XXX
@@ -213,7 +212,7 @@ public abstract class BaseStateImpl implements BaseState {
   public final long xxHash64(final long in, final long seed) {
     return XxHash64.hash(in, seed);
   }
-  
+
   @Override
   public final boolean hasByteBuffer() {
     assertValid();
@@ -332,44 +331,41 @@ public abstract class BaseStateImpl implements BaseState {
     return (getTypeId() >>> 3 & 3) == 3;
   }
 
-  //MONITORING
-
-  /**
-   * Gets the current number of active direct memory allocations.
-   * @return the current number of active direct memory allocations.
-   */
-  public static final long getCurrentDirectMemoryAllocations() {
-    return BaseStateImpl.currentDirectMemoryAllocations_.get();
-  }
-
-  /**
-   * Gets the current size of active direct memory allocated.
-   * @return the current size of active direct memory allocated.
-   */
-  public static final long getCurrentDirectMemoryAllocated() {
-    return BaseStateImpl.currentDirectMemoryAllocated_.get();
-  }
-
-  /**
-   * Gets the current number of active direct memory map allocations.
-   * @return the current number of active direct memory map allocations.
-   */
-  public static final long getCurrentDirectMemoryMapAllocations() {
-    return BaseStateImpl.currentDirectMemoryMapAllocations_.get();
-  }
-
-  /**
-   * Gets the current size of active direct memory map allocated.
-   * @return the current size of active direct memory map allocated.
-   */
-  public static final long getCurrentDirectMemoryMapAllocated() {
-    return BaseStateImpl.currentDirectMemoryMapAllocated_.get();
-  }
-
-  //REACHABILITY FENCE
-  static void reachabilityFence(@SuppressWarnings("unused") final Object obj) { }
-
   //TO STRING
+  //For debugging
+  public static final String typeDecode(final BaseStateImpl mem) {
+    int typeId = mem.getTypeId();
+    StringBuilder sb = new StringBuilder();
+    int group1 = typeId & 0x7;
+    switch (group1) {
+      case 0 : sb.append(""); break;
+      case 1 : sb.append("ReadOnly, "); break;
+      case 2 : sb.append("Region, "); break;
+      case 3 : sb.append("ReadOnly Region, "); break;
+      case 4 : sb.append("Duplicate, "); break;
+      case 5 : sb.append("ReadOnly Duplicate, "); break;
+      case 6 : sb.append("Region Duplicate, "); break;
+      case 7 : sb.append("ReadOnly Region Duplicate, "); break;
+    }
+    int group2 = (typeId >>> 3) & 0x3;
+    switch (group2) {
+      case 0 : sb.append("Heap, "); break;
+      case 1 : sb.append("Direct, "); break;
+      case 2 : sb.append("Map, "); break;
+      case 3 : sb.append("ByteBuffer, "); break;
+    }
+    int group3 = (typeId >>> 5) & 0x1;
+    switch (group3) {
+      case 0 : sb.append("Native, "); break;
+      case 1 : sb.append("NonNative, "); break;
+    }
+    int group4 = (typeId >>> 6) & 0x1;
+    switch (group4) {
+      case 0 : sb.append("Memory"); break;
+      case 1 : sb.append("Buffer"); break;
+    }
+    return sb.toString();
+  }
 
   @Override
   public final String toHexString(final String header, final long offsetBytes,
@@ -445,5 +441,42 @@ public abstract class BaseStateImpl implements BaseState {
 
     return sb.toString();
   }
+
+  //MONITORING
+
+  /**
+   * Gets the current number of active direct memory allocations.
+   * @return the current number of active direct memory allocations.
+   */
+  public static final long getCurrentDirectMemoryAllocations() {
+    return BaseStateImpl.currentDirectMemoryAllocations_.get();
+  }
+
+  /**
+   * Gets the current size of active direct memory allocated.
+   * @return the current size of active direct memory allocated.
+   */
+  public static final long getCurrentDirectMemoryAllocated() {
+    return BaseStateImpl.currentDirectMemoryAllocated_.get();
+  }
+
+  /**
+   * Gets the current number of active direct memory map allocations.
+   * @return the current number of active direct memory map allocations.
+   */
+  public static final long getCurrentDirectMemoryMapAllocations() {
+    return BaseStateImpl.currentDirectMemoryMapAllocations_.get();
+  }
+
+  /**
+   * Gets the current size of active direct memory map allocated.
+   * @return the current size of active direct memory map allocated.
+   */
+  public static final long getCurrentDirectMemoryMapAllocated() {
+    return BaseStateImpl.currentDirectMemoryMapAllocated_.get();
+  }
+
+  //REACHABILITY FENCE
+  static void reachabilityFence(@SuppressWarnings("unused") final Object obj) { }
 
 }

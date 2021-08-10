@@ -50,11 +50,12 @@ public abstract class WritableMemoryImpl extends MemoryImpl implements WritableM
 
   //BYTE BUFFER
   public static WritableMemoryImpl writableWrap(final ByteBuffer byteBuf) {
-    return BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, false, byteBuf.order());
+    return BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, false, byteBuf.order(), defaultMemReqSvr);
   }
 
-  public static WritableMemoryImpl writableWrap(final ByteBuffer byteBuf, final ByteOrder byteOrder) {
-    return BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, false, byteOrder);
+  public static WritableMemoryImpl writableWrap(final ByteBuffer byteBuf, final ByteOrder byteOrder,
+      final MemoryRequestServer memReqSvr) {
+    return BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, false, byteOrder, memReqSvr);
   }
 
   //MAP
@@ -73,12 +74,12 @@ public abstract class WritableMemoryImpl extends MemoryImpl implements WritableM
 
   //ALLOCATE DIRECT
   public static WritableHandle allocateDirect(final long capacityBytes) {
-    return allocateDirect(capacityBytes, null);
+    return allocateDirect(capacityBytes, ByteOrder.nativeOrder(), defaultMemReqSvr);
   }
 
-  public static WritableHandle allocateDirect(final long capacityBytes,
+  public static WritableHandle allocateDirect(final long capacityBytes, final ByteOrder byteOrder,
       final MemoryRequestServer memReqSvr) {
-    return BaseWritableMemoryImpl.wrapDirect(capacityBytes, Util.nativeByteOrder, memReqSvr);
+    return BaseWritableMemoryImpl.wrapDirect(capacityBytes, byteOrder, memReqSvr);
   }
 
   //REGIONS
@@ -250,11 +251,4 @@ public abstract class WritableMemoryImpl extends MemoryImpl implements WritableM
   @Override
   public abstract void setBits(long offsetBytes, byte bitMask);
 
-  
-  //OTHER WRITABLE API METHODS
-  @Override
-  public MemoryRequestServer getMemoryRequestServer() {
-    return null;
-  }
-  
 }

@@ -37,7 +37,7 @@ public interface WritableBuffer extends Buffer {
    * @return a new WritableBuffer for write operations on the given ByteBuffer.
    */
   static WritableBuffer writableWrap(ByteBuffer byteBuf) {
-    return WritableBufferImpl.writableWrap(byteBuf, byteBuf.order());
+    return WritableBufferImpl.writableWrap(byteBuf);
   }
 
   /**
@@ -48,12 +48,15 @@ public interface WritableBuffer extends Buffer {
    * @param byteBuf the given ByteBuffer, must not be null
    * @param byteOrder the byte order to be used, which may be independent of the byte order
    * state of the given ByteBuffer
+   * @param memReqSvr A user-specified MemoryRequestServer.
+   * This is a callback mechanism for a user client to request a larger Memory.
    * @return a new WritableBuffer for write operations on the given ByteBuffer.
    */
-  static WritableBuffer writableWrap(ByteBuffer byteBuf, ByteOrder byteOrder) {
-    return WritableBufferImpl.writableWrap(byteBuf, byteOrder);
-  }  
-  
+  static WritableBuffer writableWrap(ByteBuffer byteBuf, ByteOrder byteOrder, MemoryRequestServer memReqSvr) {
+    MemoryRequestServer mReqSvr = (memReqSvr == null) ? defaultMemReqSvr : memReqSvr;
+    return WritableBufferImpl.writableWrap(byteBuf, byteOrder, mReqSvr);
+  }
+
   //DUPLICATES
   /**
    * Returns a duplicate writable view of this Buffer with the same but independent values of
@@ -363,10 +366,11 @@ public interface WritableBuffer extends Buffer {
 
   //OTHER WRITABLE API METHODS
   /**
-   * For Direct Memory only. Other types of backing resources will return null.
-   * Gets the MemoryRequestServer object used by dynamic off-heap (Direct) memory objects
-   * to request additional memory.
-   * Set using {@link WritableMemory#allocateDirect(long, MemoryRequestServer)}.
+   * For ByteBuffer and Direct Memory backed resources only. Heap and Map backed resources will return null.
+   * Gets the MemoryRequestServer object used by dynamic Memory-backed objects
+   * to request additional memory.  To customize the actions of the MemoryRequestServer,
+   * extend the MemoryRequestServer interfact and
+   * set using {@link WritableMemory#allocateDirect(long, ByteOrder, MemoryRequestServer)}.
    * If not explicity set, this returns the {@link DefaultMemoryRequestServer}.
    * @return the MemoryRequestServer object (if direct memory) or null.
    */

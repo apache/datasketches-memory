@@ -87,7 +87,7 @@ public class AllocateDirectMemoryTest {
 
   @Test
   public void checkNullMemoryRequestServer() throws Exception {
-    try (WritableHandle wh = WritableMemory.allocateDirect(128, null)) {
+    try (WritableHandle wh = WritableMemory.allocateDirect(128, Util.nativeByteOrder, null)) {
       WritableMemory wmem = wh.getWritable();
       assertNotNull(wmem.getMemoryRequestServer());
     }
@@ -95,9 +95,8 @@ public class AllocateDirectMemoryTest {
 
 
   @Test
-  public void checkNonNativeDirect() throws Exception { //not allowed in public API
-    try (WritableHandle h = ReflectUtil.wrapDirect(8,  Util.nonNativeByteOrder, null)) { 
-        //BaseWritableMemory.wrapDirect(8, Util.nonNativeByteOrder, null)) {
+  public void checkNonNativeDirect() throws Exception {
+    try (WritableHandle h = WritableMemory.allocateDirect(128, Util.nonNativeByteOrder, null)) {
       WritableMemory wmem = h.getWritable();
       wmem.putChar(0, (char) 1);
       assertEquals(wmem.getByte(1), (byte) 1);

@@ -53,11 +53,11 @@ public abstract class MemoryImpl extends BaseStateImpl implements Memory {
 
   //BYTE BUFFER
   public static MemoryImpl wrap(final ByteBuffer byteBuf) {
-    return BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, true, byteBuf.order());
+    return BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, true, byteBuf.order(), defaultMemReqSvr);
   }
 
   public static MemoryImpl wrap(final ByteBuffer byteBuf, final ByteOrder byteOrder) {
-    return BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, true, byteOrder);
+    return BaseWritableMemoryImpl.wrapByteBuffer(byteBuf, true, byteOrder, defaultMemReqSvr);
   }
 
   //MAP

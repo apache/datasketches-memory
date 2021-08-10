@@ -96,11 +96,4 @@ final class DirectNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImp
     return valid.get();
   }
 
-  @Override
-  void checkValid() {
-    if (!this.isValid()) {
-      throw new IllegalStateException("MemoryImpl not valid.");
-    }
-  }
-  
 }

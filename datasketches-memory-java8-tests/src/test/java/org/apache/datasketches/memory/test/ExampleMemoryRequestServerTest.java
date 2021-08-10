@@ -21,6 +21,7 @@ package org.apache.datasketches.memory.test;
 
 import static org.testng.Assert.assertFalse;
 
+import java.nio.ByteOrder;
 import java.util.IdentityHashMap;
 
 import org.apache.datasketches.memory.MemoryRequestServer;
@@ -61,7 +62,7 @@ public class ExampleMemoryRequestServerTest {
   public void checkExampleMemoryRequestServer2() throws Exception {
     int bytes = 8;
     ExampleMemoryRequestServer svr = new ExampleMemoryRequestServer();
-    try (WritableHandle handle = WritableMemory.allocateDirect(bytes, svr)) {
+    try (WritableHandle handle = WritableMemory.allocateDirect(bytes, ByteOrder.nativeOrder(), svr)) {
       WritableMemory wMem = handle.getWritable();
       MemoryClient client = new MemoryClient(wMem);
       client.process();
@@ -73,7 +74,7 @@ public class ExampleMemoryRequestServerTest {
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void checkZeroCapacity() {
     ExampleMemoryRequestServer svr = new ExampleMemoryRequestServer();
-    WritableMemory.allocateDirect(0, svr);
+    WritableMemory.allocateDirect(0, ByteOrder.nativeOrder(), svr);
   }
 
   /**
@@ -126,7 +127,7 @@ public class ExampleMemoryRequestServerTest {
     @SuppressWarnings("resource")
     @Override
     public WritableMemory request(long capacityBytes) {
-     WritableHandle handle = WritableMemory.allocateDirect(capacityBytes, this);
+     WritableHandle handle = WritableMemory.allocateDirect(capacityBytes, ByteOrder.nativeOrder(), this);
      WritableMemory wmem = handle.getWritable();
      map.put(wmem, handle); //We track the newly allocated memory and its handle.
      return wmem;

@@ -458,7 +458,7 @@ public class MemoryTest {
   @Test
   public void wrapBigEndianAsLittle() {
     ByteBuffer bb = ByteBuffer.allocate(64);
-    bb.putChar(0, (char)1); //as BE
+    bb.putChar(0, (char)1); //as NNO
     Memory mem = Memory.wrap(bb, ByteOrder.LITTLE_ENDIAN);
     assertEquals(mem.getChar(0), 256);
   }

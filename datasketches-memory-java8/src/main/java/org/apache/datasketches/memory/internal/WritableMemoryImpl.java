@@ -74,12 +74,12 @@ public abstract class WritableMemoryImpl extends MemoryImpl implements WritableM
 
   //ALLOCATE DIRECT
   public static WritableHandle allocateDirect(final long capacityBytes) {
-    return allocateDirect(capacityBytes, null);
+    return allocateDirect(capacityBytes, ByteOrder.nativeOrder(), defaultMemReqSvr);
   }
 
-  public static WritableHandle allocateDirect(final long capacityBytes,
+  public static WritableHandle allocateDirect(final long capacityBytes, final ByteOrder byteOrder,
       final MemoryRequestServer memReqSvr) {
-    return BaseWritableMemoryImpl.wrapDirect(capacityBytes, Util.nativeByteOrder, memReqSvr);
+    return BaseWritableMemoryImpl.wrapDirect(capacityBytes, byteOrder, memReqSvr);
   }
 
   //REGIONS

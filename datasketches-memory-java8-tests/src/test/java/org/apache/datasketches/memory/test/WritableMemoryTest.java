@@ -46,7 +46,7 @@ public class WritableMemoryTest {
   @Test
   public void wrapBigEndianAsLittle() {
     ByteBuffer bb = ByteBuffer.allocate(64);
-    bb.putChar(0, (char)1); //as BE
+    bb.putChar(0, (char)1); //as NNO
     WritableMemory wmem = WritableMemory.writableWrap(bb, ByteOrder.LITTLE_ENDIAN, null);
     assertEquals(wmem.getChar(0), 256);
   }

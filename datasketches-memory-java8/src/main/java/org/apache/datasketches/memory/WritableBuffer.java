@@ -55,8 +55,8 @@ public interface WritableBuffer extends Buffer {
   static WritableBuffer writableWrap(ByteBuffer byteBuf, ByteOrder byteOrder, MemoryRequestServer memReqSvr) {
     MemoryRequestServer mReqSvr = (memReqSvr == null) ? defaultMemReqSvr : memReqSvr;
     return WritableBufferImpl.writableWrap(byteBuf, byteOrder, mReqSvr);
-  }  
-  
+  }
+
   //DUPLICATES
   /**
    * Returns a duplicate writable view of this Buffer with the same but independent values of
@@ -368,9 +368,9 @@ public interface WritableBuffer extends Buffer {
   /**
    * For ByteBuffer and Direct Memory backed resources only. Heap and Map backed resources will return null.
    * Gets the MemoryRequestServer object used by dynamic Memory-backed objects
-   * to request additional memory.  To customize the actions of the MemoryRequestServer, 
-   * extend the MemoryRequestServer interfact and 
-   * set using {@link WritableMemory#allocateDirect(long, MemoryRequestServer)}.
+   * to request additional memory.  To customize the actions of the MemoryRequestServer,
+   * extend the MemoryRequestServer interfact and
+   * set using {@link WritableMemory#allocateDirect(long, ByteOrder, MemoryRequestServer)}.
    * If not explicity set, this returns the {@link DefaultMemoryRequestServer}.
    * @return the MemoryRequestServer object (if direct memory) or null.
    */

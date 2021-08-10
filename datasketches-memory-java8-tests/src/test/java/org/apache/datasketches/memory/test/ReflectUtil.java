@@ -27,7 +27,6 @@ import java.lang.reflect.Method;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.MemoryRequestServer;
-import org.apache.datasketches.memory.WritableHandle;
 
 public final class ReflectUtil {
 
@@ -392,15 +391,6 @@ public final class ReflectUtil {
   static void unreserveMemory(final long allocationSize, final long capacity) {
     try {
       UNRESERVE_MEMORY.invoke(null, allocationSize, capacity);
-    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  static WritableHandle wrapDirect(final long capacityBytes,
-      final ByteOrder byteOrder, final MemoryRequestServer memReqSvr) {
-    try {
-      return (WritableHandle) WRAP_DIRECT.invoke(null, capacityBytes, byteOrder, memReqSvr);
     } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }

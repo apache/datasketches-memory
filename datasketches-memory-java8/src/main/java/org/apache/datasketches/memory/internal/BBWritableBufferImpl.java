@@ -45,11 +45,13 @@ final class BBWritableBufferImpl extends NativeWritableBufferImpl {
       final long capacityBytes,
       final int typeId,
       final ByteBuffer byteBuf,
+      final MemoryRequestServer memReqSvr,
       final BaseWritableMemoryImpl originMemory) {
     super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, originMemory);
     this.unsafeObj = unsafeObj;
     this.nativeBaseOffset = nativeBaseOffset;
     this.byteBuf = byteBuf;
+    this.memReqSvr = (memReqSvr == null) ? defaultMemReqSvr : memReqSvr;
     this.typeId = (byte) (id | (typeId & 0x7));
   }
 
@@ -60,10 +62,10 @@ final class BBWritableBufferImpl extends NativeWritableBufferImpl {
     return Util.isNativeByteOrder(byteOrder)
         ? new BBWritableBufferImpl(
             unsafeObj, nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes,
-            type, byteBuf, originMemory)
+            type, byteBuf, memReqSvr, originMemory)
         : new BBNonNativeWritableBufferImpl(
             unsafeObj, nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes,
-            type, byteBuf, originMemory);
+            type, byteBuf, memReqSvr, originMemory);
   }
 
   @Override
@@ -72,10 +74,10 @@ final class BBWritableBufferImpl extends NativeWritableBufferImpl {
     return Util.isNativeByteOrder(byteOrder)
         ? new BBWritableBufferImpl(
             unsafeObj, nativeBaseOffset, getRegionOffset(), getCapacity(),
-            type, byteBuf, originMemory)
+            type, byteBuf, memReqSvr, originMemory)
         : new BBNonNativeWritableBufferImpl(
             unsafeObj, nativeBaseOffset, getRegionOffset(), getCapacity(),
-            type, byteBuf, originMemory);
+            type, byteBuf, memReqSvr, originMemory);
   }
 
   @Override
@@ -89,7 +91,7 @@ final class BBWritableBufferImpl extends NativeWritableBufferImpl {
     assertValid();
     return memReqSvr; //cannot be null
   }
-  
+
   @Override
   long getNativeBaseOffset() {
     return nativeBaseOffset;

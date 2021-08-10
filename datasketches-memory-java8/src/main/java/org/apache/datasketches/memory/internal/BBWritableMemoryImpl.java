@@ -73,10 +73,10 @@ final class BBWritableMemoryImpl extends NativeWritableMemoryImpl {
     return Util.isNativeByteOrder(byteOrder)
         ? new BBWritableBufferImpl(
             unsafeObj, nativeBaseOffset, getRegionOffset(), getCapacity(),
-            type, byteBuf, this)
+            type, byteBuf, memReqSvr, this)
         : new BBNonNativeWritableBufferImpl(
             unsafeObj, nativeBaseOffset, getRegionOffset(), getCapacity(),
-            type, byteBuf, this);
+            type, byteBuf, memReqSvr, this);
   }
 
   @Override
@@ -90,7 +90,7 @@ final class BBWritableMemoryImpl extends NativeWritableMemoryImpl {
     assertValid();
     return memReqSvr; //cannot be null
   }
-  
+
   @Override
   long getNativeBaseOffset() {
     return nativeBaseOffset;

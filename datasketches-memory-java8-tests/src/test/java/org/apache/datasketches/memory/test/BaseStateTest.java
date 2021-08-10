@@ -31,6 +31,7 @@ import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
+import org.apache.datasketches.memory.internal.BaseStateImpl;
 import org.apache.datasketches.memory.internal.Prim;
 import org.apache.datasketches.memory.internal.StepBoolean;
 import org.apache.datasketches.memory.internal.Util;
@@ -107,6 +108,30 @@ public class BaseStateTest {
     fail();
   }
 
+  @Test
+  public void checkIsNativeByteOrder() {
+    assertTrue(BaseStateImpl.isNativeByteOrder(ByteOrder.nativeOrder()));
+    try {
+      BaseStateImpl.isNativeByteOrder(null);
+      fail();
+    } catch (final IllegalArgumentException e) {}
+  }
+
+  @Test
+  public void checkXxHash64() {
+    WritableMemory mem = WritableMemory.allocate(8);
+    long out = mem.xxHash64(mem.getLong(0), 1L);
+    assertTrue(out != 0);
+  }
+
+  @Test
+  public void checkTypeDecode() {
+    for (int i = 0; i < 128; i++) {
+      BaseStateImpl.typeDecode(i);
+    }
+  }
+
+  /********************/
   @Test
   public void printlnTest() {
     println("PRINTING: "+this.getClass().getName());

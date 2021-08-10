@@ -31,7 +31,7 @@ import org.apache.datasketches.memory.WritableMemory;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-public final class WritableMapHandleImpl extends MapHandleImpl 
+public final class WritableMapHandleImpl extends MapHandleImpl
     implements WritableMapHandle {
 
   WritableMapHandleImpl(final AllocateDirectWritableMap dirWmap,

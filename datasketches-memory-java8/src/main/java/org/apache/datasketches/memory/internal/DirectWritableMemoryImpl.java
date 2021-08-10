@@ -95,5 +95,5 @@ final class DirectWritableMemoryImpl extends NativeWritableMemoryImpl {
   public boolean isValid() {
     return valid.get();
   }
-  
+
 }

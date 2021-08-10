@@ -32,7 +32,7 @@ import org.apache.datasketches.memory.internal.Util;
 public interface Memory extends BaseState {
 
   //BYTE BUFFER
-  
+
   /**
    * Accesses the given ByteBuffer for read-only operations. The returned <i>Memory</i> object has
    * the same byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is
@@ -47,7 +47,7 @@ public interface Memory extends BaseState {
   static Memory wrap(ByteBuffer byteBuf) {
     return MemoryImpl.wrap(byteBuf);
   }
-  
+
   /**
    * Accesses the given ByteBuffer for read-only operations. The returned <i>Memory</i> object has
    * the given byte order, ignoring the byte order of the given ByteBuffer.  If the capacity of the
@@ -64,7 +64,7 @@ public interface Memory extends BaseState {
   static Memory wrap(ByteBuffer byteBuf, ByteOrder byteOrder) {
     return MemoryImpl.wrap(byteBuf, byteOrder);
   }
-  
+
   //MAP
   /**
    * Maps the entire given file into native-ordered Memory for read operations
@@ -81,7 +81,7 @@ public interface Memory extends BaseState {
   static MapHandle map(File file) {
     return MemoryImpl.map(file, 0, file.length(), ByteOrder.nativeOrder());
   }
-  
+
   /**
    * Maps the specified portion of the given file into Memory for read operations
    * (including those &gt; 2GB).
@@ -98,7 +98,7 @@ public interface Memory extends BaseState {
   static MapHandle map(File file, long fileOffsetBytes, long capacityBytes, ByteOrder byteOrder) {
     return MemoryImpl.map(file, fileOffsetBytes, capacityBytes, byteOrder);
   }
-  
+
   //REGIONS
   /**
    * A region is a read-only view of this object.
@@ -114,7 +114,7 @@ public interface Memory extends BaseState {
    * offsetBytes and capacityBytes.
    */
   Memory region(long offsetBytes, long capacityBytes);
-  
+
   /**
    * A region is a read-only view of this object.
    * <ul>
@@ -131,7 +131,7 @@ public interface Memory extends BaseState {
    * offsetBytes, capacityBytes and byteOrder.
    */
   Memory region(long offsetBytes, long capacityBytes, ByteOrder byteOrder);
-  
+
   //AS BUFFER
   /**
    * Returns a new <i>Buffer</i> view of this object.
@@ -148,7 +148,7 @@ public interface Memory extends BaseState {
    * @return a new <i>Buffer</i>
    */
   Buffer asBuffer();
-  
+
   /**
    * Returns a new <i>Buffer</i> view of this object, with the given
    * byte order.
@@ -166,7 +166,7 @@ public interface Memory extends BaseState {
    * @return a new <i>Buffer</i> with the given byteOrder.
    */
   Buffer asBuffer(ByteOrder byteOrder);
-  
+
   //UNSAFE BYTE BUFFER VIEW
   /**
    * Returns the specified region of this Memory object as a new read-only {@link ByteBuffer}
@@ -191,7 +191,7 @@ public interface Memory extends BaseState {
    * when it wraps a non-byte Java array.
    */
   ByteBuffer unsafeByteBufferView(long offsetBytes, int capacityBytes);
-  
+
   //ACCESS PRIMITIVE HEAP ARRAYS for readOnly
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
@@ -206,7 +206,7 @@ public interface Memory extends BaseState {
   static Memory wrap(boolean[] arr) {
     return MemoryImpl.wrap(arr);
   }
-  
+
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
    * size is zero, backing storage and byte order of the returned <i>Memory</i> object are
@@ -220,7 +220,7 @@ public interface Memory extends BaseState {
   static Memory wrap(byte[] arr) {
     return MemoryImpl.wrap(arr, 0, arr.length, Util.nativeByteOrder);
   }
-  
+
   /**
    * Wraps the given primitive array for read operations with the given byte order. If the array
    * size is zero, backing storage and byte order of the returned <i>Memory</i> object are
@@ -235,7 +235,7 @@ public interface Memory extends BaseState {
   static Memory wrap(byte[] arr, ByteOrder byteOrder) {
     return MemoryImpl.wrap(arr, 0, arr.length, byteOrder);
   }
-  
+
   /**
    * Wraps the given primitive array for read operations with the given byte order. If the given
    * lengthBytes is zero, backing storage and byte order of the returned <i>Memory</i> object are
@@ -253,7 +253,7 @@ public interface Memory extends BaseState {
       ByteOrder byteOrder) {
     return MemoryImpl.wrap(arr, offsetBytes, lengthBytes, byteOrder);
   }
-  
+
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
    * size is zero, backing storage and byte order of the returned <i>Memory</i> object are unspecified.
@@ -266,7 +266,7 @@ public interface Memory extends BaseState {
   static Memory wrap(char[] arr) {
     return MemoryImpl.wrap(arr);
   }
-  
+
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
    * size is zero, backing storage and byte order of the returned <i>Memory</i> object are unspecified.
@@ -279,7 +279,7 @@ public interface Memory extends BaseState {
   static Memory wrap(short[] arr) {
     return MemoryImpl.wrap(arr);
   }
-  
+
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
    * size is zero, backing storage and byte order of the returned <i>Memory</i> object are unspecified.
@@ -292,7 +292,7 @@ public interface Memory extends BaseState {
   static Memory wrap(int[] arr) {
     return MemoryImpl.wrap(arr);
   }
-  
+
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
    * size is zero, backing storage and byte order of the returned <i>Memory</i> object are
@@ -306,7 +306,7 @@ public interface Memory extends BaseState {
   static Memory wrap(long[] arr) {
     return MemoryImpl.wrap(arr);
   }
-  
+
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
    * size is zero, backing storage and byte order of the returned <i>Memory</i> object are
@@ -320,7 +320,7 @@ public interface Memory extends BaseState {
   static Memory wrap(float[] arr) {
     return MemoryImpl.wrap(arr);
   }
-  
+
   /**
    * Wraps the given primitive array for read operations assuming native byte order. If the array
    * size is zero, backing storage and byte order of the returned <i>Memory</i> object are
@@ -334,7 +334,7 @@ public interface Memory extends BaseState {
   static Memory wrap(double[] arr) {
     return MemoryImpl.wrap(arr);
   }
-  
+
   //PRIMITIVE getX() and getXArray()
   /**
    * Gets the boolean value at the given offset
@@ -418,7 +418,7 @@ public interface Memory extends BaseState {
    * @return the number of characters decoded.
    * @throws Utf8CodingException in case of malformed or illegal UTF-8 input
    */
-  int getCharsFromUtf8(long offsetBytes, int utf8LengthBytes, StringBuilder dst) 
+  int getCharsFromUtf8(long offsetBytes, int utf8LengthBytes, StringBuilder dst)
       throws Utf8CodingException;
 
   /**

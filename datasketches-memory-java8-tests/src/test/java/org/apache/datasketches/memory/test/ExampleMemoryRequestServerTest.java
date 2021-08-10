@@ -56,7 +56,7 @@ public class ExampleMemoryRequestServerTest {
    * by the MemoryClient when it is done with the new memory allocations.
    * The initial allocation stays open until the end where it is closed at the end of the
    * TWR scope.
-   * @throws Exception 
+   * @throws Exception
    */
   @Test
   public void checkExampleMemoryRequestServer2() throws Exception {

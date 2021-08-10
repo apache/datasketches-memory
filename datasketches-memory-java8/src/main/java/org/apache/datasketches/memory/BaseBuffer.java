@@ -29,7 +29,7 @@ public interface BaseBuffer extends BaseState {
    * @return BaseBuffer
    */
   BaseBuffer incrementPosition(long increment);
-  
+
   /**
    * Increments the current position by the given increment.
    * Checks that the resource is valid and that the positional invariants are not violated,
@@ -38,7 +38,7 @@ public interface BaseBuffer extends BaseState {
    * @return BaseBuffer
    */
   BaseBuffer incrementAndCheckPosition(final long increment);
-  
+
   /**
    * Gets the end position
    * @return the end position
@@ -115,12 +115,12 @@ public interface BaseBuffer extends BaseState {
    * @return BaseBuffer
    */
   BaseBuffer setAndCheckStartPositionEnd(long start, long position, long end);
-  
-  
-  
-  
-  
-  
-  
-  
+
+
+
+
+
+
+
+
 }

@@ -35,14 +35,14 @@ public interface BaseState {
   static final MemoryRequestServer defaultMemReqSvr = new DefaultMemoryRequestServer();
 
   //Byte Order Related
-  
+
   /**
    * Gets the current Type ByteOrder.
    * This may be different from the ByteOrder of the backing resource and of the Native Byte Order.
    * @return the current Type ByteOrder.
    */
   ByteOrder getTypeByteOrder();
-  
+
   /**
    * Returns true if the Native ByteOrder is the same as the ByteOrder of the
    * current Buffer or Memory and the same ByteOrder as the given byteOrder.
@@ -51,7 +51,7 @@ public interface BaseState {
    * current Buffer or Memory and the same ByteOrder as the given byteOrder.
    */
   boolean isByteOrderCompatible(ByteOrder byteOrder);
-  
+
   /**
    * Returns true if the given object is an instance of this class and has equal data contents.
    * @param that the given object
@@ -59,7 +59,7 @@ public interface BaseState {
    */
   @Override
   boolean equals(Object that);
-  
+
   /**
    * Returns true if the given object is an instance of this class and has equal contents to
    * this object in the given range of bytes. This will also check two distinct ranges within the
@@ -73,19 +73,19 @@ public interface BaseState {
    */
   boolean equalTo(long thisOffsetBytes, Object that,
       long thatOffsetBytes, long lengthBytes);
-  
+
   /**
    * Gets the backing ByteBuffer if it exists, otherwise returns null.
    * @return the backing ByteBuffer if it exists, otherwise returns null.
    */
   ByteBuffer getByteBuffer();
-  
+
   /**
    * Gets the capacity of this object in bytes
    * @return the capacity of this object in bytes
    */
   long getCapacity();
-  
+
   /**
    * Gets the cumulative offset in bytes of this object from the backing resource.
    * This offset may also include other offset components such as the native off-heap
@@ -94,7 +94,7 @@ public interface BaseState {
    * @return the cumulative offset in bytes of this object from the backing resource.
    */
   long getCumulativeOffset();
-  
+
   /**
    * Gets the cumulative offset in bytes of this object from the backing resource including the given
    * offsetBytes. This offset may also include other offset components such as the native off-heap
@@ -105,7 +105,7 @@ public interface BaseState {
    * given offsetBytes.
    */
   long getCumulativeOffset(long offsetBytes);
-  
+
   /**
    * Returns the offset of address zero of this object relative to the address zero of the
    * backing resource but not including the size of any Java object header.
@@ -113,7 +113,7 @@ public interface BaseState {
    * backing resource but not including the size of any Java object header.
    */
   long getRegionOffset();
-  
+
   /**
    * Returns the offset of address zero of this object relative to the address zero of the
    * backing resource plus the given offsetBytes but not including the size of any Java object
@@ -124,13 +124,13 @@ public interface BaseState {
    * header.
    */
   long getRegionOffset(long offsetBytes);
-  
+
   /**
    * Returns true if this object is backed by an on-heap primitive array
    * @return true if this object is backed by an on-heap primitive array
    */
   boolean hasArray();
-  
+
   /**
    * Returns the hashCode of this object.
    *
@@ -145,7 +145,7 @@ public interface BaseState {
    */
   @Override
   int hashCode();
-  
+
   /**
    * Returns the 64-bit hash of the sequence of bytes in this object specified by
    * <i>offsetBytes</i>, <i>lengthBytes</i> and a <i>seed</i>.  Note that the sequence of bytes is
@@ -158,7 +158,7 @@ public interface BaseState {
    * <i>offsetBytes</i> and <i>lengthBytes</i>.
    */
   long xxHash64(long offsetBytes, long lengthBytes, long seed);
-  
+
   /**
    * Returns a 64-bit hash from a single long. This method has been optimized for speed when only
    * a single hash of a long is required.
@@ -167,26 +167,26 @@ public interface BaseState {
    * @return the hash.
    */
   long xxHash64(long in, long seed);
-  
+
   /**
    * Returns true if this Memory is backed by a ByteBuffer.
    * @return true if this Memory is backed by a ByteBuffer.
    */
   boolean hasByteBuffer();
-  
+
   /**
    * Returns true if the backing resource is direct (off-heap) memory.
    * This is the case for allocated direct memory, memory mapped files,
    * @return true if the backing resource is direct (off-heap) memory.
    */
   boolean isDirect();
-  
+
   /**
    * Returns true if this object or the backing resource is read-only.
    * @return true if this object or the backing resource is read-only.
    */
   boolean isReadOnly();
-  
+
   /**
    * Returns true if the backing resource of <i>this</i> is identical with the backing resource
    * of <i>that</i>. The capacities must be the same.  If <i>this</i> is a region,
@@ -196,14 +196,14 @@ public interface BaseState {
    * of <i>that</i>.
    */
   boolean isSameResource(Object that);
-  
+
   /**
    * Returns true if this object is valid and has not been closed.
    * This is relevant only for direct (off-heap) memory and Mapped Files.
    * @return true if this object is valid and has not been closed.
    */
   boolean isValid();
-  
+
   /**
    * Checks that the specified range of bytes is within bounds of this object, throws
    * {@link IllegalArgumentException} if it's not: i. e. if offsetBytes &lt; 0, or length &lt; 0,
@@ -212,9 +212,9 @@ public interface BaseState {
    * @param lengthBytes the given length in bytes of this object
    */
   void checkValidAndBounds(long offsetBytes, long lengthBytes);
-  
+
   //Monitoring
-  
+
   /**
    * Gets the current number of active direct memory allocations.
    * @return the current number of active direct memory allocations.
@@ -222,7 +222,7 @@ public interface BaseState {
   static long getCurrentDirectMemoryAllocations() {
     return BaseStateImpl.getCurrentDirectMemoryAllocations();
   }
-  
+
   /**
    * Gets the current size of active direct memory allocated.
    * @return the current size of active direct memory allocated.
@@ -230,7 +230,7 @@ public interface BaseState {
   static long getCurrentDirectMemoryAllocated() {
     return BaseStateImpl.getCurrentDirectMemoryAllocated();
   }
-  
+
   /**
    * Gets the current number of active direct memory map allocations.
    * @return the current number of active direct memory map allocations.
@@ -238,7 +238,7 @@ public interface BaseState {
   static long getCurrentDirectMemoryMapAllocations() {
     return BaseStateImpl.getCurrentDirectMemoryMapAllocations();
   }
-  
+
   /**
    * Gets the current size of active direct memory map allocated.
    * @return the current size of active direct memory map allocated.
@@ -246,9 +246,9 @@ public interface BaseState {
   static long getCurrentDirectMemoryMapAllocated() {
     return BaseStateImpl.getCurrentDirectMemoryMapAllocated();
   }
-  
+
   //TO STRING
-  
+
   /**
    * Returns a formatted hex string of a range of this object.
    * Used primarily for testing.
@@ -258,5 +258,5 @@ public interface BaseState {
    * @return a formatted hex string in a human readable array
    */
   String toHexString(String header, long offsetBytes, int lengthBytes);
-  
+
 }

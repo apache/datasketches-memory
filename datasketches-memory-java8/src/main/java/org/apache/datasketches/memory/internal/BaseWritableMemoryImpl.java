@@ -89,7 +89,7 @@ abstract class BaseWritableMemoryImpl extends WritableMemoryImpl {
   }
 
   static BaseWritableMemoryImpl wrapByteBuffer(
-      final ByteBuffer byteBuf, final boolean localReadOnly, final ByteOrder byteOrder, 
+      final ByteBuffer byteBuf, final boolean localReadOnly, final ByteOrder byteOrder,
       final MemoryRequestServer memReqSvr) {
     final AccessByteBuffer abb = new AccessByteBuffer(byteBuf);
     if (abb.resourceReadOnly && !localReadOnly) {

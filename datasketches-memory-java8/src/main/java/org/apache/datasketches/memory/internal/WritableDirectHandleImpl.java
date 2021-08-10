@@ -49,7 +49,7 @@ public final class WritableDirectHandleImpl implements WritableHandle {
   public Memory get() {
     return wMem;
   }
-  
+
   @Override
   public WritableMemory getWritable() {
     return wMem;
@@ -62,6 +62,6 @@ public final class WritableDirectHandleImpl implements WritableHandle {
     if (direct.doClose()) {
       wMem = null;
     }
-    
+
   }
 }

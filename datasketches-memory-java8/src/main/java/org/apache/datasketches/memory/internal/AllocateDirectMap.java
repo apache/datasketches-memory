@@ -76,7 +76,7 @@ class AllocateDirectMap implements Map {
           .getDeclaredMethod("unmap0", long.class, long.class); //OK through jDK16
       FILE_CHANNEL_IMPL_UNMAP0_METHOD.setAccessible(true);
 
-      
+
       //The MappedByteBuffer methods load0, isLoaded0 and force0 are removed in 15
       MAPPED_BYTE_BUFFER_LOAD0_METHOD = MappedByteBuffer.class
           .getDeclaredMethod("load0", long.class, long.class); //JDK15 removed
@@ -122,7 +122,7 @@ class AllocateDirectMap implements Map {
   }
 
   //Map Interface
-  
+
   @Override
   public void load() {
     madvise();
@@ -152,7 +152,7 @@ class AllocateDirectMap implements Map {
     }
   }
   // End Map Interface
-  
+
   @Override
   public void close() {
     doClose("AllocateDirectMap");
@@ -166,7 +166,7 @@ class AllocateDirectMap implements Map {
         // because the valid state is already changed.
         cleaner.clean();
         return true;
-      } 
+      }
       return false;
     } catch (final Exception e) {
         throw new MemoryCloseException(resource);
@@ -295,7 +295,7 @@ class AllocateDirectMap implements Map {
           BaseStateImpl.currentDirectMemoryMapAllocated_.addAndGet(-myCapacity);
         }
         return true;
-      } 
+      }
       return false;
     }
 

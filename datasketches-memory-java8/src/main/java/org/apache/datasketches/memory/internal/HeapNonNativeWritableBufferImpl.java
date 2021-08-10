@@ -74,7 +74,7 @@ final class HeapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl 
   public MemoryRequestServer getMemoryRequestServer() {
     return null;
   }
-  
+
   @Override
   int getTypeId() {
     return typeId & 0xff;

@@ -72,7 +72,7 @@ final class NioBits {
       totalCapacityField.setAccessible(true);
       nioBitsTotalCapacity = (AtomicLong) (totalCapacityField.get(null));
 
-    } catch (final ClassNotFoundException | NoSuchMethodException |  IllegalAccessException 
+    } catch (final ClassNotFoundException | NoSuchMethodException |  IllegalAccessException
         | IllegalArgumentException | SecurityException |  NoSuchFieldException e) {
       throw new RuntimeException("Could not acquire java.nio.Bits class: " + e.getClass());
     }

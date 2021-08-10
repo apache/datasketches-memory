@@ -17,7 +17,6 @@
  * under the License.
  */
 
-
 package org.apache.datasketches.memory;
 
 import java.nio.ByteBuffer;
@@ -52,7 +51,7 @@ public interface Buffer extends BaseBuffer {
   static Buffer wrap(ByteBuffer byteBuf, ByteOrder byteOrder) {
     return BufferImpl.wrap(byteBuf, byteOrder);
   }
-  
+
   //DUPLICATES
   /**
    * Returns a read-only duplicate view of this Buffer with the same but independent values of

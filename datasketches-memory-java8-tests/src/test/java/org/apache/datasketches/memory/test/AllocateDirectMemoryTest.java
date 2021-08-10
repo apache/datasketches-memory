@@ -34,7 +34,7 @@ import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")
 public class AllocateDirectMemoryTest {
-  
+
   @Test
   public void simpleAllocateDirect() throws Exception {
     int longs = 32;
@@ -48,7 +48,7 @@ public class AllocateDirectMemoryTest {
       //inside the TWR block the memory should be valid
       ReflectUtil.checkValid(wMem);
       //OK
-    } 
+    }
     //The TWR block has exited, so the memory should be invalid
     try {
       ReflectUtil.checkValid(wMem);
@@ -100,7 +100,7 @@ public class AllocateDirectMemoryTest {
       WritableMemory wmem = h.getWritable();
       wmem.putChar(0, (char) 1);
       assertEquals(wmem.getByte(1), (byte) 1);
-    } 
+    }
   }
 
   @Test

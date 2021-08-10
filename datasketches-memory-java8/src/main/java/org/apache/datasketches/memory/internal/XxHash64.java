@@ -189,7 +189,7 @@ public class XxHash64 {
     hash = (Long.rotateLeft(hash, 27) * P1) + P4;
     return finalize(hash);
   }
-  
+
   private static long finalize(long hash) {
     hash ^= hash >>> 33;
     hash *= P2;
@@ -199,8 +199,8 @@ public class XxHash64 {
     return hash;
   }
 
-  
-  
+
+
   /**
    * Hash the given arr starting at the given offset and continuing for the given length using the
    * given seed.

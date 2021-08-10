@@ -23,7 +23,7 @@
 
 package org.apache.datasketches.memory.test;
 
-import static org.apache.datasketches.memory.internal.Util.*;
+import static org.apache.datasketches.memory.internal.Util.getResourceFile;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
@@ -37,10 +37,10 @@ import java.util.List;
 
 import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.MapHandle;
-import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.internal.Util;
+import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
+import org.apache.datasketches.memory.internal.Util;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -49,7 +49,7 @@ import org.testng.collections.Lists;
 @SuppressWarnings("javadoc")
 public class MemoryTest {
   private static final String LS = System.getProperty("line.separator");
-  
+
   @BeforeClass
   public void setReadOnly() {
     UtilTest.setGettysburgAddressFileToReadOnly();
@@ -411,7 +411,7 @@ public class MemoryTest {
 
     MapHandle mmh1 = Memory.map(file);
     MapHandle mmh2 = Memory.map(file);
-    
+
     assertEquals(BaseState.getCurrentDirectMemoryMapAllocations(), 2L);
     assertEquals(BaseState.getCurrentDirectMemoryMapAllocated(), 2 * bytes);
 

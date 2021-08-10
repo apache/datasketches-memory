@@ -42,7 +42,7 @@ final class AllocateDirectWritableMap extends AllocateDirectMap implements Writa
   }
 
   //Added by WritableMap Interface
-  
+
   @Override
   public void force() {
     if (resourceReadOnly) {

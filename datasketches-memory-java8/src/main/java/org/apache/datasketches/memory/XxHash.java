@@ -19,7 +19,15 @@
 
 package org.apache.datasketches.memory;
 
-import static org.apache.datasketches.memory.internal.XxHash64.*;
+import static org.apache.datasketches.memory.internal.XxHash64.hash;
+import static org.apache.datasketches.memory.internal.XxHash64.hashBooleans;
+import static org.apache.datasketches.memory.internal.XxHash64.hashBytes;
+import static org.apache.datasketches.memory.internal.XxHash64.hashChars;
+import static org.apache.datasketches.memory.internal.XxHash64.hashDoubles;
+import static org.apache.datasketches.memory.internal.XxHash64.hashFloats;
+import static org.apache.datasketches.memory.internal.XxHash64.hashInts;
+import static org.apache.datasketches.memory.internal.XxHash64.hashLongs;
+import static org.apache.datasketches.memory.internal.XxHash64.hashShorts;
 
 /**
  * The XxHash is a fast, non-cryptographic, 64-bit hash function that has
@@ -42,7 +50,7 @@ import static org.apache.datasketches.memory.internal.XxHash64.*;
 public final class XxHash {
 
   public XxHash() { /* singleton */ }
-  
+
   /**
    * Hash the given arr starting at the given offset and continuing for the given length using the
    * given seed.
@@ -56,7 +64,7 @@ public final class XxHash {
       final long lengthBooleans, final long seed) {
     return hashBooleans(arr, offsetBooleans, lengthBooleans, seed);
   }
-  
+
   /**
    * Hash the given arr starting at the given offset and continuing for the given length using the
    * given seed.
@@ -70,7 +78,7 @@ public final class XxHash {
       final long lengthBytes, final long seed) {
     return hashBytes(arr, offsetBytes, lengthBytes, seed);
   }
-  
+
   /**
    * Hash the given arr starting at the given offset and continuing for the given length using the
    * given seed.
@@ -84,7 +92,7 @@ public final class XxHash {
       final long lengthShorts, final long seed) {
     return hashShorts(arr, offsetShorts, lengthShorts, seed);
   }
-  
+
   /**
    * Hash the given arr starting at the given offset and continuing for the given length using the
    * given seed.
@@ -98,7 +106,7 @@ public final class XxHash {
       final long lengthChars, final long seed) {
     return hashChars(arr, offsetChars, lengthChars, seed);
   }
-  
+
   /**
    * Hash the given arr starting at the given offset and continuing for the given length using the
    * given seed.
@@ -112,7 +120,7 @@ public final class XxHash {
       final long lengthInts, final long seed) {
     return hashInts(arr, offsetInts, lengthInts, seed);
   }
-  
+
   /**
    * Hash the given arr starting at the given offset and continuing for the given length using the
    * given seed.
@@ -126,7 +134,7 @@ public final class XxHash {
       final long lengthLongs, final long seed) {
     return hashLongs(arr, offsetLongs, lengthLongs, seed);
   }
-  
+
   /**
    * Returns a 64-bit hash from a single long. This method has been optimized for speed when only
    * a single hash of a long is required.
@@ -137,7 +145,7 @@ public final class XxHash {
   public static long hashLong(final long in, final long seed) {
     return hash(in, seed);
   }
-  
+
   /**
    * Hash the given arr starting at the given offset and continuing for the given length using the
    * given seed.
@@ -151,7 +159,7 @@ public final class XxHash {
       final long lengthFloats, final long seed) {
     return hashFloats(arr, offsetFloats, lengthFloats, seed);
   }
-  
+
   /**
    * Hash the given arr starting at the given offset and continuing for the given length using the
    * given seed.
@@ -165,7 +173,7 @@ public final class XxHash {
       final long lengthDoubles, final long seed) {
     return hashDoubles(arr, offsetDoubles, lengthDoubles, seed);
   }
-  
+
   /**
    * Hash the given arr starting at the given offset and continuing for the given length using the
    * given seed.
@@ -179,6 +187,6 @@ public final class XxHash {
       final long lengthChars, final long seed) {
     return org.apache.datasketches.memory.internal.XxHash64.hashString(str, offsetChars, lengthChars, seed);
   }
-  
+
 }
 

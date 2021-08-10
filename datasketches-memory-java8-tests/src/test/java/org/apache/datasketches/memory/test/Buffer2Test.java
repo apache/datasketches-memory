@@ -412,6 +412,7 @@ public class Buffer2Test {
   public void checkWritableWrap() {
     ByteBuffer bb = ByteBuffer.allocate(16);
     WritableBuffer buf = WritableBuffer.writableWrap(bb, ByteOrder.nativeOrder(), null);
+    assertNotNull(buf);
     buf = WritableBuffer.writableWrap(bb, ByteOrder.nativeOrder(), new DefaultMemoryRequestServer());
     assertNotNull(buf);
   }

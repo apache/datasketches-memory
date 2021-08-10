@@ -354,7 +354,7 @@ public class MurmurHash3v2Test {
    * @param s the given string
    * @param fieldLength the desired field length
    * @param padChar the desired pad character
-   * @param postpend if true append the pacCharacters to the end of the string.
+   * @param postpend if true append the padCharacters to the end of the string.
    * @return prepended or postpended given string with the given character to fill the given field
    * length.
    */

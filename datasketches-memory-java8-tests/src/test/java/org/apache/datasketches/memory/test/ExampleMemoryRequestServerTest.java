@@ -101,7 +101,7 @@ public class ExampleMemoryRequestServerTest {
       WritableMemory bigMem = svr.request(2 * cap1); //get bigger mem
       long cap2 = bigMem.getCapacity();
       smallMem.copyTo(0, bigMem, 0, cap1);    //copy data from small to big
-      svr.requestClose(smallMem, bigMem);                  //done with smallMem, release it
+      svr.requestClose(smallMem, bigMem);     //done with smallMem, release it
 
       bigMem.fill(cap1, cap1, (byte) 2);      //fill the rest of bigMem, still not big enough
       println(bigMem.toHexString("Big", 0, (int)cap2));
@@ -109,7 +109,7 @@ public class ExampleMemoryRequestServerTest {
       WritableMemory giantMem = svr.request(2 * cap2); //get giant mem
       long cap3 = giantMem.getCapacity();
       bigMem.copyTo(0, giantMem, 0, cap2);    //copy data from small to big
-      svr.requestClose(bigMem, giantMem);                    //done with bigMem, release it
+      svr.requestClose(bigMem, giantMem);     //done with bigMem, release it
 
       giantMem.fill(cap2, cap2, (byte) 3);    //fill the rest of giantMem
       println(giantMem.toHexString("Giant", 0, (int)cap3));

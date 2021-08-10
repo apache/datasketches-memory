@@ -55,20 +55,20 @@ public class AllocateDirectWritableMapMemoryTest {
   private static final String LS = System.getProperty("line.separator");
 
   static final Method IS_FILE_READ_ONLY;
-  
+
   static {
     IS_FILE_READ_ONLY =
         ReflectUtil.getMethod(ReflectUtil.ALLOCATE_DIRECT_MAP, "isFileReadOnly", File.class);
   }
-  
+
   private static boolean isFileReadOnly(final File file) {
     try {
       return (boolean) IS_FILE_READ_ONLY.invoke(null, file);
-    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) { 
-      throw new RuntimeException(e); 
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
     }
   }
-  
+
   @BeforeClass
   public void setReadOnly() {
     UtilTest.setGettysburgAddressFileToReadOnly();
@@ -247,7 +247,7 @@ public class AllocateDirectWritableMapMemoryTest {
         println(""+count);
         fail();
       }
-    } 
+    }
 
   @Test
   public void printlnTest() {

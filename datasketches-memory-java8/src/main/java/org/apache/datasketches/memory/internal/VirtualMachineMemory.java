@@ -56,7 +56,7 @@ public final class VirtualMachineMemory {
     /**
      * Returns the maximum amount of allocatable direct buffer memory. The
      * directMemory variable is initialized during system initialization.
-     * 
+     *
      * @return the maximum amount of allocatable direct buffer memory.
      */
     public static long getMaxDBBMemory() {
@@ -65,7 +65,7 @@ public final class VirtualMachineMemory {
 
     /**
      * Returns true if the direct buffers should be page aligned.
-     * 
+     *
      * @return flag that determines whether direct buffers should be page aligned.
      */
     public static boolean getIsPageAligned() {

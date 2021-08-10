@@ -35,7 +35,7 @@ public class NioBitsTest {
     println("Page Aligned: " + ReflectUtil.isPageAligned());
     println("Page Size: " + ReflectUtil.pageSize());
   }
-  
+
   @Test
   public void checkGetAtomicFields() {
     //testing this beyond 2GB may not work on JVMs < 8GB.

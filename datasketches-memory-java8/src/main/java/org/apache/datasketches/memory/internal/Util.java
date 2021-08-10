@@ -36,7 +36,7 @@ import org.apache.datasketches.memory.Memory;
  */
 public final class Util {
   public static final String LS = System.getProperty("line.separator");
-  
+
   //Byte Order related
   public static final ByteOrder nativeByteOrder = ByteOrder.nativeOrder();
   public static final ByteOrder nonNativeByteOrder = nativeByteOrder == ByteOrder.LITTLE_ENDIAN
@@ -53,11 +53,11 @@ public final class Util {
    * <p>A reference to this can be found in java.nio.Bits.</p>
    */
   public static final int UNSAFE_COPY_THRESHOLD_BYTES = 1024 * 1024;
-  
+
   private Util() { }
 
   //Byte Order Related
-  
+
   /**
    * Returns the Native Byte Order
    * @return the Native Byte Order
@@ -77,8 +77,8 @@ public final class Util {
     }
     return Util.nativeByteOrder == byteOrder;
   }
-  
-  
+
+
   /**
    * Searches a range of the specified array of longs for the specified value using the binary
    * search algorithm. The range must be sorted method) prior to making this call.

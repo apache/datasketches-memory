@@ -22,7 +22,7 @@ package org.apache.datasketches.memory;
 /**
  * A Handle for a memory-mapped, read-only file resource. This
  * joins a Read-only Handle with an AutoCloseable Map resource.
- * Please read Javadocs for {@link Handle}. 
+ * Please read Javadocs for {@link Handle}.
  *
  * @author Lee Rhodes
  * @author Roman Leventov

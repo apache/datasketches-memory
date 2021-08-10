@@ -76,7 +76,7 @@ final class MapWritableMemoryImpl extends NativeWritableMemoryImpl {
   public MemoryRequestServer getMemoryRequestServer() {
     return null;
   }
-  
+
   @Override
   long getNativeBaseOffset() {
     return nativeBaseOffset;
@@ -91,5 +91,5 @@ final class MapWritableMemoryImpl extends NativeWritableMemoryImpl {
   public boolean isValid() {
     return valid.get();
   }
-  
+
 }

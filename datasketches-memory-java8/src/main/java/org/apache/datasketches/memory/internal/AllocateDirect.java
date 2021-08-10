@@ -127,7 +127,7 @@ final class AllocateDirect {
         BaseStateImpl.currentDirectMemoryAllocations_.decrementAndGet();
         BaseStateImpl.currentDirectMemoryAllocated_.addAndGet(-capacity);
         return true;
-      } 
+      }
       return false;
     }
   }

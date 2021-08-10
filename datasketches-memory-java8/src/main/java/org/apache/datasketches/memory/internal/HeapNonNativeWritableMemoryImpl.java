@@ -73,7 +73,7 @@ final class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl 
   public MemoryRequestServer getMemoryRequestServer() {
     return null;
   }
-  
+
   @Override
   int getTypeId() {
     return typeId & 0xff;
@@ -83,5 +83,5 @@ final class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl 
   Object getUnsafeObject() {
     return unsafeObj;
   }
-  
+
 }

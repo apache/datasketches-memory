@@ -159,7 +159,7 @@ public final class MurmurHash3v2 {
   /**
    * Returns a 128-bit hash of the input as a long array of size 2.
    *
-   * @param mem The input on-heap Memory. Must be non-null and non-empty, 
+   * @param mem The input on-heap Memory. Must be non-null and non-empty,
    * otherwise throws IllegalArgumentException.
    * @param offsetBytes the starting point within Memory.
    * @param lengthBytes the total number of bytes to be hashed.
@@ -170,12 +170,12 @@ public final class MurmurHash3v2 {
   @SuppressWarnings("restriction")
   public static long[] hash(final Memory mem, final long offsetBytes, final long lengthBytes,
       final long seed, final long[] hashOut) {
-    if ((mem == null) || (mem.getCapacity() == 0L)) { 
+    if ((mem == null) || (mem.getCapacity() == 0L)) {
       throw new IllegalArgumentException("Input mem is empty or null.");
     }
     final Object uObj = ((WritableMemory) mem).getArray();
-    if (uObj == null) { 
-      throw new IllegalArgumentException("The backing resource of input mem is not on-heap."); 
+    if (uObj == null) {
+      throw new IllegalArgumentException("The backing resource of input mem is not on-heap.");
     }
     long cumOff = mem.getCumulativeOffset() + offsetBytes;
 

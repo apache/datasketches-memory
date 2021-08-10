@@ -31,13 +31,13 @@ import org.apache.datasketches.memory.MemoryRequestServer;
 public final class ReflectUtil {
 
   private ReflectUtil() {}
-  
+
   static final Class<?> BASE_STATE;
   static final Class<?> BASE_WRITABLE_MEMORY_IMPL;
   static final Class<?> ALLOCATE_DIRECT_MAP;
   static final Class<?> NIO_BITS;
-  
-  static final Method CHECK_VALID; //BaseStateImpl  
+
+  static final Method CHECK_VALID; //BaseStateImpl
   static final Method GET_DIRECT_ALLOCATIONS_COUNT; //NioBits
   static final Method GET_MAX_DIRECT_BYTE_BUFFER_MEMORY; //NioBits
   static final Method GET_NATIVE_BASE_OFFSET; //BaseStateImpl
@@ -60,15 +60,15 @@ public final class ReflectUtil {
   static final Method RESERVE_MEMORY; //NioBits
   static final Method UNRESERVE_MEMORY; //NioBits
   static final Method WRAP_DIRECT; //BaseWritableMemoryImpl
-  
+
   static {
-    BASE_STATE = 
+    BASE_STATE =
         getClass("org.apache.datasketches.memory.internal.BaseStateImpl");
-    BASE_WRITABLE_MEMORY_IMPL = 
+    BASE_WRITABLE_MEMORY_IMPL =
         getClass("org.apache.datasketches.memory.internal.BaseWritableMemoryImpl");
-    ALLOCATE_DIRECT_MAP = 
+    ALLOCATE_DIRECT_MAP =
         getClass("org.apache.datasketches.memory.internal.AllocateDirectMap");
-    NIO_BITS = 
+    NIO_BITS =
         getClass("org.apache.datasketches.memory.internal.NioBits");
 
     CHECK_VALID =
@@ -83,7 +83,7 @@ public final class ReflectUtil {
         getMethod(NIO_BITS, "getReservedMemory", (Class<?>[])null); //static
     GET_TOTAL_CAPACITY =
         getMethod(NIO_BITS, "getTotalCapacity", (Class<?>[])null); //static
-    GET_UNSAFE_OBJECT = 
+    GET_UNSAFE_OBJECT =
         getMethod(BASE_STATE, "getUnsafeObject", (Class<?>[])null); //not static
     IS_BB_TYPE =
         getMethod(BASE_STATE, "isBBType", (Class<?>[])null); //not static
@@ -116,13 +116,13 @@ public final class ReflectUtil {
     UNRESERVE_MEMORY =
         getMethod(NIO_BITS, "unreserveMemory", long.class, long.class); //static
     WRAP_DIRECT =
-        getMethod(BASE_WRITABLE_MEMORY_IMPL, 
+        getMethod(BASE_WRITABLE_MEMORY_IMPL,
             "wrapDirect", long.class, ByteOrder.class, MemoryRequestServer.class);  //static method
   }
-  
+
   /**
-   * Gets a Class reference to the given class loaded by the SystemClassLoader. 
-   * This will work for private, package-private and abstract classes. 
+   * Gets a Class reference to the given class loaded by the SystemClassLoader.
+   * This will work for private, package-private and abstract classes.
    * @param fullyQualifiedBinaryName the binary name is the name of the class file on disk. This does not instantiate
    * a concrete class, but allows access to constructors, static fields and static methods.
    * @return the Class object of the given class.
@@ -162,17 +162,17 @@ public final class ReflectUtil {
     try {
       constructor.setAccessible(true);
       return constructor.newInstance(initargs);
-    } catch (final InstantiationException | IllegalAccessException | IllegalArgumentException 
+    } catch (final InstantiationException | IllegalAccessException | IllegalArgumentException
           | InvocationTargetException | SecurityException e) {
       throw new RuntimeException(e);
     }
   }
-  
+
   /**
    * Gets a declared field of the given the loaded owner class and field name. The accessible flag will be set true.
    * @param ownerClass the Class<?> object of the class loaded by the SystemClassLoader.
    * @param fieldName the desired field name
-   * @return the desired field.  
+   * @return the desired field.
    */
   public static Field getField(final Class<?> ownerClass, final String fieldName) {
     try {
@@ -183,7 +183,7 @@ public final class ReflectUtil {
       throw new RuntimeException(e);
     }
   }
-  
+
   /**
    * Gets a field value given the loaded owner class and the Field. The accessible flag will be set true.
    * @param ownerClass the loaded class owning the field
@@ -198,11 +198,11 @@ public final class ReflectUtil {
       throw new RuntimeException(e);
     }
   }
-  
+
   /**
-   * Gets a declared method of the given the loaded owning class, method name and parameter types. 
-   * The accessible flag will be set true. 
-   * @param ownerClass the given 
+   * Gets a declared method of the given the loaded owning class, method name and parameter types.
+   * The accessible flag will be set true.
+   * @param ownerClass the given
    * @param methodName the given method name
    * @param parameterTypes the list of parameter types
    * @return the desired method.
@@ -210,7 +210,7 @@ public final class ReflectUtil {
   public static Method getMethod(
       final Class<?> ownerClass, final String methodName, final Class<?>... parameterTypes ) {
     try {
-      final Method method = (parameterTypes == null) 
+      final Method method = (parameterTypes == null)
           ? ownerClass.getDeclaredMethod(methodName)
           : ownerClass.getDeclaredMethod(methodName, parameterTypes);
       method.setAccessible(true);
@@ -219,7 +219,7 @@ public final class ReflectUtil {
       throw new RuntimeException(e);
     }
   }
-  
+
   static void checkValid(final Object target) {
     try {
       CHECK_VALID.invoke(target);
@@ -231,8 +231,8 @@ public final class ReflectUtil {
   static long getDirectAllocationsCount() {
     try {
       return (long) GET_DIRECT_ALLOCATIONS_COUNT.invoke(null);
-    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) { 
-      throw new RuntimeException(e); 
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
     }
   }
 

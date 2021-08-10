@@ -73,7 +73,7 @@ final class HeapWritableMemoryImpl extends NativeWritableMemoryImpl {
   public MemoryRequestServer getMemoryRequestServer() {
     return null;
   }
-  
+
   @Override
   int getTypeId() {
     return typeId & 0xff;

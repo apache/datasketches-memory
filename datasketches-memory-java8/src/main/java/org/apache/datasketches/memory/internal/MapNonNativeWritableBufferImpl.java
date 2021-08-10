@@ -77,7 +77,7 @@ final class MapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   public MemoryRequestServer getMemoryRequestServer() {
     return null;
   }
-  
+
   @Override
   long getNativeBaseOffset() {
     return nativeBaseOffset;

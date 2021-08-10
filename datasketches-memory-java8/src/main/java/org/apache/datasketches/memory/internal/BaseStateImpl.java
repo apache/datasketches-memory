@@ -108,7 +108,7 @@ public abstract class BaseStateImpl implements BaseState {
    * @param byteOrder the given byte order
    * @return true if the given byteOrder is the same as the native byte order.
    */
-  static boolean isNativeByteOrder(final ByteOrder byteOrder) {
+  public static boolean isNativeByteOrder(final ByteOrder byteOrder) {
     if (byteOrder == null) {
       throw new IllegalArgumentException("ByteOrder parameter cannot be null.");
     }
@@ -333,8 +333,7 @@ public abstract class BaseStateImpl implements BaseState {
 
   //TO STRING
   //For debugging
-  public static final String typeDecode(final BaseStateImpl mem) {
-    int typeId = mem.getTypeId();
+  public static final String typeDecode(final int typeId) {
     StringBuilder sb = new StringBuilder();
     int group1 = typeId & 0x7;
     switch (group1) {

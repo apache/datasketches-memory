@@ -21,16 +21,18 @@ package org.apache.datasketches.memory.test;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.Buffer;
+import org.apache.datasketches.memory.DefaultMemoryRequestServer;
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.internal.ReadOnlyException;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
+import org.apache.datasketches.memory.internal.ReadOnlyException;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")
@@ -404,6 +406,15 @@ public class Buffer2Test {
     Buffer buf = Buffer.wrap(roBB);
     WritableBuffer wbuf = (WritableBuffer) buf;
     wbuf.fill((byte)0);
+  }
+
+  @Test
+  public void checkWritableWrap() {
+    ByteBuffer bb = ByteBuffer.allocate(16);
+    WritableBuffer buf = WritableBuffer.writableWrap(bb, ByteOrder.nativeOrder(), null);
+    assertNotNull(buf);
+    buf = WritableBuffer.writableWrap(bb, ByteOrder.nativeOrder(), new DefaultMemoryRequestServer());
+    assertNotNull(buf);
   }
 
   @Test

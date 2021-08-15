@@ -19,8 +19,6 @@
 
 package org.apache.datasketches.memory;
 
-import org.apache.datasketches.memory.internal.WritableMemoryImpl;
-
 /**
  * This is a simple implementation of the MemoryRequestServer that creates space on the Java heap
  * for the requesting application. This capability is only available for direct, off-heap
@@ -45,7 +43,7 @@ import org.apache.datasketches.memory.internal.WritableMemoryImpl;
  *       memReqSvr = (memReqSvr == null) ? mem.getMemoryRequestServer() : memReqSvr;
  *
  *       //Request bigger memory
- *       WritableMemory newMem = memReqSvr.request(spaceNeeded);
+ *       WritableMemory newMem = memReqSvr.request(mem, spaceNeeded);
  *
  *       //Copy your data from the current memory to the new one and resize
  *       moveAndResize(mem, newMem);
@@ -55,7 +53,7 @@ import org.apache.datasketches.memory.internal.WritableMemoryImpl;
  *       // actually close the resource.
  *       memReqSvr.requestClose(mem, newMem);
  *
- *       mem = newMem; //update your reference to memoty
+ *       mem = newMem; //update your reference to memory
  *     }
  *
  *     //continue with the add process
@@ -74,8 +72,8 @@ public final class DefaultMemoryRequestServer implements MemoryRequestServer {
    * <p>By default this allocates new memory requests on the Java heap.
    */
   @Override
-  public WritableMemory request(final long capacityBytes) {
-    final WritableMemory wmem = WritableMemoryImpl.allocate((int)capacityBytes);
+  public WritableMemory request(final WritableMemory currentWritableMemory, final long capacityBytes) {
+    final WritableMemory wmem = WritableMemory.allocate((int)capacityBytes, currentWritableMemory.getTypeByteOrder());
     return wmem;
   }
 

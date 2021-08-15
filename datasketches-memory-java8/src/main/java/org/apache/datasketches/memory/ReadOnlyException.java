@@ -17,14 +17,14 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory;
 
 /**
  * The exception thrown when attempting to write into a read-only Resource.
  *
  * @author Praveenkumar Venkatesan
  */
-public class ReadOnlyException extends UnsupportedOperationException {
+public class ReadOnlyException extends MemoryException {
     private static final long serialVersionUID = 1L;
 
     /**

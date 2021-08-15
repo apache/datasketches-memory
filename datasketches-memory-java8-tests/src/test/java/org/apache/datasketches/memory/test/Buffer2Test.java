@@ -30,9 +30,9 @@ import java.nio.ByteOrder;
 import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.DefaultMemoryRequestServer;
 import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.memory.ReadOnlyException;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
-import org.apache.datasketches.memory.internal.ReadOnlyException;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")

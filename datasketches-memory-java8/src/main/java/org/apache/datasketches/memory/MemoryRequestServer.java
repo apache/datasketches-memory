@@ -30,18 +30,21 @@ package org.apache.datasketches.memory;
 public interface MemoryRequestServer {
 
   /**
-   * Request new WritableMemory with the given capacity.
-   * @param capacityBytes The capacity being requested.
+   * Request new WritableMemory with the given capacity. The current Writable Memory will be used to
+   * determine the byte order of the returned WritableMemory and other checks.
+   * @param currentWritableMemory the current writableMemory of the client. It must be non-null.
+   * @param capacityBytes The capacity being requested. It must be >0.
+   *
    * @return new WritableMemory with the given capacity.
    */
-  WritableMemory request(long capacityBytes);
+  WritableMemory request(WritableMemory currentWritableMemory, long capacityBytes);
 
   /**
    * Request close the AutoCloseable resource.
    * This may be ignored depending on the application implementation.
-   * @param memToClose the relevant WritbleMemory to be considered for closing.
-   * @param newMemory the newly allocated WritableMemory. This is returned from the client
-   * for the convenience of the resource owner. It is optional and may be null.
+   * @param memToClose the relevant WritbleMemory to be considered for closing. It must be non-null.
+   * @param newMemory the newly allocated WritableMemory. It must be non-null.
+   * This is returned from the client to facilitate tracking for the convenience of the resource owner.
    */
   void requestClose(final WritableMemory memToClose, WritableMemory newMemory);
 

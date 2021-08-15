@@ -21,19 +21,20 @@ package org.apache.datasketches.memory.test;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.internal.ReadOnlyException;
+import org.apache.datasketches.memory.ReadOnlyException;
+import org.apache.datasketches.memory.WritableBuffer;
+import org.apache.datasketches.memory.WritableHandle;
+import org.apache.datasketches.memory.WritableMemory;
 import org.apache.datasketches.memory.internal.UnsafeUtil;
 import org.apache.datasketches.memory.internal.Util;
-import org.apache.datasketches.memory.WritableBuffer;
-import org.apache.datasketches.memory.WritableMemory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -287,8 +288,10 @@ public class NativeWritableBufferImplTest {
     ByteBuffer byteBuf = ByteBuffer.allocate(memCapacity);
     byteBuf.order(ByteOrder.nativeOrder());
     ByteBuffer byteBufRO = byteBuf.asReadOnlyBuffer();
-
-    WritableBuffer.writableWrap(byteBufRO);
+    byteBufRO.order(ByteOrder.nativeOrder());
+    assertTrue(true);
+    WritableBuffer wbuf = WritableBuffer.writableWrap(byteBufRO);
+    assertTrue(wbuf.isReadOnly());
   }
 
   @Test
@@ -503,14 +506,13 @@ public class NativeWritableBufferImplTest {
   public void checkAsWritableMemoryRO() {
     ByteBuffer bb = ByteBuffer.allocate(64);
     WritableBuffer wbuf = WritableBuffer.writableWrap(bb);
-    @SuppressWarnings("unused")
-    WritableMemory wmem = wbuf.asWritableMemory();
+    WritableMemory wmem = wbuf.asWritableMemory(); //OK
+    assertNotNull(wmem);
 
     try {
-      Buffer buf = Buffer.wrap(bb);
+      Buffer buf = Buffer.wrap(bb.asReadOnlyBuffer());
       wbuf = (WritableBuffer) buf;
-      @SuppressWarnings("unused")
-      WritableMemory wmem2 = wbuf.asWritableMemory();
+      wmem = wbuf.asWritableMemory();
       Assert.fail();
     } catch (ReadOnlyException expected) {
       // expected
@@ -583,7 +585,7 @@ public class NativeWritableBufferImplTest {
   public void checkDuplicateNonNative() {
     WritableMemory wmem = WritableMemory.allocate(64);
     wmem.putShort(0, (short) 1);
-    Buffer buf = wmem.asWritableBuffer().duplicate(Util.nonNativeByteOrder);
+    Buffer buf = wmem.asWritableBuffer().duplicate(Util.NON_NATIVE_BYTE_ORDER);
     assertEquals(buf.getShort(0), 256);
   }
 

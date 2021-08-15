@@ -27,6 +27,7 @@ import static org.testng.Assert.assertTrue;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import org.apache.datasketches.memory.DefaultMemoryRequestServer;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
@@ -65,9 +66,10 @@ public class DruidIssue11544Test {
 
     //Request Bigger Memory
     MemoryRequestServer svr = mem.getMemoryRequestServer();
+    if (svr == null) { svr = new DefaultMemoryRequestServer(); }
     assertNotNull(svr); //before the fix, this was null.
 
-    WritableMemory newMem = svr.request(initialMemSize * 2);
+    WritableMemory newMem = svr.request(mem, initialMemSize * 2);
 
     //Confirm that newMem is on the heap (the default) and 2X size
     assertFalse(newMem.isDirect());

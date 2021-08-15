@@ -22,7 +22,7 @@ package org.apache.datasketches.memory.test;
 import java.nio.ByteBuffer;
 
 import org.apache.datasketches.memory.Buffer;
-import org.apache.datasketches.memory.internal.ReadOnlyException;
+import org.apache.datasketches.memory.ReadOnlyException;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;

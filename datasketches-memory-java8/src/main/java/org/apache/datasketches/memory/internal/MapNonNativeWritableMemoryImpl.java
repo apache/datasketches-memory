@@ -22,9 +22,10 @@ package org.apache.datasketches.memory.internal;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.WritableMemory;
 
 /**
- * Implementation of {@link WritableMemoryImpl} for map memory, non-native byte order.
+ * Implementation of {@link WritableMemory} for map memory, non-native byte order.
  *
  * @author Roman Leventov
  * @author Lee Rhodes
@@ -50,26 +51,22 @@ final class MapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
   @Override
   BaseWritableMemoryImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
       final boolean readOnly, final ByteOrder byteOrder) {
-    final int type = typeId | REGION | (readOnly ? READONLY : 0);
+    final int type = setReadOnlyType(typeId, readOnly) | REGION;
     return Util.isNativeByteOrder(byteOrder)
         ? new MapWritableMemoryImpl(
-            nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes,
-            type, valid)
+            nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, type, valid)
         : new MapNonNativeWritableMemoryImpl(
-            nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes,
-            type, valid);
+            nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, type, valid);
   }
 
   @Override
   BaseWritableBufferImpl toWritableBuffer(final boolean readOnly, final ByteOrder byteOrder) {
-    final int type = typeId | (readOnly ? READONLY : 0);
+    final int type = setReadOnlyType(typeId, readOnly);
     return Util.isNativeByteOrder(byteOrder)
         ? new MapWritableBufferImpl(
-            nativeBaseOffset, getRegionOffset(), getCapacity(),
-            type, valid, this)
+            nativeBaseOffset, getRegionOffset(), getCapacity(), type, valid)
         : new MapNonNativeWritableBufferImpl(
-            nativeBaseOffset, getRegionOffset(), getCapacity(),
-            type, valid, this);
+            nativeBaseOffset, getRegionOffset(), getCapacity(), type, valid);
   }
 
   @Override

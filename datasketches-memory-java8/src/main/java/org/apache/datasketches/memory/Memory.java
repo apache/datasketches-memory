@@ -20,83 +20,76 @@
 
 package org.apache.datasketches.memory;
 
+import static org.apache.datasketches.memory.internal.Util.negativeCheck;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.WritableByteChannel;
+import java.util.Objects;
 
-import org.apache.datasketches.memory.internal.MemoryImpl;
-import org.apache.datasketches.memory.internal.Util;
+import org.apache.datasketches.memory.internal.BaseWritableMemoryImpl;
+import org.apache.datasketches.memory.internal.Prim;
+import org.apache.datasketches.memory.internal.UnsafeUtil;
 
 public interface Memory extends BaseState {
 
-  //BYTE BUFFER
+  //BYTE BUFFERf
 
   /**
-   * Accesses the given ByteBuffer for read-only operations. The returned <i>Memory</i> object has
-   * the same byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is
-   * zero, then byte order of the returned <i>Memory</i> object (as well as backing storage) is
-   * unspecified.
-   *
-   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
-   * <i>Memory.wrap(...)</i>.
-   * @param byteBuf the given ByteBuffer, must not be null
-   * @return a new <i>Memory</i> for read-only operations on the given ByteBuffer.
+   * Accesses the given <i>ByteBuffer</i> for read-only operations. The returned <i>Memory</i> object has
+   * the same byte order, as the given <i>ByteBuffer</i>.
+   * @param byteBuffer the given <i>ByteBuffer</i>. It must be non-null and with capacity >= 0.
+   * @return a new <i>Memory</i> for read-only operations on the given <i>ByteBuffer</i>.
    */
-  static Memory wrap(ByteBuffer byteBuf) {
-    return MemoryImpl.wrap(byteBuf);
+  static Memory wrap(ByteBuffer byteBuffer) {
+    return wrap(byteBuffer, byteBuffer.order());
   }
 
   /**
-   * Accesses the given ByteBuffer for read-only operations. The returned <i>Memory</i> object has
-   * the given byte order, ignoring the byte order of the given ByteBuffer.  If the capacity of the
-   * given ByteBuffer is zero the byte order of the returned <i>Memory</i> object (as well as
-   * backing storage) is unspecified.
-   *
-   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
-   * <i>Memory.wrap(...)</i>.
-   * @param byteBuf the given ByteBuffer, must not be null
-   * @param byteOrder the byte order to be used, whicn may be independent of the byte order
-   * state of the given ByteBuffer.
-   * @return a new <i>Memory</i> for read-only operations on the given ByteBuffer.
+   * Accesses the given <i>ByteBuffer</i> for read-only operations. The returned <i>Memory</i> object has
+   * the given byte order, ignoring the byte order of the given <i>ByteBuffer</i> for future reads and writes.
+   * @param byteBuffer the given <i>ByteBuffer</i>. It must be non-null and with capacity >= 0.
+   * @param byteOrder the byte order to be used.  It must be non-null.
+   * @return a new <i>Memory</i> for read-only operations on the given <i>ByteBuffer</i>.
    */
-  static Memory wrap(ByteBuffer byteBuf, ByteOrder byteOrder) {
-    return MemoryImpl.wrap(byteBuf, byteOrder);
+  static Memory wrap(ByteBuffer byteBuffer, ByteOrder byteOrder) {
+    Objects.requireNonNull(byteBuffer, "byteBuffer must not be null");
+    Objects.requireNonNull(byteOrder, "byteOrder must not be null");
+    negativeCheck(byteBuffer.capacity(), "byteBuffer");
+    return BaseWritableMemoryImpl.wrapByteBuffer(byteBuffer, true, byteOrder, null);
   }
 
   //MAP
   /**
-   * Maps the entire given file into native-ordered Memory for read operations
-   * (including those &gt; 2GB).
-   * Calling this method is equivalent to calling {@link #map(File, long, long, ByteOrder)
-   * map(file, 0, file.length(), ByteOrder.nativeOrder())}.
-   *
-   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
-   * <i>Memory.map(...)</i>.
-   * @param file the given file to map
-   * @return <i>MapHandle</i> for managing the mapped Memory.
+   * Maps the entire given file into native-ordered <i>Memory</i> for read operations
+   * Calling this method is equivalent to calling
+   * {@link #map(File, long, long, ByteOrder) map(file, 0, file.length(), ByteOrder.nativeOrder())}.
+   * @param file the given file to map. It must be non-null, length >= 0, and readable.
+   * @return <i>MapHandle</i> for managing the mapped memory.
    * Please read Javadocs for {@link Handle}.
    */
   static MapHandle map(File file) {
-    return MemoryImpl.map(file, 0, file.length(), ByteOrder.nativeOrder());
+    return map(file, 0, file.length(), ByteOrder.nativeOrder());
   }
 
   /**
-   * Maps the specified portion of the given file into Memory for read operations
-   * (including those &gt; 2GB).
-   *
-   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
-   * <i>Memory.map(...)</i>.
-   * @param file the given file to map. It may not be null.
-   * @param fileOffsetBytes the position in the given file in bytes. It may not be negative.
-   * @param capacityBytes the size of the mapped Memory. It may not be negative or zero.
-   * @param byteOrder the byte order to be used for the mapped Memory. It may not be null.
-   * @return <i>MapHandle</i> for managing the mapped Memory.
+   * Maps the specified portion of the given file into <i>Memory</i> for read operations.
+   * @param file the given file to map. It must be non-null and readable.
+   * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
+   * @param capacityBytes the size of the mapped memory. It must not be negative.
+   * @param byteOrder the byte order to be used for the mapped memory. It must be non-null.
+   * @return <i>MapHandle</i> for managing the mapped memory.
    * Please read Javadocs for {@link Handle}.
    */
   static MapHandle map(File file, long fileOffsetBytes, long capacityBytes, ByteOrder byteOrder) {
-    return MemoryImpl.map(file, fileOffsetBytes, capacityBytes, byteOrder);
+    Objects.requireNonNull(file, "file must be non-null.");
+    Objects.requireNonNull(byteOrder, "byteOrder must be non-null.");
+    if (!file.canRead()) { throw new IllegalArgumentException("file must be readable."); }
+    negativeCheck(fileOffsetBytes, "fileOffsetBytes");
+    negativeCheck(capacityBytes, "capacityBytes");
+    return (MapHandle) BaseWritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, true, byteOrder);
   }
 
   //REGIONS
@@ -106,14 +99,14 @@ public interface Memory extends BaseState {
    * <li>Returned object's origin = this object's origin + offsetBytes</li>
    * <li>Returned object's capacity = capacityBytes</li>
    * </ul>
-   * If the given capacityBytes is zero, the returned object is effectively immutable and
-   * the backing storage and byte order are unspecified.
-   * @param offsetBytes the starting offset with respect to the origin of this Memory.
-   * @param capacityBytes the capacity of the region in bytes
+   * @param offsetBytes the starting offset with respect to the origin of this <i>Memory</i>. It must be >=0.
+   * @param capacityBytes the capacity of the region in bytes. It must be >= 0.
    * @return a new <i>Memory</i> representing the defined region based on the given
    * offsetBytes and capacityBytes.
    */
-  Memory region(long offsetBytes, long capacityBytes);
+  default Memory region(long offsetBytes, long capacityBytes) {
+    return region(offsetBytes, capacityBytes, ByteOrder.nativeOrder());
+  }
 
   /**
    * A region is a read-only view of this object.
@@ -122,11 +115,9 @@ public interface Memory extends BaseState {
    * <li>Returned object's capacity = <i>capacityBytes</i></li>
    * <li>Returned object's byte order = <i>byteOrder</i></li>
    * </ul>
-   * If the given capacityBytes is zero, the returned object is effectively immutable and
-   * the backing storage and byte order are unspecified.
-   * @param offsetBytes the starting offset with respect to the origin of this Memory.
-   * @param capacityBytes the capacity of the region in bytes
-   * @param byteOrder the given byte order
+   * @param offsetBytes the starting offset with respect to the origin of this Memory. It must be >=0.
+   * @param capacityBytes the capacity of the region in bytes. It must be >= 0.
+   * @param byteOrder the given byte order. It must be non-null.
    * @return a new <i>Memory</i> representing the defined region based on the given
    * offsetBytes, capacityBytes and byteOrder.
    */
@@ -143,11 +134,11 @@ public interface Memory extends BaseState {
    * <li>Returned object's <i>capacity</i> = this object's capacity</li>
    * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable</li>
    * </ul>
-   * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and byte order are unspecified.
    * @return a new <i>Buffer</i>
    */
-  Buffer asBuffer();
+  default Buffer asBuffer() {
+    return asBuffer(ByteOrder.nativeOrder());
+  }
 
   /**
    * Returns a new <i>Buffer</i> view of this object, with the given
@@ -160,179 +151,124 @@ public interface Memory extends BaseState {
    * <li>Returned object's <i>capacity</i> = this object's capacity</li>
    * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable</li>
    * </ul>
-   * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and byte order are unspecified.
    * @param byteOrder the given byte order
    * @return a new <i>Buffer</i> with the given byteOrder.
    */
   Buffer asBuffer(ByteOrder byteOrder);
 
-  //UNSAFE BYTE BUFFER VIEW
-  /**
-   * Returns the specified region of this Memory object as a new read-only {@link ByteBuffer}
-   * object. The {@link ByteOrder} of the returned {@code ByteBuffer} corresponds to the {@linkplain
-   * #getTypeByteOrder() byte order of this Memory}. The returned ByteBuffer's position is 0 and
-   * the limit is equal to the capacity.
-   *
-   * <p>If this Memory object is the result of wrapping non-byte Java arrays ({@link
-   * Memory#wrap(int[])}, {@link Memory#wrap(long[])}, etc.) this methods throws an {@link
-   * UnsupportedOperationException}.
-   *
-   * <p>The name of this method starts with "unsafe" because if this is a native managed Memory
-   * (e. g. obtained via {@link #map(File)} or {@link WritableMemory#allocateDirect(long)})), and
-   * the returned {@code ByteBuffer} object is used after the Memory is freed, it may cause a JVM
-   * crash. This is also possible for Memory objects themselves with some methods,
-   * but Memory's use-after-free is caught as an AssertionError, if assertions are enabled.
-   *
-   * @param offsetBytes the starting offset with respect to the origin of this Memory
-   * @param capacityBytes the capacity of the returned ByteBuffer
-   * @return a new read-only {@code ByteBuffer} to access the specified region.
-   * @throws UnsupportedOperationException if this method couldn't be viewed as ByteBuffer, because
-   * when it wraps a non-byte Java array.
-   */
-  ByteBuffer unsafeByteBufferView(long offsetBytes, int capacityBytes);
-
   //ACCESS PRIMITIVE HEAP ARRAYS for readOnly
   /**
-   * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are
-   * unspecified.
-   *
-   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
-   * <i>Memory.wrap(...)</i>.
-   * @param arr the given primitive array.
+   * Wraps the given primitive array for read operations assuming native byte order.
+   * @param array the given primitive array.
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(boolean[] arr) {
-    return MemoryImpl.wrap(arr);
+  static Memory wrap(byte[] array) {
+    Objects.requireNonNull(array, "array must be non-null");
+    return wrap(array, 0, array.length, ByteOrder.nativeOrder());
   }
 
   /**
-   * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are
-   * unspecified.
-   *
-   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
-   * <i>Memory.wrap(...)</i>.
-   * @param arr the given primitive array.
-   * @return a new <i>Memory</i> for read operations
-   */
-  static Memory wrap(byte[] arr) {
-    return MemoryImpl.wrap(arr, 0, arr.length, Util.nativeByteOrder);
-  }
-
-  /**
-   * Wraps the given primitive array for read operations with the given byte order. If the array
-   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are
-   * unspecified.
-   *
-   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
-   * <i>Memory.wrap(...)</i>.
-   * @param arr the given primitive array.
+   * Wraps the given primitive array for read operations with the given byte order.
+   * @param array the given primitive array.
    * @param byteOrder the byte order to be used
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(byte[] arr, ByteOrder byteOrder) {
-    return MemoryImpl.wrap(arr, 0, arr.length, byteOrder);
+  static Memory wrap(byte[] array, ByteOrder byteOrder) {
+    return wrap(array, 0, array.length, byteOrder);
   }
 
   /**
-   * Wraps the given primitive array for read operations with the given byte order. If the given
-   * lengthBytes is zero, backing storage and byte order of the returned <i>Memory</i> object are
-   * unspecified.
-   *
-   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
-   * <i>Memory.wrap(...)</i>.
-   * @param arr the given primitive array.
+   * Wraps the given primitive array for read operations with the given byte order.
+   * @param array the given primitive array.
    * @param offsetBytes the byte offset into the given array
    * @param lengthBytes the number of bytes to include from the given array
    * @param byteOrder the byte order to be used
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(byte[] arr, int offsetBytes, int lengthBytes,
-      ByteOrder byteOrder) {
-    return MemoryImpl.wrap(arr, offsetBytes, lengthBytes, byteOrder);
+  static Memory wrap(byte[] array, int offsetBytes, int lengthBytes, ByteOrder byteOrder) {
+    Objects.requireNonNull(array, "array must be non-null");
+    Objects.requireNonNull(byteOrder, "byteOrder must be non-null");
+    negativeCheck(offsetBytes, "offsetBytes");
+    negativeCheck(lengthBytes, "lengthBytes");
+    UnsafeUtil.checkBounds(offsetBytes, lengthBytes, array.length);
+    return BaseWritableMemoryImpl.wrapHeapArray(array, 0, lengthBytes, true, ByteOrder.nativeOrder(), null);
   }
 
   /**
-   * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are unspecified.
-   *
-   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
-   * <i>Memory.wrap(...)</i>.
-   * @param arr the given primitive array.
+   * Wraps the given primitive array for read operations assuming native byte order.
+   * @param array the given primitive array.
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(char[] arr) {
-    return MemoryImpl.wrap(arr);
+  static Memory wrap(boolean[] array) {
+    Objects.requireNonNull(array, "array must be non-null");
+    final long lengthBytes = array.length << Prim.BOOLEAN.shift();
+    return BaseWritableMemoryImpl.wrapHeapArray(array, 0, lengthBytes, true, ByteOrder.nativeOrder(), null);
   }
 
   /**
-   * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are unspecified.
-   *
-   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
-   * <i>Memory.wrap(...)</i>.
-   * @param arr the given primitive array.
+   * Wraps the given primitive array for read operations assuming native byte order.
+   * @param array the given primitive array.
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(short[] arr) {
-    return MemoryImpl.wrap(arr);
+  static Memory wrap(char[] array) {
+    Objects.requireNonNull(array, "array must be non-null");
+    final long lengthBytes = array.length << Prim.CHAR.shift();
+    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, true, ByteOrder.nativeOrder(), null);
   }
 
   /**
-   * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are unspecified.
-   *
-   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
-   * <i>Memory.wrap(...)</i>.
-   * @param arr the given primitive array.
+   * Wraps the given primitive array for read operations assuming native byte order.
+   * @param array the given primitive array.
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(int[] arr) {
-    return MemoryImpl.wrap(arr);
+  static Memory wrap(short[] array) {
+    Objects.requireNonNull(array, "arr must be non-null");
+    final long lengthBytes = array.length << Prim.SHORT.shift();
+    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, true, ByteOrder.nativeOrder(), null);
   }
 
   /**
-   * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are
-   * unspecified.
-   *
-   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
-   * <i>Memory.wrap(...)</i>.
-   * @param arr the given primitive array.
+   * Wraps the given primitive array for read operations assuming native byte order.
+   * @param array the given primitive array.
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(long[] arr) {
-    return MemoryImpl.wrap(arr);
+  static Memory wrap(int[] array) {
+    Objects.requireNonNull(array, "arr must be non-null");
+    final long lengthBytes = array.length << Prim.INT.shift();
+    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, true, ByteOrder.nativeOrder(), null);
   }
 
   /**
-   * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are
-   * unspecified.
-   *
-   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
-   * <i>Memory.wrap(...)</i>.
-   * @param arr the given primitive array.
+   * Wraps the given primitive array for read operations assuming native byte order.
+   * @param array the given primitive array.
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(float[] arr) {
-    return MemoryImpl.wrap(arr);
+  static Memory wrap(long[] array) {
+    Objects.requireNonNull(array, "arr must be non-null");
+    final long lengthBytes = array.length << Prim.LONG.shift();
+    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, true, ByteOrder.nativeOrder(), null);
   }
 
   /**
-   * Wraps the given primitive array for read operations assuming native byte order. If the array
-   * size is zero, backing storage and byte order of the returned <i>Memory</i> object are
-   * unspecified.
-   *
-   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
-   * <i>Memory.wrap(...)</i>.
-   * @param arr the given primitive array.
+   * Wraps the given primitive array for read operations assuming native byte order.
+   * @param array the given primitive array.
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(double[] arr) {
-    return MemoryImpl.wrap(arr);
+  static Memory wrap(float[] array) {
+    Objects.requireNonNull(array, "arr must be non-null");
+    final long lengthBytes = array.length << Prim.FLOAT.shift();
+    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, true, ByteOrder.nativeOrder(), null);
+  }
+
+  /**
+   * Wraps the given primitive array for read operations assuming native byte order.
+   * @param array the given primitive array.
+   * @return a new <i>Memory</i> for read operations
+   */
+  static Memory wrap(double[] array) {
+    Objects.requireNonNull(array, "arr must be non-null");
+    final long lengthBytes = array.length << Prim.DOUBLE.shift();
+    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, true, ByteOrder.nativeOrder(), null);
   }
 
   //PRIMITIVE getX() and getXArray()

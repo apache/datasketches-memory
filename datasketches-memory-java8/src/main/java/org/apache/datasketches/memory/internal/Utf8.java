@@ -28,11 +28,13 @@ import java.io.IOException;
 import java.nio.BufferOverflowException;
 import java.nio.CharBuffer;
 
+import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.Utf8CodingException;
+import org.apache.datasketches.memory.WritableMemory;
 
 /**
- * Encoding and decoding implementations of {@link WritableMemoryImpl#putCharsToUtf8} and
- * {@link MemoryImpl#getCharsFromUtf8}.
+ * Encoding and decoding implementations of {@link WritableMemory#putCharsToUtf8} and
+ * {@link Memory#getCharsFromUtf8}.
  *
  * <p>This is specifically designed to reduce the production of intermediate objects (garbage),
  * thus significantly reducing pressure on the JVM Garbage Collector.

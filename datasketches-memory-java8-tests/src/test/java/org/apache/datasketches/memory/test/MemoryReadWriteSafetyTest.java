@@ -26,7 +26,7 @@ import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.MapHandle;
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.internal.ReadOnlyException;
+import org.apache.datasketches.memory.ReadOnlyException;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 

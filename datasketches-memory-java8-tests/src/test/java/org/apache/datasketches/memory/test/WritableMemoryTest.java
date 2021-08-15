@@ -28,9 +28,9 @@ import java.nio.ByteOrder;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.internal.Util;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
+import org.apache.datasketches.memory.internal.Util;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")
@@ -161,11 +161,11 @@ public class WritableMemoryTest {
   @Test
   public void checkWrapWithBO() {
     WritableMemory wmem = WritableMemory.writableWrap(new byte[0], ByteOrder.BIG_ENDIAN);
-    boolean nativeBO = wmem.getTypeByteOrder() == Util.nativeByteOrder;
-    assertTrue(nativeBO); //remains true for ZeroSizeMemory
+    boolean nativeBO = wmem.getTypeByteOrder() == Util.NATIVE_BYTE_ORDER;
+    assertFalse(nativeBO);
     println("" + nativeBO);
     wmem = WritableMemory.writableWrap(new byte[8], ByteOrder.BIG_ENDIAN);
-    nativeBO = wmem.getTypeByteOrder() == Util.nativeByteOrder;
+    nativeBO = wmem.getTypeByteOrder() == Util.NATIVE_BYTE_ORDER;
     assertFalse(nativeBO);
     println("" + nativeBO);
   }

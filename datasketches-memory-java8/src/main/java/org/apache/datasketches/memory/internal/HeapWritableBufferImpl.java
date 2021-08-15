@@ -22,9 +22,10 @@ package org.apache.datasketches.memory.internal;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.WritableBuffer;
 
 /**
- * Implementation of {@link WritableBufferImpl} for heap-based, native byte order.
+ * Implementation of {@link WritableBuffer} for heap-based, native byte order.
  *
  * @author Roman Leventov
  * @author Lee Rhodes
@@ -32,6 +33,7 @@ import org.apache.datasketches.memory.MemoryRequestServer;
 final class HeapWritableBufferImpl extends NativeWritableBufferImpl {
   private static final int id = BUFFER | NATIVE | HEAP;
   private final Object unsafeObj;
+  private final MemoryRequestServer memReqSvr;
   private final byte typeId;
 
   HeapWritableBufferImpl(
@@ -39,40 +41,47 @@ final class HeapWritableBufferImpl extends NativeWritableBufferImpl {
       final long regionOffset,
       final long capacityBytes,
       final int typeId,
-      final BaseWritableMemoryImpl originMemory) {
-    super(unsafeObj, 0L, regionOffset, capacityBytes, originMemory);
+      final MemoryRequestServer memReqSvr) {
+    super(unsafeObj, 0L, regionOffset, capacityBytes);
     this.unsafeObj = unsafeObj;
+    this.memReqSvr = memReqSvr;
     this.typeId = (byte) (id | (typeId & 0x7));
   }
 
   @Override
   BaseWritableBufferImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
       final boolean readOnly, final ByteOrder byteOrder) {
-    final int type = typeId | REGION | (readOnly ? READONLY : 0);
+    final int type = setReadOnlyType(typeId, readOnly) | REGION;
     return Util.isNativeByteOrder(byteOrder)
         ? new HeapWritableBufferImpl(
-            unsafeObj, getRegionOffset(offsetBytes), capacityBytes,
-            type, originMemory)
+            unsafeObj, getRegionOffset(offsetBytes), capacityBytes, type, memReqSvr)
         : new HeapNonNativeWritableBufferImpl(
-            unsafeObj, getRegionOffset(offsetBytes), capacityBytes,
-            type, originMemory);
+            unsafeObj, getRegionOffset(offsetBytes), capacityBytes, type, memReqSvr);
   }
 
   @Override
   BaseWritableBufferImpl toDuplicate(final boolean readOnly, final ByteOrder byteOrder) {
-    final int type = typeId | DUPLICATE | (readOnly ? READONLY : 0);
+    final int type = setReadOnlyType(typeId, readOnly) | DUPLICATE;
     return Util.isNativeByteOrder(byteOrder)
         ? new HeapWritableBufferImpl(
-            unsafeObj, getRegionOffset(), getCapacity(),
-            type, originMemory)
+            unsafeObj, getRegionOffset(), getCapacity(), type, memReqSvr)
         : new HeapNonNativeWritableBufferImpl(
-            unsafeObj, getRegionOffset(), getCapacity(),
-            type, originMemory);
+            unsafeObj, getRegionOffset(), getCapacity(), type, memReqSvr);
+  }
+
+  @Override
+  BaseWritableMemoryImpl toWritableMemory(final boolean readOnly, final ByteOrder byteOrder) {
+    final int type = setReadOnlyType(typeId, readOnly);
+    return Util.isNativeByteOrder(byteOrder)
+        ? new HeapWritableMemoryImpl(
+            unsafeObj, getRegionOffset(), getCapacity(), type, memReqSvr)
+        : new HeapNonNativeWritableMemoryImpl(
+            unsafeObj, getRegionOffset(), getCapacity(), type, memReqSvr);
   }
 
   @Override
   public MemoryRequestServer getMemoryRequestServer() {
-    return null;
+    return memReqSvr;
   }
 
   @Override

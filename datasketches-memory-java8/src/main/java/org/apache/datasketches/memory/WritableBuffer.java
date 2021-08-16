@@ -390,9 +390,9 @@ public interface WritableBuffer extends Buffer {
    * Map backed resources will always return null.
    * Gets the MemoryRequestServer object, if set, for the above resources to request additional memory.
    * The user must customize the actions of the MemoryRequestServer by
-   * extending the MemoryRequestServer interface and set using the following method:
+   * implementing the MemoryRequestServer interface and set using the following method:
    * <ul>
-   * <li>{@link WritableMemory#writableWrap(ByteBuffer, ByteOrder, MemoryRequestServer)}</li>
+   * <li>{@link WritableBuffer#writableWrap(ByteBuffer, ByteOrder, MemoryRequestServer)}</li>
    * </ul>
    * Simple implementation examples include the DefaultMemoryRequestServer in the main tree, as well as
    * the ExampleMemoryRequestServerTest and the use with ByteBuffer documented in the DruidIssue11544Test

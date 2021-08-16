@@ -621,7 +621,7 @@ public interface WritableMemory extends Memory {
    * Map backed resources will always return null.
    * Gets the MemoryRequestServer object, if set, for the above resources to request additional memory.
    * The user must customize the actions of the MemoryRequestServer by
-   * extending the MemoryRequestServer interface and set using one of these methods:
+   * implementing the MemoryRequestServer interface and set using one of these methods:
    * <ul><li>{@link WritableMemory#allocateDirect(long, ByteOrder, MemoryRequestServer)}</li>
    * <li>{@link WritableMemory#allocate(int, ByteOrder, MemoryRequestServer)}</li>
    * <li>{@link WritableMemory#writableWrap(ByteBuffer, ByteOrder, MemoryRequestServer)}</li>

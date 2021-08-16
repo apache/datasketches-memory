@@ -385,7 +385,8 @@ public interface WritableBuffer extends Buffer {
 
   //OTHER WRITABLE API METHODS
   /**
-   * WritableBuffer enables this for ByteBuffer backed resources. To enable for Heap and Direct Memory
+   * WritableBuffer enables this for ByteBuffer backed resources. However, the object returned is in the form of
+   * a WritableMemory. To convert to WritableBuffer use asWritableBuffer(). To enable for Heap and Direct Memory
    * resources, use the WritableMemory to configure and then call asWritableBuffer().
    * Map backed resources will always return null.
    * Gets the MemoryRequestServer object, if set, for the above resources to request additional memory.

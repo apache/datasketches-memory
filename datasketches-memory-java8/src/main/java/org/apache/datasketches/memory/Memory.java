@@ -35,7 +35,7 @@ import org.apache.datasketches.memory.internal.UnsafeUtil;
 
 public interface Memory extends BaseState {
 
-  //BYTE BUFFERf
+  //BYTE BUFFER
 
   /**
    * Accesses the given <i>ByteBuffer</i> for read-only operations. The returned <i>Memory</i> object has

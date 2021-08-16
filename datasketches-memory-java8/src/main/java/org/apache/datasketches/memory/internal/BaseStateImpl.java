@@ -162,7 +162,8 @@ public abstract class BaseStateImpl implements BaseState {
     return cumBaseOffset_ + offsetBytes;
   }
 
-  //made public in WritableMemoryImpl and WritableBufferImpl, only implemented in Direct Leafs
+  //Documented in WritableMemory and WritableBuffer interfaces.
+  //Implemented in the Leaf nodes; Required here by toHex(...).
   abstract MemoryRequestServer getMemoryRequestServer();
 
   //Overridden by ByteBuffer, Direct and Map leafs

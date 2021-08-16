@@ -20,10 +20,8 @@
 package org.apache.datasketches.memory;
 
 /**
- * The MemoryRequestServer is a callback interface to provide a means for a direct (off-heap),
- * dynamic WritableMemory object to request more memory from the owner of the
- * {@link WritableHandle}. Refer to {@link DefaultMemoryRequestServer} for how this can be
- * used.
+ * The MemoryRequestServer is a callback interface to provide a means for direct (off-heap), heap and ByteBuffer
+ * backed resources to request more memory.
  *
  * @author Lee Rhodes
  */
@@ -40,7 +38,8 @@ public interface MemoryRequestServer {
   WritableMemory request(WritableMemory currentWritableMemory, long capacityBytes);
 
   /**
-   * Request close the AutoCloseable resource.
+   * Request close the AutoCloseable resource. This only applies to resources allocated using
+   * WritableMemory.allocateDirect(...).
    * This may be ignored depending on the application implementation.
    * @param memToClose the relevant WritbleMemory to be considered for closing. It must be non-null.
    * @param newMemory the newly allocated WritableMemory. It must be non-null.

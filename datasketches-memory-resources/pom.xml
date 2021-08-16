@@ -169,9 +169,10 @@
                 <configuration>
                   <skip>false</skip>
                   <argLine>
+                    --add-exports java.base/jdk.internal.misc=ALL-UNNAMED
+                    --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
                     --add-opens java.base/java.nio=ALL-UNNAMED
-                    --add-opens java.base/jdk.internal.misc=ALL-UNNAMED
-                    --add-opens java.base/jdk.internal.ref=ALL-UNNAMED
+                    --add-opens java.base/sun.nio.ch=ALL-UNNAMED
                   </argLine>
                   <dependenciesToScan>
                     <dependency>org.apache.datasketches:datasketches-memory-java8-tests</dependency>

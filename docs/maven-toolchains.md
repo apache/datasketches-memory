@@ -31,7 +31,7 @@ From the [maven-toolchain-plugin documentation](https://maven.apache.org/plugins
 ### Motivation
 
 Toolchains are used in different maven modules to ensure that the correct Java compiler version 
-is used when compiling source files.  This is because `datasketches-memory` uses some JDK 
+is used when compiling source files.  This is because Datasketches Memory uses some JDK 
 version-specific APIs, which require different JDKs to compile correctly.
 
 ### Toolchains template
@@ -48,7 +48,7 @@ the requisite entries should be merged into the existing file if they do not alr
 
 ### Environment variables
 
-The `dataSketches-memory` component is pure Java and requires the following JDKs to compile:
+The DataSketches Memory component is pure Java and requires the following JDKs to compile:
 
 - JDK8/Hotspot
 - JDK9/Hotspot
@@ -73,8 +73,7 @@ might be configured as follows:
 Users can discover what JDKs have been loaded into their environment by using the following 
 command:
 
-- /usr/libexec/java_home -V
-
+    /usr/libexec/java_home -V
 
 ### Eclipse configuration
 
@@ -83,5 +82,5 @@ appropriate JDK for each module - see the [Eclipse IDE Setup](eclipse.md).
 
 ### IntelliJ configuration
 
-Similarly, if you are an Eclipse user, you may need further configuration for your IDE to use the 
+Similarly, if you are an IntelliJ user, you may need further configuration for your IDE to use the 
 appropriate JDK for each module - see the [IntelliJ IDE Setup](intellij.md).

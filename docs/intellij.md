@@ -25,6 +25,9 @@ popular IDEs.
 There are two configuration properties to be aware of when configuring your local development 
 environment:
 
+1) Java compiler versions
+2) Compiler arguments for JPMS
+
 #### Java compiler versions
 
 Settings are usually synchronised with maven toolchain configuration, otherwise the Java version 

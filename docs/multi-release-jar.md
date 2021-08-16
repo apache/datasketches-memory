@@ -19,8 +19,8 @@
 
 # Multi-Release JAR
 
-The `datasketches-memory` module assembles a JAR for release that consists of multiple 
-Java-release-specific versions of class files to coexist in a single archive (the MR-JAR).
+The `datasketches-memory` module assembles a multi-release (MR) JAR for release that consists of
+multiple Java-release-specific versions of compiled class files.
 
 From [JEP-238](https://openjdk.java.net/jeps/238):
 
@@ -30,7 +30,8 @@ language or API features available in newer releases since it is difficult to ex
 platform dependencies, which generally involves reflection, or to distribute different library 
 artifacts for different platform versions.
 
-This is specifically the case for the DataSketches Memory component.
+The next case describes the challenge in supporting newer versions of Java for libraries
+such as DataSketches Memory:
 
 > Some libraries and frameworks, furthermore, use internal APIs of the JDK that will be made 
 inaccessible in Java 9 when module boundaries are strictly enforced. This also creates a 

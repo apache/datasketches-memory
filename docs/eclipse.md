@@ -24,6 +24,9 @@ The use of Maven submodules to build a Multi Release JAR was motivated by its co
 popular IDEs. There are two configuration properties to be aware of when configuring your local 
 development environment:
 
+1) Java compiler versions
+2) Compiler arguments for JPMS
+
 ### Java compiler versions
 
 Settings are usually synchronised with Maven Toolchain configuration, otherwise the Java version 
@@ -78,7 +81,7 @@ Please note that this plugin is retired and no longer maintained!
 
 From the **Package Explorer** View:
 
-- Right click on a blank space in the view
+- Right-click on a blank space in the view
 - Select **Import/Maven/Existing Maven Projects**
 - Select **Next**, and browse to the project directory
 - Click **Open**

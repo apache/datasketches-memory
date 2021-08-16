@@ -40,7 +40,7 @@ components, and which are not;
 JDK internals are now strongly encapsulated, except for critical internal APIs such as 
 `sun.misc.Unsafe` (see [JEP-396](https://openjdk.java.net/jeps/396) and 
 [JEP-403](https://openjdk.java.net/jeps/403)).
-`datasketches-memory` can no longer access these APIs by default, and requires explicit access.
+Datasketches Memory can no longer access these APIs by default, and requires explicit access.
 
 ### Module declarations
 
@@ -59,27 +59,12 @@ module org.apache.datasketches.memory {
     requires jdk.unsupported;
 
     exports org.apache.datasketches.memory;
-    exports org.apache.datasketches.memory.internal to org.apache.datasketches.memory.tests;
 }
 ```
 
-This declaration explicitly defines the dependencies for `datasketches-memory`, as well as the 
+This declaration explicitly defines the dependencies for the `org.apache.datasketches.memory` module, as well as the 
 external API. The `org.apache.datasketches.internal` package is now inaccessible to the end user, 
 providing better encapsulation. 
-
-#### org.apache.datasketches.memory.tests
-
-The module declaration above makes provision for unit testing.  
-The `org.apache.datasketches.internal` package is not accessible to the end user, 
-but is accessible to the `org.apache.datasketches.memory.tests` module:
-
-```java
-module org.apache.datasketches.memory.tests {
-    requires java.base;
-    requires org.testng;
-    requires org.apache.datasketches.memory;
-}
-```
 
 ### Compiler arguments
 
@@ -88,7 +73,7 @@ Java versions 9 and above.
 These dependencies can be made accessible at compile time through the use of the 
 `add-exports` compiler argument.
 This argument allows one module to access some of the unexported types of another module.  
-Datasketches memory has come to depend on several internal APIs and therefore requires special 
+Datasketches Memory has come to depend on several internal APIs and therefore requires special 
 exposition.
 
 For example, in order to compile the `datasketches-memory-java9` submodule, the following compiler 
@@ -108,18 +93,11 @@ where fields and methods that do not have `public` visibility in a class.
 Reflective access requires additional arguments to be provided by the user at runtime, 
 in order to use the `datasketches-memory` JPMS module in Java versions 9 and above.
 
-The following runtime arguments should be provided when allocating memory off-heap:
-
-```shell
-    --add-opens java.base/java.nio=org.apache.datasketches.memory \
-    --add-opens java.base/jdk.internal.misc=org.apache.datasketches.memory \
-    --add-opens java.base/jdk.internal.ref=org.apache.datasketches.memory
-```
-
-Note that these arguments are not required for cases where memory is allocated on the heap.
+See the [usage instructions](usage-instructions.md) for more details.
 
 ### JPMS and Java 8
 
-Java 8 does not support module declarations and the JPMS module system.
+Java 8 does not support module declarations and the JPMS module system, and no additional
+runtime arguments are necessary.
 However, support is retained for Java 8 users by only including the compiled declaration 
 (`module-info.class`) in the `datasketches-memory` multi-release JAR for Java9 and above.

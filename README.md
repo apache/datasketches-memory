@@ -39,56 +39,30 @@ If you are interested in making contributions to this site please see our
 ---
 
 ## Java Support
+Datasketches Memory currently supports Java 8 up to and including Java 13.
 
-Datasketches memory currently supports Java 8 up to and including Java 13.
-
-In order to allocate off-heap memory using the library in Java 9 and above, you must provide the 
-following runtime arguments to the JVM:
-
-```shell
-    --add-opens java.base/java.nio=org.apache.datasketches.memory \
-    --add-opens java.base/jdk.internal.misc=org.apache.datasketches.memory \
-    --add-opens java.base/jdk.internal.ref=org.apache.datasketches.memory
-```
-
-For example, to run your local application with full compatibility for the Java module system, 
-you might use the following command:
-
-```shell
-  $JAVA \
-    --module-path mods \
-    --add-opens java.base/java.nio=org.apache.datasketches.memory \
-    --add-opens java.base/jdk.internal.misc=org.apache.datasketches.memory \
-    --add-opens java.base/jdk.internal.ref=org.apache.datasketches.memory \
-    --module my.main.application.module
-```
-
-where `mods` is your module path and `my.main.application.module` is your own JPMS module:
-
-```java
-module datasketches.memory.multirelease.test {
-    requires org.apache.datasketches.memory;
-}
-```
-
-Note that the `add-opens` arguments are not required for cases where memory is allocated on the 
-heap.
+__NOTE:__ You may have to provide additional JPMS arguments in order to use the library in Java 9 and above,
+see the [usage instructions](docs/usage-instructions.md) for details.
 
 ---
 
 ## Build Instructions
-__NOTE:__ This component accesses resource files for testing. As a result, the directory elements 
-of the full absolute path of the target installation directory must qualify as Java identifiers. 
-In other words, the directory elements must not have any space characters (or non-Java identifier 
-characters) in any of the path elements. This is required by the Oracle Java Specification in 
-order to ensure location-independent access to resources: 
-[See Oracle Location-Independent Access to Resources](https://docs.oracle.com/javase/8/docs/technotes/guides/lang/resources.html)
+__NOTE:__ 
 
-__IMPORTANT:__ This project is structured as a maven multi-module project.  
-Building this project might affect plugins that require early dependency resolution, such as the 
-javadoc and eclipse plugins.  The build instructions below have been modified to use the 
-`process-classes` phase (instead of `compile`) for these use cases.  For more information, 
-see this [Maven Reactor Issue](https://issues.apache.org/jira/browse/MNG-3283).
+1) This component accesses resource files for testing. As a result, the directory elements
+   of the full absolute path of the target installation directory must qualify as Java identifiers.
+   In other words, the directory elements must not have any space characters (or non-Java identifier
+   characters) in any of the path elements. This is required by the Oracle Java Specification in
+   order to ensure location-independent access to resources:
+   [See Oracle Location-Independent Access to Resources](https://docs.oracle.com/javase/8/docs/technotes/guides/lang/resources.html)
+
+2) This project is structured as a Maven multi-module project.  
+   Building this project might affect plugins that require early dependency resolution, such as the
+   javadoc and eclipse plugins.
+   The build instructions below have been modified to use the `process-classes` phase (instead of `compile`)
+   for these use cases.
+   
+   For more information, see this [Maven Reactor Issue](https://issues.apache.org/jira/browse/MNG-3283).
 
 ### JDK versions required to compile
 This DataSketches component is pure Java and requires the following JDKs to compile:
@@ -158,6 +132,7 @@ detail:
 * [Maven Toolchains Configuration](docs/maven-toolchains.md)
 * [Multi-Release Jar](docs/multi-release-jar.md)
 * [Java Platform Module System](docs/module-system.md)
+* [Usage instructions](docs/usage-instructions.md)
 
 In order to build and contribute to this project, please read the relevant IDE documentation:
 

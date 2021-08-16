@@ -352,7 +352,7 @@ public class MemoryTest {
     int bytes = 1024;
     long curAllocations = BaseState.getCurrentDirectMemoryAllocations();
     long curAllocated   = BaseState.getCurrentDirectMemoryAllocated();
-    System.err.println(curAllocations + " should be zero!");
+    if (curAllocations != 0) { System.err.println(curAllocations + " should be zero!"); }
     WritableHandle wh1 = WritableMemory.allocateDirect(bytes);
     WritableHandle wh2 = WritableMemory.allocateDirect(bytes);
     assertEquals(BaseState.getCurrentDirectMemoryAllocations(), 2L + curAllocations);

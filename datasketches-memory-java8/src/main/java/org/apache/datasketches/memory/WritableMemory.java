@@ -617,11 +617,18 @@ public interface WritableMemory extends Memory {
 
   //OTHER WRITABLE API METHODS
   /**
-   * For ByteBuffer and Direct Memory backed resources only. Heap and Map backed resources will return null.
-   * Gets the MemoryRequestServer object used by dynamic Memory-backed objects
-   * to request additional memory.  To customize the actions of the MemoryRequestServer,
-   * extend the MemoryRequestServer interface and
-   * set using {@link WritableMemory#allocateDirect(long, ByteOrder, MemoryRequestServer)}.
+   * WritableMemory enables this for ByteBuffer, Heap and Direct Memory backed resources.
+   * Map backed resources will always return null.
+   * Gets the MemoryRequestServer object, if set, for the above resources to request additional memory.
+   * The user must customize the actions of the MemoryRequestServer by
+   * extending the MemoryRequestServer interface and set using one of these methods:
+   * <ul><li>{@link WritableMemory#allocateDirect(long, ByteOrder, MemoryRequestServer)}</li>
+   * <li>{@link WritableMemory#allocate(int, ByteOrder, MemoryRequestServer)}</li>
+   * <li>{@link WritableMemory#writableWrap(ByteBuffer, ByteOrder, MemoryRequestServer)}</li>
+   * </ul>
+   * Simple implementation examples include the DefaultMemoryRequestServer in the main tree, as well as
+   * the ExampleMemoryRequestServerTest and the use with ByteBuffer documented in the DruidIssue11544Test
+   * in the test tree.
    * @return the MemoryRequestServer object or null.
    */
   MemoryRequestServer getMemoryRequestServer();

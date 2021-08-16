@@ -22,40 +22,46 @@ package org.apache.datasketches.memory;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Objects;
 
-import org.apache.datasketches.memory.internal.WritableBufferImpl;
+import org.apache.datasketches.memory.internal.BaseWritableBufferImpl;
+import org.apache.datasketches.memory.internal.Util;
 
 public interface WritableBuffer extends Buffer {
 
   //BYTE BUFFER
   /**
-   * Accesses the given ByteBuffer for write operations. The returned WritableBuffer object has
-   * the same byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is
-   * zero, then byte order of the returned WritableBuffer object, as well as backing storage and
-   * read-only status are unspecified.
-   * @param byteBuf the given ByteBuffer, must not be null.
-   * @return a new WritableBuffer for write operations on the given ByteBuffer.
+   * Accesses the given <i>ByteBuffer</i> for write operations. The returned <i>WritableBuffer</i> object has
+   * the same byte order, as the given <i>ByteBuffer</i>.
+   * @param byteBuf the given ByteBuffer. It must be non-null and with capacity >= 0.
+   * @return a new <i>WritableBuffer</i> for write operations on the given <i>ByteBuffer</i>.
    */
   static WritableBuffer writableWrap(ByteBuffer byteBuf) {
-    return WritableBufferImpl.writableWrap(byteBuf);
+    return writableWrap(byteBuf, byteBuf.order(), defaultMemReqSvr);
   }
 
   /**
-   * Accesses the given ByteBuffer for write operations. The returned WritableBuffer object has
-   * the given byte order, ignoring the byte order of the given ByteBuffer. If the capacity of
-   * the given ByteBuffer is zero the byte order of the returned WritableBuffer object
-   * (as well as backing storage) is unspecified.
-   * @param byteBuf the given ByteBuffer, must not be null
-   * @param byteOrder the byte order to be used, which may be independent of the byte order
-   * state of the given ByteBuffer
-   * @param memReqSvr A user-specified MemoryRequestServer.
-   * This is a callback mechanism for a user client to request a larger Memory.
-   * @return a new WritableBuffer for write operations on the given ByteBuffer.
+   * Accesses the given <i>ByteBuffer</i> for write operations. The returned <i>WritableBuffer</i> object has
+   * the given byte order, ignoring the byte order of the given <i>ByteBuffer</i> for future writes and following reads.
+   * However, this does not change the byte order of data already in the <i>ByteBuffer</i>.
+   * @param byteBuf the given ByteBuffer. It must be non-null and with capacity >= 0.
+   * @param byteOrder the byte order to be used.
+   * @param memReqSvr A user-specified <i>MemoryRequestServer</i>, which must not be null.
+   * This is a callback mechanism for a user client to request a larger <i>WritableBuffer</i>.
+   * @return a new <i>WritableBuffer</i> for write operations on the given <i>ByteBuffer</i>.
    */
   static WritableBuffer writableWrap(ByteBuffer byteBuf, ByteOrder byteOrder, MemoryRequestServer memReqSvr) {
-    MemoryRequestServer mReqSvr = (memReqSvr == null) ? defaultMemReqSvr : memReqSvr;
-    return WritableBufferImpl.writableWrap(byteBuf, byteOrder, mReqSvr);
+    Objects.requireNonNull(byteBuf, "ByteBuffer 'byteBuf' must not be null");
+    Objects.requireNonNull(byteOrder, "ByteOrder 'byteOrder' must not be null");
+    Util.negativeCheck(byteBuf.capacity(), "byteBuf.capacity");
+    if (byteBuf.isReadOnly()) {
+      throw new ReadOnlyException("Cannot create a WritableBuffer from a ReadOnly ByteBuffer.");
+    }
+    return BaseWritableBufferImpl.wrapByteBuffer(byteBuf, false, byteOrder, memReqSvr);
   }
+
+  // NO MAP
+  // NO ALLOCATE DIRECT
 
   //DUPLICATES
   /**
@@ -70,8 +76,6 @@ public interface WritableBuffer extends Buffer {
    * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable and
    * independent of this object's <i>start</i>, <i>position</i> and <i>end</i></li>
    * </ul>
-   * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and byte order are unspecified.
    * @return a duplicate writable view of this Buffer with the same but independent values of
    * <i>start</i>, <i>position</i> and <i>end</i>.
    */
@@ -89,14 +93,11 @@ public interface WritableBuffer extends Buffer {
    * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable and
    * independent of this object's <i>start</i>, <i>position</i> and <i>end</i></li>
    * </ul>
-   * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and byte order are unspecified.
    * @param byteOrder the given <i>ByteOrder</i>.
    * @return a duplicate writable view of this Buffer with the same but independent values of
    * <i>start</i>, <i>position</i> and <i>end</i>.
    */
   WritableBuffer writableDuplicate(ByteOrder byteOrder);
-
 
   //REGIONS
   /**
@@ -110,8 +111,6 @@ public interface WritableBuffer extends Buffer {
    * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable and
    * independent of this object's <i>start</i>, <i>position</i> and <i>end</i></li>
    * </ul>
-   * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and byte order are unspecified.
    * @return a new <i>WritableBuffer</i> representing the defined writable region.
    */
   WritableBuffer writableRegion();
@@ -128,8 +127,6 @@ public interface WritableBuffer extends Buffer {
    * independent of this object's <i>start</i>, <i>position</i> and <i>end</i></li>
    * <li>Returned object's byte order = <i>byteOrder</i></li>
    * </ul>
-   * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and byte order are unspecified.
    *
    * <p><b>Note: </b><i>asWritableMemory()</i> and <i>asMemory()</i>
    * will return the originating <i>Memory</i> byte order.</p>
@@ -142,14 +139,28 @@ public interface WritableBuffer extends Buffer {
   WritableBuffer writableRegion(long offsetBytes, long capacityBytes,
       ByteOrder byteOrder);
 
-  //AS MEMORY
+  //AS WRITABLE MEMORY
   /**
    * Convert this WritableBuffer to a WritableMemory.
    * If this object's capacity is zero, the returned object is effectively immutable and
    * the backing storage and byte order are unspecified.
    * @return WritableMemory
    */
-  WritableMemory asWritableMemory();
+  default WritableMemory asWritableMemory() {
+    return asWritableMemory(ByteOrder.nativeOrder());
+  }
+
+  /**
+   * Convert this WritableBuffer to a WritableMemory with the given byte order.
+   * If this object's capacity is zero, the returned object is effectively immutable and
+   * the backing storage and byte order are unspecified.
+   * @return WritableMemory
+   */
+  WritableMemory asWritableMemory(ByteOrder byteOrder);
+
+  //NO ALLOCATE HEAP VIA AUTOMATIC BYTE ARRAY
+
+  //NO ACCESS PRIMITIVE HEAP ARRAYS for WRITE
 
   //PRIMITIVE putX() and putXArray()
   /**
@@ -345,6 +356,8 @@ public interface WritableBuffer extends Buffer {
    */
   void putShortArray(short[] srcArray, int srcOffsetShorts, int lengthShorts);
 
+  // NO ATOMIC METHODS
+
   //OTHER WRITE METHODS
   /**
    * Returns the primitive backing array, otherwise null.
@@ -357,12 +370,18 @@ public interface WritableBuffer extends Buffer {
    */
   void clear();
 
+  //NO clearBits(...)
+
   /**
    * Fills this Buffer from position to end with the given byte value.
    * The position will be set to <i>end</i>.
    * @param value the given byte value
    */
   void fill(byte value);
+
+  //NO fill(offsetBytes, lengthBytes, value)
+
+  //NO setBits(...)
 
   //OTHER WRITABLE API METHODS
   /**

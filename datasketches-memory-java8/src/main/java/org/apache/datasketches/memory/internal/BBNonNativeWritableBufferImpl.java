@@ -23,9 +23,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.WritableBuffer;
 
 /**
- * Implementation of {@link WritableBufferImpl} for ByteBuffer, non-native byte order.
+ * Implementation of {@link WritableBuffer} for ByteBuffer, non-native byte order.
  *
  * @author Roman Leventov
  * @author Lee Rhodes
@@ -35,7 +36,7 @@ final class BBNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   private final Object unsafeObj;
   private final long nativeBaseOffset; //used to compute cumBaseOffset
   private final ByteBuffer byteBuf; //holds a reference to a ByteBuffer until we are done with it.
-  private MemoryRequestServer memReqSvr = null; //cannot be final;
+  private final MemoryRequestServer memReqSvr;
   private final byte typeId;
 
   BBNonNativeWritableBufferImpl(
@@ -45,39 +46,44 @@ final class BBNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
       final long capacityBytes,
       final int typeId,
       final ByteBuffer byteBuf,
-      final MemoryRequestServer memReqSvr,
-      final BaseWritableMemoryImpl originMemory) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, originMemory);
+      final MemoryRequestServer memReqSvr) {
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
     this.unsafeObj = unsafeObj;
     this.nativeBaseOffset = nativeBaseOffset;
     this.byteBuf = byteBuf;
-    this.memReqSvr = (memReqSvr == null) ? defaultMemReqSvr : memReqSvr;
+    this.memReqSvr = memReqSvr;
     this.typeId = (byte) (id | (typeId & 0x7));
   }
 
   @Override
   BaseWritableBufferImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
       final boolean readOnly, final ByteOrder byteOrder) {
-    final int type = typeId | REGION | (readOnly ? READONLY : 0);
+    final int type = setReadOnlyType(typeId, readOnly) | REGION;
     return Util.isNativeByteOrder(byteOrder)
         ? new BBWritableBufferImpl(
-          unsafeObj, nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes,
-          type, byteBuf, memReqSvr, originMemory)
+          unsafeObj, nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, type, byteBuf, memReqSvr)
         : new BBNonNativeWritableBufferImpl(
-          unsafeObj, nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes,
-          type, byteBuf, memReqSvr, originMemory);
+          unsafeObj, nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, type, byteBuf, memReqSvr);
   }
 
   @Override
   BaseWritableBufferImpl toDuplicate(final boolean readOnly, final ByteOrder byteOrder) {
-    final int type = typeId | DUPLICATE | (readOnly ? READONLY : 0);
+    final int type = setReadOnlyType(typeId, readOnly) | DUPLICATE;
     return Util.isNativeByteOrder(byteOrder)
         ? new BBWritableBufferImpl(
-            unsafeObj, nativeBaseOffset, getRegionOffset(), getCapacity(),
-            type, byteBuf, memReqSvr, originMemory)
+            unsafeObj, nativeBaseOffset, getRegionOffset(), getCapacity(), type, byteBuf, memReqSvr)
         : new BBNonNativeWritableBufferImpl(
-            unsafeObj, nativeBaseOffset, getRegionOffset(), getCapacity(),
-            type, byteBuf, memReqSvr, originMemory);
+            unsafeObj, nativeBaseOffset, getRegionOffset(), getCapacity(), type, byteBuf, memReqSvr);
+  }
+
+  @Override
+  BaseWritableMemoryImpl toWritableMemory(final boolean readOnly, final ByteOrder byteOrder) {
+    final int type = setReadOnlyType(typeId, readOnly);
+    return Util.isNativeByteOrder(byteOrder)
+        ? new BBWritableMemoryImpl(
+            unsafeObj, nativeBaseOffset, getRegionOffset(), getCapacity(), type, byteBuf, memReqSvr)
+        : new BBNonNativeWritableMemoryImpl(
+            unsafeObj, nativeBaseOffset, getRegionOffset(), getCapacity(), type, byteBuf, memReqSvr);
   }
 
   @Override
@@ -89,7 +95,7 @@ final class BBNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   @Override
   public MemoryRequestServer getMemoryRequestServer() {
     assertValid();
-    return memReqSvr; //cannot be null
+    return memReqSvr;
   }
 
   @Override

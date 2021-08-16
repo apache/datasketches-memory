@@ -20,6 +20,7 @@
 package org.apache.datasketches.memory.internal;
 
 import org.apache.datasketches.memory.BaseBuffer;
+import org.apache.datasketches.memory.ReadOnlyException;
 
 /**
  * A new positional API. This is different from and simpler than Java BufferImpl positional approach.

@@ -38,9 +38,13 @@ public final class Util {
   public static final String LS = System.getProperty("line.separator");
 
   //Byte Order related
-  public static final ByteOrder nativeByteOrder = ByteOrder.nativeOrder();
-  public static final ByteOrder nonNativeByteOrder = nativeByteOrder == ByteOrder.LITTLE_ENDIAN
+  public static final ByteOrder NON_NATIVE_BYTE_ORDER = ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN
       ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
+
+  public static ByteOrder otherByteOrder(ByteOrder order) {
+    return (order == ByteOrder.nativeOrder()) ? NON_NATIVE_BYTE_ORDER : ByteOrder.nativeOrder();
+  }
+
 
   /**
    * Don't use sun.misc.Unsafe#copyMemory to copy blocks of memory larger than this
@@ -59,14 +63,6 @@ public final class Util {
   //Byte Order Related
 
   /**
-   * Returns the Native Byte Order
-   * @return the Native Byte Order
-   */
-  public static final ByteOrder getNativeByteOrder() {
-    return nativeByteOrder;
-  }
-
-  /**
    * Returns true if the given byteOrder is the same as the native byte order.
    * @param byteOrder the given byte order
    * @return true if the given byteOrder is the same as the native byte order.
@@ -75,7 +71,7 @@ public final class Util {
     if (byteOrder == null) {
       throw new IllegalArgumentException("ByteOrder parameter cannot be null.");
     }
-    return Util.nativeByteOrder == byteOrder;
+    return ByteOrder.nativeOrder() == byteOrder;
   }
 
 
@@ -289,19 +285,19 @@ public final class Util {
 
   public static final void zeroCheck(final long value, final String arg) {
     if (value <= 0) {
-      throw new IllegalArgumentException("The argument " + arg + " may not be negative or zero.");
+      throw new IllegalArgumentException("The argument '" + arg + "' may not be negative or zero.");
     }
   }
 
   public static final void negativeCheck(final long value, final String arg) {
     if (value < 0) {
-      throw new IllegalArgumentException("The argument " + arg + " may not be negative.");
+      throw new IllegalArgumentException("The argument '" + arg + "' may not be negative.");
     }
   }
 
   public static final void nullCheck(final Object obj, final String arg) {
     if (obj == null) {
-      throw new IllegalArgumentException("The argument " + arg + " may not be null.");
+      throw new IllegalArgumentException("The argument '" + arg + "' may not be null.");
     }
   }
 

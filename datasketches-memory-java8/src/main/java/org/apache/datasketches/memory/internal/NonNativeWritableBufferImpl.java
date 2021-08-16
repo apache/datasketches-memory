@@ -29,6 +29,8 @@ import static org.apache.datasketches.memory.internal.UnsafeUtil.LONG_SHIFT;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.SHORT_SHIFT;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
 
+import org.apache.datasketches.memory.WritableBuffer;
+
 /*
  * Developer notes: The heavier methods, such as put/get arrays, duplicate, region, clear, fill,
  * compareTo, etc., use hard checks (check*() and incrementAndCheck*() methods), which execute at
@@ -43,7 +45,7 @@ import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
  */
 
 /**
- * Implementation of {@link WritableBufferImpl} for non-native endian byte order. Native variant is
+ * Implementation of {@link WritableBuffer} for non-native endian byte order. Native variant is
  * {@link NativeWritableBufferImpl}.
  * @author Roman Leventov
  * @author Lee Rhodes
@@ -53,8 +55,8 @@ abstract class NonNativeWritableBufferImpl extends BaseWritableBufferImpl {
 
   //Pass-through ctor
   NonNativeWritableBufferImpl(final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
-      final long capacityBytes, final BaseWritableMemoryImpl originMemory) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes, originMemory);
+      final long capacityBytes) {
+    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
   }
 
   //PRIMITIVE getX() and getXArray()

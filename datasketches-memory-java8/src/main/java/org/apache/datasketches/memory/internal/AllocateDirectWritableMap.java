@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
+import org.apache.datasketches.memory.ReadOnlyException;
 import org.apache.datasketches.memory.WritableMap;
 
 /**

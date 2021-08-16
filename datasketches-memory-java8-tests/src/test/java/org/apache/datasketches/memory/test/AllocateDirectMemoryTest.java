@@ -21,10 +21,10 @@ package org.apache.datasketches.memory.test;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.fail;
 
 import org.apache.datasketches.memory.BaseState;
+import org.apache.datasketches.memory.DefaultMemoryRequestServer;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
@@ -72,8 +72,13 @@ public class AllocateDirectMemoryTest {
 
       int longs2 = 64;
       int bytes2 = longs2 << 3;
-      MemoryRequestServer memReqSvr = origWmem.getMemoryRequestServer();
-      WritableMemory newWmem = memReqSvr.request(bytes2);
+      MemoryRequestServer memReqSvr;
+      if (BaseState.defaultMemReqSvr == null) {
+        memReqSvr = new DefaultMemoryRequestServer();
+      } else {
+        memReqSvr = origWmem.getMemoryRequestServer();
+      }
+      WritableMemory newWmem = memReqSvr.request(origWmem, bytes2);
       assertFalse(newWmem.isDirect()); //on heap by default
       for (int i = 0; i < longs2; i++) {
           newWmem.putLong(i << 3, i);
@@ -86,17 +91,8 @@ public class AllocateDirectMemoryTest {
   }
 
   @Test
-  public void checkNullMemoryRequestServer() throws Exception {
-    try (WritableHandle wh = WritableMemory.allocateDirect(128, Util.nativeByteOrder, null)) {
-      WritableMemory wmem = wh.getWritable();
-      assertNotNull(wmem.getMemoryRequestServer());
-    }
-  }
-
-
-  @Test
   public void checkNonNativeDirect() throws Exception {
-    try (WritableHandle h = WritableMemory.allocateDirect(128, Util.nonNativeByteOrder, null)) {
+    try (WritableHandle h = WritableMemory.allocateDirect(128, Util.NON_NATIVE_BYTE_ORDER, null)) {
       WritableMemory wmem = h.getWritable();
       wmem.putChar(0, (char) 1);
       assertEquals(wmem.getByte(1), (byte) 1);

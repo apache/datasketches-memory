@@ -19,37 +19,40 @@
 
 package org.apache.datasketches.memory;
 
+import static org.apache.datasketches.memory.internal.Util.negativeCheck;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Objects;
 
-import org.apache.datasketches.memory.internal.BufferImpl;
+import org.apache.datasketches.memory.internal.BaseWritableBufferImpl;
 
 public interface Buffer extends BaseBuffer {
 
   //BYTE BUFFER
   /**
    * Accesses the given ByteBuffer for read-only operations. The returned Buffer object has the
-   * same byte order, as the given ByteBuffer, unless the capacity of the given ByteBuffer is zero,
-   * then byte order of the returned Buffer object (as well as backing storage) is unspecified.
-   * @param byteBuf the given ByteBuffer, must not be null.
+   * same byte order, as the given ByteBuffer.
+   * @param byteBuffer the given ByteBuffer, must not be null.
    * @return a new Buffer for read-only operations on the given ByteBuffer.
    */
-  static Buffer wrap(ByteBuffer byteBuf) {
-    return BufferImpl.wrap(byteBuf);
+  static Buffer wrap(ByteBuffer byteBuffer) {
+    return wrap(byteBuffer, byteBuffer.order());
   }
 
   /**
    * Accesses the given ByteBuffer for read-only operations. The returned Buffer object has
-   * the given byte order, ignoring the byte order of the given ByteBuffer. If the capacity of
-   * the given ByteBuffer is zero the byte order of the returned Buffer object
-   * (as well as backing storage) is unspecified.
-   * @param byteBuf the given ByteBuffer, must not be null
+   * the given byte order, ignoring the byte order of the given ByteBuffer.
+   * @param byteBuffer the given ByteBuffer, must not be null
    * @param byteOrder the byte order to be used, which may be independent of the byte order
    * state of the given ByteBuffer
    * @return a new Buffer for read-only operations on the given ByteBuffer.
    */
-  static Buffer wrap(ByteBuffer byteBuf, ByteOrder byteOrder) {
-    return BufferImpl.wrap(byteBuf, byteOrder);
+  static Buffer wrap(ByteBuffer byteBuffer, ByteOrder byteOrder) {
+    Objects.requireNonNull(byteBuffer, "byteBuffer must not be null");
+    Objects.requireNonNull(byteOrder, "byteOrder must not be null");
+    negativeCheck(byteBuffer.capacity(), "byteBuffer");
+    return BaseWritableBufferImpl.wrapByteBuffer(byteBuffer, true, byteOrder, null);
   }
 
   //DUPLICATES
@@ -65,8 +68,6 @@ public interface Buffer extends BaseBuffer {
    * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable and
    * independent of this object's <i>start</i>, <i>position</i> and <i>end</i></li>
    * </ul>
-   * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and byte order are unspecified.
    * @return a read-only duplicate view of this Buffer with the same but independent values of
    * <i>start</i>, <i>position</i> and <i>end</i>.
    */
@@ -84,13 +85,13 @@ public interface Buffer extends BaseBuffer {
    * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable and
    * independent of this object's <i>start</i>, <i>position</i> and <i>end</i></li>
    * </ul>
-   * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and byte order are unspecified.
    * @param byteOrder the given <i>ByteOrder</i>.
    * @return a read-only duplicate view of this Buffer with the same but independent values of
    * <i>start</i>, <i>position</i> and <i>end</i>.
    */
   Buffer duplicate(ByteOrder byteOrder);
+
+  //NO MAP
 
   //REGIONS
   /**
@@ -104,8 +105,6 @@ public interface Buffer extends BaseBuffer {
    * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable and
    * independent of this object's <i>start</i>, <i>position</i> and <i>end</i></li>
    * </ul>
-   * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and byte order are unspecified.
    * @return a new <i>Buffer</i> representing the defined region based on the current
    * <i>position</i> and <i>end</i>.
    */
@@ -123,11 +122,6 @@ public interface Buffer extends BaseBuffer {
    * independent of this object's <i>start</i>, <i>position</i> and <i>end</i></li>
    * <li>Returned object's byte order = <i>byteOrder</i></li>
    * </ul>
-   * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing storage and byte order are unspecified.
-   *
-   * <p><b>Note: The Memory returned with </b><i>asMemory()</i> will have the originating
-   * <i>Memory</i> byte order.</p>
    *
    * @param offsetBytes the starting offset with respect to the origin of this <i>WritableBuffer</i>
    * @param capacityBytes the <i>capacity</i> of the returned region in bytes
@@ -135,18 +129,26 @@ public interface Buffer extends BaseBuffer {
    * @return a new <i>Buffer</i> representing the defined writable region
    * based on the current <i>position</i>, <i>end</i> and byteOrder.
    */
-  Buffer region(long offsetBytes, long capacityBytes,
-      ByteOrder byteOrder);
+  Buffer region(long offsetBytes, long capacityBytes, ByteOrder byteOrder);
 
-  //MEMORY
+  //AS MEMORY
   /**
    * Convert this Buffer to a Memory. The current <i>start</i>, <i>position</i> and <i>end</i>
    * are ignored.
-   * If this object's capacity is zero, the returned object is effectively immutable and
-   * the backing resource and byte order are unspecified.
    * @return Memory
    */
-  Memory asMemory();
+  default Memory asMemory() {
+    return asMemory(getTypeByteOrder());
+  }
+
+  /**
+   * Convert this Buffer to a Memory with the given byte order.
+   * The current <i>start</i>, <i>position</i> and <i>end</i> are ignored.
+   * @return Memory
+   */
+  Memory asMemory(ByteOrder byteOrder);
+
+  //NO ACCESS PRIMITIVE HEAP ARRAYS for readOnly
 
   //PRIMITIVE getX() and getXArray()
   /**
@@ -171,8 +173,7 @@ public interface Buffer extends BaseBuffer {
    * @param dstOffsetBooleans offset in array units
    * @param lengthBooleans number of array units to transfer
    */
-  void getBooleanArray(boolean[] dstArray, int dstOffsetBooleans,
-      int lengthBooleans);
+  void getBooleanArray(boolean[] dstArray, int dstOffsetBooleans, int lengthBooleans);
 
   /**
    * Gets the byte value at the current position.

@@ -29,16 +29,21 @@ import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_LONG_INDE
 import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_SHORT_INDEX_SCALE;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.checkBounds;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
+import static org.apache.datasketches.memory.internal.Util.negativeCheck;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.WritableByteChannel;
+import java.util.Objects;
 
+import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.ReadOnlyException;
 import org.apache.datasketches.memory.Utf8CodingException;
+import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMapHandle;
 import org.apache.datasketches.memory.WritableMemory;
@@ -56,21 +61,17 @@ import org.apache.datasketches.memory.WritableMemory;
  */
 
 /**
- * Common base of native-ordered and non-native-ordered {@link WritableMemoryImpl} implementations.
+ * Common base of native-ordered and non-native-ordered {@link WritableMemory} implementations.
  * Contains methods which are agnostic to the byte order.
  */
 @SuppressWarnings("restriction")
-abstract class BaseWritableMemoryImpl extends WritableMemoryImpl {
+public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements WritableMemory {
 
   //1KB of empty bytes for speedy clear()
   private final static byte[] EMPTY_BYTES;
 
-  //Static variable for cases where byteBuf/array/direct sizes are zero
-  final static BaseWritableMemoryImpl ZERO_SIZE_MEMORY;
-
   static {
     EMPTY_BYTES = new byte[1024];
-    ZERO_SIZE_MEMORY = new HeapWritableMemoryImpl(new byte[0], 0L, 0L, READONLY);
   }
 
   //Pass-through ctor
@@ -79,22 +80,19 @@ abstract class BaseWritableMemoryImpl extends WritableMemoryImpl {
     super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
   }
 
-  static BaseWritableMemoryImpl wrapHeapArray(final Object arr, final long offsetBytes,
-      final long lengthBytes, final boolean localReadOnly, final ByteOrder byteOrder) {
-    if (lengthBytes == 0) { return BaseWritableMemoryImpl.ZERO_SIZE_MEMORY; }
+  public static BaseWritableMemoryImpl wrapHeapArray(final Object arr, final long offsetBytes, final long lengthBytes,
+      final boolean localReadOnly, final ByteOrder byteOrder, final MemoryRequestServer memReqSvr) {
+
     final int typeId = localReadOnly ? READONLY : 0;
     return Util.isNativeByteOrder(byteOrder)
-        ? new HeapWritableMemoryImpl(arr, offsetBytes, lengthBytes, typeId)
-        : new HeapNonNativeWritableMemoryImpl(arr, offsetBytes, lengthBytes, typeId);
+        ? new HeapWritableMemoryImpl(arr, offsetBytes, lengthBytes, typeId, memReqSvr)
+        : new HeapNonNativeWritableMemoryImpl(arr, offsetBytes, lengthBytes, typeId, memReqSvr);
   }
 
-  static BaseWritableMemoryImpl wrapByteBuffer(
+  public static BaseWritableMemoryImpl wrapByteBuffer(
       final ByteBuffer byteBuf, final boolean localReadOnly, final ByteOrder byteOrder,
       final MemoryRequestServer memReqSvr) {
     final AccessByteBuffer abb = new AccessByteBuffer(byteBuf);
-    if (abb.resourceReadOnly && !localReadOnly) {
-      throw new ReadOnlyException("ByteBuffer is Read Only");
-    }
     final int typeId = (abb.resourceReadOnly || localReadOnly) ? READONLY : 0;
     return Util.isNativeByteOrder(byteOrder)
         ? new BBWritableMemoryImpl(abb.unsafeObj, abb.nativeBaseOffset,
@@ -104,15 +102,10 @@ abstract class BaseWritableMemoryImpl extends WritableMemoryImpl {
   }
 
   @SuppressWarnings("resource")
-  static WritableMapHandle wrapMap(final File file, final long fileOffsetBytes,
+  public static WritableMapHandle wrapMap(final File file, final long fileOffsetBytes,
       final long capacityBytes, final boolean localReadOnly, final ByteOrder byteOrder) {
-
     final AllocateDirectWritableMap dirWMap =
         new AllocateDirectWritableMap(file, fileOffsetBytes, capacityBytes, localReadOnly);
-    if (dirWMap.resourceReadOnly && !localReadOnly) {
-      dirWMap.close();
-      throw new ReadOnlyException("File is Read Only");
-    }
     final int typeId = (dirWMap.resourceReadOnly || localReadOnly) ? READONLY : 0;
     final BaseWritableMemoryImpl wmem = Util.isNativeByteOrder(byteOrder)
         ? new MapWritableMemoryImpl(dirWMap.nativeBaseOffset, 0L, capacityBytes,
@@ -123,12 +116,8 @@ abstract class BaseWritableMemoryImpl extends WritableMemoryImpl {
   }
 
   @SuppressWarnings("resource")
-  static WritableHandle wrapDirect(final long capacityBytes,
+  public static WritableHandle wrapDirect(final long capacityBytes,
       final ByteOrder byteOrder, final MemoryRequestServer memReqSvr) {
-    if (capacityBytes <= 0) {
-      throw new IllegalArgumentException(
-          "Capacity bytes should be positive, " + capacityBytes + " given");
-    }
     final AllocateDirect direct = new AllocateDirect(capacityBytes);
     final int typeId = 0; //direct is never read-only on construction
     final BaseWritableMemoryImpl wmem = Util.isNativeByteOrder(byteOrder)
@@ -141,59 +130,27 @@ abstract class BaseWritableMemoryImpl extends WritableMemoryImpl {
     return handle;
   }
 
-  //UNSAFE BYTE BUFFER VIEW FOR DIRECT MEMORY ONLY
-  @Override
-  public ByteBuffer unsafeByteBufferView(final long offsetBytes, final int capacityBytes) {
-    checkValidAndBounds(offsetBytes, capacityBytes);
-    final long cumOffset = getCumulativeOffset(offsetBytes);
-    final Object unsafeObj = getUnsafeObject();
-    final ByteBuffer result;
-    if (unsafeObj == null) {
-      result = AccessByteBuffer.getDummyReadOnlyDirectByteBuffer(cumOffset, capacityBytes);
-    } else if (unsafeObj instanceof byte[]) {
-      final int arrayOffset = (int) (cumOffset - ARRAY_BYTE_BASE_OFFSET);
-      result = ByteBuffer.wrap((byte[]) unsafeObj, arrayOffset, capacityBytes)
-          .slice().asReadOnlyBuffer();
-    } else {
-      throw new UnsupportedOperationException(
-          "This MemoryImpl object is the result of wrapping a "
-              + unsafeObj.getClass().getSimpleName()
-              + " array, it could not be viewed as a ByteBuffer.");
-    }
-    result.order(getTypeByteOrder());
-    return result;
-  }
-
   //REGIONS
   @Override
-  public MemoryImpl region(final long offsetBytes, final long capacityBytes) {
-    return writableRegionImpl(offsetBytes, capacityBytes, true, getTypeByteOrder());
-  }
-
-  @Override
-  public MemoryImpl region(final long offsetBytes, final long capacityBytes, final ByteOrder byteOrder) {
+  public Memory region(final long offsetBytes, final long capacityBytes, final ByteOrder byteOrder) {
     return writableRegionImpl(offsetBytes, capacityBytes, true, byteOrder);
   }
 
   @Override
-  public WritableMemoryImpl writableRegion(final long offsetBytes, final long capacityBytes) {
-    return writableRegionImpl(offsetBytes, capacityBytes, false, getTypeByteOrder());
-  }
-
-  @Override
-  public WritableMemoryImpl writableRegion(final long offsetBytes, final long capacityBytes,
-      final ByteOrder byteOrder) {
+  public WritableMemory writableRegion(final long offsetBytes, final long capacityBytes, final ByteOrder byteOrder) {
     return writableRegionImpl(offsetBytes, capacityBytes, false, byteOrder);
   }
 
-  WritableMemoryImpl writableRegionImpl(final long offsetBytes, final long capacityBytes,
+  WritableMemory writableRegionImpl(final long offsetBytes, final long capacityBytes,
       final boolean localReadOnly, final ByteOrder byteOrder) {
-    if (capacityBytes == 0) { return ZERO_SIZE_MEMORY; }
     if (isReadOnly() && !localReadOnly) {
-      throw new ReadOnlyException("Writable region of a read-only MemoryImpl is not allowed.");
+      throw new ReadOnlyException("Writable region of a read-only Memory is not allowed.");
     }
-    final boolean readOnly = isReadOnly() || localReadOnly;
+    negativeCheck(offsetBytes, "offsetBytes must be >= 0");
+    negativeCheck(capacityBytes, "capacityBytes must be >= 0");
+    Objects.requireNonNull(byteOrder, "byteOrder must be non-null.");
     checkValidAndBounds(offsetBytes, capacityBytes);
+    final boolean readOnly = isReadOnly() || localReadOnly;
     return toWritableRegion(offsetBytes, capacityBytes, readOnly, byteOrder);
   }
 
@@ -202,39 +159,30 @@ abstract class BaseWritableMemoryImpl extends WritableMemoryImpl {
 
   //AS BUFFER
   @Override
-  public BufferImpl asBuffer() {
-    return asWritableBuffer(true, getTypeByteOrder());
-  }
-
-  @Override
-  public BufferImpl asBuffer(final ByteOrder byteOrder) {
+  public Buffer asBuffer(final ByteOrder byteOrder) {
     return asWritableBuffer(true, byteOrder);
   }
 
   @Override
-  public WritableBufferImpl asWritableBuffer() {
-    return asWritableBuffer(false, getTypeByteOrder());
-  }
-
-  @Override
-  public WritableBufferImpl asWritableBuffer(final ByteOrder byteOrder) {
+  public WritableBuffer asWritableBuffer(final ByteOrder byteOrder) {
     return asWritableBuffer(false, byteOrder);
   }
 
-  WritableBufferImpl asWritableBuffer(final boolean localReadOnly, final ByteOrder byteOrder) {
+  WritableBuffer asWritableBuffer(final boolean localReadOnly, final ByteOrder byteOrder) {
+    Objects.requireNonNull(byteOrder, "byteOrder must be non-null");
     if (isReadOnly() && !localReadOnly) {
       throw new ReadOnlyException(
-          "Converting a read-only MemoryImpl to a writable BufferImpl is not allowed.");
+          "Converting a read-only Memory to a writable Buffer is not allowed.");
     }
     final boolean readOnly = isReadOnly() || localReadOnly;
-    final WritableBufferImpl wbuf = toWritableBuffer(readOnly, byteOrder);
+    final WritableBuffer wbuf = toWritableBuffer(readOnly, byteOrder);
     wbuf.setStartPositionEnd(0, 0, getCapacity());
     return wbuf;
   }
 
   abstract BaseWritableBufferImpl toWritableBuffer(boolean readOnly, ByteOrder byteOrder);
 
-  //PRIMITIVE getX() and getXArray() ENDIAN INDEPENDENT
+  //PRIMITIVE getX() and getXArray()
   @Override
   public final boolean getBoolean(final long offsetBytes) {
     assertValidAndBoundsForRead(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE);
@@ -340,8 +288,8 @@ abstract class BaseWritableMemoryImpl extends WritableMemoryImpl {
     } else if (getUnsafeObject() == null) {
       writeDirectMemoryTo(offsetBytes, lengthBytes, out);
     } else {
-      // MemoryImpl is backed by some array that is not byte[], for example int[], long[], etc.
-      // We don't have other choice as to do extra intermediate copy.
+      // Memory is backed by some array that is not byte[], for example int[], long[], etc.
+      // We don't have the choice to do an extra intermediate copy.
       writeToWithExtraCopy(offsetBytes, lengthBytes, out);
     }
   }

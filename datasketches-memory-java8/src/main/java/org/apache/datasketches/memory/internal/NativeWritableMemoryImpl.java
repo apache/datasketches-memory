@@ -37,6 +37,8 @@ import static org.apache.datasketches.memory.internal.UnsafeUtil.SHORT_SHIFT;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.checkBounds;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
 
+import org.apache.datasketches.memory.WritableMemory;
+
 /*
  * Developer notes: The heavier methods, such as put/get arrays, duplicate, region, clear, fill,
  * compareTo, etc., use hard checks (checkValid*() and checkBounds()), which execute at runtime and
@@ -50,7 +52,7 @@ import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
  */
 
 /**
- * Implementation of {@link WritableMemoryImpl} for native endian byte order. Non-native variant is
+ * Implementation of {@link WritableMemory} for native endian byte order. Non-native variant is
  * {@link NonNativeWritableMemoryImpl}.
  * @author Roman Leventov
  * @author Lee Rhodes

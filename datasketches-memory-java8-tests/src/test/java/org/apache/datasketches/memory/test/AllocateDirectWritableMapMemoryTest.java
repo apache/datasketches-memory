@@ -41,10 +41,10 @@ import java.nio.ByteOrder;
 import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.MapHandle;
 import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.memory.ReadOnlyException;
 import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMapHandle;
 import org.apache.datasketches.memory.WritableMemory;
-import org.apache.datasketches.memory.internal.ReadOnlyException;
 import org.apache.datasketches.memory.internal.Util;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -147,7 +147,7 @@ public class AllocateDirectWritableMapMemoryTest {
     file.deleteOnExit();  //comment out if you want to examine the file.
 
     final long bytes = 8;
-    try (WritableMapHandle h = WritableMemory.writableMap(file, 0L, bytes, Util.nonNativeByteOrder)) {
+    try (WritableMapHandle h = WritableMemory.writableMap(file, 0L, bytes, Util.NON_NATIVE_BYTE_ORDER)) {
       WritableMemory wmem = h.getWritable();
       wmem.putChar(0, (char) 1);
       assertEquals(wmem.getByte(1), (byte) 1);
@@ -166,15 +166,17 @@ public class AllocateDirectWritableMapMemoryTest {
   public void simpleMap2() throws Exception {
     File file = getResourceFile("GettysburgAddress.txt");
     assertTrue(isFileReadOnly(file));
-    try (WritableMapHandle rh = WritableMemory.writableMap(file)) { //throws
+    try (WritableMapHandle rh =
+        WritableMemory.writableMap(file)) { //throws
       //
     }
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test(expectedExceptions = ReadOnlyException.class)
   public void checkOverLength() throws Exception  {
     File file = getResourceFile("GettysburgAddress.txt");
-    try (WritableMapHandle rh = WritableMemory.writableMap(file, 0, 1 << 20, ByteOrder.nativeOrder())) {
+    try (WritableMapHandle rh =
+        WritableMemory.writableMap(file, 0, 1 << 20, ByteOrder.nativeOrder())) {
       //
     } catch (IOException e) {
       throw new RuntimeException(e);

@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.ReadOnlyException;
 
 /**
  * Keeps key configuration state for MemoryImpl and BufferImpl plus some common static variables
@@ -46,14 +47,14 @@ public abstract class BaseStateImpl implements BaseState {
   static final AtomicLong currentDirectMemoryMapAllocations_ = new AtomicLong();
   static final AtomicLong currentDirectMemoryMapAllocated_ = new AtomicLong();
 
-
-
   //class type IDs. Do not change the bit orders
+  //The first 3 bits are set dynamically
   // 0000 0XXX
   static final int READONLY = 1;
   static final int REGION = 2;
   static final int DUPLICATE = 4;
 
+  //The following 4 bits are set by the 16 leaf nodes
   // 000X X000
   static final int HEAP = 0;
   static final int DIRECT = 1 << 3;
@@ -100,7 +101,7 @@ public abstract class BaseStateImpl implements BaseState {
 
   @Override
   public final ByteOrder getTypeByteOrder() {
-    return isNonNativeType() ? Util.nonNativeByteOrder : Util.nativeByteOrder;
+    return isNonNativeType() ? Util.NON_NATIVE_BYTE_ORDER : ByteOrder.nativeOrder();
   }
 
   /**
@@ -112,13 +113,13 @@ public abstract class BaseStateImpl implements BaseState {
     if (byteOrder == null) {
       throw new IllegalArgumentException("ByteOrder parameter cannot be null.");
     }
-    return Util.nativeByteOrder == byteOrder;
+    return ByteOrder.nativeOrder() == byteOrder;
   }
 
   @Override
   public final boolean isByteOrderCompatible(final ByteOrder byteOrder) {
     final ByteOrder typeBO = getTypeByteOrder();
-    return typeBO == Util.nativeByteOrder && typeBO == byteOrder;
+    return typeBO == ByteOrder.nativeOrder() && typeBO == byteOrder;
   }
 
   @Override
@@ -294,21 +295,26 @@ public abstract class BaseStateImpl implements BaseState {
     }
   }
 
-  //TYPE ID CHECKS
+  //TYPE ID Management
   final boolean isReadOnlyType() {
     return (getTypeId() & READONLY) > 0;
   }
 
-  final boolean isBufferType() {
-    return (getTypeId() & BUFFER) > 0;
+  final static byte setReadOnlyType(byte type, boolean readOnly) {
+    return (byte)((type & ~1) | (readOnly ? READONLY : 0));
+  }
+
+  final boolean isRegionType() {
+    return (getTypeId() & REGION) > 0;
   }
 
   final boolean isDuplicateType() {
     return (getTypeId() & DUPLICATE) > 0;
   }
 
-  final boolean isRegionType() {
-    return (getTypeId() & REGION) > 0;
+  //The following are set by the leaf nodes
+  final boolean isBufferType() {
+    return (getTypeId() & BUFFER) > 0;
   }
 
   final boolean isNonNativeType() {
@@ -330,6 +336,7 @@ public abstract class BaseStateImpl implements BaseState {
   final boolean isBBType() {
     return (getTypeId() >>> 3 & 3) == 3;
   }
+
 
   //TO STRING
   //For debugging
@@ -424,7 +431,7 @@ public abstract class BaseStateImpl implements BaseState {
     sb.append("Valid               : ").append(state.isValid()).append(LS);
     sb.append("Read Only           : ").append(state.isReadOnly()).append(LS);
     sb.append("Type Byte Order     : ").append(state.getTypeByteOrder().toString()).append(LS);
-    sb.append("Native Byte Order   : ").append(Util.nativeByteOrder.toString()).append(LS);
+    sb.append("Native Byte Order   : ").append(ByteOrder.nativeOrder().toString()).append(LS);
     sb.append("JDK Runtime Version : ").append(UnsafeUtil.JDK).append(LS);
     //Data detail
     sb.append("Data, littleEndian  :  0  1  2  3  4  5  6  7");

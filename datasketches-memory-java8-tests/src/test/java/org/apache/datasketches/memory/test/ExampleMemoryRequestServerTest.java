@@ -37,21 +37,25 @@ import org.testng.annotations.Test;
 public class ExampleMemoryRequestServerTest {
 
   /**
-   * In this version all of the memory allocations are done through the MemoryRequestServer
+   * This version is without a TWR block.all of the memory allocations are done through the MemoryRequestServer
    * and each is closed by the MemoryClient when it is done with each.
    */
+  @SuppressWarnings("resource")
   @Test
-  public void checkExampleMemoryRequestServer1() {
+  public void checkExampleMemoryRequestServer1() throws Exception {
     int bytes = 8;
     ExampleMemoryRequestServer svr = new ExampleMemoryRequestServer();
-    WritableMemory wMem = svr.request(bytes);
-    MemoryClient client = new MemoryClient(wMem);
-    client.process();
-    svr.cleanup();
+    try (WritableHandle wh = WritableMemory.allocateDirect(8)) {
+      WritableMemory memStart = wh.getWritable();
+      WritableMemory wMem = svr.request(memStart, bytes);
+      MemoryClient client = new MemoryClient(wMem);
+      client.process();
+      svr.cleanup();
+    }
   }
 
   /**
-   * In this version the first memory allocation is done separately.
+   * In this version the first memory allocation is done up front in a TWR block.
    * And then the MemoryClient allocates new memories as needed, which are then closed
    * by the MemoryClient when it is done with the new memory allocations.
    * The initial allocation stays open until the end where it is closed at the end of the
@@ -63,18 +67,20 @@ public class ExampleMemoryRequestServerTest {
     int bytes = 8;
     ExampleMemoryRequestServer svr = new ExampleMemoryRequestServer();
     try (WritableHandle handle = WritableMemory.allocateDirect(bytes, ByteOrder.nativeOrder(), svr)) {
-      WritableMemory wMem = handle.getWritable();
-      MemoryClient client = new MemoryClient(wMem);
+      WritableMemory memStart = handle.getWritable();
+      MemoryClient client = new MemoryClient(memStart);
       client.process();
-      svr.cleanup();
+      svr.cleanup(); //just to be sure all are closed.
     }
   }
 
   @SuppressWarnings("resource")
   @Test(expectedExceptions = IllegalArgumentException.class)
-  public void checkZeroCapacity() {
+  public void checkZeroCapacity() throws Exception {
     ExampleMemoryRequestServer svr = new ExampleMemoryRequestServer();
-    WritableMemory.allocateDirect(0, ByteOrder.nativeOrder(), svr);
+    try (WritableHandle wh = WritableMemory.allocateDirect(0, ByteOrder.nativeOrder(), svr)) {
+
+    }
   }
 
   /**
@@ -88,9 +94,9 @@ public class ExampleMemoryRequestServerTest {
     WritableMemory smallMem;
     MemoryRequestServer svr;
 
-    MemoryClient(WritableMemory wmem) {
-      smallMem = wmem;
-      svr = wmem.getMemoryRequestServer();
+    MemoryClient(WritableMemory memStart) {
+      smallMem = memStart;
+      svr = memStart.getMemoryRequestServer();
     }
 
     void process() {
@@ -98,7 +104,7 @@ public class ExampleMemoryRequestServerTest {
       smallMem.fill((byte) 1);                //fill it, but not big enough
       println(smallMem.toHexString("Small", 0, (int)cap1));
 
-      WritableMemory bigMem = svr.request(2 * cap1); //get bigger mem
+      WritableMemory bigMem = svr.request(smallMem, 2 * cap1); //get bigger mem
       long cap2 = bigMem.getCapacity();
       smallMem.copyTo(0, bigMem, 0, cap1);    //copy data from small to big
       svr.requestClose(smallMem, bigMem);     //done with smallMem, release it
@@ -106,7 +112,7 @@ public class ExampleMemoryRequestServerTest {
       bigMem.fill(cap1, cap1, (byte) 2);      //fill the rest of bigMem, still not big enough
       println(bigMem.toHexString("Big", 0, (int)cap2));
 
-      WritableMemory giantMem = svr.request(2 * cap2); //get giant mem
+      WritableMemory giantMem = svr.request(bigMem, 2 * cap2); //get giant mem
       long cap3 = giantMem.getCapacity();
       bigMem.copyTo(0, giantMem, 0, cap2);    //copy data from small to big
       svr.requestClose(bigMem, giantMem);     //done with bigMem, release it
@@ -119,15 +125,17 @@ public class ExampleMemoryRequestServerTest {
 
   /**
    * This example MemoryRequestServer is simplistic but demonstrates one of many ways to
-   * possibly manage the continuous requests for larger memory.
+   * possibly manage the continuous requests for larger memory and to track the associations between
+   * handles and their associated memory.
    */
   public static class ExampleMemoryRequestServer implements MemoryRequestServer {
     IdentityHashMap<WritableMemory, WritableHandle> map = new IdentityHashMap<>();
 
     @SuppressWarnings("resource")
     @Override
-    public WritableMemory request(long capacityBytes) {
-     WritableHandle handle = WritableMemory.allocateDirect(capacityBytes, ByteOrder.nativeOrder(), this);
+    public WritableMemory request(WritableMemory currentWMem, long capacityBytes) {
+     ByteOrder order = currentWMem.getTypeByteOrder();
+     WritableHandle handle = WritableMemory.allocateDirect(capacityBytes, order, this);
      WritableMemory wmem = handle.getWritable();
      map.put(wmem, handle); //We track the newly allocated memory and its handle.
      return wmem;
@@ -137,14 +145,12 @@ public class ExampleMemoryRequestServerTest {
     @Override
     //here we actually release it, in reality it might be a lot more complex.
     public void requestClose(WritableMemory memToRelease, WritableMemory newMemory) {
-      if (memToRelease != null) {
-        WritableHandle handle = map.get(memToRelease);
-        if (handle != null && handle.getWritable() == memToRelease) {
-          try {
-            handle.close();
-          } catch (Exception e) {
-            throw new RuntimeException(e);
-          }
+      WritableHandle handle = map.get(memToRelease);
+      if (handle != null && handle.getWritable() == memToRelease) {
+        try {
+          handle.close();
+        } catch (Exception e) {
+          throw new RuntimeException(e);
         }
       }
     }
@@ -156,7 +162,7 @@ public class ExampleMemoryRequestServerTest {
           v.close();
         } catch (Exception e) {
           throw new RuntimeException(e);
-        } //harmless
+        }
       });
     }
   }

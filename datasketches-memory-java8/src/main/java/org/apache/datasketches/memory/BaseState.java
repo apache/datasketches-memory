@@ -32,7 +32,7 @@ import org.apache.datasketches.memory.internal.BaseStateImpl;
  * @author Lee Rhodes
  */
 public interface BaseState {
-  static final MemoryRequestServer defaultMemReqSvr = new DefaultMemoryRequestServer();
+  static final MemoryRequestServer defaultMemReqSvr = null;//new DefaultMemoryRequestServer(); //or null.
 
   //Byte Order Related
 

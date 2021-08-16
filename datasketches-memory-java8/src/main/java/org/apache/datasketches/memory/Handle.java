@@ -20,7 +20,7 @@
 package org.apache.datasketches.memory;
 
 /**
- * A handle for read-only resource.
+ * A handle for read-only Memory resource.
  *
  * <p>The purpose of a Handle is to
  * <ul><li>Provide a <i>strong reference</i> to an external <i>resource</i>.</li>

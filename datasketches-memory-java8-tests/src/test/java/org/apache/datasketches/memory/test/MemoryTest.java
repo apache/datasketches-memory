@@ -352,20 +352,21 @@ public class MemoryTest {
     int bytes = 1024;
     long curAllocations = BaseState.getCurrentDirectMemoryAllocations();
     long curAllocated   = BaseState.getCurrentDirectMemoryAllocated();
+    System.err.println(curAllocations + " should be zero!");
     WritableHandle wh1 = WritableMemory.allocateDirect(bytes);
     WritableHandle wh2 = WritableMemory.allocateDirect(bytes);
     assertEquals(BaseState.getCurrentDirectMemoryAllocations(), 2L + curAllocations);
     assertEquals(BaseState.getCurrentDirectMemoryAllocated(), 2 * bytes + curAllocated);
 
     wh1.close();
-    assertEquals(BaseState.getCurrentDirectMemoryAllocations(), 1L);
-    assertEquals(BaseState.getCurrentDirectMemoryAllocated(), bytes);
+    assertEquals(BaseState.getCurrentDirectMemoryAllocations(), 1L + curAllocations);
+    assertEquals(BaseState.getCurrentDirectMemoryAllocated(), bytes + curAllocated);
 
     wh2.close();
     wh2.close(); //check that it doesn't go negative.
     //even though the handles are closed, these methods are static access
-    assertEquals(BaseState.getCurrentDirectMemoryAllocations(), 0L);
-    assertEquals(BaseState.getCurrentDirectMemoryAllocated(), 0L);
+    assertEquals(BaseState.getCurrentDirectMemoryAllocations(), 0L + curAllocations);
+    assertEquals(BaseState.getCurrentDirectMemoryAllocated(), 0L + curAllocated);
   }
 
   @SuppressWarnings({ "resource"})

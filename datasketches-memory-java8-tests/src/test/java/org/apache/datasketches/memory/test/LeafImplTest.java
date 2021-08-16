@@ -19,7 +19,6 @@
 
 package org.apache.datasketches.memory.test;
 
-import static org.apache.datasketches.memory.internal.Util.NATIVE_BYTE_ORDER;
 import static org.apache.datasketches.memory.internal.Util.NON_NATIVE_BYTE_ORDER;
 import static org.apache.datasketches.memory.internal.Util.otherByteOrder;
 import static org.testng.Assert.assertEquals;
@@ -45,7 +44,7 @@ import org.testng.annotations.Test;
  */
 @SuppressWarnings("javadoc")
 public class LeafImplTest {
-  private static final ByteOrder NBO = NATIVE_BYTE_ORDER;
+  private static final ByteOrder NBO = ByteOrder.nativeOrder();
   private static final ByteOrder NNBO = NON_NATIVE_BYTE_ORDER;
   private static final MemoryRequestServer dummyMemReqSvr = new DummyMemoryRequestServer();
 

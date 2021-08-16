@@ -101,7 +101,7 @@ public abstract class BaseStateImpl implements BaseState {
 
   @Override
   public final ByteOrder getTypeByteOrder() {
-    return isNonNativeType() ? Util.NON_NATIVE_BYTE_ORDER : Util.NATIVE_BYTE_ORDER;
+    return isNonNativeType() ? Util.NON_NATIVE_BYTE_ORDER : ByteOrder.nativeOrder();
   }
 
   /**
@@ -113,13 +113,13 @@ public abstract class BaseStateImpl implements BaseState {
     if (byteOrder == null) {
       throw new IllegalArgumentException("ByteOrder parameter cannot be null.");
     }
-    return Util.NATIVE_BYTE_ORDER == byteOrder;
+    return ByteOrder.nativeOrder() == byteOrder;
   }
 
   @Override
   public final boolean isByteOrderCompatible(final ByteOrder byteOrder) {
     final ByteOrder typeBO = getTypeByteOrder();
-    return typeBO == Util.NATIVE_BYTE_ORDER && typeBO == byteOrder;
+    return typeBO == ByteOrder.nativeOrder() && typeBO == byteOrder;
   }
 
   @Override
@@ -308,16 +308,8 @@ public abstract class BaseStateImpl implements BaseState {
     return (getTypeId() & REGION) > 0;
   }
 
-  final static byte setRegionType(byte type, boolean region) {
-    return (byte)((type & ~2) | (region ? REGION : 0));
-  }
-
   final boolean isDuplicateType() {
     return (getTypeId() & DUPLICATE) > 0;
-  }
-
-  final static byte setDuplicateType(byte type, boolean duplicate) {
-    return (byte)((type & ~4) | (duplicate ? DUPLICATE : 0));
   }
 
   //The following are set by the leaf nodes
@@ -439,7 +431,7 @@ public abstract class BaseStateImpl implements BaseState {
     sb.append("Valid               : ").append(state.isValid()).append(LS);
     sb.append("Read Only           : ").append(state.isReadOnly()).append(LS);
     sb.append("Type Byte Order     : ").append(state.getTypeByteOrder().toString()).append(LS);
-    sb.append("Native Byte Order   : ").append(Util.NATIVE_BYTE_ORDER.toString()).append(LS);
+    sb.append("Native Byte Order   : ").append(ByteOrder.nativeOrder().toString()).append(LS);
     sb.append("JDK Runtime Version : ").append(UnsafeUtil.JDK).append(LS);
     //Data detail
     sb.append("Data, littleEndian  :  0  1  2  3  4  5  6  7");

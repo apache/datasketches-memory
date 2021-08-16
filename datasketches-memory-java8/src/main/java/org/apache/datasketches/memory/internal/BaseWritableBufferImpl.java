@@ -67,14 +67,6 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
     super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
   }
 
-  public static BaseWritableBufferImpl wrapHeapArray(final Object arr, final long offsetBytes, final long lengthBytes,
-      final boolean localReadOnly, final ByteOrder byteOrder, final MemoryRequestServer memReqSvr) {
-    final int typeId = localReadOnly ? READONLY : 0;
-    return Util.isNativeByteOrder(byteOrder)
-        ? new HeapWritableBufferImpl(arr, offsetBytes, lengthBytes, typeId, memReqSvr)
-        : new HeapNonNativeWritableBufferImpl(arr, offsetBytes, lengthBytes, typeId, memReqSvr);
-  }
-
   public static BaseWritableBufferImpl wrapByteBuffer(
       final ByteBuffer byteBuf, final boolean localReadOnly, final ByteOrder byteOrder,
       final MemoryRequestServer memReqSvr) {

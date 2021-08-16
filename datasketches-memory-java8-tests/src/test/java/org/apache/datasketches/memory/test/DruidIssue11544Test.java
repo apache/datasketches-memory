@@ -53,39 +53,58 @@ public class DruidIssue11544Test {
   @Test
   public void withByteBuffer() {
     int initialLongs = 1000;
-    int initialMemSize = initialLongs * 8;
-    ByteBuffer bb = ByteBuffer.allocateDirect(initialMemSize);
+    int size1 = initialLongs * 8;
+
+    //Start with a ByteBuffer
+    ByteBuffer bb = ByteBuffer.allocateDirect(size1);
     bb.order(ByteOrder.nativeOrder());
 
-    //Fill the byte buffer
-    for (int i = 0; i < initialLongs; i++) { bb.putLong(i * 8, i); }
+    //Wrap bb into WritableMemory
+    WritableMemory mem1 = WritableMemory.writableWrap(bb);
+    assertTrue(mem1.isDirect()); //confirm mem1 is off-heap
 
-    //Wrap, assuming default MemoryRequestServer
-    WritableMemory mem = WritableMemory.writableWrap(bb);
-    assertTrue(mem.isDirect()); //confirm mem is off-heap
+    //Acquire the DefaultMemoryRequestServer
+    //NOTE: it is a policy decision to allow the DefaultMemoryServer to be set as a default.
+    // It might be set to null. So we need to check what the current policy is.
+    MemoryRequestServer svr = mem1.getMemoryRequestServer();
+    if (svr == null) {
+      svr = new DefaultMemoryRequestServer();
+    }
+    assertNotNull(svr);
 
     //Request Bigger Memory
-    MemoryRequestServer svr = mem.getMemoryRequestServer();
-    if (svr == null) { svr = new DefaultMemoryRequestServer(); }
-    assertNotNull(svr); //before the fix, this was null.
+    int size2 = size1 * 2;
+    WritableMemory mem2 = svr.request(mem1, size2);
 
-    WritableMemory newMem = svr.request(mem, initialMemSize * 2);
-
-    //Confirm that newMem is on the heap (the default) and 2X size
-    assertFalse(newMem.isDirect());
-    assertEquals(newMem.getCapacity(), 2 * initialMemSize);
+    //Confirm that mem2 is on the heap (the default) and 2X size1
+    assertFalse(mem2.isDirect());
+    assertEquals(mem2.getCapacity(), size2);
 
     //Move data to new memory
-    mem.copyTo(0, newMem, 0, initialMemSize);
+    mem1.copyTo(0, mem2, 0, size1);
 
     //Prepare to request deallocation
-    WritableMemory oldMem = mem;
-    mem = newMem;
-
     //In the DefaultMemoryRequestServer, this is a no-op, so nothing is actually deallocated.
-    svr.requestClose(oldMem, newMem);
-    assertTrue(oldMem.isValid());
-    assertTrue(mem.isValid());
+    svr.requestClose(mem1, mem2);
+    assertTrue(mem1.isValid());
+    assertTrue(mem2.isValid());
+
+    //Now we are on the heap and need to grow again:
+    int size3 = size2 * 2;
+    WritableMemory mem3 = svr.request(mem2, size3);
+
+    //Confirm that mem3 is still on the heap and 2X of size2
+    assertFalse(mem3.isDirect());
+    assertEquals(mem3.getCapacity(), size3);
+
+    //Move data to new memory
+    mem2.copyTo(0, mem3, 0, size2);
+
+    //Prepare to request deallocation
+
+    svr.requestClose(mem2, mem3); //No-op
+    assertTrue(mem2.isValid());
+    assertTrue(mem3.isValid());
   }
 
 }

@@ -350,10 +350,12 @@ public class MemoryTest {
   @Test
   public void checkMonitorDirectStats() throws Exception {
     int bytes = 1024;
+    long curAllocations = BaseState.getCurrentDirectMemoryAllocations();
+    long curAllocated   = BaseState.getCurrentDirectMemoryAllocated();
     WritableHandle wh1 = WritableMemory.allocateDirect(bytes);
     WritableHandle wh2 = WritableMemory.allocateDirect(bytes);
-    assertEquals(BaseState.getCurrentDirectMemoryAllocations(), 2L);
-    assertEquals(BaseState.getCurrentDirectMemoryAllocated(), 2 * bytes);
+    assertEquals(BaseState.getCurrentDirectMemoryAllocations(), 2L + curAllocations);
+    assertEquals(BaseState.getCurrentDirectMemoryAllocated(), 2 * bytes + curAllocated);
 
     wh1.close();
     assertEquals(BaseState.getCurrentDirectMemoryAllocations(), 1L);

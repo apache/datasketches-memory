@@ -42,14 +42,16 @@ public class ExampleMemoryRequestServerTest {
    */
   @SuppressWarnings("resource")
   @Test
-  public void checkExampleMemoryRequestServer1() {
+  public void checkExampleMemoryRequestServer1() throws Exception {
     int bytes = 8;
     ExampleMemoryRequestServer svr = new ExampleMemoryRequestServer();
-    WritableMemory memStart = WritableMemory.allocateDirect(8).getWritable();
-    WritableMemory wMem = svr.request(memStart, bytes);
-    MemoryClient client = new MemoryClient(wMem);
-    client.process();
-    svr.cleanup();
+    try (WritableHandle wh = WritableMemory.allocateDirect(8)) {
+      WritableMemory memStart = wh.getWritable();
+      WritableMemory wMem = svr.request(memStart, bytes);
+      MemoryClient client = new MemoryClient(wMem);
+      client.process();
+      svr.cleanup();
+    }
   }
 
   /**
@@ -74,9 +76,11 @@ public class ExampleMemoryRequestServerTest {
 
   @SuppressWarnings("resource")
   @Test(expectedExceptions = IllegalArgumentException.class)
-  public void checkZeroCapacity() {
+  public void checkZeroCapacity() throws Exception {
     ExampleMemoryRequestServer svr = new ExampleMemoryRequestServer();
-    WritableMemory.allocateDirect(0, ByteOrder.nativeOrder(), svr);
+    try (WritableHandle wh = WritableMemory.allocateDirect(0, ByteOrder.nativeOrder(), svr)) {
+
+    }
   }
 
   /**

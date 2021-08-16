@@ -162,7 +162,7 @@ public interface WritableMemory extends Memory {
    * @return a new <i>WritableMemory</i> representing the defined writable region.
    */
   default WritableMemory writableRegion(long offsetBytes, long capacityBytes) {
-    return writableRegion(offsetBytes, capacityBytes, ByteOrder.nativeOrder());
+    return writableRegion(offsetBytes, capacityBytes, getTypeByteOrder());
   }
 
   /**

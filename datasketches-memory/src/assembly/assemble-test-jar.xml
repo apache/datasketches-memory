@@ -45,16 +45,20 @@
     </moduleSet>
   </moduleSets>
 
-  <!-- DEPENDENCIES, LICENSE and NOTICE -->
-  <fileSets>
-    <fileSet>
-      <directory>${project.build.outputDirectory}/META-INF</directory>
-      <outputDirectory>META-INF</outputDirectory>
-    </fileSet>
-  </fileSets>
-
-  <!-- maven artifacts -->
   <files>
+    <!-- DEPENDENCIES, LICENSE and NOTICE -->
+    <file>
+      <source>${project.build.outputDirectory}/META-INF/DEPENDENCIES</source>
+      <outputDirectory>META-INF</outputDirectory>
+    </file>
+    <file>
+      <source>${maven.multiModuleProjectDirectory}/LICENSE</source>
+      <outputDirectory>META-INF</outputDirectory>
+    </file>
+    <file>
+      <source>${maven.multiModuleProjectDirectory}/NOTICE</source>
+      <outputDirectory>META-INF</outputDirectory>
+    </file>
     <!-- pom.properties -->
     <file>
       <source>${project.build.directory}/maven-archiver/pom.properties</source>

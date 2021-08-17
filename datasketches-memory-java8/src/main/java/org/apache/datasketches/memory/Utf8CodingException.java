@@ -37,7 +37,15 @@ public final class Utf8CodingException extends RuntimeException {
     super(message);
   }
 
-  //Decode
+  //DECODE
+  /**
+   * Exception for a short UTF_8 Decode Byte Sequence
+   * @param leadByte the given lead byte
+   * @param address the given address
+   * @param limit the given limit
+   * @param required what is required
+   * @return the exception
+   */
   public static Utf8CodingException shortUtf8DecodeByteSequence(final byte leadByte, final long address,
       final long limit, final int required) {
     final String s = "Too few Utf8 decode bytes remaining given the leading byte. "
@@ -45,28 +53,53 @@ public final class Utf8CodingException extends RuntimeException {
     return new Utf8CodingException(s);
   }
 
+  /**
+   * Exception for an illegal UTF_8 Decode Byte Sequence
+   * @param bytes the illegal byte sequence
+   * @return the exception.
+   */
   public static Utf8CodingException illegalUtf8DecodeByteSequence(final byte[] bytes) {
     final String s = "Invalid UTF-8 decode byte sequence: " + badBytes(bytes);
     return new Utf8CodingException(s);
   }
 
-  //Encode
+  //ENCODE
+  /**
+   * Exception for out-of-memory
+   * @return the exception
+   */
   public static Utf8CodingException outOfMemory() {
     final String s = "Out-of-memory with characters remaining to be encoded";
     return new Utf8CodingException(s);
   }
 
+  /**
+   * Exception for an unpaired surrogate
+   * @param c The last char to encode is an unpaired surrogate
+   * @return the exception plus the unpaired surrogate character
+   */
   public static Utf8CodingException unpairedSurrogate(final char c) {
     final String s = "Last char to encode is an unpaired surrogate: 0X"
         + Integer.toHexString(c & 0XFFFF);
     return new Utf8CodingException(s);
   }
 
+  /**
+   * Exception for a short UTF_8 encode byte length
+   * @param remaining The surrogate pair that is short
+   * @return the exception plus the surrogate pair that is short
+   */
   public static Utf8CodingException shortUtf8EncodeByteLength(final int remaining) {
     final String s = "Too few MemoryImpl bytes to encode a surrogate pair: " + remaining;
     return new Utf8CodingException(s);
   }
 
+  /**
+   * Exception for an illegal surrogate pair
+   * @param c1 the first character of the pair
+   * @param c2 the second character of the pair
+   * @return the exception plus the illegal pair
+   */
   public static Utf8CodingException illegalSurrogatePair(final char c1, final char c2) {
     final String s = "Illegal Surrogate Pair: Char 1: " + Integer.toHexString(c1 & 0XFFFF)
       + ", Char 2: " + Integer.toHexString(c2 & 0XFFFF);

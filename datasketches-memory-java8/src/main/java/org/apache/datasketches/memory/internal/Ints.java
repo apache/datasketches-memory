@@ -24,6 +24,11 @@ public final class Ints {
 
   private Ints() {}
 
+  /**
+   * Checks if a cast of a long to an int is within the range of an int
+   * @param v the given long
+   * @return returns the cast int, or throws an exception that the long was out-of-range of an int.
+   */
   public static int checkedCast(final long v) {
     final int result = (int) v;
     if (result != v) {

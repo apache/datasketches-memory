@@ -45,8 +45,7 @@ import org.apache.datasketches.memory.WritableMemory;
  */
 
 /**
- * Implementation of {@link WritableMemory} for non-native endian byte order. Native variant is
- * {@link NativeWritableMemoryImpl}.
+ * Implementation of {@link WritableMemory} for non-native endian byte order.
  * @author Roman Leventov
  * @author Lee Rhodes
  */

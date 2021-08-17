@@ -80,15 +80,32 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
     super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
   }
 
+  /**
+   * The static constructor that chooses the correct Heap leaf node based on the byte order.
+   * @param arr the primitive heap array being wrapped
+   * @param offsetBytes the offset bytes into the array (independent of array type).
+   * @param lengthBytes the length of the wrapped region.
+   * @param localReadOnly the requested read-only status
+   * @param byteOrder the requested byte order
+   * @param memReqSvr the requested MemoryRequestServer, which may be null.
+   * @return this class constructed via the leaf node.
+   */
   public static BaseWritableMemoryImpl wrapHeapArray(final Object arr, final long offsetBytes, final long lengthBytes,
       final boolean localReadOnly, final ByteOrder byteOrder, final MemoryRequestServer memReqSvr) {
-
     final int typeId = localReadOnly ? READONLY : 0;
     return Util.isNativeByteOrder(byteOrder)
         ? new HeapWritableMemoryImpl(arr, offsetBytes, lengthBytes, typeId, memReqSvr)
         : new HeapNonNativeWritableMemoryImpl(arr, offsetBytes, lengthBytes, typeId, memReqSvr);
   }
 
+  /**
+   * The static constructor that chooses the correct ByteBuffer leaf node based on the byte order.
+   * @param byteBuf the ByteBuffer being wrapped
+   * @param localReadOnly the requested read-only state
+   * @param byteOrder the requested byteOrder
+   * @param memReqSvr the requested MemoryRequestServer, which may be null.
+   * @return this class constructed via the leaf node.
+   */
   public static BaseWritableMemoryImpl wrapByteBuffer(
       final ByteBuffer byteBuf, final boolean localReadOnly, final ByteOrder byteOrder,
       final MemoryRequestServer memReqSvr) {
@@ -101,6 +118,15 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
             abb.regionOffset, abb.capacityBytes,  typeId, byteBuf, memReqSvr);
   }
 
+  /**
+   * The static constructor that chooses the correct Map leaf node based on the byte order.
+   * @param file the file being wrapped.
+   * @param fileOffsetBytes the file offset bytes
+   * @param capacityBytes the requested capacity of the memory mapped region
+   * @param localReadOnly the requested read-only state
+   * @param byteOrder the requested byte-order
+   * @return this class constructed via the leaf node.
+   */
   @SuppressWarnings("resource")
   public static WritableMapHandle wrapMap(final File file, final long fileOffsetBytes,
       final long capacityBytes, final boolean localReadOnly, final ByteOrder byteOrder) {
@@ -115,6 +141,13 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
     return new WritableMapHandleImpl(dirWMap, wmem);
   }
 
+  /**
+   * The static constructor that chooses the correct Direct leaf node based on the byte order.
+   * @param capacityBytes the requested capacity for the Direct (off-heap) memory
+   * @param byteOrder the requested byte order
+   * @param memReqSvr the requested MemoryRequestServer, which may be null
+   * @return this class constructed via the leaf node.
+   */
   @SuppressWarnings("resource")
   public static WritableHandle wrapDirect(final long capacityBytes,
       final ByteOrder byteOrder, final MemoryRequestServer memReqSvr) {

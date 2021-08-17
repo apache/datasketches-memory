@@ -29,7 +29,7 @@ import sun.misc.Unsafe;
  *
  * @author Lee Rhodes
  */
-@SuppressWarnings("restriction")
+@SuppressWarnings({"restriction", "javadoc"})
 public final class UnsafeUtil {
   public static final Unsafe unsafe;
   public static final String JDK; //must be at least "1.8"
@@ -161,7 +161,7 @@ public final class UnsafeUtil {
   /**
    * Like {@link Unsafe#arrayBaseOffset(Class)}, but caches return values for common array types.
    * Useful because calling {@link Unsafe#arrayBaseOffset(Class)} directly incurs more overhead.
-   * @param c The given Class<?>.
+   * @param c The given Class&lt;?&gt;.
    * @return the base-offset
    */
   public static long getArrayBaseOffset(final Class<?> c) {

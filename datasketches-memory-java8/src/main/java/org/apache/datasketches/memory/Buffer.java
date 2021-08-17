@@ -27,6 +27,11 @@ import java.util.Objects;
 
 import org.apache.datasketches.memory.internal.BaseWritableBufferImpl;
 
+/**
+ * Defines the read-only API for relative positional access to a resource.
+ *
+ * @author Lee Rhodes
+ */
 public interface Buffer extends BaseBuffer {
 
   //BYTE BUFFER
@@ -144,6 +149,7 @@ public interface Buffer extends BaseBuffer {
   /**
    * Convert this Buffer to a Memory with the given byte order.
    * The current <i>start</i>, <i>position</i> and <i>end</i> are ignored.
+   * @param byteOrder the given byte order.
    * @return Memory
    */
   Memory asMemory(ByteOrder byteOrder);

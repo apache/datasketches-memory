@@ -33,6 +33,11 @@ import org.apache.datasketches.memory.internal.BaseWritableMemoryImpl;
 import org.apache.datasketches.memory.internal.Prim;
 import org.apache.datasketches.memory.internal.UnsafeUtil;
 
+/**
+ * Defines the read-only API for offset access to a resource.
+ *
+ * @author Lee Rhodes
+ */
 public interface Memory extends BaseState {
 
   //BYTE BUFFER
@@ -40,7 +45,7 @@ public interface Memory extends BaseState {
   /**
    * Accesses the given <i>ByteBuffer</i> for read-only operations. The returned <i>Memory</i> object has
    * the same byte order, as the given <i>ByteBuffer</i>.
-   * @param byteBuffer the given <i>ByteBuffer</i>. It must be non-null and with capacity >= 0.
+   * @param byteBuffer the given <i>ByteBuffer</i>. It must be non-null and with capacity &ge; 0.
    * @return a new <i>Memory</i> for read-only operations on the given <i>ByteBuffer</i>.
    */
   static Memory wrap(ByteBuffer byteBuffer) {
@@ -50,7 +55,7 @@ public interface Memory extends BaseState {
   /**
    * Accesses the given <i>ByteBuffer</i> for read-only operations. The returned <i>Memory</i> object has
    * the given byte order, ignoring the byte order of the given <i>ByteBuffer</i> for future reads and writes.
-   * @param byteBuffer the given <i>ByteBuffer</i>. It must be non-null and with capacity >= 0.
+   * @param byteBuffer the given <i>ByteBuffer</i>. It must be non-null and with capacity &ge; 0.
    * @param byteOrder the byte order to be used.  It must be non-null.
    * @return a new <i>Memory</i> for read-only operations on the given <i>ByteBuffer</i>.
    */
@@ -66,7 +71,7 @@ public interface Memory extends BaseState {
    * Maps the entire given file into native-ordered <i>Memory</i> for read operations
    * Calling this method is equivalent to calling
    * {@link #map(File, long, long, ByteOrder) map(file, 0, file.length(), ByteOrder.nativeOrder())}.
-   * @param file the given file to map. It must be non-null, length >= 0, and readable.
+   * @param file the given file to map. It must be non-null, length &ge; 0, and readable.
    * @return <i>MapHandle</i> for managing the mapped memory.
    * Please read Javadocs for {@link Handle}.
    */
@@ -99,8 +104,8 @@ public interface Memory extends BaseState {
    * <li>Returned object's origin = this object's origin + offsetBytes</li>
    * <li>Returned object's capacity = capacityBytes</li>
    * </ul>
-   * @param offsetBytes the starting offset with respect to the origin of this <i>Memory</i>. It must be >=0.
-   * @param capacityBytes the capacity of the region in bytes. It must be >= 0.
+   * @param offsetBytes the starting offset with respect to the origin of this <i>Memory</i>. It must be &ge; 0.
+   * @param capacityBytes the capacity of the region in bytes. It must be &ge; 0.
    * @return a new <i>Memory</i> representing the defined region based on the given
    * offsetBytes and capacityBytes.
    */
@@ -115,8 +120,8 @@ public interface Memory extends BaseState {
    * <li>Returned object's capacity = <i>capacityBytes</i></li>
    * <li>Returned object's byte order = <i>byteOrder</i></li>
    * </ul>
-   * @param offsetBytes the starting offset with respect to the origin of this Memory. It must be >=0.
-   * @param capacityBytes the capacity of the region in bytes. It must be >= 0.
+   * @param offsetBytes the starting offset with respect to the origin of this Memory. It must be &ge; 0.
+   * @param capacityBytes the capacity of the region in bytes. It must be &ge; 0.
    * @param byteOrder the given byte order. It must be non-null.
    * @return a new <i>Memory</i> representing the defined region based on the given
    * offsetBytes, capacityBytes and byteOrder.

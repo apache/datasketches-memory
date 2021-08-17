@@ -67,6 +67,14 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
     super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
   }
 
+  /**
+   * The static constructor that chooses the correct ByteBuffer leaf node based on the byte order.
+   * @param byteBuf the ByteBuffer being wrapped
+   * @param localReadOnly the requested read-only state
+   * @param byteOrder the requested byteOrder
+   * @param memReqSvr the requested MemoryRequestServer, which may be null.
+   * @return this class constructed via the leaf node.
+   */
   public static BaseWritableBufferImpl wrapByteBuffer(
       final ByteBuffer byteBuf, final boolean localReadOnly, final ByteOrder byteOrder,
       final MemoryRequestServer memReqSvr) {

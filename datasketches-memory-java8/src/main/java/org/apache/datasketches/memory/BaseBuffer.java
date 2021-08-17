@@ -19,6 +19,11 @@
 
 package org.apache.datasketches.memory;
 
+/**
+ * Defines the relative positional API.
+ *
+ * @author Lee Rhodes
+ */
 public interface BaseBuffer extends BaseState {
 
   /**
@@ -115,12 +120,5 @@ public interface BaseBuffer extends BaseState {
    * @return BaseBuffer
    */
   BaseBuffer setAndCheckStartPositionEnd(long start, long position, long end);
-
-
-
-
-
-
-
 
 }

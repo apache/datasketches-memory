@@ -45,8 +45,7 @@ import org.apache.datasketches.memory.WritableBuffer;
  */
 
 /**
- * Implementation of {@link WritableBuffer} for non-native endian byte order. Native variant is
- * {@link NativeWritableBufferImpl}.
+ * Implementation of {@link WritableBuffer} for non-native endian byte order.
  * @author Roman Leventov
  * @author Lee Rhodes
  */

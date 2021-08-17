@@ -41,7 +41,7 @@ public interface WritableMemory extends Memory {
   /**
    * Accesses the given <i>ByteBuffer</i> for write operations. The returned <i>WritableMemory</i> object has
    * the same byte order, as the given <i>ByteBuffer</i>.
-   * @param byteBuffer the given <i>ByteBuffer</i>. It must be non-null, with capacity >= 0, and writable.
+   * @param byteBuffer the given <i>ByteBuffer</i>. It must be non-null, with capacity &ge; 0, and writable.
    * @return a new <i>WritableMemory</i> for write operations on the given <i>ByteBuffer</i>.
    */
   static WritableMemory writableWrap(ByteBuffer byteBuffer) {
@@ -52,7 +52,7 @@ public interface WritableMemory extends Memory {
    * Accesses the given <i>ByteBuffer</i> for write operations. The returned <i>WritableMemory</i> object has
    * the given byte order, ignoring the byte order of the given <i>ByteBuffer</i> for future writes and following reads.
    * However, this does not change the byte order of data already in the <i>ByteBuffer</i>.
-   * @param byteBuffer the given <i>ByteBuffer</i>. It must be non-null, with capacity >= 0, and writable.
+   * @param byteBuffer the given <i>ByteBuffer</i>. It must be non-null, with capacity &ge; 0, and writable.
    * @param byteOrder the byte order to be used. It must be non-null.
    * @return a new <i>WritableMemory</i> for write operations on the given <i>ByteBuffer</i>.
    */
@@ -64,7 +64,7 @@ public interface WritableMemory extends Memory {
    * Accesses the given <i>ByteBuffer</i> for write operations. The returned <i>WritableMemory</i> object has
    * the given byte order, ignoring the byte order of the given <i>ByteBuffer</i> for future reads and writes.
    * However, this does not change the byte order of data already in the <i>ByteBuffer</i>.
-   * @param byteBuffer the given <i>ByteBuffer</i>. It must be non-null, with capacity >= 0, and writable.
+   * @param byteBuffer the given <i>ByteBuffer</i>. It must be non-null, with capacity &ge; 0, and writable.
    * @param byteOrder the byte order to be used. It must be non-null.
    * @param memReqSvr A user-specified <i>MemoryRequestServer</i>, which may be null.
    * This is a callback mechanism for a user client to request a larger <i>WritableMemory</i>.
@@ -83,7 +83,7 @@ public interface WritableMemory extends Memory {
    * Maps the entire given file into native-ordered WritableMemory for write operations
    * Calling this method is equivalent to calling
    * {@link #writableMap(File, long, long, ByteOrder) writableMap(file, 0, file.length(), ByteOrder.nativeOrder())}.
-   * @param file the given file to map. It must be non-null, with length > 0, and writable.
+   * @param file the given file to map. It must be non-null, with length &ge; 0, and writable.
    * @return WritableMapHandle for managing the mapped Memory.
    * Please read Javadocs for {@link Handle}.
    */
@@ -96,7 +96,7 @@ public interface WritableMemory extends Memory {
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>WritableMemory.map(...)</i>.
-   * @param file the given file to map. It must be non-null and writable.
+   * @param file the given file to map. It must be non-null, writable and length &ge; 0.
    * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
    * @param capacityBytes the size of the mapped Memory. It must not be negative.
    * @param byteOrder the byte order to be used for the given file. It must be non-null.
@@ -107,6 +107,7 @@ public interface WritableMemory extends Memory {
     Objects.requireNonNull(file, "file must be non-null.");
     Objects.requireNonNull(byteOrder, "byteOrder must be non-null.");
     if (!file.canWrite()) { throw new ReadOnlyException("file must be writable."); }
+    negativeCheck(file.length(), "file.length()");
     negativeCheck(fileOffsetBytes, "fileOffsetBytes");
     negativeCheck(capacityBytes, "capacityBytes");
     return BaseWritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, false, byteOrder);
@@ -122,7 +123,7 @@ public interface WritableMemory extends Memory {
    * It is the responsibility of the using application to clear this memory, if required,
    * and to call <i>close()</i> when done.</p>
    *
-   * @param capacityBytes the size of the desired memory in bytes. It must be >= 0.
+   * @param capacityBytes the size of the desired memory in bytes. It must be &ge; 0.
    * @return WritableHandle for this off-heap resource.
    * Please read Javadocs for {@link Handle}.
    */
@@ -138,7 +139,7 @@ public interface WritableMemory extends Memory {
    * It is the responsibility of the using application to clear this memory, if required,
    * and to call <i>close()</i> when done.</p>
    *
-   * @param capacityBytes the size of the desired memory in bytes. It must be >= 0.
+   * @param capacityBytes the size of the desired memory in bytes. It must be &ge; 0.
    * @param byteOrder the given byte order. It must be non-null.
    * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
    * This is a callback mechanism for a user client of direct memory to request more memory.
@@ -161,8 +162,8 @@ public interface WritableMemory extends Memory {
    * <li>Returned object's capacity = <i>capacityBytes</i></li>
    * </ul>
    *
-   * @param offsetBytes the starting offset with respect to this object. It must be >=0.
-   * @param capacityBytes the capacity of the returned object in bytes. It must be >= 0.
+   * @param offsetBytes the starting offset with respect to this object. It must be &ge; 0.
+   * @param capacityBytes the capacity of the returned object in bytes. It must be &ge; 0.
    * @return a new <i>WritableMemory</i> representing the defined writable region.
    */
   default WritableMemory writableRegion(long offsetBytes, long capacityBytes) {
@@ -179,8 +180,8 @@ public interface WritableMemory extends Memory {
    * <li>Returned object's byte order = <i>byteOrder</i></li>
    * </ul>
    *
-   * @param offsetBytes the starting offset with respect to this object. It must be >=0.
-   * @param capacityBytes the capacity of the returned object in bytes. It must be >= 0.
+   * @param offsetBytes the starting offset with respect to this object. It must be &ge; 0.
+   * @param capacityBytes the capacity of the returned object in bytes. It must be &ge; 0.
    * @param byteOrder the given byte order. It must be non-null.
    * @return a new <i>WritableMemory</i> representing the defined writable region.
    */
@@ -223,7 +224,7 @@ public interface WritableMemory extends Memory {
   //ALLOCATE HEAP VIA AUTOMATIC BYTE ARRAY
   /**
    * Creates on-heap WritableMemory with the given capacity and the native byte order.
-   * @param capacityBytes the given capacity in bytes. It must be >= 0.
+   * @param capacityBytes the given capacity in bytes. It must be &ge; 0.
    * @return a new WritableMemory for write operations on a new byte array.
    */
   static WritableMemory allocate(int capacityBytes) {
@@ -232,7 +233,7 @@ public interface WritableMemory extends Memory {
 
   /**
    * Creates on-heap WritableMemory with the given capacity and the given byte order.
-   * @param capacityBytes the given capacity in bytes. It must be >= 0.
+   * @param capacityBytes the given capacity in bytes. It must be &ge; 0.
    * @param byteOrder the given byte order to allocate new Memory object with. It must be non-null.
    * @return a new WritableMemory for write operations on a new byte array.
    */
@@ -242,7 +243,7 @@ public interface WritableMemory extends Memory {
 
   /**
    * Creates on-heap WritableMemory with the given capacity and the given byte order.
-   * @param capacityBytes the given capacity in bytes. It must be >= 0.
+   * @param capacityBytes the given capacity in bytes. It must be &ge; 0.
    * @param byteOrder the given byte order to allocate new Memory object with. It must be non-null.
    * @param memReqSvr A user-specified <i>MemoryRequestServer</i>, which may be null.
    * This is a callback mechanism for a user client to request a larger <i>WritableMemory</i>.
@@ -288,8 +289,8 @@ public interface WritableMemory extends Memory {
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>WritableMemory.wrap(...)</i>.
    * @param array the given primitive array. It must be non-null.
-   * @param offsetBytes the byte offset into the given array. It must be >=0.
-   * @param lengthBytes the number of bytes to include from the given array. It must be >=0.
+   * @param offsetBytes the byte offset into the given array. It must be &ge; 0.
+   * @param lengthBytes the number of bytes to include from the given array. It must be &ge; 0.
    * @param byteOrder the byte order to be used. It must be non-null.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
@@ -305,8 +306,8 @@ public interface WritableMemory extends Memory {
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>WritableMemory.wrap(...)</i>.
    * @param array the given primitive array. It must be non-null.
-   * @param offsetBytes the byte offset into the given array. It must be >=0.
-   * @param lengthBytes the number of bytes to include from the given array. It must be >=0.
+   * @param offsetBytes the byte offset into the given array. It must be &ge; 0.
+   * @param lengthBytes the number of bytes to include from the given array. It must be &ge; 0.
    * @param byteOrder the byte order to be used. It must be non-null.
    * @param memReqSvr A user-specified <i>MemoryRequestServer</i>, which may be null.
    * This is a callback mechanism for a user client to request a larger <i>WritableMemory</i>.

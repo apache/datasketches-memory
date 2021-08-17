@@ -38,7 +38,7 @@ public interface WritableBuffer extends Buffer {
   /**
    * Accesses the given <i>ByteBuffer</i> for write operations. The returned <i>WritableBuffer</i> object has
    * the same byte order, as the given <i>ByteBuffer</i>.
-   * @param byteBuf the given ByteBuffer. It must be non-null and with capacity >= 0.
+   * @param byteBuf the given ByteBuffer. It must be non-null and with capacity &ge; 0.
    * @return a new <i>WritableBuffer</i> for write operations on the given <i>ByteBuffer</i>.
    */
   static WritableBuffer writableWrap(ByteBuffer byteBuf) {
@@ -49,7 +49,7 @@ public interface WritableBuffer extends Buffer {
    * Accesses the given <i>ByteBuffer</i> for write operations. The returned <i>WritableBuffer</i> object has
    * the given byte order, ignoring the byte order of the given <i>ByteBuffer</i> for future writes and following reads.
    * However, this does not change the byte order of data already in the <i>ByteBuffer</i>.
-   * @param byteBuf the given ByteBuffer. It must be non-null and with capacity >= 0.
+   * @param byteBuf the given ByteBuffer. It must be non-null and with capacity &ge; 0.
    * @param byteOrder the byte order to be used.
    * @param memReqSvr A user-specified <i>MemoryRequestServer</i>, which must not be null.
    * This is a callback mechanism for a user client to request a larger <i>WritableBuffer</i>.

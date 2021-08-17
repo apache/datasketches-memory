@@ -19,28 +19,32 @@
 
 package org.apache.datasketches.memory.test;
 
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 
-//import org.apache.datasketches.memory.internal.MemoryCleaner;
+import org.apache.datasketches.memory.internal.MemoryCleaner;
+import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")
 public class MemoryCleanerTest {
 
-//    @Test
-//    public void cleanerDeallocates() {
-//       SimpleDeallocator deallocator = new SimpleDeallocator();
-//       MemoryCleaner cleaner = new MemoryCleaner(this, deallocator);
-//       cleaner.clean();
-//       assertTrue(SimpleDeallocator.getHasRun());
-//    }
-//
-//    @SuppressWarnings("unused")
-//    @Test
-//    public void noDeallocation() {
-//        SimpleDeallocator deallocator = new SimpleDeallocator();
-//        new MemoryCleaner(this, deallocator);
-//        assertFalse(SimpleDeallocator.getHasRun());
-//    }
+    @Test
+    public void cleanerDeallocates() {
+       SimpleDeallocator deallocator = new SimpleDeallocator();
+       MemoryCleaner cleaner = new MemoryCleaner(this, deallocator);
+       cleaner.clean();
+       assertTrue(SimpleDeallocator.getHasRun());
+    }
+
+    @SuppressWarnings("unused")
+    @Test
+    public void noDeallocation() {
+        SimpleDeallocator deallocator = new SimpleDeallocator();
+        new MemoryCleaner(this, deallocator);
+        assertFalse(SimpleDeallocator.getHasRun());
+    }
 
     static final class SimpleDeallocator implements Runnable {
         static final AtomicBoolean hasRun = new AtomicBoolean();

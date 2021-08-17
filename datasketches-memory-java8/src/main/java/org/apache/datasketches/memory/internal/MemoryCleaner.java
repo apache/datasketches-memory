@@ -29,7 +29,7 @@ import sun.misc.Cleaner;
  * For more information, see: https://openjdk.java.net/jeps/238
  */
 @SuppressWarnings("restriction")
-class MemoryCleaner {
+public class MemoryCleaner {
     private final Cleaner cleaner;
 
     /**

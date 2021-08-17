@@ -22,7 +22,7 @@ package org.apache.datasketches.memory.internal;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 /**
- * This is a step boolean function that can change its state only once and is thread-safe.
+ * This is a step boolean function that can change its state only once.
  *
  * @author Lee Rhodes
  */
@@ -35,6 +35,10 @@ public final class StepBoolean {
   private final int initialState;
   private volatile int state;
 
+  /**
+   * Defines the initial state
+   * @param initialState the given initial state
+   */
   public StepBoolean(final boolean initialState) {
     this.initialState = initialState ? TRUE : FALSE;
     state = this.initialState;

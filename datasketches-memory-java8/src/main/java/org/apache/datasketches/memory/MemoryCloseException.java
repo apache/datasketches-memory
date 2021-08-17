@@ -28,10 +28,18 @@ package org.apache.datasketches.memory;
 public class MemoryCloseException extends MemoryException {
   private static final long serialVersionUID = 2L;
 
+  /**
+   * The associated resource failed to close.
+   */
   public MemoryCloseException() {
     super("The associated resource failed to close.");
   }
 
+  /**
+   * The associated resource failed to close, with comment
+   *
+   * @param resource the named resource that failed to close, plus other comments.
+   */
   public MemoryCloseException(final String resource) {
     super("The associated resource, " + resource + ", failed to close");
   }

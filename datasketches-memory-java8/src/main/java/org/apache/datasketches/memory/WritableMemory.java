@@ -17,7 +17,6 @@
  * under the License.
  */
 
-
 package org.apache.datasketches.memory;
 
 import static org.apache.datasketches.memory.internal.Util.negativeCheck;
@@ -31,6 +30,11 @@ import org.apache.datasketches.memory.internal.BaseWritableMemoryImpl;
 import org.apache.datasketches.memory.internal.Prim;
 import org.apache.datasketches.memory.internal.UnsafeUtil;
 
+/**
+ * Defines the writable API for offset access to a resource.
+ *
+ * @author Lee Rhodes
+ */
 public interface WritableMemory extends Memory {
 
   //BYTE BUFFER

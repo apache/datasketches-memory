@@ -34,6 +34,7 @@ import org.apache.datasketches.memory.Memory;
 /**
  * @author Lee Rhodes
  */
+@SuppressWarnings("javadoc")
 public final class Util {
   public static final String LS = System.getProperty("line.separator");
 

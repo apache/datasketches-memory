@@ -28,6 +28,7 @@ import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.MemoryRequestServer;
 
+@SuppressWarnings("javadoc")
 public final class ReflectUtil {
 
   private ReflectUtil() {}

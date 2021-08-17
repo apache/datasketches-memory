@@ -29,7 +29,7 @@ import sun.misc.Unsafe;
  *
  * @author Lee Rhodes
  */
-@SuppressWarnings("restriction")
+@SuppressWarnings({"restriction", "javadoc"})
 public final class UnsafeUtil {
   public static final Unsafe unsafe;
   public static final String JDK; //must be at least "1.8"

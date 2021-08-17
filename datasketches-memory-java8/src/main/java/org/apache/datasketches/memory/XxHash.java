@@ -49,7 +49,7 @@ import static org.apache.datasketches.memory.internal.XxHash64.hashShorts;
  */
 public final class XxHash {
 
-  public XxHash() { /* singleton */ }
+  private XxHash() { /* singleton */ }
 
   /**
    * Hash the given arr starting at the given offset and continuing for the given length using the

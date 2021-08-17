@@ -27,6 +27,11 @@ import java.util.Objects;
 import org.apache.datasketches.memory.internal.BaseWritableBufferImpl;
 import org.apache.datasketches.memory.internal.Util;
 
+/**
+ * Defines the writable API for relative positional access to a resource
+ *
+ * @author Lee Rhodes
+ */
 public interface WritableBuffer extends Buffer {
 
   //BYTE BUFFER
@@ -154,6 +159,7 @@ public interface WritableBuffer extends Buffer {
    * Convert this WritableBuffer to a WritableMemory with the given byte order.
    * If this object's capacity is zero, the returned object is effectively immutable and
    * the backing storage and byte order are unspecified.
+   * @param byteOrder the byte order to be used.
    * @return WritableMemory
    */
   WritableMemory asWritableMemory(ByteOrder byteOrder);

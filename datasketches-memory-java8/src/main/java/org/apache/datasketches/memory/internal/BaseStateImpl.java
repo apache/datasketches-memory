@@ -340,7 +340,11 @@ public abstract class BaseStateImpl implements BaseState {
 
 
   //TO STRING
-  //For debugging
+  /**
+   * Decodes the resource type. This is primarily for debugging.
+   * @param typeId the given typeId
+   * @return a human readable string.
+   */
   public static final String typeDecode(final int typeId) {
     StringBuilder sb = new StringBuilder();
     int group1 = typeId & 0x7;

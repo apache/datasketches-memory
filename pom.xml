@@ -254,6 +254,7 @@ under the License.
             <jdkToolchain>
               <version>${jdk-toolchain.version}</version>
             </jdkToolchain>
+            <excludePackageNames>org.apache.datasketches.memory.internal</excludePackageNames>
           </configuration>
           <executions>
             <execution>

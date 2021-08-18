@@ -92,6 +92,10 @@ To run javadoc on this multi-module project, use:
 
     $ mvn clean process-classes javadoc:javadoc -DskipTests=true
 
+To run the CI tests against the multi-release JAR for specific JVM versions [9-13], use:
+
+    $ mvn clean package -Denvironment=ci -Dmatrix.jdk.version=9
+
 To run the eclipse plugin on this multi-module project, use:
 
     $ mvn clean process-classes eclipse:eclipse -DskipTests=true

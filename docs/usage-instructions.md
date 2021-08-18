@@ -22,10 +22,10 @@
 You may need to supply additional runtime arguments to the JVM depending on how you are using the Datasketches Memory library.
 There are several applicable use cases that are considered:
 
-1) Using the library from a Java 8 application
-2) Using the library with on-heap memory only
-3) Using off-heap memory in a non-modularized Java 9+ application
-4) Using off-heap memory in a modularized Java 9+ application
+1. Using the library from a Java 8 application
+2. Using the library with on-heap memory only
+3. Using off-heap memory in a non-modularized Java 9+ application
+4. Using off-heap memory in a modularized Java 9+ application
 
 ### 1) Using the library from a Java 8 application
 
@@ -60,7 +60,7 @@ As an example, consider the following launch script that compiles and runs a sim
     org.xyz.memory.CheckJava8
 ```
 
-### 2) Using the library with on-heap memory only
+### 2) Using the library with on-heap memory only, or with off-heap memory allocated via ByteBuffer by the user.
 
 No additional runtime arguments are required, regardless of whether the library is used from a Java 8 or Java 9+
 application. 
@@ -100,7 +100,7 @@ uses on-heap memory:
 
 The following section applies to applications that are not modularized JPMS applications.
 
-In order to allocate off-heap memory using the library in Java 9 and above, you must provide the
+In order to allocate off-heap memory using the `WritableMemory.allocateDirect(...)` method in Java 9 and above, you must provide the
 following runtime arguments to the JVM:
 
 ```shell
@@ -156,7 +156,7 @@ dependencies.  No distinction is made between modules and libraries since they a
 
 The following section applies to modularized JPMS applications.
 
-In order to allocate off-heap memory using the library in Java 9 and above, you must provide the
+In order to allocate off-heap memory using the `WritableMemory.allocateDirect(...)` method in Java 9 and above, you must provide the
 following runtime arguments to the JVM:
 
 ```shell

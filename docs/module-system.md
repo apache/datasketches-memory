@@ -17,7 +17,7 @@
     under the License.
 -->
 
-# Java Platform Module System (JPMS)
+# Java Platform Module System (JPMS) For JDK 9+
 
 The [Java Platform Module System](https://openjdk.java.net/projects/jigsaw/spec/) defines a module 
 system for the Java Platform. For more documentation on the implementation, see 
@@ -63,7 +63,7 @@ module org.apache.datasketches.memory {
 ```
 
 This declaration explicitly defines the dependencies for the `org.apache.datasketches.memory` module, as well as the 
-external API. The `org.apache.datasketches.internal` package is now inaccessible to the end user, 
+external API. The `org.apache.datasketches.memory.internal` package is now inaccessible to the end user, 
 providing better encapsulation. 
 
 ### Compiler arguments
@@ -73,7 +73,7 @@ Java versions 9 and above.
 These dependencies can be made accessible at compile time through the use of the 
 `add-exports` compiler argument.
 This argument allows one module to access some of the unexported types of another module.  
-Datasketches Memory has come to depend on several internal APIs and therefore requires special 
+Datasketches Memory depends on several internal APIs and therefore requires special 
 exposition.
 
 For example, in order to compile the `datasketches-memory-java9` submodule, the following compiler 
@@ -86,12 +86,15 @@ arguments are added to the Maven compiler plugin in the module's pom.xml file:
     </compilerArgs>
 ```
 
-### Runtime arguments (off-heap memory only)
+### Runtime arguments (only when allocating off-heap memory)
 
-When allocating off-heap memory, reflection is used by the datasketches memory library in cases 
-where fields and methods that do not have `public` visibility in a class.  
-Reflective access requires additional arguments to be provided by the user at runtime, 
-in order to use the `datasketches-memory` JPMS module in Java versions 9 and above.
+When allocating off-heap memory using `WritableMemory.allocateDirect(...)`, 
+reflection is used by the datasketches memory component to access JVM internal class 
+fields and methods that do not have `public` visibility.  For JDK 9+, the JPMS
+requires that the user add additional JVM run-time arguments (`add-opens...`, which permit this reflection.
+
+Note that if the user has allocated off-heap memory using ByteBuffer.allocateDirect(...),
+the DataSketches memory component can still read and write to this memory without these `add-opens...` arguments.
 
 See the [usage instructions](usage-instructions.md) for more details.
 

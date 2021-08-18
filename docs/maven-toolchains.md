@@ -39,10 +39,11 @@ version-specific APIs, which require different JDKs to compile correctly.
 Your local environment requires toolchain entries for Java 8, 9 and 11 to build this project.  
 These can be found in a reference `toolchains.xml` template in the `tools` directory.
 Any maven commands used during development can be supplemented with: 
-`--toolchains tools/toolchains.xml`, without permanently modifying a local 
-`~/.m2/toolchains.xml` file (recommended).
+`--toolchains tools/toolchains.xml`, without permanently modifying the local 
+`~/.m2/toolchains.xml` file.
 
-Alternatively, the toolchain template can be copied to your local maven `toolchains.xml`, 
+Alternatively, to avoid having to add this extra argument to every Maven command, 
+the toolchain template can be copied to your local maven `toolchains.xml`, 
 e.g. `~/.m2/toolchains.xml`.  If there is already a locally configured `toolchains.xml` file, 
 the requisite entries should be merged into the existing file if they do not already exist.
 

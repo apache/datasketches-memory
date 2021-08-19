@@ -84,7 +84,7 @@ To run normal unit tests:
 
     $ mvn clean test
 
-To run the strict profile tests:
+To run the strict profile tests (only supported in Java 8):
 
     $ mvn clean test -P strict
 

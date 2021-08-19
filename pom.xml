@@ -120,13 +120,14 @@ under the License.
     <versions-maven-plugin.version>2.8.1</versions-maven-plugin.version>
 
     <!--  Maven Plugins -->
+    <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version> <!-- overrides parent -->
     <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version> <!-- overrides parent -->
     <maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version> <!-- overrides parent -->
     <maven-enforcer-plugin.version>3.0.0-M3</maven-enforcer-plugin.version> <!-- overrides parent -->
     <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version> <!-- overrides parent -->
     <maven-javadoc-plugin.version>3.3.0</maven-javadoc-plugin.version> <!-- overrides parent -->
     <maven-release-plugin.version>3.0.0-M1</maven-release-plugin.version> <!-- overrides parent -->
-    <maven-remote-resources-plugin.version>[1.7.0,)</maven-remote-resources-plugin.version> <!-- overrides parent -->
+    <maven-remote-resources-plugin.version>1.7.0</maven-remote-resources-plugin.version> <!-- overrides parent -->
     <maven-source-plugin.version>3.2.1</maven-source-plugin.version> <!-- overrides parent -->
     <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version> <!-- overrides parent -->
     <maven-toolchains-plugin.version>3.0.0</maven-toolchains-plugin.version>
@@ -283,7 +284,7 @@ under the License.
                     <version>[1.8,1.9),[8,14)</version>
                   </requireJavaVersion>
                   <requireMavenVersion>
-                    <version>${maven.version},</version>
+                    <version>[${maven.version},)</version>
                   </requireMavenVersion>
                   <bannedDependencies>
                     <excludes>
@@ -504,6 +505,7 @@ under the License.
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-remote-resources-plugin</artifactId>
+              <version>${maven-remote-resources-plugin.version}</version>
               <executions>
                 <execution>
                   <id>process-resource-bundles</id>

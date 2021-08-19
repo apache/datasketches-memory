@@ -80,7 +80,7 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
       final MemoryRequestServer memReqSvr) {
     final AccessByteBuffer abb = new AccessByteBuffer(byteBuf);
     final int typeId = (abb.resourceReadOnly || localReadOnly) ? READONLY : 0;
-    BaseWritableBufferImpl bwbi = Util.isNativeByteOrder(byteOrder)
+    final BaseWritableBufferImpl bwbi = Util.isNativeByteOrder(byteOrder)
         ? new BBWritableBufferImpl(abb.unsafeObj, abb.nativeBaseOffset,
             abb.regionOffset, abb.capacityBytes, typeId, byteBuf, memReqSvr)
         : new BBNonNativeWritableBufferImpl(abb.unsafeObj, abb.nativeBaseOffset,

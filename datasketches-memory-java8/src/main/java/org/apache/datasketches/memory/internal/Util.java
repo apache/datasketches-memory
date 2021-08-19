@@ -42,7 +42,7 @@ public final class Util {
   public static final ByteOrder NON_NATIVE_BYTE_ORDER = ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN
       ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
 
-  public static ByteOrder otherByteOrder(ByteOrder order) {
+  public static ByteOrder otherByteOrder(final ByteOrder order) {
     return (order == ByteOrder.nativeOrder()) ? NON_NATIVE_BYTE_ORDER : ByteOrder.nativeOrder();
   }
 

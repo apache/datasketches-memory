@@ -250,7 +250,7 @@ public interface WritableMemory extends Memory {
    * @return a new WritableMemory for write operations on a new byte array.
    */
   static WritableMemory allocate(int capacityBytes, ByteOrder byteOrder, MemoryRequestServer memReqSvr) {
-    byte[] arr = new byte[capacityBytes];
+    final byte[] arr = new byte[capacityBytes];
     negativeCheck(capacityBytes, "capacityBytes");
     return writableWrap(arr, 0, capacityBytes, byteOrder, memReqSvr);
   }

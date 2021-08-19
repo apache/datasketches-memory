@@ -301,7 +301,7 @@ public abstract class BaseStateImpl implements BaseState {
     return (getTypeId() & READONLY) > 0;
   }
 
-  final static byte setReadOnlyType(byte type, boolean readOnly) {
+  final static byte setReadOnlyType(final byte type, final boolean readOnly) {
     return (byte)((type & ~1) | (readOnly ? READONLY : 0));
   }
 
@@ -346,10 +346,9 @@ public abstract class BaseStateImpl implements BaseState {
    * @return a human readable string.
    */
   public static final String typeDecode(final int typeId) {
-    StringBuilder sb = new StringBuilder();
-    int group1 = typeId & 0x7;
+    final StringBuilder sb = new StringBuilder();
+    final int group1 = typeId & 0x7;
     switch (group1) {
-      case 0 : sb.append(""); break;
       case 1 : sb.append("ReadOnly, "); break;
       case 2 : sb.append("Region, "); break;
       case 3 : sb.append("ReadOnly Region, "); break;
@@ -357,23 +356,27 @@ public abstract class BaseStateImpl implements BaseState {
       case 5 : sb.append("ReadOnly Duplicate, "); break;
       case 6 : sb.append("Region Duplicate, "); break;
       case 7 : sb.append("ReadOnly Region Duplicate, "); break;
+      default: break;
     }
-    int group2 = (typeId >>> 3) & 0x3;
+    final int group2 = (typeId >>> 3) & 0x3;
     switch (group2) {
       case 0 : sb.append("Heap, "); break;
       case 1 : sb.append("Direct, "); break;
       case 2 : sb.append("Map, "); break;
       case 3 : sb.append("ByteBuffer, "); break;
+      default: break;
     }
-    int group3 = (typeId >>> 5) & 0x1;
+    final int group3 = (typeId >>> 5) & 0x1;
     switch (group3) {
       case 0 : sb.append("Native, "); break;
       case 1 : sb.append("NonNative, "); break;
+      default: break;
     }
-    int group4 = (typeId >>> 6) & 0x1;
+    final int group4 = (typeId >>> 6) & 0x1;
     switch (group4) {
       case 0 : sb.append("Memory"); break;
       case 1 : sb.append("Buffer"); break;
+      default: break;
     }
     return sb.toString();
   }

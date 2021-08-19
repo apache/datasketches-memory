@@ -32,7 +32,7 @@ under the License.
 
   <groupId>org.apache.datasketches</groupId>
   <artifactId>datasketches-memory-root</artifactId>
-  <version>2.0.0-SNAPSHOT</version>
+  <version>2.0.0</version>
   <!-- Required for multi-module project -->
   <packaging>pom</packaging>
 
@@ -423,7 +423,7 @@ under the License.
             </jdkToolchain>
           </configuration>
         </plugin>
-        
+
       </plugins>
     </pluginManagement>
     <plugins>
@@ -518,7 +518,7 @@ under the License.
       </build>
     </profile>
 
-  
+
   </profiles>
 
   <!-- This Maven project is divided into an aggregator project (the root), that manages a group of submodules that

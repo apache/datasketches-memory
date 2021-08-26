@@ -25,7 +25,7 @@
 # The script does not assume a POM file and does not use Maven.
 # It does use git, SVN, and uses the script getGitProperties.sh
 
-#  Optional Input Parameters:
+#  Required Input Parameters:
 #  \$1 = absolute path of Java home directory
 #  \$2 = Git Version Tag for this deployment
 #       Example tag for SNAPSHOT         : 1.0.0-SNAPSHOT

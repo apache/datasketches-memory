@@ -17,16 +17,16 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# This is a general bash script to build a java version-specific
+# This is a general bash script to build a JDK version-specific
 # datasketches-memory-X.jar without multi-release functionality.
 # This is intended to be used for developers compiling from source
-# who do not wish to install several versions of java on their
+# who do not wish to install several versions of the JDK on their
 # machine.
 # The script does not assume a POM file and does not use Maven.
 # It does use git, SVN, and uses the script getGitProperties.sh
 
 #  Required Input Parameters:
-#  \$1 = absolute path of Java home directory
+#  \$1 = absolute path of JDK home directory
 #  \$2 = Git Version Tag for this deployment
 #       Example tag for SNAPSHOT         : 1.0.0-SNAPSHOT
 #       Example tag for Release Candidate: 1.0.0-RC1
@@ -34,12 +34,12 @@
 #  \$3 = absolute path of project.basedir
 #  For example:  $ <this script>.sh $JAVA_HOME 2.0.0-RC1 .
 
-if [ -z "$1" ]; then echo "Missing java.home";           exit 1; fi
+if [ -z "$1" ]; then echo "Missing JDK home";            exit 1; fi
 if [ -z "$2" ]; then echo "Missing Git Tag";             exit 1; fi
 if [ -z "$3" ]; then echo "Missing project.basedir";     exit 1; fi
 
-## Extract JavaHome and Version from input parameters:
-JavaHome=$1
+## Extract JDKHome and Version from input parameters:
+JDKHome=$1
 GitTag=$2
 
 # Setup absolute directory references
@@ -50,20 +50,20 @@ ProjectBaseDir=$3 #this must be an absolute path
 cd ${ProjectBaseDir}
 
 #### Use JAVA_HOME to set required executables ####
-if [[ -n "$JavaHome" ]] && [[ -x "${JavaHome}/bin/java" ]]; then
-  Java_="${JavaHome}/bin/java"
+if [[ -n "$JDKHome" ]] && [[ -x "${JDKHome}/bin/java" ]]; then
+  Java_="${JDKHome}/bin/java"
 else
   echo "No java version could be found."; exit 1;
 fi
 
-if [[ -n "$JavaHome" ]] && [[ -x "${JavaHome}/bin/javac" ]]; then
-  Javac_="${JavaHome}/bin/javac"
+if [[ -n "$JDKHome" ]] && [[ -x "${JDKHome}/bin/javac" ]]; then
+  Javac_="${JDKHome}/bin/javac"
 else
   echo "No javac version could be found."; exit 1;
 fi
 
-if [[ -n "$JavaHome" ]] && [[ -x "${JavaHome}/bin/jar" ]]; then
-  Jar_="${JavaHome}/bin/jar"
+if [[ -n "$JDKHome" ]] && [[ -x "${JDKHome}/bin/jar" ]]; then
+  Jar_="${JDKHome}/bin/jar"
 else
   echo "No jar version could be found."; exit 1;
 fi
@@ -72,7 +72,7 @@ fi
 if [[ "$Java_" ]]; then
   JavaVersion=$("$Java_" -version 2>&1 | head -1 | cut -d'"' -f2 | sed '/^1\./s///' | cut -d'.' -f1)
 else
-  echo "No version information could be determined from installed java."; exit 1;
+  echo "No version information could be determined from installed JDK."; exit 1;
 fi
 
 #### Cleanup and setup output directories ####
@@ -108,12 +108,12 @@ if [[ $JavaVersion -lt 8 ]]; then
 
 # version 8
 elif [[ $JavaVersion -lt 9 ]]; then
-  echo "Compiling with java version $JavaVersion..."
+  echo "Compiling with JDK version $JavaVersion..."
   ${Javac_} -d $PackageContents $(find $PackageSrc -name '*.java')
 
 # version 9 or 10
 elif [[ $JavaVersion -lt 11 ]]; then
-  echo "Compiling with java version $JavaVersion..."
+  echo "Compiling with JDK version $JavaVersion..."
   #### Copy java 9 src tree to target/src, overwriting replacements
   rsync -a $MemoryJava9Src $PackageSrc
   # Compile with JPMS exports
@@ -124,7 +124,7 @@ elif [[ $JavaVersion -lt 11 ]]; then
 
 # version 11, 12 or 13
 elif [[ $JavaVersion -lt 14 ]]; then
-  echo "Compiling with java version $JavaVersion..."
+  echo "Compiling with JDK version $JavaVersion..."
   #### Copy java 9 src tree to target/src, overwriting replacements
   rsync -a $MemoryJava9Src $PackageSrc
   #### Copy java 11 src tree to target/src, overwriting replacements
@@ -148,4 +148,3 @@ echo "--- JAR CONTENTS ---"
 ${Jar_} tf ${OutputJar}
 echo
 echo "Successfully built ${OutputJar}"
-

@@ -34,16 +34,16 @@
 #  \$3 = absolute path of project.basedir
 #  For example:  $ <this script>.sh $JAVA_HOME 2.0.0-RC1 .
 
-if [ -z "$1" ]; then echo "Missing java.home";               exit 1; fi
-if [ -z "$2" ]; then echo "Missing Git Version";             exit 1; fi
-if [ -z "$3" ]; then echo "Missing project.basedir";         exit 1; fi
-
-# Setup absolute directory references
-ScriptsDir=$(pwd)
+if [ -z "$1" ]; then echo "Missing java.home";           exit 1; fi
+if [ -z "$2" ]; then echo "Missing Git Tag";             exit 1; fi
+if [ -z "$3" ]; then echo "Missing project.basedir";     exit 1; fi
 
 ## Extract JavaHome and Version from input parameters:
 JavaHome=$1
-Version=$2
+GitTag=$2
+
+# Setup absolute directory references
+ScriptsDir=$(pwd)
 ProjectBaseDir=$3 #this must be an absolute path
 
 ####Move to project directory####
@@ -77,7 +77,7 @@ fi
 
 #### Cleanup and setup output directories ####
 OutputDir=target
-OutputJar=${OutputDir}/org.apache.datasketches.memory-${Version}.jar
+OutputJar=${OutputDir}/org.apache.datasketches.memory-${GitTag}.jar
 
 PackageDir=${OutputDir}/package
 PackageSrc=${PackageDir}/src

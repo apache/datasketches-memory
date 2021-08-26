@@ -70,6 +70,10 @@ fi
 
 #### Parse java -version into major version number ####
 if [[ "$Java_" ]]; then
+  # This expression extracts the correct major version of the Java runtime.
+  # For older runtime versions, such as 1.8, the leading '1.' is removed.
+  # Adapted from this answer on StackOverflow:
+  # https://stackoverflow.com/questions/7334754/correct-way-to-check-java-version-from-bash-script/56243046#56243046
   JavaVersion=$("$Java_" -version 2>&1 | head -1 | cut -d'"' -f2 | sed '/^1\./s///' | cut -d'.' -f1)
 else
   echo "No version information could be determined from installed JDK."; exit 1;

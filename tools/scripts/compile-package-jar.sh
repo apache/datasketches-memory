@@ -23,7 +23,7 @@
 # who do not wish to install several versions of the JDK on their
 # machine.
 # The script does not assume a POM file and does not use Maven.
-# It does use git, SVN, and uses the script getGitProperties.sh
+# It does use git and also uses the script getGitProperties.sh.
 
 #  Required Input Parameters:
 #  \$1 = absolute path of JDK home directory
@@ -43,8 +43,9 @@ JDKHome=$1
 GitTag=$2
 
 # Setup absolute directory references
-ScriptsDir=$(pwd)
 ProjectBaseDir=$3 #this must be an absolute path
+ScriptsDir=${ProjectBaseDir}/tools/scripts/
+ProjectArtifactId="memory"
 
 ####Move to project directory####
 cd ${ProjectBaseDir}
@@ -86,7 +87,8 @@ OutputJar=${OutputDir}/org.apache.datasketches.memory-${GitTag}.jar
 PackageDir=${OutputDir}/package
 PackageSrc=${PackageDir}/src
 PackageContents=${PackageDir}/contents
-PackageMeta=${PackageDir}/META-INF
+PackageMeta=${PackageContents}/META-INF
+PackageManifest=${PackageMeta}/MANIFEST.MF
 
 MemoryJava8Src=datasketches-memory-java8/src/main/java
 MemoryJava9Src=datasketches-memory-java9/src/main/java
@@ -102,6 +104,16 @@ mkdir -p $PackageMeta
 #### Copy LICENSE and NOTICE ####
 cp LICENSE $PackageMeta
 cp NOTICE $PackageMeta
+
+#### Generate MANIFEST.MF ####
+cat >> ${PackageManifest}<< EOF
+Manifest-Version: 1.0
+Created-By: Apache Datasketches Memory compile-package-jar.sh
+Multi-Release: false
+EOF
+
+#### Generate git.properties file ####
+echo "$($ScriptsDir/getGitProperties.sh $ProjectBaseDir $ProjectArtifactId $GitTag)" >> $PackageManifest
 
 #### Copy base tree to target/src
 rsync -a $MemoryJava8Src $PackageSrc

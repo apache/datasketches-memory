@@ -38,16 +38,30 @@ if [ -z "$1" ]; then echo "Missing JDK home";            exit 1; fi
 if [ -z "$2" ]; then echo "Missing Git Tag";             exit 1; fi
 if [ -z "$3" ]; then echo "Missing project.basedir";     exit 1; fi
 
-## Extract JDKHome and Version from input parameters:
+#### Extract JDKHome and Version from input parameters ####
 JDKHome=$1
 GitTag=$2
 
-# Setup absolute directory references
+#### Setup absolute directory references ####
 ProjectBaseDir=$3 #this must be an absolute path
 ScriptsDir=${ProjectBaseDir}/tools/scripts/
 ProjectArtifactId="memory"
 
-####Move to project directory####
+#### Initialise path dependent variables ####
+OutputDir=target
+OutputJar=${OutputDir}/org.apache.datasketches.memory-${GitTag}.jar
+
+PackageDir=${OutputDir}/package
+PackageSrc=${PackageDir}/src
+PackageContents=${PackageDir}/contents
+PackageMeta=${PackageContents}/META-INF
+PackageManifest=${PackageMeta}/MANIFEST.MF
+
+MemoryJava8Src=datasketches-memory-java8/src/main/java
+MemoryJava9Src=datasketches-memory-java9/src/main/java
+MemoryJava11Src=datasketches-memory-java11/src/main/java
+
+#### Move to project directory ####
 cd ${ProjectBaseDir}
 
 #### Use JAVA_HOME to set required executables ####
@@ -81,19 +95,6 @@ else
 fi
 
 #### Cleanup and setup output directories ####
-OutputDir=target
-OutputJar=${OutputDir}/org.apache.datasketches.memory-${GitTag}.jar
-
-PackageDir=${OutputDir}/package
-PackageSrc=${PackageDir}/src
-PackageContents=${PackageDir}/contents
-PackageMeta=${PackageContents}/META-INF
-PackageManifest=${PackageMeta}/MANIFEST.MF
-
-MemoryJava8Src=datasketches-memory-java8/src/main/java
-MemoryJava9Src=datasketches-memory-java9/src/main/java
-MemoryJava11Src=datasketches-memory-java11/src/main/java
-
 echo
 echo "--- CLEAN & COMPILE ---"
 rm -r $OutputDir
@@ -157,7 +158,7 @@ else
 fi
 echo
 echo "--- JAR ---"
-echo "Building Jar from ${PackageContents}..."
+echo "Building JAR from ${PackageContents}..."
 ${Jar_} cf $OutputJar -C $PackageContents .
 echo
 echo "--- JAR CONTENTS ---"

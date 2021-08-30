@@ -31,11 +31,13 @@
   </parent>
 
   <dependencies>
+    <!-- 
     <dependency>
       <groupId>org.apache.datasketches</groupId>
       <artifactId>datasketches-memory</artifactId>
       <version>${project.version}</version>
-    </dependency>
+      <scope>provided</scope>
+    </dependency> -->
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
@@ -112,6 +114,7 @@
                     <dependenciesToScan>
                       <dependency>org.apache.datasketches:datasketches-memory-java8-tests</dependency>
                     </dependenciesToScan>
+                    <reportsDirectory>./target/test-output/${maven.build.timestamp}</reportsDirectory>
                     <argLine />
                   </configuration>
                 </execution>
@@ -177,6 +180,7 @@
                   <dependenciesToScan>
                     <dependency>org.apache.datasketches:datasketches-memory-java8-tests</dependency>
                   </dependenciesToScan>
+                  <reportsDirectory>./target/test-output/${maven.build.timestamp}</reportsDirectory>
                 </configuration>
               </execution>
             </executions>

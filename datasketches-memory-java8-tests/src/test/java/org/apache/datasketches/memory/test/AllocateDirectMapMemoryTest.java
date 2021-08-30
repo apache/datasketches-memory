@@ -38,7 +38,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-@SuppressWarnings("javadoc")
+@SuppressWarnings({"javadoc", "unused"})
 public class AllocateDirectMapMemoryTest {
   private static final String LS = System.getProperty("line.separator");
   MapHandle hand = null;

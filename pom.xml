@@ -364,7 +364,7 @@ under the License.
             <jdkToolchain>
               <version>${jdk-toolchain.version}</version>
             </jdkToolchain>
-            <reportsDirectory>./target/test-output/${maven.build.timestamp}</reportsDirectory>
+            <reportsDirectory>${project.build.directory}/test-output/${maven.build.timestamp}</reportsDirectory>
           </configuration>
         </plugin>
 

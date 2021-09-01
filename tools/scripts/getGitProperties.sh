@@ -64,7 +64,3 @@ tmp=''$Tag''$CR
 prop=$prop$tmp
 
 echo "$prop"
-
-
-
-

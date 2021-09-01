@@ -65,11 +65,17 @@ __NOTE:__
    For more information, see this [Maven Reactor Issue](https://issues.apache.org/jira/browse/MNG-3283).
 
 ### JDK versions required to compile
-This DataSketches component is pure Java and requires the following JDKs to compile:
+This DataSketches component is pure Java and requires any a JDK hotspot version between 8 and 13 to compile.
+Refer to the section below for instructions on how to build a standalone JAR using a single JDK version.
+
+### JDK versions required to compile the Multi-release JAR
+The following versions of the JDK are all required to compile the multi-release JAR:
 
 - JDK8/Hotspot
 - JDK9/Hotspot
 - JDK11/Hotspot
+
+These versions are also required in order to build the Maven project in an IDE.
 
 Ensure that your local environment has been configured according to the 
 [Maven Toolchains Configuration](docs/maven-toolchains.md).
@@ -111,6 +117,20 @@ This will create the following Jars:
 * datasketches-memory-X.Y.Z-sources.jar The main source files.
 * datasketches-memory-X.Y.Z-test-sources.jar The test source files
 * datasketches-memory-X.Y.Z-javadoc.jar  The compressed Javadocs.
+
+### Building a standalone JAR using a single version of the JDK
+A shell script is provided to compile and build a JAR for situations where it is not possible to
+install multiple versions of the JDK in the same build environment.
+
+This script can be found in the **tools/scripts** directory and is invoked from the command line as follows:
+
+    $ ./tools/scripts/compile-package-jar.sh JAVA_HOME GIT_VERSION PROJECT_BASE_DIR
+
+Where:
+
+1) The first argument is the absolute path of JDK home directory e.g. $JAVA_HOME
+2) The second argument is the Git Version Tag for this deployment e.g. 1.0.0-SNAPSHOT, 1.0.0-RC1, 1.0.0 etc.
+3) The third argument is the absolute path of project.basedir e.g. /src/apache-datasketches-memory
 
 ### Toolchains
 

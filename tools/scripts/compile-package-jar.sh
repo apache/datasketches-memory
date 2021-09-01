@@ -38,14 +38,14 @@ if [ -z "$1" ]; then echo "Missing JDK home";            exit 1; fi
 if [ -z "$2" ]; then echo "Missing Git Tag";             exit 1; fi
 if [ -z "$3" ]; then echo "Missing project.basedir";     exit 1; fi
 
-#### Extract JDKHome and Version from input parameters ####
+#### Extract JDKHome, Version and ProjectBaseDir from input parameters ####
 JDKHome=$1
 GitTag=$2
+ProjectBaseDir=$3 #this must be an absolute path
 
 #### Setup absolute directory references ####
-ProjectBaseDir=$3 #this must be an absolute path
-ScriptsDir=${ProjectBaseDir}/tools/scripts/
 ProjectArtifactId="memory"
+ScriptsDir=${ProjectBaseDir}/tools/scripts/
 
 #### Initialise path dependent variables ####
 OutputDir=target
@@ -53,6 +53,7 @@ OutputJar=${OutputDir}/org.apache.datasketches.memory-${GitTag}.jar
 
 PackageDir=${OutputDir}/package
 PackageSrc=${PackageDir}/src
+PackageTests=${PackageDir}/test-classes
 PackageContents=${PackageDir}/contents
 PackageMeta=${PackageContents}/META-INF
 PackageManifest=${PackageMeta}/MANIFEST.MF
@@ -97,8 +98,10 @@ fi
 #### Cleanup and setup output directories ####
 echo
 echo "--- CLEAN & COMPILE ---"
-rm -r $OutputDir
+if [ -d "$OutputDir" ]; then rm -r $OutputDir; fi
+mkdir -p $OutputDir
 mkdir -p $PackageSrc
+mkdir -p $PackageTests
 mkdir -p $PackageContents
 mkdir -p $PackageMeta
 
@@ -117,7 +120,7 @@ EOF
 echo "$($ScriptsDir/getGitProperties.sh $ProjectBaseDir $ProjectArtifactId $GitTag)" >> $PackageManifest
 
 #### Copy base tree to target/src
-rsync -a $MemoryJava8Src $PackageSrc
+rsync -a -I $MemoryJava8Src $PackageSrc
 
 # version too low
 if [[ $JavaVersion -lt 8 ]]; then
@@ -132,7 +135,7 @@ elif [[ $JavaVersion -lt 9 ]]; then
 elif [[ $JavaVersion -lt 11 ]]; then
   echo "Compiling with JDK version $JavaVersion..."
   #### Copy java 9 src tree to target/src, overwriting replacements
-  rsync -a $MemoryJava9Src $PackageSrc
+  rsync -a -I $MemoryJava9Src $PackageSrc
   # Compile with JPMS exports
   ${Javac_} \
     --add-exports java.base/jdk.internal.ref=org.apache.datasketches.memory \
@@ -143,9 +146,9 @@ elif [[ $JavaVersion -lt 11 ]]; then
 elif [[ $JavaVersion -lt 14 ]]; then
   echo "Compiling with JDK version $JavaVersion..."
   #### Copy java 9 src tree to target/src, overwriting replacements
-  rsync -a $MemoryJava9Src $PackageSrc
+  rsync -a -I $MemoryJava9Src $PackageSrc
   #### Copy java 11 src tree to target/src, overwriting replacements
-  rsync -a $MemoryJava11Src $PackageSrc
+  rsync -a -I $MemoryJava11Src $PackageSrc
   # Compile with JPMS exports
    ${Javac_} \
    --add-exports java.base/jdk.internal.ref=org.apache.datasketches.memory \
@@ -161,7 +164,30 @@ echo "--- JAR ---"
 echo "Building JAR from ${PackageContents}..."
 ${Jar_} cf $OutputJar -C $PackageContents .
 echo
-echo "--- JAR CONTENTS ---"
-${Jar_} tf ${OutputJar}
+# Uncomment for debugging purposes
+# echo "--- JAR CONTENTS ---"
+# ${Jar_} tf ${OutputJar}
+# echo
+echo "--- RUN JAR CHECKS ---"
+echo
+MemoryMapFile=$ScriptsDir/CheckMemoryJar.java # Memory map the textual source code for the JAR checks
+
+if [[ $JavaVersion -eq 8 ]]; then
+  ${Javac_} -cp $OutputJar -d $PackageTests $(find $ScriptsDir -name '*.java')
+
+  ${Java_} -cp $PackageTests:$OutputJar org.apache.datasketches.memory.tools.scripts.CheckMemoryJar $MemoryMapFile
+else
+  ${Javac_} \
+    --add-modules org.apache.datasketches.memory \
+    -p "$OutputJar" -d $PackageTests $(find $ScriptsDir -name '*.java')
+
+  ${Java_} \
+    --add-modules org.apache.datasketches.memory \
+    --add-exports java.base/jdk.internal.misc=org.apache.datasketches.memory \
+    --add-exports java.base/jdk.internal.ref=org.apache.datasketches.memory \
+    --add-opens java.base/java.nio=org.apache.datasketches.memory \
+    --add-opens java.base/sun.nio.ch=org.apache.datasketches.memory \
+    -p $OutputJar -cp $PackageTests org.apache.datasketches.memory.tools.scripts.CheckMemoryJar $MemoryMapFile
+fi
 echo
 echo "Successfully built ${OutputJar}"

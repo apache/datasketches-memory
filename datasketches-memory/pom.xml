@@ -312,6 +312,41 @@
           <groupId>pl.project13.maven</groupId>
           <artifactId>git-commit-id-plugin</artifactId>
           <version>${git-commit-id-plugin.version}</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>revision</goal>
+              </goals>
+              <phase>initialize</phase>
+            </execution>
+          </executions>
+          <configuration>
+            <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+            <dateFormatTimeZone>UTC</dateFormatTimeZone>
+            <verbose>false</verbose>
+            <skipPoms>false</skipPoms>
+            <format>json</format>
+            <generateGitPropertiesFile>true</generateGitPropertiesFile>
+            <generateGitPropertiesFilename>${project.build.directory}/git.properties</generateGitPropertiesFilename>
+            <failOnNoGitDirectory>true</failOnNoGitDirectory>
+            <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
+            <commitIdGenerationMode>full</commitIdGenerationMode>
+            <includeOnlyProperties>
+              <includeProperty>git.branch</includeProperty>
+              <includeProperty>git.commit.id.full</includeProperty>
+              <includeProperty>git.commit.time</includeProperty>
+              <includeProperty>git.commit.user.email</includeProperty>
+              <includeProperty>git.tags</includeProperty>
+            </includeOnlyProperties>
+            <gitDescribe>
+              <skip>false</skip>
+              <always>true</always>
+              <abbrev>7</abbrev>
+              <dirty>-dirty</dirty>
+              <tags>true</tags>
+              <forceLongFormat>true</forceLongFormat>
+            </gitDescribe>
+          </configuration>
         </plugin>
 
         <plugin>
@@ -362,47 +397,6 @@
       <build>
         <pluginManagement>
           <plugins>
-            <plugin>
-              <groupId>pl.project13.maven</groupId>
-              <artifactId>git-commit-id-plugin</artifactId>
-              <version>${git-commit-id-plugin.version}</version>
-              <executions>
-                <execution>
-                  <goals>
-                    <goal>revision</goal>
-                  </goals>
-                  <phase>initialize</phase>
-                </execution>
-              </executions>
-              <configuration>
-                <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
-                <dateFormatTimeZone>UTC</dateFormatTimeZone>
-                <verbose>false</verbose>
-                <skipPoms>false</skipPoms>
-                <format>json</format>
-                <generateGitPropertiesFile>true</generateGitPropertiesFile>
-                <generateGitPropertiesFilename>${project.build.directory}/git.properties</generateGitPropertiesFilename>
-                <failOnNoGitDirectory>true</failOnNoGitDirectory>
-                <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
-                <commitIdGenerationMode>full</commitIdGenerationMode>
-                <includeOnlyProperties>
-                  <includeProperty>git.branch</includeProperty>
-                  <includeProperty>git.commit.id.full</includeProperty>
-                  <includeProperty>git.commit.time</includeProperty>
-                  <includeProperty>git.commit.user.email</includeProperty>
-                  <includeProperty>git.tags</includeProperty>
-                </includeOnlyProperties>
-                <gitDescribe>
-                  <skip>false</skip>
-                  <always>true</always>
-                  <abbrev>7</abbrev>
-                  <dirty>-dirty</dirty>
-                  <tags>true</tags>
-                  <forceLongFormat>true</forceLongFormat>
-                </gitDescribe>
-              </configuration>
-            </plugin>
-
             <!-- We want to sign the artifacts, POM, and all attached artifacts -->
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>

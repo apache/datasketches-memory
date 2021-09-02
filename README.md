@@ -45,7 +45,7 @@ __NOTE:__ You may have to provide additional JPMS arguments to the JVM in order 
 
 
 ## USE AS A LIBRARY (using jars from Maven Central)
-In this environment, the user is using the Jars from Maven Central as a library and not attempting to build the  source code or run the Memory component tests.  Depending on how the user intends to use the Memory API, the Java version used to run the user's application and whether the user's application is a JPMS application or not, will determine if the user will need to supply arguments to the JVM running their application and what those arguments need to be.  
+In this environment, the user is using the Jars from Maven Central as a library and not attempting to build the source code or run the Memory component tests.  Depending on how the user intends to use the Memory API, the Java version used to run the user's application and whether the user's application is a JPMS application or not, will determine if the user will need to supply arguments to the JVM running their application and what those arguments need to be.
 
 * API USE CASES
     * Restricted API #1 - All On-heap
@@ -107,11 +107,11 @@ User must supply the following arguments to the JVM:
 
 
 ## DEVELOPER USAGE
-In this environent the developer needs to build the Memory component from source and run the Memory Component tests.  There are two use cases. The first is for a *System Developer* that needs to build and test their own Jar from source for a specific Java version. The second use case is for a *Memory Component Developer and Contributor*. 
+In this environment the developer needs to build the Memory component from source and run the Memory Component tests.  There are two use cases. The first is for a *System Developer* that needs to build and test their own Jar from source for a specific Java version. The second use case is for a *Memory Component Developer and Contributor*.
 
 * System Developer
     * Compile, test and create a Jar for a specific Java version
-        * use the privided script for this purpose 
+        * use the provided script for this purpose
 
 * Memory Component Developer / Contributor
     * Compile & test the library from source code using:
@@ -120,8 +120,9 @@ In this environent the developer needs to build the Memory component from source
         * Maven (version)
         * Command-line
     * The developer must have installed in their development system at least JDK versions 8, 9 and 11.
+    * Unless building with the provided script, the developer must have a valid [Maven toolchain configuration](docs/maven-toolchains.md).
 
-    
+
 ### Build Instructions
 __NOTES:__ 
 
@@ -186,7 +187,7 @@ This will create the following Jars:
 * datasketches-memory-X.Y.Z-tests.jar The compiled test class files.
 * datasketches-memory-X.Y.Z-sources.jar The main source files.
 * datasketches-memory-X.Y.Z-test-sources.jar The test source files
-* datasketches-memory-X.Y.Z-javadoc.jar  The compressed Javadocs.
+* datasketches-memory-X.Y.Z-javadoc.jar The compressed Javadocs.
 
 #### Toolchains
 

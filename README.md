@@ -44,7 +44,7 @@ Because this Memory component leverages several JVM internal classes for improve
 __NOTE:__ You may have to provide additional JPMS arguments to the JVM in order to use the library in Java 9 and above as described in the following use cases and environments. Also see the [usage instructions](docs/usage-instructions.md) for more information.
 
 
-### USE AS A LIBRARY (using jars from Maven Central)
+## USE AS A LIBRARY (using jars from Maven Central)
 In this environment, the user is using the Jars from Maven Central as a library and not attempting to build the  source code or run the Memory component tests.  Depending on how the user intends to use the Memory API, the Java version used to run the user's application and whether the user's application is a JPMS application or not, will determine if the user will need to supply arguments to the JVM running their application and what those arguments need to be.  
 
 * API USE CASES
@@ -73,23 +73,23 @@ In this environment, the user is using the Jars from Maven Central as a library 
     * Running Java 9 - 13, JPMS application
 
 
-#### Summary of API Use Cases, Application Java Version and JPMS Application.
+### Table of API Use Cases Compared to Application Java Version and JPMS Application, and Possible JVM Arguments Required
 
 | Java Version & JPMS      | Restricted API 1 | Restricted API 2 API | Full API |
 |:------------------------:|:----------------:|:--------------------:|:--------:|
-| Java 8                   |   Note 1         |  Note 1              | Note 1   |
-| Java 9-13, non-JPMS      |   Note 1         |  Note 1              | Note 3   |
-| Java 9-13, JPMS          |   Note 1         |  Note 2              | Note 4   |
+| Java 8                   |   Args 1         |  Args 1              | Args 1   |
+| Java 9-13, non-JPMS      |   Args 1         |  Args 1              | Args 3   |
+| Java 9-13, JPMS          |   Args 1         |  Args 2              | Args 4   |
 
-#### Note 1
-No additional JVM arguments required
+### Args 1
+No JVM arguments required
 
-#### Note 2
+### Args 2
 User must supply the following argument to the JVM:
 
 * --add-opens java.base/sun.nio.ch=org.apache.datasketches.memory
 
-#### Note 3
+### Args 3
 User must supply the following arguments to the JVM:
 
 * --add-exports java.base/jdk.internal.misc=ALL-UNNAMED
@@ -97,7 +97,7 @@ User must supply the following arguments to the JVM:
 * --add-opens java.base/java.nio=ALL-UNNAMED
 * --add-opens java.base/sun.nio.ch=ALL-UNNAMED
 
-#### Note 4
+### Args 4
 User must supply the following arguments to the JVM:
 
 * --add-exports java.base/jdk.internal.misc=org.apache.datasketches.memory

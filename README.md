@@ -26,28 +26,104 @@
 =================
 
 # DataSketches Java Memory Component
- The goal of this component of the library is to provide high performance access to heap memory or 
- native memory for primitives, primitive arrays, ByteBuffers and memory mapped files. 
- This package is general purpose, has minimal external runtime dependencies and can be used in any 
- application that needs to manage data structures outside the Java heap.
+The goal of this component of the DataSketches library is to provide high performance access to heap memory or native memory for primitives, primitive arrays, ByteBuffers and memory mapped files. 
+This package is general purpose, has minimal external runtime dependencies and can be used in any 
+application that needs to manage data structures outside the Java heap.
 
 Please visit the main [DataSketches website](https://datasketches.apache.org) for more information.
 
-If you are interested in making contributions to this site please see our 
-[Community](https://datasketches.apache.org/docs/Community/) page for how to contact us.
+If you are interested in making contributions to this Memory component please see our 
+[Community](https://datasketches.apache.org/docs/Community/) page.
 
----
+## Release 2.0.0+
+With releases starting with 2.0.0, this Memory component supports Java 8 through Java 13.
 
-## Java Support
-Datasketches Memory currently supports Java 8 up to and including Java 13.
+Starting with Java 9, the Java language is built using the Java Platform Module System (JPMS). 
+Because this Memory component leverages several JVM internal classes for improved performance in Java 8, we had to redesign the build system to allow the user to be able to use as well as develop with this component. 
 
-__NOTE:__ You may have to provide additional JPMS arguments in order to use the library in Java 9 and above,
-see the [usage instructions](docs/usage-instructions.md) for details.
+__NOTE:__ You may have to provide additional JPMS arguments to the JVM in order to use the library in Java 9 and above as described in the following use cases and environments. Also see the [usage instructions](docs/usage-instructions.md) for more information.
 
----
 
-## Build Instructions
-__NOTE:__ 
+### USE AS A LIBRARY (using jars from Maven Central)
+In this environment, the user is using the Jars from Maven Central as a library and not attempting to build the  source code or run the Memory component tests.  Depending on how the user intends to use the Memory API, the Java version used to run the user's application and whether the user's application is a JPMS application or not, will determine if the user will need to supply arguments to the JVM running their application and what those arguments need to be.  
+
+* API USE CASES
+    * Restricted API #1 - All On-heap
+        * wrapped heap arrays
+        * wrapped on-heap ByteBuffers 
+        * No off-heap ByteBuffers
+        * No allocations of off-heap memory
+        * No use of memory-mapped files
+    * Restricted API #2 - Add off-heap ByteBuffers
+        * wrapped heap arrays
+        * wrapped on-heap ByteBuffers 
+        * wrapped off-heap ByteBuffers
+        * No allocations of off-heap memory
+        * No use of memory-mapped files
+    * Full API
+        * wrapped heap arrays
+        * wrapped on-heap ByteBuffers 
+        * wrapped off-heap ByteBuffers
+        * allocations of off-heap memory
+        * use of memory-mapped files
+
+* CALLING APPLICATION JAVA VERSION & JPMS APPLICATION
+    * Running Java 8
+    * Running Java 9 - 13, non-JPMS application
+    * Running Java 9 - 13, JPMS application
+
+
+#### Summary of API Use Cases, Application Java Version and JPMS Application.
+
+| Java Version & JPMS      | Restricted API 1 | Restricted API 2 API | Full API |
+|:------------------------:|:----------------:|:--------------------:|:--------:|
+| Java 8                   |   Note 1         |  Note 1              | Note 1   |
+| Java 9-13, non-JPMS      |   Note 1         |  Note 1              | Note 3   |
+| Java 9-13, JPMS          |   Note 1         |  Note 2              | Note 4   |
+
+#### Note 1
+No additional JVM arguments required
+
+#### Note 2
+User must supply the following argument to the JVM:
+
+* --add-opens java.base/sun.nio.ch=org.apache.datasketches.memory
+
+#### Note 3
+User must supply the following arguments to the JVM:
+
+* --add-exports java.base/jdk.internal.misc=ALL-UNNAMED
+* --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
+* --add-opens java.base/java.nio=ALL-UNNAMED
+* --add-opens java.base/sun.nio.ch=ALL-UNNAMED
+
+#### Note 4
+User must supply the following arguments to the JVM:
+
+* --add-exports java.base/jdk.internal.misc=org.apache.datasketches.memory
+* --add-exports java.base/jdk.internal.ref=org.apache.datasketches.memory
+* --add-opens java.base/java.nio=org.apache.datasketches.memory
+* --add-opens java.base/sun.nio.ch=org.apache.datasketches.memory
+
+
+## DEVELOPER USAGE
+In this environent the developer needs to build the Memory component from source and run the Memory Component tests.  There are two use cases. The first is for a *System Developer* that needs to build and test their own Jar from source for a specific Java version. The second use case is for a *Memory Component Developer and Contributor*. 
+
+* System Developer
+    * Compile, test and create a Jar for a specific Java version
+        * use the privided script for this purpose 
+
+* Memory Component Developer / Contributor
+    * Compile & test the library from source code using:
+        * Eclipse (version)
+        * IntelliJ (version)
+        * Maven (version)
+        * Command-line
+    * The developer must have installed in their development system at least JDK versions 8, 9 and 11.
+
+    
+### Build Instructions
+__NOTES:__ 
 
 1) This component accesses resource files for testing. As a result, the directory elements
    of the full absolute path of the target installation directory must qualify as Java identifiers.
@@ -64,23 +140,17 @@ __NOTE:__
    
    For more information, see this [Maven Reactor Issue](https://issues.apache.org/jira/browse/MNG-3283).
 
-### JDK versions required to compile
-This DataSketches component is pure Java and requires any a JDK hotspot version between 8 and 13 to compile.
-Refer to the section below for instructions on how to build a standalone JAR using a single JDK version.
-
-### JDK versions required to compile the Multi-release JAR
-The following versions of the JDK are all required to compile the multi-release JAR:
+#### JDK versions required to compile
+This DataSketches component is pure Java and requires the following JDKs to compile:
 
 - JDK8/Hotspot
 - JDK9/Hotspot
 - JDK11/Hotspot
 
-These versions are also required in order to build the Maven project in an IDE.
-
 Ensure that your local environment has been configured according to the 
 [Maven Toolchains Configuration](docs/maven-toolchains.md).
 
-### Recommended Build Tool
+#### Recommended Build Tool
 This DataSketches component is structured as a Maven project and Maven is the recommended Build 
 Tool.
 
@@ -118,27 +188,13 @@ This will create the following Jars:
 * datasketches-memory-X.Y.Z-test-sources.jar The test source files
 * datasketches-memory-X.Y.Z-javadoc.jar  The compressed Javadocs.
 
-### Building a standalone JAR using a single version of the JDK
-A shell script is provided to compile and build a JAR for situations where it is not possible to
-install multiple versions of the JDK in the same build environment.
-
-This script can be found in the **tools/scripts** directory and is invoked from the command line as follows:
-
-    $ ./tools/scripts/compile-package-jar.sh JAVA_HOME GIT_VERSION PROJECT_BASE_DIR
-
-Where:
-
-1) The first argument is the absolute path of JDK home directory e.g. $JAVA_HOME
-2) The second argument is the Git Version Tag for this deployment e.g. 1.0.0-SNAPSHOT, 1.0.0-RC1, 1.0.0 etc.
-3) The third argument is the absolute path of project.basedir e.g. /src/apache-datasketches-memory
-
-### Toolchains
+#### Toolchains
 
 This project makes use of Maven toolchains to ensure that the correct Java compiler version is 
 used when compiling source files.
 See the [Maven Toolchains Configuration](docs/maven-toolchains.md) for more details.
 
-### Dependencies
+#### Dependencies
 
 There are no run-time dependencies.
 
@@ -147,7 +203,7 @@ See the pom.xml file for test dependencies.
 
 ---
 
-## Further documentation for contributors
+### Further documentation for contributors
 
 For more information on the project configuration, the following topics are discussed in more 
 detail:
@@ -162,3 +218,14 @@ In order to build and contribute to this project, please read the relevant IDE d
 
 - [Eclipse IDE Setup](docs/eclipse.md)
 - [IntelliJ IDE Setup](docs/intellij.md)
+
+
+
+
+
+
+
+
+
+
+

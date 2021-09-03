@@ -17,7 +17,7 @@
     under the License.
 -->
 
-# Usage Instructions
+# Usage Examples
 
 You may need to supply additional runtime arguments to the JVM depending on how you are using the Datasketches Memory library.
 There are several applicable use cases that are considered:

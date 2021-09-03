@@ -89,14 +89,14 @@ arguments are added to the Maven compiler plugin in the module's pom.xml file:
 ### Runtime arguments (only when allocating off-heap memory)
 
 When allocating off-heap memory using `WritableMemory.allocateDirect(...)`, 
-reflection is used by the datasketches memory component to access JVM internal class 
+reflection is used by the Datasketches Memory component to access JVM internal class 
 fields and methods that do not have `public` visibility.  For JDK 9+, the JPMS
 requires that the user add additional JVM run-time arguments (`add-opens...`, which permit this reflection.
 
 Note that if the user has allocated off-heap memory using ByteBuffer.allocateDirect(...),
 the DataSketches memory component can still read and write to this memory without these `add-opens...` arguments.
 
-See the [usage instructions](usage-instructions.md) for more details.
+See the main [README](../README.md) and the [usage examples](usage-examples.md) for more details.
 
 ### JPMS and Java 8
 

@@ -41,7 +41,7 @@ With releases starting with 2.0.0, this Memory component supports Java 8 through
 Starting with Java 9, the Java language is built using the Java Platform Module System (JPMS). 
 Because this Memory component leverages several JVM internal classes for improved performance in Java 8, we had to redesign the build system to allow the user to be able to use as well as develop with this component. 
 
-__NOTE:__ You may have to provide additional JPMS arguments to the JVM in order to use the library in Java 9 and above as described in the following use cases and environments. Also see the [usage instructions](docs/usage-instructions.md) for more information.
+__NOTE:__ You may have to provide additional JPMS arguments to the JVM in order to use the library in Java 9 and above as described in the following use cases and environments. See the [usage examples](docs/usage-examples.md) for more information.
 
 
 ## USE AS A LIBRARY (using jars from Maven Central)
@@ -213,7 +213,7 @@ detail:
 * [Maven Toolchains Configuration](docs/maven-toolchains.md)
 * [Multi-Release Jar](docs/multi-release-jar.md)
 * [Java Platform Module System](docs/module-system.md)
-* [Usage instructions](docs/usage-instructions.md)
+* [Usage Examples](docs/usage-examples.md)
 
 In order to build and contribute to this project, please read the relevant IDE documentation:
 

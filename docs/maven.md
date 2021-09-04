@@ -37,8 +37,8 @@ This project has been divided into the following submodules:
 datasketches-memory-java8)
 * datasketches-memory-java11 (Java11 equivalent of some platform specific classes in 
 datasketches-memory-java8)
-* datasketches-memory (JAR assembly, does not contain source files)
-* datasketches-memory-resources (Runs test suite against assembled JAR)
+* datasketches-memory (MR-JAR assembly, does not contain source files)
+* datasketches-memory-resources (Runs test suite against assembled MR-JAR)
 
 ### Artifact assembly
 
@@ -56,4 +56,4 @@ The following jars are assembled by the `datasketches-memory` module:
 * datasketches-memory-X.Y.Z-tests.jar The compiled test class files.
 * datasketches-memory-X.Y.Z-sources.jar The main source files.
 * datasketches-memory-X.Y.Z-test-sources.jar The test source files
-* datasketches-memory-X.Y.Z-javadoc.jar  The compressed Javadocs.
+* datasketches-memory-X.Y.Z-javadoc.jar The compressed Javadocs.

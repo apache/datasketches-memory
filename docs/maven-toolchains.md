@@ -49,13 +49,7 @@ the requisite entries should be merged into the existing file if they do not alr
 
 ### Environment variables
 
-The DataSketches Memory component is pure Java and requires the following JDKs to compile:
-
-- JDK8/Hotspot
-- JDK9/Hotspot
-- JDK11/Hotspot
-
-The following environment variables should be set as follows:
+In order to compile the project using Maven toolchains, the following environment variables should be set as follows:
 
 | Environment variable              | Value                                 |
 | --------------------------------- | ------------------------------------- |

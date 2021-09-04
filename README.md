@@ -189,14 +189,3 @@ In order to build and contribute to this project, please read the relevant IDE d
 
 - [Eclipse IDE Setup](docs/eclipse.md)
 - [IntelliJ IDE Setup](docs/intellij.md)
-
-
-
-
-
-
-
-
-
-
-

@@ -3,7 +3,7 @@ name: Java Test Coverage with Maven, Coveralls
 on:
   pull_request:
   push:
-    branches: [ master ]
+    branches: [ master, UpdateDocs ]
   workflow_dispatch:
 
 env:
@@ -121,6 +121,11 @@ jobs:
           -Denvironment=ci
           -Dmatrix.jdk.version=${{matrix.jdk}}
           --toolchains .github/workflows/.toolchains.xml
+
+      # The GitTag for CI purposes is irrelevant
+      - name: Custom build script
+        run: >
+          ./tools/scripts/compile-package-jar.sh $JAVA_HOME x.y.z .
 
       - name: Test & Report
         if: ${{ matrix.jdk == 8 && success() }}

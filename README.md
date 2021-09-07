@@ -165,10 +165,9 @@ The build script performs the following steps:
 
 1.  Sets up staging directories under **target/** for the package files 
 2.  Uses git commands to gather information about the current Git commit and branch
-3.  Compiles java source tree and assembles javadocs
+3.  Compiles java source tree
 4.  Packages a JAR containing compiled sources together with the Manifest, Licence and Notice files
-5.  Packages a javadoc JAR containing documentation files together with the Manifest, Licence and Notice files
-6.  Checks and tests the assembled JAR by using the API to access four different resource types
+5.  Checks and tests the assembled JAR by using the API to access four different resource types
 
 The build script is located in the **tools/scripts/** directory and requires the following arguments:
 

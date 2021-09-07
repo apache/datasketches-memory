@@ -51,15 +51,12 @@ MemoryMapFile=$ScriptsDir/LoremIpsum.txt
 #### Initialise path dependent variables ####
 OutputDir=target
 OutputJar=${OutputDir}/org.apache.datasketches.memory-${GitTag}.jar
-OutputDocsJar=${OutputDir}/org.apache.datasketches.memory-${GitTag}-javadoc.jar
 
 PackageDir=${OutputDir}/package
 PackageSrc=${PackageDir}/src
 PackageTests=${PackageDir}/test-classes
 PackageContents=${PackageDir}/contents
-PackageDocs=${PackageDir}/javadoc
 PackageMeta=${PackageContents}/META-INF
-PackageDocsMeta=${PackageDocs}/META-INF
 PackageManifest=${PackageMeta}/MANIFEST.MF
 
 MemoryJava8Src=datasketches-memory-java8/src/main/java
@@ -73,7 +70,6 @@ cd ${ProjectBaseDir}
 if [[ -n "$JDKHome" ]] && [[ -x "${JDKHome}/bin/java" ]];    then Java_="${JDKHome}/bin/java";       else echo "No java version could be found.";    exit 1; fi
 if [[ -n "$JDKHome" ]] && [[ -x "${JDKHome}/bin/javac" ]];   then Javac_="${JDKHome}/bin/javac";     else echo "No javac version could be found.";   exit 1; fi
 if [[ -n "$JDKHome" ]] && [[ -x "${JDKHome}/bin/jar" ]];     then Jar_="${JDKHome}/bin/jar";         else echo "No jar version could be found.";     exit 1; fi
-if [[ -n "$JDKHome" ]] && [[ -x "${JDKHome}/bin/javadoc" ]]; then Javadoc_="${JDKHome}/bin/javadoc"; else echo "No javadoc version could be found."; exit 1; fi
 
 #### Parse java -version into major version number ####
 if [[ "$Java_" ]]; then
@@ -99,11 +95,10 @@ mkdir -p $PackageSrc
 mkdir -p $PackageTests
 mkdir -p $PackageContents
 mkdir -p $PackageMeta
-mkdir -p $PackageDocsMeta
 
 #### Copy LICENSE and NOTICE ####
-cp LICENSE $PackageMeta; cp LICENSE $PackageDocsMeta;
-cp NOTICE $PackageMeta; cp NOTICE $PackageDocsMeta;
+cp LICENSE $PackageMeta
+cp NOTICE $PackageMeta
 
 #### Generate MANIFEST.MF ####
 cat >> ${PackageManifest}<< EOF
@@ -114,7 +109,6 @@ EOF
 
 #### Generate git.properties file ####
 echo "$($ScriptsDir/getGitProperties.sh $ProjectBaseDir $ProjectArtifactId $GitTag)" >> $PackageManifest
-cp $PackageManifest $PackageDocsMeta
 
 #### Copy source tree to target/src
 rsync -a -I $MemoryJava8Src $PackageSrc
@@ -128,39 +122,30 @@ elif [[ $JavaVersion -gt 10 ]]; then
   rsync -a -I $MemoryJava11Src $PackageSrc
 fi
 
-#### Compile and create docs ####
+#### Compile ####
 echo "--- CLEAN & COMPILE ---"
 echo
 echo "Compiling with JDK version $JavaVersion..."
 if [[ $JavaVersion -lt 9 ]]; then
   ${Javac_} -d $PackageContents $(find $PackageSrc -name '*.java')
-  ${Javadoc_} -quiet -d $PackageDocs $(find $PackageSrc -name '*.java')
 else
   # Compile with JPMS exports
   ${Javac_} \
     --add-exports java.base/jdk.internal.ref=org.apache.datasketches.memory \
     --add-exports java.base/sun.nio.ch=org.apache.datasketches.memory \
     -d $PackageContents $(find $PackageSrc -name '*.java')
-  # Compile Javadoc with JPMS exports
-  ${Javadoc_} \
-     --add-exports java.base/jdk.internal.ref=org.apache.datasketches.memory \
-     --add-exports java.base/sun.nio.ch=org.apache.datasketches.memory \
-     -quiet -d $PackageDocs $(find $PackageSrc -name '*.java')
 fi
 echo
 echo "--- JARS ---"
 echo
 echo "Building JAR from ${PackageContents}..."
 ${Jar_} cf $OutputJar -C $PackageContents .
-echo "Building Javadoc JAR from ${PackageDocs}..."
-${Jar_} cf $OutputDocsJar -C $PackageDocs .
 echo
 
 # Uncomment this section to display JAR contents
 # echo "--- JAR CONTENTS ---"
 # echo
 # ${Jar_} tf ${OutputJar}
-# ${Jar_} tf ${OutputDocsJar}
 # echo
 
 echo "--- RUN JAR CHECKS ---"
@@ -183,4 +168,3 @@ else
 fi
 echo
 echo "Successfully built ${OutputJar}"
-echo "Successfully built ${OutputDocsJar}"

@@ -3,7 +3,7 @@ name: Java Test Coverage with Maven, Coveralls
 on:
   pull_request:
   push:
-    branches: [ master, UpdateDocs ]
+    branches: [ master ]
   workflow_dispatch:
 
 env:

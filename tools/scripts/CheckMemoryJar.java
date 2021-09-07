@@ -20,6 +20,8 @@
 package org.apache.datasketches.memory.tools.scripts;
 
 import java.io.File;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.MapHandle;
 import org.apache.datasketches.memory.Memory;
@@ -27,6 +29,14 @@ import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
 
 public class CheckMemoryJar {
+
+    public void printJDK() {
+        String JdkVersionString = System.getProperty("java.version");
+        int JdkMajorVersion = getJavaMajorVersion(JdkVersionString);
+        println("JDK Full Version : " + JdkVersionString);
+        println("JDK Major Version: " + JdkMajorVersion);
+        println("");
+    }
 
     public void checkHeapWritableMemory() {
         try {
@@ -50,9 +60,21 @@ public class CheckMemoryJar {
         }
     }
 
+    public void checkByteBuffer() throws Exception {
+        try {
+            String str = "3 - Map ByteBuffer Successful";
+            ByteBuffer bb = ByteBuffer.allocateDirect(2 * str.length());
+            bb.order(ByteOrder.nativeOrder());
+            WritableMemory wmem = WritableMemory.writableWrap(bb);
+            writeReadAndPrintString(wmem, str);
+        } catch (Exception ex) {
+            exitOnError("Map ByteBuffer", ex);
+        }
+    }
+
     public void checkMap(String mappedFilePath) throws Exception {
         try {
-            String str = "3 - Memory Map Successful";
+            String str = "4 - Memory Map Successful";
             File file = new File(mappedFilePath);
             MapHandle mh = Memory.map(file);
             Memory mem = mh.get();
@@ -61,6 +83,23 @@ public class CheckMemoryJar {
         } catch (Exception ex) {
             exitOnError("Memory Map", ex);
         }
+    }
+
+    public static void main(final String[] args) throws Exception {
+        if (args.length < 1) {
+            System.out.println("Please provide the full path to the memory mapped file!");
+            System.exit(1);
+        }
+
+        String mappedFilePath = args[0];
+        CheckMemoryJar check = new CheckMemoryJar();
+        check.printJDK();
+        check.checkHeapWritableMemory();
+        check.checkAllocateDirect();
+        check.checkByteBuffer();
+        check.checkMap(mappedFilePath);
+        println("");
+        println("All checks passed.");
     }
 
     /**********************/
@@ -80,20 +119,28 @@ public class CheckMemoryJar {
         System.exit(1);
     }
 
-    public static void main(final String[] args) throws Exception {
-        if (args.length < 1) {
-            System.out.println("Please provide the full path to the memory mapped file!");
-            System.exit(1);
-        }
-
-        String mappedFilePath = args[0];
-        CheckMemoryJar check = new CheckMemoryJar();
-        check.checkHeapWritableMemory();
-        check.checkAllocateDirect();
-        check.checkMap(mappedFilePath);
-        println("");
-        println("All checks passed.");
+    private static int getJavaMajorVersion(final String jdkVersion) {
+        int[] verArr = parseJavaVersion(jdkVersion);
+        return (verArr[0] == 1) ? verArr[1] : verArr[0];
     }
 
-    static void println(Object obj) { System.out.println(obj.toString()); }
+    /**
+     * Returns first two number groups of the java version string.
+     * @param jdkVersion the java version string from System.getProperty("java.version").
+     * @return first two number groups of the java version string.
+     */
+    private static int[] parseJavaVersion(final String jdkVersion) {
+        final int p0, p1;
+        try {
+            String[] parts = jdkVersion.trim().split("[^0-9\\.]");//grab only number groups and "."
+            parts = parts[0].split("\\."); //split out the number groups
+            p0 = Integer.parseInt(parts[0]); //the first number group
+            p1 = (parts.length > 1) ? Integer.parseInt(parts[1]) : 0; //2nd number group, or 0
+        } catch (final NumberFormatException | ArrayIndexOutOfBoundsException  e) {
+            throw new IllegalArgumentException("Improper Java -version string: " + jdkVersion + "\n" + e);
+        }
+        return new int[] {p0, p1};
+    }
+
+    private static void println(Object obj) { System.out.println(obj.toString()); }
 }

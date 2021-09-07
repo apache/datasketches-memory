@@ -58,7 +58,7 @@ configuration:
 
 ---
 
-## Running Datasketches-Memory in IntelljJ-IDEA
+## Running Datasketches-Memory in IntelliJ-IDEA
 
 Note that the following configuration was verified using IntelliJ IDEA 2021.1.2 
 (Community Edition).

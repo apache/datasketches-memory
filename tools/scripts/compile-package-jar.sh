@@ -52,7 +52,7 @@ MemoryMapFile=$ScriptsDir/LoremIpsum.txt
 OutputDir=target
 OutputJar=${OutputDir}/org.apache.datasketches.memory-${GitTag}.jar
 
-PackageDir=${OutputDir}/package
+PackageDir=${OutputDir}/archive-tmp
 PackageSrc=${PackageDir}/src
 PackageTests=${PackageDir}/test-classes
 PackageContents=${PackageDir}/contents
@@ -90,10 +90,8 @@ fi
 #### Cleanup and setup output directories ####
 echo
 if [ -d "$OutputDir" ]; then rm -r $OutputDir; fi
-mkdir -p $OutputDir
 mkdir -p $PackageSrc
 mkdir -p $PackageTests
-mkdir -p $PackageContents
 mkdir -p $PackageMeta
 
 #### Copy LICENSE and NOTICE ####

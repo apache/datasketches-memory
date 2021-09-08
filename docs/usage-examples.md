@@ -20,7 +20,8 @@
 # Usage Examples
 
 You may need to supply additional runtime arguments to the JVM depending on how you are using the Datasketches Memory library.
-There are several applicable use cases that are considered:
+For more information regarding required JPMS arguments and when they are applicable, see the [README](../README.md).
+This document provides examples for the following scenarios:
 
 1. Using the library from a Java 8 application
 2. Using the library with on-heap memory only
@@ -34,10 +35,11 @@ No additional runtime arguments are required.
 As an example, consider the following launch script that compiles and runs a simple Java 8 application:
 
 ```shell
-  export JAVA_HOME=$JAVA8_HOME
-  export JAVAC=$JAVA_HOME/bin/javac
-  export JAR=$JAVA_HOME/bin/jar
-  export JAVA=$JAVA_HOME/bin/java
+  JH=$JAVA8_HOME
+  JAVAC=$JH/bin/javac
+  JAVA=$JH/bin/java
+  JAR=$JH/bin/jar
+  
   patha=nomvn-jdk8
   
   cd $patha
@@ -46,54 +48,52 @@ As an example, consider the following launch script that compiles and runs a sim
   
   echo "--- CLEAN & COMPILE ---"
   rm -rf target
-  mkdir target
-  mkdir target/classes
-  mkdir target/test-classes
+  mkdir -p target/test-classes
   
-  $JAVAC -d target/test-classes/  -cp "libs/*"  $(find . -name '*.java')
+  $JAVAC\
+    -d target/test-classes/\
+    -cp libs/*\
+    $(find . -name '*.java')
   
   echo "---- RUN ----"
-  echo PWD:$(pwd)
   
   $JAVA\ 
-    -cp target/test-classes:libs/*:src/test/resources/\
-    org.xyz.memory.CheckJava8
+    -cp libs/*:target/test-classes:src/test/resources/\
+    org.xyz.memory.RunMain
 ```
 
-### 2) Using the library with on-heap memory only, or with off-heap memory allocated via ByteBuffer by the user.
+### 2) Using the library with on-heap memory only
 
-No additional runtime arguments are required, regardless of whether the library is used from a Java 8 or Java 9+
-application. 
+Similarly, no additional runtime arguments are required in this scenario - regardless of whether the library is used from a Java 8 or Java 9+ application. 
 
 As an example, consider the following launch script that compiles and runs a simple Java 9 application that only exclusively
 uses on-heap memory:
 
 ```shell
-  export JAVA_HOME=$JAVA9_HOME
-  export JAVAC=$JAVA_HOME/bin/javac
-  export JAR=$JAVA_HOME/bin/jar
-  export JAVA=$JAVA_HOME/bin/java
+  JH=$JAVA9_HOME
+  JAVAC=$JH/bin/javac
+  JAVA=$JH/bin/java
+  JAR=$JH/bin/jar
+  
   patha=nomvn-nomod-heap-jdk9
   
   cd $patha
-  echo PWD:$(pwd)
-  echo $JAVA_HOME
   
   echo "--- CLEAN & COMPILE ---"
   rm -rf target
-  mkdir target
-  mkdir target/classes
-  mkdir target/test-classes
+  mkdir -p target/test-classes
   
-  $JAVAC -d target/test-classes -cp "mods/*":"libs/*" -p mods $(find . -name '*.java')
+  $JAVAC\
+    -d target/test-classes/\
+    -cp "mods/*":"libs/*"
+    -p mods
+    $(find . -name '*.java')
   
   echo "---- RUN ----"
   
-  echo PWD:$(pwd)
-  
   $JAVA\
     -cp target/test-classes:"mods/*":"libs/*":src/test/resources\
-    org.xyz.memory.CheckJava9plus
+    org.xyz.memory.RunMain
 ```
 
 ### 3) Using off-heap memory in a non-modularized Java 9+ application
@@ -116,28 +116,26 @@ which runs as an UNNAMED module in a non-JPMS (non-modularized) application.
 The following launch script compiles and runs a non-modularized Java 9 application:
 
 ```shell
+  JH=$JAVA9_HOME
+  JAVAC=$JH/bin/javac
+  JAVA=$JH/bin/java
+  JAR=$JH/bin/jar
 
-  export JAVA_HOME=$JAVA9_HOME
-  export JAVAC=$JAVA_HOME/bin/javac
-  export JAR=$JAVA_HOME/bin/jar
-  export JAVA=$JAVA_HOME/bin/java
   patha=nomvn-nomod-jdk9
   
   cd $patha
-  echo PWD:$(pwd)
-  echo $JAVA_HOME
   
   echo "--- CLEAN & COMPILE ---"
   rm -rf target
-  mkdir target
-  mkdir target/classes
-  mkdir target/test-classes
+  mkdir -p target/test-classes
   
-  $JAVAC -d target/test-classes -cp "mods/*":"libs/*" -p mods $(find . -name '*.java')
+  $JAVAC\
+    -d target/test-classes/\
+    -cp "mods/*":"libs/*"
+    -p mods
+    $(find . -name '*.java')
   
   echo "---- RUN ----"
-  
-  echo PWD:$(pwd)
   
   $JAVA\
     --add-exports java.base/jdk.internal.misc=ALL-UNNAMED\
@@ -145,11 +143,11 @@ The following launch script compiles and runs a non-modularized Java 9 applicati
     --add-opens java.base/java.nio=ALL-UNNAMED\
     --add-opens java.base/sun.nio.ch=ALL-UNNAMED\
     -cp target/test-classes:"mods/*":"libs/*":src/test/resources\
-    org.xyz.memory.CheckJava9plus
+    org.xyz.memory.RunMain
 ```
 where the traditional classpath (`-cp`) argument contains all modules, libraries and resources. 
 
-Note: `mods` is a local directory containing external modules, and `libs` is a localy directory for external library
+Note: `mods` is a local directory containing external modules, and `libs` is a local directory for external library
 dependencies.  No distinction is made between modules and libraries since they are both appended to the classpath.
 
 ### 4) Using off-heap memory in a modularized Java 9+ application
@@ -171,10 +169,11 @@ These arguments expose encapsulated packages in the `java.base` package to the `
 The following launch script compiles and runs a modularized Java 9 application:
 
 ```shell
-  export JAVA_HOME=$JAVA9_HOME
-  export JAVAC=$JAVA_HOME/bin/javac
-  export JAR=$JAVA_HOME/bin/jar
-  export JAVA=$JAVA_HOME/bin/java
+  JH=$JAVA9_HOME
+  JAVAC=$JH/bin/javac
+  JAVA=$JH/bin/java
+  JAR=$JH/bin/jar
+  
   patha=nomvn-mod-jdk9
   
   cd $patha
@@ -183,11 +182,13 @@ The following launch script compiles and runs a modularized Java 9 application:
   
   echo "--- CLEAN & COMPILE ---"
   rm -rf target
-  mkdir target
-  mkdir target/classes
-  mkdir target/test-classes
+  mkdir -p target/test-classes
   
-  $JAVAC -d target/test-classes -cp "libs/*" -p mods $(find . -name '*.java')
+  $JAVAC\
+    -d target/test-classes/\
+    -cp "mods/*":"libs/*"
+    -p mods
+    $(find . -name '*.java')
   
   echo "---- RUN ----"
   echo PWD:$(pwd)
@@ -197,7 +198,7 @@ The following launch script compiles and runs a modularized Java 9 application:
     --add-opens java.base/sun.nio.ch=org.apache.datasketches.memory\
     -cp "/libs/*":src/test/resources\
     -p target/test-classes:mods\
-    -m org.xyz.memory/org.xyz.memory.CheckJava9plus
+    -m org.xyz.memory/org.xyz.memory.RunMain
 ```
 where the traditional classpath (`-cp`) argument contains libraries and resources, and the module-path argument (`-p`)
 references all external modules and compiled classes for the current user application, which is itself a module.

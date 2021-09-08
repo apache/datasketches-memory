@@ -46,12 +46,13 @@ ProjectBaseDir=$3 #this must be an absolute path
 #### Setup absolute directory references ####
 ProjectArtifactId="memory"
 ScriptsDir=${ProjectBaseDir}/tools/scripts/
+MemoryMapFile=$ScriptsDir/LoremIpsum.txt
 
 #### Initialise path dependent variables ####
 OutputDir=target
 OutputJar=${OutputDir}/org.apache.datasketches.memory-${GitTag}.jar
 
-PackageDir=${OutputDir}/package
+PackageDir=${OutputDir}/archive-tmp
 PackageSrc=${PackageDir}/src
 PackageTests=${PackageDir}/test-classes
 PackageContents=${PackageDir}/contents
@@ -66,23 +67,9 @@ MemoryJava11Src=datasketches-memory-java11/src/main/java
 cd ${ProjectBaseDir}
 
 #### Use JAVA_HOME to set required executables ####
-if [[ -n "$JDKHome" ]] && [[ -x "${JDKHome}/bin/java" ]]; then
-  Java_="${JDKHome}/bin/java"
-else
-  echo "No java version could be found."; exit 1;
-fi
-
-if [[ -n "$JDKHome" ]] && [[ -x "${JDKHome}/bin/javac" ]]; then
-  Javac_="${JDKHome}/bin/javac"
-else
-  echo "No javac version could be found."; exit 1;
-fi
-
-if [[ -n "$JDKHome" ]] && [[ -x "${JDKHome}/bin/jar" ]]; then
-  Jar_="${JDKHome}/bin/jar"
-else
-  echo "No jar version could be found."; exit 1;
-fi
+if [[ -n "$JDKHome" ]] && [[ -x "${JDKHome}/bin/java" ]];    then Java_="${JDKHome}/bin/java";       else echo "No java version could be found.";    exit 1; fi
+if [[ -n "$JDKHome" ]] && [[ -x "${JDKHome}/bin/javac" ]];   then Javac_="${JDKHome}/bin/javac";     else echo "No javac version could be found.";   exit 1; fi
+if [[ -n "$JDKHome" ]] && [[ -x "${JDKHome}/bin/jar" ]];     then Jar_="${JDKHome}/bin/jar";         else echo "No jar version could be found.";     exit 1; fi
 
 #### Parse java -version into major version number ####
 if [[ "$Java_" ]]; then
@@ -95,14 +82,16 @@ else
   echo "No version information could be determined from installed JDK."; exit 1;
 fi
 
+# Exit if Java version too low (< 8) or too high (> 13)
+if [[ $JavaVersion -lt 8 || $JavaVersion -gt 13 ]]; then
+  echo "Java version not supported: " $JavaVersion; exit 1;
+fi
+
 #### Cleanup and setup output directories ####
 echo
-echo "--- CLEAN & COMPILE ---"
 if [ -d "$OutputDir" ]; then rm -r $OutputDir; fi
-mkdir -p $OutputDir
 mkdir -p $PackageSrc
 mkdir -p $PackageTests
-mkdir -p $PackageContents
 mkdir -p $PackageMeta
 
 #### Copy LICENSE and NOTICE ####
@@ -119,62 +108,48 @@ EOF
 #### Generate git.properties file ####
 echo "$($ScriptsDir/getGitProperties.sh $ProjectBaseDir $ProjectArtifactId $GitTag)" >> $PackageManifest
 
-#### Copy base tree to target/src
+#### Copy source tree to target/src
 rsync -a -I $MemoryJava8Src $PackageSrc
 
-# version too low
-if [[ $JavaVersion -lt 8 ]]; then
-  echo "Java version not supported: " $JavaVersion; exit 1;
-
-# version 8
-elif [[ $JavaVersion -lt 9 ]]; then
-  echo "Compiling with JDK version $JavaVersion..."
-  ${Javac_} -d $PackageContents $(find $PackageSrc -name '*.java')
-
-# version 9 or 10
-elif [[ $JavaVersion -lt 11 ]]; then
-  echo "Compiling with JDK version $JavaVersion..."
+if [[ $JavaVersion -eq 9 || $JavaVersion -eq 10 ]]; then
   #### Copy java 9 src tree to target/src, overwriting replacements
   rsync -a -I $MemoryJava9Src $PackageSrc
+elif [[ $JavaVersion -gt 10 ]]; then
+  #### Copy java 9 and 11 src trees to target/src, overwriting replacements
+  rsync -a -I $MemoryJava9Src $PackageSrc
+  rsync -a -I $MemoryJava11Src $PackageSrc
+fi
+
+#### Compile ####
+echo "--- CLEAN & COMPILE ---"
+echo
+echo "Compiling with JDK version $JavaVersion..."
+if [[ $JavaVersion -lt 9 ]]; then
+  ${Javac_} -d $PackageContents $(find $PackageSrc -name '*.java')
+else
   # Compile with JPMS exports
   ${Javac_} \
     --add-exports java.base/jdk.internal.ref=org.apache.datasketches.memory \
     --add-exports java.base/sun.nio.ch=org.apache.datasketches.memory \
     -d $PackageContents $(find $PackageSrc -name '*.java')
-
-# version 11, 12 or 13
-elif [[ $JavaVersion -lt 14 ]]; then
-  echo "Compiling with JDK version $JavaVersion..."
-  #### Copy java 9 src tree to target/src, overwriting replacements
-  rsync -a -I $MemoryJava9Src $PackageSrc
-  #### Copy java 11 src tree to target/src, overwriting replacements
-  rsync -a -I $MemoryJava11Src $PackageSrc
-  # Compile with JPMS exports
-   ${Javac_} \
-   --add-exports java.base/jdk.internal.ref=org.apache.datasketches.memory \
-   --add-exports java.base/sun.nio.ch=org.apache.datasketches.memory \
-   -d $PackageContents $(find $PackageSrc -name '*.java')
-
-# version too high
-else
-  echo "Java version not supported: " $JavaVersion; exit 1;
 fi
 echo
-echo "--- JAR ---"
+echo "--- JARS ---"
+echo
 echo "Building JAR from ${PackageContents}..."
 ${Jar_} cf $OutputJar -C $PackageContents .
 echo
-# Uncomment for debugging purposes
+
+# Uncomment this section to display JAR contents
 # echo "--- JAR CONTENTS ---"
+# echo
 # ${Jar_} tf ${OutputJar}
 # echo
+
 echo "--- RUN JAR CHECKS ---"
 echo
-MemoryMapFile=$ScriptsDir/CheckMemoryJar.java # Memory map the textual source code for the JAR checks
-
 if [[ $JavaVersion -eq 8 ]]; then
   ${Javac_} -cp $OutputJar -d $PackageTests $(find $ScriptsDir -name '*.java')
-
   ${Java_} -cp $PackageTests:$OutputJar org.apache.datasketches.memory.tools.scripts.CheckMemoryJar $MemoryMapFile
 else
   ${Javac_} \

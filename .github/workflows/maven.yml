@@ -124,8 +124,9 @@ jobs:
 
       # The GitTag for CI purposes is irrelevant
       - name: Custom build script
-        run: >
+        run: |
           ./tools/scripts/compile-package-jar.sh $JAVA_HOME x.y.z .
+        shell: bash
 
       - name: Test & Report
         if: ${{ matrix.jdk == 8 && success() }}

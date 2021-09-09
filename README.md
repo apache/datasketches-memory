@@ -123,7 +123,8 @@ The Maven build requires the following JDKs to compile:
 
 Before building, first ensure that your local environment has been configured according to the [Maven Toolchains Configuration](docs/maven-toolchains.md).
 
-There are two types of tests: normal unit tests and tests run by the strict profile.
+There are three types of tests: normal unit tests, tests run by the strict profile and continuous integration(C/I) tests.
+The C/I tests target the Multi-Release (MR) JAR and run the entire test suite using a specific version of Java.  Running the C/I test command also runs the default unit tests.
 
 To run normal unit tests:
 
@@ -137,7 +138,7 @@ To run javadoc on this multi-module project, use:
 
     $ mvn clean process-classes javadoc:javadoc -DskipTests=true
 
-To run the CI tests against the multi-release JAR for specific JVM versions [9-13], use:
+To run the C/I tests against the multi-release JAR for specific JVM versions [9-13], use:
 
     $ mvn clean package -Denvironment=ci -Dmatrix.jdk.version=9
 

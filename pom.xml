@@ -322,6 +322,7 @@ under the License.
               <exclude>**/.*/**/*</exclude>
               <exclude>**/.clover/**/*</exclude>
               <exclude>**/test/resources/**/*.txt</exclude>
+              <exclude>**/test-output/**/*</exclude>
               <exclude>**/img/**/*.png</exclude>
               <exclude>**/git.properties</exclude>
               <exclude>**/scripts/LoremIpsum.txt</exclude>

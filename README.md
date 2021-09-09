@@ -160,7 +160,7 @@ This will create the following Jars:
 
 #### Building for a specific java version
 
-A build script named **compile-package-jar.sh** has been provided to package a JAR for a specific java version.  This is necessary in cases where a developer is unable to install all of the required versions of the JDK that are required as part of the Maven build.
+A build script named **compile-package-jar.sh** has been provided to package a JAR for a specific java version.  This is necessary in cases where a developer is unable to install all the required versions of the JDK that are required as part of the Maven build.
 
 The build script performs the following steps:
 

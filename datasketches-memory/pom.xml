@@ -328,7 +328,8 @@
             <format>json</format>
             <generateGitPropertiesFile>true</generateGitPropertiesFile>
             <generateGitPropertiesFilename>${project.build.directory}/git.properties</generateGitPropertiesFilename>
-            <failOnNoGitDirectory>true</failOnNoGitDirectory>
+            <!-- Maven commands are sometimes run on the release artifact directly, which is not a Git repository -->
+            <failOnNoGitDirectory>false</failOnNoGitDirectory>
             <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
             <commitIdGenerationMode>full</commitIdGenerationMode>
             <includeOnlyProperties>

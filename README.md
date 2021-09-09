@@ -26,7 +26,7 @@
 =================
 
 # DataSketches Java Memory Component
-This Memory component is general purpose, has no external runtime dependencies and can be used in any 
+This Memory component is general purpose, has no external runtime dependencies and can be used in any
 application that needs to manage data structures inside or outside the Java heap.
 
 The goal of this component of the DataSketches library is to provide a high performance access API for accessing four different types of memory resources.  Each of the four resource types is accessed using different API methods in the Memory component.
@@ -37,11 +37,11 @@ The goal of this component of the DataSketches library is to provide a high perf
 
 * **Direct:** Contiguous bytes off the Java Heap constructed by, e.g., *WritableMemory.allocateDirect(long)* method.
 
-* **Memory-Mapped Files** Contiguous bytes of a file represented in off-heap memory and created using, e.g., the *WritableMemory.writableMap(File)* method. 
+* **Memory-Mapped Files** Contiguous bytes of a file represented in off-heap memory and created using, e.g., the *WritableMemory.writableMap(File)* method.
 
 Please visit the main [DataSketches website](https://datasketches.apache.org) for more information.
 
-If you are interested in making contributions to this Memory component please see our 
+If you are interested in making contributions to this Memory component please see our
 [Community](https://datasketches.apache.org/docs/Community/) page.
 
 ## Release 2.0.0+
@@ -94,7 +94,7 @@ In this environment the developer needs to build the Memory component from sourc
 
 
 ### Build Instructions
-__NOTES:__ 
+__NOTES:__
 
 1) This component accesses resource files for testing. As a result, the directory elements
    of the full absolute path of the target installation directory must qualify as Java identifiers.
@@ -103,12 +103,12 @@ __NOTES:__
    order to ensure location-independent access to resources:
    [See Oracle Location-Independent Access to Resources](https://docs.oracle.com/javase/8/docs/technotes/guides/lang/resources.html)
 
-2) This project is structured as a Maven multi-module project.  
+2) This project is structured as a Maven multi-module project.
    Building this project might affect plugins that require early dependency resolution, such as the
    javadoc and eclipse plugins.
    The Maven build instructions below have been modified to use the `process-classes` phase (instead of `compile`)
    for these use cases.
-   
+
    For more information, see this [Maven Reactor Issue](https://issues.apache.org/jira/browse/MNG-3283).
 
 #### Dependencies
@@ -123,8 +123,8 @@ The Maven build requires the following JDKs to compile:
 
 Before building, first ensure that your local environment has been configured according to the [Maven Toolchains Configuration](docs/maven-toolchains.md).
 
-There are three types of tests: normal unit tests, tests run by the strict profile and continuous integration(C/I) tests.
-The C/I tests target the Multi-Release (MR) JAR and run the entire test suite using a specific version of Java.  Running the C/I test command also runs the default unit tests.
+There are three types of tests: normal unit tests, tests run by the strict profile and continuous integration(CI) tests.
+The CI tests target the Multi-Release (MR) JAR and run the entire test suite using a specific version of Java.  Running the CI test command also runs the default unit tests.
 
 To run normal unit tests:
 
@@ -138,7 +138,7 @@ To run javadoc on this multi-module project, use:
 
     $ mvn clean process-classes javadoc:javadoc -DskipTests=true
 
-To run the C/I tests against the multi-release JAR for specific JVM versions [9-13], use:
+To run the CI tests against the multi-release JAR for specific JVM versions [9-13], use:
 
     $ mvn clean package -Denvironment=ci -Dmatrix.jdk.version=9
 
@@ -164,7 +164,7 @@ A build script named **compile-package-jar.sh** has been provided to package a J
 
 The build script performs the following steps:
 
-1.  Sets up staging directories under **target/** for the package files 
+1.  Sets up staging directories under **target/** for the package files
 2.  Uses git commands to gather information about the current Git commit and branch
 3.  Compiles java source tree
 4.  Packages a JAR containing compiled sources together with the Manifest, Licence and Notice files
@@ -196,7 +196,7 @@ Note that the script does **not** use the _Git Version Tag_ to adjust the workin
 
 ### Further documentation for contributors
 
-For more information on the project configuration, the following topics are discussed in more 
+For more information on the project configuration, the following topics are discussed in more
 detail:
 
 * [Maven Configuration](docs/maven.md)

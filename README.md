@@ -128,27 +128,27 @@ The CI tests target the Multi-Release (MR) JAR and run the entire test suite usi
 
 To run normal unit tests:
 
-    $ mvn clean test
+    mvn clean test
 
 To run the strict profile tests (only supported in Java 8):
 
-    $ mvn clean test -P strict
+    mvn clean test -P strict
 
 To run javadoc on this multi-module project, use:
 
-    $ mvn clean process-classes javadoc:javadoc -DskipTests=true
+    mvn clean process-classes javadoc:javadoc -DskipTests=true
 
 To run the CI tests against the multi-release JAR for specific JVM versions [9-13], use:
 
-    $ mvn clean package -Denvironment=ci -Dmatrix.jdk.version=9
+    mvn clean package -Denvironment=ci -Dmatrix.jdk.version=9
 
 To run the eclipse plugin on this multi-module project, use:
 
-    $ mvn clean process-classes eclipse:eclipse -DskipTests=true
+    mvn clean process-classes eclipse:eclipse -DskipTests=true
 
 To install jars built from the downloaded source:
 
-    $ mvn clean install -DskipTests=true
+    mvn clean install -DskipTests=true
 
 This will create the following Jars:
 
@@ -180,15 +180,15 @@ For example, if the project base directory is `/src/datasketches-memory`;
 
 To run the script for a release version:
 
-    $ tools/scripts/compile-package-jar.sh $JAVA_HOME 2.0.0 /src/datasketches-memory
+    ./tools/scripts/compile-package-jar.sh $JAVA_HOME 2.0.0 /src/datasketches-memory
 
 To run the script for a snapshot version:
 
-    $ tools/scripts/compile-package-jar.sh $JAVA_HOME 2.1.0-SNAPSHOT /src/datasketches-memory
+    ./tools/scripts/compile-package-jar.sh $JAVA_HOME 2.1.0-SNAPSHOT /src/datasketches-memory
 
 To run the script for an RC version:
 
-    $ tools/scripts/compile-package-jar.sh $JAVA_HOME 2.0.0-RC1 /src/datasketches-memory
+    ./tools/scripts/compile-package-jar.sh $JAVA_HOME 2.0.0-RC1 /src/datasketches-memory
 
 Note that the script does **not** use the _Git Version Tag_ to adjust the working copy to a remote tag - it is expected that the user has a pristine copy of the desired branch/tag available **before** using the script.
 

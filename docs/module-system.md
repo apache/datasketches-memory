@@ -27,7 +27,7 @@ system for the Java Platform. For more documentation on the implementation, see
 
 > Reliable configuration, to replace the brittle, error-prone class-path mechanism with a means 
 for program components 
-> to declare explicit dependences upon one another;
+> to declare explicit dependencies upon one another;
 
 This prevents ClassLoader errors such as `NoClassDefFoundError` that typically occur at runtime 
 and make applications less reliable.
@@ -72,7 +72,7 @@ Some dependencies are encapsulated by default, and this causes compilation to fa
 Java versions 9 and above.
 These dependencies can be made accessible at compile time through the use of the 
 `add-exports` compiler argument.
-This argument allows one module to access some of the unexported types of another module.  
+This argument allows one module to access some un-exported types of another module.  
 Datasketches Memory depends on several internal APIs and therefore requires special 
 exposition.
 
@@ -89,14 +89,14 @@ arguments are added to the Maven compiler plugin in the module's pom.xml file:
 ### Runtime arguments (only when allocating off-heap memory)
 
 When allocating off-heap memory using `WritableMemory.allocateDirect(...)`, 
-reflection is used by the datasketches memory component to access JVM internal class 
+reflection is used by the Datasketches Memory component to access JVM internal class 
 fields and methods that do not have `public` visibility.  For JDK 9+, the JPMS
 requires that the user add additional JVM run-time arguments (`add-opens...`, which permit this reflection.
 
 Note that if the user has allocated off-heap memory using ByteBuffer.allocateDirect(...),
 the DataSketches memory component can still read and write to this memory without these `add-opens...` arguments.
 
-See the [usage instructions](usage-instructions.md) for more details.
+See the use **Use as a Library** and **Developer Usage** sections in the main [README](../README.md) for more details.  In addition, examples are provided in the [usage examples](usage-examples.md) document.
 
 ### JPMS and Java 8
 

@@ -34,7 +34,7 @@
       <groupId>org.apache.datasketches</groupId>
       <artifactId>datasketches-memory-java8</artifactId>
       <version>${project.parent.version}</version>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.testng</groupId>

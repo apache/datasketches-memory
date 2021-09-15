@@ -322,7 +322,10 @@ under the License.
               <exclude>**/.*/**/*</exclude>
               <exclude>**/.clover/**/*</exclude>
               <exclude>**/test/resources/**/*.txt</exclude>
-              <exclude>**/docs/*.md</exclude>
+              <exclude>**/test-output/**/*</exclude>
+              <exclude>**/img/**/*.png</exclude>
+              <exclude>**/git.properties</exclude>
+              <exclude>**/scripts/LoremIpsum.txt</exclude>
               <exclude>LICENSE</exclude>
               <exclude>NOTICE</exclude>
             </excludes>
@@ -364,6 +367,7 @@ under the License.
             <jdkToolchain>
               <version>${jdk-toolchain.version}</version>
             </jdkToolchain>
+            <reportsDirectory>${project.build.directory}/test-output/${maven.build.timestamp}</reportsDirectory>
           </configuration>
         </plugin>
 
@@ -423,7 +427,7 @@ under the License.
             </jdkToolchain>
           </configuration>
         </plugin>
-        
+
       </plugins>
     </pluginManagement>
     <plugins>
@@ -518,7 +522,7 @@ under the License.
       </build>
     </profile>
 
-  
+
   </profiles>
 
   <!-- This Maven project is divided into an aggregator project (the root), that manages a group of submodules that

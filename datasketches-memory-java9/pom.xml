@@ -33,6 +33,7 @@
             <groupId>org.apache.datasketches</groupId>
             <artifactId>datasketches-memory-java8</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

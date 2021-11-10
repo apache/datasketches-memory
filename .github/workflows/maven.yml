@@ -87,12 +87,12 @@ jobs:
           targets: 'JAVA13_HOME'
 
       - name: Install JDK 17
-          uses: AdoptOpenJDK/install-jdk@v1
-          with:
-            version: '17'
-            architecture: x64
-            impl: hotspot
-            targets: 'JAVA17_HOME'
+        uses: AdoptOpenJDK/install-jdk@v1
+        with:
+          version: '17'
+          architecture: x64
+          impl: hotspot
+          targets: 'JAVA17_HOME'
 
       - name: Install Matrix JDK
         uses: AdoptOpenJDK/install-jdk@v1

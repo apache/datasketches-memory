@@ -78,6 +78,23 @@
         </unpackOptions>
       </binaries>
     </moduleSet>
+    <!-- java17 -->
+    <moduleSet>
+      <useAllReactorProjects>true</useAllReactorProjects>
+      <includes>
+        <include>org.apache.datasketches:datasketches-memory-java17</include>
+      </includes>
+      <binaries>
+        <outputDirectory>META-INF/versions/17</outputDirectory>
+        <unpack>true</unpack>
+        <includeDependencies>false</includeDependencies>
+        <unpackOptions>
+          <excludes>
+            <exclude>/META-INF/**</exclude>
+          </excludes>
+        </unpackOptions>
+      </binaries>
+    </moduleSet>
   </moduleSets>
 
   <files>

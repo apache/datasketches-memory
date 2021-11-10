@@ -70,4 +70,14 @@
             <jdkHome>${env.JAVA13_HOME}</jdkHome>
         </configuration>
     </toolchain>
+    <toolchain>
+        <type>jdk</type>
+        <provides>
+            <version>17</version>
+            <vendor>openjdk</vendor>
+        </provides>
+        <configuration>
+            <jdkHome>${env.JAVA17_HOME}</jdkHome>
+        </configuration>
+    </toolchain>
 </toolchains>

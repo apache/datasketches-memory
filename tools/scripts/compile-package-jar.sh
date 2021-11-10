@@ -62,6 +62,7 @@ PackageManifest=${PackageMeta}/MANIFEST.MF
 MemoryJava8Src=datasketches-memory-java8/src/main/java
 MemoryJava9Src=datasketches-memory-java9/src/main/java
 MemoryJava11Src=datasketches-memory-java11/src/main/java
+MemoryJava17Src=datasketches-memory-java17/src/main/java
 
 #### Move to project directory ####
 cd ${ProjectBaseDir}
@@ -115,9 +116,10 @@ if [[ $JavaVersion -eq 9 || $JavaVersion -eq 10 ]]; then
   #### Copy java 9 src tree to target/src, overwriting replacements
   rsync -a -I $MemoryJava9Src $PackageSrc
 elif [[ $JavaVersion -gt 10 ]]; then
-  #### Copy java 9 and 11 src trees to target/src, overwriting replacements
+  #### Copy java 9, 11 and 17 src trees to target/src, overwriting replacements
   rsync -a -I $MemoryJava9Src $PackageSrc
   rsync -a -I $MemoryJava11Src $PackageSrc
+  rsync -a -I $MemoryJava17Src $PackageSrc
 fi
 
 #### Compile ####

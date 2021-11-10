@@ -41,6 +41,7 @@ for a maven module should be set as follows:
 | datasketches-memory-java8-tests   |  8  |
 | datasketches-memory-java9         |  9  |
 | datasketches-memory-java11        |  11 |
+| datasketches-memory-java17        |  17 |
 | datasketches-memory-resources     |  8  |
 
 #### Compiler arguments for JPMS

@@ -40,7 +40,6 @@ public final class ReflectUtil {
 
   static final Method CHECK_VALID; //BaseStateImpl
   static final Method GET_DIRECT_ALLOCATIONS_COUNT; //NioBits
-  static final Method GET_MAX_DIRECT_BYTE_BUFFER_MEMORY; //NioBits
   static final Method GET_NATIVE_BASE_OFFSET; //BaseStateImpl
   static final Method GET_RESERVED_MEMORY; //NioBits
   static final Method GET_TOTAL_CAPACITY; //NioBits
@@ -53,11 +52,9 @@ public final class ReflectUtil {
   static final Method IS_HEAP_TYPE; //BaseStateImpl
   static final Method IS_MAP_TYPE; //BaseStateImpl
   static final Method IS_NON_NATIVE_TYPE; //BaseStateImpl
-  static final Method IS_PAGE_ALIGHED; //NioBits
   static final Method IS_READ_ONLY_TYPE; //BaseStateImpl
   static final Method IS_REGION_TYPE; //BaseStateImpl
   static final Method PAGE_COUNT; //NioBits
-  static final Method PAGE_SIZE; //NioBits
   static final Method RESERVE_MEMORY; //NioBits
   static final Method UNRESERVE_MEMORY; //NioBits
   static final Method WRAP_DIRECT; //BaseWritableMemoryImpl
@@ -76,8 +73,6 @@ public final class ReflectUtil {
         getMethod(BASE_STATE, "checkValid", (Class<?>[])null); //not static
     GET_DIRECT_ALLOCATIONS_COUNT =
         getMethod(NIO_BITS, "getDirectAllocationsCount", (Class<?>[])null); //static
-    GET_MAX_DIRECT_BYTE_BUFFER_MEMORY =
-        getMethod(NIO_BITS, "getMaxDirectByteBufferMemory", (Class<?>[])null); //static
     GET_NATIVE_BASE_OFFSET =
         getMethod(BASE_STATE, "getNativeBaseOffset", (Class<?>[])null);
     GET_RESERVED_MEMORY =
@@ -102,16 +97,12 @@ public final class ReflectUtil {
         getMethod(BASE_STATE, "isMapType", (Class<?>[])null); //not static
     IS_NON_NATIVE_TYPE =
         getMethod(BASE_STATE, "isNonNativeType", (Class<?>[])null); //not static
-    IS_PAGE_ALIGHED =
-        getMethod(NIO_BITS, "isPageAligned", (Class<?>[])null); //static
     IS_READ_ONLY_TYPE =
         getMethod(BASE_STATE, "isReadOnlyType", (Class<?>[])null); //not static
     IS_REGION_TYPE =
         getMethod(BASE_STATE, "isRegionType", (Class<?>[])null); //not static
     PAGE_COUNT =
         getMethod(NIO_BITS, "pageCount", long.class); //static
-    PAGE_SIZE =
-        getMethod(NIO_BITS, "pageSize", (Class<?>[])null); //static
     RESERVE_MEMORY =
         getMethod(NIO_BITS, "reserveMemory", long.class, long.class); //static
     UNRESERVE_MEMORY =
@@ -237,14 +228,6 @@ public final class ReflectUtil {
     }
   }
 
-  static long getMaxDirectByteBufferMemory() {
-    try {
-      return (long) GET_MAX_DIRECT_BYTE_BUFFER_MEMORY.invoke(null);
-    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   static long getNativeBaseOffset(final Object target) {
     try {
       return (long) GET_NATIVE_BASE_OFFSET.invoke(target);
@@ -341,14 +324,6 @@ public final class ReflectUtil {
     }
   }
 
-  static boolean isPageAligned() {
-    try {
-      return (boolean) IS_PAGE_ALIGHED.invoke(null);
-    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   static boolean isReadOnlyType(final Object target) {
     try {
       return (boolean) IS_READ_ONLY_TYPE.invoke(target);
@@ -368,14 +343,6 @@ public final class ReflectUtil {
   static int pageCount(final long bytes) {
     try {
       return (int) PAGE_COUNT.invoke(null, bytes);
-    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  static int pageSize() {
-    try {
-      return (int) PAGE_SIZE.invoke(null);
     } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }

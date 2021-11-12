@@ -46,9 +46,8 @@ final class AllocateDirect {
    * @param capacityBytes the the requested capacity of off-heap memory. Cannot be zero.
    */
   AllocateDirect(final long capacityBytes) {
-    final boolean pageAligned = NioBits.isPageAligned();
-    final long pageSize = NioBits.pageSize();
-    final long allocationSize = capacityBytes + (pageAligned ? pageSize : 0);
+    //round up to multiple of 8 bytes
+    final long allocationSize = ((capacityBytes & 7L) > 0L) ? ((capacityBytes >>> 3) + 1L) << 3 : capacityBytes;
     NioBits.reserveMemory(allocationSize, capacityBytes);
 
     final long nativeAddress;
@@ -58,12 +57,7 @@ final class AllocateDirect {
       NioBits.unreserveMemory(allocationSize, capacityBytes);
       throw new RuntimeException(err);
     }
-    if (pageAligned && ((nativeAddress % pageSize) != 0)) {
-      //Round up to page boundary
-      nativeBaseOffset = (nativeAddress & ~(pageSize - 1L)) + pageSize;
-    } else {
-      nativeBaseOffset = nativeAddress;
-    }
+    nativeBaseOffset = nativeAddress;
     deallocator = new Deallocator(nativeAddress, allocationSize, capacityBytes);
     cleaner = new MemoryCleaner(this, deallocator);
   }

@@ -30,13 +30,6 @@ import org.testng.annotations.Test;
 public class NioBitsTest {
 
   @Test
-  public void checkVMParams() {
-    println("Max MemoryImpl: " + ReflectUtil.getMaxDirectByteBufferMemory());
-    println("Page Aligned: " + ReflectUtil.isPageAligned());
-    println("Page Size: " + ReflectUtil.pageSize());
-  }
-
-  @Test
   public void checkGetAtomicFields() {
     //testing this beyond 2GB may not work on JVMs < 8GB.
     //This should be checked manually
@@ -59,8 +52,7 @@ public class NioBitsTest {
     long count = ReflectUtil.getDirectAllocationsCount();
     long resMem = ReflectUtil.getReservedMemory();
     long totCap = ReflectUtil.getTotalCapacity();
-    long maxDBBmem = ReflectUtil.getMaxDirectByteBufferMemory();
-    String s = String.format("%,10d\t%,15d\t%,15d\t%,15d", count, resMem, totCap, maxDBBmem);
+    String s = String.format("%,10d\t%,15d\t%,15d", count, resMem, totCap);
     println(s);
   }
 

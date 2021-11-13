@@ -48,17 +48,15 @@ final class AllocateDirect {
   AllocateDirect(final long capacityBytes) {
     //round up to multiple of 8 bytes
     final long allocationSize = ((capacityBytes & 7L) > 0L) ? ((capacityBytes >>> 3) + 1L) << 3 : capacityBytes;
-    NioBits.reserveMemory(allocationSize, capacityBytes);
 
     final long nativeAddress;
     try {
       nativeAddress = unsafe.allocateMemory(allocationSize);
     } catch (final OutOfMemoryError err) {
-      NioBits.unreserveMemory(allocationSize, capacityBytes);
       throw new RuntimeException(err);
     }
     nativeBaseOffset = nativeAddress;
-    deallocator = new Deallocator(nativeAddress, allocationSize, capacityBytes);
+    deallocator = new Deallocator(nativeAddress, allocationSize);
     cleaner = new MemoryCleaner(this, deallocator);
   }
 
@@ -89,15 +87,13 @@ final class AllocateDirect {
     //This is the only place the actual native address is kept for use by unsafe.freeMemory();
     private final long nativeAddress;
     private final long allocationSize;
-    private final long capacity;
     private final StepBoolean valid = new StepBoolean(true); //only place for this
 
-    Deallocator(final long nativeAddress, final long allocationSize, final long capacity) {
+    Deallocator(final long nativeAddress, final long allocationSize) {
       BaseStateImpl.currentDirectMemoryAllocations_.incrementAndGet();
-      BaseStateImpl.currentDirectMemoryAllocated_.addAndGet(capacity);
+      BaseStateImpl.currentDirectMemoryAllocated_.addAndGet(allocationSize);
       this.nativeAddress = nativeAddress;
       this.allocationSize = allocationSize;
-      this.capacity = capacity;
       assert (nativeAddress != 0);
     }
 
@@ -117,9 +113,8 @@ final class AllocateDirect {
           LOG.warning("A WritableHandle was not closed manually");
         }
         unsafe.freeMemory(nativeAddress);
-        NioBits.unreserveMemory(allocationSize, capacity);
         BaseStateImpl.currentDirectMemoryAllocations_.decrementAndGet();
-        BaseStateImpl.currentDirectMemoryAllocated_.addAndGet(-capacity);
+        BaseStateImpl.currentDirectMemoryAllocated_.addAndGet(-allocationSize);
         return true;
       }
       return false;

@@ -62,7 +62,7 @@ public interface Memory extends BaseState {
   static Memory wrap(ByteBuffer byteBuffer, ByteOrder byteOrder) {
     Objects.requireNonNull(byteBuffer, "byteBuffer must not be null");
     Objects.requireNonNull(byteOrder, "byteOrder must not be null");
-    negativeCheck(byteBuffer.capacity(), "byteBuffer");
+    negativeCheck(byteBuffer.capacity(), "byteBuffer.capacity()");
     return BaseWritableMemoryImpl.wrapByteBuffer(byteBuffer, true, byteOrder, null);
   }
 
@@ -81,9 +81,9 @@ public interface Memory extends BaseState {
 
   /**
    * Maps the specified portion of the given file into <i>Memory</i> for read operations.
-   * @param file the given file to map. It must be non-null and readable.
+   * @param file the given file to map. It must be non-null,readable and length &ge; 0.
    * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
-   * @param capacityBytes the size of the mapped memory. It must not be negative.
+   * @param capacityBytes the size of the mapped memory. It must be &ge; 0.
    * @param byteOrder the byte order to be used for the mapped memory. It must be non-null.
    * @return <i>MapHandle</i> for managing the mapped memory.
    * Please read Javadocs for {@link Handle}.
@@ -92,6 +92,7 @@ public interface Memory extends BaseState {
     Objects.requireNonNull(file, "file must be non-null.");
     Objects.requireNonNull(byteOrder, "byteOrder must be non-null.");
     if (!file.canRead()) { throw new IllegalArgumentException("file must be readable."); }
+    negativeCheck(file.length(), "file.length()");
     negativeCheck(fileOffsetBytes, "fileOffsetBytes");
     negativeCheck(capacityBytes, "capacityBytes");
     return (MapHandle) BaseWritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, true, byteOrder);
@@ -164,7 +165,7 @@ public interface Memory extends BaseState {
   //ACCESS PRIMITIVE HEAP ARRAYS for readOnly
   /**
    * Wraps the given primitive array for read operations assuming native byte order.
-   * @param array the given primitive array.
+   * @param array the given primitive array. It must be non-null and with length &ge; 0.
    * @return a new <i>Memory</i> for read operations
    */
   static Memory wrap(byte[] array) {
@@ -184,9 +185,9 @@ public interface Memory extends BaseState {
 
   /**
    * Wraps the given primitive array for read operations with the given byte order.
-   * @param array the given primitive array.
+   * @param array the given primitive array. It must be non-null and length &ge; 0.
    * @param offsetBytes the byte offset into the given array
-   * @param lengthBytes the number of bytes to include from the given array
+   * @param lengthBytes the number of bytes to include from the given array, it must be &ge; 0.
    * @param byteOrder the byte order to be used
    * @return a new <i>Memory</i> for read operations
    */
@@ -201,7 +202,7 @@ public interface Memory extends BaseState {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order.
-   * @param array the given primitive array.
+   * @param array the given primitive array. It must be non-null and length &ge; 0.
    * @return a new <i>Memory</i> for read operations
    */
   static Memory wrap(boolean[] array) {
@@ -212,7 +213,7 @@ public interface Memory extends BaseState {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order.
-   * @param array the given primitive array.
+   * @param array the given primitive array. It must be non-null and length &ge; 0.
    * @return a new <i>Memory</i> for read operations
    */
   static Memory wrap(char[] array) {
@@ -223,7 +224,7 @@ public interface Memory extends BaseState {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order.
-   * @param array the given primitive array.
+   * @param array the given primitive array. It must be non-null and length &ge; 0.
    * @return a new <i>Memory</i> for read operations
    */
   static Memory wrap(short[] array) {
@@ -234,7 +235,7 @@ public interface Memory extends BaseState {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order.
-   * @param array the given primitive array.
+   * @param array the given primitive array. It must be non-null and length &ge; 0.
    * @return a new <i>Memory</i> for read operations
    */
   static Memory wrap(int[] array) {
@@ -245,7 +246,7 @@ public interface Memory extends BaseState {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order.
-   * @param array the given primitive array.
+   * @param array the given primitive array. It must be non-null and length &ge; 0.
    * @return a new <i>Memory</i> for read operations
    */
   static Memory wrap(long[] array) {
@@ -256,7 +257,7 @@ public interface Memory extends BaseState {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order.
-   * @param array the given primitive array.
+   * @param array the given primitive array. It must be non-null and length &ge; 0.
    * @return a new <i>Memory</i> for read operations
    */
   static Memory wrap(float[] array) {
@@ -267,7 +268,7 @@ public interface Memory extends BaseState {
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order.
-   * @param array the given primitive array.
+   * @param array the given primitive array. It must be non-null and length &ge; 0.
    * @return a new <i>Memory</i> for read operations
    */
   static Memory wrap(double[] array) {

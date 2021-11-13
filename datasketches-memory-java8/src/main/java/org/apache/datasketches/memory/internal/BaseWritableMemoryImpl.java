@@ -30,6 +30,7 @@ import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_SHORT_IND
 import static org.apache.datasketches.memory.internal.UnsafeUtil.checkBounds;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
 import static org.apache.datasketches.memory.internal.Util.negativeCheck;
+import static org.apache.datasketches.memory.internal.Util.zeroCheck;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,7 +75,7 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
     EMPTY_BYTES = new byte[1024];
   }
 
-  //Pass-through ctor
+  //Pass-through constructor
   BaseWritableMemoryImpl(final Object unsafeObj, final long nativeBaseOffset,
       final long regionOffset, final long capacityBytes) {
     super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
@@ -82,7 +83,7 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
 
   /**
    * The static constructor that chooses the correct Heap leaf node based on the byte order.
-   * @param arr the primitive heap array being wrapped
+   * @param arr the primitive heap array being wrapped. It must be non-null with length &ge; 0.
    * @param offsetBytes the offset bytes into the array (independent of array type).
    * @param lengthBytes the length of the wrapped region.
    * @param localReadOnly the requested read-only status
@@ -92,6 +93,8 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
    */
   public static BaseWritableMemoryImpl wrapHeapArray(final Object arr, final long offsetBytes, final long lengthBytes,
       final boolean localReadOnly, final ByteOrder byteOrder, final MemoryRequestServer memReqSvr) {
+    Objects.requireNonNull(arr, "array must be non-null");
+    negativeCheck(lengthBytes, "lengthBytes");
     final int typeId = localReadOnly ? READONLY : 0;
     return Util.isNativeByteOrder(byteOrder)
         ? new HeapWritableMemoryImpl(arr, offsetBytes, lengthBytes, typeId, memReqSvr)
@@ -120,9 +123,9 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
 
   /**
    * The static constructor that chooses the correct Map leaf node based on the byte order.
-   * @param file the file being wrapped.
+   * @param file the file being wrapped. It must be non-null with length &gt; 0.
    * @param fileOffsetBytes the file offset bytes
-   * @param capacityBytes the requested capacity of the memory mapped region
+   * @param capacityBytes the requested capacity of the memory mapped region. It must be &gt; 0
    * @param localReadOnly the requested read-only state
    * @param byteOrder the requested byte-order
    * @return this class constructed via the leaf node.
@@ -130,6 +133,8 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
   @SuppressWarnings("resource")
   public static WritableMapHandle wrapMap(final File file, final long fileOffsetBytes,
       final long capacityBytes, final boolean localReadOnly, final ByteOrder byteOrder) {
+    Objects.requireNonNull(file, "file must be non-null");
+    zeroCheck(capacityBytes, "capacityBytes");
     final AllocateDirectWritableMap dirWMap =
         new AllocateDirectWritableMap(file, fileOffsetBytes, capacityBytes, localReadOnly);
     final int typeId = (dirWMap.resourceReadOnly || localReadOnly) ? READONLY : 0;
@@ -143,7 +148,7 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
 
   /**
    * The static constructor that chooses the correct Direct leaf node based on the byte order.
-   * @param capacityBytes the requested capacity for the Direct (off-heap) memory
+   * @param capacityBytes the requested capacity for the Direct (off-heap) memory.  It must be &ge; 0.
    * @param byteOrder the requested byte order
    * @param memReqSvr the requested MemoryRequestServer, which may be null
    * @return this class constructed via the leaf node.
@@ -151,6 +156,7 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
   @SuppressWarnings("resource")
   public static WritableHandle wrapDirect(final long capacityBytes,
       final ByteOrder byteOrder, final MemoryRequestServer memReqSvr) {
+    negativeCheck(capacityBytes, "capacityBytes");
     final AllocateDirect direct = new AllocateDirect(capacityBytes);
     final int typeId = 0; //direct is never read-only on construction
     final BaseWritableMemoryImpl wmem = Util.isNativeByteOrder(byteOrder)
@@ -176,12 +182,12 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
 
   WritableMemory writableRegionImpl(final long offsetBytes, final long capacityBytes,
       final boolean localReadOnly, final ByteOrder byteOrder) {
+    negativeCheck(offsetBytes, "offsetBytes");
+    negativeCheck(capacityBytes, "capacityBytes");
+    Objects.requireNonNull(byteOrder, "byteOrder must be non-null.");
     if (isReadOnly() && !localReadOnly) {
       throw new ReadOnlyException("Writable region of a read-only Memory is not allowed.");
     }
-    negativeCheck(offsetBytes, "offsetBytes must be >= 0");
-    negativeCheck(capacityBytes, "capacityBytes must be >= 0");
-    Objects.requireNonNull(byteOrder, "byteOrder must be non-null.");
     checkValidAndBounds(offsetBytes, capacityBytes);
     final boolean readOnly = isReadOnly() || localReadOnly;
     return toWritableRegion(offsetBytes, capacityBytes, readOnly, byteOrder);

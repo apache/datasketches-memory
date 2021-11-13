@@ -34,7 +34,7 @@ import java.util.logging.Logger;
 import org.apache.datasketches.memory.Map;
 import org.apache.datasketches.memory.MemoryCloseException;
 
-import sun.nio.ch.FileChannelImpl;
+import sun.nio.ch.FileChannelImpl; //java.base/
 
 /**
  * Allocates direct memory used to memory map files for read operations.
@@ -127,8 +127,8 @@ class AllocateDirectMap implements Map {
   public void load() {
     madvise();
     // Performance optimization. Read a byte from each page to bring it into memory.
-    final int ps = NioBits.pageSize();
-    final int count = NioBits.pageCount(capacityBytes);
+    final int ps = UnsafeUtil.PAGE_SIZE;
+    final int count = (int)UnsafeUtil.pageCount(capacityBytes);
     long offset = nativeBaseOffset;
     for (int i = 0; i < count; i++) {
       unsafe.getByte(offset);
@@ -139,7 +139,7 @@ class AllocateDirectMap implements Map {
   @Override
   public boolean isLoaded() {
     try {
-      final int pageCount = NioBits.pageCount(capacityBytes);
+      final int pageCount = (int)UnsafeUtil.pageCount(capacityBytes);
       return (boolean) MAPPED_BYTE_BUFFER_ISLOADED0_METHOD
           //isLoaded0 is effectively static, so ZERO_READ_ONLY_DIRECT_BYTE_BUFFER is not modified
           .invoke(AccessByteBuffer.ZERO_READ_ONLY_DIRECT_BYTE_BUFFER,

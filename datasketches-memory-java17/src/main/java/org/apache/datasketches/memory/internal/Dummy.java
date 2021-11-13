@@ -20,14 +20,8 @@
 package org.apache.datasketches.memory.internal;
 
 /**
- * Extracts version-dependent field names into standalone class.
- * Some field names in the VM internal class have changed in
- * later versions. The appropriate class will be loaded by the class loader
- * depending on the Java version that is used.
- * For more information, see: https://openjdk.java.net/jeps/238
+ * Temporary class & placeholder. It may not be needed.
  */
-class NioBitsFields {
-    static String COUNT_FIELD_NAME = "count";
-    static String RESERVED_MEMORY_FIELD_NAME = "reservedMemory";
-    static String TOTAL_CAPACITY_FIELD_NAME = "totalCapacity";
+public class Dummy {
+
 }

@@ -37,6 +37,7 @@ public final class UnsafeUtil {
 
   //not an indicator of whether compressed references are used.
   public static final int ADDRESS_SIZE;
+  public static final int PAGE_SIZE;
 
   //For 64-bit JVMs: these offsets vary depending on coop: 16 for JVM <= 32GB; 24 for JVM > 32GB.
   // Making this constant long-typed, rather than int, to exclude possibility of accidental overflow
@@ -102,6 +103,7 @@ public final class UnsafeUtil {
     //4 on 32-bit systems. 4 on 64-bit systems < 32GB, otherwise 8.
     //This alone is not an indicator of compressed ref (coop)
     ADDRESS_SIZE = unsafe.addressSize();
+    PAGE_SIZE = unsafe.pageSize();
 
     ARRAY_BOOLEAN_BASE_OFFSET = unsafe.arrayBaseOffset(boolean[].class);
     ARRAY_BYTE_BASE_OFFSET = unsafe.arrayBaseOffset(byte[].class);
@@ -187,6 +189,10 @@ public final class UnsafeUtil {
     } else {
       return unsafe.arrayBaseOffset(c);
     }
+  }
+
+  public static long pageCount(final long bytes) {
+    return (int)((bytes + PAGE_SIZE) - 1L) / PAGE_SIZE;
   }
 
   /**

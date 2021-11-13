@@ -36,13 +36,10 @@ public final class ReflectUtil {
   static final Class<?> BASE_STATE;
   static final Class<?> BASE_WRITABLE_MEMORY_IMPL;
   static final Class<?> ALLOCATE_DIRECT_MAP;
-  static final Class<?> NIO_BITS;
+  //static final Class<?> UNSAFE_UTIL;
 
   static final Method CHECK_VALID; //BaseStateImpl
-  static final Method GET_DIRECT_ALLOCATIONS_COUNT; //NioBits
   static final Method GET_NATIVE_BASE_OFFSET; //BaseStateImpl
-  static final Method GET_RESERVED_MEMORY; //NioBits
-  static final Method GET_TOTAL_CAPACITY; //NioBits
   static final Method GET_UNSAFE_OBJECT; //BaseStateImpl
   static final Method IS_BB_TYPE; //BaseStateImpl
   static final Method IS_BUFFER_TYPE; //BaseStateImpl
@@ -54,9 +51,6 @@ public final class ReflectUtil {
   static final Method IS_NON_NATIVE_TYPE; //BaseStateImpl
   static final Method IS_READ_ONLY_TYPE; //BaseStateImpl
   static final Method IS_REGION_TYPE; //BaseStateImpl
-  static final Method PAGE_COUNT; //NioBits
-  static final Method RESERVE_MEMORY; //NioBits
-  static final Method UNRESERVE_MEMORY; //NioBits
   static final Method WRAP_DIRECT; //BaseWritableMemoryImpl
 
   static {
@@ -66,19 +60,10 @@ public final class ReflectUtil {
         getClass("org.apache.datasketches.memory.internal.BaseWritableMemoryImpl");
     ALLOCATE_DIRECT_MAP =
         getClass("org.apache.datasketches.memory.internal.AllocateDirectMap");
-    NIO_BITS =
-        getClass("org.apache.datasketches.memory.internal.NioBits");
-
     CHECK_VALID =
         getMethod(BASE_STATE, "checkValid", (Class<?>[])null); //not static
-    GET_DIRECT_ALLOCATIONS_COUNT =
-        getMethod(NIO_BITS, "getDirectAllocationsCount", (Class<?>[])null); //static
     GET_NATIVE_BASE_OFFSET =
         getMethod(BASE_STATE, "getNativeBaseOffset", (Class<?>[])null);
-    GET_RESERVED_MEMORY =
-        getMethod(NIO_BITS, "getReservedMemory", (Class<?>[])null); //static
-    GET_TOTAL_CAPACITY =
-        getMethod(NIO_BITS, "getTotalCapacity", (Class<?>[])null); //static
     GET_UNSAFE_OBJECT =
         getMethod(BASE_STATE, "getUnsafeObject", (Class<?>[])null); //not static
     IS_BB_TYPE =
@@ -101,12 +86,6 @@ public final class ReflectUtil {
         getMethod(BASE_STATE, "isReadOnlyType", (Class<?>[])null); //not static
     IS_REGION_TYPE =
         getMethod(BASE_STATE, "isRegionType", (Class<?>[])null); //not static
-    PAGE_COUNT =
-        getMethod(NIO_BITS, "pageCount", long.class); //static
-    RESERVE_MEMORY =
-        getMethod(NIO_BITS, "reserveMemory", long.class, long.class); //static
-    UNRESERVE_MEMORY =
-        getMethod(NIO_BITS, "unreserveMemory", long.class, long.class); //static
     WRAP_DIRECT =
         getMethod(BASE_WRITABLE_MEMORY_IMPL,
             "wrapDirect", long.class, ByteOrder.class, MemoryRequestServer.class);  //static method
@@ -220,33 +199,9 @@ public final class ReflectUtil {
     }
   }
 
-  static long getDirectAllocationsCount() {
-    try {
-      return (long) GET_DIRECT_ALLOCATIONS_COUNT.invoke(null);
-    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   static long getNativeBaseOffset(final Object target) {
     try {
       return (long) GET_NATIVE_BASE_OFFSET.invoke(target);
-    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  static long getReservedMemory() {
-    try {
-      return (long) GET_RESERVED_MEMORY.invoke(null);
-    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  static long getTotalCapacity() {
-    try {
-      return (long) GET_TOTAL_CAPACITY.invoke(null);
     } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
@@ -335,30 +290,6 @@ public final class ReflectUtil {
   static boolean isRegionType(final Object target) {
     try {
       return (boolean) IS_REGION_TYPE.invoke(target);
-    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  static int pageCount(final long bytes) {
-    try {
-      return (int) PAGE_COUNT.invoke(null, bytes);
-    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  static void reserveMemory(final long allocationSize, final long capacity) {
-    try {
-     RESERVE_MEMORY.invoke(null, allocationSize, capacity);
-    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  static void unreserveMemory(final long allocationSize, final long capacity) {
-    try {
-      UNRESERVE_MEMORY.invoke(null, allocationSize, capacity);
     } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }

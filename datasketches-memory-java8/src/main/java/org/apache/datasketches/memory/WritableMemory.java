@@ -20,6 +20,7 @@
 package org.apache.datasketches.memory;
 
 import static org.apache.datasketches.memory.internal.Util.negativeCheck;
+import static org.apache.datasketches.memory.internal.Util.zeroCheck;
 
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -73,7 +74,7 @@ public interface WritableMemory extends Memory {
   static WritableMemory writableWrap(ByteBuffer byteBuffer, ByteOrder byteOrder, MemoryRequestServer memReqSvr) {
     Objects.requireNonNull(byteBuffer, "byteBuffer must be non-null");
     Objects.requireNonNull(byteOrder, "byteOrder must be non-null");
-    negativeCheck(byteBuffer.capacity(), "byteBuffer");
+    negativeCheck(byteBuffer.capacity(), "byteBuffer.capacity()");
     if (byteBuffer.isReadOnly()) { throw new ReadOnlyException("byteBuffer must be writable."); }
     return BaseWritableMemoryImpl.wrapByteBuffer(byteBuffer, false, byteOrder, memReqSvr);
   }
@@ -98,7 +99,7 @@ public interface WritableMemory extends Memory {
    * <i>WritableMemory.map(...)</i>.
    * @param file the given file to map. It must be non-null, writable and length &ge; 0.
    * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
-   * @param capacityBytes the size of the mapped Memory. It must not be negative.
+   * @param capacityBytes the size of the mapped Memory. It must be &ge; 0.
    * @param byteOrder the byte order to be used for the given file. It must be non-null.
    * @return WritableMapHandle for managing the mapped Memory.
    * Please read Javadocs for {@link Handle}.
@@ -123,7 +124,7 @@ public interface WritableMemory extends Memory {
    * It is the responsibility of the using application to clear this memory, if required,
    * and to call <i>close()</i> when done.</p>
    *
-   * @param capacityBytes the size of the desired memory in bytes. It must be &ge; 0.
+   * @param capacityBytes the size of the desired memory in bytes. It must be &gt; 0.
    * @return WritableHandle for this off-heap resource.
    * Please read Javadocs for {@link Handle}.
    */
@@ -139,7 +140,7 @@ public interface WritableMemory extends Memory {
    * It is the responsibility of the using application to clear this memory, if required,
    * and to call <i>close()</i> when done.</p>
    *
-   * @param capacityBytes the size of the desired memory in bytes. It must be &ge; 0.
+   * @param capacityBytes the size of the desired memory in bytes. It must be &gt; 0.
    * @param byteOrder the given byte order. It must be non-null.
    * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
    * This is a callback mechanism for a user client of direct memory to request more memory.
@@ -148,7 +149,7 @@ public interface WritableMemory extends Memory {
    */
   static WritableHandle allocateDirect(long capacityBytes, ByteOrder byteOrder, MemoryRequestServer memReqSvr) {
     Objects.requireNonNull(byteOrder, "byteOrder must be non-null");
-    negativeCheck(capacityBytes, "capacityBytes");
+    zeroCheck(capacityBytes, "capacityBytes");
     return BaseWritableMemoryImpl.wrapDirect(capacityBytes, byteOrder, memReqSvr);
   }
 
@@ -163,7 +164,7 @@ public interface WritableMemory extends Memory {
    * </ul>
    *
    * @param offsetBytes the starting offset with respect to this object. It must be &ge; 0.
-   * @param capacityBytes the capacity of the returned object in bytes. It must be &ge; 0.
+   * @param capacityBytes the capacity of the returned object in bytes. It must be &gt; 0.
    * @return a new <i>WritableMemory</i> representing the defined writable region.
    */
   default WritableMemory writableRegion(long offsetBytes, long capacityBytes) {
@@ -181,7 +182,7 @@ public interface WritableMemory extends Memory {
    * </ul>
    *
    * @param offsetBytes the starting offset with respect to this object. It must be &ge; 0.
-   * @param capacityBytes the capacity of the returned object in bytes. It must be &ge; 0.
+   * @param capacityBytes the capacity of the returned object in bytes. It must be &gt; 0.
    * @param byteOrder the given byte order. It must be non-null.
    * @return a new <i>WritableMemory</i> representing the defined writable region.
    */
@@ -263,7 +264,7 @@ public interface WritableMemory extends Memory {
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>WritableMemory.wrap(...)</i>.
-   * @param array the given primitive array. It must be non-null.
+   * @param array the given primitive array. It must be non-null, with length &ge; 0.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
   static WritableMemory writableWrap(byte[] array) {
@@ -275,7 +276,7 @@ public interface WritableMemory extends Memory {
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>WritableMemory.wrap(...)</i>.
-   * @param array the given primitive array. It must be non-null.
+   * @param array the given primitive array. It must be non-null, with length &ge; 0
    * @param byteOrder the byte order to be used. It must be non-null.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
@@ -325,7 +326,7 @@ public interface WritableMemory extends Memory {
 
   /**
    * Wraps the given primitive array for write operations assuming native byte order.
-   * @param array the given primitive array. It must be non-null.
+   * @param array the given primitive array. It must be non-null with length &ge; 0.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
   static WritableMemory writableWrap(boolean[] array) {
@@ -336,7 +337,7 @@ public interface WritableMemory extends Memory {
 
   /**
    * Wraps the given primitive array for write operations assuming native byte order.
-   * @param array the given primitive array.
+   * @param array the given primitive array. It must be non-null with length &ge; 0.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
   static WritableMemory writableWrap(char[] array) {
@@ -347,7 +348,7 @@ public interface WritableMemory extends Memory {
 
   /**
    * Wraps the given primitive array for write operations assuming native byte order.
-   * @param array the given primitive array.
+   * @param array the given primitive array. It must be non-null with length &ge; 0.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
   static WritableMemory writableWrap(short[] array) {
@@ -358,7 +359,7 @@ public interface WritableMemory extends Memory {
 
   /**
    * Wraps the given primitive array for write operations assuming native byte order.
-   * @param array the given primitive array.
+   * @param array the given primitive array. It must be non-null with length &ge; 0.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
   static WritableMemory writableWrap(int[] array) {
@@ -369,7 +370,7 @@ public interface WritableMemory extends Memory {
 
   /**
    * Wraps the given primitive array for write operations assuming native byte order.
-   * @param array the given primitive array.
+   * @param array the given primitive array. It must be non-null with length &ge; 0.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
   static WritableMemory writableWrap(long[] array) {
@@ -380,7 +381,7 @@ public interface WritableMemory extends Memory {
 
   /**
    * Wraps the given primitive array for write operations assuming native byte order.
-   * @param array the given primitive array.
+   * @param array the given primitive array. It must be non-null with length &ge; 0.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
   static WritableMemory writableWrap(float[] array) {
@@ -391,7 +392,7 @@ public interface WritableMemory extends Memory {
 
   /**
    * Wraps the given primitive array for write operations assuming native byte order.
-   * @param array the given primitive array.
+   * @param array the given primitive array. It must be non-null with length &ge; 0.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
   static WritableMemory writableWrap(double[] array) {

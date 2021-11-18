@@ -35,7 +35,7 @@ public interface BaseState {
   /**
    * The placeholder for the default MemoryRequestServer, if set at all.
    */
-  static final MemoryRequestServer defaultMemReqSvr = null; //new DefaultMemoryRequestServer();
+  //static final MemoryRequestServer defaultMemReqSvr = null; //new DefaultMemoryRequestServer();
 
   //Byte Order Related
 

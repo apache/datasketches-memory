@@ -19,32 +19,30 @@
 
 package org.apache.datasketches.memory.internal;
 
-import jdk.internal.ref.Cleaner;
+import java.lang.ref.Cleaner;
 
 /**
- * Extracts a version-dependent reference to the `jdk.internal.ref.Cleaner` into
- * a standalone class. The package name for Cleaner has changed in
- * later versions. The appropriate class will be loaded by the class loader
- * depending on the Java version that is used.
- * For more information, see: https://openjdk.java.net/jeps/238
+ * The package name and API for Cleaner changed from Java 8 to Java 9+.
+ * This extracts the java 9+ `java.lang.ref.Cleaner` into a standalone class.
  */
 public class MemoryCleaner {
-    private final Cleaner cleaner;
+  private final Cleaner cleaner = Cleaner.create();
+  private final Cleaner.Cleanable cleanable;
 
-    /**
-     * Creates a new `jdk.internal.ref.Cleaner`.
-     * @param referent the object to be cleaned
-     * @param deallocator - the cleanup code to be run when the cleaner is invoked.
-     * return MemoryCleaner
-     */
-    public MemoryCleaner(final Object referent, final Runnable deallocator) {
-        cleaner = Cleaner.create(referent, deallocator);
-    }
+  /**
+   * Creates a new `java.lang.ref.Cleaner`.
+   * @param referent the object to be cleaned
+   * @param deallocator - the cleanup code to be run when the cleaner is invoked.
+   * return MemoryCleaner
+   */
+  public MemoryCleaner(final Object referent, final Runnable deallocator) {
+      this.cleanable = cleaner.register(referent, deallocator);
+  }
 
-    /**
-     * Runs this cleaner, if it has not been run before.
-     */
+  /**
+   * Runs this cleaner, if it has not been run before.
+   */
     public void clean() {
-        cleaner.clean();
+        cleanable.clean();
     }
 }

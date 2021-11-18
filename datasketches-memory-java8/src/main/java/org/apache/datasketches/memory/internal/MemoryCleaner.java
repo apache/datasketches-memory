@@ -22,11 +22,8 @@ package org.apache.datasketches.memory.internal;
 import sun.misc.Cleaner;
 
 /**
- * Extracts a version-dependent reference to the `sun.misc.Cleaner` into
- * a standalone class. The package name for Cleaner has changed in
- * later versions. The appropriate class will be loaded by the class loader
- * depending on the Java version that is used.
- * For more information, see: https://openjdk.java.net/jeps/238
+ * The package name and API for Cleaner changed from Java 8 to Java 9+.
+ * This extracts the java 8 `sun.misc.Cleaner` into a standalone class.
  */
 @SuppressWarnings("restriction")
 public class MemoryCleaner {

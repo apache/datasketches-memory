@@ -16,11 +16,5 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-@SuppressWarnings("javadoc")
-module org.apache.datasketches.memory {
-    requires java.base;
-    requires java.logging;
-    requires jdk.unsupported;
 
-    exports org.apache.datasketches.memory;
-}
+package org.apache.datasketches.memory;

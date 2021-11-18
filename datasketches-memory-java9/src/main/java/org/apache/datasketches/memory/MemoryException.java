@@ -16,11 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-@SuppressWarnings("javadoc")
-module org.apache.datasketches.memory {
-    requires java.base;
-    requires java.logging;
-    requires jdk.unsupported;
 
-    exports org.apache.datasketches.memory;
+package org.apache.datasketches.memory;
+
+/**
+ * Specific RuntimeExceptions for the datasketches-memory component.
+ *
+ * @author Lee Rhodes
+ *
+ */
+public class MemoryException extends RuntimeException {
+  private static final long serialVersionUID = 1L;
+
+  /**
+   * Constructs a new runtime exception with the specified detail message. The cause is not
+   * initialized, and may subsequently be initialized by a call to
+   * Throwable.initCause(java.lang.Throwable).
+   *
+   * @param message the detail message. The detail message is saved for later retrieval by the
+   * Throwable.getMessage() method.
+   */
+  public MemoryException(final String message) {
+    super(message);
+  }
 }

@@ -22,5 +22,5 @@ module org.apache.datasketches.memory {
     requires java.logging;
     requires jdk.unsupported;
     requires jdk.incubator.foreign;
-    exports org.apache.datasketches.memory.internal;
+    exports org.apache.datasketches.memory;
 }

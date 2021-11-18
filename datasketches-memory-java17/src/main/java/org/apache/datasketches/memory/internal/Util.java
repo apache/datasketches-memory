@@ -19,6 +19,8 @@
 
 package org.apache.datasketches.memory.internal;
 
+import static jdk.incubator.foreign.MemoryAccess.getLongAtIndex;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -29,7 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Random;
 
-import org.apache.datasketches.memory.Memory;
+import jdk.incubator.foreign.MemorySegment;
 
 /**
  * @author Lee Rhodes
@@ -81,9 +83,9 @@ public final class Util {
    * search algorithm. The range must be sorted method) prior to making this call.
    * If it is not sorted, the results are undefined. If the range contains
    * multiple elements with the specified value, there is no guarantee which one will be found.
-   * @param mem the Memory to be searched
-   * @param fromLongIndex the index of the first element (inclusive) to be searched
-   * @param toLongIndex the index of the last element (exclusive) to be searched
+   * @param seg the MemorySegment to be searched
+   * @param fromLongIndex the index of the first long element (inclusive) to be searched
+   * @param toLongIndex the index of the last long element (exclusive) to be searched
    * @param key the value to be searched for
    * @return index of the search key, if it is contained in the array within the specified range;
    * otherwise, (-(insertion point) - 1). The insertion point is defined as the point at which
@@ -91,15 +93,15 @@ public final class Util {
    * than the key, or toIndex if all elements in the range are less than the specified key.
    * Note that this guarantees that the return value will be &ge; 0 if and only if the key is found.
    */
-  public static long binarySearchLongs(final Memory mem, final long fromLongIndex,
+  public static long binarySearchLongs(final MemorySegment seg, final long fromLongIndex,
       final long toLongIndex, final long key) {
-    UnsafeUtil.checkBounds(fromLongIndex << 3, (toLongIndex - fromLongIndex) << 3, mem.getCapacity());
+    UnsafeUtil.checkBounds(fromLongIndex << 3, (toLongIndex - fromLongIndex) << 3, seg.byteSize());
     long low = fromLongIndex;
     long high = toLongIndex - 1L;
 
     while (low <= high) {
       final long mid = (low + high) >>> 1;
-      final long midVal = mem.getLong(mid << 3);
+      final long midVal = getLongAtIndex(seg, mid);
 
       if (midVal < key)      { low = mid + 1;  }
       else if (midVal > key) { high = mid - 1; }
@@ -235,7 +237,7 @@ public final class Util {
      * Fills the given array with random valid Code Points from <i>startCP</i>, inclusive, to
      * <i>endCP</i>, exclusive.
      * The surrogate range, which is from <i>Character.MIN_SURROGATE</i>, inclusive, to
-     * <i>Character.MAX_SURROGATE</i>, inclusive, is always <u>excluded</u>.
+     * <i>Character.MAX_SURROGATE</i>, inclusive, is always <i>excluded</i>.
      * @param cpArr the array to fill
      * @param startCP the starting Code Point, included.
      * @param endCP the ending Code Point, excluded. This value cannot exceed 0x110000.
@@ -257,7 +259,7 @@ public final class Util {
      * Return a single valid random Code Point from 0, inclusive, to
      * <i>Character.MAX_CODE_POINT</i>, inclusive.
      * The surrogate range, which is from <i>Character.MIN_SURROGATE</i>, inclusive, to
-     * <i>Character.MAX_SURROGATE</i>, inclusive, is always <u>excluded</u>.
+     * <i>Character.MAX_SURROGATE</i>, inclusive, is always <i>excluded</i>.
      * @return a single valid random CodePoint.
      */
     public final int getCodePoint() {
@@ -268,7 +270,7 @@ public final class Util {
      * Return a single valid random Code Point from <i>startCP</i>, inclusive, to
      * <i>endCP</i>, exclusive.
      * The surrogate range, which is from <i>Character.MIN_SURROGATE</i>, inclusive, to
-     * <i>Character.MAX_SURROGATE</i>, inclusive, is always <u>excluded</u>.
+     * <i>Character.MAX_SURROGATE</i>, inclusive, is always <i>excluded</i>.
      * @param startCP the starting Code Point, included.
      * @param endCP the ending Code Point, excluded. This value cannot exceed 0x110000.
      * @return a single valid random CodePoint.

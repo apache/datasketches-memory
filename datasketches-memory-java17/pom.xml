@@ -19,7 +19,6 @@
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -48,11 +47,10 @@
     <packaging>jar</packaging>
 
     <properties>
-        <java.version>17</java.version>
-        <jdk-toolchain.version>17</jdk-toolchain.version>
+        <java.version>11</java.version>
+        <jdk-toolchain.version>11</jdk-toolchain.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
     </properties>
-
 
 </project>

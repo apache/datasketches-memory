@@ -19,15 +19,18 @@
 
 package org.apache.datasketches.memory.internal;
 
+import static org.apache.datasketches.memory.internal.UnsafeUtil.LS;
+import static org.apache.datasketches.memory.internal.UnsafeUtil.assertBounds;
+import static org.apache.datasketches.memory.internal.UnsafeUtil.checkBounds;
+import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.MemoryRequestServer;
-//import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.ReadOnlyException;
-//import org.apache.datasketches.memory.internal.XxHash64;
 
 /**
  * Keeps key configuration state for MemoryImpl and BufferImpl plus some common static variables
@@ -161,7 +164,7 @@ public abstract class BaseStateImpl implements BaseState {
 
   //Documented in WritableMemory and WritableBuffer interfaces.
   //Implemented in the Leaf nodes; Required here by toHex(...).
-  //abstract MemoryRequestServer getMemoryRequestServer();
+  abstract MemoryRequestServer getMemoryRequestServer();
 
   //Overridden by ByteBuffer, Direct and Map leafs
   long getNativeBaseOffset() {

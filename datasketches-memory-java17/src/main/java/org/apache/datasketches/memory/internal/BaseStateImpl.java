@@ -26,7 +26,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.ReadOnlyException;
-import org.apache.datasketches.memory.internal.UnsafeUtil;
 
 import static org.apache.datasketches.memory.internal.UnsafeUtil.checkBounds;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.assertBounds;
@@ -38,7 +37,6 @@ import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
  *
  * @author Lee Rhodes
  */
-@SuppressWarnings("restriction")
 public abstract class BaseStateImpl implements BaseState {
 
   //Monitoring

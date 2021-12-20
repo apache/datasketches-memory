@@ -121,6 +121,16 @@
       <source>${project.basedir}/pom.xml</source>
       <outputDirectory>META-INF/maven/org.apache.datasketches/datasketches-memory</outputDirectory>
     </file>
+    <!-- Java 9 module-info.java -->
+    <file>
+      <source>${project.basedir}/src/main/resources/module-info-j9.java</source>
+      <outputDirectory>META-INF/versions/9</outputDirectory>
+    </file>
+    <!-- Java 17 module-info.java -->
+    <file>
+      <source>${project.basedir}/src/main/resources/module-info-j17.java</source>
+      <outputDirectory>META-INF/versions/17</outputDirectory>
+    </file>
   </files>
 
 </assembly>

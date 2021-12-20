@@ -109,6 +109,7 @@ jobs:
       - name: Compile
         run: >
           mvn clean compile
+          -X
           -Dmaven.javadoc.skip=true
           -Dgpg.skip=true
           --toolchains .github/workflows/.toolchains.xml
@@ -116,6 +117,7 @@ jobs:
       - name: Install Dependencies
         run: >
           mvn clean install
+          -X
           -DskipTests=true
           -Dmaven.javadoc.skip=true
           -Dgpg.skip=true
@@ -124,6 +126,7 @@ jobs:
       - name: Package
         run: >
           mvn package
+          -X
           -Dmaven.javadoc.skip=true
           -Dgpg.skip=true
           -Denvironment=ci

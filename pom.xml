@@ -281,7 +281,7 @@ under the License.
               <configuration>
                 <rules>
                   <requireJavaVersion>
-                    <version>[1.8,1.9),[8,17]</version>
+                    <version>[1.8,1.9),[8,18)</version>
                   </requireJavaVersion>
                   <requireMavenVersion>
                     <version>[${maven.version},)</version>
@@ -378,7 +378,7 @@ under the License.
           <configuration>
             <toolchains>
               <jdk>
-                <version>[1.8,1.9),[9,17]</version>
+                <version>[1.8,1.9),[9,18)</version>
               </jdk>
             </toolchains>
           </configuration>

@@ -166,7 +166,7 @@ public class UtilTest {
     assertTrue(file.exists());
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test(expectedExceptions = NullPointerException.class)
   public void resourceFileNotFound() {
     final String shortFileName = "GettysburgAddress.txt";
     getResourceFile(shortFileName + "123");
@@ -179,7 +179,7 @@ public class UtilTest {
     assertTrue(bytes.length == 1541);
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test(expectedExceptions = NullPointerException.class)
   public void resourceBytesFileNotFound() {
     final String shortFileName = "GettysburgAddress.txt";
     getResourceBytes(shortFileName + "123");

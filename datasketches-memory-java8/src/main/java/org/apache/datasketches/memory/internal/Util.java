@@ -27,6 +27,7 @@ import java.net.URL;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.Random;
 
 import org.apache.datasketches.memory.Memory;
@@ -302,7 +303,7 @@ public final class Util {
     }
   }
 
-  //Resources
+  //Resources NOTE: these 3 methods are duplicated in Java/ datasketches/Util
 
   /**
    * Gets the absolute path of the given resource file's shortName.
@@ -317,12 +318,15 @@ public final class Util {
    * @return the absolute path of the given resource file's shortName.
    */
   public static String getResourcePath(final String shortFileName) {
+    Objects.requireNonNull(shortFileName, "input parameter " + shortFileName + " cannot be null.");
     try {
       final URL url = Util.class.getClassLoader().getResource(shortFileName);
+      Objects.requireNonNull(url, "resource " + shortFileName + " could not be acquired.");
       final URI uri = url.toURI();
-      final String path = uri.getPath(); //decodes any special characters
+      //decodes any special characters
+      final String path = uri.isAbsolute() ? Paths.get(uri).toAbsolutePath().toString() : uri.getPath();
       return path;
-    } catch (final NullPointerException | URISyntaxException e) {
+    } catch (final URISyntaxException e) {
       throw new IllegalArgumentException("Cannot find resource: " + shortFileName + LS + e);
     }
   }

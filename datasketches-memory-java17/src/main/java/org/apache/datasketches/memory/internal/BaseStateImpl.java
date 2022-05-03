@@ -19,7 +19,6 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.UnsafeUtil.LS;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.assertBounds;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.checkBounds;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
@@ -38,7 +37,6 @@ import org.apache.datasketches.memory.ReadOnlyException;
  *
  * @author Lee Rhodes
  */
-@SuppressWarnings("restriction")
 public abstract class BaseStateImpl implements BaseState {
 
   //Monitoring
@@ -46,6 +44,7 @@ public abstract class BaseStateImpl implements BaseState {
   static final AtomicLong currentDirectMemoryAllocated_ = new AtomicLong();
   static final AtomicLong currentDirectMemoryMapAllocations_ = new AtomicLong();
   static final AtomicLong currentDirectMemoryMapAllocated_ = new AtomicLong();
+  static final String LS = System.getProperty("line.separator");
 
   //class type IDs. Do not change the bit orders
   //The first 3 bits are set dynamically
@@ -241,9 +240,9 @@ public abstract class BaseStateImpl implements BaseState {
     if (this == that1) { return true; }
 
     return cumBaseOffset_ == that1.cumBaseOffset_
-            && capacityBytes_ == that1.capacityBytes_
-            && getUnsafeObject() == that1.getUnsafeObject()
-            && getByteBuffer() == that1.getByteBuffer();
+       && capacityBytes_ == that1.capacityBytes_
+       && getUnsafeObject() == that1.getUnsafeObject()
+       && getByteBuffer() == that1.getByteBuffer();
   }
 
   //Overridden by Direct and Map leafs
@@ -408,7 +407,7 @@ public abstract class BaseStateImpl implements BaseState {
   static final String toHex(final BaseStateImpl state, final String preamble, final long offsetBytes,
       final int lengthBytes) {
     final long capacity = state.getCapacity();
-    UnsafeUtil.checkBounds(offsetBytes, lengthBytes, capacity);
+    checkBounds(offsetBytes, lengthBytes, capacity);
     final StringBuilder sb = new StringBuilder();
     final Object uObj = state.getUnsafeObject();
     final String uObjStr;

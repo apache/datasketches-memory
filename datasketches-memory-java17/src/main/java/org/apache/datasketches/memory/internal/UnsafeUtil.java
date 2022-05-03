@@ -29,7 +29,6 @@ import sun.misc.Unsafe;
  *
  * @author Lee Rhodes
  */
-@SuppressWarnings({"restriction", "javadoc"})
 public final class UnsafeUtil {
   public static final Unsafe unsafe;
   public static final String JDK; //must be at least "1.8"
@@ -221,8 +220,8 @@ public final class UnsafeUtil {
   public static void checkBounds(final long reqOff, final long reqLen, final long allocSize) {
     if ((reqOff | reqLen | (reqOff + reqLen) | (allocSize - (reqOff + reqLen))) < 0) {
       throw new IllegalArgumentException(
-          "reqOffset: " + reqOff + ", reqLength: " + reqLen
-              + ", (reqOff + reqLen): " + (reqOff + reqLen) + ", allocSize: " + allocSize);
+        "reqOffset: " + reqOff + ", reqLength: " + reqLen
+        + ", (reqOff + reqLen): " + (reqOff + reqLen) + ", allocSize: " + allocSize);
     }
   }
 }

@@ -285,7 +285,7 @@ under the License.
               <configuration>
                 <rules>
                   <requireJavaVersion>
-                    <version>[1.8, 1.9),8,[11,14),[17,18)</version>
+                    <version>[1.8, 1.9),[8],[11,14),[17,18)</version>
                   </requireJavaVersion>
                   <requireMavenVersion>
                     <version>[${maven.version},)</version>

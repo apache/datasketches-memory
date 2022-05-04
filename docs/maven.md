@@ -27,14 +27,12 @@ Datasketches Memory makes use of some features of the Java platform, for example
 which have evolved in Java versions 9 and above.   Therefore, a multi-module project allows us to 
 add support for later versions of Java by using independent Maven modules to target 
 platform-specific APIs.  For example, to deallocate references a `sun.misc.Cleaner` will be used 
-in Java8, but the `jdk.internal.ref.Cleaner` is used in Java 9.
+in Java8, but the `jdk.internal.ref.Cleaner` is used in Java 11.
 
 This project has been divided into the following submodules:
 
 * datasketches-memory-java8 (base version of the JVM that is currently supported)
 * datasketches-memory-java8-tests
-* datasketches-memory-java9 (Java9 equivalent of some platform specific classes in 
-datasketches-memory-java8)
 * datasketches-memory-java11 (Java11 equivalent of some platform specific classes in 
 datasketches-memory-java8)
 * datasketches-memory (MR-JAR assembly, does not contain source files)

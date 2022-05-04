@@ -25,8 +25,8 @@ This document provides examples for the following scenarios:
 
 1. Using the library from a Java 8 application
 2. Using the library with on-heap memory only
-3. Using off-heap memory in a non-modularized Java 9+ application
-4. Using off-heap memory in a modularized Java 9+ application
+3. Using off-heap memory in a non-modularized Java 11+ application
+4. Using off-heap memory in a modularized Java 11+ application
 
 ### 1) Using the library from a Java 8 application
 
@@ -64,18 +64,18 @@ As an example, consider the following launch script that compiles and runs a sim
 
 ### 2) Using the library with on-heap memory only
 
-Similarly, no additional runtime arguments are required in this scenario - regardless of whether the library is used from a Java 8 or Java 9+ application. 
+Similarly, no additional runtime arguments are required in this scenario - regardless of whether the library is used from a Java 8 or Java 11+ application. 
 
-As an example, consider the following launch script that compiles and runs a simple Java 9 application that only exclusively
+As an example, consider the following launch script that compiles and runs a simple Java 11 application that only exclusively
 uses on-heap memory:
 
 ```shell
-  JH=$JAVA9_HOME
+  JH=$JAVA11_HOME
   JAVAC=$JH/bin/javac
   JAVA=$JH/bin/java
   JAR=$JH/bin/jar
   
-  patha=nomvn-nomod-heap-jdk9
+  patha=nomvn-nomod-heap-jdk11
   
   cd $patha
   
@@ -96,11 +96,11 @@ uses on-heap memory:
     org.xyz.memory.RunMain
 ```
 
-### 3) Using off-heap memory in a non-modularized Java 9+ application
+### 3) Using off-heap memory in a non-modularized Java 11+ application
 
 The following section applies to applications that are not modularized JPMS applications.
 
-In order to allocate off-heap memory using the `WritableMemory.allocateDirect(...)` method in Java 9 and above, you must provide the
+In order to allocate off-heap memory using the `WritableMemory.allocateDirect(...)` method in Java 11 and above, you must provide the
 following runtime arguments to the JVM:
 
 ```shell
@@ -113,15 +113,15 @@ following runtime arguments to the JVM:
 These arguments expose encapsulated packages in the `java.base` package to the `org.apache.datasketches.memory` module,
 which runs as an UNNAMED module in a non-JPMS (non-modularized) application.
 
-The following launch script compiles and runs a non-modularized Java 9 application:
+The following launch script compiles and runs a non-modularized Java 11 application:
 
 ```shell
-  JH=$JAVA9_HOME
+  JH=$JAVA11_HOME
   JAVAC=$JH/bin/javac
   JAVA=$JH/bin/java
   JAR=$JH/bin/jar
 
-  patha=nomvn-nomod-jdk9
+  patha=nomvn-nomod-jdk11
   
   cd $patha
   
@@ -150,11 +150,11 @@ where the traditional classpath (`-cp`) argument contains all modules, libraries
 Note: `mods` is a local directory containing external modules, and `libs` is a local directory for external library
 dependencies.  No distinction is made between modules and libraries since they are both appended to the classpath.
 
-### 4) Using off-heap memory in a modularized Java 9+ application
+### 4) Using off-heap memory in a modularized Java 11+ application
 
 The following section applies to modularized JPMS applications.
 
-In order to allocate off-heap memory using the `WritableMemory.allocateDirect(...)` method in Java 9 and above, you must provide the
+In order to allocate off-heap memory using the `WritableMemory.allocateDirect(...)` method in Java 11 and above, you must provide the
 following runtime arguments to the JVM:
 
 ```shell
@@ -166,15 +166,15 @@ following runtime arguments to the JVM:
 
 These arguments expose encapsulated packages in the `java.base` package to the `org.apache.datasketches.memory` module.
 
-The following launch script compiles and runs a modularized Java 9 application:
+The following launch script compiles and runs a modularized Java 11 application:
 
 ```shell
-  JH=$JAVA9_HOME
+  JH=$JAVA11_HOME
   JAVAC=$JH/bin/javac
   JAVA=$JH/bin/java
   JAR=$JH/bin/jar
   
-  patha=nomvn-mod-jdk9
+  patha=nomvn-mod-jdk11
   
   cd $patha
   echo PWD:$(pwd)

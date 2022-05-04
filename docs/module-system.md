@@ -17,7 +17,7 @@
     under the License.
 -->
 
-# Java Platform Module System (JPMS) For JDK 9+
+# Java Platform Module System (JPMS) For JDK 11+
 
 The [Java Platform Module System](https://openjdk.java.net/projects/jigsaw/spec/) defines a module 
 system for the Java Platform. For more documentation on the implementation, see 
@@ -49,7 +49,7 @@ dependency graph.
 
 #### org.apache.datasketches.memory
 
-In the `datasketches-memory-java9` maven submodule root, the following module declaration has 
+In the `datasketches-memory-java11` maven submodule root, the following module declaration has 
 been added:
 
 ```java
@@ -69,14 +69,14 @@ providing better encapsulation.
 ### Compiler arguments
 
 Some dependencies are encapsulated by default, and this causes compilation to fail for 
-Java versions 9 and above.
+Java versions 11 and above.
 These dependencies can be made accessible at compile time through the use of the 
 `add-exports` compiler argument.
 This argument allows one module to access some un-exported types of another module.  
 Datasketches Memory depends on several internal APIs and therefore requires special 
 exposition.
 
-For example, in order to compile the `datasketches-memory-java9` submodule, the following compiler 
+For example, in order to compile the `datasketches-memory-java11` submodule, the following compiler 
 arguments are added to the Maven compiler plugin in the module's pom.xml file:
 
 ```xml
@@ -90,7 +90,7 @@ arguments are added to the Maven compiler plugin in the module's pom.xml file:
 
 When allocating off-heap memory using `WritableMemory.allocateDirect(...)`, 
 reflection is used by the Datasketches Memory component to access JVM internal class 
-fields and methods that do not have `public` visibility.  For JDK 9+, the JPMS
+fields and methods that do not have `public` visibility.  For JDK 11+, the JPMS
 requires that the user add additional JVM run-time arguments (`add-opens...`, which permit this reflection.
 
 Note that if the user has allocated off-heap memory using ByteBuffer.allocateDirect(...),
@@ -103,4 +103,4 @@ See the use **Use as a Library** and **Developer Usage** sections in the main [R
 Java 8 does not support module declarations and the JPMS module system, and no additional
 runtime arguments are necessary.
 However, support is retained for Java 8 users by only including the compiled declaration 
-(`module-info.class`) in the `datasketches-memory` multi-release JAR for Java9 and above.
+(`module-info.class`) in the `datasketches-memory` multi-release JAR for Java11 and above.

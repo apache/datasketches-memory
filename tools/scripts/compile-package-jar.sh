@@ -60,7 +60,6 @@ PackageMeta=${PackageContents}/META-INF
 PackageManifest=${PackageMeta}/MANIFEST.MF
 
 MemoryJava8Src=datasketches-memory-java8/src/main/java
-MemoryJava9Src=datasketches-memory-java9/src/main/java
 MemoryJava11Src=datasketches-memory-java11/src/main/java
 
 #### Move to project directory ####
@@ -111,12 +110,8 @@ echo "$($ScriptsDir/getGitProperties.sh $ProjectBaseDir $ProjectArtifactId $GitT
 #### Copy source tree to target/src
 rsync -a -I $MemoryJava8Src $PackageSrc
 
-if [[ $JavaVersion -eq 9 || $JavaVersion -eq 10 ]]; then
-  #### Copy java 9 src tree to target/src, overwriting replacements
-  rsync -a -I $MemoryJava9Src $PackageSrc
-elif [[ $JavaVersion -gt 10 ]]; then
-  #### Copy java 9 and 11 src trees to target/src, overwriting replacements
-  rsync -a -I $MemoryJava9Src $PackageSrc
+if [[ $JavaVersion -gt 10 ]]; then
+  #### Copy java 11 src trees to target/src, overwriting replacements
   rsync -a -I $MemoryJava11Src $PackageSrc
 fi
 

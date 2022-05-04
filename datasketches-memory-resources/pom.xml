@@ -125,9 +125,9 @@
     </profile>
 
     <profile>
-      <id>java9to13</id>
+      <id>java11to13</id>
       <activation>
-        <jdk>[9,14)</jdk>
+        <jdk>[11,14)</jdk>
         <property>
           <name>environment</name>
           <value>ci</value>

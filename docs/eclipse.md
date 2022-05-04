@@ -143,7 +143,7 @@ click on **Java Build Path**.
 - Lastly, for all other modules, verify that the **Execution Environment** is selected and set 
 to the Java 8 JRE:
 
-![Eclipse build path](img/eclipse-build-path-3.png "Java 8 Eclipse project build path")
+![Eclipse build path](img/eclipse-build-path-2.png "Java 8 Eclipse project build path")
 
 ### Running unit tests
 

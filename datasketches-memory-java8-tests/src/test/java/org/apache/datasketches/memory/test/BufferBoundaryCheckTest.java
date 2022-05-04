@@ -19,13 +19,28 @@
 
 package org.apache.datasketches.memory.test;
 
+import static org.testng.Assert.assertEquals;
+
+import java.nio.ByteOrder;
+
+import org.apache.datasketches.memory.DefaultMemoryRequestServer;
+import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")
 public class BufferBoundaryCheckTest {
 
-  private final WritableMemory writableMemory = WritableMemory.allocate(8);
+  private final MemoryRequestServer defaultMemReqSvr = new DefaultMemoryRequestServer();
+  private final ByteOrder byteOrder  = ByteOrder.nativeOrder();
+  private final WritableMemory writableMemory = WritableMemory.allocate(8, byteOrder, defaultMemReqSvr);
+
+  @Test
+  public void checkMemAlloc() {
+    WritableMemory wmem = WritableMemory.allocate(8);
+    wmem.putByte(7, (byte)1);
+    assertEquals(wmem.getByte(7), (byte)1);
+  }
 
   @Test
   public void testGetBoolean() {

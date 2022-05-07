@@ -66,7 +66,7 @@ final class CompareAndCopy {
     return (cap1 == cap2) && equals(state1, 0, state2, 0, cap1);
   }
 
-  //Developer notes: this is subtlely different from (campare == 0) in that this has an early
+  //Developer notes: this is subtly different from (compare == 0) in that this has an early
   // stop if the arrays and offsets are the same as there is only one length.  Also this can take
   // advantage of chunking with longs, while compare cannot.
   static boolean equals(

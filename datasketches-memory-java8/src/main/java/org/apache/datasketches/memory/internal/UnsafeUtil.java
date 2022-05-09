@@ -144,9 +144,9 @@ public final class UnsafeUtil {
   }
 
   public static void checkJavaVersion(final String jdkVer, final int p0, final int p1) {
-    if ( (p0 < 1) || ((p0 == 1) && (p1 < 8)) || (p0 > 13)  ) {
+    if ( (p0 < 1) || ((p0 == 1) && (p1 < 8)) || (p0 == 9) || (p0 == 10) || (p0 > 13)  ) {
       throw new IllegalArgumentException(
-          "Unsupported JDK Major Version, must be one of 1.8, 8, 9, 10, 11, 12, 13: " + jdkVer);
+          "Unsupported JDK Major Version, must be one of 1.8, 8, 11, 12, 13: " + jdkVer);
     }
   }
 

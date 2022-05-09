@@ -43,7 +43,7 @@ public class UnsafeUtilTest {
   public void checkJdkString() {
     String jdkVer;
     int[] p = new int[2];
-    String[] good1_Strings = {"1.8.0_121", "8", "9", "10", "11", "12", "13"};
+    String[] good1_Strings = {"1.8.0_121", "8", "11", "12", "13"};
     int len = good1_Strings.length;
     for (int i = 0; i < len; i++) {
       jdkVer = good1_Strings[i];
@@ -53,47 +53,14 @@ public class UnsafeUtilTest {
       if (p[0] == 1) { assertTrue(jdkMajor == p[1]); }
       if (p[0] > 1 ) { assertTrue(jdkMajor == p[0]); }
     }
-    try {
-      jdkVer = "14.0.4"; //ver 14 string
-      p = UnsafeUtil.parseJavaVersion(jdkVer);
-      UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]);
-      fail();
-    } catch (IllegalArgumentException e) {
-      println("" + e);
-    }
 
-    try {
-      jdkVer = "1.7.0_80"; //1.7 string
-      p = UnsafeUtil.parseJavaVersion(jdkVer);
-      UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]);
-      fail();
-    } catch (IllegalArgumentException e) {
-      println("" + e);
-    }
-    try {
-      jdkVer = "1.6.0_65"; //valid string but < 1.7
-      p = UnsafeUtil.parseJavaVersion(jdkVer);
-      UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]); //throws
-      fail();
-    } catch (IllegalArgumentException e) {
-      println("" + e);
-    }
-    try {
-      jdkVer = "b"; //invalid string
-      p = UnsafeUtil.parseJavaVersion(jdkVer);
-      UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]); //throws
-      fail();
-    } catch (IllegalArgumentException e) {
-      println("" + e);
-    }
-    try {
-      jdkVer = ""; //invalid string
-      p = UnsafeUtil.parseJavaVersion(jdkVer);
-      UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]); //throws
-      fail();
-    } catch (IllegalArgumentException e) {
-      println("" + e);
-    }
+    invalidVersionTest("14.0.4"); // ver 14 string
+    invalidVersionTest("1.7.0_80"); // ver 1.7 string
+    invalidVersionTest("9.0.4_80"); // ver 9 string
+    invalidVersionTest("10.0.2_80"); // ver 10 string
+    invalidVersionTest("1.6.0_65"); // ver < 1.8 string
+    invalidVersionTest("b"); // invalid version
+    invalidVersionTest(""); // invalid version
   }
 
   @Test
@@ -151,4 +118,19 @@ public class UnsafeUtilTest {
     //System.out.println(s);
   }
 
+  /**
+   * @param jdkVer java runtime version identifier
+   */
+  static void invalidVersionTest(final String jdkVer)
+  {
+    try {
+      int[] p = new int[2];
+      p = UnsafeUtil.parseJavaVersion(jdkVer);
+      UnsafeUtil.checkJavaVersion(jdkVer, p[0], p[1]); //throws
+      fail();
+    }
+    catch (IllegalArgumentException e) {
+      println("" + e);
+    }
+  }
 }

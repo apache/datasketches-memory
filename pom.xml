@@ -281,7 +281,7 @@ under the License.
               <configuration>
                 <rules>
                   <requireJavaVersion>
-                    <version>[1.8,1.9),[8,14)</version>
+                    <version>[1.8,1.9),[8],[11,14),[17,18)</version>
                   </requireJavaVersion>
                   <requireMavenVersion>
                     <version>[${maven.version},)</version>
@@ -378,7 +378,7 @@ under the License.
           <configuration>
             <toolchains>
               <jdk>
-                <version>[1.8,1.9),[9,14)</version>
+                <version>[1.8,1.9),[8],[11,14),[17,18)</version>
               </jdk>
             </toolchains>
           </configuration>
@@ -533,7 +533,6 @@ under the License.
   <modules>
     <module>datasketches-memory-java8</module>
     <module>datasketches-memory-java8-tests</module>
-    <module>datasketches-memory-java9</module>
     <module>datasketches-memory-java11</module>
     <module>datasketches-memory</module>
     <module>datasketches-memory-resources</module>

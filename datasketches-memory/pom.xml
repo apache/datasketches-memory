@@ -136,12 +136,6 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.apache.datasketches</groupId>
-      <artifactId>datasketches-memory-java9</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.datasketches</groupId>
       <artifactId>datasketches-memory-java11</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
@@ -291,7 +285,7 @@ under the License.
               <configuration>
                 <rules>
                   <requireJavaVersion>
-                    <version>[1.8,1.9),[8,14)</version>
+                    <version>[1.8, 1.9),[8],[11,14),[17,18)</version>
                   </requireJavaVersion>
                   <requireMavenVersion>
                     <version>[${maven.version},)</version>

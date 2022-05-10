@@ -53,9 +53,9 @@ Also see the [usage examples](docs/usage-examples.md) for more information.
 In this environment, the user is using the Jars from Maven Central as a library  dependency and not attempting to build the Memory component from the source code or run the Memory component tests.
 
 * If you are running Java 8, no extra JVM arguments are required.
-* If you are running Java 9-13 and only using the **Heap** related API, no extra JVM arguments are required.
+* If you are running Java 11-13 and only using the **Heap** related API, no extra JVM arguments are required.
 
-Otherwise, if you are running Java 9-13 and ...
+Otherwise, if you are running Java 11-13 and ...
 
 * If your application **is not a JPMS module** use the following table. Choose the columns that describe your use of the Memory API.  If any of the columns contain a *Yes*, then the JVM argument in the first column of the row containing a *Yes* will be required. If you are not sure the extent of the Memory API being used, there is no harm in specifying all 4 JVM arguments. Note: do not embed any spaces in the full argument.
 
@@ -89,7 +89,7 @@ In this environment the developer needs to build the Memory component from sourc
         * IntelliJ (version)
         * Maven (version)
         * Command-line or scripts
-    * The developer must have installed in their development system at least JDK versions 8, 9 and 11.
+    * The developer must have installed in their development system at least JDK versions 8 and 11.
     * Unless building with the provided script, the developer must have a valid [Maven toolchain configuration](docs/maven-toolchains.md).
 
 
@@ -118,7 +118,6 @@ There are no run-time dependencies. See the pom.xml file for test dependencies.
 The Maven build requires the following JDKs to compile:
 
 - JDK8/Hotspot
-- JDK9/Hotspot
 - JDK11/Hotspot
 
 Before building, first ensure that your local environment has been configured according to the [Maven Toolchains Configuration](docs/maven-toolchains.md).
@@ -138,9 +137,9 @@ To run javadoc on this multi-module project, use:
 
     mvn clean process-classes javadoc:javadoc -DskipTests=true
 
-To run the CI tests against the multi-release JAR for specific JVM versions [9-13], use:
+To run the CI tests against the multi-release JAR for specific JVM versions [11-13], use:
 
-    mvn clean package -Denvironment=ci -Dmatrix.jdk.version=9
+    mvn clean package -Denvironment=ci -Dmatrix.jdk.version=11
 
 To run the eclipse plugin on this multi-module project, use:
 

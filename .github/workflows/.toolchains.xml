@@ -23,26 +23,6 @@
     <toolchain>
         <type>jdk</type>
         <provides>
-            <version>9</version>
-            <vendor>openjdk</vendor>
-        </provides>
-        <configuration>
-            <jdkHome>${env.JAVA9_HOME}</jdkHome>
-        </configuration>
-    </toolchain>
-    <toolchain>
-        <type>jdk</type>
-        <provides>
-            <version>10</version>
-            <vendor>openjdk</vendor>
-        </provides>
-        <configuration>
-            <jdkHome>${env.JAVA10_HOME}</jdkHome>
-        </configuration>
-    </toolchain>
-    <toolchain>
-        <type>jdk</type>
-        <provides>
             <version>11</version>
             <vendor>openjdk</vendor>
         </provides>

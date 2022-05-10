@@ -17,4 +17,30 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory;
+
+/**
+ * Read only interface for a memory mapped file
+ *
+ * @author Roman Leventov
+ * @author Lee Rhodes
+ * @author Praveenkumar Venkatesan
+ */
+public interface Map extends AutoCloseable {
+
+  /**
+   * @see <a href="https://docs.oracle.com/javase/8/docs/api/java/nio/MappedByteBuffer.html#load--">
+   * java/nio/MappedByteBuffer.load</a>
+   */
+  void load();
+
+  /**
+   * @return true if loaded
+   *
+   * @see <a href=
+   * "https://docs.oracle.com/javase/8/docs/api/java/nio/MappedByteBuffer.html#isLoaded--"> java
+   * /nio/MappedByteBuffer.isLoaded</a>
+   */
+  boolean isLoaded();
+
+}

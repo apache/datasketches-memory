@@ -36,7 +36,7 @@ version-specific APIs, which require different JDKs to compile correctly.
 
 ### Toolchains template
 
-Your local environment requires toolchain entries for Java 8, 9 and 11 to build this project.  
+Your local environment requires toolchain entries for Java 8 and 11 to build this project.  
 These can be found in a reference `toolchains.xml` template in the `tools` directory.
 Any maven commands used during development can be supplemented with: 
 `--toolchains tools/toolchains.xml`, without permanently modifying the local 
@@ -54,14 +54,12 @@ In order to compile the project using Maven toolchains, the following environmen
 | Environment variable              | Value                                 |
 | --------------------------------- | ------------------------------------- |
 | JAVA8_HOME                        |  Home directory for Java 8 (openJDK)  |
-| JAVA9_HOME                        |  Home directory for Java 9 (openJDK)  |
 | JAVA11_HOME                       |  Home directory for Java 11 (openJDK) |
 
 For example, if you are using [SDKMAN!](https://sdkman.io/), your environment 
 might be configured as follows:
 
 - JAVA8_HOME: `/Users/me/.sdkman/candidates/java/8.0.282.hs-adpt`
-- JAVA9_HOME: `/Users/me/.sdkman/candidates/java/9.0.4-open`
 - JAVA11_HOME: `/Users/me/.sdkman/candidates/java/11.0.10.hs-adpt`
 
 #### For MacOS or Linux variants

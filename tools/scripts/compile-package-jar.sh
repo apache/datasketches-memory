@@ -32,7 +32,7 @@
 #       Example tag for Release Candidate: 1.0.0-RC1
 #       Example tag for Release          : 1.0.0
 #  \$3 = absolute path of project.basedir
-#  For example:  $ <this script>.sh $JAVA_HOME 2.0.0-RC1 .
+#  For example:  $ <this script>.sh $JAVA_HOME 2.1.0 .
 
 if [ -z "$1" ]; then echo "Missing JDK home";            exit 1; fi
 if [ -z "$2" ]; then echo "Missing Git Tag";             exit 1; fi

@@ -179,15 +179,15 @@ For example, if the project base directory is `/src/datasketches-memory`;
 
 To run the script for a release version:
 
-    ./tools/scripts/compile-package-jar.sh $JAVA_HOME 2.0.0 /src/datasketches-memory
+    ./tools/scripts/compile-package-jar.sh $JAVA_HOME 2.1.0 /src/datasketches-memory
 
 To run the script for a snapshot version:
 
-    ./tools/scripts/compile-package-jar.sh $JAVA_HOME 2.1.0-SNAPSHOT /src/datasketches-memory
+    ./tools/scripts/compile-package-jar.sh $JAVA_HOME 2.2.0-SNAPSHOT /src/datasketches-memory
 
 To run the script for an RC version:
 
-    ./tools/scripts/compile-package-jar.sh $JAVA_HOME 2.0.0-RC1 /src/datasketches-memory
+    ./tools/scripts/compile-package-jar.sh $JAVA_HOME 2.1.0-RC1 /src/datasketches-memory
 
 Note that the script does **not** use the _Git Version Tag_ to adjust the working copy to a remote tag - it is expected that the user has a pristine copy of the desired branch/tag available **before** using the script.
 

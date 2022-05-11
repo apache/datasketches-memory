@@ -47,7 +47,6 @@ import org.apache.datasketches.memory.internal.Util;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
-@SuppressWarnings("javadoc")
 public class UtilTest {
   private static final String LS = System.getProperty("line.separator");
 

@@ -220,7 +220,6 @@ public interface WritableMemory extends Memory {
    */
   WritableBuffer asWritableBuffer(ByteOrder byteOrder);
 
-
   //ALLOCATE HEAP VIA AUTOMATIC BYTE ARRAY
   /**
    * Creates on-heap WritableMemory with the given capacity and the native byte order.
@@ -254,7 +253,6 @@ public interface WritableMemory extends Memory {
     negativeCheck(capacityBytes, "capacityBytes");
     return writableWrap(arr, 0, capacityBytes, byteOrder, memReqSvr);
   }
-
 
   //ACCESS PRIMITIVE HEAP ARRAYS for WRITE
 

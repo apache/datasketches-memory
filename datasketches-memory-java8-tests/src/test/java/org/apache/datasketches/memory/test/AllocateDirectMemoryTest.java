@@ -32,7 +32,6 @@ import org.apache.datasketches.memory.internal.Util;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
-@SuppressWarnings("javadoc")
 public class AllocateDirectMemoryTest {
 
   @Test

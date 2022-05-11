@@ -52,7 +52,6 @@ import static org.apache.datasketches.memory.internal.UnsafeUtil.SHORT_SHIFT;
  *
  * @author Lee Rhodes
  */
-@SuppressWarnings("javadoc")
 public enum Prim {
   BOOLEAN(ARRAY_BOOLEAN_BASE_OFFSET, ARRAY_BOOLEAN_INDEX_SCALE, BOOLEAN_SHIFT),
   BYTE(ARRAY_BYTE_BASE_OFFSET, ARRAY_BYTE_INDEX_SCALE, BYTE_SHIFT),

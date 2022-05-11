@@ -173,7 +173,7 @@ under the License.
     
     <module name="CustomImportOrder">
       <property name="specialImportsRegExp" value="org"/>
-      <property name="sortImportsInGroupAlphabetically" value="true"/>
+      <property name="sortImportsInGroupAlphabetically" value="false"/>
       <property name="separateLineBetweenGroups" value="true"/>
       <!-- Google: "STATIC###SPECIAL_IMPORTS###THIRD_PARTY_PACKAGE###STANDARD_JAVA_PACKAGE" -->
       <property name="customImportOrderRules" value="STATIC###STANDARD_JAVA_PACKAGE###SPECIAL_IMPORTS###THIRD_PARTY_PACKAGE"/>
@@ -200,14 +200,14 @@ under the License.
     </module>
     
     <module name="JavadocMethod">
-      <property name="scope" value="public"/>
+      <property name="accessModifiers" value="public"/>
       <property name="allowMissingParamTags" value="false"/> <!-- default -->
       <property name="allowMissingReturnTag" value="false"/> <!-- default -->
       <property name="allowedAnnotations" value="Override, Test"/>
     </module>
     
     <module name="JavadocParagraph"/>
-    
+
     <module name="JavadocTagContinuationIndentation">
       <property name="severity" value="ignore"/>
       <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
@@ -240,7 +240,7 @@ under the License.
     </module>
     
     <module name="CommentsIndentation">
-      <property name="severity" value="warning"/>
+      <property name="severity" value="ignore"/>
       <!-- <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/> -->
     </module>
     
@@ -352,6 +352,7 @@ under the License.
     <!-- Whitespace -->
     <module name="EmptyLineSeparator">
       <property name="allowNoEmptyLineBetweenFields" value="true"/>
+      <property name="allowMultipleEmptyLines" value="false"/>
     </module>
     
     <module name="GenericWhitespace">

@@ -30,7 +30,6 @@ import org.apache.datasketches.memory.ReadOnlyException;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
-@SuppressWarnings("javadoc")
 public class MemoryReadWriteSafetyTest {
 
   // Test various operations with read-only Memory

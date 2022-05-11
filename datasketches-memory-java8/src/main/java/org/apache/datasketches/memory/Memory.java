@@ -17,7 +17,6 @@
  * under the License.
  */
 
-
 package org.apache.datasketches.memory;
 
 import static org.apache.datasketches.memory.internal.Util.negativeCheck;

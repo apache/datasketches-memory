@@ -103,7 +103,6 @@ class AllocateDirectMap implements Map {
   final boolean resourceReadOnly;
 
   //called from AllocateDirectWritableMap constructor
-  @SuppressWarnings("resource")
   AllocateDirectMap(final File file, final long fileOffsetBytes, final long capacityBytes,
       final boolean localReadOnly) {
     this.capacityBytes = capacityBytes;

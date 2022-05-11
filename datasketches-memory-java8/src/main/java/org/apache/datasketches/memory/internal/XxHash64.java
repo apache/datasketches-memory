@@ -199,8 +199,6 @@ public class XxHash64 {
     return hash;
   }
 
-
-
   /**
    * Hash the given arr starting at the given offset and continuing for the given length using the
    * given seed.

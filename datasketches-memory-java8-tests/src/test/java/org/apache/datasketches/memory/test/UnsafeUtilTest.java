@@ -34,7 +34,6 @@ import org.testng.annotations.Test;
 /**
  * @author Lee Rhodes
  */
-@SuppressWarnings("javadoc")
 public class UnsafeUtilTest {
   long testField = 1; //Do not remove & cannot be static. Used in reflection check.
 

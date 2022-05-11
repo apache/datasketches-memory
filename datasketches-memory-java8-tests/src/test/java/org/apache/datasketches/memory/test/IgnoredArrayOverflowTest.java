@@ -25,7 +25,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-@SuppressWarnings("javadoc")
 public class IgnoredArrayOverflowTest {
 
   private WritableHandle h;

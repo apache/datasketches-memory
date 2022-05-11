@@ -36,7 +36,6 @@ final class HeapWritableMemoryImpl extends NativeWritableMemoryImpl {
   private final MemoryRequestServer memReqSvr;
   private final byte typeId;
 
-
   HeapWritableMemoryImpl(
       final Object unsafeObj,
       final long regionOffset,
@@ -47,7 +46,6 @@ final class HeapWritableMemoryImpl extends NativeWritableMemoryImpl {
     this.unsafeObj = unsafeObj;
     this.memReqSvr = memReqSvr;
     this.typeId = (byte) (id | (typeId & 0x7));
-
   }
 
   @Override

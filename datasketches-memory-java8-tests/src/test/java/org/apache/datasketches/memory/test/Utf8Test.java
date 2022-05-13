@@ -44,7 +44,6 @@ import com.google.protobuf.ByteString;
  * https://developers.google.com/protocol-buffers/
  * See LICENSE.
  */
-@SuppressWarnings("javadoc")
 public class Utf8Test {
 
   @Test

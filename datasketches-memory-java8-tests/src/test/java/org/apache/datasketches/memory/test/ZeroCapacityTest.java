@@ -32,19 +32,17 @@ import org.testng.annotations.Test;
 /**
  * @author Lee Rhodes
  */
-@SuppressWarnings("javadoc")
 public class ZeroCapacityTest {
 
-  @SuppressWarnings({ "unused", "resource" })
   @Test
   public void checkZeroCapacity() throws Exception {
     WritableMemory wmem = WritableMemory.allocate(0);
     assertEquals(wmem.getCapacity(), 0);
 
-    Memory mem1 = Memory.wrap(new byte[0]);
-    Memory mem2 = Memory.wrap(ByteBuffer.allocate(0));
+    Memory.wrap(new byte[0]);
+    Memory.wrap(ByteBuffer.allocate(0));
     Memory mem3 = Memory.wrap(ByteBuffer.allocateDirect(0));
-    Memory reg = mem3.region(0, 0);
+    mem3.region(0, 0);
     WritableHandle wh = null;
     try {
       wh = WritableMemory.allocateDirect(0);

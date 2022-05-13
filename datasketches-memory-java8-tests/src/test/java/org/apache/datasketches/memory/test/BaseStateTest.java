@@ -37,7 +37,6 @@ import org.apache.datasketches.memory.internal.StepBoolean;
 import org.apache.datasketches.memory.internal.Util;
 import org.testng.annotations.Test;
 
-@SuppressWarnings("javadoc")
 public class BaseStateTest {
 
   @Test

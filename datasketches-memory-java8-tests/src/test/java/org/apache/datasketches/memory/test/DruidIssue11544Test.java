@@ -48,7 +48,6 @@ import org.testng.annotations.Test;
  * @author Lee Rhodes
  *
  */
-@SuppressWarnings("javadoc")
 public class DruidIssue11544Test {
 
   @Test

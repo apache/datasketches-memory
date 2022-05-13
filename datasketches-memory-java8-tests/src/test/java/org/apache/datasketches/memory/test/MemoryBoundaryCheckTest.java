@@ -23,7 +23,6 @@ import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
-@SuppressWarnings("javadoc")
 public class MemoryBoundaryCheckTest {
 
   private final WritableBuffer writableBuffer = WritableMemory.allocate(8).asWritableBuffer();

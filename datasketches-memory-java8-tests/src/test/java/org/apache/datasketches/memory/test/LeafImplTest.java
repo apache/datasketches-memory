@@ -42,7 +42,6 @@ import org.testng.annotations.Test;
 /**
  * @author Lee Rhodes
  */
-@SuppressWarnings("javadoc")
 public class LeafImplTest {
   private static final ByteOrder NBO = ByteOrder.nativeOrder();
   private static final ByteOrder NNBO = NON_NATIVE_BYTE_ORDER;

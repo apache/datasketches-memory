@@ -99,8 +99,7 @@ under the License.
     <!-- END:UNIQUE FOR THIS JAVA COMPONENT -->
 
     <!-- Test -->
-    <!-- Version 7.4.0 fails to locate jquery.min.js for reporting on debian systems -->
-    <testng.version>7.1.0</testng.version>
+    <testng.version>7.5</testng.version>
 
     <!-- System-wide properties -->
     <maven.version>3.5.0</maven.version>
@@ -123,10 +122,10 @@ under the License.
     <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version> <!-- overrides parent -->
     <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version> <!-- overrides parent -->
     <maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version> <!-- overrides parent -->
-    <maven-enforcer-plugin.version>3.0.0-M3</maven-enforcer-plugin.version> <!-- overrides parent -->
+    <maven-enforcer-plugin.version>3.0.0</maven-enforcer-plugin.version> <!-- overrides parent -->
     <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version> <!-- overrides parent -->
-    <maven-javadoc-plugin.version>3.3.0</maven-javadoc-plugin.version> <!-- overrides parent -->
-    <maven-release-plugin.version>3.0.0-M1</maven-release-plugin.version> <!-- overrides parent -->
+    <maven-javadoc-plugin.version>3.3.1</maven-javadoc-plugin.version> <!-- overrides parent -->
+    <maven-release-plugin.version>3.0.0-M4</maven-release-plugin.version> <!-- overrides parent -->
     <maven-remote-resources-plugin.version>1.7.0</maven-remote-resources-plugin.version> <!-- overrides parent -->
     <maven-source-plugin.version>3.2.1</maven-source-plugin.version> <!-- overrides parent -->
     <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version> <!-- overrides parent -->

@@ -127,7 +127,6 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
    * @param byteOrder the requested byte-order
    * @return this class constructed via the leaf node.
    */
-  @SuppressWarnings("resource")
   public static WritableMapHandle wrapMap(final File file, final long fileOffsetBytes,
       final long capacityBytes, final boolean localReadOnly, final ByteOrder byteOrder) {
     final AllocateDirectWritableMap dirWMap =
@@ -148,7 +147,6 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
    * @param memReqSvr the requested MemoryRequestServer, which may be null
    * @return this class constructed via the leaf node.
    */
-  @SuppressWarnings("resource")
   public static WritableHandle wrapDirect(final long capacityBytes,
       final ByteOrder byteOrder, final MemoryRequestServer memReqSvr) {
     final AllocateDirect direct = new AllocateDirect(capacityBytes);

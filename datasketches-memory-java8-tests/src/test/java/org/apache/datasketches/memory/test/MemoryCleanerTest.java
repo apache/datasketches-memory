@@ -27,7 +27,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.datasketches.memory.internal.MemoryCleaner;
 import org.testng.annotations.Test;
 
-@SuppressWarnings("javadoc")
 public class MemoryCleanerTest {
 
     @Test
@@ -38,7 +37,6 @@ public class MemoryCleanerTest {
        assertTrue(SimpleDeallocator.getHasRun());
     }
 
-    @SuppressWarnings("unused")
     @Test
     public void noDeallocation() {
         SimpleDeallocator deallocator = new SimpleDeallocator();

@@ -33,14 +33,12 @@ import org.testng.annotations.Test;
  * Examples of how to use the MemoryRequestServer with a memory hungry client.
  * @author Lee Rhodes
  */
-@SuppressWarnings("javadoc")
 public class ExampleMemoryRequestServerTest {
 
   /**
    * This version is without a TWR block.all of the memory allocations are done through the MemoryRequestServer
    * and each is closed by the MemoryClient when it is done with each.
    */
-  @SuppressWarnings("resource")
   @Test
   public void checkExampleMemoryRequestServer1() throws Exception {
     int bytes = 8;
@@ -74,7 +72,6 @@ public class ExampleMemoryRequestServerTest {
     }
   }
 
-  @SuppressWarnings("resource")
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void checkZeroCapacity() throws Exception {
     ExampleMemoryRequestServer svr = new ExampleMemoryRequestServer();
@@ -131,7 +128,6 @@ public class ExampleMemoryRequestServerTest {
   public static class ExampleMemoryRequestServer implements MemoryRequestServer {
     IdentityHashMap<WritableMemory, WritableHandle> map = new IdentityHashMap<>();
 
-    @SuppressWarnings("resource")
     @Override
     public WritableMemory request(WritableMemory currentWMem, long capacityBytes) {
      ByteOrder order = currentWMem.getTypeByteOrder();
@@ -141,7 +137,6 @@ public class ExampleMemoryRequestServerTest {
      return wmem;
     }
 
-    @SuppressWarnings("resource")
     @Override
     //here we actually release it, in reality it might be a lot more complex.
     public void requestClose(WritableMemory memToRelease, WritableMemory newMemory) {

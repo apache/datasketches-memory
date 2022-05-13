@@ -35,7 +35,6 @@ import net.openhft.hashing.LongHashFunction;
 /**
  * @author Lee Rhodes
  */
-@SuppressWarnings("javadoc")
 public class XxHash64Test {
 
   @Test

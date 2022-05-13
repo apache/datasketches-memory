@@ -35,7 +35,6 @@ import org.apache.datasketches.memory.Memory;
 /**
  * @author Lee Rhodes
  */
-@SuppressWarnings("javadoc")
 public final class Util {
   public static final String LS = System.getProperty("line.separator");
 
@@ -46,7 +45,6 @@ public final class Util {
   public static ByteOrder otherByteOrder(final ByteOrder order) {
     return (order == ByteOrder.nativeOrder()) ? NON_NATIVE_BYTE_ORDER : ByteOrder.nativeOrder();
   }
-
 
   /**
    * Don't use sun.misc.Unsafe#copyMemory to copy blocks of memory larger than this
@@ -75,7 +73,6 @@ public final class Util {
     }
     return ByteOrder.nativeOrder() == byteOrder;
   }
-
 
   /**
    * Searches a range of the specified array of longs for the specified value using the binary

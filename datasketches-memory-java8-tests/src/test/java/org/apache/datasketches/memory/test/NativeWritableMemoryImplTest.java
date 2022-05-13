@@ -37,12 +37,10 @@ import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
-@SuppressWarnings("javadoc")
 public class NativeWritableMemoryImplTest {
 
   //Simple Native direct
 
-  @SuppressWarnings("resource")
   @Test
   public void checkNativeCapacityAndClose() throws Exception {
     int memCapacity = 64;

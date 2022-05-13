@@ -28,7 +28,6 @@ import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.MemoryRequestServer;
 
-@SuppressWarnings("javadoc")
 public final class ReflectUtil {
 
   private ReflectUtil() {}
@@ -203,7 +202,7 @@ public final class ReflectUtil {
   /**
    * Gets a declared method of the given the loaded owning class, method name and parameter types.
    * The accessible flag will be set true.
-   * @param ownerClass the given
+   * @param ownerClass the given owner class
    * @param methodName the given method name
    * @param parameterTypes the list of parameter types
    * @return the desired method.

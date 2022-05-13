@@ -46,7 +46,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.testng.collections.Lists;
 
-@SuppressWarnings("javadoc")
 public class MemoryTest {
   private static final String LS = System.getProperty("line.separator");
 
@@ -324,7 +323,6 @@ public class MemoryTest {
   @Test(expectedExceptions = AssertionError.class)
   public void checkParentUseAfterFree() throws Exception {
     int bytes = 64 * 8;
-    @SuppressWarnings("resource") //intentionally not using try-with-resouces here
     WritableHandle wh = WritableMemory.allocateDirect(bytes);
     WritableMemory wmem = wh.getWritable();
     wh.close();
@@ -336,7 +334,6 @@ public class MemoryTest {
   @Test(expectedExceptions = AssertionError.class)
   public void checkRegionUseAfterFree() throws Exception {
     int bytes = 64;
-    @SuppressWarnings("resource") //intentionally not using try-with-resouces here
     WritableHandle wh = WritableMemory.allocateDirect(bytes);
     Memory wmem = wh.get();
     Memory region = wmem.region(0L, bytes);
@@ -346,7 +343,6 @@ public class MemoryTest {
     region.getByte(0);
   }
 
-  @SuppressWarnings({ "resource"})
   @Test
   public void checkMonitorDirectStats() throws Exception {
     int bytes = 1024;
@@ -369,7 +365,6 @@ public class MemoryTest {
     assertEquals(BaseState.getCurrentDirectMemoryAllocated(), 0L + curAllocated);
   }
 
-  @SuppressWarnings({ "resource"})
   @Test
   public void checkMonitorDirectMapStats() throws Exception {
     File file = getResourceFile("GettysburgAddress.txt");

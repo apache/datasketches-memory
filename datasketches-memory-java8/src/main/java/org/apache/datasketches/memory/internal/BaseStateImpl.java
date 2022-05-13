@@ -338,7 +338,6 @@ public abstract class BaseStateImpl implements BaseState {
     return (getTypeId() >>> 3 & 3) == 3;
   }
 
-
   //TO STRING
   /**
    * Decodes the resource type. This is primarily for debugging.
@@ -491,6 +490,6 @@ public abstract class BaseStateImpl implements BaseState {
   }
 
   //REACHABILITY FENCE
-  static void reachabilityFence(@SuppressWarnings("unused") final Object obj) { }
+  static void reachabilityFence(final Object obj) { }
 
 }

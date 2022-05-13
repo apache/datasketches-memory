@@ -315,7 +315,6 @@ public final class MurmurHash3v2 {
     return k2;
   }
 
-
   /**
    * Final self mix of h*.
    *

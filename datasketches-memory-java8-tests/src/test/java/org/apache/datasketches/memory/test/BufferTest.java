@@ -33,7 +33,6 @@ import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 import org.testng.collections.Lists;
 
-@SuppressWarnings("javadoc")
 public class BufferTest {
 
   @Test
@@ -283,7 +282,6 @@ public class BufferTest {
   @Test(expectedExceptions = AssertionError.class)
   public void checkParentUseAfterFree() throws Exception {
     int bytes = 64 * 8;
-    @SuppressWarnings("resource") //intentionally not using try-with-resources here
     WritableHandle wh = WritableMemory.allocateDirect(bytes);
     WritableMemory wmem = wh.getWritable();
     WritableBuffer wbuf = wmem.asWritableBuffer();
@@ -293,7 +291,6 @@ public class BufferTest {
     wbuf.getLong();
   }
 
-  @SuppressWarnings("resource")
   @Test(expectedExceptions = AssertionError.class)
   public void checkRegionUseAfterFree() throws Exception {
     int bytes = 64;

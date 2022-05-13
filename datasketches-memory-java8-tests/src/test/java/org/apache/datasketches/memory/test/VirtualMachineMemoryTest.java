@@ -22,7 +22,7 @@ package org.apache.datasketches.memory.test;
 import org.apache.datasketches.memory.internal.VirtualMachineMemory;
 import org.testng.annotations.Test;
 
-@SuppressWarnings({"javadoc","unused"})
+@SuppressWarnings({"unused"})
 public class VirtualMachineMemoryTest {
 
     @Test

@@ -26,6 +26,7 @@ import static org.testng.Assert.assertTrue;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;

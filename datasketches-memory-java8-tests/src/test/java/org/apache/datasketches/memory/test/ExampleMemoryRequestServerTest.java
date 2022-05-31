@@ -38,6 +38,7 @@ public class ExampleMemoryRequestServerTest {
   /**
    * This version is without a TWR block.all of the memory allocations are done through the MemoryRequestServer
    * and each is closed by the MemoryClient when it is done with each.
+   * @throws Exception
    */
   @Test
   public void checkExampleMemoryRequestServer1() throws Exception {

@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        jdk: [8,11,12,13]
+        jdk: [8,11,12,13,17]
 
     # All JDKs are installed per build machine which is inefficient
 
@@ -69,6 +69,14 @@ jobs:
           architecture: x64
           impl: hotspot
           targets: 'JAVA13_HOME'
+
+      - name: Install JDK 17
+        uses: AdoptOpenJDK/install-jdk@v1
+        with:
+          version: '17'
+          architecture: x64
+          impl: hotspot
+          targets: 'JAVA17_HOME'
 
       - name: Install Matrix JDK
         uses: AdoptOpenJDK/install-jdk@v1

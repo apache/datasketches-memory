@@ -61,6 +61,8 @@ PackageManifest=${PackageMeta}/MANIFEST.MF
 
 MemoryJava8Src=datasketches-memory-java8/src/main/java
 MemoryJava11Src=datasketches-memory-java11/src/main/java
+MemoryJava17Src=datasketches-memory-java17/src/main/java
+AssemblyResources=datasketches-memory/src/main/resources
 
 #### Move to project directory ####
 cd ${ProjectBaseDir}
@@ -81,8 +83,8 @@ else
   echo "No version information could be determined from installed JDK."; exit 1;
 fi
 
-# Exit if Java version too low (< 8) or too high (> 13)
-if [[ $JavaVersion -lt 8 || $JavaVersion -gt 13 ]]; then
+# Exit if Java version too low (< 8) or too high (> 17)
+if [[ $JavaVersion -lt 8 || $JavaVersion -gt 17 ]]; then
   echo "Java version not supported: " $JavaVersion; exit 1;
 fi
 
@@ -113,6 +115,12 @@ rsync -a -I $MemoryJava8Src $PackageSrc
 if [[ $JavaVersion -gt 10 ]]; then
   #### Copy java 11 src trees to target/src, overwriting replacements
   rsync -a -I $MemoryJava11Src $PackageSrc
+  cp $AssemblyResources/module-info-j11.java $PackageSrc/java/module-info.java
+elif [[ $JavaVersion -gt 13 ]]; then
+  #### Copy java 11 and 17 src trees to target/src, overwriting replacements
+  rsync -a -I $MemoryJava11Src $PackageSrc
+  rsync -a -I $MemoryJava17Src $PackageSrc
+  cp $AssemblyResources/module-info-j17.java $PackageSrc/java/module-info.java
 fi
 
 #### Compile ####
@@ -121,12 +129,15 @@ echo
 echo "Compiling with JDK version $JavaVersion..."
 if [[ $JavaVersion -lt 9 ]]; then
   ${Javac_} -d $PackageContents $(find $PackageSrc -name '*.java')
-else
+elif [[ $JavaVersion -lt 14 ]]; then
   # Compile with JPMS exports
   ${Javac_} \
     --add-exports java.base/jdk.internal.ref=org.apache.datasketches.memory \
     --add-exports java.base/sun.nio.ch=org.apache.datasketches.memory \
     -d $PackageContents $(find $PackageSrc -name '*.java')
+elif [[ $JavaVersion -gt 13 ]]; then
+  # Java 17 does not require JPMS exports
+  ${Javac_} -d $PackageContents $(find $PackageSrc -name '*.java')
 fi
 echo
 echo "--- JARS ---"

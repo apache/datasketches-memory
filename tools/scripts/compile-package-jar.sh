@@ -110,17 +110,17 @@ EOF
 echo "$($ScriptsDir/getGitProperties.sh $ProjectBaseDir $ProjectArtifactId $GitTag)" >> $PackageManifest
 
 #### Copy source tree to target/src
-rsync -a -I $MemoryJava8Src $PackageSrc
-
-if [[ $JavaVersion -gt 10 ]]; then
-  #### Copy java 11 src trees to target/src, overwriting replacements
-  rsync -a -I $MemoryJava11Src $PackageSrc
-  cp $AssemblyResources/module-info-j11.java $PackageSrc/java/module-info.java
+if [[ $JavaVersion -eq 8 ]]; then
+  rsync -a -I $MemoryJava8Src $PackageSrc
 elif [[ $JavaVersion -gt 13 ]]; then
-  #### Copy java 11 and 17 src trees to target/src, overwriting replacements
-  rsync -a -I $MemoryJava11Src $PackageSrc
+  #### Copy java 17 src trees to target/src, overwriting replacements
   rsync -a -I $MemoryJava17Src $PackageSrc
   cp $AssemblyResources/module-info-j17.java $PackageSrc/java/module-info.java
+elif [[ $JavaVersion -gt 10 ]]; then
+  #### Copy java 11 src trees to target/src, overwriting replacements
+  rsync -a -I $MemoryJava8Src $PackageSrc
+  rsync -a -I $MemoryJava11Src $PackageSrc
+  cp $AssemblyResources/module-info-j11.java $PackageSrc/java/module-info.java
 fi
 
 #### Compile ####
@@ -157,7 +157,7 @@ echo
 if [[ $JavaVersion -eq 8 ]]; then
   ${Javac_} -cp $OutputJar -d $PackageTests $(find $ScriptsDir -name '*.java')
   ${Java_} -cp $PackageTests:$OutputJar org.apache.datasketches.memory.tools.scripts.CheckMemoryJar $MemoryMapFile
-else
+elif [[ $JavaVersion -lt 17 ]]; then
   ${Javac_} \
     --add-modules org.apache.datasketches.memory \
     -p "$OutputJar" -d $PackageTests $(find $ScriptsDir -name '*.java')
@@ -169,6 +169,8 @@ else
     --add-opens java.base/java.nio=org.apache.datasketches.memory \
     --add-opens java.base/sun.nio.ch=org.apache.datasketches.memory \
     -p $OutputJar -cp $PackageTests org.apache.datasketches.memory.tools.scripts.CheckMemoryJar $MemoryMapFile
+else
+echo "Skipping checks for Java17...for now."
 fi
 echo
 echo "Successfully built ${OutputJar}"

@@ -533,6 +533,7 @@ under the License.
     <module>datasketches-memory-java8</module>
     <module>datasketches-memory-java8-tests</module>
     <module>datasketches-memory-java11</module>
+    <module>datasketches-memory-java17</module>
     <module>datasketches-memory</module>
     <module>datasketches-memory-resources</module>
   </modules>

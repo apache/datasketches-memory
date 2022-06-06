@@ -49,7 +49,7 @@
                     <configuration>
                         <compilerArgs>
                             <arg>--add-exports</arg>
-                            <arg>java.base/jdk.internal.ref=org.apache.datasketches.memory</arg>
+                            <arg>java.base/jdk.internal.ref=ALL-UNNAMED</arg>
                         </compilerArgs>
                     </configuration>
                 </plugin>

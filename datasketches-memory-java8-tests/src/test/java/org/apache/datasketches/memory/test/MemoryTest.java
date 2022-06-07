@@ -21,44 +21,45 @@
  * Note: Lincoln's Gettysburg Address is in the public domain. See LICENSE.
  */
 
-package org.apache.datasketches.memory.test;
+package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.Util.getResourceFile;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
-import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
 
 import org.apache.datasketches.memory.BaseState;
-import org.apache.datasketches.memory.MapHandle;
 import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableBuffer;
-import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
-import org.apache.datasketches.memory.internal.Util;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.testng.collections.Lists;
 
+import jdk.incubator.foreign.ResourceScope;
+
 public class MemoryTest {
   private static final String LS = System.getProperty("line.separator");
+  private static final MemoryRequestServer memReqSvr = BaseState.defaultMemReqSvr;
+
 
   @BeforeClass
-  public void setReadOnly() {
+  public void setReadOnly() throws IOException {
     UtilTest.setGettysburgAddressFileToReadOnly();
   }
 
   @Test
   public void checkDirectRoundTrip() throws Exception {
     int n = 1024; //longs
-    try (WritableHandle wh = WritableMemory.allocateDirect(n * 8)) {
-      WritableMemory mem = wh.getWritable();
+    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
+      WritableMemory mem = WritableMemory.allocateDirect(n * 8, scope, memReqSvr);
       for (int i = 0; i < n; i++) {
         mem.putLong(i * 8, i);
       }
@@ -100,7 +101,6 @@ public class MemoryTest {
       assertEquals(v, i);
     }
     // check 0 length array wraps
-    Memory memZeroLengthArrayBoolean = WritableMemory.writableWrap(new boolean[0]);
     Memory memZeroLengthArrayByte = WritableMemory.writableWrap(new byte[0]);
     Memory memZeroLengthArrayChar = WritableMemory.writableWrap(new char[0]);
     Memory memZeroLengthArrayShort = WritableMemory.writableWrap(new short[0]);
@@ -108,7 +108,6 @@ public class MemoryTest {
     Memory memZeroLengthArrayLong = WritableMemory.writableWrap(new long[0]);
     Memory memZeroLengthArrayFloat = WritableMemory.writableWrap(new float[0]);
     Memory memZeroLengthArrayDouble = WritableMemory.writableWrap(new double[0]);
-    assertEquals(memZeroLengthArrayBoolean.getCapacity(), 0);
     assertEquals(memZeroLengthArrayByte.getCapacity(), 0);
     assertEquals(memZeroLengthArrayChar.getCapacity(), 0);
     assertEquals(memZeroLengthArrayShort.getCapacity(), 0);
@@ -121,7 +120,6 @@ public class MemoryTest {
     List<Memory> memoryToCheck = Lists.newArrayList();
     memoryToCheck.add(WritableMemory.allocate(0));
     memoryToCheck.add(WritableMemory.writableWrap(ByteBuffer.allocate(0)));
-    memoryToCheck.add(WritableMemory.writableWrap(new boolean[0]));
     memoryToCheck.add(WritableMemory.writableWrap(new byte[0]));
     memoryToCheck.add(WritableMemory.writableWrap(new char[0]));
     memoryToCheck.add(WritableMemory.writableWrap(new short[0]));
@@ -130,7 +128,6 @@ public class MemoryTest {
     memoryToCheck.add(WritableMemory.writableWrap(new float[0]));
     memoryToCheck.add(WritableMemory.writableWrap(new double[0]));
     memoryToCheck.add(Memory.wrap(ByteBuffer.allocate(0)));
-    memoryToCheck.add(Memory.wrap(new boolean[0]));
     memoryToCheck.add(Memory.wrap(new byte[0]));
     memoryToCheck.add(Memory.wrap(new char[0]));
     memoryToCheck.add(Memory.wrap(new short[0]));
@@ -176,6 +173,36 @@ public class MemoryTest {
   }
 
   @Test
+  public void checkByteBufferNonNativeHeap() {
+    int n = 10; //longs
+    byte[] arr = new byte[n * 8];
+    ByteBuffer bb = ByteBuffer.wrap(arr); //non-native order
+    WritableMemory wmem = WritableMemory.writableWrap(bb, BaseState.NON_NATIVE_BYTE_ORDER);
+    for (int i = 0; i < n; i++) { //write to wmem
+      wmem.putLong(i * 8, i);
+    }
+    for (int i = 0; i < n; i++) { //read from wmem
+      long v = wmem.getLong(i * 8);
+      assertEquals(v, i);
+    }
+    for (int i = 0; i < n; i++) { //read from BB
+      long v = bb.getLong(i * 8);
+      assertEquals(v, i);
+    }
+    Memory mem1 = Memory.wrap(arr, BaseState.NON_NATIVE_BYTE_ORDER);
+    for (int i = 0; i < n; i++) { //read from wrapped arr
+      long v = mem1.getLong(i * 8);
+      assertEquals(v, i);
+    }
+    //convert to RO
+    Memory mem = wmem;
+    for (int i = 0; i < n; i++) {
+      long v = mem.getLong(i * 8);
+      assertEquals(v, i);
+    }
+  }
+
+  @Test
   public void checkByteBufDirect() {
     int n = 1024; //longs
     ByteBuffer bb = ByteBuffer.allocateDirect(n * 8);
@@ -206,13 +233,17 @@ public class MemoryTest {
   }
 
   @Test
-  public void checkByteBufWrongOrder() {
+  public void checkByteBufOrderIgnored() {
     int n = 1024; //longs
     ByteBuffer bb = ByteBuffer.allocate(n * 8);
-    bb.order(ByteOrder.BIG_ENDIAN);
-    Memory mem = Memory.wrap(bb);
-    assertFalse(mem.getTypeByteOrder() == ByteOrder.nativeOrder());
-    assertEquals(mem.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
+    bb.order(ByteOrder.BIG_ENDIAN); //ignored
+    Memory mem = Memory.wrap(bb); //Defaults to LE
+    assertTrue(mem.getByteOrder() == ByteOrder.nativeOrder());
+    assertEquals(mem.getByteOrder(), ByteOrder.LITTLE_ENDIAN);
+    //Now explicitly set it
+    mem = Memory.wrap(bb, BaseState.NON_NATIVE_BYTE_ORDER);
+    assertFalse(mem.getByteOrder() == ByteOrder.nativeOrder());
+    assertEquals(mem.getByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test
@@ -227,7 +258,7 @@ public class MemoryTest {
     for (int i = 0; i < 64; i++) {
       assertEquals(mem.getByte(i), 64 + i);
     }
-    mem.toHexString("slice", 0, slice.capacity());
+    mem.toHexString("slice", 0, slice.capacity(), true);
     //println(s);
   }
 
@@ -267,7 +298,7 @@ public class MemoryTest {
     long[] arr = new long[n];
     for (int i = 0; i < n; i++) { arr[i] = i; }
     Memory mem = Memory.wrap(arr);
-    Memory reg = mem.region(n2 * 8, n2 * 8, Util.NON_NATIVE_BYTE_ORDER); //top half
+    Memory reg = mem.region(n2 * 8, n2 * 8, BaseState.NON_NATIVE_BYTE_ORDER); //top half
     for (int i = 0; i < n2; i++) {
       long v = Long.reverseBytes(reg.getLong(i * 8));
       long e = i + n2;
@@ -307,7 +338,7 @@ public class MemoryTest {
       //println("" + wmem.getLong(i * 8));
     }
     //println("");
-    WritableMemory reg = wmem.writableRegion(n2 * 8, n2 * 8, Util.NON_NATIVE_BYTE_ORDER);
+    WritableMemory reg = wmem.writableRegion(n2 * 8, n2 * 8, BaseState.NON_NATIVE_BYTE_ORDER);
     for (int i = 0; i < n2; i++) { reg.putLong(i * 8, i); }
     for (int i = 0; i < n; i++) {
       long v = wmem.getLong(i * 8);
@@ -320,123 +351,73 @@ public class MemoryTest {
     }
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @SuppressWarnings("resource")
+  @Test(expectedExceptions = IllegalStateException.class)
   public void checkParentUseAfterFree() throws Exception {
     int bytes = 64 * 8;
-    WritableHandle wh = WritableMemory.allocateDirect(bytes);
-    WritableMemory wmem = wh.getWritable();
-    wh.close();
+    ResourceScope scope = ResourceScope.newConfinedScope();
+    WritableMemory wmem = WritableMemory.allocateDirect(bytes, scope, memReqSvr);
+    wmem.close();
     //with -ea assert: Memory not valid.
     //with -da sometimes segfaults, sometimes passes!
     wmem.getLong(0);
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @SuppressWarnings("resource")
+  @Test(expectedExceptions = IllegalStateException.class)
   public void checkRegionUseAfterFree() throws Exception {
     int bytes = 64;
-    WritableHandle wh = WritableMemory.allocateDirect(bytes);
-    Memory wmem = wh.get();
+    ResourceScope scope = ResourceScope.newConfinedScope();
+    WritableMemory wmem = WritableMemory.allocateDirect(bytes, scope, memReqSvr);
     Memory region = wmem.region(0L, bytes);
-    wh.close();
+    wmem.close();
     //with -ea assert: Memory not valid.
     //with -da sometimes segfaults, sometimes passes!
     region.getByte(0);
   }
 
   @Test
-  public void checkMonitorDirectStats() throws Exception {
-    int bytes = 1024;
-    long curAllocations = BaseState.getCurrentDirectMemoryAllocations();
-    long curAllocated   = BaseState.getCurrentDirectMemoryAllocated();
-    if (curAllocations != 0) { System.err.println(curAllocations + " should be zero!"); }
-    WritableHandle wh1 = WritableMemory.allocateDirect(bytes);
-    WritableHandle wh2 = WritableMemory.allocateDirect(bytes);
-    assertEquals(BaseState.getCurrentDirectMemoryAllocations(), 2L + curAllocations);
-    assertEquals(BaseState.getCurrentDirectMemoryAllocated(), 2 * bytes + curAllocated);
-
-    wh1.close();
-    assertEquals(BaseState.getCurrentDirectMemoryAllocations(), 1L + curAllocations);
-    assertEquals(BaseState.getCurrentDirectMemoryAllocated(), bytes + curAllocated);
-
-    wh2.close();
-    wh2.close(); //check that it doesn't go negative.
-    //even though the handles are closed, these methods are static access
-    assertEquals(BaseState.getCurrentDirectMemoryAllocations(), 0L + curAllocations);
-    assertEquals(BaseState.getCurrentDirectMemoryAllocated(), 0L + curAllocated);
-  }
-
-  @Test
-  public void checkMonitorDirectMapStats() throws Exception {
-    File file = getResourceFile("GettysburgAddress.txt");
-    long bytes = file.length();
-
-    MapHandle mmh1 = Memory.map(file);
-    MapHandle mmh2 = Memory.map(file);
-
-    assertEquals(BaseState.getCurrentDirectMemoryMapAllocations(), 2L);
-    assertEquals(BaseState.getCurrentDirectMemoryMapAllocated(), 2 * bytes);
-
-    mmh1.close();
-    assertEquals(BaseState.getCurrentDirectMemoryMapAllocations(), 1L);
-    assertEquals(BaseState.getCurrentDirectMemoryMapAllocated(), bytes);
-
-    mmh2.close();
-    mmh2.close(); //check that it doesn't go negative.
-    //even though the handles are closed, these methods are static access
-    assertEquals(BaseState.getCurrentDirectMemoryMapAllocations(), 0L);
-    assertEquals(BaseState.getCurrentDirectMemoryMapAllocated(), 0L);
-  }
-
-  @Test
   public void checkMemReqSvr() throws Exception {
     WritableMemory wmem;
     WritableBuffer wbuf;
-    if (BaseState.defaultMemReqSvr == null) { //This is a policy choice
-      //ON HEAP
-      wmem = WritableMemory.writableWrap(new byte[16]);
-      assertNull(wmem.getMemoryRequestServer());
-      wbuf = wmem.asWritableBuffer();
-      assertNull(wbuf.getMemoryRequestServer());
-      //OFF HEAP
-      try (WritableHandle wdh = WritableMemory.allocateDirect(16)) { //OFF HEAP
-        wmem = wdh.getWritable();
-        assertNull(wmem.getMemoryRequestServer());
-        wbuf = wmem.asWritableBuffer();
-        assertNull(wbuf.getMemoryRequestServer());
-      }
-      //ByteBuffer
-      ByteBuffer bb = ByteBuffer.allocate(16);
-      wmem = WritableMemory.writableWrap(bb);
-      assertNull(wmem.getMemoryRequestServer());
-      wbuf = wmem.asWritableBuffer();
-      assertNull(wbuf.getMemoryRequestServer());
-    } else {
-      //ON HEAP
-      wmem = WritableMemory.writableWrap(new byte[16]);
-      assertNotNull(wmem.getMemoryRequestServer());
-      wbuf = wmem.asWritableBuffer();
-      assertNotNull(wbuf.getMemoryRequestServer());
-      //OFF HEAP
-      try (WritableHandle wdh = WritableMemory.allocateDirect(16)) {
-        WritableMemory wmem2 = wdh.getWritable();
-        assertNotNull(wmem2.getMemoryRequestServer());
-        wbuf = wmem.asWritableBuffer();
-        assertNotNull(wbuf.getMemoryRequestServer());
-      }
-      //ByteBuffer
-      ByteBuffer bb = ByteBuffer.allocate(16);
-      wmem = WritableMemory.writableWrap(bb);
+
+    //ON HEAP
+    wmem = WritableMemory.writableWrap(new byte[16]);
+    assertNull(wmem.getMemoryRequestServer());
+    wbuf = wmem.asWritableBuffer();
+    assertNull(wbuf.getMemoryRequestServer());
+    //OFF HEAP
+    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
+       wmem = WritableMemory.allocateDirect(16, scope, memReqSvr);  //OFF HEAP
       assertNotNull(wmem.getMemoryRequestServer());
       wbuf = wmem.asWritableBuffer();
       assertNotNull(wbuf.getMemoryRequestServer());
     }
-  }
+    //ByteBuffer
+    ByteBuffer bb = ByteBuffer.allocate(16);
+    wmem = WritableMemory.writableWrap(bb);
+    assertNull(wmem.getMemoryRequestServer());
+    wbuf = wmem.asWritableBuffer();
+    assertNull(wbuf.getMemoryRequestServer());
 
-  @Test
-  public void checkHashCode() {
-    WritableMemory wmem = WritableMemory.allocate(32 + 7);
-    int hc = wmem.hashCode();
-    assertEquals(hc, -1895166923);
+    //ON HEAP
+    wmem = WritableMemory.writableWrap(new byte[16], 0, 16, BaseState.NATIVE_BYTE_ORDER, memReqSvr);
+    assertNotNull(wmem.getMemoryRequestServer());
+    wbuf = wmem.asWritableBuffer();
+    assertNotNull(wbuf.getMemoryRequestServer());
+    //OFF HEAP
+    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
+      WritableMemory wmem2 = WritableMemory.allocateDirect(16, scope, memReqSvr);
+      assertNotNull(wmem2.getMemoryRequestServer());
+      wbuf = wmem.asWritableBuffer();
+      assertNotNull(wbuf.getMemoryRequestServer());
+    }
+    //ByteBuffer
+    bb = ByteBuffer.allocate(16);
+    wmem = WritableMemory.writableWrap(bb);
+    assertNull(wmem.getMemoryRequestServer());
+    wbuf = wmem.asWritableBuffer();
+    assertNull(wbuf.getMemoryRequestServer());
   }
 
   @Test

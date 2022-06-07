@@ -17,13 +17,14 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.test;
+package org.apache.datasketches.memory.internal;
 
 import static org.testng.Assert.assertEquals;
 
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.Buffer;
+import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
@@ -239,22 +240,40 @@ public class NonNativeWritableBufferImplTest {
     WritableMemory wmem = WritableMemory.writableWrap(bArr, ByteOrder.BIG_ENDIAN);
     WritableBuffer wbuf = wmem.asWritableBuffer();
     WritableBuffer wdup = wbuf.writableDuplicate();
-    assertEquals(wdup.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(wdup.getByteOrder(), ByteOrder.BIG_ENDIAN);
 
     WritableBuffer wreg = wbuf.writableRegion();
-    assertEquals(wreg.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(wreg.getByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test
-  public void checkDuplicateZeros() {
-    byte[] bArr = new byte[0];
+  public void checkConversionByteOrder() {
+    byte[] bArr = new byte[8];
+    bArr[1] = 1;
     WritableMemory wmem = WritableMemory.writableWrap(bArr, ByteOrder.BIG_ENDIAN);
+    assertEquals(wmem.getByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(wmem.getChar(0), 1);
+
     Buffer buf = wmem.asBuffer();
+    assertEquals(buf.getByteOrder(), ByteOrder.BIG_ENDIAN); //
+    assertEquals(buf.getChar(0), 1);
+
     Buffer dup = buf.duplicate();
-    assertEquals(dup.getTypeByteOrder(), ByteOrder.LITTLE_ENDIAN);
+    assertEquals(dup.getByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(dup.getChar(0), 1);
 
     Buffer reg = buf.region();
-    assertEquals(reg.getTypeByteOrder(), ByteOrder.LITTLE_ENDIAN);
+    assertEquals(reg.getByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(reg.getChar(0), 1);
+
+    Memory mem = reg.asMemory();
+    assertEquals(mem.getByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(mem.getChar(0), 1);
+
+    Memory mreg = mem.region(0, 8);
+    assertEquals(mreg.getByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(mreg.getChar(0), 1);
+
   }
 
 }

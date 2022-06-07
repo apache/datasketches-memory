@@ -17,13 +17,10 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.test;
+package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_DOUBLE_INDEX_SCALE;
-import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 
 import java.nio.ByteOrder;
 
@@ -31,19 +28,9 @@ import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
-import org.apache.datasketches.memory.internal.BaseStateImpl;
-import org.apache.datasketches.memory.internal.Prim;
-import org.apache.datasketches.memory.internal.StepBoolean;
-import org.apache.datasketches.memory.internal.Util;
 import org.testng.annotations.Test;
 
 public class BaseStateTest {
-
-  @Test
-  public void checkPrimOffset() {
-    int off = (int)Prim.BYTE.off();
-    assertTrue(off > 0);
-  }
 
   @Test
   public void checkIsSameResource() {
@@ -65,55 +52,10 @@ public class BaseStateTest {
     assertFalse(mem.equalTo(0, arr, 0, 8));
   }
 
-  //StepBoolean checks
-  @Test
-  public void checkStepBoolean() {
-    checkStepBoolean(true);
-    checkStepBoolean(false);
-  }
-
-  private static void checkStepBoolean(boolean initialState) {
-    StepBoolean step = new StepBoolean(initialState);
-    assertTrue(step.get() == initialState); //confirm initialState
-    step.change();
-    assertTrue(step.hasChanged());      //1st change was successful
-    assertTrue(step.get() != initialState); //confirm it is different from initialState
-    step.change();
-    assertTrue(step.get() != initialState); //Still different from initialState
-    assertTrue(step.hasChanged());  //confirm it was changed from initialState value
-  }
-
-  @Test
-  public void checkPrim() {
-    assertEquals(Prim.DOUBLE.scale(), ARRAY_DOUBLE_INDEX_SCALE);
-  }
-
-  @Test
-  public void checkGetNativeBaseOffset_Heap() throws Exception {
-    WritableMemory wmem = WritableMemory.allocate(8); //heap
-    final long offset = ReflectUtil.getNativeBaseOffset(wmem);
-    assertEquals(offset, 0L);
-  }
-
   @Test
   public void checkIsByteOrderCompatible() {
     WritableMemory wmem = WritableMemory.allocate(8);
     assertTrue(wmem.isByteOrderCompatible(ByteOrder.nativeOrder()));
-  }
-
-  @Test(expectedExceptions = IllegalArgumentException.class)
-  public void checkByteOrderNull() {
-    Util.isNativeByteOrder(null);
-    fail();
-  }
-
-  @Test
-  public void checkIsNativeByteOrder() {
-    assertTrue(BaseStateImpl.isNativeByteOrder(ByteOrder.nativeOrder()));
-    try {
-      BaseStateImpl.isNativeByteOrder(null);
-      fail();
-    } catch (final IllegalArgumentException e) {}
   }
 
   @Test
@@ -125,9 +67,26 @@ public class BaseStateTest {
 
   @Test
   public void checkTypeDecode() {
-    for (int i = 0; i < 128; i++) {
-      BaseStateImpl.typeDecode(i);
+    for (int i = 0; i < 256; i++) {
+      String str = BaseStateImpl.typeDecode(i);
+      println(i + "\t" + str);
     }
+  }
+
+  @Test
+  public void checkToHexString() {
+    WritableMemory mem = WritableMemory.writableWrap(new byte[16]);
+    println(mem.toHexString("baseMem", 0, 16, true));
+    for (int i = 0; i < 16; i++) { mem.putByte(i, (byte)i); }
+    Buffer buf = mem.asBuffer();
+    println(buf.toHexString("buffer", 0, 16, true));
+  }
+
+  @Test
+  public void checkToMemorySegment() {
+    WritableMemory mem = WritableMemory.allocate(8);
+    mem.toMemorySegment();
+    mem.asByteBufferView(ByteOrder.nativeOrder());
   }
 
   /********************/

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.test;
+package org.apache.datasketches.memory.internal;
 
 import static org.testng.Assert.assertEquals;
 
@@ -25,21 +25,24 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
 
-import org.apache.datasketches.memory.WritableHandle;
+import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 import org.testng.collections.Lists;
 
-public class BufferTest {
+import jdk.incubator.foreign.ResourceScope;
 
+public class BufferTest {
+  private final MemoryRequestServer memReqSvr = BaseState.defaultMemReqSvr;
   @Test
   public void checkDirectRoundTrip() throws Exception {
     int n = 1024; //longs
-    try (WritableHandle wh = WritableMemory.allocateDirect(n * 8)) {
-      WritableMemory wmem = wh.getWritable();
+    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
+    WritableMemory wmem = WritableMemory.allocateDirect(n * 8, scope, memReqSvr);
       WritableBuffer wbuf = wmem.asWritableBuffer();
       for (int i = 0; i < n; i++) {
         wbuf.putLong(i);
@@ -94,7 +97,6 @@ public class BufferTest {
     buffersToCheck.add(WritableMemory.allocate(0).asBuffer());
     buffersToCheck.add(WritableBuffer.writableWrap(ByteBuffer.allocate(0)));
     buffersToCheck.add(Buffer.wrap(ByteBuffer.allocate(0)));
-    buffersToCheck.add(Memory.wrap(new boolean[0]).asBuffer());
     buffersToCheck.add(Memory.wrap(new byte[0]).asBuffer());
     buffersToCheck.add(Memory.wrap(new char[0]).asBuffer());
     buffersToCheck.add(Memory.wrap(new short[0]).asBuffer());
@@ -201,9 +203,9 @@ public class BufferTest {
   public void checkByteBufBigEndianOrder() {
     int n = 1024; //longs
     ByteBuffer bb = ByteBuffer.allocate(n * 8);
-    bb.order(ByteOrder.BIG_ENDIAN);
+    bb.order(BaseState.NON_NATIVE_BYTE_ORDER);
     Buffer buf = Buffer.wrap(bb);
-    assertEquals(buf.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(buf.getByteOrder(), ByteOrder.nativeOrder());
   }
 
   @Test
@@ -220,7 +222,7 @@ public class BufferTest {
     for (int i = 0; i < 64; i++) {
       assertEquals(buf.getByte(), 64 + i);
     }
-    buf.toHexString("slice", 0, slice.capacity());
+    buf.toHexString("slice", 0, slice.capacity(), true);
     //println(s);
   }
 
@@ -279,29 +281,28 @@ public class BufferTest {
     }
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @SuppressWarnings("resource")
+  @Test(expectedExceptions = IllegalStateException.class)
   public void checkParentUseAfterFree() throws Exception {
     int bytes = 64 * 8;
-    WritableHandle wh = WritableMemory.allocateDirect(bytes);
-    WritableMemory wmem = wh.getWritable();
+    WritableMemory wmem = WritableMemory.allocateDirect(bytes, ResourceScope.newConfinedScope(), memReqSvr);
     WritableBuffer wbuf = wmem.asWritableBuffer();
-    wh.close();
+    wbuf.close();
     //with -ea assert: Memory not valid.
     //with -da sometimes segfaults, sometimes passes!
     wbuf.getLong();
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @SuppressWarnings("resource")
+  @Test(expectedExceptions = IllegalStateException.class)
   public void checkRegionUseAfterFree() throws Exception {
     int bytes = 64;
-    WritableHandle wh = WritableMemory.allocateDirect(bytes);
-    Memory wmem = wh.get();
-
-    Buffer reg = wmem.asBuffer().region();
-    wh.close();
+    WritableMemory wmem = WritableMemory.allocateDirect(bytes, ResourceScope.newConfinedScope(), memReqSvr);
+    Buffer region = wmem.asBuffer().region();
+    region.close();
     //with -ea assert: Memory not valid.
     //with -da sometimes segfaults, sometimes passes!
-    reg.getByte();
+    region.getByte();
   }
 
   @Test(expectedExceptions = AssertionError.class)

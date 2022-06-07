@@ -17,22 +17,25 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.test;
+package org.apache.datasketches.memory.internal;
 
 import static org.testng.Assert.assertEquals;
 
-import org.apache.datasketches.memory.WritableHandle;
+import org.apache.datasketches.memory.BaseState;
+import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
-public class CommonBufferTest {
+import jdk.incubator.foreign.ResourceScope;
 
+public class CommonBufferTest {
+  private final MemoryRequestServer memReqSvr = BaseState.defaultMemReqSvr;
   @Test
   public void checkSetGet() throws Exception {
     int memCapacity = 60; //must be at least 60
-    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh.getWritable();
+    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
+      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, scope, memReqSvr);
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
       setGetTests(buf);
@@ -133,8 +136,8 @@ public class CommonBufferTest {
   @Test
   public void checkSetGetArrays() throws Exception {
     int memCapacity = 32;
-    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh.getWritable();
+    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
+      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, scope, memReqSvr);
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
       setGetArraysTests(buf);
@@ -143,18 +146,6 @@ public class CommonBufferTest {
 
   public static void setGetArraysTests(WritableBuffer buf) {
     int words = 4;
-
-    boolean[] srcArray1 = {true, false, true, false};
-    boolean[] dstArray1 = new boolean[words];
-    buf.resetPosition();
-    buf.fill((byte)127);
-    buf.resetPosition();
-    buf.putBooleanArray(srcArray1, 0, words);
-    buf.resetPosition();
-    buf.getBooleanArray(dstArray1, 0, words);
-    for (int i=0; i<words; i++) {
-      assertEquals(dstArray1[i], srcArray1[i]);
-    }
 
     byte[] srcArray2 = { 1, -2, 3, -4 };
     byte[] dstArray2 = new byte[4];
@@ -186,7 +177,7 @@ public class CommonBufferTest {
       assertEquals(dstArray4[i], srcArray4[i], 0.0);
     }
 
-    float[] srcArray5 = { (float)1.0, (float)-2.0, (float)3.0, (float)-4.0 };
+    float[] srcArray5 = { 1.0F, -2.0F, 3.0F, -4.0F };
     float[] dstArray5 = new float[words];
     buf.resetPosition();
     buf.putFloatArray(srcArray5, 0, words);
@@ -230,8 +221,8 @@ public class CommonBufferTest {
   @Test
   public void checkSetGetPartialArraysWithOffset() throws Exception {
     int memCapacity = 32;
-    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh.getWritable();
+    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
+      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, scope, memReqSvr);
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
       setGetPartialArraysWithOffsetTests(buf);
@@ -240,15 +231,6 @@ public class CommonBufferTest {
 
   public static void setGetPartialArraysWithOffsetTests(WritableBuffer buf) {
     int items= 4;
-    boolean[] srcArray1 = {true, false, true, false};
-    boolean[] dstArray1 = new boolean[items];
-    buf.resetPosition();
-    buf.putBooleanArray(srcArray1, 2, items/2);
-    buf.resetPosition();
-    buf.getBooleanArray(dstArray1, 2, items/2);
-    for (int i=2; i<items; i++) {
-      assertEquals(dstArray1[i], srcArray1[i]);
-    }
 
     byte[] srcArray2 = { 1, -2, 3, -4 };
     byte[] dstArray2 = new byte[items];
@@ -280,7 +262,7 @@ public class CommonBufferTest {
       assertEquals(dstArray4[i], srcArray4[i], 0.0);
     }
 
-    float[] srcArray5 = { (float)1.0, (float)-2.0, (float)3.0, (float)-4.0 };
+    float[] srcArray5 = { 1.0F, -2.0F, 3.0F, -4.0F };
     float[] dstArray5 = new float[items];
     buf.resetPosition();
     buf.putFloatArray(srcArray5, 2, items/2);
@@ -324,8 +306,8 @@ public class CommonBufferTest {
   @Test
   public void checkSetClearMemoryRegions() throws Exception {
     int memCapacity = 64; //must be 64
-    try (WritableHandle wrh1 = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh1.getWritable();
+    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
+      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, scope, memReqSvr);
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
 
@@ -413,8 +395,8 @@ public class CommonBufferTest {
   @Test
   public void checkToHexStringAllMem() throws Exception {
     int memCapacity = 48; //must be 48
-    try (WritableHandle wrh1 = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem = wrh1.getWritable();
+    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
+      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, scope, memReqSvr);
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
       toHexStringAllMemTests(buf); //requires println enabled to visually check

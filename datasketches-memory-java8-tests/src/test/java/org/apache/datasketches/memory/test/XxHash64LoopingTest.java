@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.test;
+package org.apache.datasketches.memory.internal;
 
 import static org.testng.Assert.assertEquals;
 

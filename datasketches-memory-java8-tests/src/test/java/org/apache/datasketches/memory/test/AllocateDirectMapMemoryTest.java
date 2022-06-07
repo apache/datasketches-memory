@@ -21,9 +21,9 @@
  * Note: Lincoln's Gettysburg Address is in the public domain. See LICENSE.
  */
 
-package org.apache.datasketches.memory.test;
+package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.Util.*;
+import static org.apache.datasketches.memory.internal.Util.getResourceFile;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -32,40 +32,39 @@ import static org.testng.Assert.fail;
 import java.io.File;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.MapHandle;
 import org.apache.datasketches.memory.Memory;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import jdk.incubator.foreign.ResourceScope;
 
 public class AllocateDirectMapMemoryTest {
   private static final String LS = System.getProperty("line.separator");
-  MapHandle hand = null;
-
-  @BeforeClass
-  public void setReadOnly() {
-    UtilTest.setGettysburgAddressFileToReadOnly();
-  }
 
   @Test
   public void simpleMap() throws Exception {
     File file = getResourceFile("GettysburgAddress.txt");
-    assertTrue(ReflectUtil.isFileReadOnly(file));
-    try (MapHandle rh = Memory.map(file)) {
-      rh.close();
+    file.setReadOnly();
+    Memory mem = null;
+    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
+      mem = Memory.map(file, scope);
     }
+    assertFalse(mem.isAlive());
   }
 
   @Test
   public void testIllegalArguments() throws Exception {
     File file = getResourceFile("GettysburgAddress.txt");
-    try (MapHandle rh = Memory.map(file, -1, Integer.MAX_VALUE, ByteOrder.nativeOrder())) {
-      fail("Failed: testIllegalArgumentException: Position was negative.");
-    } catch (IllegalArgumentException e) {
+    Memory mem = null;
+    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
+      mem = Memory.map(file, -1, Integer.MAX_VALUE, scope, ByteOrder.nativeOrder());
+      fail("Failed: test IllegalArgumentException: Position was negative.");
+      mem.getCapacity();
+    }
+    catch (IllegalArgumentException e) {
       //ok
     }
-
-    try (MapHandle rh = Memory.map(file, 0, -1, ByteOrder.nativeOrder())) {
+    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
+      mem = Memory.map(file, 0, -1, scope, ByteOrder.nativeOrder());
       fail("Failed: testIllegalArgumentException: Size was negative.");
     } catch (IllegalArgumentException e) {
       //ok
@@ -76,76 +75,45 @@ public class AllocateDirectMapMemoryTest {
   public void testMapAndMultipleClose() throws Exception {
     File file = getResourceFile("GettysburgAddress.txt");
     long memCapacity = file.length();
-    try (MapHandle rh = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
-      Memory map = rh.get();
-      assertEquals(memCapacity, map.getCapacity());
-      rh.close();
-      rh.close();
-      map.getCapacity(); //throws assertion error
-    } catch (AssertionError e) {
-      //OK
+    Memory mem = null;
+    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
+      mem = Memory.map(file, 0, memCapacity, scope, ByteOrder.nativeOrder());
+      assertEquals(memCapacity, mem.getCapacity());
+      //mem.close(); //a close inside the TWR block will throw excption when the TWR block ends
     }
-  }
-
-  @Test
-  public void testReadFailAfterClose() throws Exception {
-    File file = getResourceFile("GettysburgAddress.txt");
-    long memCapacity = file.length();
-    try (MapHandle rh = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
-      Memory mmf = rh.get();
-      rh.close();
-      mmf.getByte(0);
-    } catch (AssertionError e) {
-      //OK
-    }
+    mem.close(); //multiple closes outside the TWR block are OK, but unnecessary
+    mem.close();
   }
 
   @Test
   public void testLoad() throws Exception {
     File file = getResourceFile("GettysburgAddress.txt");
     long memCapacity = file.length();
-    try (MapHandle rh = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
-      rh.load();
-      assertTrue(rh.isLoaded());
-      rh.close();
+    Memory mem = null;
+    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
+      mem = Memory.map(file, 0, memCapacity, scope, ByteOrder.nativeOrder());
+      mem.load();
+      assertTrue(mem.isLoaded());
     }
   }
 
+  @SuppressWarnings("resource")
   @Test
-  public void testHandlerHandoffWithTWR() throws Exception {
+  public void testHandleHandoff() throws Exception {
     File file = getResourceFile("GettysburgAddress.txt");
     long memCapacity = file.length();
-    Memory mem;
-    try (MapHandle rh = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
-      rh.load();
-      assertTrue(rh.isLoaded());
-      hand = rh;
-      mem = rh.get();
-    } //TWR closes
-    assertFalse(mem.isValid());
-    //println(""+mem.isValid());
-  }
-
-  @Test
-  public void testHandoffWithoutClose() throws Exception {
-    File file = getResourceFile("GettysburgAddress.txt");
-    long memCapacity = file.length();
-    MapHandle rh = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder());
-    rh.load();
-    assertTrue(rh.isLoaded());
-    hand = rh;
-    //The receiver of the handler must close the resource, in this case it is the class.
-  }
-
-  @AfterClass
-  public void afterAllTests() throws Exception {
-      if (hand != null) {
-      Memory mem = hand.get();
-      if ((mem != null) && mem.isValid()) {
-        hand.close();
-        assertFalse(mem.isValid());
-      }
+    ResourceScope scope = ResourceScope.newConfinedScope();
+    Memory mem = Memory.map(file, 0, memCapacity, scope, ByteOrder.nativeOrder());
+    ResourceScope.Handle handle = scope.acquire();
+    try {
+      mem.load();
+      assertTrue(mem.isLoaded());
+    } finally {
+      mem.scope().release(handle);
     }
+    assertTrue(mem.isAlive());
+    mem.close(); //handle must be released before close
+    assertFalse(mem.isAlive());
   }
 
   @Test

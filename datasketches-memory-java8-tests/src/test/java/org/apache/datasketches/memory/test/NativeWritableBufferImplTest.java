@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.test;
+package org.apache.datasketches.memory.internal;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -27,55 +27,37 @@ import static org.testng.Assert.assertTrue;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.ReadOnlyException;
+import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableBuffer;
-import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
-import org.apache.datasketches.memory.internal.UnsafeUtil;
-import org.apache.datasketches.memory.internal.Util;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import jdk.incubator.foreign.ResourceScope;
+
 public class NativeWritableBufferImplTest {
+  private static final MemoryRequestServer memReqSvr = BaseState.defaultMemReqSvr;
 
   //Simple Native direct
 
+  @SuppressWarnings("resource")
   @Test
   public void checkNativeCapacityAndClose() throws Exception {
     int memCapacity = 64;
-    WritableHandle wmh = WritableMemory.allocateDirect(memCapacity);
-    WritableMemory wmem = wmh.getWritable();
+    ResourceScope scope = ResourceScope.newConfinedScope();
+    WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, scope, memReqSvr);
     WritableBuffer wbuf = wmem.asWritableBuffer();
     assertEquals(wbuf.getCapacity(), memCapacity);
 
-    wmh.close(); //intentional
-    assertFalse(wbuf.isValid());
-
-    wmh.close(); //intentional, nothing to free
+    wmem.close(); //intentional
+    assertFalse(wbuf.isAlive());
+    wmem.close(); //intentional, nothing to free
   }
 
   //Simple Heap arrays
-
-  @Test
-  public void checkBooleanArray() {
-    boolean[] srcArray = { true, false, true, false, false, true, true, false };
-    boolean[] dstArray = new boolean[8];
-
-    Buffer buf = Memory.wrap(srcArray).asBuffer();
-    buf.getBooleanArray(dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
-      assertEquals(dstArray[i], srcArray[i]);
-    }
-
-    WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
-    wbuf.getBooleanArray(dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
-      assertEquals(dstArray[i], srcArray[i]);
-    }
-    assertTrue(buf.hasArray());
-  }
 
   @Test
   public void checkByteArray() {
@@ -206,10 +188,10 @@ public class NativeWritableBufferImplTest {
   @Test
   public void checkNativeBaseBound() throws Exception {
     int memCapacity = 64;
-    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory wmem = wrh.getWritable();
+    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, scope, memReqSvr);
       WritableBuffer wbuf = wmem.asWritableBuffer();
-      wbuf.toHexString("Force Assertion Error", memCapacity, 8);
+      wbuf.toHexString("Force Assertion Error", memCapacity, 8, false);
     } catch (IllegalArgumentException e) {
       //ok
     }
@@ -218,24 +200,23 @@ public class NativeWritableBufferImplTest {
   @Test
   public void checkNativeSrcArrayBound() throws Exception {
     long memCapacity = 64;
-    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory wmem = wrh.getWritable();
+    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, scope, memReqSvr);
       WritableBuffer wbuf = wmem.asWritableBuffer();
       byte[] srcArray = { 1, -2, 3, -4 };
       wbuf.putByteArray(srcArray, 0, 5); //wrong!
-    } catch (IllegalArgumentException e) {
+    } catch (IndexOutOfBoundsException e) {
       //pass
     }
   }
 
-
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test(expectedExceptions = IndexOutOfBoundsException.class)
   public void checkRegionBounds() throws Exception {
     int memCapacity = 64;
-    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory wmem = wrh.getWritable();
+    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, scope, memReqSvr);
       WritableBuffer wbuf = wmem.asWritableBuffer();
-      wbuf.writableRegion(1, 64, wbuf.getTypeByteOrder()); //wrong!
+      wbuf.writableRegion(1, 64, wbuf.getByteOrder()); //wrong!
     }
   }
 
@@ -256,7 +237,7 @@ public class NativeWritableBufferImplTest {
     }
 
     assertTrue(wbuf.hasByteBuffer());
-    ByteBuffer byteBuf2 = wbuf.getByteBuffer();
+    ByteBuffer byteBuf2 = wbuf.toByteBuffer(ByteOrder.nativeOrder());
     assertEquals(byteBuf2, byteBuf);
     //println( mem.toHexString("HeapBB", 0, memCapacity));
   }
@@ -280,7 +261,7 @@ public class NativeWritableBufferImplTest {
     //println(mem.toHexString("HeapBB", 0, memCapacity));
   }
 
-  @Test(expectedExceptions = ReadOnlyException.class)
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void checkWrapWithBBReadonly2() {
     int memCapacity = 64;
     ByteBuffer byteBuf = ByteBuffer.allocate(memCapacity);
@@ -313,7 +294,7 @@ public class NativeWritableBufferImplTest {
     //println(mem.toHexString("HeapBB", 0, memCapacity));
   }
 
-  @Test(expectedExceptions = ReadOnlyException.class)
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void checkWrapWithDirectBBReadonlyPut() {
     int memCapacity = 64;
     ByteBuffer byteBuf = ByteBuffer.allocateDirect(memCapacity);
@@ -342,17 +323,17 @@ public class NativeWritableBufferImplTest {
     //println( mem.toHexString("HeapBB", 0, memCapacity));
   }
 
+  @SuppressWarnings("resource")
   @Test
   public void checkIsDirect() throws Exception {
     int memCapacity = 64;
     WritableBuffer mem = WritableMemory.allocate(memCapacity).asWritableBuffer();
     assertFalse(mem.isDirect());
-    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
-      WritableMemory mem2 = wrh.getWritable();
-      WritableBuffer wbuf = mem2.asWritableBuffer();
-      assertTrue(wbuf.isDirect());
-      wrh.close(); //immediate close
-    }
+    ResourceScope scope = ResourceScope.newConfinedScope();
+    WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, scope, memReqSvr);
+    WritableBuffer wbuf = wmem.asWritableBuffer();
+    assertTrue(wbuf.isDirect());
+    wmem.close(); //immediate close
   }
 
   @Test
@@ -372,7 +353,7 @@ public class NativeWritableBufferImplTest {
 
   @Test
   public void checkGoodBounds() {
-    UnsafeUtil.checkBounds(50, 50, 100);
+   BaseStateImpl.checkBounds(50, 50, 100);
   }
 
   @Test
@@ -403,18 +384,13 @@ public class NativeWritableBufferImplTest {
     byte[] arr1 = new byte[] {0, 1, 2, 3};
     byte[] arr2 = new byte[] {0, 1, 2, 4};
     byte[] arr3 = new byte[] {0, 1, 2, 3, 4};
+    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
+      WritableMemory mem1 = WritableMemory.allocateDirect(4, scope, memReqSvr);
+      WritableMemory mem2 = WritableMemory.allocateDirect(4, scope, memReqSvr);
+      WritableMemory mem3 = WritableMemory.allocateDirect(5, scope, memReqSvr);
 
-    try (WritableHandle h1 = WritableMemory.allocateDirect(4);
-        WritableHandle h2 = WritableMemory.allocateDirect(4);
-        WritableHandle h3 = WritableMemory.allocateDirect(5))
-    {
-      WritableMemory mem1 = h1.getWritable();
       mem1.putByteArray(0, arr1, 0, 4);
-
-      WritableMemory mem2 = h2.getWritable();
       mem2.putByteArray(0, arr2, 0, 4);
-
-      WritableMemory mem3 = h3.getWritable();
       mem3.putByteArray(0, arr3, 0, 5);
 
       Buffer buf1 = mem1.asBuffer();
@@ -456,7 +432,7 @@ public class NativeWritableBufferImplTest {
     for (int i = 0; i < 64; i++) { wmem.putByte(i, (byte)i); }
 
     WritableBuffer wbuf = wmem.asWritableBuffer().writableDuplicate();
-    wbuf.checkValidAndBounds(0, 64);
+
     for (int i = 0; i < 64; i++) {
       assertEquals(wbuf.getByte(), i);
     }
@@ -469,19 +445,8 @@ public class NativeWritableBufferImplTest {
     for (int i = 0; i < 64; i++) {
       assertEquals(wmem2.getByte(i), i);
     }
-    WritableMemory wmem3 = wbuf.asWritableMemory();
-    wmem3.checkValidAndBounds(0, 64);
-  }
+    wbuf.asWritableMemory();
 
-  @Test
-  public void checkCumAndRegionOffset() {
-    WritableMemory wmem = WritableMemory.allocate(64);
-    WritableMemory reg = wmem.writableRegion(32, 32);
-    WritableBuffer buf = reg.asWritableBuffer();
-    assertEquals(buf.getRegionOffset(), 32);
-    assertEquals(buf.getRegionOffset(0), 32);
-    assertEquals(buf.getCumulativeOffset(), 32 + 16);
-    assertEquals(buf.getCumulativeOffset(0), 32 + 16);
   }
 
   @Test
@@ -512,7 +477,7 @@ public class NativeWritableBufferImplTest {
       wbuf = (WritableBuffer) buf;
       wmem = wbuf.asWritableMemory();
       Assert.fail();
-    } catch (ReadOnlyException expected) {
+    } catch (IllegalArgumentException expected) {
       // expected
     }
   }
@@ -530,7 +495,7 @@ public class NativeWritableBufferImplTest {
       @SuppressWarnings("unused")
       WritableBuffer wdup2 = wbuf.writableDuplicate();
       Assert.fail();
-    } catch (ReadOnlyException expected) {
+    } catch (IllegalArgumentException expected) {
       // ignore
     }
   }
@@ -548,7 +513,7 @@ public class NativeWritableBufferImplTest {
       @SuppressWarnings("unused")
       WritableBuffer wreg2 = wbuf.writableRegion();
       Assert.fail();
-    } catch (ReadOnlyException expected) {
+    } catch (IllegalArgumentException expected) {
       // ignore
     }
   }
@@ -558,15 +523,15 @@ public class NativeWritableBufferImplTest {
     ByteBuffer bb = ByteBuffer.allocate(64);
     WritableBuffer wbuf = WritableBuffer.writableWrap(bb);
     @SuppressWarnings("unused")
-    WritableBuffer wreg = wbuf.writableRegion(0, 1, wbuf.getTypeByteOrder());
+    WritableBuffer wreg = wbuf.writableRegion(0, 1, wbuf.getByteOrder());
 
     try {
       Buffer buf = Buffer.wrap(bb);
       wbuf = (WritableBuffer) buf;
       @SuppressWarnings("unused")
-      WritableBuffer wreg2 = wbuf.writableRegion(0, 1, wbuf.getTypeByteOrder());
+      WritableBuffer wreg2 = wbuf.writableRegion(0, 1, wbuf.getByteOrder());
       Assert.fail();
-    } catch (ReadOnlyException expected) {
+    } catch (IllegalArgumentException expected) {
       // ignore
     }
   }
@@ -575,7 +540,7 @@ public class NativeWritableBufferImplTest {
   public void checkZeroBuffer() {
     WritableMemory wmem = WritableMemory.allocate(8);
     WritableBuffer wbuf = wmem.asWritableBuffer();
-    WritableBuffer reg = wbuf.writableRegion(0, 0, wbuf.getTypeByteOrder());
+    WritableBuffer reg = wbuf.writableRegion(0, 0, wbuf.getByteOrder());
     assertEquals(reg.getCapacity(), 0);
   }
 
@@ -583,7 +548,7 @@ public class NativeWritableBufferImplTest {
   public void checkDuplicateNonNative() {
     WritableMemory wmem = WritableMemory.allocate(64);
     wmem.putShort(0, (short) 1);
-    Buffer buf = wmem.asWritableBuffer().duplicate(Util.NON_NATIVE_BYTE_ORDER);
+    Buffer buf = wmem.asWritableBuffer().duplicate(BaseState.NON_NATIVE_BYTE_ORDER);
     assertEquals(buf.getShort(0), 256);
   }
 

@@ -32,8 +32,8 @@ import java.util.Objects;
  * @author Lee Rhodes
  */
 @SuppressWarnings("javadoc")
-public final class Util {
-  public static final String LS = System.getProperty("line.separator");
+final class Util {
+  static final String LS = System.getProperty("line.separator");
 
   private Util() { }
 
@@ -43,7 +43,7 @@ public final class Util {
    * @param bitMask defines the bits of interest
    * @return true if all the masked bits of value are zero
    */
-  public static final boolean isAllBitsClear(final long value, final long bitMask) {
+  static final boolean isAllBitsClear(final long value, final long bitMask) {
     return (~value & bitMask) == bitMask;
   }
 
@@ -53,7 +53,7 @@ public final class Util {
    * @param bitMask defines the bits of interest
    * @return true if all the masked bits of value are one
    */
-  public static final boolean isAllBitsSet(final long value, final long bitMask) {
+  static final boolean isAllBitsSet(final long value, final long bitMask) {
     return (value & bitMask) == bitMask;
   }
 
@@ -63,7 +63,7 @@ public final class Util {
    * @param bitMask defines the bits of interest
    * @return true if any the masked bits of value are zero
    */
-  public static final boolean isAnyBitsClear(final long value, final long bitMask) {
+  static final boolean isAnyBitsClear(final long value, final long bitMask) {
     return (~value & bitMask) != 0;
   }
 
@@ -73,7 +73,7 @@ public final class Util {
    * @param bitMask defines the bits of interest
    * @return true if any the masked bits of value are one
    */
-  public static final boolean isAnyBitsSet(final long value, final long bitMask) {
+  static final boolean isAnyBitsSet(final long value, final long bitMask) {
     return (value & bitMask) != 0;
   }
 
@@ -92,7 +92,7 @@ public final class Util {
    * @return the absolute path of the given resource file's shortName.
    * @throws IllegalArgumentException if resource cannot be found
    */
-  public static String getResourcePath(final String shortFileName) {
+  static String getResourcePath(final String shortFileName) {
     Objects.requireNonNull(shortFileName, "input parameter " + shortFileName + " cannot be null.");
     try {
       final URL url = Util.class.getClassLoader().getResource(shortFileName);
@@ -111,7 +111,7 @@ public final class Util {
    * @param shortFileName the last name in the pathname's name sequence.
    * @return the file defined by the given resource file's shortFileName.
    */
-  public static File getResourceFile(final String shortFileName) {
+  static File getResourceFile(final String shortFileName) {
     return new File(getResourcePath(shortFileName));
   }
 
@@ -121,7 +121,7 @@ public final class Util {
    * @return a byte array of the contents of the file defined by the given resource file's shortFileName.
    * @throws IllegalArgumentException if resource cannot be read.
    */
-  public static byte[] getResourceBytes(final String shortFileName) {
+  static byte[] getResourceBytes(final String shortFileName) {
     try {
       return Files.readAllBytes(Paths.get(getResourcePath(shortFileName)));
     } catch (final IOException e) {

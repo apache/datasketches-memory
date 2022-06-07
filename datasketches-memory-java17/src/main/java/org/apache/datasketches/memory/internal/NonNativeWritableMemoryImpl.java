@@ -19,6 +19,7 @@
 
 package org.apache.datasketches.memory.internal;
 
+import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableMemory;
 
 import jdk.incubator.foreign.MemoryAccess;
@@ -42,13 +43,14 @@ import jdk.incubator.foreign.MemorySegment;
  * @author Lee Rhodes
  */
 @SuppressWarnings("restriction")
-abstract class NonNativeWritableMemoryImpl extends BaseWritableMemoryImpl {
+final class NonNativeWritableMemoryImpl extends BaseWritableMemoryImpl {
 
   //Pass-through ctor
   NonNativeWritableMemoryImpl(
       final MemorySegment seg,
-      final int typeId) {
-    super(seg, typeId);
+      final int typeId,
+      final MemoryRequestServer memReqSvr) {
+    super(seg, typeId, memReqSvr);
   }
 
   ///PRIMITIVE getX() and getXArray()

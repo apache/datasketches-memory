@@ -21,7 +21,6 @@ package org.apache.datasketches.memory;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Objects;
 
 import org.apache.datasketches.memory.internal.BaseWritableBufferImpl;
 
@@ -61,8 +60,6 @@ public interface Buffer extends BaseBuffer {
    * @return a new <i>Buffer</i> for read-only operations on the given ByteBuffer.
    */
   static Buffer wrap(ByteBuffer byteBuffer, ByteOrder byteOrder) {
-    Objects.requireNonNull(byteBuffer, "byteBuffer must not be null");
-    Objects.requireNonNull(byteOrder, "byteOrder must not be null");
     return BaseWritableBufferImpl.wrapByteBuffer(byteBuffer, true, byteOrder);
   }
 
@@ -84,9 +81,8 @@ public interface Buffer extends BaseBuffer {
    * <i>start</i>, <i>position</i> and <i>end</i>.
    */
   default Buffer duplicate() {
-    return duplicate(getTypeByteOrder());
+    return duplicate(getByteOrder());
   }
-
 
   /**
    * Returns a read-only duplicate view of this Buffer with the same but independent values of
@@ -126,7 +122,7 @@ public interface Buffer extends BaseBuffer {
    * <i>position</i> and <i>end</i>.
    */
   default Buffer region() {
-    return region(getPosition(), getEnd() - getPosition(), getTypeByteOrder());
+    return region(getPosition(), getEnd() - getPosition(), getByteOrder());
   }
 
   /**
@@ -158,7 +154,7 @@ public interface Buffer extends BaseBuffer {
    * @return Memory
    */
   default Memory asMemory() {
-    return asMemory(getTypeByteOrder());
+    return asMemory(getByteOrder());
   }
 
   /**
@@ -175,6 +171,21 @@ public interface Buffer extends BaseBuffer {
   //END OF CONSTRUCTOR-TYPE METHODS
 
   //PRIMITIVE getX() and getXArray()
+
+  /**
+   * Gets the boolean value at the current position.
+   * Increments the position by <i>Byte.BYTES</i>.
+   * @return the boolean at the current position
+   */
+  boolean getBoolean();
+
+  /**
+   * Gets the boolean value at the given offset.
+   * This does not change the position.
+   * @param offsetBytes offset bytes relative to this Memory start
+   * @return the boolean at the given offset
+   */
+  boolean getBoolean(long offsetBytes);
 
   /**
    * Gets the byte value at the current position.

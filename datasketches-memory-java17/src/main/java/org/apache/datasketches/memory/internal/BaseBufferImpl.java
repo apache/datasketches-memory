@@ -20,12 +20,13 @@
 package org.apache.datasketches.memory.internal;
 
 import org.apache.datasketches.memory.BaseBuffer;
-import org.apache.datasketches.memory.ReadOnlyException;
+import org.apache.datasketches.memory.MemoryRequestServer;
 
 import jdk.incubator.foreign.MemorySegment;
 
 /**
- * A new positional API. This is different from and simpler than Java BufferImpl positional approach.
+ * This implements the positional API.
+ * This is different from and simpler than Java BufferImpl positional approach.
  * <ul><li>All based on longs instead of ints.</li>
  * <li>Eliminated "mark". Rarely used and confusing with its silent side effects.</li>
  * <li>The invariants are {@code 0 <= start <= position <= end <= capacity}.</li>
@@ -41,7 +42,7 @@ import jdk.incubator.foreign.MemorySegment;
  *
  * @author Lee Rhodes
  */
-public abstract class BaseBufferImpl extends BaseStateImpl implements BaseBuffer {
+abstract class BaseBufferImpl extends BaseStateImpl implements BaseBuffer {
   private long capacity;
   private long start = 0;
   private long pos = 0;
@@ -50,8 +51,9 @@ public abstract class BaseBufferImpl extends BaseStateImpl implements BaseBuffer
   //Pass-through ctor
   BaseBufferImpl(
       final MemorySegment seg,
-      final int typeId) {
-    super(seg, typeId);
+      final int typeId,
+      final MemoryRequestServer memReqSvr) {
+    super(seg, typeId, memReqSvr);
     capacity = end = seg.byteSize();
   }
 
@@ -141,31 +143,11 @@ public abstract class BaseBufferImpl extends BaseStateImpl implements BaseBuffer
     pos = newPos;
   }
 
-  final void incrementAndAssertPositionForWrite(final long position, final long increment) {
-    assert !isReadOnly() : "BufferImpl is read-only.";
-    final long newPos = position + increment;
-    assertInvariants(start, newPos, end, capacity);
-    pos = newPos;
-  }
-
   //checks are used for arrays and apply at runtime
   final void incrementAndCheckPositionForRead(final long position, final long increment) {
     final long newPos = position + increment;
     checkInvariants(start, newPos, end, capacity);
     pos = newPos;
-  }
-
-  final void incrementAndCheckPositionForWrite(final long position, final long increment) {
-    checkValidForWrite();
-    final long newPos = position + increment;
-    checkInvariants(start, newPos, end, capacity);
-    pos = newPos;
-  }
-
-  final void checkValidForWrite() {
-    if (isReadOnly()) {
-      throw new ReadOnlyException("BufferImpl is read-only.");
-    }
   }
 
   /**

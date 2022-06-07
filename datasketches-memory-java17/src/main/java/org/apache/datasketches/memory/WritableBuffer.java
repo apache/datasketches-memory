@@ -22,7 +22,6 @@ package org.apache.datasketches.memory;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Objects;
 
 import org.apache.datasketches.memory.internal.BaseWritableBufferImpl;
 
@@ -60,12 +59,9 @@ public interface WritableBuffer extends Buffer {
    * @param byteBuffer the given ByteBuffer. It must be non-null and writable.
    * @param byteOrder the byte order to be used.  It must be non-null.
    * @return a new <i>WritableBuffer</i> for write operations on the given <i>ByteBuffer</i>.
-   * @throws ReadOnlyException if ByteBuffer is not writable
+   * @throws IllegalArgumentException if ByteBuffer is not writable
    */
   static WritableBuffer writableWrap(ByteBuffer byteBuffer, ByteOrder byteOrder) {
-    Objects.requireNonNull(byteBuffer, "ByteBuffer must not be null");
-    Objects.requireNonNull(byteOrder, "ByteOrder must not be null");
-    if (byteBuffer.isReadOnly()) { throw new ReadOnlyException("ByteBuffer must be writable."); }
     return BaseWritableBufferImpl.wrapByteBuffer(byteBuffer, false, byteOrder);
   }
 
@@ -123,7 +119,7 @@ public interface WritableBuffer extends Buffer {
    * @return a new <i>WritableBuffer</i> representing the defined writable region.
    */
   default WritableBuffer writableRegion() {
-    return writableRegion(getPosition(), getEnd() - getPosition(), getTypeByteOrder());
+    return writableRegion(getPosition(), getEnd() - getPosition(), getByteOrder());
   }
 
   /**
@@ -175,6 +171,21 @@ public interface WritableBuffer extends Buffer {
   //END OF CONSTRUCTOR-TYPE METHODS
 
   //PRIMITIVE putX() and putXArray()
+
+  /**
+   * Puts the boolean value at the current position.
+   * Increments the position by <i>Byte.BYTES</i>.
+   * @param value the value to put
+   */
+  void putBoolean(boolean value);
+
+  /**
+   * Puts the boolean value at the given offset.
+   * This does not change the position.
+   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param value the value to put
+   */
+  void putBoolean(long offsetBytes, boolean value);
 
   /**
    * Puts the byte value at the current position.

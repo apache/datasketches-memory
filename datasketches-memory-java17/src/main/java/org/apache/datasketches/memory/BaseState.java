@@ -31,7 +31,7 @@ import jdk.incubator.foreign.ResourceScope;
  *
  * @author Lee Rhodes
  */
-public interface BaseState /* extends AutoCloseable */ {
+public interface BaseState {
 
   /**
    * The java line separator character as a String.
@@ -42,80 +42,7 @@ public interface BaseState /* extends AutoCloseable */ {
   static final ByteOrder NON_NATIVE_BYTE_ORDER =
       ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN
       ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
-
-  /**
-   * For off-heap segments, this closes the controlling ResourceScope. If the segment is
-   * not off-heap, this does nothing.
-   */
-  void close();
-
-  /**
-   * Forces any changes made to the contents of this mapped segment to be written to the storage device described
-   * by the mapped segment's file descriptor. Please refer to
-   * <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#force()">force()</a>
-   */
-  void force();
-
-  /**
-   * Loads the contents of this mapped segment into physical memory. Please refer to
-   * <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#load()">load()</a>
-   */
-  void load();
-
-  /**
-   * Unloads the contents of this mapped segment from physical memory. Please refer to
-   * <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#unload()">unload()</a>
-   */
-  void unload();
-
-  /**
-   * Tells whether or not the contents of this mapped segment is resident in physical memory. Please refer to
-   * <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#isLoaded()">isLoaded()</a>
-   * @return true if it is likely that the contents of this segment is resident in physical memory.
-   */
-  boolean isLoaded();
-
-  /**
-   * Returns the resource scope associated with this memory segment.
-   * @return the resource scope associated with this memory segment.
-   */
-  ResourceScope scope();
-
-  /**
-   * Is the underlying resource scope alive?
-   * @return true, if the underlying resource scope is alive.
-   */
-  boolean isAlive();
-
-  /**
-   * Gets the current Type ByteOrder.
-   * This may be different from the ByteOrder of the backing resource and of the Native Byte Order.
-   * @return the current Type ByteOrder.
-   */
-  ByteOrder getTypeByteOrder();
-
-  /**
-   * Returns true if the Native ByteOrder is the same as the ByteOrder of the
-   * current Buffer or Memory and the same ByteOrder as the given byteOrder.
-   * @param byteOrder the given ByteOrder
-   * @return true if the Native ByteOrder is the same as the ByteOrder of the
-   * current Buffer or Memory and the same ByteOrder as the given byteOrder.
-   */
-  boolean isByteOrderCompatible(ByteOrder byteOrder);
-
-  /**
-   * Returns true if the given object is an instance of this class and has equal contents to
-   * this object in the given range of bytes. This will also check two distinct ranges within the
-   * same object for equals.
-   * @param thisOffsetBytes the starting offset in bytes for this object.
-   * @param that the given BaseState object
-   * @param thatOffsetBytes the starting offset in bytes for the given object
-   * @param lengthBytes the size of the range in bytes
-   * @return true if the given object has equal contents to this object in the given range of
-   * bytes.
-   */
-  boolean equalTo(long thisOffsetBytes, Object that,
-      long thatOffsetBytes, long lengthBytes);
+  static final MemoryRequestServer defaultMemReqSvr = new DefaultMemoryRequestServer();
 
   /**
    * Returns a ByteBuffer view of this Memory object with the given ByteOrder.
@@ -134,6 +61,167 @@ public interface BaseState /* extends AutoCloseable */ {
   ByteBuffer asByteBufferView(ByteOrder order);
 
   /**
+   * For off-heap segments, this closes the controlling ResourceScope. If the segment is
+   * not off-heap, this does nothing.
+   */
+  void close();
+
+  /**
+   * Returns true if the given object is an instance of this class and has equal contents to
+   * this object in the given range of bytes. This will also check two distinct ranges within the
+   * same object for equals.
+   * @param thisOffsetBytes the starting offset in bytes for this object.
+   * @param that the given BaseState object
+   * @param thatOffsetBytes the starting offset in bytes for the given object
+   * @param lengthBytes the size of the range in bytes
+   * @return true if the given object has equal contents to this object in the given range of
+   * bytes.
+   */
+  boolean equalTo(long thisOffsetBytes, Object that,
+      long thatOffsetBytes, long lengthBytes);
+
+  /**
+   * Forces any changes made to the contents of this mapped segment to be written to the storage device described
+   * by the mapped segment's file descriptor. Please refer to
+   * <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#force()">force()</a>
+   */
+  void force();
+
+  /**
+   * Gets the capacity of this object in bytes
+   * @return the capacity of this object in bytes
+   */
+  long getCapacity();
+
+  /**
+   * Returns the configured MemoryRequestSever or null, if it has not been configured.
+   * @return the configured MemoryRequestSever or null, if it has not been configured.
+   */
+  MemoryRequestServer getMemoryRequestServer();
+
+  /**
+   * Gets the current Type ByteOrder.
+   * This may be different from the ByteOrder of the backing resource and of the Native Byte Order.
+   * @return the current Type ByteOrder.
+   */
+  ByteOrder getByteOrder();
+
+  /**
+   * Returns true if this Memory is backed by a ByteBuffer.
+   * @return true if this Memory is backed by a ByteBuffer.
+   */
+  boolean hasByteBuffer();
+
+  /**
+   * Returns true if the MemoryRequestServer has been configured.
+   * @return true if the MemoryRequestServer has been configured.
+   */
+  boolean hasMemoryRequestServer();
+
+  /**
+   * Is the underlying resource scope alive?
+   * @return true, if the underlying resource scope is alive.
+   */
+  boolean isAlive();
+
+  /**
+   * Returns true if this instance is a Buffer or WritableBuffer instance.
+   * @return true if this instance is a Buffer or WritableBuffer instance.
+   */
+  boolean isBuffer();
+
+  /**
+   * Returns true if the Native ByteOrder is the same as the ByteOrder of the
+   * current Buffer or Memory and the same ByteOrder as the given byteOrder.
+   * @param byteOrder the given ByteOrder
+   * @return true if the Native ByteOrder is the same as the ByteOrder of the
+   * current Buffer or Memory and the same ByteOrder as the given byteOrder.
+   */
+  boolean isByteOrderCompatible(ByteOrder byteOrder);
+
+  /**
+   * Returns true if the backing resource is direct (off-heap) memory.
+   * This can be true for allocated direct memory, memory mapped files,
+   * or from a wrapped ByteBuffer that was allocated direct.
+   * @return true if the backing resource is direct (off-heap) memory.
+   */
+  boolean isDirect();
+
+  /**
+   * Returns true if this instance is a duplicate of a Buffer instance.
+   * @return true if this instance is a duplicate of a Buffer instance.
+   */
+  boolean isDuplicate();
+
+  /**
+   * Returns true if the backing resource is on the Java heap.
+   * This can be true for wrapped heap primitive arrays
+   * or from a wrapped ByteBuffer that was allocated on the Java heap.
+   * @return true if the backing resource is on the Java heap.
+   */
+  boolean isHeap();
+
+  /**
+   * Tells whether or not the contents of this mapped segment is resident in physical memory. Please refer to
+   * <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#isLoaded()">isLoaded()</a>
+   * @return true if it is likely that the contents of this segment is resident in physical memory.
+   */
+  boolean isLoaded();
+
+  /**
+   * Returns true if this instance is of a memory mapped file.
+   * @return true if this instance is of a memory mapped file.
+   */
+  boolean isMapped();
+
+  /**
+   * Returns true if this instance is of a Memory or WritableMemory instance
+   * @return true if this instance is of a Memory or WritableMemory instance
+   */
+  boolean isMemory();
+
+  /**
+   * Returns true if this object or the backing resource is read-only.
+   * @return true if this object or the backing resource is read-only.
+   */
+  boolean isReadOnly();
+
+  /**
+   * Returns true if this instance is a region view of another Memory or Buffer
+   * @return true if this instance is a region view of another Memory or Buffer
+   */
+  boolean isRegion();
+
+  /**
+   * Returns true if the backing resource of <i>this</i> is identical with the backing resource
+   * of <i>that</i>. The capacities must be the same.  If <i>this</i> is a region,
+   * the region offset must also be the same.
+   * @param that A different non-null object
+   * @return true if the backing resource of <i>this</i> is the same as the backing resource
+   * of <i>that</i>.
+   */
+  boolean isSameResource(Object that);
+
+  /**
+   * Loads the contents of this mapped segment into physical memory. Please refer to
+   * <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#load()">load()</a>
+   */
+  void load();
+
+  /**
+   * Returns the resource scope associated with this memory segment.
+   * @return the resource scope associated with this memory segment.
+   */
+  ResourceScope scope();
+
+  //  /**
+  //   * Sets the default MemoryRequestServer to be used in case of capacity overflow of off-heap
+  //   * (Direct or Native) allocated Memory or of on-heap allocated Memory.
+  //   * @param memReqSvr the given default MemoryRequestServer
+  //   */
+  //  void setMemoryRequestServer(MemoryRequestServer memReqSvr);
+
+  /**
    * Returns a new ByteBuffer with a copy of the data from this Memory object.
    * This new ByteBuffer will be writable, on heap, and with the endianness specified
    * by the given ByteOrder.
@@ -143,6 +231,17 @@ public interface BaseState /* extends AutoCloseable */ {
   ByteBuffer toByteBuffer(ByteOrder order);
 
   /**
+   * Returns a description of this object with an optional formatted hex string of the data
+   * for the specified a range. Used primarily for testing.
+   * @param comment a description
+   * @param offsetBytes offset bytes relative to this object start
+   * @param lengthBytes number of bytes to convert to a hex string
+   * @param withData include output listing of byte data in the given range
+   * @return a description and hex output in a human readable format.
+   */
+  String toHexString(String comment, long offsetBytes, int lengthBytes, boolean withData);
+
+  /**
    * Returns a copy of the underlying MemorySegment.
    * The size is limited to <i>Integer.MAX_VALUE</i>.
    * @return a copy of the underlying MemorySegment
@@ -150,10 +249,21 @@ public interface BaseState /* extends AutoCloseable */ {
   MemorySegment toMemorySegment();
 
   /**
-   * Gets the capacity of this object in bytes
-   * @return the capacity of this object in bytes
+   * Unloads the contents of this mapped segment from physical memory. Please refer to
+   * <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#unload()">unload()</a>
    */
-  long getCapacity();
+  void unload();
+
+  /**
+   * Returns a 64-bit hash from a single long. This method has been optimized for speed when only
+   * a single hash of a long is required.
+   * @param in A long.
+   * @param seed A long valued seed.
+   * @return the hash.
+   */
+  long xxHash64(long in, long seed);
+
+  //TO STRING
 
   /**
    * Returns the 64-bit hash of the sequence of bytes in this object specified by
@@ -167,75 +277,5 @@ public interface BaseState /* extends AutoCloseable */ {
    * <i>offsetBytes</i> and <i>lengthBytes</i>.
    */
   long xxHash64(long offsetBytes, long lengthBytes, long seed);
-
-  /**
-   * Returns a 64-bit hash from a single long. This method has been optimized for speed when only
-   * a single hash of a long is required.
-   * @param in A long.
-   * @param seed A long valued seed.
-   * @return the hash.
-   */
-  long xxHash64(long in, long seed);
-
-  /**
-   * Returns true if this Memory is backed by a ByteBuffer.
-   * @return true if this Memory is backed by a ByteBuffer.
-   */
-  boolean hasByteBuffer();
-
-  /**
-   * Returns true if the backing resource is direct (off-heap) memory.
-   * This is the case for allocated direct memory, memory mapped files,
-   * @return true if the backing resource is direct (off-heap) memory.
-   */
-  boolean isDirect();
-
-  /**
-   * Returns true if this object or the backing resource is read-only.
-   * @return true if this object or the backing resource is read-only.
-   */
-  boolean isReadOnly();
-
-  /**
-   * Returns true if the backing resource of <i>this</i> is identical with the backing resource
-   * of <i>that</i>. The capacities must be the same.  If <i>this</i> is a region,
-   * the region offset must also be the same.
-   * @param that A different non-null object
-   * @return true if the backing resource of <i>this</i> is the same as the backing resource
-   * of <i>that</i>.
-   */
-  boolean isSameResource(Object that);
-
-  /**
-   * Returns the configured MemoryRequestSever or null, if it has not been configured.
-   * @return the configured MemoryRequestSever or null, if it has not been configured.
-   */
-  MemoryRequestServer getMemoryRequestServer();
-
-  /**
-   * Returns true if the MemoryRequestServer has been configured.
-   * @return true if the MemoryRequestServer has been configured.
-   */
-  boolean hasMemoryRequestServer();
-
-  /**
-   * Sets the default MemoryRequestServer to be used in case of capacity overflow of off-heap
-   * (Direct or Native) allocated Memory or of on-heap allocated Memory.
-   * @param memReqSvr the given default MemoryRequestServer
-   */
-  void setMemoryRequestServer(MemoryRequestServer memReqSvr);
-
-  //TO STRING
-
-  /**
-   * Returns a description of this object with an optional formatted hex string of the data
-   * for the specified a range. Used primarily for testing.
-   * @param comment a description
-   * @param offsetBytes offset bytes relative to this object start
-   * @param lengthBytes number of bytes to convert to a hex string
-   * @param withData include output listing of byte data in the given range
-   * @return a description and hex output in a human readable format.
-   */
-  String toHexString(String comment, long offsetBytes, int lengthBytes, boolean withData);
 
 }

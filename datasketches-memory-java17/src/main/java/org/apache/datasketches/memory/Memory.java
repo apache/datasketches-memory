@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Objects;
 
 import org.apache.datasketches.memory.internal.BaseWritableMemoryImpl;
 
@@ -63,8 +62,6 @@ public interface Memory extends BaseState {
    * @return a new <i>Memory</i> for read-only operations on the given <i>ByteBuffer</i>.
    */
   static Memory wrap(ByteBuffer byteBuffer, ByteOrder byteOrder) {
-    Objects.requireNonNull(byteBuffer, "byteBuffer must not be null");
-    Objects.requireNonNull(byteOrder, "byteOrder must not be null");
     return BaseWritableMemoryImpl.wrapByteBuffer(byteBuffer, true, byteOrder);
   }
 
@@ -79,9 +76,15 @@ public interface Memory extends BaseState {
    * @param file the given file to map. It must be non-null with a non-negative length and readable.
    * @param scope the given ResourceScope. It must be non-null.
    * @return mapped Memory.
-   * @throws Exception various IO exceptions
+   * @throws IllegalArgumentException -- if file is not readable.
+   * @throws IllegalStateException - if scope has been already closed, or if access occurs from a thread other
+   * than the thread owning scope.
+   * @throws IOException - if the specified path does not point to an existing file, or if some other I/O error occurs.
+   * @throws SecurityException - If a security manager is installed and it denies an unspecified permission
+   * required by the implementation.
    */
-  static Memory map(File file, ResourceScope scope) throws Exception {
+  static Memory map(File file, ResourceScope scope)
+      throws IllegalArgumentException, IllegalStateException, IOException, SecurityException {
     return map(file, 0, file.length(), scope, ByteOrder.nativeOrder());
   }
 
@@ -93,16 +96,15 @@ public interface Memory extends BaseState {
    * @param scope the given ResourceScope. It must be non-null.
    * @param byteOrder the byte order to be used.  It must be non-null.
    * @return mapped Memory
-   * @throws Exception various IO exceptions
-   * @throws IllegalArgumentException if file is not readable
+   * @throws IllegalArgumentException -- if file is not readable.
+   * @throws IllegalStateException - if scope has been already closed, or if access occurs from a thread other
+   * than the thread owning scope.
+   * @throws IOException - if the specified path does not point to an existing file, or if some other I/O error occurs.
+   * @throws SecurityException - If a security manager is installed and it denies an unspecified permission
+   * required by the implementation.
    */
-  @SuppressWarnings("resource")
   static Memory map(File file, long fileOffsetBytes, long capacityBytes, ResourceScope scope, ByteOrder byteOrder)
-      throws Exception {
-    Objects.requireNonNull(file, "File must be non-null.");
-    Objects.requireNonNull(byteOrder, "ByteOrder must be non-null.");
-    Objects.requireNonNull(scope, "ResourceScope must be non-null.");
-    if (!file.canRead()) { throw new IllegalArgumentException("File must be readable."); }
+      throws IllegalArgumentException, IllegalStateException, IOException, SecurityException {
     return BaseWritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, true, byteOrder);
   }
 
@@ -121,7 +123,7 @@ public interface Memory extends BaseState {
    * offsetBytes and capacityBytes.
    */
   default Memory region(long offsetBytes, long capacityBytes) {
-    return region(offsetBytes, capacityBytes, getTypeByteOrder());
+    return region(offsetBytes, capacityBytes, getByteOrder());
   }
 
   /**
@@ -153,7 +155,7 @@ public interface Memory extends BaseState {
    * @return a new <i>Buffer</i>
    */
   default Buffer asBuffer() {
-    return asBuffer(getTypeByteOrder());
+    return asBuffer(getByteOrder());
   }
 
   /**
@@ -181,7 +183,6 @@ public interface Memory extends BaseState {
    * @return a new <i>Memory</i> for read operations
    */
   static Memory wrap(byte[] array) {
-    Objects.requireNonNull(array, "array must be non-null");
     return wrap(array, 0, array.length, ByteOrder.nativeOrder());
   }
 
@@ -204,7 +205,6 @@ public interface Memory extends BaseState {
    * @return a new <i>Memory</i> for read operations
    */
   static Memory wrap(byte[] array, int offsetBytes, int lengthBytes, ByteOrder byteOrder) {
-    Objects.requireNonNull(array, "array must be non-null");
     final MemorySegment slice = MemorySegment.ofArray(array).asSlice(offsetBytes, lengthBytes).asReadOnly();
     return BaseWritableMemoryImpl.wrapSegmentAsArray(slice, byteOrder, null);
   }
@@ -215,9 +215,8 @@ public interface Memory extends BaseState {
    * @return a new <i>Memory</i> for read operations
    */
   static Memory wrap(char[] array) {
-    Objects.requireNonNull(array, "array must be non-null");
-    final MemorySegment slice = MemorySegment.ofArray(array).asReadOnly();
-    return BaseWritableMemoryImpl.wrapSegmentAsArray(slice, ByteOrder.nativeOrder(), null);
+    final MemorySegment seg = MemorySegment.ofArray(array).asReadOnly();
+    return BaseWritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
   }
 
   /**
@@ -226,9 +225,8 @@ public interface Memory extends BaseState {
    * @return a new <i>Memory</i> for read operations
    */
   static Memory wrap(short[] array) {
-    Objects.requireNonNull(array, "arr must be non-null");
-    final MemorySegment slice = MemorySegment.ofArray(array).asReadOnly();
-    return BaseWritableMemoryImpl.wrapSegmentAsArray(slice, ByteOrder.nativeOrder(), null);
+    final MemorySegment seg = MemorySegment.ofArray(array).asReadOnly();
+    return BaseWritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
   }
 
   /**
@@ -237,9 +235,8 @@ public interface Memory extends BaseState {
    * @return a new <i>Memory</i> for read operations
    */
   static Memory wrap(int[] array) {
-    Objects.requireNonNull(array, "arr must be non-null");
-    final MemorySegment slice = MemorySegment.ofArray(array).asReadOnly();
-    return BaseWritableMemoryImpl.wrapSegmentAsArray(slice, ByteOrder.nativeOrder(), null);
+    final MemorySegment seg = MemorySegment.ofArray(array).asReadOnly();
+    return BaseWritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
   }
 
   /**
@@ -248,9 +245,8 @@ public interface Memory extends BaseState {
    * @return a new <i>Memory</i> for read operations
    */
   static Memory wrap(long[] array) {
-    Objects.requireNonNull(array, "arr must be non-null");
-    final MemorySegment slice = MemorySegment.ofArray(array).asReadOnly();
-    return BaseWritableMemoryImpl.wrapSegmentAsArray(slice, ByteOrder.nativeOrder(), null);
+    final MemorySegment seg = MemorySegment.ofArray(array).asReadOnly();
+    return BaseWritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
   }
 
   /**
@@ -259,9 +255,8 @@ public interface Memory extends BaseState {
    * @return a new <i>Memory</i> for read operations
    */
   static Memory wrap(float[] array) {
-    Objects.requireNonNull(array, "arr must be non-null");
-    final MemorySegment slice = MemorySegment.ofArray(array).asReadOnly();
-    return BaseWritableMemoryImpl.wrapSegmentAsArray(slice, ByteOrder.nativeOrder(), null);
+    final MemorySegment seg = MemorySegment.ofArray(array).asReadOnly();
+    return BaseWritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
   }
 
   /**
@@ -270,13 +265,19 @@ public interface Memory extends BaseState {
    * @return a new <i>Memory</i> for read operations
    */
   static Memory wrap(double[] array) {
-    Objects.requireNonNull(array, "arr must be non-null");
-    final MemorySegment slice = MemorySegment.ofArray(array).asReadOnly();
-    return BaseWritableMemoryImpl.wrapSegmentAsArray(slice, ByteOrder.nativeOrder(), null);
+    final MemorySegment seg = MemorySegment.ofArray(array).asReadOnly();
+    return BaseWritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
   }
   //END OF CONSTRUCTOR-TYPE METHODS
 
   //PRIMITIVE getX() and getXArray()
+
+  /**
+   * Gets the boolean value at the given offset
+   * @param offsetBytes offset bytes relative to this Memory start
+   * @return the boolean at the given offset
+   */
+  boolean getBoolean(long offsetBytes);
 
   /**
    * Gets the byte value at the given offset

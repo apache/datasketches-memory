@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.test;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -28,7 +28,9 @@ import java.nio.ByteOrder;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
+import org.apache.datasketches.memory.internal.Util;
 import org.testng.annotations.Test;
 
 public class WritableMemoryTest {
@@ -37,30 +39,39 @@ public class WritableMemoryTest {
   public void wrapBigEndian() {
     ByteBuffer bb = ByteBuffer.allocate(64); //big endian
     WritableMemory wmem = WritableMemory.writableWrap(bb);
-    assertEquals(wmem.getByteOrder(), ByteOrder.LITTLE_ENDIAN); //ignore BB endianness
+    assertEquals(wmem.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
     wmem = WritableMemory.writableWrap(bb, ByteOrder.nativeOrder());
-    assertEquals(wmem.getByteOrder(), ByteOrder.LITTLE_ENDIAN);
+    assertEquals(wmem.getTypeByteOrder(), ByteOrder.LITTLE_ENDIAN);
   }
 
   @Test
   public void wrapBigEndianAsLittle() {
     ByteBuffer bb = ByteBuffer.allocate(64);
     bb.putChar(0, (char)1); //as NNO
-    WritableMemory wmem = WritableMemory.writableWrap(bb, ByteOrder.LITTLE_ENDIAN);
+    WritableMemory wmem = WritableMemory.writableWrap(bb, ByteOrder.LITTLE_ENDIAN, null);
     assertEquals(wmem.getChar(0), 256);
   }
 
   @Test
   public void allocateWithByteOrder() {
     WritableMemory wmem = WritableMemory.allocate(64, ByteOrder.BIG_ENDIAN);
-    assertEquals(wmem.getByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(wmem.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
     wmem = WritableMemory.allocate(64, ByteOrder.LITTLE_ENDIAN);
-    assertEquals(wmem.getByteOrder(), ByteOrder.LITTLE_ENDIAN);
+    assertEquals(wmem.getTypeByteOrder(), ByteOrder.LITTLE_ENDIAN);
     wmem = WritableMemory.writableWrap(new byte[64], 32, 32, ByteOrder.BIG_ENDIAN);
-    assertEquals(wmem.getByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(wmem.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test
+  public void checkGetArray() {
+    byte[] byteArr = new byte[64];
+    WritableMemory wmem = WritableMemory.writableWrap(byteArr);
+    assertTrue(wmem.getArray() == byteArr);
+    WritableBuffer wbuf = wmem.asWritableBuffer();
+    assertTrue(wbuf.getArray() == byteArr);
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void checkSelfArrayCopy() {
     byte[] srcAndDst = new byte[128];
     WritableMemory wmem = WritableMemory.writableWrap(srcAndDst);
@@ -80,14 +91,14 @@ public class WritableMemoryTest {
     assertFalse(wmem1.equals(wmem2));
 
     WritableMemory reg1 = wmem1.writableRegion(0, wmem1.getCapacity());
-    assertTrue(wmem1.equalTo(0, reg1, 0, wmem1.getCapacity()));
+    assertTrue(wmem1.equals(reg1));
 
     wmem2 = WritableMemory.allocate(len);
     for (int i = 0; i < len; i++) {
       wmem1.putByte(i, (byte) i);
       wmem2.putByte(i, (byte) i);
     }
-    assertTrue(wmem1.equalTo(0, wmem2, 0, len));
+    assertTrue(wmem1.equals(wmem2));
     assertTrue(wmem1.equalTo(0, wmem1, 0, len));
 
     reg1 = wmem1.writableRegion(0, wmem1.getCapacity());
@@ -114,9 +125,13 @@ public class WritableMemoryTest {
     int len = 23;
     WritableMemory wmem1 = WritableMemory.allocate(len);
     assertFalse(wmem1.equals(null));
+    //@SuppressWarnings({"EqualsWithItself", "SelfEquals"}) //unsupported
+    //SelfEquals for Plexus, EqualsWithItself for IntelliJ
+    //boolean eq1 = wmem1.equals(wmem1); //strict profile complains
+    //assertTrue(eq1);
 
     WritableMemory wmem2 = WritableMemory.allocate(len + 1);
-    assertTrue(wmem1.equalTo(0, wmem2, 0, len));
+    assertFalse(wmem1.equals(wmem2));
 
     for (int i = 0; i < len; i++) {
       wmem1.putByte(i, (byte) i);
@@ -128,31 +143,32 @@ public class WritableMemoryTest {
 
   @Test
   public void checkLargeEquals() {
-    final int thresh = 1 << 20;
-    final int len = thresh * 2 + 7;
-    byte[] byteArr1 = new byte[len];
-    ThreadLocalRandom.current().nextBytes(byteArr1);
-    byte[] byteArr2 = byteArr1.clone();
-    Memory mem1 = Memory.wrap(byteArr1);
-    Memory mem2 = Memory.wrap(byteArr2);
-    assertTrue(mem1.equalTo(0, mem2, 0, len));
+    // Size bigger than UNSAFE_COPY_MEMORY_THRESHOLD; size with "reminder" = 7, to test several
+    // traits of the implementation
+    final int thresh = Util.UNSAFE_COPY_THRESHOLD_BYTES;
+    byte[] bytes1 = new byte[(thresh * 2) + 7];
+    ThreadLocalRandom.current().nextBytes(bytes1);
+    byte[] bytes2 = bytes1.clone();
+    Memory mem1 = Memory.wrap(bytes1);
+    Memory mem2 = Memory.wrap(bytes2);
+    assertTrue(mem1.equals(mem2));
 
-    byteArr2[thresh + 10] = (byte) (byteArr1[thresh + 10] + 1);
-    assertFalse(mem1.equalTo(0, mem2, 0, len));
+    bytes2[thresh + 10] = (byte) (bytes1[thresh + 10] + 1);
+    assertFalse(mem1.equals(mem2));
 
-    byteArr2[thresh + 10] = byteArr1[thresh + 10];
-    byteArr2[(thresh * 2) + 3] = (byte) (byteArr1[(thresh * 2) + 3] + 1);
-    assertFalse(mem1.equalTo(0,mem2, 0, len));
+    bytes2[thresh + 10] = bytes1[thresh + 10];
+    bytes2[(thresh * 2) + 3] = (byte) (bytes1[(thresh * 2) + 3] + 1);
+    assertFalse(mem1.equals(mem2));
   }
 
   @Test
   public void checkWrapWithBO() {
     WritableMemory wmem = WritableMemory.writableWrap(new byte[0], ByteOrder.BIG_ENDIAN);
-    boolean nativeBO = wmem.getByteOrder() == ByteOrder.nativeOrder();
+    boolean nativeBO = wmem.getTypeByteOrder() == ByteOrder.nativeOrder();
     assertFalse(nativeBO);
     println("" + nativeBO);
     wmem = WritableMemory.writableWrap(new byte[8], ByteOrder.BIG_ENDIAN);
-    nativeBO = wmem.getByteOrder() == ByteOrder.nativeOrder();
+    nativeBO = wmem.getTypeByteOrder() == ByteOrder.nativeOrder();
     assertFalse(nativeBO);
     println("" + nativeBO);
   }

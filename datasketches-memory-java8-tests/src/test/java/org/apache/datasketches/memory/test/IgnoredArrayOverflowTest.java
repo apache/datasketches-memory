@@ -17,35 +17,29 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.test;
 
-import java.nio.ByteOrder;
-
-import org.apache.datasketches.memory.BaseState;
-import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import jdk.incubator.foreign.ResourceScope;
-
 public class IgnoredArrayOverflowTest {
-  private static final MemoryRequestServer memReqSvr = BaseState.defaultMemReqSvr;
 
+  private WritableHandle h;
   private WritableMemory memory;
   private static final long MAX_SIZE = (1L << 10); // use 1L << 31 to test int overrange
 
-  @SuppressWarnings("resource")
   @BeforeClass
   public void allocate() {
-    ResourceScope scope = ResourceScope.newConfinedScope();
-    memory = WritableMemory.allocateDirect(MAX_SIZE, 8L, scope, ByteOrder.nativeOrder(), memReqSvr);
+    h = WritableMemory.allocateDirect(MAX_SIZE);
+    memory = h.getWritable();
   }
 
   @AfterClass
   public void close() throws Exception {
-    memory.close();
+    h.close();
   }
 
   @Test

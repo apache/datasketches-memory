@@ -21,98 +21,124 @@
  * Note: Lincoln's Gettysburg Address is in the public domain. See LICENSE.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.test;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.datasketches.memory.internal.Util.getResourceFile;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.ByteOrder;
-import java.nio.file.InvalidPathException;
 
 import org.apache.datasketches.memory.BaseState;
+import org.apache.datasketches.memory.MapHandle;
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.ReadOnlyException;
+import org.apache.datasketches.memory.WritableHandle;
+import org.apache.datasketches.memory.WritableMapHandle;
 import org.apache.datasketches.memory.WritableMemory;
+import org.apache.datasketches.memory.internal.Util;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import jdk.incubator.foreign.ResourceScope;
-
 public class AllocateDirectWritableMapMemoryTest {
   private static final String LS = System.getProperty("line.separator");
-  private final MemoryRequestServer memReqSvr = BaseState.defaultMemReqSvr;
+
+  static final Method IS_FILE_READ_ONLY;
+
+  static {
+    IS_FILE_READ_ONLY =
+        ReflectUtil.getMethod(ReflectUtil.ALLOCATE_DIRECT_MAP, "isFileReadOnly", File.class);
+  }
+
+  private static boolean isFileReadOnly(final File file) {
+    try {
+      return (boolean) IS_FILE_READ_ONLY.invoke(null, file);
+    } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
   @BeforeClass
-  public void setReadOnly() throws IOException {
+  public void setReadOnly() {
     UtilTest.setGettysburgAddressFileToReadOnly();
   }
 
   @Test
-  public void simpleMap()
-      throws IllegalArgumentException, InvalidPathException, IllegalStateException, UnsupportedOperationException,
-      IOException, SecurityException {
+  public void simpleMap() throws Exception {
     File file = getResourceFile("GettysburgAddress.txt");
-    Memory mem = null;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      mem = Memory.map(file,scope);
-      byte[] byteArr = new byte[(int)mem.getCapacity()];
-      mem.getByteArray(0, byteArr, 0, byteArr.length);
-      String text = new String(byteArr, UTF_8);
+    try (MapHandle h = Memory.map(file); WritableMapHandle wh = (WritableMapHandle) h) {
+      Memory mem = h.get();
+      byte[] bytes = new byte[(int)mem.getCapacity()];
+      mem.getByteArray(0, bytes, 0, bytes.length);
+      String text = new String(bytes, UTF_8);
       println(text);
-      assertTrue(mem.isReadOnly());
+      try {
+        wh.force();
+        fail();
+      } catch (ReadOnlyException e) {
+        //OK
+      }
     }
   }
 
   @Test
-  public void copyOffHeapToMemoryMappedFile()
-      throws IllegalArgumentException, InvalidPathException, IllegalStateException, UnsupportedOperationException,
-      IOException, SecurityException {
-    long numBytes = 1L << 10; //small for unit tests.  Make it larger than 2GB if you like.
-    long numLongs = numBytes >>> 3;
+  public void copyOffHeapToMemoryMappedFile() throws Exception {
+    long bytes = 1L << 10; //small for unit tests.  Make it larger than 2GB if you like.
+    long longs = bytes >>> 3;
 
-    File file = new File("TestFile.bin"); //create a dummy file
+    File file = new File("TestFile.bin");
     if (file.exists()) {
-      java.nio.file.Files.delete(file.toPath());
+      try {
+        java.nio.file.Files.delete(file.toPath());
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
     assertTrue(file.createNewFile());
     assertTrue (file.setWritable(true, false)); //writable=true, ownerOnly=false
     assertTrue (file.isFile());
     file.deleteOnExit();  //comment out if you want to examine the file.
 
-    WritableMemory dstMem = null;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) { //this scope manages two Memory objects
-      dstMem = WritableMemory.writableMap(file, 0, numBytes, scope, ByteOrder.nativeOrder());
+    try (
+        WritableMapHandle dstHandle
+          = WritableMemory.writableMap(file, 0, bytes, ByteOrder.nativeOrder());
+        WritableHandle srcHandle = WritableMemory.allocateDirect(bytes)) {
 
-      WritableMemory srcMem
-        = WritableMemory.allocateDirect(numBytes, 8, scope, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory dstMem = dstHandle.getWritable();
+      WritableMemory srcMem = srcHandle.getWritable();
 
-      //load source with consecutive longs
-      for (long i = 0; i < numLongs; i++) {
-        srcMem.putLong(i << 3, i);
+      for (long i = 0; i < longs; i++) {
+        srcMem.putLong(i << 3, i); //load source with consecutive longs
       }
-      //off-heap to off-heap copy
-      srcMem.copyTo(0, dstMem, 0, srcMem.getCapacity());
-      dstMem.force(); //push any remaining to the file
+
+      srcMem.copyTo(0, dstMem, 0, srcMem.getCapacity()); //off-heap to off-heap copy
+
+      dstHandle.force(); //push any remaining to the file
+
       //check end value
-      assertEquals(dstMem.getLong(numLongs - 1L << 3), numLongs - 1L);
-    } //both map and direct closed here
+      assertEquals(dstMem.getLong(longs - 1L << 3), longs - 1L);
+    }
   }
 
   @Test
-  public void checkNonNativeFile()
-      throws IllegalArgumentException, InvalidPathException, IllegalStateException, UnsupportedOperationException,
-      IOException, SecurityException {
+  public void checkNonNativeFile() throws Exception {
     File file = new File("TestFile2.bin");
     if (file.exists()) {
-      java.nio.file.Files.delete(file.toPath());
+      try {
+        java.nio.file.Files.delete(file.toPath());
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
     assertTrue(file.createNewFile());
     assertTrue(file.setWritable(true, false)); //writable=true, ownerOnly=false
@@ -120,87 +146,75 @@ public class AllocateDirectWritableMapMemoryTest {
     file.deleteOnExit();  //comment out if you want to examine the file.
 
     final long bytes = 8;
-    WritableMemory wmem = null;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      wmem = WritableMemory.writableMap(file, 0L, bytes, scope, BaseState.NON_NATIVE_BYTE_ORDER);
+    try (WritableMapHandle h = WritableMemory.writableMap(file, 0L, bytes, Util.NON_NATIVE_BYTE_ORDER)) {
+      WritableMemory wmem = h.getWritable();
       wmem.putChar(0, (char) 1);
       assertEquals(wmem.getByte(1), (byte) 1);
     }
   }
 
-  @SuppressWarnings("resource")
-  @Test
-  public void testMapExceptionNoTWR()
-      throws IllegalArgumentException, InvalidPathException, IllegalStateException, UnsupportedOperationException,
-      IOException, SecurityException {
+  @Test(expectedExceptions = RuntimeException.class)
+  public void testMapException() throws IOException {
     File dummy = createFile("dummy.txt", ""); //zero length
-    ResourceScope scope = ResourceScope.newConfinedScope();
-    Memory.map(dummy, 0, dummy.length(), scope, ByteOrder.nativeOrder());
-    scope.close();
+    //throws java.lang.reflect.InvocationTargetException
+    Memory.map(dummy, 0, dummy.length(), ByteOrder.nativeOrder());
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
-  public void simpleMap2()
-      throws IllegalArgumentException, InvalidPathException, IllegalStateException, UnsupportedOperationException,
-      IOException, SecurityException {
+  @Test(expectedExceptions = ReadOnlyException.class)
+  public void simpleMap2() throws Exception {
     File file = getResourceFile("GettysburgAddress.txt");
-    assertTrue(file.canRead());
-    assertFalse(file.canWrite());
-    WritableMemory wmem = null;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      wmem = WritableMemory.writableMap(file, scope); //throws ReadOnlyException
-      wmem.getCapacity();
+    assertTrue(isFileReadOnly(file));
+    try (WritableMapHandle rh =
+        WritableMemory.writableMap(file)) { //throws
+      //
     }
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
-  public void checkReadException()
-      throws IllegalArgumentException, InvalidPathException, IllegalStateException, UnsupportedOperationException,
-      IOException, SecurityException {
+  @Test(expectedExceptions = ReadOnlyException.class)
+  public void checkOverLength() throws Exception  {
     File file = getResourceFile("GettysburgAddress.txt");
-    WritableMemory wmem = null;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      wmem = WritableMemory.writableMap(file, 0, 1 << 20, scope, ByteOrder.nativeOrder());
-      //throws ReadOnlyException
-      wmem.getCapacity();
+    try (WritableMapHandle rh =
+        WritableMemory.writableMap(file, 0, 1 << 20, ByteOrder.nativeOrder())) {
+      //
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
   }
 
   @Test
-  public void testForce()
-      throws IllegalArgumentException, InvalidPathException, IllegalStateException, UnsupportedOperationException,
-      IOException, SecurityException {
+  public void testForce() throws Exception {
     String origStr = "Corectng spellng mistks";
     File origFile = createFile("force_original.txt", origStr); //23
     assertTrue(origFile.setWritable(true, false));
     long origBytes = origFile.length();
     String correctStr = "Correcting spelling mistakes"; //28
     byte[] correctByteArr = correctStr.getBytes(UTF_8);
-    long correctBytesLen = correctByteArr.length;
+    long corrBytes = correctByteArr.length;
 
-    Memory mem = null;
-    WritableMemory wmem = null;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      mem = Memory.map(origFile, 0, origBytes, scope, ByteOrder.nativeOrder());
-      mem.load();
-      assertTrue(mem.isLoaded());
+    try (MapHandle rh = Memory.map(origFile, 0, origBytes, ByteOrder.nativeOrder())) {
+      Memory map = rh.get();
+      rh.load();
+      assertTrue(rh.isLoaded());
       //confirm orig string
       byte[] buf = new byte[(int)origBytes];
-      mem.getByteArray(0, buf, 0, (int)origBytes);
+      map.getByteArray(0, buf, 0, (int)origBytes);
       String bufStr = new String(buf, UTF_8);
       assertEquals(bufStr, origStr);
+    }
 
-      wmem = WritableMemory.writableMap(origFile, 0, correctBytesLen, scope, ByteOrder.nativeOrder());
-      wmem.load();
-      assertTrue(wmem.isLoaded());
+    try (WritableMapHandle wrh = WritableMemory.writableMap(origFile, 0, corrBytes,
+        ByteOrder.nativeOrder())) {
+      WritableMemory wMap = wrh.getWritable();
+      wrh.load();
+      assertTrue(wrh.isLoaded());
       // over write content
-      wmem.putByteArray(0, correctByteArr, 0, (int)correctBytesLen);
-      wmem.force();
+      wMap.putByteArray(0, correctByteArr, 0, (int)corrBytes);
+      wrh.force();
       //confirm correct string
-      byte[] buf2 = new byte[(int)correctBytesLen];
-      wmem.getByteArray(0, buf2, 0, (int)correctBytesLen);
-      String bufStr2 = new String(buf2, UTF_8);
-      assertEquals(bufStr2, correctStr);
+      byte[] buf = new byte[(int)corrBytes];
+      wMap.getByteArray(0, buf, 0, (int)corrBytes);
+      String bufStr = new String(buf, UTF_8);
+      assertEquals(bufStr, correctStr);
     }
   }
 
@@ -217,6 +231,23 @@ public class AllocateDirectWritableMapMemoryTest {
     }
     return file;
   }
+
+  @Test
+  public void checkExplicitClose() throws Exception {
+    File file = getResourceFile("GettysburgAddress.txt");
+    try (MapHandle wmh = Memory.map(file)) {
+      wmh.close(); //explicit close.
+    } //end of scope call to Cleaner/Deallocator also will be redundant
+  }
+
+  @AfterClass
+  public void checkDirectCounter() {
+    long count =  BaseState.getCurrentDirectMemoryMapAllocations();
+      if (count != 0) {
+        println(""+count);
+        fail();
+      }
+    }
 
   @Test
   public void printlnTest() {

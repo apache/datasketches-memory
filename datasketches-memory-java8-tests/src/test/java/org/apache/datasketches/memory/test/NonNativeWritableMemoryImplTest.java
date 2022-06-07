@@ -17,12 +17,13 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.test;
 
 import static org.testng.Assert.assertEquals;
 
 import java.nio.ByteOrder;
 
+import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
@@ -166,11 +167,53 @@ public class NonNativeWritableMemoryImplTest {
 
   //check Atomic Write Methods
 
+
+  @Test
+  public void testGetAndAddLong() {
+    wmem.getAndAddLong(0, 1L);
+    try {
+      wmem.getAndAddLong(1, 1L);
+      throw new RuntimeException("Expected AssertionError");
+    } catch (final AssertionError expected) {
+      // ignore
+    }
+  }
+
+  @Test
+  public void testGetAndSetLong() {
+    wmem.getAndSetLong(0, 1L);
+    try {
+      wmem.getAndSetLong(1, 1L);
+      throw new RuntimeException("Expected AssertionError");
+    } catch (final AssertionError expected) {
+      // ignore
+    }
+  }
+
+  @Test
+  public void testCompareAndSwapLong() {
+    wmem.compareAndSwapLong(0, 0L, 1L);
+    try {
+      wmem.compareAndSwapLong(1, 0L, 1L);
+      throw new RuntimeException("Expected AssertionError");
+    } catch (final AssertionError expected) {
+      // ignore
+    }
+  }
+
   //check Region
   @Test
   public void checkRegion() {
     WritableMemory wreg = wmem.writableRegion(0, wmem.getCapacity());
-    assertEquals(wreg.getByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(wreg.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
+  }
+
+  @Test
+  public void checkRegionZeros() {
+    byte[] bArr1 = new byte[0];
+    WritableMemory wmem1 = WritableMemory.writableWrap(bArr1, ByteOrder.BIG_ENDIAN);
+    Memory reg = wmem1.region(0, wmem1.getCapacity());
+    assertEquals(reg.getTypeByteOrder(), ByteOrder.LITTLE_ENDIAN);
   }
 
 }

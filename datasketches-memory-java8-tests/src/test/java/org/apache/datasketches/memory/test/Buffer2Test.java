@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.test;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -28,7 +28,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.Buffer;
+import org.apache.datasketches.memory.DefaultMemoryRequestServer;
 import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.memory.ReadOnlyException;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
@@ -50,6 +52,8 @@ public class Buffer2Test {
     while (buffer.hasRemaining()) {
       assertEquals(bb.get(), buffer.getByte());
     }
+
+    assertEquals(true, buffer.hasArray());
     assertEquals(true, buffer.hasByteBuffer());
   }
 
@@ -69,6 +73,7 @@ public class Buffer2Test {
       assertEquals(bb.get(), buffer.getByte());
     }
 
+    assertEquals(false, buffer.hasArray());
     assertEquals(true, buffer.hasByteBuffer());
   }
 
@@ -91,6 +96,7 @@ public class Buffer2Test {
     buffer.getByteArray(copyByteArray, 0, 64);
     assertEquals(byteArray, copyByteArray);
 
+    assertEquals(true, buffer.hasArray());
     assertEquals(false, buffer.hasByteBuffer());
   }
 
@@ -215,6 +221,30 @@ public class Buffer2Test {
   }
 
   @Test
+  public void testWrapBooleanArray() {
+    boolean[] booleanArray = new boolean[64];
+
+    for (int i = 0; i < 64; i++) {
+      if ((i % 3) == 0) {
+        booleanArray[i] = true;
+      }
+    }
+
+    Buffer buffer = Memory.wrap(booleanArray).asBuffer();
+    int i = 0;
+    while (buffer.hasRemaining()) {
+      assertEquals(booleanArray[i++], buffer.getBoolean());
+    }
+
+    buffer.setPosition(0);
+    boolean[] copyBooleanArray = new boolean[64];
+    buffer.getBooleanArray(copyBooleanArray, 0, 64);
+    for (int j = 0; j < copyBooleanArray.length; j++) {
+      assertEquals(booleanArray[j], copyBooleanArray[j]);
+    }
+  }
+
+  @Test
   public void testByteBufferPositionPreservation() {
     ByteBuffer bb = ByteBuffer.allocate(64).order(ByteOrder.nativeOrder());
 
@@ -251,7 +281,7 @@ public class Buffer2Test {
   public void testGetSetIncResetPosition() {
     ByteBuffer bb = ByteBuffer.allocate(64).order(ByteOrder.nativeOrder());
 
-    byte b = 0;
+    Byte b = 0;
     while (bb.hasRemaining()) {
       bb.put(b);
       b++;
@@ -321,7 +351,7 @@ public class Buffer2Test {
     for (int i = 0; i < n; i++) { arr[i] = i; }
     Memory mem = Memory.wrap(arr);
     Buffer buf = mem.asBuffer();
-    Buffer reg = buf.region(n2 * 8, n2 * 8, buf.getByteOrder()); //top half
+    Buffer reg = buf.region(n2 * 8, n2 * 8, buf.getTypeByteOrder()); //top half
     for (int i = 0; i < n2; i++) {
       long v = reg.getLong(i * 8);
       long e = i + n2;
@@ -350,7 +380,7 @@ public class Buffer2Test {
     }
   }
 
-  @Test(expectedExceptions = UnsupportedOperationException.class)
+  @Test(expectedExceptions = AssertionError.class)
   public void testROByteBuffer() {
     byte[] arr = new byte[64];
     ByteBuffer roBB = ByteBuffer.wrap(arr).asReadOnlyBuffer();
@@ -359,7 +389,7 @@ public class Buffer2Test {
     wbuf.putByte(0, (byte) 1);
   }
 
-  @Test(expectedExceptions = UnsupportedOperationException.class)
+  @Test(expectedExceptions = ReadOnlyException.class)
   public void testROByteBuffer2() {
     byte[] arr = new byte[64];
     ByteBuffer roBB = ByteBuffer.wrap(arr).asReadOnlyBuffer();
@@ -368,7 +398,7 @@ public class Buffer2Test {
     wbuf.putByteArray(arr, 0, 64);
   }
 
-  @Test(expectedExceptions = UnsupportedOperationException.class)
+  @Test(expectedExceptions = ReadOnlyException.class)
   public void testIllegalFill() {
     byte[] arr = new byte[64];
     ByteBuffer roBB = ByteBuffer.wrap(arr).asReadOnlyBuffer();
@@ -380,7 +410,9 @@ public class Buffer2Test {
   @Test
   public void checkWritableWrap() {
     ByteBuffer bb = ByteBuffer.allocate(16);
-    WritableBuffer buf = WritableBuffer.writableWrap(bb, ByteOrder.nativeOrder());
+    WritableBuffer buf = WritableBuffer.writableWrap(bb, ByteOrder.nativeOrder(), null);
+    assertNotNull(buf);
+    buf = WritableBuffer.writableWrap(bb, ByteOrder.nativeOrder(), new DefaultMemoryRequestServer());
     assertNotNull(buf);
   }
 

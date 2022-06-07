@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.test;
 
 import static org.apache.datasketches.memory.XxHash.*;
 import static org.testng.Assert.assertEquals;
@@ -103,7 +103,7 @@ public class XxHash64Test {
   /**
    * This simple test compares the output of {@link BaseState#xxHash64(long, long, long)} with the
    * output of {@link net.openhft.hashing.LongHashFunction}, that itself is tested against the
-   * reference implementation in C.  This increases confidence that the xxHash function implemented
+   * reference implementation in C.  This increase confidence that the xxHash function implemented
    * in this package is in fact the same xxHash function implemented in C.
    *
    * @author Roman Leventov
@@ -165,6 +165,10 @@ public class XxHash64Test {
     hash1 = hashDoubleArr(darr, 1, 1, 0);
     assertEquals(hash1, hash0);
 
+    boolean[] blarr = new boolean[16];
+    wmem.getBooleanArray(0, blarr, 0, 16); //any byte != 0 is true
+    hash1 = hashBooleanArr(blarr, 8, 8, 0);
+    assertEquals(hash1, hash0);
   }
 
   @Test

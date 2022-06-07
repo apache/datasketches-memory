@@ -17,34 +17,32 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.test;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.apache.datasketches.memory.internal.Util.UNSAFE_COPY_THRESHOLD_BYTES;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.channels.Channels;
+import java.nio.channels.WritableByteChannel;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.datasketches.memory.BaseState;
+import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableMemory;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import jdk.incubator.foreign.ResourceScope;
-
 public class MemoryWriteToTest {
-  private static final MemoryRequestServer memReqSvr = BaseState.defaultMemReqSvr;
 
   @Test
-  public void testOnHeapBytes() throws IOException {
+  public void testOnHeap() throws IOException {
     testWriteTo(createRandomBytesMemory(0));
     testWriteTo(createRandomBytesMemory(7));
     testWriteTo(createRandomBytesMemory(1023));
     testWriteTo(createRandomBytesMemory(10_000));
-    testWriteTo(createRandomBytesMemory((1 << 20) * 5));
-    testWriteTo(createRandomBytesMemory(((1 << 20) * 5) + 10));
+    testWriteTo(createRandomBytesMemory(UNSAFE_COPY_THRESHOLD_BYTES * 5));
+    testWriteTo(createRandomBytesMemory((UNSAFE_COPY_THRESHOLD_BYTES * 5) + 10));
   }
 
   @Test
@@ -53,20 +51,21 @@ public class MemoryWriteToTest {
     testWriteTo(createRandomIntsMemory(7));
     testWriteTo(createRandomIntsMemory(1023));
     testWriteTo(createRandomIntsMemory(10_000));
-    testWriteTo(createRandomIntsMemory((1 << 20) * 5));
-    testWriteTo(createRandomIntsMemory(((1 << 20) * 5) + 10));
+    testWriteTo(createRandomIntsMemory(UNSAFE_COPY_THRESHOLD_BYTES * 5));
+    testWriteTo(createRandomIntsMemory((UNSAFE_COPY_THRESHOLD_BYTES * 5) + 10));
   }
 
   @Test
   public void testOffHeap() throws Exception {
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory mem = WritableMemory.allocateDirect(((1 << 20) * 5) + 10, scope, memReqSvr);
+    try (WritableHandle handle =
+        WritableMemory.allocateDirect((UNSAFE_COPY_THRESHOLD_BYTES * 5) + 10)) {
+      WritableMemory mem = handle.getWritable();
       testWriteTo(mem.region(0, 0));
       testOffHeap(mem, 7);
       testOffHeap(mem, 1023);
       testOffHeap(mem, 10_000);
-      testOffHeap(mem, (1 << 20) * 5);
-      testOffHeap(mem, ((1 << 20) * 5) + 10);
+      testOffHeap(mem, UNSAFE_COPY_THRESHOLD_BYTES * 5);
+      testOffHeap(mem, (UNSAFE_COPY_THRESHOLD_BYTES * 5) + 10);
     }
   }
 
@@ -87,15 +86,11 @@ public class MemoryWriteToTest {
   }
 
   private static void testWriteTo(Memory mem) throws IOException {
-    int cap = (int)mem.getCapacity();
-    ByteArrayOutputStream baos = new ByteArrayOutputStream(cap);
-    mem.writeToByteStream(0, cap, baos);
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    try (WritableByteChannel out = Channels.newChannel(baos)) {
+      mem.writeTo(0, mem.getCapacity(), out);
+    }
     byte[] result = baos.toByteArray();
-    assertTrue(mem.equalTo(0, Memory.wrap(result), 0, cap));
-    //OR
-    byte[] barr = new byte[cap];
-    mem.getByteArray(0, barr, 0, cap);
-    assertEquals(barr, result);
+    Assert.assertTrue(mem.equals(Memory.wrap(result)));
   }
-
 }

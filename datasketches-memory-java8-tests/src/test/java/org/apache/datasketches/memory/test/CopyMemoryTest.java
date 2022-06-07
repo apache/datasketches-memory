@@ -17,23 +17,20 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.test;
 
+import static org.apache.datasketches.memory.internal.Util.UNSAFE_COPY_THRESHOLD_BYTES;
 import static org.testng.Assert.assertEquals;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.datasketches.memory.BaseState;
+import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import jdk.incubator.foreign.ResourceScope;
-
 public class CopyMemoryTest {
-  private static final MemoryRequestServer memReqSvr = BaseState.defaultMemReqSvr;
 
   @Test
   public void heapWSource() {
@@ -61,22 +58,24 @@ public class CopyMemoryTest {
   public void directWSource() throws Exception {
     int k1 = 1 << 20; //longs
     int k2 = 2 * k1;
-    WritableMemory srcMem = genWmem(k1, false);
-    WritableMemory dstMem = genMem(k2, true);
-    srcMem.copyTo(0, dstMem, k1 << 3, k1 << 3);
-    check(dstMem, k1, k1, 1);
-    srcMem.close();
+    try (WritableHandle wrh = genWRH(k1, false)) {
+      WritableMemory srcMem = wrh.getWritable();
+      WritableMemory dstMem = genMem(k2, true);
+      srcMem.copyTo(0, dstMem, k1 << 3, k1 << 3);
+      check(dstMem, k1, k1, 1);
+    }
   }
 
   @Test
   public void directROSource() throws Exception {
     int k1 = 1 << 20; //longs
     int k2 = 2 * k1;
-    Memory srcMem = genWmem(k1, false);
-    WritableMemory dstMem = genMem(k2, true);
-    srcMem.copyTo(0, dstMem, k1 << 3, k1 << 3);
-    check(dstMem, k1, k1, 1);
-    srcMem.close();
+    try (WritableHandle wrh = genWRH(k1, false)) {
+      Memory srcMem = wrh.get();
+      WritableMemory dstMem = genMem(k2, true);
+      srcMem.copyTo(0, dstMem, k1 << 3, k1 << 3);
+      check(dstMem, k1, k1, 1);
+    }
   }
 
   @Test
@@ -108,38 +107,40 @@ public class CopyMemoryTest {
   public void directROSrcRegion() throws Exception {
     int k1 = 1 << 20; //longs
     //gen baseMem of k1 longs w data, direct
-    Memory baseMem = genWmem(k1, false);
-    //gen src region of k1/2 longs, off= k1/2
-    Memory srcReg = baseMem.region((k1/2) << 3, (k1/2) << 3);
-
-    WritableMemory dstMem = genMem(2 * k1, true); //empty
-    srcReg.copyTo(0, dstMem, k1 << 3, (k1/2) << 3);
-    check(dstMem, k1, k1/2, (k1/2) + 1);
-    baseMem.close();
+    try (WritableHandle wrh = genWRH(k1, false)) {
+      Memory baseMem = wrh.get();
+      //gen src region of k1/2 longs, off= k1/2
+      Memory srcReg = baseMem.region((k1/2) << 3, (k1/2) << 3);
+      WritableMemory dstMem = genMem(2 * k1, true); //empty
+      srcReg.copyTo(0, dstMem, k1 << 3, (k1/2) << 3);
+      check(dstMem, k1, k1/2, (k1/2) + 1);
+    }
   }
 
   @Test
   public void testOverlappingCopyLeftToRight() {
-    byte[] bytes = new byte[(((1 << 20) * 5) / 2) + 1];
+    byte[] bytes = new byte[((UNSAFE_COPY_THRESHOLD_BYTES * 5) / 2) + 1];
     ThreadLocalRandom.current().nextBytes(bytes);
     byte[] referenceBytes = bytes.clone();
     Memory referenceMem = Memory.wrap(referenceBytes);
     WritableMemory mem = WritableMemory.writableWrap(bytes);
-    long copyLen = (1 << 20) * 2;
-    mem.copyTo(0, mem, (1 << 20) / 2, copyLen);
-    Assert.assertEquals(0, mem.compareTo((1 << 20) / 2, copyLen, referenceMem, 0, copyLen));
+    long copyLen = UNSAFE_COPY_THRESHOLD_BYTES * 2;
+    mem.copyTo(0, mem, UNSAFE_COPY_THRESHOLD_BYTES / 2, copyLen);
+    Assert.assertEquals(0, mem.compareTo(UNSAFE_COPY_THRESHOLD_BYTES / 2, copyLen, referenceMem, 0,
+        copyLen));
   }
 
   @Test
   public void testOverlappingCopyRightToLeft() {
-    byte[] bytes = new byte[(((1 << 20) * 5) / 2) + 1];
+    byte[] bytes = new byte[((UNSAFE_COPY_THRESHOLD_BYTES * 5) / 2) + 1];
     ThreadLocalRandom.current().nextBytes(bytes);
     byte[] referenceBytes = bytes.clone();
     Memory referenceMem = Memory.wrap(referenceBytes);
     WritableMemory mem = WritableMemory.writableWrap(bytes);
-    long copyLen = (1 << 20) * 2;
-    mem.copyTo((1 << 20) / 2, mem, 0, copyLen);
-    Assert.assertEquals(0, mem.compareTo(0, copyLen, referenceMem, (1 << 20) / 2, copyLen));
+    long copyLen = UNSAFE_COPY_THRESHOLD_BYTES * 2;
+    mem.copyTo(UNSAFE_COPY_THRESHOLD_BYTES / 2, mem, 0, copyLen);
+    Assert.assertEquals(0, mem.compareTo(0, copyLen, referenceMem, UNSAFE_COPY_THRESHOLD_BYTES / 2,
+        copyLen));
   }
 
   private static void check(Memory mem, int offsetLongs, int lengthLongs, int startValue) {
@@ -149,16 +150,17 @@ public class CopyMemoryTest {
     }
   }
 
-  @SuppressWarnings("resource")
-  private static WritableMemory genWmem(int longs, boolean empty) {
-    WritableMemory wmem = WritableMemory.allocateDirect(longs << 3, ResourceScope.newConfinedScope(), memReqSvr);
+  private static WritableHandle genWRH(int longs, boolean empty) {
+    WritableHandle wrh = WritableMemory.allocateDirect(longs << 3);
+    WritableMemory mem = wrh.getWritable();
     if (empty) {
-      wmem.clear();
+      mem.clear();
     } else {
-      for (int i = 0; i < longs; i++) { wmem.putLong(i << 3, i + 1); }
+      for (int i = 0; i < longs; i++) { mem.putLong(i << 3, i + 1); }
     }
-    return wmem;
+    return wrh;
   }
+
 
   private static WritableMemory genMem(int longs, boolean empty) {
     WritableMemory mem = WritableMemory.allocate(longs << 3);

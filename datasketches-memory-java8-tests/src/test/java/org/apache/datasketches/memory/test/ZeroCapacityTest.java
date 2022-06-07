@@ -17,28 +17,23 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.test;
 
 import static org.testng.Assert.assertEquals;
 
 import java.nio.ByteBuffer;
 
-import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import jdk.incubator.foreign.ResourceScope;
 
 /**
  * @author Lee Rhodes
  */
 public class ZeroCapacityTest {
-  private static final MemoryRequestServer memReqSvr = BaseState.defaultMemReqSvr;
 
-  @SuppressWarnings("resource")
   @Test
   public void checkZeroCapacity() throws Exception {
     WritableMemory wmem = WritableMemory.allocate(0);
@@ -48,15 +43,12 @@ public class ZeroCapacityTest {
     Memory.wrap(ByteBuffer.allocate(0));
     Memory mem3 = Memory.wrap(ByteBuffer.allocateDirect(0));
     mem3.region(0, 0);
-    WritableMemory nullMem = null;
-    ResourceScope scope = ResourceScope.newConfinedScope();
-    try { //Invalid allocation size : 0
-      nullMem = WritableMemory.allocateDirect(0, scope, memReqSvr);
+    WritableHandle wh = null;
+    try {
+      wh = WritableMemory.allocateDirect(0);
       Assert.fail();
     } catch (IllegalArgumentException ignore) {
-      if (nullMem != null) {
-        nullMem.close();
-      }
+      if (wh != null) { wh.close(); }
       // expected
     }
   }

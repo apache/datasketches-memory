@@ -17,16 +17,17 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.test;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.BaseState;
+import org.apache.datasketches.memory.DefaultMemoryRequestServer;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
@@ -48,7 +49,6 @@ import org.testng.annotations.Test;
  *
  */
 public class DruidIssue11544Test {
-  private static final MemoryRequestServer memReqSvr = BaseState.defaultMemReqSvr;
 
   @Test
   public void withByteBuffer() {
@@ -63,9 +63,18 @@ public class DruidIssue11544Test {
     WritableMemory mem1 = WritableMemory.writableWrap(bb);
     assertTrue(mem1.isDirect()); //confirm mem1 is off-heap
 
+    //Acquire the DefaultMemoryRequestServer
+    //NOTE: it is a policy decision to allow the DefaultMemoryServer to be set as a default.
+    // It might be set to null. So we need to check what the current policy is.
+    MemoryRequestServer svr = mem1.getMemoryRequestServer();
+    if (svr == null) {
+      svr = new DefaultMemoryRequestServer();
+    }
+    assertNotNull(svr);
+
     //Request Bigger Memory
     int size2 = size1 * 2;
-    WritableMemory mem2 = memReqSvr.request(mem1, size2);
+    WritableMemory mem2 = svr.request(mem1, size2);
 
     //Confirm that mem2 is on the heap (the default) and 2X size1
     assertFalse(mem2.isDirect());
@@ -76,13 +85,13 @@ public class DruidIssue11544Test {
 
     //Prepare to request deallocation
     //In the DefaultMemoryRequestServer, this is a no-op, so nothing is actually deallocated.
-    memReqSvr.requestClose(mem1, mem2);
-    assertTrue(mem1.isAlive());
-    assertTrue(mem2.isAlive());
+    svr.requestClose(mem1, mem2);
+    assertTrue(mem1.isValid());
+    assertTrue(mem2.isValid());
 
     //Now we are on the heap and need to grow again:
     int size3 = size2 * 2;
-    WritableMemory mem3 = memReqSvr.request(mem2, size3);
+    WritableMemory mem3 = svr.request(mem2, size3);
 
     //Confirm that mem3 is still on the heap and 2X of size2
     assertFalse(mem3.isDirect());
@@ -93,9 +102,9 @@ public class DruidIssue11544Test {
 
     //Prepare to request deallocation
 
-    memReqSvr.requestClose(mem2, mem3); //No-op
-    assertTrue(mem2.isAlive());
-    assertTrue(mem3.isAlive());
+    svr.requestClose(mem2, mem3); //No-op
+    assertTrue(mem2.isValid());
+    assertTrue(mem3.isValid());
   }
 
 }

@@ -17,27 +17,23 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.test;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
 import java.nio.ByteBuffer;
 
-import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.Buffer;
-import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableBuffer;
+import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
-
-import jdk.incubator.foreign.ResourceScope;
 
 /**
  * @author Lee Rhodes
  */
 public class BufferInvariantsTest {
-  private static final MemoryRequestServer memReqSvr = BaseState.defaultMemReqSvr;
 
   @Test
   public void testRegion() {
@@ -165,8 +161,8 @@ public class BufferInvariantsTest {
 
   @Test
   public void checkLimitsDirect() throws Exception {
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(100, scope, memReqSvr);
+    try (WritableHandle hand = WritableMemory.allocateDirect(100)) {
+      WritableMemory wmem = hand.getWritable();
       Buffer buf = wmem.asBuffer();
       buf.setStartPositionEnd(40, 45, 50);
       buf.setStartPositionEnd(0, 0, 100);
@@ -174,7 +170,7 @@ public class BufferInvariantsTest {
         buf.setStartPositionEnd(0, 0, 101);
         fail();
       } catch (AssertionError e) {
-        //
+        //ok
       }
     }
   }
@@ -236,8 +232,8 @@ public class BufferInvariantsTest {
   @Test
   public void testBufDirect() throws Exception {
     int n = 25;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-    WritableMemory wmem = WritableMemory.allocateDirect(n, scope, memReqSvr);
+    try (WritableHandle whand = WritableMemory.allocateDirect(n)) {
+    WritableMemory wmem = whand.getWritable();
     WritableBuffer buf = wmem.asWritableBuffer();
     for (byte i = 0; i < n; i++) { buf.putByte(i); }
     buf.setPosition(0);

@@ -17,24 +17,20 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.test;
 
 import static org.testng.Assert.fail;
 
-import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
-
-import jdk.incubator.foreign.ResourceScope;
 
 /**
  * @author Lee Rhodes
  */
 public class BaseBufferTest {
-  private static final MemoryRequestServer memReqSvr = BaseState.defaultMemReqSvr;
 
   @Test
   public void checkLimits() {
@@ -78,15 +74,16 @@ public class BaseBufferTest {
   }
 
   @Test
-  public void checkCheckNotAliveAfterTWR() {
+  public void checkCheckValid() throws Exception {
     WritableMemory wmem;
     Buffer buf;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      wmem = WritableMemory.allocateDirect(100, scope, memReqSvr);
+    try (WritableHandle hand = WritableMemory.allocateDirect(100)) {
+      wmem = hand.getWritable();
       buf = wmem.asBuffer();
     }
     try {
-      buf.asMemory(); //not alive
-    } catch (IllegalStateException e) { }
+      @SuppressWarnings("unused")
+      Memory mem = buf.asMemory();
+    } catch (AssertionError ae) { }
   }
 }

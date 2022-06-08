@@ -26,7 +26,6 @@ import jdk.incubator.foreign.MemorySegment;
 /**
  * @author Lee Rhodes
  */
-@SuppressWarnings("restriction")
 final class CompareAndCopy {
 
   private CompareAndCopy() { }

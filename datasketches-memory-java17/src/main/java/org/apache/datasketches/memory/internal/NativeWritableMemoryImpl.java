@@ -42,7 +42,6 @@ import jdk.incubator.foreign.MemorySegment;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-@SuppressWarnings("restriction")
 final class NativeWritableMemoryImpl extends BaseWritableMemoryImpl {
 
   //Pass-through ctor

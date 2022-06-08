@@ -49,7 +49,6 @@ import jdk.incubator.foreign.MemorySegment;
  * Common base of native-ordered and non-native-ordered {@link WritableBuffer} implementations.
  * Contains methods which are agnostic to the byte order.
  */
-@SuppressWarnings("restriction")
 public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements WritableBuffer {
 
   //Pass-through constructor

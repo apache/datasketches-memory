@@ -124,7 +124,6 @@ public interface WritableMemory extends Memory {
    * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
    * @return WritableMemory for this off-heap, native resource.
    */
-  @SuppressWarnings("resource")
   static WritableMemory allocateDirect(long capacityBytes, ResourceScope scope, MemoryRequestServer memReqSvr) {
     return allocateDirect(capacityBytes, 8, scope, ByteOrder.nativeOrder(), memReqSvr);
   }
@@ -144,7 +143,6 @@ public interface WritableMemory extends Memory {
    * This is a callback mechanism for a user client of direct memory to request more memory.
    * @return WritableMemory
    */
-  @SuppressWarnings("resource")
   static WritableMemory allocateDirect(
       long capacityBytes,
       long alignmentBytes,

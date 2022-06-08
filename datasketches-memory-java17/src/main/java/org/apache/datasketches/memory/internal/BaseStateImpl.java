@@ -40,7 +40,6 @@ import jdk.incubator.foreign.ResourceScope;
  *
  * @author Lee Rhodes
  */
-@SuppressWarnings("restriction")
 abstract class BaseStateImpl implements BaseState {
   static final String JDK; //must be at least "1.8"
   static final int JDK_MAJOR; //8, 11, 12, etc

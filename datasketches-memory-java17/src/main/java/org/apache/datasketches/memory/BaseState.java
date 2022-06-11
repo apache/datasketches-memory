@@ -193,14 +193,15 @@ public interface BaseState {
   boolean isRegion();
 
   /**
-   * Returns true if the backing resource of <i>this</i> is identical with the backing resource
-   * of <i>that</i>. The capacities must be the same.  If <i>this</i> is a region,
-   * the region offset must also be the same.
-   * @param that A different non-null object
-   * @return true if the backing resource of <i>this</i> is the same as the backing resource
-   * of <i>that</i>.
+   * Returns a positive number if <i>this</i> overlaps <i>that</i> and <i>this</i> base address is &le; <i>that</i>
+   * base address.
+   * Returns a negative number if <i>this</i> overlaps <i>that</i> and <i>this</i> base address is &gt; <i>that</i>
+   * base address.
+   * Returns a zero if there is no overlap or if one or both objects are null, not active or on heap.
+   * @param that the other BaseState object
+   * @return a long value representing the ordering and size of overlap between <i>this</i> and <i>that</i>.
    */
-  boolean isSameResource(Object that);
+  long nativeOverlap(BaseState that);
 
   /**
    * Loads the contents of this mapped segment into physical memory. Please refer to

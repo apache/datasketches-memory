@@ -127,7 +127,7 @@ public final class XxHash {
    * @param seed A long valued seed.
    * @return the hash.
    */
-  public static long hashLong(final long in, final int seed) {
+  public static long hashLong(final long in, final long seed) {
     return hash(in, seed);
   }
 

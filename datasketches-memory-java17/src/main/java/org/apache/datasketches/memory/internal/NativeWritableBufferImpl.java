@@ -45,7 +45,6 @@ import jdk.incubator.foreign.MemorySegment;
  */
 final class NativeWritableBufferImpl extends BaseWritableBufferImpl {
 
-  //Pass-through ctor
   NativeWritableBufferImpl(
       final MemorySegment seg,
       final int typeId,

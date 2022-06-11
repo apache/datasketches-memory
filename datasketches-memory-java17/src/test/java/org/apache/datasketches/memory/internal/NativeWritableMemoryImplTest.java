@@ -625,14 +625,6 @@ public class NativeWritableMemoryImplTest {
   }
 
   @Test
-  public void checkIsSameResource() {
-    byte[] byteArr = new byte[64];
-    WritableMemory wmem1 = WritableMemory.writableWrap(byteArr);
-    WritableMemory wmem2 = WritableMemory.writableWrap(byteArr);
-    assertTrue(wmem1.isSameResource(wmem2));
-  }
-
-  @Test
   public void checkAsWritableBufferWithBB() {
     ByteBuffer byteBuf = ByteBuffer.allocate(64);
     byteBuf.position(16);

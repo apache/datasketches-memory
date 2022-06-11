@@ -450,14 +450,6 @@ public class NativeWritableBufferImplTest {
   }
 
   @Test
-  public void checkIsSameResource() {
-    byte[] byteArr = new byte[64];
-    WritableBuffer wbuf1 = WritableMemory.writableWrap(byteArr).asWritableBuffer();
-    WritableBuffer wbuf2 = WritableMemory.writableWrap(byteArr).asWritableBuffer();
-    assertTrue(wbuf1.isSameResource(wbuf2));
-  }
-
-  @Test
   public void checkDegenerateRegionReturn() {
     Memory mem = Memory.wrap(new byte[0]);
     Buffer buf = mem.asBuffer();

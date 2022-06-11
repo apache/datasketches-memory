@@ -19,6 +19,7 @@
 
 package org.apache.datasketches.memory.internal;
 
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -26,23 +27,48 @@ import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
+
+import jdk.incubator.foreign.MemorySegment;
+import jdk.incubator.foreign.ResourceScope;
 
 public class BaseStateTest {
 
   @Test
-  public void checkIsSameResource() {
-    WritableMemory wmem = WritableMemory.allocate(16);
-    Memory mem = wmem;
-    assertFalse(wmem.isSameResource(null));
-    assertTrue(wmem.isSameResource(mem));
+  public void checkNativeOverlap() {
+    MemorySegment par = MemorySegment.allocateNative(100, ResourceScope.newImplicitScope());
+    //Equal sizes
+    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 20), getSeg(par, 40, 60)),   0);
+    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 20), getSeg(par, 20, 40)),   0);
+    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 20), getSeg(par,  0, 20)),  20);
+    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 20), getSeg(par, 10, 30)),  10);
+    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 10, 30), getSeg(par,  0, 20)), -10);
+    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 20, 40), getSeg(par,  0, 20)),   0);
+    //Unequal Sizes A > B
+    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 40), getSeg(par, 60, 80)),   0);
+    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 40), getSeg(par, 40, 60)),   0);
+    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 40), getSeg(par, 30, 50)),  10);
+    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 40), getSeg(par, 20, 40)),  20);
+    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 40), getSeg(par, 10, 30)),  20);
+    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 40), getSeg(par,  0, 20)),  20);
+    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 10, 50), getSeg(par,  0, 20)), -10);
+    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 20, 60), getSeg(par,  0, 20)),   0);
+    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 40, 80), getSeg(par,  0, 20)),   0);
+    //Unequal Sizes B > A
+    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 60, 80), getSeg(par,  0, 40)),   0);
+    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 40, 60), getSeg(par,  0, 40)),   0);
+    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 30, 50), getSeg(par,  0, 40)), -10);
+    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 20, 40), getSeg(par,  0, 40)), -20);
+    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 10, 30), getSeg(par,  0, 40)), -20);
+    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 20), getSeg(par,  0, 40)),  20);
+    assertEquals(BaseStateImpl.nativeOverlap( getSeg(par, 0, 20), getSeg(par, 10, 50)),  10);
+    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 20), getSeg(par, 20, 60)),   0);
+    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 20), getSeg(par, 40, 80)),   0);
+  }
 
-    WritableBuffer wbuf = wmem.asWritableBuffer();
-    Buffer buf = wbuf;
-    assertFalse(wbuf.isSameResource(null));
-    assertTrue(wbuf.isSameResource(buf));
+  private static MemorySegment getSeg(MemorySegment parent, long left, long right) {
+    return parent.asSlice(left, right - left);
   }
 
   @Test

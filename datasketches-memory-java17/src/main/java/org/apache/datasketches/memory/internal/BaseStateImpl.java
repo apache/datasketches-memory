@@ -30,7 +30,6 @@ import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 
-import jdk.incubator.foreign.MemoryAddress;
 import jdk.incubator.foreign.MemorySegment;
 import jdk.incubator.foreign.ResourceScope;
 
@@ -375,14 +374,48 @@ abstract class BaseStateImpl implements BaseState {
   }
 
   @Override
-  public final boolean isSameResource(final Object that) {
-    if (this == that) { return true; }
-    final MemoryAddress myAdd = seg.address();
-    if (that instanceof BaseStateImpl) {
-      final MemoryAddress thatAdd = ((BaseStateImpl)that).seg.address();
-      return (myAdd.equals(thatAdd));
+  public final long nativeOverlap(final BaseState that) {
+    if (that == null) { return 0; }
+    if (!that.isAlive()) { return 0; }
+    BaseStateImpl thatBSI = (BaseStateImpl) that;
+    if (this == thatBSI) { return seg.byteSize(); }
+    return nativeOverlap(seg, thatBSI.seg);
+  }
+
+  static long nativeOverlap(final MemorySegment segA, final MemorySegment segB) {
+    if (!segA.isNative() || !segB.isNative()) { return 0; }
+    final long bytesA = segA.byteSize();
+    final long bytesB = segB.byteSize();
+    final long lA = segA.address().toRawLongValue(); //left A
+    final long lB = segB.address().toRawLongValue(); //left B
+    final long rA = lA + bytesA; //right A
+    final long rB = lB + bytesB; //right B
+    if (bytesA == bytesB) { return nativeOverlapEqualSizes(lA, rA, lB, rB); }
+    return nativeOverlapNotEqualSizes(lA, rA, lB, rB);
+  }
+
+  static long nativeOverlapEqualSizes(final long lA, final long rA, final long lB, final long rB) {
+    if ((rA <= lB) || (rB <= lA)) { return 0; }
+    if (lA == lB) { return rA - lA; } //size of A
+    if ((lA < lB) && (rA < rB)) { return rA - lB; } //positive if lB is higher than lA
+    return lA - rB; // (lB < lA) && (rB < rA)) negative if lB is lower than lA
+  }
+
+  static long nativeOverlapNotEqualSizes(final long lA, final long rA, final long lB, final long rB) {
+    if ((rA <= lB) || (rB <= lA)) { return 0; }
+    final long res;
+    if (rB - lB < rA - lA) {
+      res = bSmallerThanA(lA, rA, lB, rB);
+    } else {
+      res = bSmallerThanA(lB, rB, lA, rA); //A smaller than B, reverse coordinates
     }
-    return false;
+    return (lB < lA) ? -res : res;
+  }
+
+  static long bSmallerThanA(long lA, long rA, long lB, long rB) {
+    if ((lB < rA) && (rA < rB)) { return rA - lB; } //B overlaps A's right
+    if ((rB <= rA) && (lA <= lB)) { return rB - lB; } //B is totally within A
+    return rB - lA; // ((lB < lA) && (lA < rB)) B is lower
   }
 
   @Override
@@ -390,11 +423,6 @@ abstract class BaseStateImpl implements BaseState {
 
   @Override
   public ResourceScope scope() { return seg.scope(); }
-
-  //  @Override
-  //  public void setMemoryRequestServer(final MemoryRequestServer memReqSvr) {
-  //    this.memReqSvr = memReqSvr;
-  //  }
 
   @Override
   public ByteBuffer toByteBuffer(final ByteOrder order) {

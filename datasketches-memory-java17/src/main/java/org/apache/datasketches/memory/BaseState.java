@@ -68,6 +68,14 @@ public interface BaseState {
 
   /**
    * Returns true if the given object is an instance of this class and has equal contents to
+   * this object.
+   * @param that the given BaseState object
+   * @return true if the given object has equal contents to this object.
+   */
+  boolean equalTo(BaseState that);
+
+  /**
+   * Returns true if the given object is an instance of this class and has equal contents to
    * this object in the given range of bytes. This will also check two distinct ranges within the
    * same object for equals.
    * @param thisOffsetBytes the starting offset in bytes for this object.
@@ -77,7 +85,7 @@ public interface BaseState {
    * @return true if the given object has equal contents to this object in the given range of
    * bytes.
    */
-  boolean equalTo(long thisOffsetBytes, Object that,
+  boolean equalTo(long thisOffsetBytes, BaseState that,
       long thatOffsetBytes, long lengthBytes);
 
   /**
@@ -193,6 +201,12 @@ public interface BaseState {
   boolean isRegion();
 
   /**
+   * Loads the contents of this mapped segment into physical memory. Please refer to
+   * <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#load()">load()</a>
+   */
+  void load();
+
+  /**
    * Returns a positive number if <i>this</i> overlaps <i>that</i> and <i>this</i> base address is &le; <i>that</i>
    * base address.
    * Returns a negative number if <i>this</i> overlaps <i>that</i> and <i>this</i> base address is &gt; <i>that</i>
@@ -204,10 +218,12 @@ public interface BaseState {
   long nativeOverlap(BaseState that);
 
   /**
-   * Loads the contents of this mapped segment into physical memory. Please refer to
-   * <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#load()">load()</a>
+   * See <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#mismatch(jdk.incubator.foreign.MemorySegment)>mismatch</a>
+   * @param that the other BaseState
+   * @return the relative offset, in bytes, of the first mismatch between this and the given other BaseState object,
+   * otherwise -1 if no mismatch
    */
-  void load();
+  long mismatch(BaseState that);
 
   /**
    * Returns the resource scope associated with this memory segment.

@@ -282,11 +282,16 @@ abstract class BaseStateImpl implements BaseState {
   }
 
   @Override
-  public final boolean equalTo(final long thisOffsetBytes, final Object that,
+  public final boolean equalTo(final BaseState that) {
+    Objects.requireNonNull(that);
+    return equalTo(0, that, 0, that.getCapacity());
+  }
+
+  @Override
+  public final boolean equalTo(final long thisOffsetBytes, final BaseState that,
       final long thatOffsetBytes, final long lengthBytes) {
-    return that instanceof BaseStateImpl
-      ? CompareAndCopy.equals(seg, thisOffsetBytes, ((BaseStateImpl) that).seg, thatOffsetBytes, lengthBytes)
-      : false;
+    Objects.requireNonNull(that);
+   return CompareAndCopy.equals(seg, thisOffsetBytes, ((BaseStateImpl) that).seg, thatOffsetBytes, lengthBytes);
   }
 
   @Override
@@ -374,6 +379,17 @@ abstract class BaseStateImpl implements BaseState {
   }
 
   @Override
+  public void load() { seg.load(); }
+
+  @Override
+  public long mismatch(final BaseState that) {
+    Objects.requireNonNull(that);
+    if (!that.isAlive()) { throw new IllegalArgumentException("Given argument is not alive."); }
+    BaseStateImpl thatBSI = (BaseStateImpl) that;
+    return seg.mismatch(thatBSI.seg);
+  }
+
+  @Override
   public final long nativeOverlap(final BaseState that) {
     if (that == null) { return 0; }
     if (!that.isAlive()) { return 0; }
@@ -417,9 +433,6 @@ abstract class BaseStateImpl implements BaseState {
     if ((rB <= rA) && (lA <= lB)) { return rB - lB; } //B is totally within A
     return rB - lA; // ((lB < lA) && (lA < rB)) B is lower
   }
-
-  @Override
-  public void load() { seg.load(); }
 
   @Override
   public ResourceScope scope() { return seg.scope(); }

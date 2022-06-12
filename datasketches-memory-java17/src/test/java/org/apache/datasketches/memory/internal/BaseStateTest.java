@@ -73,9 +73,12 @@ public class BaseStateTest {
 
   @Test
   public void checkNotEqualTo() {
-    byte[] arr = new byte[8];
-    Memory mem = Memory.wrap(arr);
-    assertFalse(mem.equalTo(0, arr, 0, 8));
+    byte[] arr1 = new byte[8];
+    Memory mem = Memory.wrap(arr1);
+    byte[] arr2 = new byte[8];
+    arr2[7] = 1;
+    Memory mem2 = Memory.wrap(arr2);
+    assertFalse(mem.equalTo(0, mem2, 0, 8));
   }
 
   @Test

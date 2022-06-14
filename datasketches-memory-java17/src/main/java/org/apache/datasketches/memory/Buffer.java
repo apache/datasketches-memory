@@ -44,7 +44,7 @@ public interface Buffer extends BaseBuffer {
    * @return a new <i>Buffer</i> for read-only operations on the given ByteBuffer.
    */
   static Buffer wrap(ByteBuffer byteBuffer) {
-    return wrap(byteBuffer, ByteOrder.nativeOrder(), null);
+    return wrap(byteBuffer, ByteOrder.nativeOrder());
   }
 
   /**
@@ -57,11 +57,10 @@ public interface Buffer extends BaseBuffer {
    * This does not affect the ByteOrder of data already in the ByteBuffer.
    * @param byteBuffer the given ByteBuffer, must not be null
    * @param byteOrder the ByteOrder to be used. It must be non-null.
-   * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
    * @return a new <i>Buffer</i> for read-only operations on the given ByteBuffer.
    */
-  static Buffer wrap(ByteBuffer byteBuffer, ByteOrder byteOrder, MemoryRequestServer memReqSvr) {
-    return BaseWritableBufferImpl.wrapByteBuffer(byteBuffer, true, byteOrder, memReqSvr);
+  static Buffer wrap(ByteBuffer byteBuffer, ByteOrder byteOrder) {
+    return BaseWritableBufferImpl.wrapByteBuffer(byteBuffer, true, byteOrder, null);
   }
 
   //DUPLICATES

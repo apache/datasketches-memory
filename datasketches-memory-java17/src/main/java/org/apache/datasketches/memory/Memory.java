@@ -48,7 +48,7 @@ public interface Memory extends BaseState {
    * @return a new <i>Memory</i> for read-only operations on the given <i>ByteBuffer</i>.
    */
   static Memory wrap(ByteBuffer byteBuffer) {
-    return wrap(byteBuffer, ByteOrder.nativeOrder(), null);
+    return wrap(byteBuffer, ByteOrder.nativeOrder());
   }
 
   /**
@@ -59,11 +59,10 @@ public interface Memory extends BaseState {
    * This does not affect the ByteOrder of data already in the ByteBuffer.
    * @param byteBuffer the given <i>ByteBuffer</i>. It must be non-null.
    * @param byteOrder the byte order to be used.  It must be non-null.
-   * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
    * @return a new <i>Memory</i> for read-only operations on the given <i>ByteBuffer</i>.
    */
-  static Memory wrap(ByteBuffer byteBuffer, ByteOrder byteOrder, MemoryRequestServer memReqSvr) {
-    return BaseWritableMemoryImpl.wrapByteBuffer(byteBuffer, true, byteOrder, memReqSvr);
+  static Memory wrap(ByteBuffer byteBuffer, ByteOrder byteOrder) {
+    return BaseWritableMemoryImpl.wrapByteBuffer(byteBuffer, true, byteOrder, null);
   }
 
   //Duplicates make no sense here

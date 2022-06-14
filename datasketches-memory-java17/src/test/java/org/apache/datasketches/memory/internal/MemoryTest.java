@@ -241,7 +241,7 @@ public class MemoryTest {
     assertTrue(mem.getByteOrder() == ByteOrder.nativeOrder());
     assertEquals(mem.getByteOrder(), ByteOrder.LITTLE_ENDIAN);
     //Now explicitly set it
-    mem = Memory.wrap(bb, BaseState.NON_NATIVE_BYTE_ORDER, memReqSvr);
+    mem = Memory.wrap(bb, BaseState.NON_NATIVE_BYTE_ORDER);
     assertFalse(mem.getByteOrder() == ByteOrder.nativeOrder());
     assertEquals(mem.getByteOrder(), ByteOrder.BIG_ENDIAN);
   }
@@ -435,7 +435,7 @@ public class MemoryTest {
   public void wrapBigEndianAsLittle() {
     ByteBuffer bb = ByteBuffer.allocate(64);
     bb.putChar(0, (char)1); //as NNO
-    Memory mem = Memory.wrap(bb, ByteOrder.LITTLE_ENDIAN, memReqSvr);
+    Memory mem = Memory.wrap(bb, ByteOrder.LITTLE_ENDIAN);
     assertEquals(mem.getChar(0), 256);
   }
 

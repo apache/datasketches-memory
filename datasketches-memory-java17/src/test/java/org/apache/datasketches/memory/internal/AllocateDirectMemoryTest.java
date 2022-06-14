@@ -83,8 +83,7 @@ public class AllocateDirectMemoryTest {
     WritableMemory wmem = null;
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
       wmem = WritableMemory.allocateDirect( 128, 8, scope,
-          BaseState.NON_NATIVE_BYTE_ORDER,
-          memReqSvr);
+          BaseState.NON_NATIVE_BYTE_ORDER, memReqSvr);
       wmem.putChar(0, (char) 1);
       assertEquals(wmem.getByte(1), (byte) 1);
     }

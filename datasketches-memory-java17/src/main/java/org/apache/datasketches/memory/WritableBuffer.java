@@ -45,7 +45,7 @@ public interface WritableBuffer extends Buffer {
    * @return a new <i>WritableBuffer</i> for write operations on the given <i>ByteBuffer</i>.
    */
   static WritableBuffer writableWrap(ByteBuffer byteBuffer) {
-    return writableWrap(byteBuffer, ByteOrder.nativeOrder());
+    return writableWrap(byteBuffer, ByteOrder.nativeOrder(), null);
   }
 
   /**
@@ -58,11 +58,12 @@ public interface WritableBuffer extends Buffer {
    * This does not affect the ByteOrder of data already in the ByteBuffer.
    * @param byteBuffer the given ByteBuffer. It must be non-null and writable.
    * @param byteOrder the byte order to be used.  It must be non-null.
+   * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
    * @return a new <i>WritableBuffer</i> for write operations on the given <i>ByteBuffer</i>.
    * @throws IllegalArgumentException if ByteBuffer is not writable
    */
-  static WritableBuffer writableWrap(ByteBuffer byteBuffer, ByteOrder byteOrder) {
-    return BaseWritableBufferImpl.wrapByteBuffer(byteBuffer, false, byteOrder);
+  static WritableBuffer writableWrap(ByteBuffer byteBuffer, ByteOrder byteOrder, MemoryRequestServer memReqSvr) {
+    return BaseWritableBufferImpl.wrapByteBuffer(byteBuffer, false, byteOrder, memReqSvr);
   }
 
   //DUPLICATES

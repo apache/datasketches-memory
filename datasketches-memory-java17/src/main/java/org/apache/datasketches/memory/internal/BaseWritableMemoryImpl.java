@@ -87,7 +87,8 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
   public static WritableMemory wrapByteBuffer(
       final ByteBuffer byteBuffer,
       final boolean localReadOnly,
-      final ByteOrder byteOrder) {
+      final ByteOrder byteOrder,
+      final MemoryRequestServer memReqSvr) {
     Objects.requireNonNull(byteBuffer, "ByteBuffer must not be null");
     Objects.requireNonNull(byteOrder, "ByteOrder must not be null");
     final ByteBuffer byteBuf;
@@ -112,9 +113,9 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
     final WritableMemory wmem;
     if (byteOrder == NON_NATIVE_BYTE_ORDER) {
       type |= NONNATIVE;
-      wmem = new NonNativeWritableMemoryImpl(seg, type, null);
+      wmem = new NonNativeWritableMemoryImpl(seg, type, memReqSvr);
     } else {
-      wmem = new NativeWritableMemoryImpl(seg, type, null);
+      wmem = new NativeWritableMemoryImpl(seg, type, memReqSvr);
     }
     return wmem;
   }

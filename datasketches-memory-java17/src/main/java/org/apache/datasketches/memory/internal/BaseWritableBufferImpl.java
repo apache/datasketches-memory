@@ -66,7 +66,8 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
   public static WritableBuffer wrapByteBuffer(
       final ByteBuffer byteBuffer,
       final boolean localReadOnly,
-      final ByteOrder byteOrder) {
+      final ByteOrder byteOrder,
+      final MemoryRequestServer memReqSvr) {
     Objects.requireNonNull(byteBuffer, "ByteBuffer must not be null");
     Objects.requireNonNull(byteOrder, "ByteOrder must not be null");
     final ByteBuffer byteBuf;
@@ -91,9 +92,9 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
     final WritableBuffer wbuf;
     if (byteOrder == NON_NATIVE_BYTE_ORDER) {
       type |= NONNATIVE;
-      wbuf = new NonNativeWritableBufferImpl(seg, type, null);
+      wbuf = new NonNativeWritableBufferImpl(seg, type, memReqSvr);
     } else {
-      wbuf = new NativeWritableBufferImpl(seg, type, null);
+      wbuf = new NativeWritableBufferImpl(seg, type, memReqSvr);
     }
     wbuf.setStartPositionEnd(0, byteBuffer.position(), byteBuffer.limit());
     return wbuf;

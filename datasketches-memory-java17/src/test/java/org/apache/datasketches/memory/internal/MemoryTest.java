@@ -177,7 +177,7 @@ public class MemoryTest {
     int n = 10; //longs
     byte[] arr = new byte[n * 8];
     ByteBuffer bb = ByteBuffer.wrap(arr); //non-native order
-    WritableMemory wmem = WritableMemory.writableWrap(bb, BaseState.NON_NATIVE_BYTE_ORDER);
+    WritableMemory wmem = WritableMemory.writableWrap(bb, BaseState.NON_NATIVE_BYTE_ORDER, memReqSvr);
     for (int i = 0; i < n; i++) { //write to wmem
       wmem.putLong(i * 8, i);
     }
@@ -241,7 +241,7 @@ public class MemoryTest {
     assertTrue(mem.getByteOrder() == ByteOrder.nativeOrder());
     assertEquals(mem.getByteOrder(), ByteOrder.LITTLE_ENDIAN);
     //Now explicitly set it
-    mem = Memory.wrap(bb, BaseState.NON_NATIVE_BYTE_ORDER);
+    mem = Memory.wrap(bb, BaseState.NON_NATIVE_BYTE_ORDER, memReqSvr);
     assertFalse(mem.getByteOrder() == ByteOrder.nativeOrder());
     assertEquals(mem.getByteOrder(), ByteOrder.BIG_ENDIAN);
   }
@@ -435,7 +435,7 @@ public class MemoryTest {
   public void wrapBigEndianAsLittle() {
     ByteBuffer bb = ByteBuffer.allocate(64);
     bb.putChar(0, (char)1); //as NNO
-    Memory mem = Memory.wrap(bb, ByteOrder.LITTLE_ENDIAN);
+    Memory mem = Memory.wrap(bb, ByteOrder.LITTLE_ENDIAN, memReqSvr);
     assertEquals(mem.getChar(0), 256);
   }
 

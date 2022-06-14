@@ -83,7 +83,7 @@ public class LeafImplTest {
     ByteBuffer bb = ByteBuffer.allocate((int)cap);
     bb.order(NBO);
     bb.putShort(0, (short) 1);
-    WritableMemory mem = WritableMemory.writableWrap(bb, NBO);
+    WritableMemory mem = WritableMemory.writableWrap(bb, NBO, dummyMemReqSvr);
     assertEquals(bb.isDirect(), mem.isDirect());
 
     checkCombinations(mem, off, cap, mem.isDirect(), mem.getByteOrder(), true, false);
@@ -92,7 +92,7 @@ public class LeafImplTest {
     ByteBuffer dbb = ByteBuffer.allocateDirect((int)cap);
     dbb.order(NBO);
     dbb.putShort(0, (short) 1);
-    mem = WritableMemory.writableWrap(dbb, NBO);
+    mem = WritableMemory.writableWrap(dbb, NBO, dummyMemReqSvr);
     assertEquals(dbb.isDirect(), mem.isDirect());
 
     checkCombinations(mem, off, cap,  mem.isDirect(), mem.getByteOrder(), true, false);
@@ -101,7 +101,7 @@ public class LeafImplTest {
     bb = ByteBuffer.allocate((int)cap);
     bb.order(NNBO);
     bb.putShort(0, (short) 1);
-    mem = WritableMemory.writableWrap(bb, NNBO);
+    mem = WritableMemory.writableWrap(bb, NNBO, dummyMemReqSvr);
     assertEquals(bb.isDirect(), mem.isDirect());
 
     checkCombinations(mem, off, cap, mem.isDirect(), mem.getByteOrder(), true, false);
@@ -110,7 +110,7 @@ public class LeafImplTest {
     dbb = ByteBuffer.allocateDirect((int)cap);
     dbb.order(NNBO);
     dbb.putShort(0, (short) 1);
-    mem = WritableMemory.writableWrap(dbb, NNBO);
+    mem = WritableMemory.writableWrap(dbb, NNBO, dummyMemReqSvr);
     assertEquals(dbb.isDirect(), mem.isDirect());
 
     checkCombinations(mem, off, cap,  mem.isDirect(), mem.getByteOrder(), true, false);

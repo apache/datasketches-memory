@@ -398,40 +398,43 @@ abstract class BaseStateImpl implements BaseState {
     return nativeOverlap(seg, thatBSI.seg);
   }
 
-  static long nativeOverlap(final MemorySegment segA, final MemorySegment segB) {
-    if (!segA.isNative() || !segB.isNative()) { return 0; }
+  static final long nativeOverlap(final MemorySegment segA, final MemorySegment segB) { //used in test
+    if (!segA.isNative() || !segB.isNative()) { return 0; } //both segments must be native
+    //Assume that memory addresses increase from left to right.
+    //Identify the left and right edges of two regions, A and B in memory.
     final long bytesA = segA.byteSize();
     final long bytesB = segB.byteSize();
     final long lA = segA.address().toRawLongValue(); //left A
     final long lB = segB.address().toRawLongValue(); //left B
     final long rA = lA + bytesA; //right A
     final long rB = lB + bytesB; //right B
-    if (bytesA == bytesB) { return nativeOverlapEqualSizes(lA, rA, lB, rB); }
-    return nativeOverlapNotEqualSizes(lA, rA, lB, rB);
+    if ((rA <= lB) || (rB <= lA)) { return 0; } //Eliminate the totally disjoint case:
+
+    final long result = (bytesA == bytesB) //Two major cases: equal and not equal in size
+        ? nativeOverlapEqualSizes(lA, rA, lB, rB)
+        : nativeOverlapNotEqualSizes(lA, rA, lB, rB);
+
+    return (lB < lA) ? -result : result; //if lB is lower in memory than lA, we return a negative result
   }
 
-  static long nativeOverlapEqualSizes(final long lA, final long rA, final long lB, final long rB) {
-    if ((rA <= lB) || (rB <= lA)) { return 0; }
-    if (lA == lB) { return rA - lA; } //size of A
-    if ((lA < lB) && (rA < rB)) { return rA - lB; } //positive if lB is higher than lA
-    return lA - rB; // (lB < lA) && (rB < rA)) negative if lB is lower than lA
+  private static final long nativeOverlapEqualSizes(final long lA, final long rA, final long lB, final long rB) {
+    if (lA == lB) { return rA - lA; } //Exact overlap, return either size
+    return (lA < lB)
+        ? rA - lB  //Partial overlap on right portion of A
+        : rB - lA; //else partial overlap on left portion of A
   }
 
-  static long nativeOverlapNotEqualSizes(final long lA, final long rA, final long lB, final long rB) {
-    if ((rA <= lB) || (rB <= lA)) { return 0; }
-    final long res;
-    if (rB - lB < rA - lA) {
-      res = bSmallerThanA(lA, rA, lB, rB);
-    } else {
-      res = bSmallerThanA(lB, rB, lA, rA); //A smaller than B, reverse coordinates
-    }
-    return (lB < lA) ? -res : res;
+  private static final long nativeOverlapNotEqualSizes(final long lA, final long rA, final long lB, final long rB) {
+    return (rB - lB < rA - lA) //whichever is larger we assign to parameters 1 and 2
+        ? biggerSmaller(lA, rA, lB, rB)  //A bigger than B
+        : biggerSmaller(lB, rB, lA, rA); //B bigger than A, reverse parameters
   }
 
-  static long bSmallerThanA(long lA, long rA, long lB, long rB) {
-    if ((lB < rA) && (rA < rB)) { return rA - lB; } //B overlaps A's right
-    if ((rB <= rA) && (lA <= lB)) { return rB - lB; } //B is totally within A
-    return rB - lA; // ((lB < lA) && (lA < rB)) B is lower
+  private static final long biggerSmaller(long lLarge, long rLarge, long lSmall, long rSmall) {
+    if ((rSmall <= rLarge) && (lLarge <= lSmall)) { return rSmall - lSmall; } //Small is totally within Large
+    return (rLarge < rSmall)
+        ? rLarge - lSmall  //Partial overlap on right portion of Large
+        : rSmall - lLarge; //Partial overlap on left portion of Large
   }
 
   @Override

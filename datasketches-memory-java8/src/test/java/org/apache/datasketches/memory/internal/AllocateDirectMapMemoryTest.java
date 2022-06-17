@@ -21,7 +21,7 @@
  * Note: Lincoln's Gettysburg Address is in the public domain. See LICENSE.
  */
 
-package org.apache.datasketches.memory.test;
+package org.apache.datasketches.memory.internal;
 
 import static org.apache.datasketches.memory.internal.Util.*;
 import static org.testng.Assert.assertEquals;
@@ -50,7 +50,7 @@ public class AllocateDirectMapMemoryTest {
   @Test
   public void simpleMap() throws Exception {
     File file = getResourceFile("GettysburgAddress.txt");
-    assertTrue(ReflectUtil.isFileReadOnly(file));
+    assertTrue(AllocateDirectMap.isFileReadOnly(file));
     try (MapHandle rh = Memory.map(file)) {
       rh.close();
     }

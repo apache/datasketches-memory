@@ -41,40 +41,24 @@
     <maven.javadoc.skip>false</maven.javadoc.skip>
   </properties>
 
-  <profiles>
-
-    <profile>
-      <id>strict</id>
-      <!-- The error prone compiler is only currently supported for compilation in JDK 8 -->
-      <activation>
-        <jdk>[1.8, 1.9),8</jdk>
-      </activation>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-compiler-plugin</artifactId>
-              <version>${maven-compiler-plugin.version}</version>
-              <dependencies>
-                <dependency>
-                  <groupId>org.codehaus.plexus</groupId>
-                  <artifactId>plexus-compiler-javac-errorprone</artifactId>
-                  <version>${plexus-compiler-javac-errorprone.version}</version>
-                </dependency>
-              </dependencies>
-              <configuration>
-                <source>${maven.compiler.source}</source>
-                <target>${maven.compiler.target}</target>
-                <compilerId>javac-with-errorprone</compilerId>
-                <forceJavacCompilerUse>true</forceJavacCompilerUse>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-
-  </profiles>
+  <dependencies>
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- Used for UTF8 testing -->
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- Used for xxHash testing -->
+      <groupId>net.openhft</groupId>
+      <artifactId>zero-allocation-hashing</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
 </project>

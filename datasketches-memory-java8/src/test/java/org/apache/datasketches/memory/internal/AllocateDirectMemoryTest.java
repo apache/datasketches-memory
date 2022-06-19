@@ -23,12 +23,11 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.fail;
 
-import static org.apache.datasketches.memory.BaseState.*;
+import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.DefaultMemoryRequestServer;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
-import org.apache.datasketches.memory.internal.Util;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
@@ -45,12 +44,12 @@ public class AllocateDirectMemoryTest {
         assertEquals(wMem.getLong(i << 3), i);
       }
       //inside the TWR block the memory should be valid
-      BaseState.checkValid(wMem);
+      ((BaseStateImpl)wMem).checkValid();
       //OK
     }
     //The TWR block has exited, so the memory should be invalid
     try {
-      ReflectUtil.checkValid(wMem);
+      ((BaseStateImpl)wMem).checkValid();
       fail();
     } catch (final RuntimeException e) {
       //OK

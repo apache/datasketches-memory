@@ -42,8 +42,6 @@ import java.nio.file.attribute.PosixFileAttributeView;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermissions;
 
-import org.apache.datasketches.memory.internal.UnsafeUtil;
-import org.apache.datasketches.memory.internal.Util;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 

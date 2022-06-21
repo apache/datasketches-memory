@@ -73,6 +73,22 @@ under the License.
             </compilerArgs>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${maven-surefire-plugin.version}</version>
+          <executions>
+            <execution>
+              <configuration>
+                <skip>false</skip>
+                <argLine>
+                  --add-modules jdk.incubator.foreign
+                </argLine>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
       </plugins>
     </pluginManagement>
   </build>

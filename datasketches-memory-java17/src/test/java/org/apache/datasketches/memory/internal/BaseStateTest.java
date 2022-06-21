@@ -45,6 +45,7 @@ public class BaseStateTest {
     assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 20), getSeg(par, 10, 30)),  10);
     assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 10, 30), getSeg(par,  0, 20)), -10);
     assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 20, 40), getSeg(par,  0, 20)),   0);
+    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0,  0), getSeg(par,  0,  0)),   0);
     //Unequal Sizes A > B
     assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 40), getSeg(par, 60, 80)),   0);
     assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 40), getSeg(par, 40, 60)),   0);
@@ -55,6 +56,8 @@ public class BaseStateTest {
     assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 10, 50), getSeg(par,  0, 20)), -10);
     assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 20, 60), getSeg(par,  0, 20)),   0);
     assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 40, 80), getSeg(par,  0, 20)),   0);
+    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 40, 80), getSeg(par,  0,  0)),   0);
+
     //Unequal Sizes B > A
     assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 60, 80), getSeg(par,  0, 40)),   0);
     assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 40, 60), getSeg(par,  0, 40)),   0);
@@ -65,6 +68,7 @@ public class BaseStateTest {
     assertEquals(BaseStateImpl.nativeOverlap( getSeg(par, 0, 20), getSeg(par, 10, 50)),  10);
     assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 20), getSeg(par, 20, 60)),   0);
     assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 20), getSeg(par, 40, 80)),   0);
+    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0,  0), getSeg(par, 40, 80)),   0);
   }
 
   private static MemorySegment getSeg(MemorySegment parent, long left, long right) {

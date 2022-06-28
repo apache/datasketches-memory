@@ -531,10 +531,7 @@ under the License.
        contribute to this project -->
   <modules>
     <module>datasketches-memory-java8</module>
-    <module>datasketches-memory-java8-tests</module>
     <module>datasketches-memory-java11</module>
-    <module>datasketches-memory</module>
-    <module>datasketches-memory-resources</module>
   </modules>
 
 </project>

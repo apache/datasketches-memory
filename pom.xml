@@ -20,7 +20,7 @@ under the License.
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -131,6 +131,7 @@ under the License.
     <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version> <!-- overrides parent -->
     <maven-toolchains-plugin.version>3.0.0</maven-toolchains-plugin.version>
     <maven-install-plugin.version>3.0.0-M1</maven-install-plugin.version>
+    <maven-exec-plugin.version>3.0.0</maven-exec-plugin.version>
     <!-- Apache Plugins -->
     <apache-rat-plugin.version>0.13</apache-rat-plugin.version> <!-- overrides parent -->
     <!-- org.jacoco Maven Plugins -->
@@ -427,6 +428,12 @@ under the License.
           </configuration>
         </plugin>
 
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>${maven-exec-plugin.version}</version>
+        </plugin>
+
       </plugins>
     </pluginManagement>
     <plugins>
@@ -520,7 +527,6 @@ under the License.
         </pluginManagement>
       </build>
     </profile>
-
 
   </profiles>
 

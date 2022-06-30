@@ -57,4 +57,38 @@
         </pluginManagement>
     </build>
 
+    <profiles>
+        <profile>
+            <id>assemble-mr-jar</id>
+            <activation>
+                <property>
+                    <name>!unsetDefaultProfile</name>
+                </property>
+            </activation>
+            <build>
+                <defaultGoal>exec:exec</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>${maven-exec-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>default-cli</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>package</phase>
+                                <configuration>
+                                    <executable>bash</executable>
+                                    <commandlineArgs>${maven.multiModuleProjectDirectory}/tools/scripts/package-mr-jar.sh</commandlineArgs>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 </project>

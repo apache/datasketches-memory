@@ -65,6 +65,12 @@
                     <name>!unsetDefaultProfile</name>
                 </property>
             </activation>
+            <properties>
+                <assembly.script.path>${maven.multiModuleProjectDirectory}/tools/scripts/package-mr-jar.sh</assembly.script.path>
+                <assembly.java.home>${env.JAVA_HOME}</assembly.java.home>
+                <assembly.git.tag>${project.version}</assembly.git.tag>
+                <assembly.base.dir>${maven.multiModuleProjectDirectory}</assembly.base.dir>
+            </properties>
             <build>
                 <defaultGoal>exec:exec</defaultGoal>
                 <plugins>
@@ -81,7 +87,7 @@
                                 <phase>package</phase>
                                 <configuration>
                                     <executable>bash</executable>
-                                    <commandlineArgs>${maven.multiModuleProjectDirectory}/tools/scripts/package-mr-jar.sh</commandlineArgs>
+                                    <commandlineArgs>${assembly.script.path} ${assembly.java.home} ${assembly.git.tag} ${assembly.base.dir}</commandlineArgs>
                                 </configuration>
                             </execution>
                         </executions>

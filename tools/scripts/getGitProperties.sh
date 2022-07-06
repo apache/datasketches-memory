@@ -29,7 +29,7 @@ CR=$'\n'
 
 #Add Implementation Vendor
 prop=$prop'Implementation-Vendor: '
-tmp='The Apache Software Foundataion'$CR
+tmp='The Apache Software Foundation'$CR
 prop=$prop$tmp
 
 #Add GroupId : ArtifactId

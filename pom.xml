@@ -413,7 +413,7 @@ under the License.
             <!--suppress UnresolvedMavenProperty -->
             <repoToken>${coveralls-repo-token}</repoToken>
             <!--suppress UnresolvedMavenProperty -->
-            <jacocoReports>${maven.multiModuleProjectDirectory}/datasketches-memory/target/site/jacoco-aggregate/jacoco.xml</jacocoReports>
+            <jacocoReports>${maven.multiModuleProjectDirectory}/datasketches-java11/target/site/jacoco-aggregate/jacoco.xml</jacocoReports>
           </configuration>
         </plugin>
 

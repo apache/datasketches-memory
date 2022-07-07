@@ -100,10 +100,8 @@ jobs:
       - name: Package
         run: >
           mvn package
-          -Dmaven.javadoc.skip=true
+          -Dmaven.javadoc.skip=false
           -Dgpg.skip=true
-          -Denvironment=ci
-          -Dmatrix.jdk.version=${{matrix.jdk}}
           --toolchains .github/workflows/.toolchains.xml
 
       # The GitTag for CI purposes is irrelevant
@@ -119,5 +117,4 @@ jobs:
           -Dcoveralls-repo-token=${repo_token}
           -Dmaven.javadoc.skip=true
           -Dgpg.skip=true
-          -Dmatrix.jdk.version=${{matrix.jdk}}
           --toolchains .github/workflows/.toolchains.xml

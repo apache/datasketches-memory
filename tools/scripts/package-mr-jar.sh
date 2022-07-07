@@ -103,13 +103,6 @@ prepare_jar () {
 
   mkdir -p ${JarMeta}/versions/11
   mkdir -p ${JarMaven}
-
-  #### Generate MANIFEST.MF ####
-  cat >> ${JarMeta}/MANIFEST.MF<< EOF
-Manifest-Version: 1.0
-Created-By: Apache Datasketches Memory package-mr-jar.sh
-Multi-Release: true
-EOF
   
   #### Generate DEPENDENCIES ####
  cat >> ${JarMeta}/DEPENDENCIES<< EOF
@@ -127,9 +120,16 @@ EOF
   cp ${MavenArchiver}/pom.properties $JarMaven
   cp pom.xml $JarMaven
   
-  #### Generate git.properties file ####
-  echo "$($ScriptsDir/getGitProperties.sh $ProjectBaseDir $ProjectArtifactId $GitTag)" >> ${JarMeta}/MANIFEST.MF
 }
+
+#### Generate MANIFEST.MF ####
+cat >> ${ArchiveDir}/MANIFEST.MF<< EOF
+Manifest-Version: 1.0
+Created-By: Apache Datasketches Memory package-mr-jar.sh
+Multi-Release: true
+EOF
+#### Generate git.properties file ####
+echo "$($ScriptsDir/getGitProperties.sh $ProjectBaseDir $ProjectArtifactId $GitTag)" >> ${ArchiveDir}/MANIFEST.MF
 
 ###########################
 #### MULTI-RELEASE JAR ####
@@ -141,7 +141,7 @@ rsync -q -a -I --filter="- .*" ${MemoryJava8Classes}/org $PackageMrJar
 rsync -q -a -I --filter="- .*" ${MemoryJava11Classes}/org ${PackageMrJar}/META-INF/versions/11
 cp ${MemoryJava11Classes}/module-info.class ${PackageMrJar}/META-INF/versions/11
 
-${Jar_} cf $OutputMrJar -C $PackageMrJar .
+${Jar_} cfm $OutputMrJar ${ArchiveDir}/MANIFEST.MF -C $PackageMrJar .
 echo "Created multi-release jar ${OutputMrJar}"
 
 ###########################
@@ -151,7 +151,7 @@ prepare_jar $PackageTests
 #### Copy java 8 compiled test classes to target/jar
 rsync -q -a -I --filter="- .*" ${MemoryJava8TestClasses}/org $PackageTests
 
-${Jar_} cf $OutputTests -C $PackageTests .
+${Jar_} cfm $OutputTests ${ArchiveDir}/MANIFEST.MF -C $PackageTests .
 echo "Created tests jar ${OutputTests}"
 
 ###########################
@@ -164,7 +164,7 @@ rsync -q -a -I --filter="- .*" ${MemoryJava8Sources}/org $PackageSources
 rsync -q -a -I --filter="- .*" ${MemoryJava11Sources}/org ${PackageSources}/META-INF/versions/11
 cp ${MemoryJava11Sources}/module-info.java ${PackageSources}/META-INF/versions/11
 
-${Jar_} cf $OutputSources -C $PackageSources .
+${Jar_} cfm $OutputSources ${ArchiveDir}/MANIFEST.MF -C $PackageSources .
 echo "Created sources jar ${OutputSources}"
 
 ###########################
@@ -174,7 +174,7 @@ prepare_jar $PackageTestSources
 #### Copy java 8 test source files to target/test-sources
 rsync -q -a -I --filter="- .*" ${MemoryJava8TestSources}/org $PackageTestSources
 
-${Jar_} cf $OutputTestSources -C $PackageTestSources .
+${Jar_} cfm $OutputTestSources ${ArchiveDir}/MANIFEST.MF -C $PackageTestSources .
 echo "Created test sources jar ${OutputTestSources}"
 
 ###########################
@@ -183,5 +183,5 @@ echo "Created test sources jar ${OutputTestSources}"
 prepare_jar $PackageJavaDoc
 
 rsync -q -a -I --filter="- .*" ${MemoryJava8Docs} $PackageJavaDoc
-${Jar_} cf $OutputJavaDoc -C $PackageJavaDoc .
+${Jar_} cfm $OutputJavaDoc ${ArchiveDir}/MANIFEST.MF -C $PackageJavaDoc .
 echo "Created javadoc jar ${OutputJavaDoc}"

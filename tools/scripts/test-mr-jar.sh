@@ -87,7 +87,9 @@ if [[ $JavaVersion -eq 8 ]]; then
   ${Javac_} -cp $OutputJar -d $PackageChecks $(find $ScriptsDir -name '*.java')
   ${Java_} -cp $PackageChecks:$OutputJar org.apache.datasketches.memory.tools.scripts.CheckMemoryJar $MemoryMapFile
 else
-  ${Javac_} -cp $OutputJar -d $PackageChecks $(find $ScriptsDir -name '*.java')
+  ${Javac_} \
+    --add-modules org.apache.datasketches.memory \
+    -p "$OutputJar" -d $PackageChecks $(find $ScriptsDir -name '*.java')
 
   ${Java_} \
     --add-modules org.apache.datasketches.memory \

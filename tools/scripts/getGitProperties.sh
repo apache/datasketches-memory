@@ -38,28 +38,28 @@ tmp='org.apache.datasketches:'$ArtId$CR
 prop=$prop$tmp
 
 # Add Branch
-prop=$prop'git.branch: '
+prop=$prop'Git-Branch: '
 tmp=''$(git rev-parse --abbrev-ref HEAD)''$CR
 prop=$prop$tmp
 
 #Add commit-id
-prop=$prop'git.commit.id.full: '
+prop=$prop'Git-Commit-Id-Full: '
 ID=$(git rev-parse HEAD)
 tmp=''$ID''$CR
 prop=$prop$tmp
 
 #Add timestamp
-prop=$prop'git.commit.time: '
+prop=$prop'Git-Commit-Time: '
 tmp=''$(git show --no-patch --no-notes --pretty='%cI' $ID)''$CR
 prop=$prop$tmp
 
 #Add user email
-prop=$prop'git-commit-user-email: '
+prop=$prop'Git-Commit-User-Email: '
 tmp=''$(git show --no-patch --no-notes --pretty='%ce' $ID)''$CR
 prop=$prop$tmp
 
 #Add Tag
-prop=$prop'git.commit.tag: '
+prop=$prop'Git-Commit-Tag: '
 tmp=''$Tag''$CR
 prop=$prop$tmp
 

@@ -44,12 +44,16 @@ GitTag=$2
 ProjectBaseDir=$3 #this must be an absolute path
 
 #### Setup absolute directory references ####
-ProjectArtifactId="memory"
+ProjectArtifactId="datasketches-memory"
 ScriptsDir=${ProjectBaseDir}/tools/scripts/
 
 #### Initialise path dependent variables ####
 OutputDir=target
-OutputJar=${OutputDir}/datasketches-memory-${GitTag}.jar
+OutputMrJar=${OutputDir}/datasketches-memory-${GitTag}.jar
+OutputTests=${OutputDir}/datasketches-memory-${GitTag}-tests.jar
+OutputJavaDoc=${OutputDir}/datasketches-memory-${GitTag}-javadoc.jar
+OutputSources=${OutputDir}/datasketches-memory-${GitTag}-sources.jar
+OutputTestSources=${OutputDir}/datasketches-memory-${GitTag}-test-sources.jar
 
 ArchiveDir=${OutputDir}/archive-tmp
 PackageSources=${ArchiveDir}/sources
@@ -65,17 +69,25 @@ cd ${ProjectBaseDir}
 if [[ -n "$JDKHome" ]] && [[ -x "${JDKHome}/bin/jar" ]];     then Jar_="${JDKHome}/bin/jar";         else echo "No jar version could be found.";     exit 1; fi
 
 MemoryJava8Classes=datasketches-memory-java8/target/classes
+MemoryJava8TestClasses=datasketches-memory-java8/target/test-classes
+MemoryJava8Sources=datasketches-memory-java8/src/main/java
+MemoryJava8TestSources=datasketches-memory-java8/src/test/java
+MemoryJava8Docs=datasketches-memory-java8/target/apidocs/
 MemoryJava11Classes=datasketches-memory-java11/target/classes
+MemoryJava11Sources=datasketches-memory-java11/src/main/java
+MemoryJava8Docs=datasketches-memory-java8/target/apidocs/
 MavenArchiver=target/maven-archiver
 
-if ! [[ -x "${MemoryJava8Classes}" ]];    then echo "No compiled classes in ${MemoryJava8Classes}.";    exit 1; fi
-if ! [[ -x "${MemoryJava11Classes}" ]];   then echo "No compiled classes in ${MemoryJava11Classes}.";   exit 1; fi
-if ! [[ -x "${MavenArchiver}" ]];         then echo "No maven archiver ${MavenArchiver}.";                   exit 1; fi
+if ! [[ -x "${MemoryJava8Classes}" ]];        then echo "No compiled classes - run mvn package first.";        exit 1; fi
+if ! [[ -x "${MemoryJava8TestClasses}" ]];    then echo "No compiled test classes - run mvn package first.";   exit 1; fi
+if ! [[ -x "${MemoryJava11Classes}" ]];       then echo "No compiled classes - run mvn package first.";        exit 1; fi
+if ! [[ -x "${MemoryJava8Docs}" ]];           then echo "No javadocs - run mvn package first.";                exit 1; fi
+if ! [[ -x "${MavenArchiver}" ]];             then echo "No maven archiver - run mvn package first.";          exit 1; fi
 
 #### Cleanup and setup output directories ####
 echo
 if [ -d "$OutputDir" ]; then rm -f $OutputDir/*.jar; fi
-if [ -d "$PackageDir" ]; then rm -r $PackageDir; fi
+if [ -d "$ArchiveDir" ]; then rm -r $ArchiveDir; fi
 
 mkdir -p $PackageSources
 mkdir -p $PackageTestSources
@@ -83,53 +95,93 @@ mkdir -p $PackageTests
 mkdir -p $PackageJavaDoc
 mkdir -p $PackageMrJar
 
-###########################
-####    JAVADOC JAR    ####
-###########################
+#### JAR Metadata function
+prepare_jar () {
+  JarBase=$1
+  JarMeta=${JarBase}/META-INF
+  JarMaven=${JarMeta}/maven/org.apache.datasketches/datasketches-memory
 
-###########################
-#### MULTI-RELEASE JAR ####
-###########################
-PackageMrJarMeta=${PackageMrJar}/META-INF
-PackageMrJarMaven=${PackageMrJarMeta}/maven/org.apache.datasketches/datasketches-memory
-mkdir -p ${PackageMrJarMeta}/versions/11
-mkdir -p ${PackageMrJarMaven}
+  mkdir -p ${JarMeta}/versions/11
+  mkdir -p ${JarMaven}
 
-#### Generate MANIFEST.MF ####
-cat >> ${PackageMrJarMeta}/MANIFEST.MF<< EOF
+  #### Generate MANIFEST.MF ####
+  cat >> ${JarMeta}/MANIFEST.MF<< EOF
 Manifest-Version: 1.0
 Created-By: Apache Datasketches Memory package-mr-jar.sh
 Multi-Release: true
 EOF
-
-#### Generate DEPENDENCIES ####
-cat >> ${PackageMrJarMeta}/DEPENDENCIES<< EOF
+  
+  #### Generate DEPENDENCIES ####
+ cat >> ${JarMeta}/DEPENDENCIES<< EOF
 // ------------------------------------------------------------------
 // Transitive dependencies of this project determined from the
 // maven pom organized by organization.
 // ------------------------------------------------------------------
 EOF
+  
+  #### Copy LICENSE and NOTICE ####
+  cp LICENSE $JarMeta
+  cp NOTICE $JarMeta
+  
+  #### Copy pom.properties
+  cp ${MavenArchiver}/pom.properties $JarMaven
+  cp pom.xml $JarMaven
+  
+  #### Generate git.properties file ####
+  echo "$($ScriptsDir/getGitProperties.sh $ProjectBaseDir $ProjectArtifactId $GitTag)" >> ${JarMeta}/MANIFEST.MF
+}
 
-#### Copy LICENSE and NOTICE ####
-cp LICENSE $PackageMrJarMeta
-cp NOTICE $PackageMrJarMeta
-
-#### Copy pom.properties
-cp ${MavenArchiver}/pom.properties $PackageMrJarMaven
-cp pom.xml $PackageMrJarMaven
-
-#### Generate git.properties file ####
-echo "$($ScriptsDir/getGitProperties.sh $ProjectBaseDir $ProjectArtifactId $GitTag)" >> ${PackageMrJarMeta}/MANIFEST.MF
-
+###########################
+#### MULTI-RELEASE JAR ####
+###########################
+prepare_jar $PackageMrJar
 #### Copy java 8 compiled classes to target/jar
 rsync -q -a -I --filter="- .*" ${MemoryJava8Classes}/org $PackageMrJar
 #### Copy java 11 compiled classes to target/jar/META-INF/versions/11
-rsync -q -a -I --filter="- .*" ${MemoryJava11Classes}/org ${PackageMrJarMeta}/versions/11
-cp ${MemoryJava11Classes}/module-info.class ${PackageMrJarMeta}/versions/11
+rsync -q -a -I --filter="- .*" ${MemoryJava11Classes}/org ${PackageMrJar}/META-INF/versions/11
+cp ${MemoryJava11Classes}/module-info.class ${PackageMrJar}/META-INF/versions/11
 
-${Jar_} cf $OutputJar -C $PackageMrJar .
+${Jar_} cf $OutputMrJar -C $PackageMrJar .
+echo "Created multi-release jar ${OutputMrJar}"
 
-echo "Created multi-release jar ${OutputJar}"
+###########################
+####     TESTS JAR     ####
+###########################
+prepare_jar $PackageTests
+#### Copy java 8 compiled test classes to target/jar
+rsync -q -a -I --filter="- .*" ${MemoryJava8TestClasses}/org $PackageTests
 
+${Jar_} cf $OutputTests -C $PackageTests .
+echo "Created tests jar ${OutputTests}"
 
+###########################
+####    SOURCES JAR    ####
+###########################
+prepare_jar $PackageSources
+#### Copy java 8 source files to target/sources
+rsync -q -a -I --filter="- .*" ${MemoryJava8Sources}/org $PackageSources
+#### Copy java 11 source files to target/sources/META-INF/versions/11
+rsync -q -a -I --filter="- .*" ${MemoryJava11Sources}/org ${PackageSources}/META-INF/versions/11
+cp ${MemoryJava11Sources}/module-info.java ${PackageSources}/META-INF/versions/11
 
+${Jar_} cf $OutputSources -C $PackageSources .
+echo "Created sources jar ${OutputSources}"
+
+###########################
+####  TEST SOURCES JAR ####
+###########################
+prepare_jar $PackageTestSources
+#### Copy java 8 test source files to target/test-sources
+rsync -q -a -I --filter="- .*" ${MemoryJava8TestSources}/org $PackageTestSources
+
+${Jar_} cf $OutputTestSources -C $PackageTestSources .
+echo "Created test sources jar ${OutputTestSources}"
+
+###########################
+####    JAVADOC JAR    ####
+###########################
+prepare_jar $PackageJavaDoc
+
+rsync -q -a -I --filter="- .*" ${MemoryJava8Docs} $PackageJavaDoc
+${Jar_} cf $OutputJavaDoc -C $PackageJavaDoc .
+echo "Created javadoc jar ${OutputJavaDoc}"

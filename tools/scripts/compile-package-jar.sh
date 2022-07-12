@@ -132,7 +132,7 @@ echo
 echo "--- JARS ---"
 echo
 echo "Building JAR from ${PackageContents}..."
-${Jar_} cf $OutputJar -C $PackageContents .
+${Jar_} cfm $OutputJar ${PackageManifest} -C $PackageContents .
 echo
 
 # Uncomment this section to display JAR contents

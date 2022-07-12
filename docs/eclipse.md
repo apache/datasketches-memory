@@ -29,22 +29,19 @@ development environment:
 
 ### Java compiler versions
 
-Settings are usually synchronised with Maven Toolchain configuration, otherwise the Java version 
+Settings are usually synchronized with Maven Toolchain configuration, otherwise the Java version 
 for a Maven module should be set as follows:
 
-| Maven submodule                   | JDK |
-| --------------------------------- | --- |
-| datasketches-memory-root          |  8  |
-| datasketches-memory               |  8  |
-| datasketches-memory-java8         |  8  |
-| datasketches-memory-java8-tests   |  8  |
-| datasketches-memory-java11        |  11 |
-| datasketches-memory-resources     |  8  |
+| Maven submodule            | JDK |
+| -------------------------- | --- |
+| datasketches-memory-root   | 8   |
+| datasketches-memory-java8  | 8   |
+| datasketches-memory-java11 | 11  |
 
 ### Compiler arguments for JPMS
 
 In order to compile Maven modules in Java versions 11 and above, it is necessary to provide the 
-following arguments to the compiler.  These are usually synchronised with the `pom.xml` 
+following arguments to the compiler.  These are usually synchronized with the `pom.xml` 
 configuration:
 
 ```xml
@@ -65,7 +62,7 @@ Note that the following configuration was verified using Eclipse Version: 2020-1
 The [Eclipse Maven plugin](https://maven.apache.org/plugins/maven-eclipse-plugin/) is used to 
 generate Eclipse IDE files.  In order to run the eclipse plugin use:
 
-    $ mvn clean process-classes eclipse:eclipse -DskipTests=true
+    $ mvn clean eclipse:eclipse -DskipTests=true
 
 More information about using the eclipse plugin with multi-module Maven builds can be found
 in the Maven 
@@ -124,7 +121,7 @@ compliance level is set for each module by using the Eclipse `Java Compiler` dia
 You might need to verify this for each module, making sure the correct compliance level is used:
 
 - `datasketches-memory-java11` should use level 11 compliance.
-- all other modules should use level 1.8 compliance.
+- `datasketches-memory-java8` should use level 1.8 compliance.
 
 ---
 
@@ -147,7 +144,7 @@ to the Java 8 JRE:
 
 ### Running unit tests
 
-- Under the `datasketches-memory-java-8-tests` module, right-click on the `src/test/java` 
+- Under the `datasketches-memory-java8` module, right-click on the `src/test/java` 
 directory.
 - Select **Run-As** / **TestNG Test**
 - It should open a new window and run over 400 tests without error.

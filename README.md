@@ -59,21 +59,21 @@ Otherwise, if you are running Java 11-13 and ...
 
 * If your application **is not a JPMS module** use the following table. Choose the columns that describe your use of the Memory API.  If any of the columns contain a *Yes*, then the JVM argument in the first column of the row containing a *Yes* will be required. If you are not sure the extent of the Memory API being used, there is no harm in specifying all 4 JVM arguments. Note: do not embed any spaces in the full argument.
 
-| JVM Arguments for non-JPMS Applications                | Direct ByteBuffer | Direct | MemoryMapped Files |
-|:------------------------------------------------------:|:----------------:|:------:|:------------------:|
-| --add-exports java.base/jdk.internal.misc= ALL-UNNAMED |                  |  Yes   |                    |
-| --add-exports java.base/jdk.internal.ref= ALL-UNNAMED  |                  |  Yes   | Yes                |
-| --add-opens java.base/java.nio= ALL-UNNAMED            |                  |  Yes   | Yes                |
-| --add-opens java.base/sun.nio.ch= ALL-UNNAMED          |                  |        | Yes                |
+|        JVM Arguments for non-JPMS Applications         | Direct ByteBuffer | Direct | MemoryMapped Files |
+| :----------------------------------------------------: | :---------------: | :----: | :----------------: |
+| --add-exports java.base/jdk.internal.misc= ALL-UNNAMED |                   |  Yes   |                    |
+| --add-exports java.base/jdk.internal.ref= ALL-UNNAMED  |                   |  Yes   |        Yes         |
+|      --add-opens java.base/java.nio= ALL-UNNAMED       |                   |  Yes   |        Yes         |
+|     --add-opens java.base/sun.nio.ch= ALL-UNNAMED      |                   |        |        Yes         |
 
 * If your application **is a JPMS module** use the following table. Choose the columns that describe your use of the Memory API.  If any of the columns contain a *Yes*, then the JVM argument in the first column of the row containing a *Yes* will be required. If you are not sure the extent of the Memory API being used, there is no harm in specifying all 4 JVM arguments. Note: do not embed any spaces in the full argument.
 
-| JVM Arguments for JPMS Applications                                       | Direct ByteBuffer | Direct | MemoryMapped Files |
-|:-------------------------------------------------------------------------:|:----------------:|:------:|:------------------:|
-| --add-exports java.base/jdk.internal.misc= org.apache.datasketches.memory |                  |  Yes   |                    |
-| --add-exports java.base/jdk.internal.ref= org.apache.datasketches.memory  |                  |  Yes   | Yes                |
-| --add-opens java.base/java.nio= org.apache.datasketches.memory            |                  |  Yes   | Yes                |
-| --add-opens java.base/sun.nio.ch= org.apache.datasketches.memory          |  Yes             |        | Yes                |
+|                    JVM Arguments for JPMS Applications                    | Direct ByteBuffer | Direct | MemoryMapped Files |
+| :-----------------------------------------------------------------------: | :---------------: | :----: | :----------------: |
+| --add-exports java.base/jdk.internal.misc= org.apache.datasketches.memory |                   |  Yes   |                    |
+| --add-exports java.base/jdk.internal.ref= org.apache.datasketches.memory  |                   |  Yes   |        Yes         |
+|      --add-opens java.base/java.nio= org.apache.datasketches.memory       |                   |  Yes   |        Yes         |
+|     --add-opens java.base/sun.nio.ch= org.apache.datasketches.memory      |        Yes        |        |        Yes         |
 
 
 ## DEVELOPER USAGE
@@ -103,14 +103,6 @@ __NOTES:__
    order to ensure location-independent access to resources:
    [See Oracle Location-Independent Access to Resources](https://docs.oracle.com/javase/8/docs/technotes/guides/lang/resources.html)
 
-2) This project is structured as a Maven multi-module project.
-   Building this project might affect plugins that require early dependency resolution, such as the
-   javadoc and eclipse plugins.
-   The Maven build instructions below have been modified to use the `process-classes` phase (instead of `compile`)
-   for these use cases.
-
-   For more information, see this [Maven Reactor Issue](https://issues.apache.org/jira/browse/MNG-3283).
-
 #### Dependencies
 There are no run-time dependencies. See the pom.xml file for test dependencies.
 
@@ -135,15 +127,15 @@ To run the strict profile tests (only supported in Java 8):
 
 To run javadoc on this multi-module project, use:
 
-    mvn clean process-classes javadoc:javadoc -DskipTests=true
+    mvn clean javadoc:javadoc -DskipTests=true
 
-To run the CI tests against the multi-release JAR for specific JVM versions [11-13], use:
+To build the multi-release JAR, use:
 
-    mvn clean package -Denvironment=ci -Dmatrix.jdk.version=11
+    mvn clean package
 
 To run the eclipse plugin on this multi-module project, use:
 
-    mvn clean process-classes eclipse:eclipse -DskipTests=true
+    mvn clean eclipse:eclipse -DskipTests=true
 
 To install jars built from the downloaded source:
 

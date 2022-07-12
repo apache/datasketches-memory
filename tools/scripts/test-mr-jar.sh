@@ -17,13 +17,10 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# This is a general bash script to build a JDK version-specific
-# datasketches-memory-X.jar without multi-release functionality.
-# This is intended to be used for developers compiling from source
-# who do not wish to install several versions of the JDK on their
-# machine.
-# The script does not assume a POM file and does not use Maven.
-# It does use git and also uses the script getGitProperties.sh.
+# This is a general bash script to test a datasketches-memory-X.jar
+# with multi-release functionality.
+# This is intended to be used for C/I matrix testing or for quick
+# verification of the output from the assembly process.
 
 #  Required Input Parameters:
 #  \$1 = absolute path of JDK home directory
@@ -50,17 +47,10 @@ MemoryMapFile=$ScriptsDir/LoremIpsum.txt
 
 #### Initialise path dependent variables ####
 OutputDir=target
-OutputJar=${OutputDir}/org.apache.datasketches.memory-${GitTag}.jar
+OutputJar=${OutputDir}/datasketches-memory-${GitTag}.jar
 
 PackageDir=${OutputDir}/archive-tmp
-PackageSrc=${PackageDir}/src
-PackageTests=${PackageDir}/test-classes
-PackageContents=${PackageDir}/contents
-PackageMeta=${PackageContents}/META-INF
-PackageManifest=${PackageMeta}/MANIFEST.MF
-
-MemoryJava8Src=datasketches-memory-java8/src/main/java
-MemoryJava11Src=datasketches-memory-java11/src/main/java
+PackageChecks=${PackageDir}/checks
 
 #### Move to project directory ####
 cd ${ProjectBaseDir}
@@ -88,68 +78,18 @@ fi
 
 #### Cleanup and setup output directories ####
 echo
-if [ -d "$OutputDir" ]; then rm -r $OutputDir; fi
-mkdir -p $PackageSrc
-mkdir -p $PackageTests
-mkdir -p $PackageMeta
-
-#### Copy LICENSE and NOTICE ####
-cp LICENSE $PackageMeta
-cp NOTICE $PackageMeta
-
-#### Generate MANIFEST.MF ####
-cat >> ${PackageManifest}<< EOF
-Manifest-Version: 1.0
-Created-By: Apache Datasketches Memory compile-package-jar.sh
-Multi-Release: false
-EOF
-
-#### Generate git.properties file ####
-echo "$($ScriptsDir/getGitProperties.sh $ProjectBaseDir $ProjectArtifactId $GitTag)" >> $PackageManifest
-
-#### Copy source tree to target/src
-rsync -a -I $MemoryJava8Src $PackageSrc
-
-if [[ $JavaVersion -gt 10 ]]; then
-  #### Copy java 11 src trees to target/src, overwriting replacements
-  rsync -a -I $MemoryJava11Src $PackageSrc
-fi
-
-#### Compile ####
-echo "--- CLEAN & COMPILE ---"
-echo
-echo "Compiling with JDK version $JavaVersion..."
-if [[ $JavaVersion -lt 9 ]]; then
-  ${Javac_} -d $PackageContents $(find $PackageSrc -name '*.java')
-else
-  # Compile with JPMS exports
-  ${Javac_} \
-    --add-exports java.base/jdk.internal.ref=org.apache.datasketches.memory \
-    --add-exports java.base/sun.nio.ch=org.apache.datasketches.memory \
-    -d $PackageContents $(find $PackageSrc -name '*.java')
-fi
-echo
-echo "--- JARS ---"
-echo
-echo "Building JAR from ${PackageContents}..."
-${Jar_} cfm $OutputJar ${PackageManifest} -C $PackageContents .
-echo
-
-# Uncomment this section to display JAR contents
-# echo "--- JAR CONTENTS ---"
-# echo
-# ${Jar_} tf ${OutputJar}
-# echo
+if [ -d "$PackageChecks" ]; then rm -r $PackageChecks; fi
+mkdir -p $PackageChecks
 
 echo "--- RUN JAR CHECKS ---"
 echo
 if [[ $JavaVersion -eq 8 ]]; then
-  ${Javac_} -cp $OutputJar -d $PackageTests $(find $ScriptsDir -name '*.java')
-  ${Java_} -cp $PackageTests:$OutputJar org.apache.datasketches.memory.tools.scripts.CheckMemoryJar $MemoryMapFile
+  ${Javac_} -cp $OutputJar -d $PackageChecks $(find $ScriptsDir -name '*.java')
+  ${Java_} -cp $PackageChecks:$OutputJar org.apache.datasketches.memory.tools.scripts.CheckMemoryJar $MemoryMapFile
 else
   ${Javac_} \
     --add-modules org.apache.datasketches.memory \
-    -p "$OutputJar" -d $PackageTests $(find $ScriptsDir -name '*.java')
+    -p "$OutputJar" -d $PackageChecks $(find $ScriptsDir -name '*.java')
 
   ${Java_} \
     --add-modules org.apache.datasketches.memory \
@@ -157,7 +97,7 @@ else
     --add-exports java.base/jdk.internal.ref=org.apache.datasketches.memory \
     --add-opens java.base/java.nio=org.apache.datasketches.memory \
     --add-opens java.base/sun.nio.ch=org.apache.datasketches.memory \
-    -p $OutputJar -cp $PackageTests org.apache.datasketches.memory.tools.scripts.CheckMemoryJar $MemoryMapFile
+    -p $OutputJar -cp $PackageChecks org.apache.datasketches.memory.tools.scripts.CheckMemoryJar $MemoryMapFile
 fi
 echo
-echo "Successfully built ${OutputJar}"
+echo "Successfully checked ${OutputJar}"

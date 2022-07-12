@@ -33,14 +33,11 @@ environment:
 Settings are usually synchronised with maven toolchain configuration, otherwise the Java version 
 for a maven module should be set as follows:
 
-| Maven submodule                   | JDK |
-| --------------------------------- | --- |
-| datasketches-memory-root          |  8  |
-| datasketches-memory               |  8  |
-| datasketches-memory-java8         |  8  |
-| datasketches-memory-java8-tests   |  8  |
-| datasketches-memory-java11        |  11 |
-| datasketches-memory-resources     |  8  |
+| Maven submodule            | JDK |
+| -------------------------- | --- |
+| datasketches-memory-root   | 8   |
+| datasketches-memory-java8  | 8   |
+| datasketches-memory-java11 | 11  |
 
 #### Compiler arguments for JPMS
 

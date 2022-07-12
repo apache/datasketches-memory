@@ -32,23 +32,16 @@ in Java8, but the `jdk.internal.ref.Cleaner` is used in Java 11.
 This project has been divided into the following submodules:
 
 * datasketches-memory-java8 (base version of the JVM that is currently supported)
-* datasketches-memory-java8-tests
 * datasketches-memory-java11 (Java11 equivalent of some platform specific classes in 
-datasketches-memory-java8)
-* datasketches-memory (MR-JAR assembly, does not contain source files)
-* datasketches-memory-resources (Runs test suite against assembled MR-JAR)
 
 ### Artifact assembly
 
-The [Maven assembly plugin](https://maven.apache.org/plugins/maven-assembly-plugin/) builds all 
-artifacts for this project from the other modules within the project.  
-These modules are complementary and not standalone. 
-Therefore, they are not installed and downloaded independently by the end user.
+During the Maven package phase, the [Maven exec plugin](https://www.mojohaus.org/exec-maven-plugin/index.html) 
+invokes a custom bash script `package-mr-jar.sh` located in the `tools/scripts` directory.   
+This script assembles sources and compiled classes from the individual maven modules into
+a coherent set of JARs that appear to the end user to originate from a single module.
 
-Instead, the Maven assembly plugin builds all jars, and hides the multi-module configuration 
-from the end user.
-
-The following jars are assembled by the `datasketches-memory` module:
+The following jars are assembled by the bash package script:
 
 * datasketches-memory-X.Y.Z.jar The compiled main class files.
 * datasketches-memory-X.Y.Z-tests.jar The compiled test class files.

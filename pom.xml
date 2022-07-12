@@ -20,7 +20,7 @@ under the License.
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -131,6 +131,7 @@ under the License.
     <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version> <!-- overrides parent -->
     <maven-toolchains-plugin.version>3.0.0</maven-toolchains-plugin.version>
     <maven-install-plugin.version>3.0.0-M1</maven-install-plugin.version>
+    <maven-exec-plugin.version>3.0.0</maven-exec-plugin.version>
     <!-- Apache Plugins -->
     <apache-rat-plugin.version>0.13</apache-rat-plugin.version> <!-- overrides parent -->
     <!-- org.jacoco Maven Plugins -->
@@ -412,7 +413,7 @@ under the License.
             <!--suppress UnresolvedMavenProperty -->
             <repoToken>${coveralls-repo-token}</repoToken>
             <!--suppress UnresolvedMavenProperty -->
-            <jacocoReports>${maven.multiModuleProjectDirectory}/datasketches-memory/target/site/jacoco-aggregate/jacoco.xml</jacocoReports>
+            <jacocoReports>${maven.multiModuleProjectDirectory}/datasketches-memory-java11/target/site/jacoco-aggregate/jacoco.xml</jacocoReports>
           </configuration>
         </plugin>
 
@@ -425,6 +426,12 @@ under the License.
               <version>${jdk-toolchain.version}</version>
             </jdkToolchain>
           </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>${maven-exec-plugin.version}</version>
         </plugin>
 
       </plugins>
@@ -521,7 +528,6 @@ under the License.
       </build>
     </profile>
 
-
   </profiles>
 
   <!-- This Maven project is divided into an aggregator project (the root), that manages a group of submodules that
@@ -531,10 +537,7 @@ under the License.
        contribute to this project -->
   <modules>
     <module>datasketches-memory-java8</module>
-    <module>datasketches-memory-java8-tests</module>
     <module>datasketches-memory-java11</module>
-    <module>datasketches-memory</module>
-    <module>datasketches-memory-resources</module>
   </modules>
 
 </project>

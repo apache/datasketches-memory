@@ -53,8 +53,75 @@
                         </compilerArgs>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <!-- Generates aggregate code coverage report from website.  This applies across all Maven submodules. -->
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco-maven-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>default-report</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>report-aggregate</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
+
+    <profiles>
+        <profile>
+            <id>assemble-mr-jar</id>
+            <activation>
+                <property>
+                    <name>!unsetDefaultProfile</name>
+                </property>
+            </activation>
+            <properties>
+                <assembly.script.path>${maven.multiModuleProjectDirectory}/tools/scripts/package-mr-jar.sh</assembly.script.path>
+                <assembly.checks.script.path>${maven.multiModuleProjectDirectory}/tools/scripts/test-mr-jar.sh</assembly.checks.script.path>
+                <assembly.java.home>${env.JAVA_HOME}</assembly.java.home>
+                <assembly.git.tag>${project.version}</assembly.git.tag>
+                <assembly.base.dir>${maven.multiModuleProjectDirectory}</assembly.base.dir>
+            </properties>
+            <build>
+                <defaultGoal>exec:exec</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>${maven-exec-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>package-mr-jar</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>package</phase>
+                                <configuration>
+                                    <executable>bash</executable>
+                                    <commandlineArgs>${assembly.script.path} ${assembly.java.home} ${assembly.git.tag} ${assembly.base.dir}</commandlineArgs>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>check-mr-jar</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>package</phase>
+                                <configuration>
+                                    <executable>bash</executable>
+                                    <commandlineArgs>${assembly.checks.script.path} ${assembly.java.home} ${assembly.git.tag} ${assembly.base.dir}</commandlineArgs>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

@@ -40,8 +40,11 @@ replacements for such internal APIs.
 
 ### Assembly
 
-The Maven assembly plugin uses the Maven submodules during the `package` phase.  
-The following maven submodules to source the compiled class files for the MR-JAR:
+During the Maven package phase, the [Maven exec plugin](https://www.mojohaus.org/exec-maven-plugin/index.html) 
+invokes a custom bash script `package-mr-jar.sh` located in the `tools/scripts` directory.   
+This script requires that the prior phases in the Maven lifecycle have been completed.
+
+The following maven submodules are used to source the compiled class files for the MR-JAR:
 
 ![MR-JAR maven module mapping](img/mr-jar-sources.png "MR-JAR maven module mapping")
 

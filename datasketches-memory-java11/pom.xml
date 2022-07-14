@@ -53,21 +53,6 @@
                         </compilerArgs>
                     </configuration>
                 </plugin>
-                <plugin>
-                    <!-- Generates aggregate code coverage report from website.  This applies across all Maven submodules. -->
-                    <groupId>org.jacoco</groupId>
-                    <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>${jacoco-maven-plugin.version}</version>
-                    <executions>
-                        <execution>
-                            <id>default-report</id>
-                            <phase>verify</phase>
-                            <goals>
-                                <goal>report-aggregate</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
             </plugins>
         </pluginManagement>
     </build>

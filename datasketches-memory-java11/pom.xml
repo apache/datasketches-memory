@@ -78,6 +78,8 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
+                        <!-- The trailing comment on the line below ignores an eclipse warning. The version is required for dependency updates. -->
+                        <version>${maven-exec-plugin.version}</version><!--$NO-MVN-MAN-VER$-->
                         <executions>
                             <execution>
                                 <id>package-mr-jar</id>

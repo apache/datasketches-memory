@@ -151,14 +151,14 @@ This will create the following Jars:
 
 #### Building for a specific java version
 
-A build script named **compile-package-jar.sh** has been provided to package a JAR for a specific java version.  This is necessary in cases where a developer is unable to install all the required versions of the JDK that are required as part of the Maven build.
+A build script named **package-single-release-jar.sh** has been provided to package a JAR for a specific java version.  This is necessary in cases where a developer is unable to install all the required versions of the JDK that are required as part of the Maven build.
 
 The build script performs the following steps:
 
 1.  Sets up staging directories under **target/** for the package files
 2.  Uses git commands to gather information about the current Git commit and branch
 3.  Compiles java source tree
-4.  Packages a JAR containing compiled sources together with the Manifest, Licence and Notice files
+4.  Packages a JAR containing compiled sources together with the Manifest, License and Notice files
 5.  Checks and tests the assembled JAR by using the API to access four different resource types
 
 The build script is located in the **tools/scripts/** directory and requires the following arguments:
@@ -171,15 +171,15 @@ For example, if the project base directory is `/src/datasketches-memory`;
 
 To run the script for a release version:
 
-    ./tools/scripts/compile-package-jar.sh $JAVA_HOME 2.1.0 /src/datasketches-memory
+    ./tools/scripts/package-single-release-jar.sh $JAVA_HOME 2.1.0 /src/datasketches-memory
 
 To run the script for a snapshot version:
 
-    ./tools/scripts/compile-package-jar.sh $JAVA_HOME 2.2.0-SNAPSHOT /src/datasketches-memory
+    ./tools/scripts/package-single-release-jar.sh $JAVA_HOME 2.2.0-SNAPSHOT /src/datasketches-memory
 
 To run the script for an RC version:
 
-    ./tools/scripts/compile-package-jar.sh $JAVA_HOME 2.1.0-RC1 /src/datasketches-memory
+    ./tools/scripts/package-single-release-jar.sh $JAVA_HOME 2.1.0-RC1 /src/datasketches-memory
 
 Note that the script does **not** use the _Git Version Tag_ to adjust the working copy to a remote tag - it is expected that the user has a pristine copy of the desired branch/tag available **before** using the script.
 
@@ -200,3 +200,6 @@ In order to build and contribute to this project, please read the relevant IDE d
 
 - [Eclipse IDE Setup](docs/eclipse.md)
 - [IntelliJ IDE Setup](docs/intellij.md)
+
+For releasing to AppNexus, please use the `sign-deploy-jar.sh` script in the scripts directory.
+See the documentation within the script for usage instructions.

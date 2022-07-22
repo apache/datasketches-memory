@@ -49,7 +49,7 @@ dependency graph.
 
 #### org.apache.datasketches.memory
 
-In the `datasketches-memory-java11` maven submodule root, the following module declaration has 
+In the `datasketches-memory-java11` maven submodule source root, the following module declaration has 
 been added:
 
 ```java

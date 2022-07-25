@@ -34,7 +34,7 @@ for a Maven module should be set as follows:
 
 | Maven submodule            | JDK |
 | -------------------------- | --- |
-| datasketches-memory-root   | 8   |
+| datasketches-memory        | 8   |
 | datasketches-memory-java8  | 8   |
 | datasketches-memory-java11 | 11  |
 

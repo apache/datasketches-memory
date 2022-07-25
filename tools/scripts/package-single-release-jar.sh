@@ -23,7 +23,8 @@
 # who do not wish to install several versions of the JDK on their
 # machine.
 # The script does not assume a POM file and does not use Maven.
-# It does use git and also uses the script getGitProperties.sh.
+# It does use git and also uses the script get-git-properties.sh and
+# test-jar.sh scripts.
 
 #  Required Input Parameters:
 #  \$1 = absolute path of JDK home directory
@@ -46,7 +47,7 @@ ProjectBaseDir=$3 #this must be an absolute path
 #### Setup absolute directory references ####
 ProjectArtifactId="memory"
 ScriptsDir=${ProjectBaseDir}/tools/scripts/
-MemoryMapFile=$ScriptsDir/LoremIpsum.txt
+MemoryMapFile=$ScriptsDir/assets/LoremIpsum.txt
 
 #### Initialise path dependent variables ####
 OutputDir=target
@@ -100,12 +101,12 @@ cp NOTICE $PackageMeta
 #### Generate MANIFEST.MF ####
 cat >> ${PackageManifest}<< EOF
 Manifest-Version: 1.0
-Created-By: Apache Datasketches Memory compile-package-jar.sh
+Created-By: Apache Datasketches Memory package-single-release-jar.sh
 Multi-Release: false
 EOF
 
 #### Generate git.properties file ####
-echo "$($ScriptsDir/getGitProperties.sh $ProjectBaseDir $ProjectArtifactId $GitTag)" >> $PackageManifest
+echo "$($ScriptsDir/get-git-properties.sh $ProjectBaseDir $ProjectArtifactId $GitTag)" >> $PackageManifest
 
 #### Copy source tree to target/src
 rsync -a -I $MemoryJava8Src $PackageSrc
@@ -134,6 +135,7 @@ echo
 echo "Building JAR from ${PackageContents}..."
 ${Jar_} cfm $OutputJar ${PackageManifest} -C $PackageContents .
 echo
+echo "Successfully built ${OutputJar}"
 
 # Uncomment this section to display JAR contents
 # echo "--- JAR CONTENTS ---"
@@ -141,23 +143,4 @@ echo
 # ${Jar_} tf ${OutputJar}
 # echo
 
-echo "--- RUN JAR CHECKS ---"
-echo
-if [[ $JavaVersion -eq 8 ]]; then
-  ${Javac_} -cp $OutputJar -d $PackageTests $(find $ScriptsDir -name '*.java')
-  ${Java_} -cp $PackageTests:$OutputJar org.apache.datasketches.memory.tools.scripts.CheckMemoryJar $MemoryMapFile
-else
-  ${Javac_} \
-    --add-modules org.apache.datasketches.memory \
-    -p "$OutputJar" -d $PackageTests $(find $ScriptsDir -name '*.java')
-
-  ${Java_} \
-    --add-modules org.apache.datasketches.memory \
-    --add-exports java.base/jdk.internal.misc=org.apache.datasketches.memory \
-    --add-exports java.base/jdk.internal.ref=org.apache.datasketches.memory \
-    --add-opens java.base/java.nio=org.apache.datasketches.memory \
-    --add-opens java.base/sun.nio.ch=org.apache.datasketches.memory \
-    -p $OutputJar -cp $PackageTests org.apache.datasketches.memory.tools.scripts.CheckMemoryJar $MemoryMapFile
-fi
-echo
-echo "Successfully built ${OutputJar}"
+echo "$($ScriptsDir/test-jar.sh $JDKHome $GitTag $OutputJar $ProjectBaseDir)"

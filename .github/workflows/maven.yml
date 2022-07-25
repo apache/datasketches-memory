@@ -106,7 +106,7 @@ jobs:
       # The GitTag for CI purposes is irrelevant
       - name: Custom build script
         run: |
-          ./tools/scripts/compile-package-jar.sh $JAVA_HOME x.y.z .
+          ./tools/scripts/package-single-release-jar.sh $JAVA_HOME x.y.z .
         shell: bash
 
       - name: Test & Report

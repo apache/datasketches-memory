@@ -20,7 +20,7 @@
 # Maven Configuration: Multi-Module Project
 
 This project is a multi-module Maven project. A multi-module Maven project consists of an 
-aggregator project (the `datasketches-memory-root` project), together with a set of submodules. 
+aggregator project (the `datasketches-memory` project), together with a set of submodules. 
 The aggregator's configuration is inherited by each submodule, thus reducing duplication.
 
 Datasketches Memory makes use of some features of the Java platform, for example, `Unsafe`, 

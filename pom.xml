@@ -325,7 +325,7 @@ under the License.
               <exclude>**/test-output/**/*</exclude>
               <exclude>**/img/**/*.png</exclude>
               <exclude>**/git.properties</exclude>
-              <exclude>**/scripts/LoremIpsum.txt</exclude>
+              <exclude>**/scripts/assets/LoremIpsum.txt</exclude>
               <exclude>LICENSE</exclude>
               <exclude>NOTICE</exclude>
             </excludes>

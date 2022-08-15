@@ -17,8 +17,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# This is a general bash script to test a datasketches-memory-X.jar
-# with multi-release functionality.
+# This is a general bash script to test a datasketches-memory-X.jar.
 # This is intended to be used for C/I matrix testing or for quick
 # verification of the output from the assembly process.
 
@@ -28,29 +27,23 @@
 #       Example tag for SNAPSHOT         : 1.0.0-SNAPSHOT
 #       Example tag for Release Candidate: 1.0.0-RC1
 #       Example tag for Release          : 1.0.0
-#  \$3 = absolute path of project.basedir
-#  For example:  $ <this script>.sh $JAVA_HOME 2.1.0 .
+#  \$3 = absolute path of datasketches-memory-X.jar
+#  \$4 = absolute path of project.basedir
+#  For example:  $ <this script>.sh $JAVA_HOME 2.1.0 target/datasketches-memory-X.jar .
 
-if [ -z "$1" ]; then echo "Missing JDK home";            exit 1; fi
-if [ -z "$2" ]; then echo "Missing Git Tag";             exit 1; fi
-if [ -z "$3" ]; then echo "Missing project.basedir";     exit 1; fi
-
-#### Extract JDKHome, Version and ProjectBaseDir from input parameters ####
+#### Extract JDKHome, Version, TestJar and ProjectBaseDir from input parameters ####
 JDKHome=$1
 GitTag=$2
-ProjectBaseDir=$3 #this must be an absolute path
+TestJar=$3
+ProjectBaseDir=$4
 
 #### Setup absolute directory references ####
 ProjectArtifactId="memory"
 ScriptsDir=${ProjectBaseDir}/tools/scripts/
-MemoryMapFile=$ScriptsDir/LoremIpsum.txt
+MemoryMapFile=$ScriptsDir/assets/LoremIpsum.txt
 
 #### Initialise path dependent variables ####
-OutputDir=target
-OutputJar=${OutputDir}/datasketches-memory-${GitTag}.jar
-
-PackageDir=${OutputDir}/archive-tmp
-PackageChecks=${PackageDir}/checks
+PackageChecks=target/archive-tmp/checks
 
 #### Move to project directory ####
 cd ${ProjectBaseDir}
@@ -84,12 +77,12 @@ mkdir -p $PackageChecks
 echo "--- RUN JAR CHECKS ---"
 echo
 if [[ $JavaVersion -eq 8 ]]; then
-  ${Javac_} -cp $OutputJar -d $PackageChecks $(find $ScriptsDir -name '*.java')
-  ${Java_} -cp $PackageChecks:$OutputJar org.apache.datasketches.memory.tools.scripts.CheckMemoryJar $MemoryMapFile
+  ${Javac_} -cp $TestJar -d $PackageChecks $(find ${ScriptsDir/assets} -name '*.java')
+  ${Java_} -cp $PackageChecks:$TestJar org.apache.datasketches.memory.tools.scripts.CheckMemoryJar $MemoryMapFile
 else
   ${Javac_} \
     --add-modules org.apache.datasketches.memory \
-    -p "$OutputJar" -d $PackageChecks $(find $ScriptsDir -name '*.java')
+    -p "$TestJar" -d $PackageChecks $(find ${ScriptsDir/assets} -name '*.java')
 
   ${Java_} \
     --add-modules org.apache.datasketches.memory \
@@ -97,7 +90,7 @@ else
     --add-exports java.base/jdk.internal.ref=org.apache.datasketches.memory \
     --add-opens java.base/java.nio=org.apache.datasketches.memory \
     --add-opens java.base/sun.nio.ch=org.apache.datasketches.memory \
-    -p $OutputJar -cp $PackageChecks org.apache.datasketches.memory.tools.scripts.CheckMemoryJar $MemoryMapFile
+    -p $TestJar -cp $PackageChecks org.apache.datasketches.memory.tools.scripts.CheckMemoryJar $MemoryMapFile
 fi
 echo
-echo "Successfully checked ${OutputJar}"
+echo "Successfully checked ${TestJar}"

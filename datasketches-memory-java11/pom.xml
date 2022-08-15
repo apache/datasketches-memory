@@ -66,8 +66,7 @@
                 </property>
             </activation>
             <properties>
-                <assembly.script.path>${maven.multiModuleProjectDirectory}/tools/scripts/package-mr-jar.sh</assembly.script.path>
-                <assembly.checks.script.path>${maven.multiModuleProjectDirectory}/tools/scripts/test-mr-jar.sh</assembly.checks.script.path>
+                <assembly.script.path>${maven.multiModuleProjectDirectory}/tools/scripts/package-multi-release-jar.sh</assembly.script.path>
                 <assembly.java.home>${env.JAVA_HOME}</assembly.java.home>
                 <assembly.git.tag>${project.version}</assembly.git.tag>
                 <assembly.base.dir>${maven.multiModuleProjectDirectory}</assembly.base.dir>
@@ -78,6 +77,8 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
+                        <!-- The trailing comment on the line below ignores an eclipse warning. The version is required for dependency updates. -->
+                        <version>${maven-exec-plugin.version}</version><!--$NO-MVN-MAN-VER$-->
                         <executions>
                             <execution>
                                 <id>package-mr-jar</id>
@@ -88,17 +89,6 @@
                                 <configuration>
                                     <executable>bash</executable>
                                     <commandlineArgs>${assembly.script.path} ${assembly.java.home} ${assembly.git.tag} ${assembly.base.dir}</commandlineArgs>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>check-mr-jar</id>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <phase>package</phase>
-                                <configuration>
-                                    <executable>bash</executable>
-                                    <commandlineArgs>${assembly.checks.script.path} ${assembly.java.home} ${assembly.git.tag} ${assembly.base.dir}</commandlineArgs>
                                 </configuration>
                             </execution>
                         </executions>

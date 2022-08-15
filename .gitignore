@@ -60,7 +60,7 @@ build.xml
 *.properties
 *.releaseBackup
 *.next
-*.tag
+*.asc
 
 # Jekyll
 _site/

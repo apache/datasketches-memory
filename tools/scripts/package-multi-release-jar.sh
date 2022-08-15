@@ -20,7 +20,7 @@
 # This is a general bash script to build a datasketches-memory-X.jar
 # with multi-release functionality.  The sources, test-sources, tests and
 # javadoc jars are also included in the output.
-# It does use git and also uses the script getGitProperties.sh.
+# It does use git and also uses the script get-git-properties.sh.
 #
 # NOTE: This script assumes that `mvn package` has been run prior to invocation.
 #       By default, it is called from the maven exec-plugin.
@@ -129,7 +129,7 @@ Created-By: Apache Datasketches Memory package-mr-jar.sh
 Multi-Release: true
 EOF
 #### Generate git.properties file ####
-echo "$($ScriptsDir/getGitProperties.sh $ProjectBaseDir $ProjectArtifactId $GitTag)" >> ${ArchiveDir}/MANIFEST.MF
+echo "$($ScriptsDir/get-git-properties.sh $ProjectBaseDir $ProjectArtifactId $GitTag)" >> ${ArchiveDir}/MANIFEST.MF
 
 ###########################
 #### MULTI-RELEASE JAR ####
@@ -185,3 +185,5 @@ prepare_jar $PackageJavaDoc
 rsync -q -a -I --filter="- .*" ${MemoryJava8Docs} $PackageJavaDoc
 ${Jar_} cfm $OutputJavaDoc ${ArchiveDir}/MANIFEST.MF -C $PackageJavaDoc .
 echo "Created javadoc jar ${OutputJavaDoc}"
+
+echo "$($ScriptsDir/test-jar.sh $JDKHome $GitTag $OutputMrJar $ProjectBaseDir)"

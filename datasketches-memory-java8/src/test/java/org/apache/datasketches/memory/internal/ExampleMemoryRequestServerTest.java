@@ -38,7 +38,7 @@ public class ExampleMemoryRequestServerTest {
   /**
    * This version is without a TWR block.all of the memory allocations are done through the MemoryRequestServer
    * and each is closed by the MemoryClient when it is done with each.
-   * @throws Exception
+   * @throws Exception  thrown by automatic close() invocation on WritableHandle.
    */
   @Test
   public void checkExampleMemoryRequestServer1() throws Exception {
@@ -59,7 +59,7 @@ public class ExampleMemoryRequestServerTest {
    * by the MemoryClient when it is done with the new memory allocations.
    * The initial allocation stays open until the end where it is closed at the end of the
    * TWR scope.
-   * @throws Exception
+   * @throws Exception thrown by automatic close() invocation on WritableHandle.
    */
   @Test
   public void checkExampleMemoryRequestServer2() throws Exception {

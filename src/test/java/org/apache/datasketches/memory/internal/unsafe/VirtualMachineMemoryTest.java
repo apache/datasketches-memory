@@ -17,9 +17,8 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.internal.unsafe;
 
-import org.apache.datasketches.memory.internal.VirtualMachineMemory;
 import org.testng.annotations.Test;
 
 @SuppressWarnings({"unused"})

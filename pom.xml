@@ -20,7 +20,7 @@ under the License.
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-v4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -31,12 +31,10 @@ under the License.
   </parent>
 
   <groupId>org.apache.datasketches</groupId>
-  <artifactId>datasketches-memory-root</artifactId>
+  <artifactId>datasketches-memory</artifactId>
   <version>2.3.0-SNAPSHOT</version>
-  <!-- Required for multi-module project -->
-  <packaging>pom</packaging>
 
-  <name>${project.artifactId}</name>
+  <name>Datasketches Memory</name>
   <description>High-performance native memory access.</description>
   <url>https://datasketches.apache.org/</url>
   <inceptionYear>2015</inceptionYear>
@@ -82,462 +80,49 @@ under the License.
     </developer>
   </developers>
 
-  <!--
-       NOTE:
-       The datasketches-memory submodule uses the Maven project-aggregation feature and does not inherit
-       from this root module as a parent; so that there is no runtime dependency on the parent project (root module).
-       As a result, some properties from this POM (including the version) are duplicated in the datasketches-memory
-       module for inclusion in the assembled artifacts.  For more information, see:
-       https://maven.apache.org/guides/introduction/introduction-to-the-pom.html#Project_Aggregation -->
-
-
   <properties>
-    <!-- UNIQUE FOR THIS JAVA COMPONENT -->
-    <protobuf-java.version>4.0.0-rc-2</protobuf-java.version>
-    <!-- Used for UTF8 testing -->
-    <zero-allocation-hashing.version>0.15</zero-allocation-hashing.version>
-    <!-- END:UNIQUE FOR THIS JAVA COMPONENT -->
-
-    <!-- Test -->
-    <testng.version>7.5</testng.version>
-
-    <!-- System-wide properties -->
-    <maven.version>3.5.0</maven.version>
-    <java.version>1.8</java.version>
-    <jdk-toolchain.version>8</jdk-toolchain.version>
-    <maven.compiler.source>${java.version}</maven.compiler.source>
-    <maven.compiler.target>${java.version}</maven.compiler.target>
-    <argLine>-Xmx4g -Duser.language=en -Duser.country=US -Dfile.encoding=UTF-8</argLine>
-    <charset.encoding>UTF-8</charset.encoding>
-    <project.build.sourceEncoding>${charset.encoding}</project.build.sourceEncoding>
-    <project.build.resourceEncoding>${charset.encoding}</project.build.resourceEncoding>
-    <project.reporting.outputEncoding>${charset.encoding}</project.reporting.outputEncoding>
-
-    <!-- org.codehaus plugins -->
-    <!-- used for strict profile testing-->
-    <plexus-compiler-javac-errorprone.version>2.8.5</plexus-compiler-javac-errorprone.version>
-    <versions-maven-plugin.version>2.8.1</versions-maven-plugin.version>
-
-    <!--  Maven Plugins -->
-    <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version> <!-- overrides parent -->
-    <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version> <!-- overrides parent -->
-    <maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version> <!-- overrides parent -->
-    <maven-enforcer-plugin.version>3.0.0</maven-enforcer-plugin.version> <!-- overrides parent -->
-    <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version> <!-- overrides parent -->
-    <maven-javadoc-plugin.version>3.3.1</maven-javadoc-plugin.version> <!-- overrides parent -->
-    <maven-release-plugin.version>3.0.0-M4</maven-release-plugin.version> <!-- overrides parent -->
-    <maven-remote-resources-plugin.version>1.7.0</maven-remote-resources-plugin.version> <!-- overrides parent -->
-    <maven-source-plugin.version>3.2.1</maven-source-plugin.version> <!-- overrides parent -->
-    <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version> <!-- overrides parent -->
-    <maven-toolchains-plugin.version>3.0.0</maven-toolchains-plugin.version>
-    <maven-install-plugin.version>3.0.0-M1</maven-install-plugin.version>
-    <maven-exec-plugin.version>3.0.0</maven-exec-plugin.version>
-    <!-- Apache Plugins -->
-    <apache-rat-plugin.version>0.13</apache-rat-plugin.version> <!-- overrides parent -->
-    <!-- org.jacoco Maven Plugins -->
-    <jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
-    <!-- org.eluder Maven Plugins -->
-    <coveralls-repo-token></coveralls-repo-token>
-    <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
-    <!-- other -->
-    <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
-    <maven.deploy.skip>true</maven.deploy.skip>
-    <maven.install.skip>true</maven.install.skip>
-    <maven.javadoc.skip>true</maven.javadoc.skip>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 
-  <repositories>
-    <repository>
-      <id>apache.snapshots</id>
-      <name>Apache Snapshot Repository</name>
-      <url>https://repository.apache.org/content/groups/snapshots/org/apache/datasketches/</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>apache</id>
-      <name>Apache Releases Repository</name>
-      <url>https://repository.apache.org/content/repositories/releases/org/apache/datasketches/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-
-  <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>org.testng</groupId>
         <artifactId>testng</artifactId>
-        <version>${testng.version}</version>
+        <version>7.5</version>
         <scope>test</scope>
       </dependency>
+      <!-- Used for UTF8 testing -->
       <dependency>
-        <!-- Used for UTF8 testing -->
         <groupId>com.google.protobuf</groupId>
         <artifactId>protobuf-java</artifactId>
-        <version>${protobuf-java.version}</version>
+        <version>4.0.0-rc-2</version>
         <scope>test</scope>
       </dependency>
+      <!-- Used for xxHash testing -->
       <dependency>
-        <!-- Used for xxHash testing -->
         <groupId>net.openhft</groupId>
         <artifactId>zero-allocation-hashing</artifactId>
-        <version>${zero-allocation-hashing.version}</version>
+        <version>0.15</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
-  </dependencyManagement>
 
   <build>
     <pluginManagement>
       <plugins>
-
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>versions-maven-plugin</artifactId>
-          <version>${versions-maven-plugin.version}</version>
-        </plugin>
-
-        <plugin>
-          <!-- We want to deploy the artifacts to a staging location for perusal -->
-          <!-- Apache Parent pom: apache-release profile -->
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-deploy-plugin</artifactId>
-          <version>${maven-deploy-plugin.version}</version>
-        </plugin>
-
-        <plugin>
-          <!-- Apache Parent pom, pluginManagement-->
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-release-plugin</artifactId>
-          <version>${maven-release-plugin.version}</version>
-        </plugin>
-
-        <plugin>
-          <!-- Extends Apache Parent pom, pluginManagement-->
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>${maven-jar-plugin.version}</version>
-          <executions>
-            <execution>
-              <id>default-jar</id>
-              <phase>package</phase>
-              <goals>
-                <goal>jar</goal>
-              </goals>
-            </execution>
-            <execution>
-              <id>default-test-jar</id>
-              <phase>package</phase>
-              <goals>
-                <goal>test-jar</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-
-        <plugin>
-          <!-- Extends Apache Parent pom, apache-release profile -->
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <version>${maven-javadoc-plugin.version}</version>
-          <configuration>
-            <docfilessubdirs>true</docfilessubdirs>
-            <doclint>none</doclint>
-            <jdkToolchain>
-              <version>${jdk-toolchain.version}</version>
-            </jdkToolchain>
-            <excludePackageNames>org.apache.datasketches.memory.internal</excludePackageNames>
-          </configuration>
-          <executions>
-            <execution>
-              <id>attach-javadocs</id>
-              <phase>package</phase>
-              <goals>
-                <goal>jar</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-enforcer-plugin</artifactId>
-          <version>${maven-enforcer-plugin.version}</version>
-          <executions>
-            <execution>
-              <id>enforce-banned-dependencies</id>
-              <goals>
-                <goal>enforce</goal>
-              </goals>
-              <configuration>
-                <rules>
-                  <requireJavaVersion>
-                    <version>[1.8,1.9),[8],[11,14),[17,18)</version>
-                  </requireJavaVersion>
-                  <requireMavenVersion>
-                    <version>[${maven.version},)</version>
-                  </requireMavenVersion>
-                  <bannedDependencies>
-                    <excludes>
-                      <!--LGPL licensed library-->
-                      <exclude>com.google.code.findbugs:annotations</exclude>
-                    </excludes>
-                  </bannedDependencies>
-                </rules>
-                <fail>true</fail>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-
-        <plugin>
-          <!-- Apache Parent pom, pluginManagement-->
-          <groupId>org.apache.rat</groupId>
-          <artifactId>apache-rat-plugin</artifactId>
-          <version>${apache-rat-plugin.version}</version>
-          <executions>
-            <execution>
-              <phase>verify</phase>
-              <goals>
-                <goal>check</goal>
-              </goals>
-            </execution>
-          </executions>
-          <configuration>
-            <outputDirectory>${project.basedir}/rat</outputDirectory>
-            <consoleOutput>true</consoleOutput>
-            <useDefaultExcludes>true</useDefaultExcludes>
-            <excludes>
-              <exclude>**/*.yaml</exclude>
-              <exclude>**/*.yml</exclude>
-              <exclude>**/.*/**/*</exclude>
-              <exclude>**/.clover/**/*</exclude>
-              <exclude>**/test/resources/**/*.txt</exclude>
-              <exclude>**/test-output/**/*</exclude>
-              <exclude>**/img/**/*.png</exclude>
-              <exclude>**/git.properties</exclude>
-              <exclude>**/scripts/assets/LoremIpsum.txt</exclude>
-              <exclude>LICENSE</exclude>
-              <exclude>NOTICE</exclude>
-            </excludes>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <!-- Extends Apache Parent pom, apache-release profile -->
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-source-plugin</artifactId>
-          <version>${maven-source-plugin.version}</version>
-          <executions>
-            <execution>
-              <id>attach-sources</id>
-              <phase>package</phase>
-              <goals>
-                <goal>jar-no-fork</goal>
-              </goals>
-            </execution>
-            <execution>
-              <id>attach-test-sources</id>
-              <phase>package</phase>
-              <goals>
-                <goal>test-jar-no-fork</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-
-        <plugin>
-          <!-- Apache Parent pom, pluginManagement-->
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>${maven-surefire-plugin.version}</version>
-          <configuration>
-            <trimStackTrace>false</trimStackTrace>
-            <useManifestOnlyJar>false</useManifestOnlyJar>
-            <redirectTestOutputToFile>true</redirectTestOutputToFile>
-            <jdkToolchain>
-              <version>${jdk-toolchain.version}</version>
-            </jdkToolchain>
-            <reportsDirectory>${project.build.directory}/test-output/${maven.build.timestamp}</reportsDirectory>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-toolchains-plugin</artifactId>
-          <version>${maven-toolchains-plugin.version}</version>
-          <configuration>
-            <toolchains>
-              <jdk>
-                <version>[1.8,1.9),[8],[11,14),[17,18)</version>
-              </jdk>
-            </toolchains>
-          </configuration>
-          <executions>
-            <execution>
-              <goals><goal>toolchain</goal></goals>
-            </execution>
-          </executions>
-        </plugin>
-
-        <plugin>
-          <!-- Generates code coverage report from website. -->
-          <groupId>org.jacoco</groupId>
-          <artifactId>jacoco-maven-plugin</artifactId>
-          <version>${jacoco-maven-plugin.version}</version>
-          <executions>
-            <execution>
-              <id>default-prepare-agent</id>
-              <goals>
-                <goal>prepare-agent</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-
-        <plugin>
-          <!-- Submit code coverage report to Coveralls.io. -->
-          <groupId>org.eluder.coveralls</groupId>
-          <artifactId>coveralls-maven-plugin</artifactId>
-          <version>${coveralls-maven-plugin.version}</version>
-          <configuration>
-            <!--suppress UnresolvedMavenProperty -->
-            <repoToken>${coveralls-repo-token}</repoToken>
-            <!--suppress UnresolvedMavenProperty -->
-            <jacocoReports>${maven.multiModuleProjectDirectory}/datasketches-memory-java8/target/site/jacoco/jacoco.xml</jacocoReports>
-          </configuration>
-        </plugin>
-
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>${maven-compiler-plugin.version}</version>
+          <version>3.10.0</version>
           <configuration>
             <jdkToolchain>
-              <version>${jdk-toolchain.version}</version>
+              <version>8</version>
             </jdkToolchain>
           </configuration>
         </plugin>
-
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>exec-maven-plugin</artifactId>
-          <version>${maven-exec-plugin.version}</version>
-        </plugin>
-
       </plugins>
     </pluginManagement>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-deploy-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-release-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.rat</groupId>
-        <artifactId>apache-rat-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.eluder.coveralls</groupId>
-        <artifactId>coveralls-maven-plugin</artifactId>
-      </plugin>
-    </plugins>
   </build>
-
-  <profiles>
-    <!-- Disable source release assembly for 'apache-release' profile.
-             This is performed from a script outside Maven
-    -->
-    <profile>
-      <id>apache-release</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <version>${maven-assembly-plugin.version}</version>
-            <executions>
-              <execution>
-                <id>source-release-assembly</id>
-                <phase>none</phase>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>only-eclipse</id>
-      <activation>
-        <property>
-          <name>m2e.version</name>
-        </property>
-      </activation>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-remote-resources-plugin</artifactId>
-              <version>${maven-remote-resources-plugin.version}</version>
-              <executions>
-                <execution>
-                  <id>process-resource-bundles</id>
-                  <phase>none</phase>
-                </execution>
-              </executions>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-
-  </profiles>
-
-  <!-- This Maven project is divided into an aggregator project (the root), that manages a group of submodules that
-       inherit configuration from this root module.
-       A multi-module project is used to target different version-specific features of the Java language APIs.
-       Furthermore, it is a structure that is supported in most IDEs allowing minimal disruption to developers that
-       contribute to this project -->
-  <modules>
-    <module>datasketches-memory-java8</module>
-    <module>datasketches-memory-java11</module>
-  </modules>
 
 </project>

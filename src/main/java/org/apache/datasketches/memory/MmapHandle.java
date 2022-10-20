@@ -27,4 +27,4 @@ package org.apache.datasketches.memory;
  * @author Lee Rhodes
  * @author Roman Leventov
  */
-public interface MapHandle extends Map, Handle { }
+public interface MmapHandle extends Mmap, Handle { }

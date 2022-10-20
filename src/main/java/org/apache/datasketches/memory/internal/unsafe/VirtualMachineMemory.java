@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.internal.unsafe;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

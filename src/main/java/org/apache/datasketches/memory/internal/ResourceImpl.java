@@ -19,18 +19,17 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.UnsafeUtil.LS;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.assertBounds;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.checkBounds;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.datasketches.memory.BaseState;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.LS;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.assertBounds;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.checkBounds;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.unsafe;
+
 import org.apache.datasketches.memory.MemoryRequestServer;
-import org.apache.datasketches.memory.ReadOnlyException;
+import org.apache.datasketches.memory.internal.unsafe.UnsafeUtil;
 
 /**
  * Keeps key configuration state for MemoryImpl and BufferImpl plus some common static variables
@@ -39,35 +38,35 @@ import org.apache.datasketches.memory.ReadOnlyException;
  * @author Lee Rhodes
  */
 @SuppressWarnings("restriction")
-public abstract class BaseStateImpl implements BaseState {
+public abstract class ResourceImpl {
 
   //Monitoring
-  static final AtomicLong currentDirectMemoryAllocations_ = new AtomicLong();
-  static final AtomicLong currentDirectMemoryAllocated_ = new AtomicLong();
-  static final AtomicLong currentDirectMemoryMapAllocations_ = new AtomicLong();
-  static final AtomicLong currentDirectMemoryMapAllocated_ = new AtomicLong();
+  public static final AtomicLong currentDirectMemoryAllocations_ = new AtomicLong();
+  public static final AtomicLong currentDirectMemoryAllocated_ = new AtomicLong();
+  public static final AtomicLong currentDirectMemoryMapAllocations_ = new AtomicLong();
+  public static final AtomicLong currentDirectMemoryMapAllocated_ = new AtomicLong();
 
   //class type IDs. Do not change the bit orders
   //The first 3 bits are set dynamically
   // 0000 0XXX
-  static final int READONLY = 1;
-  static final int REGION = 2;
-  static final int DUPLICATE = 4;
+  public static final int READONLY = 1;
+  public static final int REGION = 2;
+  public static final int DUPLICATE = 4;
 
   //The following 4 bits are set by the 16 leaf nodes
   // 000X X000
-  static final int HEAP = 0;
-  static final int DIRECT = 1 << 3;
-  static final int MAP = 2 << 3;
-  static final int BYTEBUF = 3 << 3;
+  public static final int HEAP = 0;
+  public static final int DIRECT = 1 << 3;
+  public static final int MAP = 2 << 3;
+  public static final int BYTEBUF = 3 << 3;
 
   // 00X0 0000
-  static final int NATIVE = 0;
-  static final int NONNATIVE = 1 << 5;
+  public static final int NATIVE = 0;
+  public static final int NONNATIVE = 1 << 5;
 
   // 0X00 0000
-  static final int MEMORY = 0;
-  static final int BUFFER = 1 << 6;
+  public static final int MEMORY = 0;
+  public static final int BUFFER = 1 << 6;
 
   private final long capacityBytes_;
 
@@ -89,7 +88,7 @@ public abstract class BaseStateImpl implements BaseState {
    * This offset does not include the size of an object array header, if there is one.
    * @param capacityBytes the capacity of this object. Used by all methods when checking bounds.
    */
-  BaseStateImpl(final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
+  ResourceImpl(final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
       final long capacityBytes) {
     capacityBytes_ = capacityBytes;
     cumBaseOffset_ = regionOffset + (unsafeObj == null
@@ -99,8 +98,7 @@ public abstract class BaseStateImpl implements BaseState {
 
   //Byte Order Related
 
-  @Override
-  public final ByteOrder getTypeByteOrder() {
+  public final ByteOrder getByteOrder() {
     return isNonNativeType() ? Util.NON_NATIVE_BYTE_ORDER : ByteOrder.nativeOrder();
   }
 
@@ -116,47 +114,40 @@ public abstract class BaseStateImpl implements BaseState {
     return ByteOrder.nativeOrder() == byteOrder;
   }
 
-  @Override
   public final boolean isByteOrderCompatible(final ByteOrder byteOrder) {
-    final ByteOrder typeBO = getTypeByteOrder();
+    final ByteOrder typeBO = getByteOrder();
     return typeBO == ByteOrder.nativeOrder() && typeBO == byteOrder;
   }
 
-  @Override
   public final boolean equals(final Object that) {
     if (this == that) { return true; }
-    return that instanceof BaseStateImpl
-      ? CompareAndCopy.equals(this, (BaseStateImpl) that)
+    return that instanceof ResourceImpl
+      ? CompareAndCopy.equals(this, (ResourceImpl) that)
       : false;
   }
 
-  @Override
   public final boolean equalTo(final long thisOffsetBytes, final Object that,
       final long thatOffsetBytes, final long lengthBytes) {
-    return that instanceof BaseStateImpl
-      ? CompareAndCopy.equals(this, thisOffsetBytes, (BaseStateImpl) that, thatOffsetBytes, lengthBytes)
+    return that instanceof ResourceImpl
+      ? CompareAndCopy.equals(this, thisOffsetBytes, (ResourceImpl) that, thatOffsetBytes, lengthBytes)
       : false;
   }
 
   //Overridden by ByteBuffer Leafs
-  @Override
   public ByteBuffer getByteBuffer() {
     return null;
   }
 
-  @Override
   public final long getCapacity() {
     assertValid();
     return capacityBytes_;
   }
 
-  @Override
   public final long getCumulativeOffset() {
     assertValid();
     return cumBaseOffset_;
   }
 
-  @Override
   public final long getCumulativeOffset(final long offsetBytes) {
     assertValid();
     return cumBaseOffset_ + offsetBytes;
@@ -164,14 +155,11 @@ public abstract class BaseStateImpl implements BaseState {
 
   //Documented in WritableMemory and WritableBuffer interfaces.
   //Implemented in the Leaf nodes; Required here by toHex(...).
-  abstract MemoryRequestServer getMemoryRequestServer();
+  protected abstract MemoryRequestServer getMemoryRequestServer();
 
   //Overridden by ByteBuffer, Direct and Map leafs
-  long getNativeBaseOffset() {
-    return 0;
-  }
+  protected abstract long getNativeBaseOffset();
 
-  @Override
   public final long getRegionOffset() {
     final Object unsafeObj = getUnsafeObject();
     return unsafeObj == null
@@ -179,21 +167,17 @@ public abstract class BaseStateImpl implements BaseState {
         : cumBaseOffset_ - UnsafeUtil.getArrayBaseOffset(unsafeObj.getClass());
   }
 
-  @Override
   public final long getRegionOffset(final long offsetBytes) {
     return getRegionOffset() + offsetBytes;
   }
 
   //Overridden by all leafs
-  abstract int getTypeId();
+  protected abstract int getTypeId();
 
   //Overridden by Heap and ByteBuffer Leafs. Made public as getArray() in WritableMemoryImpl and
   // WritableBufferImpl
-  Object getUnsafeObject() {
-    return null;
-  }
+  protected abstract Object getUnsafeObject();
 
-  @Override
   public final boolean hasArray() {
     assertValid();
     return getUnsafeObject() != null;
@@ -204,39 +188,33 @@ public abstract class BaseStateImpl implements BaseState {
     return (int) xxHash64(0, capacityBytes_, 0); //xxHash64() calls checkValid()
   }
 
-  @Override
   public final long xxHash64(final long offsetBytes, final long lengthBytes, final long seed) {
     checkValid();
     return XxHash64.hash(getUnsafeObject(), cumBaseOffset_ + offsetBytes, lengthBytes, seed);
   }
 
-  @Override
   public final long xxHash64(final long in, final long seed) {
     return XxHash64.hash(in, seed);
   }
 
-  @Override
   public final boolean hasByteBuffer() {
     assertValid();
     return getByteBuffer() != null;
   }
 
-  @Override
   public final boolean isDirect() {
     return getUnsafeObject() == null;
   }
 
-  @Override
   public final boolean isReadOnly() {
     assertValid();
     return isReadOnlyType();
   }
 
-  @Override
   public final boolean isSameResource(final Object that) {
     checkValid();
     if (that == null) { return false; }
-    final BaseStateImpl that1 = (BaseStateImpl) that;
+    final ResourceImpl that1 = (ResourceImpl) that;
     that1.checkValid();
     if (this == that1) { return true; }
 
@@ -247,17 +225,16 @@ public abstract class BaseStateImpl implements BaseState {
   }
 
   //Overridden by Direct and Map leafs
-  @Override
   public boolean isValid() {
     return true;
   }
 
   //ASSERTS AND CHECKS
-  final void assertValid() {
+  protected final void assertValid() {
     assert isValid() : "MemoryImpl not valid.";
   }
 
-  void checkValid() {
+  public void checkValid() {
     if (!isValid()) {
       throw new IllegalStateException("MemoryImpl not valid.");
     }
@@ -280,7 +257,6 @@ public abstract class BaseStateImpl implements BaseState {
     assert !isReadOnly() : "MemoryImpl is read-only.";
   }
 
-  @Override
   public final void checkValidAndBounds(final long offsetBytes, final long lengthBytes) {
     checkValid();
     //read capacityBytes_ directly to eliminate extra checkValid() call
@@ -292,7 +268,7 @@ public abstract class BaseStateImpl implements BaseState {
     //read capacityBytes_ directly to eliminate extra checkValid() call
     checkBounds(offsetBytes, lengthBytes, capacityBytes_);
     if (isReadOnly()) {
-      throw new ReadOnlyException("MemoryImpl is read-only.");
+      throw new IllegalArgumentException("MemoryImpl is read-only.");
     }
   }
 
@@ -301,7 +277,7 @@ public abstract class BaseStateImpl implements BaseState {
     return (getTypeId() & READONLY) > 0;
   }
 
-  final static byte setReadOnlyType(final byte type, final boolean readOnly) {
+  protected final static byte setReadOnlyType(final byte type, final boolean readOnly) {
     return (byte)((type & ~1) | (readOnly ? READONLY : 0));
   }
 
@@ -380,9 +356,7 @@ public abstract class BaseStateImpl implements BaseState {
     return sb.toString();
   }
 
-  @Override
-  public final String toHexString(final String header, final long offsetBytes,
-      final int lengthBytes) {
+  public final String toHexString(final String header, final long offsetBytes, final int lengthBytes) {
     checkValid();
     final String klass = this.getClass().getSimpleName();
     final String s1 = String.format("(..., %d, %d)", offsetBytes, lengthBytes);
@@ -398,13 +372,13 @@ public abstract class BaseStateImpl implements BaseState {
   /**
    * Returns a formatted hex string of an area of this object.
    * Used primarily for testing.
-   * @param state the BaseStateImpl
+   * @param state the ResourceImpl
    * @param preamble a descriptive header
    * @param offsetBytes offset bytes relative to the MemoryImpl start
    * @param lengthBytes number of bytes to convert to a hex string
    * @return a formatted hex string in a human readable array
    */
-  static final String toHex(final BaseStateImpl state, final String preamble, final long offsetBytes,
+  static final String toHex(final ResourceImpl state, final String preamble, final long offsetBytes,
       final int lengthBytes) {
     final long capacity = state.getCapacity();
     UnsafeUtil.checkBounds(offsetBytes, lengthBytes, capacity);
@@ -437,7 +411,7 @@ public abstract class BaseStateImpl implements BaseState {
     sb.append("MemReq, hashCode    : ").append(memReqStr).append(LS);
     sb.append("Valid               : ").append(state.isValid()).append(LS);
     sb.append("Read Only           : ").append(state.isReadOnly()).append(LS);
-    sb.append("Type Byte Order     : ").append(state.getTypeByteOrder().toString()).append(LS);
+    sb.append("Byte Order          : ").append(state.getByteOrder().toString()).append(LS);
     sb.append("Native Byte Order   : ").append(ByteOrder.nativeOrder().toString()).append(LS);
     sb.append("JDK Runtime Version : ").append(UnsafeUtil.JDK).append(LS);
     //Data detail
@@ -462,7 +436,7 @@ public abstract class BaseStateImpl implements BaseState {
    * @return the current number of active direct memory allocations.
    */
   public static final long getCurrentDirectMemoryAllocations() {
-    return BaseStateImpl.currentDirectMemoryAllocations_.get();
+    return ResourceImpl.currentDirectMemoryAllocations_.get();
   }
 
   /**
@@ -470,7 +444,7 @@ public abstract class BaseStateImpl implements BaseState {
    * @return the current size of active direct memory allocated.
    */
   public static final long getCurrentDirectMemoryAllocated() {
-    return BaseStateImpl.currentDirectMemoryAllocated_.get();
+    return ResourceImpl.currentDirectMemoryAllocated_.get();
   }
 
   /**
@@ -478,7 +452,7 @@ public abstract class BaseStateImpl implements BaseState {
    * @return the current number of active direct memory map allocations.
    */
   public static final long getCurrentDirectMemoryMapAllocations() {
-    return BaseStateImpl.currentDirectMemoryMapAllocations_.get();
+    return ResourceImpl.currentDirectMemoryMapAllocations_.get();
   }
 
   /**
@@ -486,10 +460,10 @@ public abstract class BaseStateImpl implements BaseState {
    * @return the current size of active direct memory map allocated.
    */
   public static final long getCurrentDirectMemoryMapAllocated() {
-    return BaseStateImpl.currentDirectMemoryMapAllocated_.get();
+    return ResourceImpl.currentDirectMemoryMapAllocated_.get();
   }
 
   //REACHABILITY FENCE
-  static void reachabilityFence(final Object obj) { }
+  public static void reachabilityFence(final Object obj) { }
 
 }

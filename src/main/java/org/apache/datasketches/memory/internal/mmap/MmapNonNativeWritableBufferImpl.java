@@ -17,12 +17,17 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.internal.mmap;
 
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableBuffer;
+import org.apache.datasketches.memory.internal.BaseWritableBufferImpl;
+import org.apache.datasketches.memory.internal.BaseWritableMemoryImpl;
+import org.apache.datasketches.memory.internal.NonNativeWritableBufferImpl;
+import org.apache.datasketches.memory.internal.Util;
+import org.apache.datasketches.memory.internal.unsafe.StepBoolean;
 
 /**
  * Implementation of {@link WritableBuffer} for map memory, non-native byte order.
@@ -30,13 +35,13 @@ import org.apache.datasketches.memory.WritableBuffer;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-final class MapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
+public final class MmapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   private static final int id = BUFFER | NONNATIVE | MAP;
   private final long nativeBaseOffset; //used to compute cumBaseOffset
   private final StepBoolean valid; //a reference only
   private final byte typeId;
 
-  MapNonNativeWritableBufferImpl(
+  public MmapNonNativeWritableBufferImpl(
       final long nativeBaseOffset,
       final long regionOffset,
       final long capacityBytes,
@@ -49,33 +54,33 @@ final class MapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   }
 
   @Override
-  BaseWritableBufferImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
+  protected BaseWritableBufferImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
       final boolean readOnly, final ByteOrder byteOrder) {
     final int type = setReadOnlyType(typeId, readOnly) | REGION;
     return Util.isNativeByteOrder(byteOrder)
-        ? new MapWritableBufferImpl(
+        ? new MmapWritableBufferImpl(
             nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, type, valid)
-        : new MapNonNativeWritableBufferImpl(
+        : new MmapNonNativeWritableBufferImpl(
             nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, type, valid);
   }
 
   @Override
-  BaseWritableBufferImpl toDuplicate(final boolean readOnly, final ByteOrder byteOrder) {
+  protected BaseWritableBufferImpl toDuplicate(final boolean readOnly, final ByteOrder byteOrder) {
     final int type = setReadOnlyType(typeId, readOnly) | DUPLICATE;
     return Util.isNativeByteOrder(byteOrder)
-        ? new MapWritableBufferImpl(
+        ? new MmapWritableBufferImpl(
             nativeBaseOffset, getRegionOffset(), getCapacity(), type, valid)
-        : new MapNonNativeWritableBufferImpl(
+        : new MmapNonNativeWritableBufferImpl(
             nativeBaseOffset, getRegionOffset(), getCapacity(), type, valid);
   }
 
   @Override
-  BaseWritableMemoryImpl toWritableMemory(final boolean readOnly, final ByteOrder byteOrder) {
+  protected BaseWritableMemoryImpl toWritableMemory(final boolean readOnly, final ByteOrder byteOrder) {
     final int type = setReadOnlyType(typeId, readOnly);
     return Util.isNativeByteOrder(byteOrder)
-        ? new MapWritableMemoryImpl(
+        ? new MmapWritableMemoryImpl(
             nativeBaseOffset, getRegionOffset(), getCapacity(), type, valid)
-        : new MapNonNativeWritableMemoryImpl(
+        : new MmapNonNativeWritableMemoryImpl(
             nativeBaseOffset, getRegionOffset(), getCapacity(), type, valid);
   }
 
@@ -85,12 +90,12 @@ final class MapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   }
 
   @Override
-  long getNativeBaseOffset() {
+  protected long getNativeBaseOffset() {
     return nativeBaseOffset;
   }
 
   @Override
-  int getTypeId() {
+  protected int getTypeId() {
     return typeId & 0xff;
   }
 
@@ -99,4 +104,8 @@ final class MapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
     return valid.get();
   }
 
+  @Override
+  protected Object getUnsafeObject() {
+      return null;
+  }
 }

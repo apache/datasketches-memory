@@ -4,4 +4,4 @@
 /**
  * 
  */
-package org.apache.datasketches.memory;
+package org.apache.datasketches.memory.hash;

@@ -17,12 +17,16 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.internal.heap;
 
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableBuffer;
+import org.apache.datasketches.memory.internal.BaseWritableBufferImpl;
+import org.apache.datasketches.memory.internal.BaseWritableMemoryImpl;
+import org.apache.datasketches.memory.internal.NativeWritableBufferImpl;
+import org.apache.datasketches.memory.internal.Util;
 
 /**
  * Implementation of {@link WritableBuffer} for heap-based, native byte order.
@@ -30,13 +34,13 @@ import org.apache.datasketches.memory.WritableBuffer;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-final class HeapWritableBufferImpl extends NativeWritableBufferImpl {
+public final class HeapWritableBufferImpl extends NativeWritableBufferImpl {
   private static final int id = BUFFER | NATIVE | HEAP;
   private final Object unsafeObj;
   private final MemoryRequestServer memReqSvr;
   private final byte typeId;
 
-  HeapWritableBufferImpl(
+  public HeapWritableBufferImpl(
       final Object unsafeObj,
       final long regionOffset,
       final long capacityBytes,
@@ -49,7 +53,7 @@ final class HeapWritableBufferImpl extends NativeWritableBufferImpl {
   }
 
   @Override
-  BaseWritableBufferImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
+  protected BaseWritableBufferImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
       final boolean readOnly, final ByteOrder byteOrder) {
     final int type = setReadOnlyType(typeId, readOnly) | REGION;
     return Util.isNativeByteOrder(byteOrder)
@@ -60,7 +64,7 @@ final class HeapWritableBufferImpl extends NativeWritableBufferImpl {
   }
 
   @Override
-  BaseWritableBufferImpl toDuplicate(final boolean readOnly, final ByteOrder byteOrder) {
+  protected BaseWritableBufferImpl toDuplicate(final boolean readOnly, final ByteOrder byteOrder) {
     final int type = setReadOnlyType(typeId, readOnly) | DUPLICATE;
     return Util.isNativeByteOrder(byteOrder)
         ? new HeapWritableBufferImpl(
@@ -70,7 +74,7 @@ final class HeapWritableBufferImpl extends NativeWritableBufferImpl {
   }
 
   @Override
-  BaseWritableMemoryImpl toWritableMemory(final boolean readOnly, final ByteOrder byteOrder) {
+  protected BaseWritableMemoryImpl toWritableMemory(final boolean readOnly, final ByteOrder byteOrder) {
     final int type = setReadOnlyType(typeId, readOnly);
     return Util.isNativeByteOrder(byteOrder)
         ? new HeapWritableMemoryImpl(
@@ -85,13 +89,17 @@ final class HeapWritableBufferImpl extends NativeWritableBufferImpl {
   }
 
   @Override
-  int getTypeId() {
+  protected int getTypeId() {
     return typeId & 0xff;
   }
 
   @Override
-  Object getUnsafeObject() {
+  protected Object getUnsafeObject() {
     return unsafeObj;
   }
 
+  @Override
+  protected long getNativeBaseOffset() {
+    return 0;
+  }
 }

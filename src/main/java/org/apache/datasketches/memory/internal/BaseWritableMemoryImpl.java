@@ -19,17 +19,17 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_BOOLEAN_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_BOOLEAN_INDEX_SCALE;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_BYTE_INDEX_SCALE;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_CHAR_INDEX_SCALE;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_INT_INDEX_SCALE;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_LONG_INDEX_SCALE;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_SHORT_INDEX_SCALE;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.checkBounds;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
 import static org.apache.datasketches.memory.internal.Util.negativeCheck;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_BOOLEAN_BASE_OFFSET;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_BOOLEAN_INDEX_SCALE;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_BYTE_INDEX_SCALE;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_CHAR_INDEX_SCALE;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_INT_INDEX_SCALE;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_LONG_INDEX_SCALE;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_SHORT_INDEX_SCALE;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.checkBounds;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.unsafe;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,11 +41,23 @@ import java.util.Objects;
 import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.MemoryRequestServer;
-import org.apache.datasketches.memory.ReadOnlyException;
-import org.apache.datasketches.memory.Utf8CodingException;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableHandle;
-import org.apache.datasketches.memory.WritableMapHandle;
+import org.apache.datasketches.memory.WritableMmapHandle;
+import org.apache.datasketches.memory.internal.bbuf.AccessByteBuffer;
+import org.apache.datasketches.memory.internal.bbuf.BBNonNativeWritableMemoryImpl;
+import org.apache.datasketches.memory.internal.bbuf.BBWritableMemoryImpl;
+import org.apache.datasketches.memory.internal.direct.AllocateDirect;
+import org.apache.datasketches.memory.internal.direct.DirectNonNativeWritableMemoryImpl;
+import org.apache.datasketches.memory.internal.direct.DirectWritableMemoryImpl;
+import org.apache.datasketches.memory.internal.direct.WritableDirectHandleImpl;
+import org.apache.datasketches.memory.internal.heap.HeapNonNativeWritableMemoryImpl;
+import org.apache.datasketches.memory.internal.heap.HeapWritableMemoryImpl;
+import org.apache.datasketches.memory.internal.mmap.AllocateDirectWritableMmap;
+import org.apache.datasketches.memory.internal.mmap.MmapNonNativeWritableMemoryImpl;
+import org.apache.datasketches.memory.internal.mmap.MmapWritableMemoryImpl;
+import org.apache.datasketches.memory.internal.mmap.WritableMmapHandleImpl;
+import org.apache.datasketches.memory.internal.unsafe.UnsafeUtil;
 import org.apache.datasketches.memory.WritableMemory;
 
 /*
@@ -65,7 +77,7 @@ import org.apache.datasketches.memory.WritableMemory;
  * Contains methods which are agnostic to the byte order.
  */
 @SuppressWarnings("restriction")
-public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements WritableMemory {
+public abstract class BaseWritableMemoryImpl extends ResourceImpl implements WritableMemory {
 
   //1KB of empty bytes for speedy clear()
   private final static byte[] EMPTY_BYTES;
@@ -127,17 +139,17 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
    * @param byteOrder the requested byte-order
    * @return this class constructed via the leaf node.
    */
-  public static WritableMapHandle wrapMap(final File file, final long fileOffsetBytes,
+  public static WritableMmapHandle wrapMap(final File file, final long fileOffsetBytes,
       final long capacityBytes, final boolean localReadOnly, final ByteOrder byteOrder) {
-    final AllocateDirectWritableMap dirWMap =
-        new AllocateDirectWritableMap(file, fileOffsetBytes, capacityBytes, localReadOnly);
-    final int typeId = (dirWMap.resourceReadOnly || localReadOnly) ? READONLY : 0;
+    final AllocateDirectWritableMmap dirWMap =
+        new AllocateDirectWritableMmap(file, fileOffsetBytes, capacityBytes, localReadOnly);
+    final int typeId = (dirWMap.isResourceReadOnly() || localReadOnly) ? READONLY : 0;
     final BaseWritableMemoryImpl wmem = Util.isNativeByteOrder(byteOrder)
-        ? new MapWritableMemoryImpl(dirWMap.nativeBaseOffset, 0L, capacityBytes,
+        ? new MmapWritableMemoryImpl(dirWMap.getNativeBaseOffset(), 0L, capacityBytes,
             typeId, dirWMap.getValid())
-        : new MapNonNativeWritableMemoryImpl(dirWMap.nativeBaseOffset, 0L, capacityBytes,
+        : new MmapNonNativeWritableMemoryImpl(dirWMap.getNativeBaseOffset(), 0L, capacityBytes,
             typeId, dirWMap.getValid());
-    return new WritableMapHandleImpl(dirWMap, wmem);
+    return new WritableMmapHandleImpl(dirWMap, wmem);
   }
 
   /**
@@ -172,10 +184,10 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
     return writableRegionImpl(offsetBytes, capacityBytes, false, byteOrder);
   }
 
-  WritableMemory writableRegionImpl(final long offsetBytes, final long capacityBytes,
+  private WritableMemory writableRegionImpl(final long offsetBytes, final long capacityBytes,
       final boolean localReadOnly, final ByteOrder byteOrder) {
     if (isReadOnly() && !localReadOnly) {
-      throw new ReadOnlyException("Writable region of a read-only Memory is not allowed.");
+      throw new IllegalArgumentException("Writable region of a read-only Memory is not allowed.");
     }
     negativeCheck(offsetBytes, "offsetBytes must be >= 0");
     negativeCheck(capacityBytes, "capacityBytes must be >= 0");
@@ -185,7 +197,7 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
     return toWritableRegion(offsetBytes, capacityBytes, readOnly, byteOrder);
   }
 
-  abstract BaseWritableMemoryImpl toWritableRegion(
+  protected abstract BaseWritableMemoryImpl toWritableRegion(
       long offsetBytes, long capcityBytes, boolean readOnly, ByteOrder byteOrder);
 
   //AS BUFFER
@@ -199,19 +211,18 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
     return asWritableBuffer(false, byteOrder);
   }
 
-  WritableBuffer asWritableBuffer(final boolean localReadOnly, final ByteOrder byteOrder) {
+  private BaseWritableBufferImpl asWritableBuffer(final boolean localReadOnly, final ByteOrder byteOrder) {
     Objects.requireNonNull(byteOrder, "byteOrder must be non-null");
     if (isReadOnly() && !localReadOnly) {
-      throw new ReadOnlyException(
-          "Converting a read-only Memory to a writable Buffer is not allowed.");
+      throw new IllegalArgumentException("Converting a read-only Memory to a writable Buffer is not allowed.");
     }
     final boolean readOnly = isReadOnly() || localReadOnly;
-    final WritableBuffer wbuf = toWritableBuffer(readOnly, byteOrder);
+    final BaseWritableBufferImpl wbuf = toWritableBuffer(readOnly, byteOrder);
     wbuf.setStartPositionEnd(0, 0, getCapacity());
     return wbuf;
   }
 
-  abstract BaseWritableBufferImpl toWritableBuffer(boolean readOnly, ByteOrder byteOrder);
+  protected abstract BaseWritableBufferImpl toWritableBuffer(boolean readOnly, ByteOrder byteOrder);
 
   //PRIMITIVE getX() and getXArray()
   @Override
@@ -299,14 +310,14 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
   @Override
   public final int compareTo(final long thisOffsetBytes, final long thisLengthBytes,
       final Memory thatMem, final long thatOffsetBytes, final long thatLengthBytes) {
-    return CompareAndCopy.compare((BaseStateImpl)this, thisOffsetBytes, thisLengthBytes,
-        (BaseStateImpl)thatMem, thatOffsetBytes, thatLengthBytes);
+    return CompareAndCopy.compare((ResourceImpl)this, thisOffsetBytes, thisLengthBytes,
+        (ResourceImpl)thatMem, thatOffsetBytes, thatLengthBytes);
   }
 
   @Override
   public final void copyTo(final long srcOffsetBytes, final WritableMemory destination,
       final long dstOffsetBytes, final long lengthBytes) {
-    CompareAndCopy.copy((BaseStateImpl)this, srcOffsetBytes, (BaseStateImpl)destination,
+    CompareAndCopy.copy((ResourceImpl)this, srcOffsetBytes, (ResourceImpl)destination,
         dstOffsetBytes, lengthBytes);
   }
 

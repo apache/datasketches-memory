@@ -17,17 +17,18 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.internal.mmap;
 
-import org.apache.datasketches.memory.MapHandle;
+import org.apache.datasketches.memory.MmapHandle;
+import org.apache.datasketches.memory.internal.BaseWritableMemoryImpl;
 import org.apache.datasketches.memory.Memory;
 
-class MapHandleImpl implements MapHandle {
+class MmapHandleImpl implements MmapHandle {
 
-  final AllocateDirectMap dirMap;
+  final AllocateDirectMmap dirMap;
   BaseWritableMemoryImpl wMem;
 
-  MapHandleImpl(final AllocateDirectMap dirMap, final BaseWritableMemoryImpl wMem) {
+  MmapHandleImpl(final AllocateDirectMmap dirMap, final BaseWritableMemoryImpl wMem) {
     this.dirMap = dirMap;
     this.wMem = wMem;
   }

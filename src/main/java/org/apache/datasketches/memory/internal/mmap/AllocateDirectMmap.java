@@ -17,9 +17,7 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
-
-import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
+package org.apache.datasketches.memory.internal.mmap;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -31,8 +29,14 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.logging.Logger;
 
-import org.apache.datasketches.memory.Map;
-import org.apache.datasketches.memory.MemoryCloseException;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.unsafe;
+
+import org.apache.datasketches.memory.Mmap;
+import org.apache.datasketches.memory.internal.ResourceImpl;
+import org.apache.datasketches.memory.internal.bbuf.AccessByteBuffer;
+import org.apache.datasketches.memory.internal.unsafe.MemoryCleaner;
+import org.apache.datasketches.memory.internal.unsafe.NioBits;
+import org.apache.datasketches.memory.internal.unsafe.StepBoolean;
 
 import sun.nio.ch.FileChannelImpl;
 
@@ -53,8 +57,8 @@ import sun.nio.ch.FileChannelImpl;
  * @author Praveenkumar Venkatesan
  */
 @SuppressWarnings("restriction")
-class AllocateDirectMap implements Map {
-  static final Logger LOG = Logger.getLogger(AllocateDirectMap.class.getCanonicalName());
+public class AllocateDirectMmap implements Mmap {
+  static final Logger LOG = Logger.getLogger(AllocateDirectMmap.class.getCanonicalName());
 
   private static final int MAP_RO = 0;
   private static final int MAP_RW = 1;
@@ -102,8 +106,8 @@ class AllocateDirectMap implements Map {
   final long nativeBaseOffset;
   final boolean resourceReadOnly;
 
-  //called from AllocateDirectWritableMap constructor
-  AllocateDirectMap(final File file, final long fileOffsetBytes, final long capacityBytes,
+  //called from AllocateDirectWritableMmap constructor
+  public AllocateDirectMmap(final File file, final long fileOffsetBytes, final long capacityBytes,
       final boolean localReadOnly) {
     this.capacityBytes = capacityBytes;
     resourceReadOnly = isFileReadOnly(file);
@@ -154,7 +158,7 @@ class AllocateDirectMap implements Map {
 
   @Override
   public void close() {
-    doClose("AllocateDirectMap");
+    doClose("AllocateDirectMmap");
   }
 
   boolean doClose(final String resource) {
@@ -168,13 +172,13 @@ class AllocateDirectMap implements Map {
       }
       return false;
     } catch (final Exception e) {
-        throw new MemoryCloseException(resource);
+        throw new IllegalStateException("The associated resource failed to close: " + resource);
     } finally {
-      BaseStateImpl.reachabilityFence(this);
+      ResourceImpl.reachabilityFence(this);
     }
   }
 
-  StepBoolean getValid() {
+  public StepBoolean getValid() {
     return deallocator.getValid();
   }
 
@@ -260,8 +264,8 @@ class AllocateDirectMap implements Map {
 
     Deallocator(final long nativeBaseOffset, final long capacityBytes,
         final RandomAccessFile raf) {
-      BaseStateImpl.currentDirectMemoryMapAllocations_.incrementAndGet();
-      BaseStateImpl.currentDirectMemoryMapAllocated_.addAndGet(capacityBytes);
+      ResourceImpl.currentDirectMemoryMapAllocations_.incrementAndGet();
+      ResourceImpl.currentDirectMemoryMapAllocated_.addAndGet(capacityBytes);
       myRaf = raf;
       assert myRaf != null;
       myFc = myRaf.getChannel();
@@ -284,14 +288,14 @@ class AllocateDirectMap implements Map {
       if (valid.change()) {
         if (calledFromCleaner) {
           // Warn about non-deterministic resource cleanup.
-          LOG.warning("A WritableMapHandleImpl was not closed manually");
+          LOG.warning("A WritableMmapHandleImpl was not closed manually");
         }
         try {
           unmap();
         }
         finally {
-          BaseStateImpl.currentDirectMemoryMapAllocations_.decrementAndGet();
-          BaseStateImpl.currentDirectMemoryMapAllocated_.addAndGet(-myCapacity);
+          ResourceImpl.currentDirectMemoryMapAllocations_.decrementAndGet();
+          ResourceImpl.currentDirectMemoryMapAllocated_.addAndGet(-myCapacity);
         }
         return true;
       }
@@ -313,4 +317,11 @@ class AllocateDirectMap implements Map {
     }
   } //End of class Deallocator
 
+  public long getNativeBaseOffset() {
+    return nativeBaseOffset;
+  }
+
+  public boolean isResourceReadOnly() {
+    return resourceReadOnly;
+  }
 }

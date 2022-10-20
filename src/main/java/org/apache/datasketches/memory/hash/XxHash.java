@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory;
+package org.apache.datasketches.memory.hash;
 
 import static org.apache.datasketches.memory.internal.XxHash64.hash;
 import static org.apache.datasketches.memory.internal.XxHash64.hashBooleans;

@@ -22,14 +22,13 @@ package org.apache.datasketches.memory.internal;
 import static java.lang.Character.isSurrogate;
 import static java.lang.Character.isSurrogatePair;
 import static java.lang.Character.toCodePoint;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.unsafe;
 
 import java.io.IOException;
 import java.nio.BufferOverflowException;
 import java.nio.CharBuffer;
 
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.Utf8CodingException;
 import org.apache.datasketches.memory.WritableMemory;
 
 /**
@@ -57,7 +56,7 @@ final class Utf8 {
   //Decode
   static final int getCharsFromUtf8(final long offsetBytes, final int utf8LengthBytes,
       final Appendable dst, final long cumBaseOffset, final Object unsafeObj)
-          throws IOException, Utf8CodingException {
+          throws IOException {
 
     if ((dst instanceof CharBuffer) && ((CharBuffer) dst).hasArray()) {
       return getCharBufferCharsFromUtf8(offsetBytes, ((CharBuffer) dst), utf8LengthBytes,
@@ -280,6 +279,14 @@ final class Utf8 {
 
   /******************/
   //Encode
+  /**
+   * @param offsetBytes
+   * @param src
+   * @param capacityBytes
+   * @param cumBaseOffset
+   * @param unsafeObj
+   * @return count of characters added to utf8
+   */
   static long putCharsToUtf8(final long offsetBytes, final CharSequence src,
         final long capacityBytes, final long cumBaseOffset, final Object unsafeObj) {
 

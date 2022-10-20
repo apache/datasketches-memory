@@ -27,4 +27,4 @@ package org.apache.datasketches.memory;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-public interface WritableMapHandle extends WritableMap, WritableHandle { }
+public interface WritableMmapHandle extends MmapHandle, WritableMmap, WritableHandle { }

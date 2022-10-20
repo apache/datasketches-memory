@@ -26,7 +26,7 @@ package org.apache.datasketches.memory;
  * @author Lee Rhodes
  * @author Praveenkumar Venkatesan
  */
-public interface WritableMap extends Map {
+public interface WritableMmap extends Mmap {
 
   /**
    * @see <a href="https://docs.oracle.com/javase/8/docs/api/java/nio/MappedByteBuffer.html#force--">

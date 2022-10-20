@@ -17,9 +17,11 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.internal.unsafe;
 
-import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.unsafe;
+
+import org.apache.datasketches.memory.internal.Util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -32,7 +34,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author Lee Rhodes
  */
 @SuppressWarnings("restriction")
-final class NioBits {
+public final class NioBits {
   private static final Class<?> NIO_BITS_CLASS;
   private static final Method NIO_BITS_RESERVE_MEMORY_METHOD;
   private static final Method NIO_BITS_UNRESERVE_MEMORY_METHOD;
@@ -80,31 +82,31 @@ final class NioBits {
 
   private NioBits() { }
 
-  static long getDirectAllocationsCount() { //tested via reflection
+  public static long getDirectAllocationsCount() { //tested via reflection
     return nioBitsCount.get();
   }
 
-  static long getReservedMemory() { //tested via reflection
+  public static long getReservedMemory() { //tested via reflection
     return nioBitsReservedMemory.get();
   }
 
-  static long getTotalCapacity() { //tested via reflection
+  public static long getTotalCapacity() { //tested via reflection
     return nioBitsTotalCapacity.get();
   }
 
-  static int pageSize() {
+  public static int pageSize() {
     return pageSize;
   }
 
-  static int pageCount(final long bytes) {
+  public static int pageCount(final long bytes) {
     return (int)((bytes + pageSize()) - 1L) / pageSize();
   }
 
-  static long getMaxDirectByteBufferMemory() { //tested via reflection
+  public static long getMaxDirectByteBufferMemory() { //tested via reflection
     return maxDBBMemory;
   }
 
-  static boolean isPageAligned() {
+  public static boolean isPageAligned() {
     return isPageAligned;
   }
 
@@ -112,11 +114,11 @@ final class NioBits {
   // Comment from java.nio.Bits.java ~ line 705:
   // -XX:MaxDirectMemorySize limits the total capacity rather than the
   // actual memory usage, which will differ when buffers are page aligned.
-  static void reserveMemory(final long allocationSize, final long capacity) {
+  public static void reserveMemory(final long allocationSize, final long capacity) {
     reserveUnreserve(allocationSize, capacity, NIO_BITS_RESERVE_MEMORY_METHOD);
   }
 
-  static void unreserveMemory(final long allocationSize, final long capacity) {
+  public static void unreserveMemory(final long allocationSize, final long capacity) {
     reserveUnreserve(allocationSize, capacity, NIO_BITS_UNRESERVE_MEMORY_METHOD);
   }
 

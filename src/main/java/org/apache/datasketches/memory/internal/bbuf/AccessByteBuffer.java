@@ -17,12 +17,14 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.internal.bbuf;
 
-import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
+import org.apache.datasketches.memory.internal.unsafe.UnsafeUtil;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.unsafe;
 
 /**
  * Acquires access to a ByteBuffer.
@@ -32,9 +34,9 @@ import java.nio.ByteOrder;
  * @author Roman Leventov
  */
 @SuppressWarnings("restriction")
-final class AccessByteBuffer {
+public final class AccessByteBuffer {
 
-  static final ByteBuffer ZERO_READ_ONLY_DIRECT_BYTE_BUFFER =
+  public static final ByteBuffer ZERO_READ_ONLY_DIRECT_BYTE_BUFFER =
       ByteBuffer.allocateDirect(0).asReadOnlyBuffer();
 
   private static final long NIO_BUFFER_ADDRESS_FIELD_OFFSET =
@@ -46,18 +48,18 @@ final class AccessByteBuffer {
   private static final long BYTE_BUFFER_OFFSET_FIELD_OFFSET =
       UnsafeUtil.getFieldOffset(java.nio.ByteBuffer.class, "offset");
 
-  final long nativeBaseOffset;
-  final long capacityBytes;
-  final long regionOffset;
-  final Object unsafeObj;
-  final boolean resourceReadOnly;
-  final ByteOrder byteOrder; //not used externally, here for reference.
+  public final long nativeBaseOffset;
+  public final long capacityBytes;
+  public final long regionOffset;
+  public final Object unsafeObj;
+  public final boolean resourceReadOnly;
+  public final ByteOrder byteOrder; //not used externally, here for reference.
 
   /**
    * The given ByteBuffer may be either readOnly or writable
    * @param byteBuf the given ByteBuffer
    */
-  AccessByteBuffer(final ByteBuffer byteBuf) {
+  public AccessByteBuffer(final ByteBuffer byteBuf) {
     capacityBytes = byteBuf.capacity();
     resourceReadOnly = byteBuf.isReadOnly();
     byteOrder = byteBuf.order();
@@ -80,8 +82,11 @@ final class AccessByteBuffer {
    * This method is adapted from
    * https://github.com/odnoklassniki/one-nio/blob/master/src/one/nio/mem/DirectMemory.java
    * : wrap(...). See LICENSE.
+   * @param address 
+   * @param capacity 
+   * @return the bytebuffer
    */
-  static ByteBuffer getDummyReadOnlyDirectByteBuffer(final long address, final int capacity) {
+  public static ByteBuffer getDummyReadOnlyDirectByteBuffer(final long address, final int capacity) {
     final ByteBuffer buf = ZERO_READ_ONLY_DIRECT_BYTE_BUFFER.duplicate();
     unsafe.putLong(buf, NIO_BUFFER_ADDRESS_FIELD_OFFSET, address);
     unsafe.putInt(buf, NIO_BUFFER_CAPACITY_FIELD_OFFSET, capacity);

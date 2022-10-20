@@ -19,8 +19,7 @@
 
 package org.apache.datasketches.memory.internal;
 
-import org.apache.datasketches.memory.BaseBuffer;
-import org.apache.datasketches.memory.ReadOnlyException;
+import org.apache.datasketches.memory.Buffer;
 
 /**
  * A new positional API. This is different from and simpler than Java BufferImpl positional approach.
@@ -39,7 +38,7 @@ import org.apache.datasketches.memory.ReadOnlyException;
  *
  * @author Lee Rhodes
  */
-public abstract class BaseBufferImpl extends BaseStateImpl implements BaseBuffer {
+public abstract class BaseBufferImpl extends ResourceImpl implements Buffer {
   private long capacity;
   private long start = 0;
   private long pos = 0;
@@ -52,66 +51,54 @@ public abstract class BaseBufferImpl extends BaseStateImpl implements BaseBuffer
     capacity = end = capacityBytes;
   }
 
-  @Override
   public final BaseBufferImpl incrementPosition(final long increment) {
     incrementAndAssertPositionForRead(pos, increment);
     return this;
   }
 
-  @Override
   public final BaseBufferImpl incrementAndCheckPosition(final long increment) {
     incrementAndCheckPositionForRead(pos, increment);
     return this;
   }
 
-  @Override
   public final long getEnd() {
     return end;
   }
 
-  @Override
   public final long getPosition() {
     return pos;
   }
 
-  @Override
   public final long getStart() {
     return start;
   }
 
-  @Override
   public final long getRemaining()  {
     return end - pos;
   }
 
-  @Override
   public final boolean hasRemaining() {
     return (end - pos) > 0;
   }
 
-  @Override
   public final BaseBufferImpl resetPosition() {
     pos = start;
     return this;
   }
 
-  @Override
   public final BaseBufferImpl setPosition(final long position) {
     assertInvariants(start, position, end, capacity);
     pos = position;
     return this;
   }
 
-  @Override
   public final BaseBufferImpl setAndCheckPosition(final long position) {
     checkInvariants(start, position, end, capacity);
     pos = position;
     return this;
   }
 
-  @Override
-  public final BaseBufferImpl setStartPositionEnd(final long start, final long position,
-      final long end) {
+  public final BaseBufferImpl setStartPositionEnd(final long start, final long position, final long end) {
     assertInvariants(start, position, end, capacity);
     this.start = start;
     this.end = end;
@@ -119,9 +106,7 @@ public abstract class BaseBufferImpl extends BaseStateImpl implements BaseBuffer
     return this;
   }
 
-  @Override
-  public final BaseBufferImpl setAndCheckStartPositionEnd(final long start, final long position,
-      final long end) {
+  public final BaseBufferImpl setAndCheckStartPositionEnd(final long start, final long position, final long end) {
     checkInvariants(start, position, end, capacity);
     this.start = start;
     this.end = end;
@@ -165,7 +150,7 @@ public abstract class BaseBufferImpl extends BaseStateImpl implements BaseBuffer
   final void checkValidForWrite() {
     checkValid();
     if (isReadOnly()) {
-      throw new ReadOnlyException("BufferImpl is read-only.");
+      throw new IllegalArgumentException("BufferImpl is read-only.");
     }
   }
 

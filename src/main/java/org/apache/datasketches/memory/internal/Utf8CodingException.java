@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory;
+package org.apache.datasketches.memory.internal;
 
 /**
  * This exception will be thrown for errors encountered during either the encoding of characters

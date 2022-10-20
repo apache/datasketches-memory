@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.internal.unsafe;
 
 /**
  * Extracts version-dependent field names into standalone class.

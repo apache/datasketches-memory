@@ -17,10 +17,11 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.internal.mmap;
 
 import org.apache.datasketches.memory.Handle;
-import org.apache.datasketches.memory.WritableMapHandle;
+import org.apache.datasketches.memory.WritableMmapHandle;
+import org.apache.datasketches.memory.internal.BaseWritableMemoryImpl;
 import org.apache.datasketches.memory.WritableMemory;
 
 /**
@@ -31,11 +32,11 @@ import org.apache.datasketches.memory.WritableMemory;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-public final class WritableMapHandleImpl extends MapHandleImpl
-    implements WritableMapHandle {
+public final class WritableMmapHandleImpl extends MmapHandleImpl
+    implements WritableMmapHandle {
 
-  WritableMapHandleImpl(
-      final AllocateDirectWritableMap dirWmap,
+  public WritableMmapHandleImpl(
+      final AllocateDirectWritableMmap dirWmap,
       final BaseWritableMemoryImpl wMem) {
     super(dirWmap, wMem);
   }
@@ -47,6 +48,6 @@ public final class WritableMapHandleImpl extends MapHandleImpl
 
   @Override
   public void force() {
-    ((AllocateDirectWritableMap)dirMap).force();
+    ((AllocateDirectWritableMmap)dirMap).force();
   }
 }

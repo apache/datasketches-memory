@@ -17,13 +17,17 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.internal.bbuf;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableMemory;
+import org.apache.datasketches.memory.internal.BaseWritableBufferImpl;
+import org.apache.datasketches.memory.internal.BaseWritableMemoryImpl;
+import org.apache.datasketches.memory.internal.NativeWritableMemoryImpl;
+import org.apache.datasketches.memory.internal.Util;
 
 /**
  * Implementation of {@link WritableMemory} for ByteBuffer, native byte order.
@@ -31,7 +35,7 @@ import org.apache.datasketches.memory.WritableMemory;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-final class BBWritableMemoryImpl extends NativeWritableMemoryImpl {
+public final class BBWritableMemoryImpl extends NativeWritableMemoryImpl {
   private static final int id = MEMORY | NATIVE | BYTEBUF;
   private final Object unsafeObj;
   private final long nativeBaseOffset; //used to compute cumBaseOffset
@@ -39,7 +43,7 @@ final class BBWritableMemoryImpl extends NativeWritableMemoryImpl {
   private final MemoryRequestServer memReqSvr;
   private final byte typeId;
 
-  BBWritableMemoryImpl(
+  public BBWritableMemoryImpl(
       final Object unsafeObj,
       final long nativeBaseOffset,
       final long regionOffset,
@@ -56,7 +60,7 @@ final class BBWritableMemoryImpl extends NativeWritableMemoryImpl {
   }
 
   @Override
-  BaseWritableMemoryImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
+  protected BaseWritableMemoryImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
       final boolean readOnly, final ByteOrder byteOrder) {
     final int type = setReadOnlyType(typeId, readOnly) | REGION;
     return Util.isNativeByteOrder(byteOrder)
@@ -67,7 +71,7 @@ final class BBWritableMemoryImpl extends NativeWritableMemoryImpl {
   }
 
   @Override
-  BaseWritableBufferImpl toWritableBuffer(final boolean readOnly, final ByteOrder byteOrder) {
+  protected BaseWritableBufferImpl toWritableBuffer(final boolean readOnly, final ByteOrder byteOrder) {
     final int type = setReadOnlyType(typeId, readOnly);
     return Util.isNativeByteOrder(byteOrder)
         ? new BBWritableBufferImpl(
@@ -89,17 +93,17 @@ final class BBWritableMemoryImpl extends NativeWritableMemoryImpl {
   }
 
   @Override
-  long getNativeBaseOffset() {
+  protected long getNativeBaseOffset() {
     return nativeBaseOffset;
   }
 
   @Override
-  int getTypeId() {
+  protected int getTypeId() {
     return typeId & 0xff;
   }
 
   @Override
-  Object getUnsafeObject() {
+  protected Object getUnsafeObject() {
     assertValid();
     return unsafeObj;
   }

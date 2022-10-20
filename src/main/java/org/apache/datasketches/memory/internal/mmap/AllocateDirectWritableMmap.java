@@ -17,14 +17,14 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.internal.mmap;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
-import org.apache.datasketches.memory.ReadOnlyException;
-import org.apache.datasketches.memory.WritableMap;
+import org.apache.datasketches.memory.WritableMmap;
+import org.apache.datasketches.memory.internal.bbuf.AccessByteBuffer;
 
 /**
  * Allocates direct memory used to memory map files for write operations
@@ -35,9 +35,9 @@ import org.apache.datasketches.memory.WritableMap;
  * @author Praveenkumar Venkatesan
  */
 //Called from WritableMemoryImpl, implements combo of WritableMemoryImpl with WritableMap resource
-final class AllocateDirectWritableMap extends AllocateDirectMap implements WritableMap {
+public final class AllocateDirectWritableMmap extends AllocateDirectMmap implements WritableMmap {
 
-  AllocateDirectWritableMap(final File file, final long fileOffsetBytes,
+  public AllocateDirectWritableMmap(final File file, final long fileOffsetBytes,
       final long capacityBytes, final boolean localReadOnly) {
     super(file, fileOffsetBytes, capacityBytes, localReadOnly);
   }
@@ -47,7 +47,7 @@ final class AllocateDirectWritableMap extends AllocateDirectMap implements Writa
   @Override
   public void force() {
     if (resourceReadOnly) {
-      throw new ReadOnlyException("MemoryImpl Mapped File is Read Only.");
+      throw new IllegalArgumentException("MemoryImpl Mapped File is Read Only.");
     }
     try {
       MAPPED_BYTE_BUFFER_FORCE0_METHOD

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.internal.unsafe;
 
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 

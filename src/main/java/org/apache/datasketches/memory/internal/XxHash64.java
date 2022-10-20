@@ -19,21 +19,21 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_BOOLEAN_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_CHAR_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_DOUBLE_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_FLOAT_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_INT_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_LONG_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_SHORT_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.CHAR_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.DOUBLE_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.FLOAT_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.INT_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.LONG_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.SHORT_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_BOOLEAN_BASE_OFFSET;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_CHAR_BASE_OFFSET;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_DOUBLE_BASE_OFFSET;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_FLOAT_BASE_OFFSET;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_INT_BASE_OFFSET;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_LONG_BASE_OFFSET;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_SHORT_BASE_OFFSET;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.CHAR_SHIFT;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.DOUBLE_SHIFT;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.FLOAT_SHIFT;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.INT_SHIFT;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.LONG_SHIFT;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.SHORT_SHIFT;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.unsafe;
 
 /**
  * The XxHash is a fast, non-cryptographic, 64-bit hash function that has

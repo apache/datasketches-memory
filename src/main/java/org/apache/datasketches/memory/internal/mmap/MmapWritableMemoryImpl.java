@@ -17,12 +17,17 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.internal.mmap;
 
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableMemory;
+import org.apache.datasketches.memory.internal.BaseWritableBufferImpl;
+import org.apache.datasketches.memory.internal.BaseWritableMemoryImpl;
+import org.apache.datasketches.memory.internal.NativeWritableMemoryImpl;
+import org.apache.datasketches.memory.internal.Util;
+import org.apache.datasketches.memory.internal.unsafe.StepBoolean;
 
 /**
  * Implementation of {@link WritableMemory} for map memory, native byte order.
@@ -30,13 +35,13 @@ import org.apache.datasketches.memory.WritableMemory;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-final class MapWritableMemoryImpl extends NativeWritableMemoryImpl {
+public final class MmapWritableMemoryImpl extends NativeWritableMemoryImpl {
   private static final int id = MEMORY | NATIVE | MAP;
   private final long nativeBaseOffset; //used to compute cumBaseOffset
   private final StepBoolean valid; //a reference only
   private final byte typeId;
 
-  MapWritableMemoryImpl(
+  public MmapWritableMemoryImpl(
       final long nativeBaseOffset,
       final long regionOffset,
       final long capacityBytes,
@@ -49,23 +54,23 @@ final class MapWritableMemoryImpl extends NativeWritableMemoryImpl {
   }
 
   @Override
-  BaseWritableMemoryImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
+  protected BaseWritableMemoryImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
       final boolean readOnly, final ByteOrder byteOrder) {
     final int type = setReadOnlyType(typeId, readOnly) | REGION;
     return Util.isNativeByteOrder(byteOrder)
-        ? new MapWritableMemoryImpl(
+        ? new MmapWritableMemoryImpl(
             nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, type, valid)
-        : new MapNonNativeWritableMemoryImpl(
+        : new MmapNonNativeWritableMemoryImpl(
             nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, type, valid);
   }
 
   @Override
-  BaseWritableBufferImpl toWritableBuffer(final boolean readOnly, final ByteOrder byteOrder) {
+  protected BaseWritableBufferImpl toWritableBuffer(final boolean readOnly, final ByteOrder byteOrder) {
     final int type = setReadOnlyType(typeId, readOnly);
     return Util.isNativeByteOrder(byteOrder)
-        ? new MapWritableBufferImpl(
+        ? new MmapWritableBufferImpl(
             nativeBaseOffset, getRegionOffset(), getCapacity(), type, valid)
-        : new MapNonNativeWritableBufferImpl(
+        : new MmapNonNativeWritableBufferImpl(
             nativeBaseOffset, getRegionOffset(), getCapacity(), type, valid);
   }
 
@@ -75,12 +80,12 @@ final class MapWritableMemoryImpl extends NativeWritableMemoryImpl {
   }
 
   @Override
-  long getNativeBaseOffset() {
+  protected long getNativeBaseOffset() {
     return nativeBaseOffset;
   }
 
   @Override
-  int getTypeId() {
+  protected int getTypeId() {
     return typeId & 0xff;
   }
 
@@ -89,4 +94,8 @@ final class MapWritableMemoryImpl extends NativeWritableMemoryImpl {
     return valid.get();
   }
 
+  @Override
+  protected Object getUnsafeObject() {
+      return null;
+  }
 }

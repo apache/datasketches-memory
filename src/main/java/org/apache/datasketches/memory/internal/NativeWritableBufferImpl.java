@@ -19,24 +19,24 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_CHAR_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_DOUBLE_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_DOUBLE_INDEX_SCALE;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_FLOAT_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_FLOAT_INDEX_SCALE;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_INT_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_LONG_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_SHORT_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.CHAR_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.DOUBLE_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.FLOAT_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.INT_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.LONG_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.SHORT_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.checkBounds;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
-
 import org.apache.datasketches.memory.WritableBuffer;
+
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_CHAR_BASE_OFFSET;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_DOUBLE_BASE_OFFSET;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_DOUBLE_INDEX_SCALE;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_FLOAT_BASE_OFFSET;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_FLOAT_INDEX_SCALE;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_INT_BASE_OFFSET;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_LONG_BASE_OFFSET;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_SHORT_BASE_OFFSET;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.CHAR_SHIFT;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.DOUBLE_SHIFT;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.FLOAT_SHIFT;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.INT_SHIFT;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.LONG_SHIFT;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.SHORT_SHIFT;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.checkBounds;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.unsafe;
 
 /*
  * Developer notes: The heavier methods, such as put/get arrays, duplicate, region, clear, fill,
@@ -57,10 +57,10 @@ import org.apache.datasketches.memory.WritableBuffer;
  * @author Lee Rhodes
  */
 @SuppressWarnings("restriction")
-abstract class NativeWritableBufferImpl extends BaseWritableBufferImpl {
+public abstract class NativeWritableBufferImpl extends BaseWritableBufferImpl {
 
   //Pass-through ctor
-  NativeWritableBufferImpl(final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
+  public NativeWritableBufferImpl(final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
       final long capacityBytes) {
     super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
   }

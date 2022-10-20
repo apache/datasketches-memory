@@ -17,12 +17,13 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.internal.direct;
 
 import org.apache.datasketches.memory.Handle;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
+import org.apache.datasketches.memory.internal.BaseWritableMemoryImpl;
 
 /**
  * A Handle for a writable direct memory resource.
@@ -40,7 +41,7 @@ public final class WritableDirectHandleImpl implements WritableHandle {
   final AllocateDirect direct;
   private BaseWritableMemoryImpl wMem;
 
-  WritableDirectHandleImpl(final AllocateDirect allocatedDirect, final BaseWritableMemoryImpl wMem) {
+  public WritableDirectHandleImpl(final AllocateDirect allocatedDirect, final BaseWritableMemoryImpl wMem) {
     direct = allocatedDirect;
     this.wMem = wMem;
   }

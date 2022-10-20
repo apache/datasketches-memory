@@ -17,11 +17,16 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.internal.direct;
 
-import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
+import org.apache.datasketches.memory.internal.ResourceImpl;
+import org.apache.datasketches.memory.internal.unsafe.MemoryCleaner;
+import org.apache.datasketches.memory.internal.unsafe.NioBits;
+import org.apache.datasketches.memory.internal.unsafe.StepBoolean;
 
 import java.util.logging.Logger;
+
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.unsafe;
 
 /**
  * Provides access to direct (native) memory.
@@ -30,7 +35,7 @@ import java.util.logging.Logger;
  * @author Lee Rhodes
  */
 @SuppressWarnings("restriction")
-final class AllocateDirect {
+public final class AllocateDirect {
   static final Logger LOG = Logger.getLogger(AllocateDirect.class.getCanonicalName());
 
   private final Deallocator deallocator;
@@ -45,7 +50,7 @@ final class AllocateDirect {
    * The allocated memory will be 8-byte aligned, but may not be page aligned.
    * @param capacityBytes the the requested capacity of off-heap memory. Cannot be zero.
    */
-  AllocateDirect(final long capacityBytes) {
+  public AllocateDirect(final long capacityBytes) {
     final boolean pageAligned = NioBits.isPageAligned();
     final long pageSize = NioBits.pageSize();
     final long allocationSize = capacityBytes + (pageAligned ? pageSize : 0);
@@ -79,15 +84,15 @@ final class AllocateDirect {
       }
       return false;
     } finally {
-      BaseStateImpl.reachabilityFence(this);
+      ResourceImpl.reachabilityFence(this);
     }
   }
 
-  long getNativeBaseOffset() {
+  public long getNativeBaseOffset() {
     return nativeBaseOffset;
   }
 
-  StepBoolean getValid() {
+  public StepBoolean getValid() {
     return deallocator.getValid();
   }
 
@@ -99,8 +104,8 @@ final class AllocateDirect {
     private final StepBoolean valid = new StepBoolean(true); //only place for this
 
     Deallocator(final long nativeAddress, final long allocationSize, final long capacity) {
-      BaseStateImpl.currentDirectMemoryAllocations_.incrementAndGet();
-      BaseStateImpl.currentDirectMemoryAllocated_.addAndGet(capacity);
+      ResourceImpl.currentDirectMemoryAllocations_.incrementAndGet();
+      ResourceImpl.currentDirectMemoryAllocated_.addAndGet(capacity);
       this.nativeAddress = nativeAddress;
       this.allocationSize = allocationSize;
       this.capacity = capacity;
@@ -124,8 +129,8 @@ final class AllocateDirect {
         }
         unsafe.freeMemory(nativeAddress);
         NioBits.unreserveMemory(allocationSize, capacity);
-        BaseStateImpl.currentDirectMemoryAllocations_.decrementAndGet();
-        BaseStateImpl.currentDirectMemoryAllocated_.addAndGet(-capacity);
+        ResourceImpl.currentDirectMemoryAllocations_.decrementAndGet();
+        ResourceImpl.currentDirectMemoryAllocated_.addAndGet(-capacity);
         return true;
       }
       return false;

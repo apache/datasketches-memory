@@ -65,6 +65,10 @@ package org.apache.datasketches.memory;
  * @author Lee Rhodes
  */
 public final class DefaultMemoryRequestServer implements MemoryRequestServer {
+    
+  public static final DefaultMemoryRequestServer DEFAULT = new DefaultMemoryRequestServer();
+    
+  private MemoryFactory factory = new DefaultMemoryFactory(this);
 
   /**
    * {@inheritDoc}
@@ -73,7 +77,7 @@ public final class DefaultMemoryRequestServer implements MemoryRequestServer {
    */
   @Override
   public WritableMemory request(final WritableMemory currentWritableMemory, final long capacityBytes) {
-    final WritableMemory wmem = WritableMemory.allocate((int)capacityBytes, currentWritableMemory.getTypeByteOrder());
+    final WritableMemory wmem = factory.allocate((int)capacityBytes, currentWritableMemory.getByteOrder());
     return wmem;
   }
 
@@ -87,6 +91,16 @@ public final class DefaultMemoryRequestServer implements MemoryRequestServer {
   @Override
   public void requestClose(final WritableMemory memToRelease, final WritableMemory newMemory) {
     //do nothing
+  }
+  
+  /**
+   * Get the associated {@link MemoryFactory}. This has package level access so that the default
+   * {@link DefaultMemoryFactory} can correctly initialize itself with a cross reference to this.
+   * 
+   * @return The current {@link MemoryFactory}
+   */
+  MemoryFactory getFactory() {
+    return factory;
   }
 
 }

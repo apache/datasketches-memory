@@ -17,35 +17,35 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.internal.unsafe;
 
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_BOOLEAN_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_BOOLEAN_INDEX_SCALE;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_BYTE_INDEX_SCALE;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_CHAR_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_CHAR_INDEX_SCALE;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_DOUBLE_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_DOUBLE_INDEX_SCALE;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_FLOAT_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_FLOAT_INDEX_SCALE;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_INT_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_INT_INDEX_SCALE;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_LONG_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_LONG_INDEX_SCALE;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_OBJECT_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_OBJECT_INDEX_SCALE;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_SHORT_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_SHORT_INDEX_SCALE;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.BOOLEAN_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.BYTE_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.CHAR_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.DOUBLE_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.FLOAT_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.INT_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.LONG_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.OBJECT_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.SHORT_SHIFT;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_BOOLEAN_BASE_OFFSET;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_BOOLEAN_INDEX_SCALE;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_BYTE_INDEX_SCALE;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_CHAR_BASE_OFFSET;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_CHAR_INDEX_SCALE;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_DOUBLE_BASE_OFFSET;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_DOUBLE_INDEX_SCALE;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_FLOAT_BASE_OFFSET;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_FLOAT_INDEX_SCALE;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_INT_BASE_OFFSET;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_INT_INDEX_SCALE;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_LONG_BASE_OFFSET;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_LONG_INDEX_SCALE;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_OBJECT_BASE_OFFSET;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_OBJECT_INDEX_SCALE;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_SHORT_BASE_OFFSET;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_SHORT_INDEX_SCALE;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.BOOLEAN_SHIFT;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.BYTE_SHIFT;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.CHAR_SHIFT;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.DOUBLE_SHIFT;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.FLOAT_SHIFT;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.INT_SHIFT;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.LONG_SHIFT;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.OBJECT_SHIFT;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.SHORT_SHIFT;
 
 /**
  * Creates easy to access association between the major Unsafe constants.

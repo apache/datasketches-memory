@@ -17,12 +17,17 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.internal.direct;
 
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableBuffer;
+import org.apache.datasketches.memory.internal.BaseWritableBufferImpl;
+import org.apache.datasketches.memory.internal.BaseWritableMemoryImpl;
+import org.apache.datasketches.memory.internal.NonNativeWritableBufferImpl;
+import org.apache.datasketches.memory.internal.Util;
+import org.apache.datasketches.memory.internal.unsafe.StepBoolean;
 
 /**
  * Implementation of {@link WritableBuffer} for direct memory, non-native byte order.
@@ -30,7 +35,7 @@ import org.apache.datasketches.memory.WritableBuffer;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-final class DirectNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
+public final class DirectNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   private static final int id = BUFFER | NONNATIVE | DIRECT;
   private final long nativeBaseOffset; //used to compute cumBaseOffset
   private final StepBoolean valid; //a reference only
@@ -52,7 +57,7 @@ final class DirectNonNativeWritableBufferImpl extends NonNativeWritableBufferImp
   }
 
   @Override
-  BaseWritableBufferImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
+  protected BaseWritableBufferImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
       final boolean readOnly, final ByteOrder byteOrder) {
     final int type = setReadOnlyType(typeId, readOnly) | REGION;
     return Util.isNativeByteOrder(byteOrder)
@@ -63,7 +68,7 @@ final class DirectNonNativeWritableBufferImpl extends NonNativeWritableBufferImp
   }
 
   @Override
-  BaseWritableBufferImpl toDuplicate(final boolean readOnly, final ByteOrder byteOrder) {
+  protected BaseWritableBufferImpl toDuplicate(final boolean readOnly, final ByteOrder byteOrder) {
     final int type = setReadOnlyType(typeId, readOnly) | DUPLICATE;
     return Util.isNativeByteOrder(byteOrder)
         ? new DirectWritableBufferImpl(
@@ -73,7 +78,7 @@ final class DirectNonNativeWritableBufferImpl extends NonNativeWritableBufferImp
   }
 
   @Override
-  BaseWritableMemoryImpl toWritableMemory(final boolean readOnly, final ByteOrder byteOrder) {
+  protected BaseWritableMemoryImpl toWritableMemory(final boolean readOnly, final ByteOrder byteOrder) {
     final int type = setReadOnlyType(typeId, readOnly);
     return Util.isNativeByteOrder(byteOrder)
         ? new DirectWritableMemoryImpl(
@@ -89,12 +94,12 @@ final class DirectNonNativeWritableBufferImpl extends NonNativeWritableBufferImp
   }
 
   @Override
-  long getNativeBaseOffset() {
+  protected long getNativeBaseOffset() {
     return nativeBaseOffset;
   }
 
   @Override
-  int getTypeId() {
+  protected int getTypeId() {
     return typeId & 0xff;
   }
 
@@ -103,4 +108,8 @@ final class DirectNonNativeWritableBufferImpl extends NonNativeWritableBufferImp
     return valid.get();
   }
 
+  @Override
+  protected Object getUnsafeObject() {
+      return null;
+  }
 }

@@ -1,26 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
 
   http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-v4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-v4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -33,6 +34,7 @@ under the License.
   <groupId>org.apache.datasketches</groupId>
   <artifactId>datasketches-memory</artifactId>
   <version>2.3.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
 
   <name>Datasketches Memory</name>
   <description>High-performance native memory access.</description>
@@ -58,7 +60,8 @@ under the License.
 
   <scm>
     <connection>scm:git:ssh://git@github.com/apache/${project.artifactId}.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/apache/${project.artifactId}.git</developerConnection>
+    <developerConnection>scm:git:ssh://git@github.com/apache/${project.artifactId}.git
+    </developerConnection>
     <url>https://github.com/apache/${project.artifactId}</url>
     <tag>HEAD</tag>
   </scm>
@@ -83,30 +86,57 @@ under the License.
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <jdk-toolchain.version>8</jdk-toolchain.version>
   </properties>
 
-    <dependencies>
-      <dependency>
-        <groupId>org.testng</groupId>
-        <artifactId>testng</artifactId>
-        <version>7.5</version>
-        <scope>test</scope>
-      </dependency>
-      <!-- Used for UTF8 testing -->
-      <dependency>
-        <groupId>com.google.protobuf</groupId>
-        <artifactId>protobuf-java</artifactId>
-        <version>4.0.0-rc-2</version>
-        <scope>test</scope>
-      </dependency>
-      <!-- Used for xxHash testing -->
-      <dependency>
-        <groupId>net.openhft</groupId>
-        <artifactId>zero-allocation-hashing</artifactId>
-        <version>0.15</version>
-        <scope>test</scope>
-      </dependency>
-    </dependencies>
+  <repositories>
+    <repository>
+      <id>apache.snapshots</id>
+      <name>Apache Snapshot Repository</name>
+      <url>https://repository.apache.org/content/groups/snapshots/org/apache/datasketches/</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>apache</id>
+      <name>Apache Releases Repository</name>
+      <url>https://repository.apache.org/content/repositories/releases/org/apache/datasketches/
+      </url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <version>7.5</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Used for UTF8 testing -->
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>4.0.0-rc-2</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Used for xxHash testing -->
+    <dependency>
+      <groupId>net.openhft</groupId>
+      <artifactId>zero-allocation-hashing</artifactId>
+      <version>0.15</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
   <build>
     <pluginManagement>
@@ -121,8 +151,385 @@ under the License.
             </jdkToolchain>
           </configuration>
         </plugin>
+        <plugin>
+          <!-- Extends Apache Parent pom, pluginManagement -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.3.0</version>
+        </plugin>
+        <plugin>
+          <!-- Extends Apache Parent pom, apache-release profile -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>3.4.1</version>
+          <configuration>
+            <docfilessubdirs>true</docfilessubdirs>
+            <doclint>none</doclint>
+            <jdkToolchain>
+              <version>${jdk-toolchain.version}</version>
+            </jdkToolchain>
+            <excludePackageNames>org.apache.datasketches.memory.internal</excludePackageNames>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>3.1.0</version>
+        </plugin>
+
+        <plugin>
+          <!-- Apache Parent pom, pluginManagement -->
+          <groupId>org.apache.rat</groupId>
+          <artifactId>apache-rat-plugin</artifactId>
+          <version>0.13</version>
+          <configuration>
+            <outputDirectory>${project.basedir}/rat</outputDirectory>
+            <consoleOutput>true</consoleOutput>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <excludes>
+              <exclude>**/*.yaml</exclude>
+              <exclude>**/*.yml</exclude>
+              <exclude>**/.*/**/*</exclude>
+              <exclude>**/.clover/**/*</exclude>
+              <exclude>**/test/resources/**/*.txt</exclude>
+              <exclude>**/test-output/**/*</exclude>
+              <exclude>**/validation-output/**/*</exclude>
+              <exclude>**/img/**/*.png</exclude>
+              <exclude>**/git.properties</exclude>
+              <exclude>**/scripts/assets/LoremIpsum.txt</exclude>
+              <exclude>LICENSE</exclude>
+              <exclude>NOTICE</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <!-- Extends Apache Parent pom, apache-release profile -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>3.2.1</version>
+        </plugin>
+
+        <plugin>
+          <!-- Apache Parent pom, pluginManagement -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>3.0.0-M7</version>
+          <configuration>
+            <trimStackTrace>false</trimStackTrace>
+            <useManifestOnlyJar>false</useManifestOnlyJar>
+            <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            <jdkToolchain>
+              <version>${jdk-toolchain.version}</version>
+            </jdkToolchain>
+            <reportsDirectory>${project.build.directory}/test-output/${maven.build.timestamp}
+            </reportsDirectory>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <!-- Apache Parent pom, pluginManagement -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>3.0.0-M7</version>
+          <configuration>
+            <trimStackTrace>false</trimStackTrace>
+            <useManifestOnlyJar>false</useManifestOnlyJar>
+            <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            <jdkToolchain>
+              <version>${jdk-toolchain.version}</version>
+            </jdkToolchain>
+            <reportsDirectory>${project.build.directory}/validation-output/${maven.build.timestamp}
+            </reportsDirectory>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-toolchains-plugin</artifactId>
+          <version>3.1.0</version>
+          <configuration>
+            <toolchains>
+              <jdk>
+                <version>[1.8,1.9),[8],[11,14),[17,18)</version>
+              </jdk>
+            </toolchains>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <!-- Generates code coverage report from website. -->
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>0.8.6</version>
+        </plugin>
+
+        <plugin>
+          <!-- Submit code coverage report to Coveralls.io. -->
+          <groupId>org.eluder.coveralls</groupId>
+          <artifactId>coveralls-maven-plugin</artifactId>
+          <version>${coveralls-maven-plugin.version}</version>
+          <configuration>
+            <!--suppress UnresolvedMavenProperty -->
+            <repoToken>${coveralls-repo-token}</repoToken>
+            <!--suppress UnresolvedMavenProperty -->
+            <jacocoReports>${maven.multiModuleProjectDirectory}/datasketches-memory-java8/target/site/jacoco/jacoco.xml
+            </jacocoReports>
+          </configuration>
+        </plugin>
+
       </plugins>
     </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-compile</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <jdkToolchain>
+                <version>8</version>
+              </jdkToolchain>
+              <source>1.8</source>
+              <target>1.8</target>
+            </configuration>
+          </execution>
+          <execution>
+            <id>default-testCompile</id>
+            <goals>
+              <goal>testCompile</goal>
+            </goals>
+            <configuration>
+              <jdkToolchain>
+                <version>8</version>
+              </jdkToolchain>
+              <source>1.8</source>
+              <target>1.8</target>
+              <testExcludes>
+                <testExclude>module-info.java</testExclude>
+              </testExcludes>
+            </configuration>
+          </execution>
+          <execution>
+            <id>compile-java-11</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <compilerArgs>
+                <arg>--add-exports</arg>
+                <arg>java.base/jdk.internal.ref=org.apache.datasketches.memory</arg>
+              </compilerArgs>
+              <jdkToolchain>
+                <version>11</version>
+              </jdkToolchain>
+              <source>11</source>
+              <target>11</target>
+              <compileSourceRoots>
+                <compileSourceRoot>${project.basedir}/src/main/java11</compileSourceRoot>
+              </compileSourceRoots>
+              <!-- multiReleaseOutput>true</multiReleaseOutput -->
+              <outputDirectory>${project.build.outputDirectory}/META-INF/versions/11
+              </outputDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>compile-java-17</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <release>17</release>
+              <jdkToolchain>
+                <version>17</version>
+              </jdkToolchain>
+              <compileSourceRoots>
+                <compileSourceRoot>${project.basedir}/src/main/java17</compileSourceRoot>
+              </compileSourceRoots>
+              <multiReleaseOutput>true</multiReleaseOutput>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <!-- Extends Apache Parent pom, pluginManagement -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-jar</id>
+            <phase>package</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+            <configuration>
+              <archive>
+                <manifestEntries>
+                  <Multi-Release>true</Multi-Release>
+                  <Automatic-Module-Name>org.apache.datasketches.memory</Automatic-Module-Name>
+                </manifestEntries>
+              </archive>
+            </configuration>
+          </execution>
+          <execution>
+            <id>default-test-jar</id>
+            <phase>package</phase>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <phase>package</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>enforce-banned-dependencies</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireJavaVersion>
+                  <version>[1.8,1.9),[8],[11,14),[17,18)</version>
+                </requireJavaVersion>
+                <requireMavenVersion>
+                  <version>[${maven.version},)</version>
+                </requireMavenVersion>
+                <bannedDependencies>
+                  <excludes>
+                    <!--LGPL licensed library -->
+                    <exclude>com.google.code.findbugs:annotations</exclude>
+                  </excludes>
+                </bannedDependencies>
+              </rules>
+              <fail>true</fail>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>package</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>attach-test-sources</id>
+            <phase>package</phase>
+            <goals>
+              <goal>test-jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <!-- Apache Parent pom, pluginManagement -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>jdk8</id>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+            <configuration>
+              <jdkToolchain>
+                <version>8</version>
+              </jdkToolchain>
+            </configuration>
+          </execution>
+          <execution>
+            <id>jdk11</id>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+            <configuration>
+              <jdkToolchain>
+                <version>11</version>
+              </jdkToolchain>
+            </configuration>
+          </execution>
+          <execution>
+            <id>jdk17</id>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+            <configuration>
+              <jdkToolchain>
+                <version>17</version>
+              </jdkToolchain>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-toolchains-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>toolchain</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-prepare-agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
   </build>
 
 </project>

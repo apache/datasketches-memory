@@ -60,8 +60,7 @@
 
   <scm>
     <connection>scm:git:ssh://git@github.com/apache/${project.artifactId}.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/apache/${project.artifactId}.git
-    </developerConnection>
+    <developerConnection>scm:git:ssh://git@github.com/apache/${project.artifactId}.git</developerConnection>
     <url>https://github.com/apache/${project.artifactId}</url>
     <tag>HEAD</tag>
   </scm>
@@ -86,6 +85,8 @@
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.build.timestamp.format>yyyy-MM-dd'T'HH mm ss'Z'</maven.build.timestamp.format>
+
     <jdk-toolchain.version>8</jdk-toolchain.version>
   </properties>
 
@@ -104,8 +105,7 @@
     <repository>
       <id>apache</id>
       <name>Apache Releases Repository</name>
-      <url>https://repository.apache.org/content/repositories/releases/org/apache/datasketches/
-      </url>
+      <url>https://repository.apache.org/content/repositories/releases/org/apache/datasketches/</url>
       <releases>
         <enabled>true</enabled>
       </releases>

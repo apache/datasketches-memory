@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.internal.unsafe;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -26,6 +26,7 @@ import static org.testng.Assert.fail;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.datasketches.memory.internal.Ints;
 import org.testng.annotations.Test;
 
 

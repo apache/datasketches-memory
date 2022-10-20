@@ -28,9 +28,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.Buffer;
+import org.apache.datasketches.memory.DefaultBufferFactory;
+import org.apache.datasketches.memory.DefaultMemoryFactory;
 import org.apache.datasketches.memory.DefaultMemoryRequestServer;
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.ReadOnlyException;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
@@ -48,7 +49,7 @@ public class Buffer2Test {
     }
     bb.position(0);
 
-    Buffer buffer = Buffer.wrap(bb.asReadOnlyBuffer().order(ByteOrder.nativeOrder()));
+    Buffer buffer = DefaultBufferFactory.DEFAULT.wrap(bb.asReadOnlyBuffer().order(ByteOrder.nativeOrder()));
     while (buffer.hasRemaining()) {
       assertEquals(bb.get(), buffer.getByte());
     }
@@ -68,7 +69,7 @@ public class Buffer2Test {
     }
     bb.position(0);
 
-    Buffer buffer = Buffer.wrap(bb);
+    Buffer buffer = DefaultBufferFactory.DEFAULT.wrap(bb);
     while (buffer.hasRemaining()) {
       assertEquals(bb.get(), buffer.getByte());
     }
@@ -85,7 +86,7 @@ public class Buffer2Test {
       byteArray[i] = i;
     }
 
-    Buffer buffer = Memory.wrap(byteArray).asBuffer();
+    Buffer buffer = DefaultMemoryFactory.DEFAULT.wrap(byteArray).asBuffer();
     int i = 0;
     while (buffer.hasRemaining()) {
       assertEquals(byteArray[i++], buffer.getByte());
@@ -108,7 +109,7 @@ public class Buffer2Test {
       charArray[i] = i;
     }
 
-    Buffer buffer = Memory.wrap(charArray).asBuffer();
+    Buffer buffer = DefaultMemoryFactory.DEFAULT.wrap(charArray).asBuffer();
     int i = 0;
     while (buffer.hasRemaining()) {
       assertEquals(charArray[i++], buffer.getChar());
@@ -128,7 +129,7 @@ public class Buffer2Test {
       shortArray[i] = i;
     }
 
-    Buffer buffer = Memory.wrap(shortArray).asBuffer();
+    Buffer buffer = DefaultMemoryFactory.DEFAULT.wrap(shortArray).asBuffer();
     int i = 0;
     while (buffer.hasRemaining()) {
       assertEquals(shortArray[i++], buffer.getShort());
@@ -148,7 +149,7 @@ public class Buffer2Test {
       intArray[i] = i;
     }
 
-    Buffer buffer = Memory.wrap(intArray).asBuffer();
+    Buffer buffer = DefaultMemoryFactory.DEFAULT.wrap(intArray).asBuffer();
     int i = 0;
     while (buffer.hasRemaining()) {
       assertEquals(intArray[i++], buffer.getInt());
@@ -168,7 +169,7 @@ public class Buffer2Test {
       longArray[i] = i;
     }
 
-    Buffer buffer = Memory.wrap(longArray).asBuffer();
+    Buffer buffer = DefaultMemoryFactory.DEFAULT.wrap(longArray).asBuffer();
     int i = 0;
     while (buffer.hasRemaining()) {
       assertEquals(longArray[i++], buffer.getLong());
@@ -188,7 +189,7 @@ public class Buffer2Test {
       floatArray[i] = i;
     }
 
-    Buffer buffer = Memory.wrap(floatArray).asBuffer();
+    Buffer buffer = DefaultMemoryFactory.DEFAULT.wrap(floatArray).asBuffer();
     int i = 0;
     while (buffer.hasRemaining()) {
       assertEquals(floatArray[i++], buffer.getFloat());
@@ -208,7 +209,7 @@ public class Buffer2Test {
       doubleArray[i] = i;
     }
 
-    Buffer buffer = Memory.wrap(doubleArray).asBuffer();
+    Buffer buffer = DefaultMemoryFactory.DEFAULT.wrap(doubleArray).asBuffer();
     int i = 0;
     while (buffer.hasRemaining()) {
       assertEquals(doubleArray[i++], buffer.getDouble());
@@ -230,7 +231,7 @@ public class Buffer2Test {
       }
     }
 
-    Buffer buffer = Memory.wrap(booleanArray).asBuffer();
+    Buffer buffer = DefaultMemoryFactory.DEFAULT.wrap(booleanArray).asBuffer();
     int i = 0;
     while (buffer.hasRemaining()) {
       assertEquals(booleanArray[i++], buffer.getBoolean());
@@ -255,7 +256,7 @@ public class Buffer2Test {
     }
     bb.position(10);
 
-    Buffer buffer = Buffer.wrap(bb);
+    Buffer buffer = DefaultBufferFactory.DEFAULT.wrap(bb);
     while (buffer.hasRemaining()) {
       assertEquals(bb.get(), buffer.getByte());
     }
@@ -272,7 +273,7 @@ public class Buffer2Test {
     }
     bb.position(10);
 
-    Buffer buffer = Buffer.wrap(bb);
+    Buffer buffer = DefaultBufferFactory.DEFAULT.wrap(bb);
     assertEquals(bb.hasRemaining(), buffer.hasRemaining());
     assertEquals(bb.remaining(), buffer.getRemaining());
   }
@@ -288,7 +289,7 @@ public class Buffer2Test {
     }
     bb.position(10);
 
-    Buffer buffer = Buffer.wrap(bb);
+    Buffer buffer = DefaultBufferFactory.DEFAULT.wrap(bb);
     assertEquals(bb.position(), buffer.getPosition());
     assertEquals(30, buffer.setPosition(30).getPosition());
     assertEquals(40, buffer.incrementPosition(10).getPosition());
@@ -306,7 +307,7 @@ public class Buffer2Test {
     }
     bb.position(10);
 
-    Buffer buffer = Buffer.wrap(bb.slice().order(ByteOrder.nativeOrder()));
+    Buffer buffer = DefaultBufferFactory.DEFAULT.wrap(bb.slice().order(ByteOrder.nativeOrder()));
     while (buffer.hasRemaining()) {
       assertEquals(bb.get(), buffer.getByte());
     }
@@ -328,7 +329,7 @@ public class Buffer2Test {
     }
     bb.position(10);
 
-    Buffer buffer = Buffer.wrap(bb.slice().order(ByteOrder.nativeOrder())); //slice = 54
+    Buffer buffer = DefaultBufferFactory.DEFAULT.wrap(bb.slice().order(ByteOrder.nativeOrder())); //slice = 54
     buffer.setPosition(30);//remaining = 24
     Buffer dupBuffer = buffer.duplicate(); //all 54
     Buffer regionBuffer = buffer.region(); //24
@@ -349,9 +350,9 @@ public class Buffer2Test {
     int n2 = n / 2;
     long[] arr = new long[n];
     for (int i = 0; i < n; i++) { arr[i] = i; }
-    Memory mem = Memory.wrap(arr);
+    Memory mem = DefaultMemoryFactory.DEFAULT.wrap(arr);
     Buffer buf = mem.asBuffer();
-    Buffer reg = buf.region(n2 * 8, n2 * 8, buf.getTypeByteOrder()); //top half
+    Buffer reg = buf.region(n2 * 8, n2 * 8, buf.getByteOrder()); //top half
     for (int i = 0; i < n2; i++) {
       long v = reg.getLong(i * 8);
       long e = i + n2;
@@ -370,7 +371,7 @@ public class Buffer2Test {
     }
     bb.position(10);
 
-    Buffer buffer = Buffer.wrap(bb);
+    Buffer buffer = DefaultBufferFactory.DEFAULT.wrap(bb);
     Memory memory = buffer.asMemory();
 
     assertEquals(buffer.getCapacity(), memory.getCapacity());
@@ -384,25 +385,25 @@ public class Buffer2Test {
   public void testROByteBuffer() {
     byte[] arr = new byte[64];
     ByteBuffer roBB = ByteBuffer.wrap(arr).asReadOnlyBuffer();
-    Buffer buf = Buffer.wrap(roBB);
+    Buffer buf = DefaultBufferFactory.DEFAULT.wrap(roBB);
     WritableBuffer wbuf = (WritableBuffer) buf;
     wbuf.putByte(0, (byte) 1);
   }
 
-  @Test(expectedExceptions = ReadOnlyException.class)
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void testROByteBuffer2() {
     byte[] arr = new byte[64];
     ByteBuffer roBB = ByteBuffer.wrap(arr).asReadOnlyBuffer();
-    Buffer buf = Buffer.wrap(roBB);
+    Buffer buf = DefaultBufferFactory.DEFAULT.wrap(roBB);
     WritableBuffer wbuf = (WritableBuffer) buf;
     wbuf.putByteArray(arr, 0, 64);
   }
 
-  @Test(expectedExceptions = ReadOnlyException.class)
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void testIllegalFill() {
     byte[] arr = new byte[64];
     ByteBuffer roBB = ByteBuffer.wrap(arr).asReadOnlyBuffer();
-    Buffer buf = Buffer.wrap(roBB);
+    Buffer buf = DefaultBufferFactory.DEFAULT.wrap(roBB);
     WritableBuffer wbuf = (WritableBuffer) buf;
     wbuf.fill((byte)0);
   }
@@ -410,15 +411,15 @@ public class Buffer2Test {
   @Test
   public void checkWritableWrap() {
     ByteBuffer bb = ByteBuffer.allocate(16);
-    WritableBuffer buf = WritableBuffer.writableWrap(bb, ByteOrder.nativeOrder(), null);
+    WritableBuffer buf = DefaultBufferFactory.DEFAULT.writableWrap(bb, ByteOrder.nativeOrder(), null);
     assertNotNull(buf);
-    buf = WritableBuffer.writableWrap(bb, ByteOrder.nativeOrder(), new DefaultMemoryRequestServer());
+    buf = DefaultBufferFactory.DEFAULT.writableWrap(bb, ByteOrder.nativeOrder(), new DefaultMemoryRequestServer());
     assertNotNull(buf);
   }
 
   @Test
   public void testWritableDuplicate() {
-    WritableMemory wmem = WritableMemory.writableWrap(new byte[1]);
+    WritableMemory wmem = DefaultMemoryFactory.DEFAULT.writableWrap(new byte[1]);
     WritableBuffer wbuf = wmem.asWritableBuffer();
     WritableBuffer wbuf2 = wbuf.writableDuplicate();
     assertEquals(wbuf2.getCapacity(), 1);
@@ -429,7 +430,7 @@ public class Buffer2Test {
   @Test
   public void checkIndependence() {
     int cap = 64;
-    WritableMemory wmem = WritableMemory.allocate(cap);
+    WritableMemory wmem = DefaultMemoryFactory.DEFAULT.allocate(cap);
     WritableBuffer wbuf1 = wmem.asWritableBuffer();
     WritableBuffer wbuf2 = wmem.asWritableBuffer();
     assertFalse(wbuf1 == wbuf2);

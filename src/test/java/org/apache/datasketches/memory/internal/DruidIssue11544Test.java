@@ -27,6 +27,7 @@ import static org.testng.Assert.assertTrue;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import org.apache.datasketches.memory.DefaultMemoryFactory;
 import org.apache.datasketches.memory.DefaultMemoryRequestServer;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableMemory;
@@ -60,7 +61,7 @@ public class DruidIssue11544Test {
     bb.order(ByteOrder.nativeOrder());
 
     //Wrap bb into WritableMemory
-    WritableMemory mem1 = WritableMemory.writableWrap(bb);
+    WritableMemory mem1 = DefaultMemoryFactory.DEFAULT.writableWrap(bb);
     assertTrue(mem1.isDirect()); //confirm mem1 is off-heap
 
     //Acquire the DefaultMemoryRequestServer

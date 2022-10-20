@@ -21,6 +21,7 @@ package org.apache.datasketches.memory.internal;
 
 import static org.testng.Assert.assertEquals;
 
+import org.apache.datasketches.memory.DefaultMemoryFactory;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
@@ -41,7 +42,7 @@ public class XxHash64LoopingTest {
     for (int i = 0; i < 1025; i++) {
       byte[] byteArr = new byte[i];
       for (int j = 0; j < byteArr.length; j++) { byteArr[j] = (byte) j; }
-      WritableMemory wmem = WritableMemory.writableWrap(byteArr);
+      WritableMemory wmem = DefaultMemoryFactory.DEFAULT.writableWrap(byteArr);
       long hash = wmem.xxHash64(0, byteArr.length, seed);
       assertEquals(hash, HASHES_OF_LOOPING_BYTES_WITH_SEED_42[i]);
     }

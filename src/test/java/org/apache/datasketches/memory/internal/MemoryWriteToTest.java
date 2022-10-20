@@ -28,6 +28,7 @@ import java.nio.channels.WritableByteChannel;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.datasketches.memory.WritableHandle;
+import org.apache.datasketches.memory.DefaultMemoryFactory;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.Assert;
@@ -58,7 +59,7 @@ public class MemoryWriteToTest {
   @Test
   public void testOffHeap() throws Exception {
     try (WritableHandle handle =
-        WritableMemory.allocateDirect((UNSAFE_COPY_THRESHOLD_BYTES * 5) + 10)) {
+            DefaultMemoryFactory.DEFAULT.allocateDirect((UNSAFE_COPY_THRESHOLD_BYTES * 5) + 10)) {
       WritableMemory mem = handle.getWritable();
       testWriteTo(mem.region(0, 0));
       testOffHeap(mem, 7);
@@ -77,12 +78,12 @@ public class MemoryWriteToTest {
   private static Memory createRandomBytesMemory(int size) {
     byte[] bytes = new byte[size];
     ThreadLocalRandom.current().nextBytes(bytes);
-    return Memory.wrap(bytes);
+    return DefaultMemoryFactory.DEFAULT.wrap(bytes);
   }
 
   private static Memory createRandomIntsMemory(int size) {
     int[] ints = ThreadLocalRandom.current().ints(size).toArray();
-    return Memory.wrap(ints);
+    return DefaultMemoryFactory.DEFAULT.wrap(ints);
   }
 
   private static void testWriteTo(Memory mem) throws IOException {
@@ -91,6 +92,6 @@ public class MemoryWriteToTest {
       mem.writeTo(0, mem.getCapacity(), out);
     }
     byte[] result = baos.toByteArray();
-    Assert.assertTrue(mem.equals(Memory.wrap(result)));
+    Assert.assertTrue(mem.equals(DefaultMemoryFactory.DEFAULT.wrap(result)));
   }
 }

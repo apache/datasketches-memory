@@ -24,6 +24,7 @@ import static org.testng.Assert.assertFalse;
 import java.nio.ByteOrder;
 import java.util.IdentityHashMap;
 
+import org.apache.datasketches.memory.DefaultMemoryFactory;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
@@ -38,13 +39,13 @@ public class ExampleMemoryRequestServerTest {
   /**
    * This version is without a TWR block.all of the memory allocations are done through the MemoryRequestServer
    * and each is closed by the MemoryClient when it is done with each.
-   * @throws Exception  thrown by automatic close() invocation on WritableHandle.
+   * @throws Exception
    */
   @Test
   public void checkExampleMemoryRequestServer1() throws Exception {
     int bytes = 8;
     ExampleMemoryRequestServer svr = new ExampleMemoryRequestServer();
-    try (WritableHandle wh = WritableMemory.allocateDirect(8)) {
+    try (WritableHandle wh = DefaultMemoryFactory.DEFAULT.allocateDirect(8)) {
       WritableMemory memStart = wh.getWritable();
       WritableMemory wMem = svr.request(memStart, bytes);
       MemoryClient client = new MemoryClient(wMem);
@@ -59,13 +60,13 @@ public class ExampleMemoryRequestServerTest {
    * by the MemoryClient when it is done with the new memory allocations.
    * The initial allocation stays open until the end where it is closed at the end of the
    * TWR scope.
-   * @throws Exception thrown by automatic close() invocation on WritableHandle.
+   * @throws Exception
    */
   @Test
   public void checkExampleMemoryRequestServer2() throws Exception {
     int bytes = 8;
     ExampleMemoryRequestServer svr = new ExampleMemoryRequestServer();
-    try (WritableHandle handle = WritableMemory.allocateDirect(bytes, ByteOrder.nativeOrder(), svr)) {
+    try (WritableHandle handle = DefaultMemoryFactory.DEFAULT.allocateDirect(bytes, ByteOrder.nativeOrder(), svr)) {
       WritableMemory memStart = handle.getWritable();
       MemoryClient client = new MemoryClient(memStart);
       client.process();
@@ -76,7 +77,7 @@ public class ExampleMemoryRequestServerTest {
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void checkZeroCapacity() throws Exception {
     ExampleMemoryRequestServer svr = new ExampleMemoryRequestServer();
-    try (WritableHandle wh = WritableMemory.allocateDirect(0, ByteOrder.nativeOrder(), svr)) {
+    try (WritableHandle wh = DefaultMemoryFactory.DEFAULT.allocateDirect(0, ByteOrder.nativeOrder(), svr)) {
 
     }
   }
@@ -131,8 +132,8 @@ public class ExampleMemoryRequestServerTest {
 
     @Override
     public WritableMemory request(WritableMemory currentWMem, long capacityBytes) {
-     ByteOrder order = currentWMem.getTypeByteOrder();
-     WritableHandle handle = WritableMemory.allocateDirect(capacityBytes, order, this);
+     ByteOrder order = currentWMem.getByteOrder();
+     WritableHandle handle = DefaultMemoryFactory.DEFAULT.allocateDirect(capacityBytes, order, this);
      WritableMemory wmem = handle.getWritable();
      map.put(wmem, handle); //We track the newly allocated memory and its handle.
      return wmem;

@@ -22,6 +22,7 @@ package org.apache.datasketches.memory.internal;
 import static org.testng.Assert.fail;
 
 import org.apache.datasketches.memory.Buffer;
+import org.apache.datasketches.memory.DefaultMemoryFactory;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
@@ -34,7 +35,7 @@ public class BaseBufferTest {
 
   @Test
   public void checkLimits() {
-    Buffer buf = Memory.wrap(new byte[100]).asBuffer();
+    Buffer buf = DefaultMemoryFactory.DEFAULT.wrap(new byte[100]).asBuffer();
     buf.setStartPositionEnd(40, 45, 50);
     buf.setStartPositionEnd(0, 0, 100);
     try {
@@ -47,7 +48,7 @@ public class BaseBufferTest {
 
   @Test
   public void checkLimitsAndCheck() {
-    Buffer buf = Memory.wrap(new byte[100]).asBuffer();
+    Buffer buf = DefaultMemoryFactory.DEFAULT.wrap(new byte[100]).asBuffer();
     buf.setAndCheckStartPositionEnd(40, 45, 50);
     buf.setAndCheckStartPositionEnd(0, 0, 100);
     try {
@@ -77,7 +78,7 @@ public class BaseBufferTest {
   public void checkCheckValid() throws Exception {
     WritableMemory wmem;
     Buffer buf;
-    try (WritableHandle hand = WritableMemory.allocateDirect(100)) {
+    try (WritableHandle hand = DefaultMemoryFactory.DEFAULT.allocateDirect(100)) {
       wmem = hand.getWritable();
       buf = wmem.asBuffer();
     }

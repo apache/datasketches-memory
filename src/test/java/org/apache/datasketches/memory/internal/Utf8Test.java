@@ -28,10 +28,9 @@ import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.datasketches.memory.DefaultMemoryFactory;
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.Utf8CodingException;
 import org.apache.datasketches.memory.WritableMemory;
-import org.apache.datasketches.memory.internal.Util.RandomCodePoints;
 import org.testng.annotations.Test;
 
 import com.google.protobuf.ByteString;
@@ -58,8 +57,8 @@ public class Utf8Test {
 
   @Test
   public void testPutInvalidChars() { //The surrogates must be a pair, thus invalid alone
-    WritableMemory mem = WritableMemory.allocate(10);
-    WritableMemory emptyMem = WritableMemory.allocate(0);
+    WritableMemory mem = DefaultMemoryFactory.DEFAULT.allocate(10);
+    WritableMemory emptyMem = DefaultMemoryFactory.DEFAULT.allocate(0);
     for (int c = Character.MIN_SURROGATE; c <= Character.MAX_SURROGATE; c++) {
       assertSurrogate(mem, (char) c);
       assertSurrogate(emptyMem, (char) c);
@@ -77,7 +76,7 @@ public class Utf8Test {
 
   @Test
   public void testPutInvaidSurrogatePairs() {
-    WritableMemory mem = WritableMemory.allocate(4);
+    WritableMemory mem = DefaultMemoryFactory.DEFAULT.allocate(4);
     StringBuilder sb = new StringBuilder();
     sb.append(Character.MIN_HIGH_SURROGATE);
     sb.append(Character.MAX_HIGH_SURROGATE);
@@ -90,7 +89,7 @@ public class Utf8Test {
 
   @Test
   public void testPutHighBMP() {
-    WritableMemory mem = WritableMemory.allocate(2);
+    WritableMemory mem = DefaultMemoryFactory.DEFAULT.allocate(2);
     StringBuilder sb = new StringBuilder();
     sb.append("\uE000");
     try {
@@ -102,7 +101,7 @@ public class Utf8Test {
 
   @Test
   public void testPutExtendedAscii() {
-    WritableMemory mem = WritableMemory.allocate(1);
+    WritableMemory mem = DefaultMemoryFactory.DEFAULT.allocate(1);
     StringBuilder sb = new StringBuilder();
     sb.append("\u07FF");
     try {
@@ -114,7 +113,7 @@ public class Utf8Test {
 
   @Test
   public void testPutOneAsciiToEmpty() {
-    WritableMemory mem = WritableMemory.allocate(0);
+    WritableMemory mem = DefaultMemoryFactory.DEFAULT.allocate(0);
     StringBuilder sb = new StringBuilder();
     sb.append("a");
     try {
@@ -126,7 +125,7 @@ public class Utf8Test {
 
   @Test
   public void testPutValidSurrogatePair() {
-    WritableMemory mem = WritableMemory.allocate(4);
+    WritableMemory mem = DefaultMemoryFactory.DEFAULT.allocate(4);
     StringBuilder sb = new StringBuilder();
     sb.append(Character.MIN_HIGH_SURROGATE);
     sb.append(Character.MIN_LOW_SURROGATE);
@@ -217,7 +216,7 @@ public class Utf8Test {
     rcp.fillCodePointArray(cpArr, 0, minPlane2CP);
     String rcpStr = new String(cpArr, 0, numCP);
     //println(rcpStr);
-    WritableMemory wmem = WritableMemory.allocate(4 * numCP);
+    WritableMemory wmem = DefaultMemoryFactory.DEFAULT.allocate(4 * numCP);
     int utf8Bytes = (int) wmem.putCharsToUtf8(0, rcpStr);
 
     StringBuilder sb = new StringBuilder();
@@ -301,7 +300,7 @@ public class Utf8Test {
     String refStr = "Quizdeltagerne spiste jordb\u00e6r med fl\u00f8de, mens cirkusklovnen";
     byte[] refByteArr = refStr.getBytes(UTF_8);
     int addBytes = refByteArr.length;
-    WritableMemory refMem = WritableMemory.writableWrap(refByteArr);
+    WritableMemory refMem = DefaultMemoryFactory.DEFAULT.writableWrap(refByteArr);
     int decodedChars = refMem.getCharsFromUtf8(0, addBytes, sb);
     String finalStr = sb.toString();
     int finalChars = finalStr.toCharArray().length;
@@ -317,7 +316,7 @@ public class Utf8Test {
     byte[] refByteArr = refStr.getBytes(UTF_8);
     int refBytes = refByteArr.length;
     int offset = 100;
-    WritableMemory tgtMem = WritableMemory.allocate(refBytes + offset);
+    WritableMemory tgtMem = DefaultMemoryFactory.DEFAULT.allocate(refBytes + offset);
     long bytesEncoded = tgtMem.putCharsToUtf8(offset, refStr);
     assertEquals(bytesEncoded, refBytes);
   }
@@ -388,14 +387,14 @@ public class Utf8Test {
   private static void assertInvalid(byte[] bytes) {
     int bytesLen = bytes.length;
     try {
-      Memory.wrap(bytes).getCharsFromUtf8(0, bytesLen, new StringBuilder());
+        DefaultMemoryFactory.DEFAULT.wrap(bytes).getCharsFromUtf8(0, bytesLen, new StringBuilder());
       fail();
     } catch (Utf8CodingException e) {
       // Expected.
     }
     try {
       CharBuffer cb = CharBuffer.allocate(bytesLen);
-      Memory.wrap(bytes).getCharsFromUtf8(0, bytesLen, cb);
+      DefaultMemoryFactory.DEFAULT.wrap(bytes).getCharsFromUtf8(0, bytesLen, cb);
       fail();
     } catch (Utf8CodingException | IOException e) {
       // Expected.
@@ -404,7 +403,7 @@ public class Utf8Test {
 
   private static void assertInvalidSlice(byte[] bytes, int index, int size) {
     try {
-      Memory mem = Memory.wrap(bytes);
+      Memory mem = DefaultMemoryFactory.DEFAULT.wrap(bytes);
       mem.getCharsFromUtf8(index, size, new StringBuilder());
       fail();
     } catch (IllegalArgumentException e) { //Pure bounds violation
@@ -435,15 +434,15 @@ public class Utf8Test {
     if (utf8LengthBytes == -1) {
       utf8LengthBytes = refByteArr.length;
     }
-    Memory refMem = Memory.wrap(refByteArr);
+    Memory refMem = DefaultMemoryFactory.DEFAULT.wrap(refByteArr);
 
     byte[] refByteArr2 = new byte[refByteArr.length + 1];
     System.arraycopy(refByteArr, 0, refByteArr2, 1, refByteArr.length);
-    Memory refReg = Memory.wrap(refByteArr2).region(1, refByteArr.length);
+    Memory refReg = DefaultMemoryFactory.DEFAULT.wrap(refByteArr2).region(1, refByteArr.length);
 
-    WritableMemory dstMem = WritableMemory.allocate(refByteArr.length);
+    WritableMemory dstMem = DefaultMemoryFactory.DEFAULT.allocate(refByteArr.length);
     WritableMemory dstMem2 =
-            WritableMemory.allocate(refByteArr.length + 1).writableRegion(1, refByteArr.length);
+            DefaultMemoryFactory.DEFAULT.allocate(refByteArr.length + 1).writableRegion(1, refByteArr.length);
 
     // Test with Memory objects, where base offset != 0
     assertRoundTrips(refStr, refSubCharLen, offsetBytes, utf8LengthBytes, refByteArr, refMem, dstMem);
@@ -475,7 +474,7 @@ public class Utf8Test {
     assertEquals(0, dstMem.compareTo(0, refByteArr.length, refMem, 0, refByteArr.length));
 
     // Test write overflow
-    WritableMemory writeMem2 = WritableMemory.allocate(refByteArr.length - 1);
+    WritableMemory writeMem2 = DefaultMemoryFactory.DEFAULT.allocate(refByteArr.length - 1);
     try {
       writeMem2.putCharsToUtf8(0, refStr);
       fail();

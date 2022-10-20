@@ -17,17 +17,18 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.internal.direct;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.fail;
 
-import org.apache.datasketches.memory.BaseState;
-import org.apache.datasketches.memory.DefaultMemoryRequestServer;
+import org.apache.datasketches.memory.DefaultMemoryFactory;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
+import org.apache.datasketches.memory.internal.ResourceImpl;
+import org.apache.datasketches.memory.internal.Util;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
@@ -37,19 +38,19 @@ public class AllocateDirectMemoryTest {
   public void simpleAllocateDirect() throws Exception {
     int longs = 32;
     WritableMemory wMem;
-    try (WritableHandle wh = WritableMemory.allocateDirect(longs << 3)) {
+    try (WritableHandle wh = DefaultMemoryFactory.DEFAULT.allocateDirect(longs << 3)) {
       wMem = wh.getWritable();
       for (int i = 0; i<longs; i++) {
         wMem.putLong(i << 3, i);
         assertEquals(wMem.getLong(i << 3), i);
       }
       //inside the TWR block the memory should be valid
-      ((BaseStateImpl)wMem).checkValid();
+      ((ResourceImpl)wMem).checkValid();
       //OK
     }
     //The TWR block has exited, so the memory should be invalid
     try {
-      ((BaseStateImpl)wMem).checkValid();
+      ((ResourceImpl)wMem).checkValid();
       fail();
     } catch (final RuntimeException e) {
       //OK
@@ -60,7 +61,7 @@ public class AllocateDirectMemoryTest {
   public void checkDefaultMemoryRequestServer() throws Exception {
     int longs1 = 32;
     int bytes1 = longs1 << 3;
-    try (WritableHandle wh = WritableMemory.allocateDirect(bytes1)) {
+    try (WritableHandle wh = DefaultMemoryFactory.DEFAULT.allocateDirect(bytes1)) {
       WritableMemory origWmem = wh.getWritable();
       for (int i = 0; i<longs1; i++) { //puts data in wMem1
         origWmem.putLong(i << 3, i);
@@ -71,11 +72,7 @@ public class AllocateDirectMemoryTest {
       int longs2 = 64;
       int bytes2 = longs2 << 3;
       MemoryRequestServer memReqSvr;
-      if (BaseState.defaultMemReqSvr == null) {
-        memReqSvr = new DefaultMemoryRequestServer();
-      } else {
-        memReqSvr = origWmem.getMemoryRequestServer();
-      }
+      memReqSvr = origWmem.getMemoryRequestServer();
       WritableMemory newWmem = memReqSvr.request(origWmem, bytes2);
       assertFalse(newWmem.isDirect()); //on heap by default
       for (int i = 0; i < longs2; i++) {
@@ -90,7 +87,7 @@ public class AllocateDirectMemoryTest {
 
   @Test
   public void checkNonNativeDirect() throws Exception {
-    try (WritableHandle h = WritableMemory.allocateDirect(128, Util.NON_NATIVE_BYTE_ORDER, null)) {
+    try (WritableHandle h = DefaultMemoryFactory.DEFAULT.allocateDirect(128, Util.NON_NATIVE_BYTE_ORDER, null)) {
       WritableMemory wmem = h.getWritable();
       wmem.putChar(0, (char) 1);
       assertEquals(wmem.getByte(1), (byte) 1);
@@ -100,7 +97,7 @@ public class AllocateDirectMemoryTest {
   @Test
   public void checkExplicitClose() throws Exception {
     final long cap = 128;
-    try (WritableHandle wdh = WritableMemory.allocateDirect(cap)) {
+    try (WritableHandle wdh = DefaultMemoryFactory.DEFAULT.allocateDirect(cap)) {
       wdh.close(); //explicit close. Does the work of closing
     } //end of scope call to Cleaner/Deallocator also will be redundant
   }
@@ -108,8 +105,8 @@ public class AllocateDirectMemoryTest {
 
   @AfterClass
   public void checkDirectCounter() {
-    WritableMemory.writableWrap(new byte[8]);
-    long count = BaseState.getCurrentDirectMemoryAllocations();
+    DefaultMemoryFactory.DEFAULT.writableWrap(new byte[8]);
+    long count = ResourceImpl.getCurrentDirectMemoryAllocations();
     if (count != 0) {
       println(""+count);
       fail();

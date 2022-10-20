@@ -21,17 +21,16 @@ package org.apache.datasketches.memory.internal;
 
 import java.nio.ByteBuffer;
 
-import org.apache.datasketches.memory.Buffer;
-import org.apache.datasketches.memory.ReadOnlyException;
+import org.apache.datasketches.memory.DefaultBufferFactory;
+import org.apache.datasketches.memory.DefaultMemoryFactory;
 import org.apache.datasketches.memory.WritableBuffer;
-import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
 public class BufferReadWriteSafetyTest {
 
   // Test various operations with read-only Buffer
 
-  private final WritableBuffer buf = (WritableBuffer) Buffer.wrap(ByteBuffer.allocate(8));
+  private final WritableBuffer buf = (WritableBuffer) DefaultBufferFactory.DEFAULT.wrap(ByteBuffer.allocate(8));
 
   @Test(expectedExceptions = AssertionError.class)
   public void testPutByte() {
@@ -113,42 +112,42 @@ public class BufferReadWriteSafetyTest {
     buf.putDouble(1);
   }
 
-  @Test(expectedExceptions = ReadOnlyException.class)
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void testPutByteArray() {
     buf.putByteArray(new byte[] {1}, 0, 1);
   }
 
-  @Test(expectedExceptions = ReadOnlyException.class)
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void testPutBooleanArray() {
     buf.putBooleanArray(new boolean[] {true}, 0, 1);
   }
 
-  @Test(expectedExceptions = ReadOnlyException.class)
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void testPutShortArray() {
     buf.putShortArray(new short[] {1}, 0, 1);
   }
 
-  @Test(expectedExceptions = ReadOnlyException.class)
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void testPutCharArray() {
     buf.putCharArray(new char[] {1}, 0, 1);
   }
 
-  @Test(expectedExceptions = ReadOnlyException.class)
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void testPutIntArray() {
     buf.putIntArray(new int[] {1}, 0, 1);
   }
 
-  @Test(expectedExceptions = ReadOnlyException.class)
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void testPutLongArray() {
     buf.putLongArray(new long[] {1}, 0, 1);
   }
 
-  @Test(expectedExceptions = ReadOnlyException.class)
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void testPutFloatArray() {
     buf.putFloatArray(new float[] {1}, 0, 1);
   }
 
-  @Test(expectedExceptions = ReadOnlyException.class)
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void testDoubleByteArray() {
     buf.putDoubleArray(new double[] {1}, 0, 1);
   }
@@ -157,19 +156,19 @@ public class BufferReadWriteSafetyTest {
 
   @Test(expectedExceptions = AssertionError.class)
   public void testWritableMemoryAsBuffer() {
-    WritableBuffer buf1 = (WritableBuffer) WritableMemory.allocate(8).asBuffer();
+    WritableBuffer buf1 = (WritableBuffer) DefaultMemoryFactory.DEFAULT.allocate(8).asBuffer();
     buf1.putInt(1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testWritableBufferRegion() {
-    WritableBuffer buf1 = (WritableBuffer) WritableMemory.allocate(8).asWritableBuffer().region();
+    WritableBuffer buf1 = (WritableBuffer) DefaultMemoryFactory.DEFAULT.allocate(8).asWritableBuffer().region();
     buf1.putInt(1);
   }
 
   @Test(expectedExceptions = AssertionError.class)
   public void testWritableBufferDuplicate() {
-    WritableBuffer buf1 = (WritableBuffer) WritableMemory.allocate(8).asWritableBuffer().duplicate();
+    WritableBuffer buf1 = (WritableBuffer) DefaultMemoryFactory.DEFAULT.allocate(8).asWritableBuffer().duplicate();
     buf1.putInt(1);
   }
 }

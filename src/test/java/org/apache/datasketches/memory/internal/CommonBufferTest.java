@@ -22,6 +22,7 @@ package org.apache.datasketches.memory.internal;
 import static org.testng.Assert.assertEquals;
 
 import org.apache.datasketches.memory.WritableHandle;
+import org.apache.datasketches.memory.DefaultMemoryFactory;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
@@ -31,7 +32,7 @@ public class CommonBufferTest {
   @Test
   public void checkSetGet() throws Exception {
     int memCapacity = 60; //must be at least 60
-    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableHandle wrh = DefaultMemoryFactory.DEFAULT.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh.getWritable();
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
@@ -133,7 +134,7 @@ public class CommonBufferTest {
   @Test
   public void checkSetGetArrays() throws Exception {
     int memCapacity = 32;
-    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableHandle wrh = DefaultMemoryFactory.DEFAULT.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh.getWritable();
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
@@ -230,7 +231,7 @@ public class CommonBufferTest {
   @Test
   public void checkSetGetPartialArraysWithOffset() throws Exception {
     int memCapacity = 32;
-    try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableHandle wrh = DefaultMemoryFactory.DEFAULT.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh.getWritable();
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
@@ -324,7 +325,7 @@ public class CommonBufferTest {
   @Test
   public void checkSetClearMemoryRegions() throws Exception {
     int memCapacity = 64; //must be 64
-    try (WritableHandle wrh1 = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableHandle wrh1 = DefaultMemoryFactory.DEFAULT.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh1.getWritable();
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
@@ -413,7 +414,7 @@ public class CommonBufferTest {
   @Test
   public void checkToHexStringAllMem() throws Exception {
     int memCapacity = 48; //must be 48
-    try (WritableHandle wrh1 = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableHandle wrh1 = DefaultMemoryFactory.DEFAULT.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh1.getWritable();
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);

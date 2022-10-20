@@ -23,43 +23,37 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.Util.characterPad;
-import static org.apache.datasketches.memory.internal.Util.getResourceBytes;
-import static org.apache.datasketches.memory.internal.Util.getResourceFile;
+import static org.apache.datasketches.memory.internal.TestUtils.getResourceFile;
+import static org.apache.datasketches.memory.internal.TestUtils.getResourceBytes;
+import static org.apache.datasketches.memory.internal.TestUtils.zeroPad;
+import static org.apache.datasketches.memory.internal.TestUtils.characterPad;
+import static org.apache.datasketches.memory.internal.TestUtils.nullCheck;
 import static org.apache.datasketches.memory.internal.Util.negativeCheck;
-import static org.apache.datasketches.memory.internal.Util.nullCheck;
 import static org.apache.datasketches.memory.internal.Util.zeroCheck;
-import static org.apache.datasketches.memory.internal.Util.zeroPad;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.attribute.PosixFileAttributeView;
-import java.nio.file.attribute.PosixFileAttributes;
-import java.nio.file.attribute.PosixFilePermissions;
 
+import org.apache.datasketches.memory.DefaultMemoryFactory;
 import org.apache.datasketches.memory.WritableMemory;
+import org.apache.datasketches.memory.internal.unsafe.UnsafeUtil;
 import org.testng.annotations.Test;
 
 public class UtilTest {
-  private static final String LS = System.getProperty("line.separator");
-
   //Binary Search
   @Test
   public void checkBinarySearch() {
     int k = 1024; //longs
-    WritableMemory wMem = WritableMemory.allocate(k << 3); //1024 longs
+    WritableMemory wMem = DefaultMemoryFactory.DEFAULT.allocate(k << 3); //1024 longs
     for (int i = 0; i < k; i++) { wMem.putLong(i << 3, i); }
-    long idx = Util.binarySearchLongs(wMem, 0, k - 1, k / 2);
+    long idx = TestUtils.binarySearchLongs(wMem, 0, k - 1, k / 2);
     long val = wMem.getLong(idx << 3);
     assertEquals(idx, k/2);
     assertEquals(val, k/2);
 
-    idx = Util.binarySearchLongs(wMem, 0, k - 1, k);
+    idx = TestUtils.binarySearchLongs(wMem, 0, k - 1, k);
     assertEquals(idx, -1024);
   }
 
@@ -106,7 +100,7 @@ public class UtilTest {
 
   @Test
   public void checkCodePointArr() {
-    final Util.RandomCodePoints rvcp = new Util.RandomCodePoints(true);
+    final RandomCodePoints rvcp = new RandomCodePoints(true);
     final int n = 1000;
     final int[] cpArr = new int[n];
     rvcp.fillCodePointArray(cpArr);
@@ -120,37 +114,13 @@ public class UtilTest {
 
   @Test
   public void checkCodePoint() {
-    final Util.RandomCodePoints rvcp = new Util.RandomCodePoints(true);
+    final RandomCodePoints rvcp = new RandomCodePoints(true);
     final int n = 1000;
     for (int i = 0; i < n; i++) {
       int cp = rvcp.getCodePoint();
       if ((cp >= Character.MIN_SURROGATE) && (cp <= Character.MAX_SURROGATE)) {
         fail();
       }
-    }
-  }
-
-  static final String getFileAttributes(File file) {
-    try {
-    PosixFileAttributes attrs = Files.getFileAttributeView(
-        file.toPath(), PosixFileAttributeView.class, new LinkOption[0]).readAttributes();
-    String s = String.format("%s: %s %s %s%n",
-        file.getPath(),
-        attrs.owner().getName(),
-        attrs.group().getName(),
-        PosixFilePermissions.toString(attrs.permissions()));
-    return s;
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  static final void setGettysburgAddressFileToReadOnly() {
-    File file = getResourceFile("GettysburgAddress.txt");
-    try {
-    Files.setPosixFilePermissions(file.toPath(), PosixFilePermissions.fromString("r--r--r--"));
-    } catch (IOException e) {
-      throw new RuntimeException(e);
     }
   }
 
@@ -173,7 +143,7 @@ public class UtilTest {
   public void resourceBytesCorrect() {
     final String shortFileName = "GettysburgAddress.txt";
     final byte[] bytes = getResourceBytes(shortFileName);
-    assertTrue(bytes.length == 1541);
+    assertEquals(bytes.length, 1534 + (System.lineSeparator().length() * 7));
   }
 
   @Test(expectedExceptions = NullPointerException.class)
@@ -188,8 +158,8 @@ public class UtilTest {
   }
 
   static void println(final Object o) {
-    if (o == null) { print(LS); }
-    else { print(o.toString() + LS); }
+    if (o == null) { print(TestUtils.LS); }
+    else { print(o.toString() + TestUtils.LS); }
   }
 
   /**

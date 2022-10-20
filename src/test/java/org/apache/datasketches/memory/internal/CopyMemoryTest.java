@@ -25,6 +25,7 @@ import static org.testng.Assert.assertEquals;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.datasketches.memory.WritableHandle;
+import org.apache.datasketches.memory.DefaultMemoryFactory;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.Assert;
@@ -122,8 +123,8 @@ public class CopyMemoryTest {
     byte[] bytes = new byte[((UNSAFE_COPY_THRESHOLD_BYTES * 5) / 2) + 1];
     ThreadLocalRandom.current().nextBytes(bytes);
     byte[] referenceBytes = bytes.clone();
-    Memory referenceMem = Memory.wrap(referenceBytes);
-    WritableMemory mem = WritableMemory.writableWrap(bytes);
+    Memory referenceMem = DefaultMemoryFactory.DEFAULT.wrap(referenceBytes);
+    WritableMemory mem = DefaultMemoryFactory.DEFAULT.writableWrap(bytes);
     long copyLen = UNSAFE_COPY_THRESHOLD_BYTES * 2;
     mem.copyTo(0, mem, UNSAFE_COPY_THRESHOLD_BYTES / 2, copyLen);
     Assert.assertEquals(0, mem.compareTo(UNSAFE_COPY_THRESHOLD_BYTES / 2, copyLen, referenceMem, 0,
@@ -135,8 +136,8 @@ public class CopyMemoryTest {
     byte[] bytes = new byte[((UNSAFE_COPY_THRESHOLD_BYTES * 5) / 2) + 1];
     ThreadLocalRandom.current().nextBytes(bytes);
     byte[] referenceBytes = bytes.clone();
-    Memory referenceMem = Memory.wrap(referenceBytes);
-    WritableMemory mem = WritableMemory.writableWrap(bytes);
+    Memory referenceMem = DefaultMemoryFactory.DEFAULT.wrap(referenceBytes);
+    WritableMemory mem = DefaultMemoryFactory.DEFAULT.writableWrap(bytes);
     long copyLen = UNSAFE_COPY_THRESHOLD_BYTES * 2;
     mem.copyTo(UNSAFE_COPY_THRESHOLD_BYTES / 2, mem, 0, copyLen);
     Assert.assertEquals(0, mem.compareTo(0, copyLen, referenceMem, UNSAFE_COPY_THRESHOLD_BYTES / 2,
@@ -151,7 +152,7 @@ public class CopyMemoryTest {
   }
 
   private static WritableHandle genWRH(int longs, boolean empty) {
-    WritableHandle wrh = WritableMemory.allocateDirect(longs << 3);
+    WritableHandle wrh = DefaultMemoryFactory.DEFAULT.allocateDirect(longs << 3);
     WritableMemory mem = wrh.getWritable();
     if (empty) {
       mem.clear();
@@ -163,7 +164,7 @@ public class CopyMemoryTest {
 
 
   private static WritableMemory genMem(int longs, boolean empty) {
-    WritableMemory mem = WritableMemory.allocate(longs << 3);
+    WritableMemory mem = DefaultMemoryFactory.DEFAULT.allocate(longs << 3);
     if (!empty) {
       for (int i = 0; i < longs; i++) { mem.putLong(i << 3, i + 1); }
     }

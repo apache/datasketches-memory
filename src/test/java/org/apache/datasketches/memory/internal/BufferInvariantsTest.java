@@ -25,6 +25,8 @@ import static org.testng.Assert.fail;
 import java.nio.ByteBuffer;
 
 import org.apache.datasketches.memory.Buffer;
+import org.apache.datasketches.memory.DefaultBufferFactory;
+import org.apache.datasketches.memory.DefaultMemoryFactory;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
@@ -39,7 +41,7 @@ public class BufferInvariantsTest {
   public void testRegion() {
     ByteBuffer byteBuffer = ByteBuffer.allocate(10);
     byteBuffer.limit(7);
-    Buffer buff = Buffer.wrap(byteBuffer); //assuming buff has cap of 8
+    Buffer buff = DefaultBufferFactory.DEFAULT.wrap(byteBuffer); //assuming buff has cap of 8
     assertEquals(buff.getCapacity(), 10); //wrong should be 8
     buff.getByte(); //pos moves to 1
     Buffer copyBuff = buff.region(); //pos: 0, start: 0, end: 6: cap: 7
@@ -92,7 +94,7 @@ public class BufferInvariantsTest {
   @Test
   public void testBuf() {
     int n = 25;
-    WritableBuffer buf = WritableMemory.allocate(n).asWritableBuffer();
+    WritableBuffer buf = DefaultMemoryFactory.DEFAULT.allocate(n).asWritableBuffer();
     for (byte i = 0; i < n; i++) { buf.putByte(i); }
     buf.setPosition(0);
     assertEquals(buf.getPosition(), 0);
@@ -138,7 +140,7 @@ public class BufferInvariantsTest {
     bb.position(5);
     bb.limit(20);
 
-    Buffer buf = Buffer.wrap(bb);
+    Buffer buf = DefaultBufferFactory.DEFAULT.wrap(bb);
     assertEquals(buf.getPosition(), 5);
     assertEquals(buf.getEnd(), 20);
     assertEquals(buf.getRemaining(), 15);
@@ -161,7 +163,7 @@ public class BufferInvariantsTest {
 
   @Test
   public void checkLimitsDirect() throws Exception {
-    try (WritableHandle hand = WritableMemory.allocateDirect(100)) {
+    try (WritableHandle hand = DefaultMemoryFactory.DEFAULT.allocateDirect(100)) {
       WritableMemory wmem = hand.getWritable();
       Buffer buf = wmem.asBuffer();
       buf.setStartPositionEnd(40, 45, 50);
@@ -179,7 +181,7 @@ public class BufferInvariantsTest {
   public void testRegionDirect() {
     ByteBuffer byteBuffer = ByteBuffer.allocate(10);
     byteBuffer.limit(7);
-    Buffer buff = Buffer.wrap(byteBuffer); //assuming buff has cap of 8
+    Buffer buff = DefaultBufferFactory.DEFAULT.wrap(byteBuffer); //assuming buff has cap of 8
     assertEquals(buff.getCapacity(), 10); //wrong should be 8
     buff.getByte(); //pos moves to 1
     Buffer copyBuff = buff.region(); //pos: 0, start: 0, end: 6: cap: 7
@@ -232,7 +234,7 @@ public class BufferInvariantsTest {
   @Test
   public void testBufDirect() throws Exception {
     int n = 25;
-    try (WritableHandle whand = WritableMemory.allocateDirect(n)) {
+    try (WritableHandle whand = DefaultMemoryFactory.DEFAULT.allocateDirect(n)) {
     WritableMemory wmem = whand.getWritable();
     WritableBuffer buf = wmem.asWritableBuffer();
     for (byte i = 0; i < n; i++) { buf.putByte(i); }
@@ -281,7 +283,7 @@ public class BufferInvariantsTest {
     bb.position(5);
     bb.limit(20);
 
-    Buffer buf = Buffer.wrap(bb);
+    Buffer buf = DefaultBufferFactory.DEFAULT.wrap(bb);
     assertEquals(buf.getPosition(), 5);
     assertEquals(buf.getEnd(), 20);
     assertEquals(buf.getRemaining(), 15);

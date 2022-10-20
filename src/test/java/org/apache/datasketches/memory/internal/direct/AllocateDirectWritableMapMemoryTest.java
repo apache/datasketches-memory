@@ -21,10 +21,10 @@
  * Note: Lincoln's Gettysburg Address is in the public domain. See LICENSE.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.internal.direct;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.apache.datasketches.memory.internal.Util.getResourceFile;
+import static org.apache.datasketches.memory.internal.TestUtils.getResourceFile;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -36,29 +36,29 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.BaseState;
-import org.apache.datasketches.memory.MapHandle;
+import org.apache.datasketches.memory.DefaultMemoryFactory;
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.ReadOnlyException;
+import org.apache.datasketches.memory.MmapHandle;
 import org.apache.datasketches.memory.WritableHandle;
-import org.apache.datasketches.memory.WritableMapHandle;
 import org.apache.datasketches.memory.WritableMemory;
+import org.apache.datasketches.memory.WritableMmapHandle;
+import org.apache.datasketches.memory.internal.ResourceImpl;
+import org.apache.datasketches.memory.internal.TestUtils;
+import org.apache.datasketches.memory.internal.Util;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class AllocateDirectWritableMapMemoryTest {
-  private static final String LS = System.getProperty("line.separator");
-
   @BeforeClass
   public void setReadOnly() {
-    UtilTest.setGettysburgAddressFileToReadOnly();
+    TestUtils.setGettysburgAddressFileToReadOnly();
   }
 
   @Test
   public void simpleMap() throws Exception {
     File file = getResourceFile("GettysburgAddress.txt");
-    try (MapHandle h = Memory.map(file); WritableMapHandle wh = (WritableMapHandle) h) {
+    try (MmapHandle h = DefaultMemoryFactory.DEFAULT.map(file); WritableMmapHandle wh = (WritableMmapHandle) h) {
       Memory mem = h.get();
       byte[] bytes = new byte[(int)mem.getCapacity()];
       mem.getByteArray(0, bytes, 0, bytes.length);
@@ -67,7 +67,7 @@ public class AllocateDirectWritableMapMemoryTest {
       try {
         wh.force();
         fail();
-      } catch (ReadOnlyException e) {
+      } catch (IllegalArgumentException e) {
         //OK
       }
     }
@@ -92,9 +92,9 @@ public class AllocateDirectWritableMapMemoryTest {
     file.deleteOnExit();  //comment out if you want to examine the file.
 
     try (
-        WritableMapHandle dstHandle
-          = WritableMemory.writableMap(file, 0, bytes, ByteOrder.nativeOrder());
-        WritableHandle srcHandle = WritableMemory.allocateDirect(bytes)) {
+        WritableMmapHandle dstHandle
+          = DefaultMemoryFactory.DEFAULT.writableMap(file, 0, bytes, ByteOrder.nativeOrder());
+        WritableHandle srcHandle = DefaultMemoryFactory.DEFAULT.allocateDirect(bytes)) {
 
       WritableMemory dstMem = dstHandle.getWritable();
       WritableMemory srcMem = srcHandle.getWritable();
@@ -128,7 +128,7 @@ public class AllocateDirectWritableMapMemoryTest {
     file.deleteOnExit();  //comment out if you want to examine the file.
 
     final long bytes = 8;
-    try (WritableMapHandle h = WritableMemory.writableMap(file, 0L, bytes, Util.NON_NATIVE_BYTE_ORDER)) {
+    try (WritableMmapHandle h = DefaultMemoryFactory.DEFAULT.writableMap(file, 0L, bytes, Util.NON_NATIVE_BYTE_ORDER)) {
       WritableMemory wmem = h.getWritable();
       wmem.putChar(0, (char) 1);
       assertEquals(wmem.getByte(1), (byte) 1);
@@ -139,24 +139,24 @@ public class AllocateDirectWritableMapMemoryTest {
   public void testMapException() throws IOException {
     File dummy = createFile("dummy.txt", ""); //zero length
     //throws java.lang.reflect.InvocationTargetException
-    Memory.map(dummy, 0, dummy.length(), ByteOrder.nativeOrder());
+    DefaultMemoryFactory.DEFAULT.map(dummy, 0, dummy.length(), ByteOrder.nativeOrder());
   }
 
-  @Test(expectedExceptions = ReadOnlyException.class)
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void simpleMap2() throws Exception {
     File file = getResourceFile("GettysburgAddress.txt");
     assertTrue(file.canRead() && !file.canWrite());
-    try (WritableMapHandle rh =
-        WritableMemory.writableMap(file)) { //throws
+    try (WritableMmapHandle rh =
+            DefaultMemoryFactory.DEFAULT.writableMap(file)) { //throws
       //
     }
   }
 
-  @Test(expectedExceptions = ReadOnlyException.class)
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void checkOverLength() throws Exception  {
     File file = getResourceFile("GettysburgAddress.txt");
-    try (WritableMapHandle rh =
-        WritableMemory.writableMap(file, 0, 1 << 20, ByteOrder.nativeOrder())) {
+    try (WritableMmapHandle rh =
+            DefaultMemoryFactory.DEFAULT.writableMap(file, 0, 1 << 20, ByteOrder.nativeOrder())) {
       //
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -173,7 +173,7 @@ public class AllocateDirectWritableMapMemoryTest {
     byte[] correctByteArr = correctStr.getBytes(UTF_8);
     long corrBytes = correctByteArr.length;
 
-    try (MapHandle rh = Memory.map(origFile, 0, origBytes, ByteOrder.nativeOrder())) {
+    try (MmapHandle rh = DefaultMemoryFactory.DEFAULT.map(origFile, 0, origBytes, ByteOrder.nativeOrder())) {
       Memory map = rh.get();
       rh.load();
       assertTrue(rh.isLoaded());
@@ -184,7 +184,7 @@ public class AllocateDirectWritableMapMemoryTest {
       assertEquals(bufStr, origStr);
     }
 
-    try (WritableMapHandle wrh = WritableMemory.writableMap(origFile, 0, corrBytes,
+    try (WritableMmapHandle wrh = DefaultMemoryFactory.DEFAULT.writableMap(origFile, 0, corrBytes,
         ByteOrder.nativeOrder())) {
       WritableMemory wMap = wrh.getWritable();
       wrh.load();
@@ -217,14 +217,14 @@ public class AllocateDirectWritableMapMemoryTest {
   @Test
   public void checkExplicitClose() throws Exception {
     File file = getResourceFile("GettysburgAddress.txt");
-    try (MapHandle wmh = Memory.map(file)) {
+    try (MmapHandle wmh = DefaultMemoryFactory.DEFAULT.map(file)) {
       wmh.close(); //explicit close.
     } //end of scope call to Cleaner/Deallocator also will be redundant
   }
 
   @AfterClass
   public void checkDirectCounter() {
-    long count =  BaseState.getCurrentDirectMemoryMapAllocations();
+    long count =  ResourceImpl.getCurrentDirectMemoryMapAllocations();
       if (count != 0) {
         println(""+count);
         fail();
@@ -237,8 +237,8 @@ public class AllocateDirectWritableMapMemoryTest {
   }
 
   static void println(final Object o) {
-    if (o == null) { print(LS); }
-    else { print(o.toString() + LS); }
+    if (o == null) { print(TestUtils.LS); }
+    else { print(o.toString() + TestUtils.LS); }
   }
 
   /**

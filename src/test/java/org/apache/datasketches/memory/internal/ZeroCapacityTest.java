@@ -23,6 +23,7 @@ import static org.testng.Assert.assertEquals;
 
 import java.nio.ByteBuffer;
 
+import org.apache.datasketches.memory.DefaultMemoryFactory;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
@@ -36,16 +37,16 @@ public class ZeroCapacityTest {
 
   @Test
   public void checkZeroCapacity() throws Exception {
-    WritableMemory wmem = WritableMemory.allocate(0);
+    WritableMemory wmem = DefaultMemoryFactory.DEFAULT.allocate(0);
     assertEquals(wmem.getCapacity(), 0);
 
-    Memory.wrap(new byte[0]);
-    Memory.wrap(ByteBuffer.allocate(0));
-    Memory mem3 = Memory.wrap(ByteBuffer.allocateDirect(0));
+    DefaultMemoryFactory.DEFAULT.wrap(new byte[0]);
+    DefaultMemoryFactory.DEFAULT.wrap(ByteBuffer.allocate(0));
+    Memory mem3 = DefaultMemoryFactory.DEFAULT.wrap(ByteBuffer.allocateDirect(0));
     mem3.region(0, 0);
     WritableHandle wh = null;
     try {
-      wh = WritableMemory.allocateDirect(0);
+      wh = DefaultMemoryFactory.DEFAULT.allocateDirect(0);
       Assert.fail();
     } catch (IllegalArgumentException ignore) {
       if (wh != null) { wh.close(); }

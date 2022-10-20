@@ -19,6 +19,7 @@
 
 package org.apache.datasketches.memory.internal;
 
+import org.apache.datasketches.memory.DefaultMemoryFactory;
 import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.AfterClass;
@@ -33,7 +34,7 @@ public class IgnoredArrayOverflowTest {
 
   @BeforeClass
   public void allocate() {
-    h = WritableMemory.allocateDirect(MAX_SIZE);
+    h = DefaultMemoryFactory.DEFAULT.allocateDirect(MAX_SIZE);
     memory = h.getWritable();
   }
 

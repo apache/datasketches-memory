@@ -19,7 +19,7 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_DOUBLE_INDEX_SCALE;
+import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_DOUBLE_INDEX_SCALE;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -28,9 +28,12 @@ import static org.testng.Assert.fail;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.Buffer;
+import org.apache.datasketches.memory.DefaultMemoryFactory;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
+import org.apache.datasketches.memory.internal.unsafe.Prim;
+import org.apache.datasketches.memory.internal.unsafe.StepBoolean;
 import org.testng.annotations.Test;
 
 public class BaseStateTest {
@@ -43,7 +46,7 @@ public class BaseStateTest {
 
   @Test
   public void checkIsSameResource() {
-    WritableMemory wmem = WritableMemory.allocate(16);
+    WritableMemory wmem = DefaultMemoryFactory.DEFAULT.allocate(16);
     Memory mem = wmem;
     assertFalse(wmem.isSameResource(null));
     assertTrue(wmem.isSameResource(mem));
@@ -57,7 +60,7 @@ public class BaseStateTest {
   @Test
   public void checkNotEqualTo() {
     byte[] arr = new byte[8];
-    Memory mem = Memory.wrap(arr);
+    Memory mem = DefaultMemoryFactory.DEFAULT.wrap(arr);
     assertFalse(mem.equalTo(0, arr, 0, 8));
   }
 
@@ -86,14 +89,14 @@ public class BaseStateTest {
 
   @Test
   public void checkGetNativeBaseOffset_Heap() throws Exception {
-    WritableMemory wmem = WritableMemory.allocate(8); //heap
-    final long offset = ((BaseStateImpl)wmem).getNativeBaseOffset();
+    WritableMemory wmem = DefaultMemoryFactory.DEFAULT.allocate(8); //heap
+    final long offset = ((ResourceImpl)wmem).getNativeBaseOffset();
     assertEquals(offset, 0L);
   }
 
   @Test
   public void checkIsByteOrderCompatible() {
-    WritableMemory wmem = WritableMemory.allocate(8);
+    WritableMemory wmem = DefaultMemoryFactory.DEFAULT.allocate(8);
     assertTrue(wmem.isByteOrderCompatible(ByteOrder.nativeOrder()));
   }
 
@@ -105,16 +108,16 @@ public class BaseStateTest {
 
   @Test
   public void checkIsNativeByteOrder() {
-    assertTrue(BaseStateImpl.isNativeByteOrder(ByteOrder.nativeOrder()));
+    assertTrue(ResourceImpl.isNativeByteOrder(ByteOrder.nativeOrder()));
     try {
-      BaseStateImpl.isNativeByteOrder(null);
+      ResourceImpl.isNativeByteOrder(null);
       fail();
     } catch (final IllegalArgumentException e) {}
   }
 
   @Test
   public void checkXxHash64() {
-    WritableMemory mem = WritableMemory.allocate(8);
+    WritableMemory mem = DefaultMemoryFactory.DEFAULT.allocate(8);
     long out = mem.xxHash64(mem.getLong(0), 1L);
     assertTrue(out != 0);
   }
@@ -122,7 +125,7 @@ public class BaseStateTest {
   @Test
   public void checkTypeDecode() {
     for (int i = 0; i < 128; i++) {
-      BaseStateImpl.typeDecode(i);
+      ResourceImpl.typeDecode(i);
     }
   }
 

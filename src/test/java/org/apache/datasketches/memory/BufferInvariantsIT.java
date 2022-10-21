@@ -17,25 +17,19 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
 import java.nio.ByteBuffer;
 
-import org.apache.datasketches.memory.Buffer;
-import org.apache.datasketches.memory.DefaultBufferFactory;
-import org.apache.datasketches.memory.DefaultMemoryFactory;
-import org.apache.datasketches.memory.WritableBuffer;
-import org.apache.datasketches.memory.WritableHandle;
-import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
 /**
  * @author Lee Rhodes
  */
-public class BufferInvariantsTest {
+public class BufferInvariantsIT {
 
   @Test
   public void testRegion() {

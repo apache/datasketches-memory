@@ -17,13 +17,11 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory;
 
-import org.apache.datasketches.memory.DefaultMemoryFactory;
-import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
-public class BufferBoundaryCheckTest {
+public class BufferBoundaryCheckIT {
 
   private final WritableMemory writableMemory = DefaultMemoryFactory.DEFAULT.allocate(8);
 

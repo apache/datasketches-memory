@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -27,10 +27,6 @@ import static org.testng.Assert.assertTrue;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.DefaultMemoryFactory;
-import org.apache.datasketches.memory.DefaultMemoryRequestServer;
-import org.apache.datasketches.memory.MemoryRequestServer;
-import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
 /**
@@ -49,7 +45,7 @@ import org.testng.annotations.Test;
  * @author Lee Rhodes
  *
  */
-public class DruidIssue11544Test {
+public class DruidIssue11544IT {
 
   @Test
   public void withByteBuffer() {

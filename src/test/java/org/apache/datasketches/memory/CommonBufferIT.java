@@ -17,17 +17,13 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory;
 
 import static org.testng.Assert.assertEquals;
 
-import org.apache.datasketches.memory.WritableHandle;
-import org.apache.datasketches.memory.DefaultMemoryFactory;
-import org.apache.datasketches.memory.WritableBuffer;
-import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
-public class CommonBufferTest {
+public class CommonBufferIT {
 
   @Test
   public void checkSetGet() throws Exception {

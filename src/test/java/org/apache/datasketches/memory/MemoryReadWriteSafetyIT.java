@@ -17,19 +17,16 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory;
 
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.DefaultMemoryFactory;
-import org.apache.datasketches.memory.MmapHandle;
-import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
-public class MemoryReadWriteSafetyTest {
+public class MemoryReadWriteSafetyIT {
 
   // Test various operations with read-only Memory
 

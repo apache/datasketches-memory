@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory.hash;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.datasketches.memory.hash.MurmurHash3v2.hash;
@@ -25,7 +25,6 @@ import static org.testng.Assert.fail;
 
 import org.apache.datasketches.memory.DefaultMemoryFactory;
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.hash.MurmurHash3v2;
 import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.Assert;
@@ -37,7 +36,7 @@ import org.testng.annotations.Test;
  *
  * @author Lee Rhodes
  */
-public class MurmurHash3v2Test {
+public class MurmurHash3v2IT {
 
   @Test
   public void checkByteArrRemainderGT8() { //byte[], remainder > 8

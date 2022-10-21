@@ -17,24 +17,20 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory;
 
 import static org.testng.Assert.assertFalse;
 
 import java.nio.ByteOrder;
 import java.util.IdentityHashMap;
 
-import org.apache.datasketches.memory.DefaultMemoryFactory;
-import org.apache.datasketches.memory.MemoryRequestServer;
-import org.apache.datasketches.memory.WritableHandle;
-import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
 /**
  * Examples of how to use the MemoryRequestServer with a memory hungry client.
  * @author Lee Rhodes
  */
-public class ExampleMemoryRequestServerTest {
+public class ExampleMemoryRequestServerIT {
 
   /**
    * This version is without a TWR block.all of the memory allocations are done through the MemoryRequestServer

@@ -17,21 +17,17 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory;
 
 import static org.apache.datasketches.memory.internal.Util.UNSAFE_COPY_THRESHOLD_BYTES;
 import static org.testng.Assert.assertEquals;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.datasketches.memory.WritableHandle;
-import org.apache.datasketches.memory.DefaultMemoryFactory;
-import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.WritableMemory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class CopyMemoryTest {
+public class CopyMemoryIT {
 
   @Test
   public void heapWSource() {

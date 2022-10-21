@@ -17,16 +17,13 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory;
 
 import java.nio.ByteBuffer;
 
-import org.apache.datasketches.memory.DefaultBufferFactory;
-import org.apache.datasketches.memory.DefaultMemoryFactory;
-import org.apache.datasketches.memory.WritableBuffer;
 import org.testng.annotations.Test;
 
-public class BufferReadWriteSafetyTest {
+public class BufferReadWriteSafetyIT {
 
   // Test various operations with read-only Buffer
 

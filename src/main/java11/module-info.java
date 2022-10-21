@@ -20,6 +20,6 @@ module org.apache.datasketches.memory {
   requires java.base;
   requires java.logging;
   requires jdk.unsupported;
-
+    
   exports org.apache.datasketches.memory;
 }

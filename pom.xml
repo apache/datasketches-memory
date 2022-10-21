@@ -223,8 +223,7 @@
             <jdkToolchain>
               <version>${jdk-toolchain.version}</version>
             </jdkToolchain>
-            <reportsDirectory>${project.build.directory}/test-output/${maven.build.timestamp}
-            </reportsDirectory>
+            <reportsDirectory>${project.build.directory}/test-output/${maven.build.timestamp}</reportsDirectory>
           </configuration>
         </plugin>
 
@@ -240,8 +239,7 @@
             <jdkToolchain>
               <version>${jdk-toolchain.version}</version>
             </jdkToolchain>
-            <reportsDirectory>${project.build.directory}/validation-output/${maven.build.timestamp}
-            </reportsDirectory>
+            <reportsDirectory>${project.build.directory}/validation-output/${maven.build.timestamp}</reportsDirectory>
           </configuration>
         </plugin>
 
@@ -274,8 +272,7 @@
             <!--suppress UnresolvedMavenProperty -->
             <repoToken>${coveralls-repo-token}</repoToken>
             <!--suppress UnresolvedMavenProperty -->
-            <jacocoReports>${maven.multiModuleProjectDirectory}/datasketches-memory-java8/target/site/jacoco/jacoco.xml
-            </jacocoReports>
+            <jacocoReports>${maven.multiModuleProjectDirectory}/datasketches-memory-java8/target/site/jacoco/jacoco.xml</jacocoReports>
           </configuration>
         </plugin>
 
@@ -336,25 +333,7 @@
                 <compileSourceRoot>${project.basedir}/src/main/java11</compileSourceRoot>
               </compileSourceRoots>
               <!-- multiReleaseOutput>true</multiReleaseOutput -->
-              <outputDirectory>${project.build.outputDirectory}/META-INF/versions/11
-              </outputDirectory>
-            </configuration>
-          </execution>
-          <execution>
-            <id>compile-java-17</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-            <configuration>
-              <release>17</release>
-              <jdkToolchain>
-                <version>17</version>
-              </jdkToolchain>
-              <compileSourceRoots>
-                <compileSourceRoot>${project.basedir}/src/main/java17</compileSourceRoot>
-              </compileSourceRoots>
-              <multiReleaseOutput>true</multiReleaseOutput>
+              <outputDirectory>${project.build.outputDirectory}/META-INF/versions/11</outputDirectory>
             </configuration>
           </execution>
         </executions>
@@ -489,18 +468,7 @@
               <jdkToolchain>
                 <version>11</version>
               </jdkToolchain>
-            </configuration>
-          </execution>
-          <execution>
-            <id>jdk17</id>
-            <goals>
-              <goal>integration-test</goal>
-              <goal>verify</goal>
-            </goals>
-            <configuration>
-              <jdkToolchain>
-                <version>17</version>
-              </jdkToolchain>
+              <argLine>--add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-exports java.base/jdk.internal.misc=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED</argLine>
             </configuration>
           </execution>
         </executions>
@@ -531,5 +499,33 @@
     </plugins>
 
   </build>
+
+  <profiles>
+    <profile>
+      <id>only-eclipse</id>
+      <activation>
+        <property>
+          <name>m2e.version</name>
+        </property>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-remote-resources-plugin</artifactId>
+              <version>${maven-remote-resources-plugin.version}</version>
+              <executions>
+                <execution>
+                  <id>process-resource-bundles</id>
+                  <phase>none</phase>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
 
 </project>

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory;
 
 import static org.apache.datasketches.memory.internal.TestUtils.isAllBitsClear;
 import static org.apache.datasketches.memory.internal.TestUtils.isAllBitsSet;
@@ -27,12 +27,9 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import org.apache.datasketches.memory.DefaultMemoryFactory;
-import org.apache.datasketches.memory.WritableHandle;
-import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
-public class CommonMemoryTest {
+public class CommonMemoryIT {
 
   @Test
   public void checkSetGet() throws Exception {

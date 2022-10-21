@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory;
 
 import static org.testng.Assert.assertEquals;
 
@@ -25,17 +25,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
 
-import org.apache.datasketches.memory.WritableHandle;
-import org.apache.datasketches.memory.Buffer;
-import org.apache.datasketches.memory.DefaultBufferFactory;
-import org.apache.datasketches.memory.DefaultMemoryFactory;
-import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.WritableBuffer;
-import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 import org.testng.collections.Lists;
 
-public class BufferTest {
+public class BufferIT {
 
   @Test
   public void checkDirectRoundTrip() throws Exception {

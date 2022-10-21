@@ -17,21 +17,16 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory;
 
 import static org.testng.Assert.fail;
 
-import org.apache.datasketches.memory.Buffer;
-import org.apache.datasketches.memory.DefaultMemoryFactory;
-import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.WritableHandle;
-import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
 /**
  * @author Lee Rhodes
  */
-public class BaseBufferTest {
+public class BaseBufferIT {
 
   @Test
   public void checkLimits() {

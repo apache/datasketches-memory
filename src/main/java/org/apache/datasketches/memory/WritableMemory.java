@@ -353,7 +353,7 @@ public interface WritableMemory extends Resource, Memory {
      * <li>{@link MemoryFactory#writableWrap(ByteBuffer, ByteOrder, MemoryRequestServer)}</li>
      * </ul>
      * Simple implementation examples include the DefaultMemoryRequestServer in the main tree, as well as
-     * the ExampleMemoryRequestServerTest and the use with ByteBuffer documented in the DruidIssue11544Test
+     * the ExampleMemoryRequestServerIT and the use with ByteBuffer documented in the DruidIssue11544IT
      * in the test tree.
      * @return the MemoryRequestServer object or null.
      */

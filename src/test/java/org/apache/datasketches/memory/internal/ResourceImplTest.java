@@ -19,7 +19,6 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.unsafe.UnsafeUtil.ARRAY_DOUBLE_INDEX_SCALE;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -32,17 +31,9 @@ import org.apache.datasketches.memory.DefaultMemoryFactory;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
-import org.apache.datasketches.memory.internal.unsafe.Prim;
-import org.apache.datasketches.memory.internal.unsafe.StepBoolean;
 import org.testng.annotations.Test;
 
-public class BaseStateTest {
-
-  @Test
-  public void checkPrimOffset() {
-    int off = (int)Prim.BYTE.off();
-    assertTrue(off > 0);
-  }
+public class ResourceImplTest {
 
   @Test
   public void checkIsSameResource() {
@@ -62,29 +53,6 @@ public class BaseStateTest {
     byte[] arr = new byte[8];
     Memory mem = DefaultMemoryFactory.DEFAULT.wrap(arr);
     assertFalse(mem.equalTo(0, arr, 0, 8));
-  }
-
-  //StepBoolean checks
-  @Test
-  public void checkStepBoolean() {
-    checkStepBoolean(true);
-    checkStepBoolean(false);
-  }
-
-  private static void checkStepBoolean(boolean initialState) {
-    StepBoolean step = new StepBoolean(initialState);
-    assertTrue(step.get() == initialState); //confirm initialState
-    step.change();
-    assertTrue(step.hasChanged());      //1st change was successful
-    assertTrue(step.get() != initialState); //confirm it is different from initialState
-    step.change();
-    assertTrue(step.get() != initialState); //Still different from initialState
-    assertTrue(step.hasChanged());  //confirm it was changed from initialState value
-  }
-
-  @Test
-  public void checkPrim() {
-    assertEquals(Prim.DOUBLE.scale(), ARRAY_DOUBLE_INDEX_SCALE);
   }
 
   @Test

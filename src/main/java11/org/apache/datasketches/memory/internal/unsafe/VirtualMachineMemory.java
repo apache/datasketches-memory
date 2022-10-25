@@ -23,23 +23,23 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * Extracts a version-dependent reference to the `jdk.internal.misc.VM` into
+ * Extracts a version-dependent reference to the VM class into
  * a standalone class. The package name for VM has changed in
  * later versions. The appropriate class will be loaded by the class loader
  * depending on the Java version that is used.
  * For more information, see: https://openjdk.java.net/jeps/238
  */
 public final class VirtualMachineMemory {
-
   private static final Class<?> VM_CLASS;
   private static final Method VM_MAX_DIRECT_MEMORY_METHOD;
   private static final Method VM_IS_DIRECT_MEMORY_PAGE_ALIGNED_METHOD;
   private static final long maxDBBMemory;
   private static final boolean isPageAligned;
+  private static final String VM_LOCATION = "jdk.internal.misc.VM"; //JDK 11
 
   static {
     try {
-      VM_CLASS = Class.forName("jdk.internal.misc.VM");
+      VM_CLASS = Class.forName(VM_LOCATION);
       VM_MAX_DIRECT_MEMORY_METHOD = VM_CLASS.getDeclaredMethod("maxDirectMemory");
       VM_MAX_DIRECT_MEMORY_METHOD.setAccessible(true);
       maxDBBMemory = (long) VM_MAX_DIRECT_MEMORY_METHOD.invoke(null); //static method
@@ -51,7 +51,7 @@ public final class VirtualMachineMemory {
           .invoke(null); //static method
     } catch (final ClassNotFoundException | NoSuchMethodException |  IllegalAccessException
         | IllegalArgumentException | InvocationTargetException | SecurityException e) {
-      throw new RuntimeException("Could not acquire jdk.internal.misc.VM: " + e.getClass());
+      throw new RuntimeException("Could not acquire " + VM_LOCATION + ": " + e.getClass());
     }
   }
 

@@ -26,7 +26,7 @@ package org.apache.datasketches.memory.internal.unsafe;
  * depending on the Java version that is used.
  * For more information, see: https://openjdk.java.net/jeps/238
  */
-class NioBitsFields {
+class NioBitsFields { //JDK 8
     static String COUNT_FIELD_NAME = "count";
     static String RESERVED_MEMORY_FIELD_NAME = "reservedMemory";
     static String TOTAL_CAPACITY_FIELD_NAME = "totalCapacity";

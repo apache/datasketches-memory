@@ -19,10 +19,10 @@
 
 package org.apache.datasketches.memory.internal.unsafe;
 
-import sun.misc.Cleaner;
+import sun.misc.Cleaner; //JDK 8
 
 /**
- * Extracts a version-dependent reference to the `sun.misc.Cleaner` into
+ * Extracts a version-dependent reference to the Cleaner into
  * a standalone class. The package name for Cleaner has changed in
  * later versions. The appropriate class will be loaded by the class loader
  * depending on the Java version that is used.
@@ -30,23 +30,22 @@ import sun.misc.Cleaner;
  */
 @SuppressWarnings("restriction")
 public class MemoryCleaner {
-    private final Cleaner cleaner;
+  private final Cleaner cleaner;
 
-    /**
-     * Creates a new `sun.misc.Cleaner`.
-     * @param referent the object to be cleaned
-     * @param deallocator - the cleanup code to be run when the cleaner is invoked.
-     * return MemoryCleaner
-     */
-    public MemoryCleaner(final Object referent, final Runnable deallocator) {
-        cleaner = Cleaner.create(referent, deallocator);
-    }
+  /**
+   * Creates a new Cleaner.
+   * @param referent the object to be cleaned
+   * @param deallocator - the cleanup code to be run when the cleaner is invoked.
+   * return MemoryCleaner
+   */
+  public MemoryCleaner(final Object referent, final Runnable deallocator) {
+    cleaner = Cleaner.create(referent, deallocator);
+  }
 
-    /**
-     * Runs this cleaner, if it has not been run before.
-     */
-    public void clean() {
-        cleaner.clean();
-    }
+  /**
+   * Runs this cleaner, if it has not been run before.
+   */
+  public void clean() {
+    cleaner.clean();
+  }
 }
-

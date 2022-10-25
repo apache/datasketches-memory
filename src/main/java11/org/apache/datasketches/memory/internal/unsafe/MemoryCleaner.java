@@ -19,20 +19,21 @@
 
 package org.apache.datasketches.memory.internal.unsafe;
 
-import jdk.internal.ref.Cleaner;
+import jdk.internal.ref.Cleaner; //JDK 11
 
 /**
- * Extracts a version-dependent reference to the `jdk.internal.ref.Cleaner` into
+ * Extracts a version-dependent reference to the Cleaner into
  * a standalone class. The package name for Cleaner has changed in
  * later versions. The appropriate class will be loaded by the class loader
  * depending on the Java version that is used.
  * For more information, see: https://openjdk.java.net/jeps/238
  */
+@SuppressWarnings("restriction")
 public class MemoryCleaner {
   private final Cleaner cleaner;
 
   /**
-   * Creates a new `jdk.internal.ref.Cleaner`.
+   * Creates a new Cleaner.
    * @param referent the object to be cleaned
    * @param deallocator - the cleanup code to be run when the cleaner is invoked.
    * return MemoryCleaner

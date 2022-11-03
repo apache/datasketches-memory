@@ -30,7 +30,7 @@ import java.util.Objects;
  */
 public interface MemoryFactory {
     
-    MemoryRequestServer getDefaultMemoryRequestServer();
+    MemoryRequestServer getMemoryRequestServer();
     
     //BYTE BUFFER
 
@@ -72,7 +72,7 @@ public interface MemoryFactory {
      * @return a new <i>WritableMemory</i> for write operations on the given <i>ByteBuffer</i>.
      */
     default WritableMemory writableWrap(ByteBuffer byteBuffer, ByteOrder byteOrder) {
-        return writableWrap(byteBuffer, byteOrder, getDefaultMemoryRequestServer());
+        return writableWrap(byteBuffer, byteOrder, getMemoryRequestServer());
     }
     
     /**
@@ -154,7 +154,7 @@ public interface MemoryFactory {
       * @return a new WritableMemory for write operations on a new byte array.
       */
      default WritableMemory allocate(int capacityBytes, ByteOrder byteOrder) {
-       return allocate(capacityBytes, byteOrder, getDefaultMemoryRequestServer());
+       return allocate(capacityBytes, byteOrder, getMemoryRequestServer());
      }
 
      /**
@@ -186,7 +186,7 @@ public interface MemoryFactory {
       * Please read Javadocs for {@link Handle}.
       */
      default WritableHandle allocateDirect(long capacityBytes) {
-       return allocateDirect(capacityBytes, ByteOrder.nativeOrder(), getDefaultMemoryRequestServer());
+       return allocateDirect(capacityBytes, ByteOrder.nativeOrder(), getMemoryRequestServer());
      }
 
      /**
@@ -249,7 +249,7 @@ public interface MemoryFactory {
      * @return a new WritableMemory for write operations on the given primitive array.
      */
     default WritableMemory writableWrap(byte[] array, ByteOrder byteOrder) {
-      return writableWrap(array, 0, array.length, byteOrder, getDefaultMemoryRequestServer());
+      return writableWrap(array, 0, array.length, byteOrder, getMemoryRequestServer());
     }
 
     /**
@@ -274,7 +274,7 @@ public interface MemoryFactory {
      * @return a new WritableMemory for write operations on the given primitive array.
      */
     default WritableMemory writableWrap(byte[] array, int offsetBytes, int lengthBytes, ByteOrder byteOrder) {
-      return writableWrap(array, offsetBytes, lengthBytes, byteOrder, getDefaultMemoryRequestServer());
+      return writableWrap(array, offsetBytes, lengthBytes, byteOrder, getMemoryRequestServer());
     }
 
     /**

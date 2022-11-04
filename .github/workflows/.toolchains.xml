@@ -30,24 +30,4 @@
             <jdkHome>${env.JAVA11_HOME}</jdkHome>
         </configuration>
     </toolchain>
-    <toolchain>
-        <type>jdk</type>
-        <provides>
-            <version>12</version>
-            <vendor>openjdk</vendor>
-        </provides>
-        <configuration>
-            <jdkHome>${env.JAVA12_HOME}</jdkHome>
-        </configuration>
-    </toolchain>
-    <toolchain>
-        <type>jdk</type>
-        <provides>
-            <version>13</version>
-            <vendor>openjdk</vendor>
-        </provides>
-        <configuration>
-            <jdkHome>${env.JAVA13_HOME}</jdkHome>
-        </configuration>
-    </toolchain>
 </toolchains>

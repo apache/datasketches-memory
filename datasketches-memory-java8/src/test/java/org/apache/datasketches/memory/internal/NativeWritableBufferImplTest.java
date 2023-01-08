@@ -478,7 +478,6 @@ public class NativeWritableBufferImplTest {
     WritableBuffer buf = reg.asWritableBuffer();
     assertEquals(buf.getRegionOffset(), 32);
     assertEquals(buf.getRegionOffset(0), 32);
-    assertEquals(buf.getCumulativeOffset(), 32 + 16);
     assertEquals(buf.getCumulativeOffset(0), 32 + 16);
   }
 

@@ -177,7 +177,7 @@ public final class MurmurHash3v2 {
     if (uObj == null) {
       throw new IllegalArgumentException("The backing resource of input mem is not on-heap.");
     }
-    long cumOff = mem.getCumulativeOffset() + offsetBytes;
+    long cumOff = mem.getCumulativeOffset(offsetBytes);
 
     long h1 = seed;
     long h2 = seed;

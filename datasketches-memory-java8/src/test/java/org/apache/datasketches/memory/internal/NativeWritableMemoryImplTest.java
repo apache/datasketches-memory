@@ -27,11 +27,11 @@ import static org.testng.Assert.fail;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.ReadOnlyException;
 import org.apache.datasketches.memory.WritableBuffer;
+import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
@@ -656,8 +656,8 @@ public class NativeWritableMemoryImplTest {
     WritableMemory reg = wmem.writableRegion(32, 32);
     assertEquals(reg.getRegionOffset(), 32);
     assertEquals(reg.getRegionOffset(0), 32);
-    assertEquals(reg.getCumulativeOffset(), 32 + 16);
     assertEquals(reg.getCumulativeOffset(0), 32 + 16);
+
   }
 
   @Test

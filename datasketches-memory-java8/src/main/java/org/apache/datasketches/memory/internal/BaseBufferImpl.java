@@ -45,12 +45,12 @@ public abstract class BaseBufferImpl extends BaseStateImpl implements BaseBuffer
   private long pos = 0;
   private long end;
 
-  //Pass-through ctor
-  BaseBufferImpl(final Object unsafeObj, final long nativeBaseOffset,
-      final long regionOffset, final long capacityBytes) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
+  //Pass-through constructor
+  BaseBufferImpl(final long capacityBytes) {
+    super();
     capacity = end = capacityBytes;
   }
+
 
   @Override
   public final BaseBufferImpl incrementPosition(final long increment) {

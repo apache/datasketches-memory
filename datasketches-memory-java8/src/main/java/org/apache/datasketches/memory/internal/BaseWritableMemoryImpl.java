@@ -74,11 +74,8 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
     EMPTY_BYTES = new byte[1024];
   }
 
-  //Pass-through ctor
-  BaseWritableMemoryImpl(final Object unsafeObj, final long nativeBaseOffset,
-      final long regionOffset, final long capacityBytes) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
-  }
+  //Pass-through constructor
+  BaseWritableMemoryImpl() { }
 
   /**
    * The static constructor that chooses the correct Heap leaf node based on the byte order.
@@ -92,10 +89,11 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
    */
   public static BaseWritableMemoryImpl wrapHeapArray(final Object arr, final long offsetBytes, final long lengthBytes,
       final boolean localReadOnly, final ByteOrder byteOrder, final MemoryRequestServer memReqSvr) {
-    final int typeId = localReadOnly ? READONLY : 0;
+    final long cumOffsetBytes = UnsafeUtil.getArrayBaseOffset(arr.getClass()) + offsetBytes;
+    final int typeId = (localReadOnly ? READONLY : 0);
     return Util.isNativeByteOrder(byteOrder)
-        ? new HeapWritableMemoryImpl(arr, offsetBytes, lengthBytes, typeId, memReqSvr)
-        : new HeapNonNativeWritableMemoryImpl(arr, offsetBytes, lengthBytes, typeId, memReqSvr);
+        ? new HeapWritableMemoryImpl(arr, offsetBytes, lengthBytes, typeId, cumOffsetBytes)
+        : new HeapNonNativeWritableMemoryImpl(arr, offsetBytes, lengthBytes, typeId, cumOffsetBytes);
   }
 
   /**
@@ -163,30 +161,31 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
 
   //REGIONS
   @Override
-  public Memory region(final long offsetBytes, final long capacityBytes, final ByteOrder byteOrder) {
-    return writableRegionImpl(offsetBytes, capacityBytes, true, byteOrder);
+  public Memory region(final long regionOffsetBytes, final long capacityBytes, final ByteOrder byteOrder) {
+    return writableRegionImpl(regionOffsetBytes, capacityBytes, true, byteOrder);
   }
 
   @Override
-  public WritableMemory writableRegion(final long offsetBytes, final long capacityBytes, final ByteOrder byteOrder) {
-    return writableRegionImpl(offsetBytes, capacityBytes, false, byteOrder);
+  public WritableMemory writableRegion(final long regionOffsetBytes, final long capacityBytes,
+      final ByteOrder byteOrder) {
+    return writableRegionImpl(regionOffsetBytes, capacityBytes, false, byteOrder);
   }
 
-  WritableMemory writableRegionImpl(final long offsetBytes, final long capacityBytes,
+  private WritableMemory writableRegionImpl(final long regionOffsetBytes, final long capacityBytes,
       final boolean localReadOnly, final ByteOrder byteOrder) {
     if (isReadOnly() && !localReadOnly) {
       throw new ReadOnlyException("Writable region of a read-only Memory is not allowed.");
     }
-    negativeCheck(offsetBytes, "offsetBytes must be >= 0");
+    negativeCheck(regionOffsetBytes, "offsetBytes must be >= 0");
     negativeCheck(capacityBytes, "capacityBytes must be >= 0");
     Objects.requireNonNull(byteOrder, "byteOrder must be non-null.");
-    checkValidAndBounds(offsetBytes, capacityBytes);
-    final boolean readOnly = isReadOnly() || localReadOnly;
-    return toWritableRegion(offsetBytes, capacityBytes, readOnly, byteOrder);
+    checkValidAndBounds(regionOffsetBytes, capacityBytes);
+    final boolean finalReadOnly = isReadOnly() || localReadOnly;
+    return toWritableRegion(regionOffsetBytes, capacityBytes, finalReadOnly, byteOrder);
   }
 
   abstract BaseWritableMemoryImpl toWritableRegion(
-      long offsetBytes, long capcityBytes, boolean readOnly, ByteOrder byteOrder);
+      long regionOffsetBytes, long capacityBytes, boolean finalReadOnly, ByteOrder byteOrder);
 
   //AS BUFFER
   @Override
@@ -199,19 +198,19 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
     return asWritableBuffer(false, byteOrder);
   }
 
-  WritableBuffer asWritableBuffer(final boolean localReadOnly, final ByteOrder byteOrder) {
+  private WritableBuffer asWritableBuffer(final boolean localReadOnly, final ByteOrder byteOrder) {
     Objects.requireNonNull(byteOrder, "byteOrder must be non-null");
     if (isReadOnly() && !localReadOnly) {
       throw new ReadOnlyException(
           "Converting a read-only Memory to a writable Buffer is not allowed.");
     }
-    final boolean readOnly = isReadOnly() || localReadOnly;
-    final WritableBuffer wbuf = toWritableBuffer(readOnly, byteOrder);
+    final boolean finalReadOnly = isReadOnly() || localReadOnly;
+    final WritableBuffer wbuf = toWritableBuffer(finalReadOnly, byteOrder);
     wbuf.setStartPositionEnd(0, 0, getCapacity());
     return wbuf;
   }
 
-  abstract BaseWritableBufferImpl toWritableBuffer(boolean readOnly, ByteOrder byteOrder);
+  abstract BaseWritableBufferImpl toWritableBuffer(boolean finalReadOnly, ByteOrder byteOrder);
 
   //PRIMITIVE getX() and getXArray()
   @Override
@@ -258,7 +257,7 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
   public final int getCharsFromUtf8(final long offsetBytes, final int utf8LengthBytes,
       final Appendable dst) throws IOException, Utf8CodingException {
     checkValidAndBounds(offsetBytes, utf8LengthBytes);
-    return Utf8.getCharsFromUtf8(offsetBytes, utf8LengthBytes, dst, getCumulativeOffset(),
+    return Utf8.getCharsFromUtf8(offsetBytes, utf8LengthBytes, dst, getCumulativeOffset(0),
         getUnsafeObject());
   }
 
@@ -371,7 +370,7 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
   @Override
   public final long putCharsToUtf8(final long offsetBytes, final CharSequence src) {
     checkValid();
-    return Utf8.putCharsToUtf8(offsetBytes, src, getCapacity(), getCumulativeOffset(),
+    return Utf8.putCharsToUtf8(offsetBytes, src, getCapacity(), getCumulativeOffset(0),
         getUnsafeObject());
   }
 

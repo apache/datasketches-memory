@@ -61,11 +61,8 @@ import org.apache.datasketches.memory.WritableMemory;
 @SuppressWarnings("restriction")
 public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements WritableBuffer {
 
-  //Pass-through ctor
-  BaseWritableBufferImpl(final Object unsafeObj, final long nativeBaseOffset,
-      final long regionOffset, final long capacityBytes) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
-  }
+  //Pass-through constructor
+  BaseWritableBufferImpl(final long capacityBytes) { super(capacityBytes); }
 
   /**
    * The static constructor that chooses the correct ByteBuffer leaf node based on the byte order.
@@ -154,8 +151,8 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
     if (isReadOnly() && !localReadOnly) {
       throw new ReadOnlyException("Writable duplicate of a read-only Buffer is not allowed.");
     }
-    final boolean readOnly = isReadOnly() || localReadOnly;
-    final WritableBuffer wbuf = toDuplicate(readOnly, byteOrder);
+    final boolean finalReadOnly = isReadOnly() || localReadOnly;
+    final WritableBuffer wbuf = toDuplicate(finalReadOnly, byteOrder);
     wbuf.setStartPositionEnd(getStart(), getPosition(), getEnd());
     return wbuf;
   }
@@ -179,8 +176,8 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
       throw new ReadOnlyException(
           "Converting a read-only Buffer to a writable Memory is not allowed.");
     }
-    final boolean readOnly = isReadOnly() || localReadOnly;
-    final WritableMemory wmem = toWritableMemory(readOnly, byteOrder);
+    final boolean finalReadOnly = isReadOnly() || localReadOnly;
+    final WritableMemory wmem = toWritableMemory(finalReadOnly, byteOrder);
     return wmem;
   }
 

@@ -49,14 +49,14 @@ final class MapWritableMemoryImpl extends NativeWritableMemoryImpl {
   }
 
   @Override
-  BaseWritableMemoryImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
+  BaseWritableMemoryImpl toWritableRegion(final long regionOffsetBytes, final long capacityBytes,
       final boolean readOnly, final ByteOrder byteOrder) {
     final int type = setReadOnlyType(typeId, readOnly) | REGION;
     return Util.isNativeByteOrder(byteOrder)
         ? new MapWritableMemoryImpl(
-            nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, type, valid)
+            nativeBaseOffset, getRegionOffset(regionOffsetBytes), capacityBytes, type, valid)
         : new MapNonNativeWritableMemoryImpl(
-            nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, type, valid);
+            nativeBaseOffset, getRegionOffset(regionOffsetBytes), capacityBytes, type, valid);
   }
 
   @Override

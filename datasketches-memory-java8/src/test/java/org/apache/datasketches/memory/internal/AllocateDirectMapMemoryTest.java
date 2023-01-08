@@ -23,7 +23,7 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.Util.*;
+import static org.apache.datasketches.memory.internal.Util.getResourceFile;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -55,6 +55,37 @@ public class AllocateDirectMapMemoryTest {
       rh.close();
     }
   }
+
+  @Test
+  public void simpleMap2() throws Exception {
+    File file = getResourceFile("GettysburgAddress.txt");
+    try (
+        MapHandle rh =
+        Memory.map(file)
+        )
+    {
+      Memory mem = rh.get();
+      println("Mem Cap: " + mem.getCapacity());
+      println("Cum Offset: " + mem.getCumulativeOffset(0));
+      println("Region Offset: " + mem.getRegionOffset());
+      StringBuilder sb = new StringBuilder();
+      mem.getCharsFromUtf8(43, 176, sb);
+      println(sb.toString());
+
+      Memory mem2 = mem.region(38, 12);
+      println("Mem Cap: " + mem2.getCapacity());
+      println("Cum Offset: " + mem2.getCumulativeOffset(0));
+      println("Region Offset: " + mem2.getRegionOffset());
+      StringBuilder sb2 = new StringBuilder();
+      mem2.getCharsFromUtf8(0, 12, sb2);
+      println(sb2.toString());
+
+
+
+      rh.close();
+    }
+  }
+
 
   @Test
   public void testIllegalArguments() throws Exception {
@@ -163,7 +194,7 @@ public class AllocateDirectMapMemoryTest {
    */
   static void print(final Object o) {
     if (o != null) {
-      //System.out.print(o.toString()); //disable here
+      System.out.print(o.toString()); //disable here
     }
   }
 

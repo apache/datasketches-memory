@@ -105,9 +105,9 @@ public class BaseStateTest {
 
   @Test
   public void checkIsNativeByteOrder() {
-    assertTrue(BaseStateImpl.isNativeByteOrder(ByteOrder.nativeOrder()));
+    assertTrue(Util.isNativeByteOrder(ByteOrder.nativeOrder()));
     try {
-      BaseStateImpl.isNativeByteOrder(null);
+      Util.isNativeByteOrder(null);
       fail();
     } catch (final IllegalArgumentException e) {}
   }

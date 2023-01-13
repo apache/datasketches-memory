@@ -31,76 +31,134 @@ import org.apache.datasketches.memory.WritableBuffer;
  * @author Lee Rhodes
  */
 final class DirectNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
-  private static final int id = BUFFER | NONNATIVE | DIRECT;
-  private final long nativeBaseOffset; //used to compute cumBaseOffset
-  private final StepBoolean valid; //a reference only
+  private final long nativeBaseOffset;
+  private final long offsetBytes;
+  private final long capacityBytes;
+  private final int typeId;
+  private long cumOffsetBytes;
+  private long regionOffsetBytes;
   private final MemoryRequestServer memReqSvr;
-  private final byte typeId;
+  private final StepBoolean valid; //a reference only
 
   DirectNonNativeWritableBufferImpl(
       final long nativeBaseOffset,
-      final long regionOffset,
+      final long offsetBytes,
       final long capacityBytes,
       final int typeId,
-      final StepBoolean valid,
-      final MemoryRequestServer memReqSvr) {
-    super(null, nativeBaseOffset, regionOffset, capacityBytes);
+      final long cumOffsetBytes,
+      final MemoryRequestServer memReqSvr,
+      final StepBoolean valid) {
+    super(capacityBytes);
     this.nativeBaseOffset = nativeBaseOffset;
-    this.valid = valid;
+    this.offsetBytes = offsetBytes;
+    this.capacityBytes = capacityBytes;
+    this.typeId = removeNnBuf(typeId) | DIRECT | BUFFER | NONNATIVE; //initially cannot be ReadOnly
+    this.cumOffsetBytes = cumOffsetBytes;
+    this.regionOffsetBytes = 0;
     this.memReqSvr = memReqSvr;
-    this.typeId = (byte) (id | (typeId & 0x7));
+    this.valid = valid;
   }
 
   @Override
-  BaseWritableBufferImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
-      final boolean readOnly, final ByteOrder byteOrder) {
-    final int type = setReadOnlyType(typeId, readOnly) | REGION;
-    return Util.isNativeByteOrder(byteOrder)
-        ? new DirectWritableBufferImpl(
-            nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, type, valid, memReqSvr)
-        : new DirectNonNativeWritableBufferImpl(
-            nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, type, valid, memReqSvr);
-  }
-
-  @Override
-  BaseWritableBufferImpl toDuplicate(final boolean readOnly, final ByteOrder byteOrder) {
-    final int type = setReadOnlyType(typeId, readOnly) | DUPLICATE;
-    return Util.isNativeByteOrder(byteOrder)
-        ? new DirectWritableBufferImpl(
-            nativeBaseOffset, getRegionOffset(), getCapacity(), type, valid, memReqSvr)
-        : new DirectNonNativeWritableBufferImpl(
-            nativeBaseOffset, getRegionOffset(), getCapacity(), type, valid, memReqSvr);
+  BaseWritableBufferImpl toWritableRegion(
+      final long regionOffsetBytes,
+      final long capacityBytes,
+      final boolean readOnly,
+      final ByteOrder byteOrder) {
+    this.regionOffsetBytes = regionOffsetBytes;
+    final long newOffsetBytes = offsetBytes + regionOffsetBytes;
+    cumOffsetBytes += regionOffsetBytes;
+    int typeIdOut = removeNnBuf(typeId) | BUFFER | REGION | (readOnly ? READONLY : 0);
+    if (Util.isNativeByteOrder(byteOrder)) {
+      typeIdOut |= NATIVE;
+      return new DirectWritableBufferImpl(
+          nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr, valid);
+    } else {
+      typeIdOut |= NONNATIVE;
+      return new DirectNonNativeWritableBufferImpl(
+          nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr, valid);
+    }
   }
 
   @Override
   BaseWritableMemoryImpl toWritableMemory(final boolean readOnly, final ByteOrder byteOrder) {
-    final int type = setReadOnlyType(typeId, readOnly);
-    return Util.isNativeByteOrder(byteOrder)
-        ? new DirectWritableMemoryImpl(
-            nativeBaseOffset, getRegionOffset(), getCapacity(), type, valid, memReqSvr)
-        : new DirectNonNativeWritableMemoryImpl(
-            nativeBaseOffset, getRegionOffset(), getCapacity(), type, valid, memReqSvr);
+    int typeIdOut = removeNnBuf(typeId) | MEMORY | (readOnly ? READONLY : 0);
+
+    if (byteOrder == ByteOrder.nativeOrder()) {
+      typeIdOut |= NATIVE;
+      return new DirectWritableMemoryImpl(
+          nativeBaseOffset, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr, valid);
+    } else {
+      typeIdOut |= NONNATIVE;
+      return new DirectNonNativeWritableMemoryImpl(
+          nativeBaseOffset, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr, valid);
+    }
   }
 
   @Override
-  public MemoryRequestServer getMemoryRequestServer() {
-    assertValid();
-    return memReqSvr;
-  }
+  BaseWritableBufferImpl toDuplicate(final boolean readOnly, final ByteOrder byteOrder) {
+    int typeIdOut = removeNnBuf(typeId) | BUFFER | DUPLICATE | (readOnly ? READONLY : 0);
 
-  @Override
-  long getNativeBaseOffset() {
-    return nativeBaseOffset;
-  }
-
-  @Override
-  int getTypeId() {
-    return typeId & 0xff;
+    if (byteOrder == ByteOrder.nativeOrder()) {
+      typeIdOut |= NATIVE;
+      return new DirectWritableBufferImpl(
+          nativeBaseOffset, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr, valid);
+    } else {
+      typeIdOut |= NONNATIVE;
+      return new DirectNonNativeWritableBufferImpl(
+          nativeBaseOffset, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr, valid);
+    }
   }
 
   @Override
   public boolean isValid() {
     return valid.get();
+  }
+
+  @Override
+  public long getCapacity() {
+    assertValid();
+    return capacityBytes;
+  }
+
+  @Override
+  public long getCumulativeOffset() {
+    assertValid();
+    return cumOffsetBytes;
+  }
+
+  @Override
+  public MemoryRequestServer getMemoryRequestServer() {
+    return memReqSvr;
+  }
+
+  @Override
+  public long getNativeBaseOffset() {
+    return nativeBaseOffset;
+  }
+
+  @Override
+  public long getOffset() {
+    assertValid();
+    return offsetBytes;
+  }
+
+  @Override
+  public long getRegionOffset() {
+    assertValid();
+    return regionOffsetBytes;
+  }
+
+  @Override
+  int getTypeId() {
+    assertValid();
+    return typeId;
+  }
+
+  @Override
+  Object getUnsafeObject() {
+    assertValid();
+    return null;
   }
 
 }

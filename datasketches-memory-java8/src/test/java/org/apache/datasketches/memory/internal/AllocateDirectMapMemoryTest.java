@@ -59,28 +59,28 @@ public class AllocateDirectMapMemoryTest {
   @Test
   public void simpleMap2() throws Exception {
     File file = getResourceFile("GettysburgAddress.txt");
-    try (
-        MapHandle rh =
-        Memory.map(file)
-        )
+    try (MapHandle rh = Memory.map(file))
     {
       Memory mem = rh.get();
-      println("Mem Cap: " + mem.getCapacity());
+      println("Mem Cap:    " + mem.getCapacity());
+      println("Native Off: " + ((BaseStateImpl)mem).getNativeBaseOffset());
+      println("Offset:     " + ((BaseStateImpl)mem).getOffset());
       println("Cum Offset: " + mem.getCumulativeOffset(0));
       println("Region Offset: " + mem.getRegionOffset());
       StringBuilder sb = new StringBuilder();
       mem.getCharsFromUtf8(43, 176, sb);
       println(sb.toString());
 
-      Memory mem2 = mem.region(38, 12);
+      println("");
+      Memory mem2 = mem.region(43+76, 20);
       println("Mem Cap: " + mem2.getCapacity());
+      println("Native Off: " + ((BaseStateImpl)mem).getNativeBaseOffset());
+      println("Offset:     " + ((BaseStateImpl)mem).getOffset());
       println("Cum Offset: " + mem2.getCumulativeOffset(0));
       println("Region Offset: " + mem2.getRegionOffset());
       StringBuilder sb2 = new StringBuilder();
       mem2.getCharsFromUtf8(0, 12, sb2);
       println(sb2.toString());
-
-
 
       rh.close();
     }
@@ -194,7 +194,7 @@ public class AllocateDirectMapMemoryTest {
    */
   static void print(final Object o) {
     if (o != null) {
-      System.out.print(o.toString()); //disable here
+      //System.out.print(o.toString()); //disable here
     }
   }
 

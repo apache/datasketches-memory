@@ -31,42 +31,83 @@ import org.apache.datasketches.memory.WritableMemory;
  * @author Lee Rhodes
  */
 final class MapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
-  private static final int id = MEMORY | NONNATIVE | MAP;
-  private final long nativeBaseOffset; //used to compute cumBaseOffset
+  private final long nativeBaseOffset;
+  private final long offsetBytes;
+  private final long capacityBytes;
+  private final int typeId;
+  private long cumOffsetBytes;
+  private long regionOffsetBytes;
   private final StepBoolean valid; //a reference only
-  private final byte typeId;
 
   MapNonNativeWritableMemoryImpl(
       final long nativeBaseOffset,
-      final long regionOffset,
+      final long offsetBytes,
       final long capacityBytes,
       final int typeId,
+      final long cumOffsetBytes,
       final StepBoolean valid) {
-    super(null, nativeBaseOffset, regionOffset, capacityBytes);
+    super();
     this.nativeBaseOffset = nativeBaseOffset;
+    this.offsetBytes = offsetBytes;
+    this.capacityBytes = capacityBytes;
+    this.typeId = removeNnBuf(typeId) | MAP | MEMORY | NONNATIVE;
+    this.cumOffsetBytes = cumOffsetBytes;
+    this.regionOffsetBytes = 0;
     this.valid = valid;
-    this.typeId = (byte) (id | (typeId & 0x7));
   }
 
   @Override
-  BaseWritableMemoryImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
-      final boolean readOnly, final ByteOrder byteOrder) {
-    final int type = setReadOnlyType(typeId, readOnly) | REGION;
-    return Util.isNativeByteOrder(byteOrder)
-        ? new MapWritableMemoryImpl(
-            nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, type, valid)
-        : new MapNonNativeWritableMemoryImpl(
-            nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, type, valid);
+  BaseWritableMemoryImpl toWritableRegion(
+      final long regionOffsetBytes,
+      final long capacityBytes,
+      final boolean readOnly,
+      final ByteOrder byteOrder) {
+    this.regionOffsetBytes = regionOffsetBytes;
+    final long newOffsetBytes = offsetBytes + regionOffsetBytes;
+    cumOffsetBytes += regionOffsetBytes;
+    int typeIdOut = removeNnBuf(typeId) | MAP | REGION | (readOnly ? READONLY : 0);
+
+    if (Util.isNativeByteOrder(byteOrder)) {
+      typeIdOut |= NATIVE;
+      return new MapWritableMemoryImpl(
+          nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, valid);
+    } else {
+      typeIdOut |= NONNATIVE;
+      return new MapNonNativeWritableMemoryImpl(
+          nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, valid);
+    }
   }
 
   @Override
   BaseWritableBufferImpl toWritableBuffer(final boolean readOnly, final ByteOrder byteOrder) {
-    final int type = setReadOnlyType(typeId, readOnly);
-    return Util.isNativeByteOrder(byteOrder)
-        ? new MapWritableBufferImpl(
-            nativeBaseOffset, getRegionOffset(), getCapacity(), type, valid)
-        : new MapNonNativeWritableBufferImpl(
-            nativeBaseOffset, getRegionOffset(), getCapacity(), type, valid);
+    int typeIdOut = removeNnBuf(typeId) | BUFFER | (readOnly ? READONLY : 0);
+
+    if (byteOrder == ByteOrder.nativeOrder()) {
+      typeIdOut |= NATIVE;
+      return new MapWritableBufferImpl(
+          nativeBaseOffset, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, valid);
+    } else {
+      typeIdOut |= NONNATIVE;
+      return new MapNonNativeWritableBufferImpl(
+          nativeBaseOffset, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, valid);
+    }
+  }
+
+  @Override
+  public boolean isValid() {
+    return valid.get();
+  }
+
+  @Override
+  public long getCapacity() {
+    assertValid();
+    return capacityBytes;
+  }
+
+  @Override
+  public long getCumulativeOffset() {
+    assertValid();
+    return cumOffsetBytes;
   }
 
   @Override
@@ -75,18 +116,32 @@ final class MapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
   }
 
   @Override
-  long getNativeBaseOffset() {
+  public long getNativeBaseOffset() {
     return nativeBaseOffset;
   }
 
   @Override
-  int getTypeId() {
-    return typeId & 0xff;
+  public long getOffset() {
+    assertValid();
+    return offsetBytes;
   }
 
   @Override
-  public boolean isValid() {
-    return valid.get();
+  public long getRegionOffset() {
+    assertValid();
+    return regionOffsetBytes;
+  }
+
+  @Override
+  int getTypeId() {
+    assertValid();
+    return typeId;
+  }
+
+  @Override
+  Object getUnsafeObject() {
+    assertValid();
+    return null;
   }
 
 }

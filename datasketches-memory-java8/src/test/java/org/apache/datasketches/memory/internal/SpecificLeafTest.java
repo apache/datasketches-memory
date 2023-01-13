@@ -46,8 +46,10 @@ public class SpecificLeafTest {
     bb.order(ByteOrder.nativeOrder());
 
     Memory mem = Memory.wrap(bb).region(0, bytes, ByteOrder.nativeOrder());
-
-    assertTrue(((BaseStateImpl)mem).isByteBufferType(((BaseStateImpl)mem).getTypeId()));
+    BaseStateImpl bsi = (BaseStateImpl)mem;
+    int typeId = bsi.getTypeId();
+    assertTrue(bsi.isByteBufferType(typeId));
+    assertTrue(bsi.isNativeType(typeId));
     assertTrue(mem.isReadOnly());
     checkCrossLeafTypeIds(mem);
     Buffer buf = mem.asBuffer().region(0, bytes, ByteOrder.nativeOrder());
@@ -91,6 +93,33 @@ public class SpecificLeafTest {
   }
 
   @Test
+  public void checkHeapLeafs() {
+    int bytes = 128;
+    Memory mem = Memory.wrap(new byte[bytes]);
+    BaseStateImpl bsi = (BaseStateImpl)mem;
+    int typeId = bsi.getTypeId();
+    assertTrue(bsi.isHeapType(typeId));
+    assertTrue(bsi.isReadOnlyType(typeId));
+    checkCrossLeafTypeIds(mem);
+    Memory nnreg = mem.region(0, bytes, Util.NON_NATIVE_BYTE_ORDER);
+
+    Memory reg = mem.region(0, bytes, ByteOrder.nativeOrder());
+    Buffer buf = reg.asBuffer().region(0, bytes, ByteOrder.nativeOrder());
+    Buffer buf4 = buf.duplicate();
+
+    Memory reg2 = nnreg.region(0, bytes, Util.NON_NATIVE_BYTE_ORDER);
+    Buffer buf2 = reg2.asBuffer().region(0, bytes, Util.NON_NATIVE_BYTE_ORDER);
+    Buffer buf3 = buf2.duplicate();
+
+    assertFalse(((BaseStateImpl)mem).isRegionType(((BaseStateImpl)mem).getTypeId()));
+    assertTrue(((BaseStateImpl)reg2).isRegionType(((BaseStateImpl)reg2).getTypeId()));
+    assertTrue(((BaseStateImpl)buf).isRegionType(((BaseStateImpl)buf).getTypeId()));
+    assertTrue(((BaseStateImpl)buf2).isRegionType(((BaseStateImpl)buf2).getTypeId()));
+    assertTrue(((BaseStateImpl)buf3).isDuplicateType(((BaseStateImpl)buf3).getTypeId()));
+    assertTrue(((BaseStateImpl)buf4).isDuplicateType(((BaseStateImpl)buf4).getTypeId()));
+  }
+
+  @Test
   public void checkMapLeafs() throws Exception {
     File file = new File("TestFile2.bin");
     if (file.exists()) {
@@ -108,7 +137,7 @@ public class SpecificLeafTest {
     final long bytes = 128;
 
     try (WritableMapHandle h = WritableMemory.writableMap(file, 0L, bytes, ByteOrder.nativeOrder())) {
-      WritableMemory mem = h.getWritable(); //native mem
+      WritableMemory mem = h.getWritable();
       assertTrue(((BaseStateImpl)mem).isMapType(((BaseStateImpl)mem).getTypeId()));
       assertFalse(mem.isReadOnly());
       checkCrossLeafTypeIds(mem);
@@ -131,35 +160,18 @@ public class SpecificLeafTest {
     }
   }
 
-  @Test
-  public void checkHeapLeafs() {
-    int bytes = 128;
-    Memory mem = Memory.wrap(new byte[bytes]);
-    assertTrue(((BaseStateImpl)mem).isHeapType(((BaseStateImpl)mem).getTypeId()));
-    assertTrue(((BaseStateImpl)mem).isReadOnlyType(((BaseStateImpl)mem).getTypeId()));
-    checkCrossLeafTypeIds(mem);
-    Memory nnreg = mem.region(0, bytes, Util.NON_NATIVE_BYTE_ORDER);
-
-    Memory reg = mem.region(0, bytes, ByteOrder.nativeOrder());
-    Buffer buf = reg.asBuffer().region(0, bytes, ByteOrder.nativeOrder());
-    Buffer buf4 = buf.duplicate();
-
-    Memory reg2 = nnreg.region(0, bytes, Util.NON_NATIVE_BYTE_ORDER);
-    Buffer buf2 = reg2.asBuffer().region(0, bytes, Util.NON_NATIVE_BYTE_ORDER);
-    Buffer buf3 = buf2.duplicate();
-
-    assertFalse(((BaseStateImpl)mem).isRegionType(((BaseStateImpl)mem).getTypeId()));
-    assertTrue(((BaseStateImpl)reg2).isRegionType(((BaseStateImpl)reg2).getTypeId()));
-    assertTrue(((BaseStateImpl)buf).isRegionType(((BaseStateImpl)buf).getTypeId()));
-    assertTrue(((BaseStateImpl)buf2).isRegionType(((BaseStateImpl)buf2).getTypeId()));
-    assertTrue(((BaseStateImpl)buf3).isDuplicateType(((BaseStateImpl)buf3).getTypeId()));
-    assertTrue(((BaseStateImpl)buf4).isDuplicateType(((BaseStateImpl)buf4).getTypeId()));
-  }
+//  static void theId(Memory mem) {
+//    int typeId = ((BaseStateImpl)mem).getTypeId();
+//    System.out.println(BaseStateImpl.typeDecode(typeId));
+//  }
+//  static void theId(Buffer buf) {
+//    int typeId = ((BaseStateImpl)buf).getTypeId();
+//    System.out.println(BaseStateImpl.typeDecode(typeId));
+//  }
 
   private static void checkCrossLeafTypeIds(Memory mem) {
     Memory reg1 = mem.region(0, mem.getCapacity());
     assertTrue(((BaseStateImpl)reg1).isRegionType(((BaseStateImpl)reg1).getTypeId()));
-
     Buffer buf1 = reg1.asBuffer();
     assertTrue(((BaseStateImpl)buf1).isRegionType(((BaseStateImpl)buf1).getTypeId()));
     assertTrue(((BaseStateImpl)buf1).isBufferType(((BaseStateImpl)buf1).getTypeId()));

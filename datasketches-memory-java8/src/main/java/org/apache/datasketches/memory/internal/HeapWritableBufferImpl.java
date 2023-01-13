@@ -37,13 +37,15 @@ final class HeapWritableBufferImpl extends NativeWritableBufferImpl {
   private final int typeId;
   private long cumOffsetBytes;
   private long regionOffsetBytes;
+  private final MemoryRequestServer memReqSvr;
 
   HeapWritableBufferImpl(
       final Object unsafeObj,
       final long offsetBytes,
       final long capacityBytes,
       final int typeId,
-      final long cumOffsetBytes) {
+      final long cumOffsetBytes,
+      final MemoryRequestServer memReqSvr) {
     super(capacityBytes);
     this.unsafeObj = unsafeObj;
     this.offsetBytes = offsetBytes;
@@ -51,6 +53,7 @@ final class HeapWritableBufferImpl extends NativeWritableBufferImpl {
     this.typeId = removeNnBuf(typeId) | HEAP | BUFFER | NATIVE;
     this.cumOffsetBytes = cumOffsetBytes;
     this.regionOffsetBytes = 0;
+    this.memReqSvr = memReqSvr;
   }
 
   @Override
@@ -59,31 +62,19 @@ final class HeapWritableBufferImpl extends NativeWritableBufferImpl {
       final long capacityBytes,
       final boolean readOnly,
       final ByteOrder byteOrder) {
-    final Object unsafeObj = this.unsafeObj;
-    final long newOffsetBytes = this.offsetBytes + regionOffsetBytes;
+    this.regionOffsetBytes = regionOffsetBytes;
+    final long newOffsetBytes = offsetBytes + regionOffsetBytes;
     this.cumOffsetBytes += regionOffsetBytes;
     int typeIdOut = removeNnBuf(typeId) | BUFFER | REGION | (readOnly ? READONLY : 0);
+
     if (Util.isNativeByteOrder(byteOrder)) {
       typeIdOut |= NATIVE;
-      return new HeapWritableBufferImpl(unsafeObj, newOffsetBytes, capacityBytes, typeIdOut, cumOffsetBytes);
-    } else {
-      typeIdOut |= NONNATIVE;
-      return new HeapNonNativeWritableBufferImpl(unsafeObj, newOffsetBytes, capacityBytes, typeIdOut, cumOffsetBytes);
-    }
-  }
-
-  @Override
-  BaseWritableBufferImpl toDuplicate(final boolean readOnly, final ByteOrder byteOrder) {
-    int typeIdOut = removeNnBuf(typeId) | BUFFER | DUPLICATE | (readOnly ? READONLY : 0);
-
-    if (byteOrder == ByteOrder.nativeOrder()) {
-      typeIdOut |= NATIVE;
       return new HeapWritableBufferImpl(
-          unsafeObj, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes);
+          unsafeObj, newOffsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr);
     } else {
       typeIdOut |= NONNATIVE;
       return new HeapNonNativeWritableBufferImpl(
-          unsafeObj, regionOffsetBytes, capacityBytes, typeIdOut, cumOffsetBytes);
+          unsafeObj, newOffsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr);
     }
   }
 
@@ -94,11 +85,26 @@ final class HeapWritableBufferImpl extends NativeWritableBufferImpl {
     if (byteOrder == ByteOrder.nativeOrder()) {
       typeIdOut |= NATIVE;
       return new HeapWritableMemoryImpl(
-          unsafeObj, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes);
+          unsafeObj, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr);
     } else {
       typeIdOut |= NONNATIVE;
       return new HeapNonNativeWritableMemoryImpl(
-          unsafeObj, regionOffsetBytes, capacityBytes, typeIdOut, cumOffsetBytes);
+          unsafeObj, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr);
+    }
+  }
+
+  @Override
+  BaseWritableBufferImpl toDuplicate(final boolean readOnly, final ByteOrder byteOrder) {
+    int typeIdOut = removeNnBuf(typeId) | BUFFER | DUPLICATE | (readOnly ? READONLY : 0);
+
+    if (byteOrder == ByteOrder.nativeOrder()) {
+      typeIdOut |= NATIVE;
+      return new HeapWritableBufferImpl(
+          unsafeObj, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr);
+    } else {
+      typeIdOut |= NONNATIVE;
+      return new HeapNonNativeWritableBufferImpl(
+          unsafeObj, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr);
     }
   }
 
@@ -116,12 +122,18 @@ final class HeapWritableBufferImpl extends NativeWritableBufferImpl {
 
   @Override
   public MemoryRequestServer getMemoryRequestServer() {
-    return null;
+    return memReqSvr;
   }
 
   @Override
   public long getNativeBaseOffset() {
     return 0;
+  }
+
+  @Override
+  public long getOffset() {
+    assertValid();
+    return offsetBytes;
   }
 
   @Override

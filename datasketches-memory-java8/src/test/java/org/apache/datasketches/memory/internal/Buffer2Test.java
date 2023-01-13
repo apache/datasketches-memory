@@ -50,7 +50,9 @@ public class Buffer2Test {
 
     Buffer buffer = Buffer.wrap(bb.asReadOnlyBuffer().order(ByteOrder.nativeOrder()));
     while (buffer.hasRemaining()) {
-      assertEquals(bb.get(), buffer.getByte());
+      byte a1 = bb.get();
+      byte b1 = buffer.getByte();
+      assertEquals(a1, b1);
     }
 
     assertEquals(true, buffer.hasArray());

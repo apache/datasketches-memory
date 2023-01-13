@@ -48,7 +48,7 @@ final class AccessByteBuffer {
 
   final long nativeBaseOffset;
   final long capacityBytes;
-  final long regionOffset;
+  final long offsetBytes;
   final Object unsafeObj;
   final boolean resourceReadOnly;
   final ByteOrder byteOrder; //not used externally, here for reference.
@@ -65,13 +65,13 @@ final class AccessByteBuffer {
     if (direct) {
       nativeBaseOffset = ((sun.nio.ch.DirectBuffer) byteBuf).address();
       unsafeObj = null;
-      regionOffset = 0L; //address() is already adjusted for direct slices, so regionOffset = 0
+      offsetBytes = 0L; //address() is already adjusted for direct slices, so regionOffset = 0
     } else {
       nativeBaseOffset = 0L;
       // ByteBuffer.arrayOffset() and ByteBuffer.array() throw ReadOnlyBufferException if
       // ByteBuffer is read-only. This uses reflection for both writable and read-only cases.
       // Includes the slice() offset for heap.
-      regionOffset = unsafe.getInt(byteBuf, BYTE_BUFFER_OFFSET_FIELD_OFFSET);
+      offsetBytes = unsafe.getInt(byteBuf, BYTE_BUFFER_OFFSET_FIELD_OFFSET);
       unsafeObj = unsafe.getObject(byteBuf, BYTE_BUFFER_HB_FIELD_OFFSET);
     }
   }
@@ -82,11 +82,11 @@ final class AccessByteBuffer {
    * : wrap(...). See LICENSE.
    */
   static ByteBuffer getDummyReadOnlyDirectByteBuffer(final long address, final int capacity) {
-    final ByteBuffer buf = ZERO_READ_ONLY_DIRECT_BYTE_BUFFER.duplicate();
-    unsafe.putLong(buf, NIO_BUFFER_ADDRESS_FIELD_OFFSET, address);
-    unsafe.putInt(buf, NIO_BUFFER_CAPACITY_FIELD_OFFSET, capacity);
-    buf.limit(capacity);
-    return buf;
+    final ByteBuffer byteBuf = ZERO_READ_ONLY_DIRECT_BYTE_BUFFER.duplicate();
+    unsafe.putLong(byteBuf, NIO_BUFFER_ADDRESS_FIELD_OFFSET, address);
+    unsafe.putInt(byteBuf, NIO_BUFFER_CAPACITY_FIELD_OFFSET, capacity);
+    byteBuf.limit(capacity);
+    return byteBuf;
   }
 
 }

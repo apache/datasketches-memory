@@ -77,11 +77,12 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
       final MemoryRequestServer memReqSvr) {
     final AccessByteBuffer abb = new AccessByteBuffer(byteBuf);
     final int typeId = (abb.resourceReadOnly || localReadOnly) ? READONLY : 0;
+    final long cumOffsetBytes = 0;
     final BaseWritableBufferImpl bwbi = Util.isNativeByteOrder(byteOrder)
         ? new BBWritableBufferImpl(abb.unsafeObj, abb.nativeBaseOffset,
-            abb.regionOffset, abb.capacityBytes, typeId, byteBuf, memReqSvr)
+            abb.offsetBytes, abb.capacityBytes, typeId, cumOffsetBytes, memReqSvr, byteBuf)
         : new BBNonNativeWritableBufferImpl(abb.unsafeObj, abb.nativeBaseOffset,
-            abb.regionOffset, abb.capacityBytes,  typeId, byteBuf, memReqSvr);
+            abb.offsetBytes, abb.capacityBytes,  typeId, cumOffsetBytes, memReqSvr, byteBuf);
     bwbi.setStartPositionEnd(0, byteBuf.position(), byteBuf.limit());
     return bwbi;
   }
@@ -294,7 +295,7 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
   }
 
   /*
-   * Develper notes: There is no copyTo for Buffers because of the ambiguity of what to do with
+   * Developer notes: There is no copyTo for Buffers because of the ambiguity of what to do with
    * the positional values. Switch to MemoryImpl view to do copyTo.
    */
 

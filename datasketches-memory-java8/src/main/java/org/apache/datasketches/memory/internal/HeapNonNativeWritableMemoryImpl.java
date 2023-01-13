@@ -37,13 +37,15 @@ final class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl 
   private final int typeId;
   private long cumOffsetBytes;
   private long regionOffsetBytes;
+  private final MemoryRequestServer memReqSvr;
 
   HeapNonNativeWritableMemoryImpl(
       final Object unsafeObj,
       final long offsetBytes,
       final long capacityBytes,
       final int typeId,
-      final long cumOffsetBytes) {
+      final long cumOffsetBytes,
+      final MemoryRequestServer memReqSvr) {
     super();
     this.unsafeObj = unsafeObj;
     this.offsetBytes = offsetBytes;
@@ -51,6 +53,7 @@ final class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl 
     this.typeId = removeNnBuf(typeId) | HEAP | MEMORY | NONNATIVE;
     this.cumOffsetBytes = cumOffsetBytes;
     this.regionOffsetBytes = 0;
+    this.memReqSvr = memReqSvr;
   }
 
   @Override
@@ -59,16 +62,19 @@ final class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl 
       final long capacityBytes,
       final boolean readOnly,
       final ByteOrder byteOrder) {
-    final Object unsafeObj = this.unsafeObj;
-    final long newOffsetBytes = this.offsetBytes + this.regionOffsetBytes;
-    this.cumOffsetBytes += this.regionOffsetBytes;
+    this.regionOffsetBytes = regionOffsetBytes;
+    final long newOffsetBytes = offsetBytes + regionOffsetBytes;
+    this.cumOffsetBytes += regionOffsetBytes;
     int typeIdOut = removeNnBuf(typeId) | MEMORY | REGION | (readOnly ? READONLY : 0);
+
     if (Util.isNativeByteOrder(byteOrder)) {
       typeIdOut |= NATIVE;
-      return new HeapWritableMemoryImpl(unsafeObj, newOffsetBytes, capacityBytes, typeIdOut, cumOffsetBytes);
+      return new HeapWritableMemoryImpl(
+          unsafeObj, newOffsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr);
     } else {
       typeIdOut |= NONNATIVE;
-      return new HeapNonNativeWritableMemoryImpl(unsafeObj, newOffsetBytes, capacityBytes, typeIdOut, cumOffsetBytes);
+      return new HeapNonNativeWritableMemoryImpl(
+          unsafeObj, newOffsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr);
     }
   }
 
@@ -79,11 +85,11 @@ final class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl 
     if (byteOrder == ByteOrder.nativeOrder()) {
       typeIdOut |= NATIVE;
       return new HeapWritableBufferImpl(
-          unsafeObj, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes);
+          unsafeObj, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr);
     } else {
       typeIdOut |= NONNATIVE;
       return new HeapNonNativeWritableBufferImpl(
-          unsafeObj, regionOffsetBytes, capacityBytes, typeIdOut, cumOffsetBytes);
+          unsafeObj, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr);
     }
   }
 
@@ -101,12 +107,18 @@ final class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl 
 
   @Override
   public MemoryRequestServer getMemoryRequestServer() {
-    return null;
+    return memReqSvr;
   }
 
   @Override
   public long getNativeBaseOffset() {
     return 0;
+  }
+
+  @Override
+  public long getOffset() {
+    assertValid();
+    return offsetBytes;
   }
 
   @Override

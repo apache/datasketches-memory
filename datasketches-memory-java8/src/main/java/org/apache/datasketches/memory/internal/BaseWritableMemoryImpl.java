@@ -92,8 +92,8 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
     final long cumOffsetBytes = UnsafeUtil.getArrayBaseOffset(arr.getClass()) + offsetBytes;
     final int typeId = (localReadOnly ? READONLY : 0);
     return Util.isNativeByteOrder(byteOrder)
-        ? new HeapWritableMemoryImpl(arr, offsetBytes, lengthBytes, typeId, cumOffsetBytes)
-        : new HeapNonNativeWritableMemoryImpl(arr, offsetBytes, lengthBytes, typeId, cumOffsetBytes);
+        ? new HeapWritableMemoryImpl(arr, offsetBytes, lengthBytes, typeId, cumOffsetBytes, memReqSvr)
+        : new HeapNonNativeWritableMemoryImpl(arr, offsetBytes, lengthBytes, typeId, cumOffsetBytes, memReqSvr);
   }
 
   /**
@@ -109,11 +109,14 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
       final MemoryRequestServer memReqSvr) {
     final AccessByteBuffer abb = new AccessByteBuffer(byteBuf);
     final int typeId = (abb.resourceReadOnly || localReadOnly) ? READONLY : 0;
+    final long cumOffsetBytes = abb.offsetBytes + (abb.unsafeObj == null
+        ? abb.nativeBaseOffset
+        : UnsafeUtil.getArrayBaseOffset(abb.unsafeObj.getClass()));
     return Util.isNativeByteOrder(byteOrder)
         ? new BBWritableMemoryImpl(abb.unsafeObj, abb.nativeBaseOffset,
-            abb.regionOffset, abb.capacityBytes, typeId, byteBuf, memReqSvr)
+            abb.offsetBytes, abb.capacityBytes, typeId, cumOffsetBytes, memReqSvr, byteBuf)
         : new BBNonNativeWritableMemoryImpl(abb.unsafeObj, abb.nativeBaseOffset,
-            abb.regionOffset, abb.capacityBytes,  typeId, byteBuf, memReqSvr);
+            abb.offsetBytes, abb.capacityBytes,  typeId, cumOffsetBytes, memReqSvr, byteBuf);
   }
 
   /**
@@ -130,11 +133,22 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
     final AllocateDirectWritableMap dirWMap =
         new AllocateDirectWritableMap(file, fileOffsetBytes, capacityBytes, localReadOnly);
     final int typeId = (dirWMap.resourceReadOnly || localReadOnly) ? READONLY : 0;
+    final long cumOffsetBytes = dirWMap.nativeBaseOffset;
     final BaseWritableMemoryImpl wmem = Util.isNativeByteOrder(byteOrder)
-        ? new MapWritableMemoryImpl(dirWMap.nativeBaseOffset, 0L, capacityBytes,
-            typeId, dirWMap.getValid())
-        : new MapNonNativeWritableMemoryImpl(dirWMap.nativeBaseOffset, 0L, capacityBytes,
-            typeId, dirWMap.getValid());
+        ? new MapWritableMemoryImpl(
+            dirWMap.nativeBaseOffset,
+            0L,
+            capacityBytes,
+            typeId,
+            cumOffsetBytes,
+            dirWMap.getValid())
+        : new MapNonNativeWritableMemoryImpl(
+            dirWMap.nativeBaseOffset,
+            0L,
+            capacityBytes,
+            typeId,
+            cumOffsetBytes,
+            dirWMap.getValid());
     return new WritableMapHandleImpl(dirWMap, wmem);
   }
 
@@ -149,11 +163,25 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
       final ByteOrder byteOrder, final MemoryRequestServer memReqSvr) {
     final AllocateDirect direct = new AllocateDirect(capacityBytes);
     final int typeId = 0; //direct is never read-only on construction
+    final long nativeBaseOffset = direct.getNativeBaseOffset();
+    final long cumOffsetBytes = nativeBaseOffset;
     final BaseWritableMemoryImpl wmem = Util.isNativeByteOrder(byteOrder)
-        ? new DirectWritableMemoryImpl(direct.getNativeBaseOffset(), 0L, capacityBytes,
-            typeId, direct.getValid(), memReqSvr)
-        : new DirectNonNativeWritableMemoryImpl(direct.getNativeBaseOffset(), 0L, capacityBytes,
-            typeId, direct.getValid(), memReqSvr);
+        ? new DirectWritableMemoryImpl(
+            nativeBaseOffset,
+            0L,
+            capacityBytes,
+            typeId,
+            cumOffsetBytes,
+            memReqSvr,
+            direct.getValid())
+        : new DirectNonNativeWritableMemoryImpl(
+            nativeBaseOffset,
+            0L,
+            capacityBytes,
+            typeId,
+            cumOffsetBytes,
+            memReqSvr,
+            direct.getValid());
 
     final WritableHandle handle = new WritableDirectHandleImpl(direct, wmem);
     return handle;

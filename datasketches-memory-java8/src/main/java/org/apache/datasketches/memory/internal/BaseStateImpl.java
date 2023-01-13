@@ -183,6 +183,8 @@ public abstract class BaseStateImpl implements BaseState {
   //Overridden by ByteBuffer, Direct and Map leafs
   abstract long getNativeBaseOffset();
 
+  abstract long getOffset();
+
   @Override
   public final ByteOrder getTypeByteOrder() {
     return isNonNativeType(getTypeId()) ? Util.NON_NATIVE_BYTE_ORDER : ByteOrder.nativeOrder();
@@ -394,6 +396,7 @@ public abstract class BaseStateImpl implements BaseState {
    */
   public static final String typeDecode(final int typeId) {
     final StringBuilder sb = new StringBuilder();
+    sb.append(typeId + ": ");
     final int group1 = typeId & 0x7;
     switch (group1) {
       case 1 : sb.append("ReadOnly, "); break;
@@ -410,7 +413,7 @@ public abstract class BaseStateImpl implements BaseState {
       case 0 : sb.append("Heap, "); break;
       case 1 : sb.append("Direct, "); break;
       case 2 : sb.append("Map, "); break;
-      case 3 : sb.append("ByteBuffer, "); break;
+      case 3 : sb.append("Map Direct, "); break;
       default: break;
     }
     final int group3 = (typeId >>> 5) & 0x1;
@@ -421,9 +424,13 @@ public abstract class BaseStateImpl implements BaseState {
     }
     final int group4 = (typeId >>> 6) & 0x1;
     switch (group4) {
-      case 0 : sb.append("Memory"); break;
-      case 1 : sb.append("Buffer"); break;
+      case 0 : sb.append("Memory, "); break;
+      case 1 : sb.append("Buffer, "); break;
       default: break;
+    }
+    final int group5 = (typeId >>> 7) & 0x1;
+    switch (group5) {
+      case 1 : sb.append("ByteBuffer"); break;
     }
     return sb.toString();
   }

@@ -654,9 +654,8 @@ public class NativeWritableMemoryImplTest {
   public void checkCumAndRegionOffset() {
     WritableMemory wmem = WritableMemory.allocate(64);
     WritableMemory reg = wmem.writableRegion(32, 32);
-    assertEquals(reg.getRegionOffset(), 32);
-    assertEquals(reg.getRegionOffset(0), 32);
-    assertEquals(reg.getCumulativeOffset(0), 32 + 16);
+    assertEquals(reg.getTotalOffset(), 32);
+    assertEquals(((BaseStateImpl)reg).getCumulativeOffset(0), 32 + 16);
 
   }
 

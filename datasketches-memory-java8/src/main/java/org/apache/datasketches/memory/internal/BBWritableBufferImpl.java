@@ -32,14 +32,13 @@ import org.apache.datasketches.memory.WritableBuffer;
  * @author Lee Rhodes
  */
 final class BBWritableBufferImpl extends NativeWritableBufferImpl {
-  private final ByteBuffer byteBuf; //holds a reference to a ByteBuffer until we are done with it.
+  private final ByteBuffer byteBuf;    //holds a reference to a ByteBuffer until we are done with it.
   private final Object unsafeObj;
-  private final long nativeBaseOffset;
-  private final long offsetBytes;
+  private final long nativeBaseOffset; //raw off-heap address of root allocation (whether direct or ByteBuffer)
+  private final long offsetBytes;      //from the root resource including original ByteBuffer position or split offset
   private final long capacityBytes;
   private final int typeId;
-  private long cumOffsetBytes;
-  private long regionOffsetBytes;
+  private long cumOffsetBytes;         //includes array header if heap and nativeBaseOffset if off-heap
   private final MemoryRequestServer memReqSvr;
 
   BBWritableBufferImpl(
@@ -58,7 +57,6 @@ final class BBWritableBufferImpl extends NativeWritableBufferImpl {
     this.capacityBytes = capacityBytes;
     this.typeId = removeNnBuf(typeId) | BYTEBUF | BUFFER | NATIVE;
     this.cumOffsetBytes = cumOffsetBytes;
-    this.regionOffsetBytes = 0;
     this.memReqSvr = memReqSvr;
     this.byteBuf = byteBuf;
   }
@@ -69,19 +67,18 @@ final class BBWritableBufferImpl extends NativeWritableBufferImpl {
       final long capacityBytes,
       final boolean readOnly,
       final ByteOrder byteOrder) {
-    this.regionOffsetBytes = regionOffsetBytes;
     final long newOffsetBytes = offsetBytes + regionOffsetBytes;
-    cumOffsetBytes += regionOffsetBytes;
+    final long newCumOffsetBytes = cumOffsetBytes + regionOffsetBytes;
     int typeIdOut = removeNnBuf(typeId) | BUFFER | REGION | (readOnly ? READONLY : 0);
 
     if (Util.isNativeByteOrder(byteOrder)) {
       typeIdOut |= NATIVE;
       return new BBWritableBufferImpl(
-          unsafeObj, nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr, byteBuf);
+          unsafeObj, nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, memReqSvr, byteBuf);
     } else {
       typeIdOut |= NONNATIVE;
       return new BBNonNativeWritableBufferImpl(
-          unsafeObj, nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr, byteBuf);
+          unsafeObj, nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, memReqSvr, byteBuf);
     }
   }
 
@@ -138,15 +135,9 @@ final class BBWritableBufferImpl extends NativeWritableBufferImpl {
   }
 
   @Override
-  public long getOffset() {
+  public long getTotalOffset() {
     assertValid();
     return offsetBytes;
-  }
-
-  @Override
-  public long getRegionOffset() {
-    assertValid();
-    return regionOffsetBytes;
   }
 
   @Override
@@ -159,6 +150,12 @@ final class BBWritableBufferImpl extends NativeWritableBufferImpl {
   Object getUnsafeObject() {
     assertValid();
     return unsafeObj;
+  }
+
+  @Override
+  public ByteBuffer getByteBuffer() {
+    assertValid();
+    return byteBuf;
   }
 
 }

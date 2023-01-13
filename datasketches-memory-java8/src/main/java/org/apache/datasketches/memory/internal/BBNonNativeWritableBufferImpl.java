@@ -39,7 +39,6 @@ final class BBNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   private final long capacityBytes;
   private final int typeId;
   private long cumOffsetBytes;
-  private long regionOffsetBytes;
   private final MemoryRequestServer memReqSvr;
 
   BBNonNativeWritableBufferImpl(
@@ -58,7 +57,6 @@ final class BBNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
     this.capacityBytes = capacityBytes;
     this.typeId = removeNnBuf(typeId) | BYTEBUF | BUFFER | NONNATIVE;
     this.cumOffsetBytes = cumOffsetBytes;
-    this.regionOffsetBytes = 0;
     this.memReqSvr = memReqSvr;
     this.byteBuf = byteBuf;
   }
@@ -69,19 +67,18 @@ final class BBNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
       final long capacityBytes,
       final boolean readOnly,
       final ByteOrder byteOrder) {
-    this.regionOffsetBytes = regionOffsetBytes;
     final long newOffsetBytes = offsetBytes + regionOffsetBytes;
-    cumOffsetBytes += regionOffsetBytes;
+    final long newCumOffsetBytes = cumOffsetBytes + regionOffsetBytes;
     int typeIdOut = removeNnBuf(typeId) | BUFFER | REGION | (readOnly ? READONLY : 0);
 
     if (Util.isNativeByteOrder(byteOrder)) {
       typeIdOut |= NATIVE;
       return new BBWritableBufferImpl(
-          unsafeObj, nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr, byteBuf);
+          unsafeObj, nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, memReqSvr, byteBuf);
     } else {
       typeIdOut |= NONNATIVE;
       return new BBNonNativeWritableBufferImpl(
-          unsafeObj, nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr, byteBuf);
+          unsafeObj, nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, memReqSvr, byteBuf);
     }
   }
 
@@ -138,15 +135,9 @@ final class BBNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   }
 
   @Override
-  public long getOffset() {
+  public long getTotalOffset() {
     assertValid();
     return offsetBytes;
-  }
-
-  @Override
-  public long getRegionOffset() {
-    assertValid();
-    return regionOffsetBytes;
   }
 
   @Override
@@ -159,6 +150,12 @@ final class BBNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   Object getUnsafeObject() {
     assertValid();
     return unsafeObj;
+  }
+
+  @Override
+  public ByteBuffer getByteBuffer() {
+    assertValid();
+    return byteBuf;
   }
 
 }

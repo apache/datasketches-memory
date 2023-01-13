@@ -115,55 +115,20 @@ public interface BaseState {
   long getCapacity();
 
   /**
-   * Gets the cumulative offset in bytes of this object from the backing resource.
-   * This offset may also include other offset components such as the native off-heap
-   * memory address, DirectByteBuffer split offsets, region offsets, and unsafe arrayBaseOffsets.
-   *
-   * @return the cumulative offset in bytes of this object from the backing resource.
+   * Returns the offset of address zero of this object relative to the base address of the
+   * backing resource. This does not include the object header for heap arrays nor the initial
+   * offset of a memory-mapped file.
+   * @return the offset of address zero of this object relative to the base address of the
+   * backing resource.
    */
-  long getCumulativeOffset();
+  long getTotalOffset();
 
   /**
-   * Gets the cumulative offset in bytes of this object from the backing resource including the given
-   * localOffsetBytes. This offset may also include other offset components such as the native off-heap
-   * memory address, DirectByteBuffer split offsets, region offsets, and object arrayBaseOffsets.
-   *
-   * @param localOffsetBytes offset to be added to the cumulative offset.
-   * @return the cumulative offset in bytes of this object from the backing resource including the
-   * given offsetBytes.
+   * Gets the current ByteOrder.
+   * This may be different from the ByteOrder of the backing resource and {@link ByteOrder#nativeOrder()}
+   * @return the current ByteOrder.
    */
-  default long getCumulativeOffset(long localOffsetBytes) {
-    return getCumulativeOffset() + localOffsetBytes;
-  }
-
-  /**
-   * Returns the offset of address zero of this object relative to the address zero of the
-   * backing resource but not including the size of any Java object header.
-   * This is only used when moving directly across to Memory, Buffer or Buffer duplicate.
-   * @return the offset of address zero of this object relative to the address zero of the
-   * backing resource but not including the size of any Java object header.
-   */
-  long getRegionOffset();
-
-  /**
-   * Returns the offset of address zero of this object relative to the address zero of the
-   * backing resource plus the given offsetBytes but not including the size of any Java object
-   * header.
-   * @param offsetBytes the given offsetBytes
-   * @return the offset of address zero of this object relative to the address zero of the
-   * backing resource plus the given offsetBytes but not including the size of any Java object
-   * header.
-   */
-  default long getRegionOffset(long offsetBytes) {
-    return getRegionOffset() + offsetBytes;
-  }
-
-  /**
-   * Gets the current Type ByteOrder.
-   * This may be different from the ByteOrder of the backing resource and of the Native Byte Order.
-   * @return the current Type ByteOrder.
-   */
-  ByteOrder getTypeByteOrder();
+  ByteOrder getByteOrder();
 
   /**
    * Returns true if this object is backed by an on-heap primitive array

@@ -36,7 +36,6 @@ final class HeapWritableBufferImpl extends NativeWritableBufferImpl {
   private final long capacityBytes;
   private final int typeId;
   private long cumOffsetBytes;
-  private long regionOffsetBytes;
   private final MemoryRequestServer memReqSvr;
 
   HeapWritableBufferImpl(
@@ -52,7 +51,6 @@ final class HeapWritableBufferImpl extends NativeWritableBufferImpl {
     this.capacityBytes = capacityBytes;
     this.typeId = removeNnBuf(typeId) | HEAP | BUFFER | NATIVE;
     this.cumOffsetBytes = cumOffsetBytes;
-    this.regionOffsetBytes = 0;
     this.memReqSvr = memReqSvr;
   }
 
@@ -62,19 +60,18 @@ final class HeapWritableBufferImpl extends NativeWritableBufferImpl {
       final long capacityBytes,
       final boolean readOnly,
       final ByteOrder byteOrder) {
-    this.regionOffsetBytes = regionOffsetBytes;
     final long newOffsetBytes = offsetBytes + regionOffsetBytes;
-    this.cumOffsetBytes += regionOffsetBytes;
+    final long newCumOffsetBytes = cumOffsetBytes + regionOffsetBytes;
     int typeIdOut = removeNnBuf(typeId) | BUFFER | REGION | (readOnly ? READONLY : 0);
 
     if (Util.isNativeByteOrder(byteOrder)) {
       typeIdOut |= NATIVE;
       return new HeapWritableBufferImpl(
-          unsafeObj, newOffsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr);
+          unsafeObj, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, memReqSvr);
     } else {
       typeIdOut |= NONNATIVE;
       return new HeapNonNativeWritableBufferImpl(
-          unsafeObj, newOffsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr);
+          unsafeObj, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, memReqSvr);
     }
   }
 
@@ -131,15 +128,9 @@ final class HeapWritableBufferImpl extends NativeWritableBufferImpl {
   }
 
   @Override
-  public long getOffset() {
+  public long getTotalOffset() {
     assertValid();
     return offsetBytes;
-  }
-
-  @Override
-  public long getRegionOffset() {
-    assertValid();
-    return regionOffsetBytes;
   }
 
   @Override

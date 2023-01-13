@@ -36,7 +36,6 @@ final class MapWritableMemoryImpl extends NativeWritableMemoryImpl {
   private final long capacityBytes;
   private final int typeId;
   private long cumOffsetBytes;
-  private long regionOffsetBytes;
   private final StepBoolean valid; //a reference only
 
   MapWritableMemoryImpl(
@@ -52,7 +51,6 @@ final class MapWritableMemoryImpl extends NativeWritableMemoryImpl {
     this.capacityBytes = capacityBytes;
     this.typeId = removeNnBuf(typeId) | MAP | MEMORY | NATIVE;
     this.cumOffsetBytes = cumOffsetBytes;
-    this.regionOffsetBytes = cumOffsetBytes - nativeBaseOffset;
     this.valid = valid;
   }
 
@@ -64,17 +62,17 @@ final class MapWritableMemoryImpl extends NativeWritableMemoryImpl {
       final ByteOrder byteOrder) {
     //this.regionOffsetBytes = regionOffsetBytes;
     final long newOffsetBytes = offsetBytes + regionOffsetBytes;
-    cumOffsetBytes += regionOffsetBytes;
+    final long newCumOffsetBytes = cumOffsetBytes + regionOffsetBytes;
     int typeIdOut = removeNnBuf(typeId) | MAP | REGION | (readOnly ? READONLY : 0);
 
     if (Util.isNativeByteOrder(byteOrder)) {
       typeIdOut |= NATIVE;
       return new MapWritableMemoryImpl(
-          nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, valid);
+          nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, valid);
     } else {
       typeIdOut |= NONNATIVE;
       return new MapNonNativeWritableMemoryImpl(
-          nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, valid);
+          nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, valid);
     }
   }
 
@@ -121,15 +119,9 @@ final class MapWritableMemoryImpl extends NativeWritableMemoryImpl {
   }
 
   @Override
-  public long getOffset() {
+  public long getTotalOffset() {
     assertValid();
     return offsetBytes;
-  }
-
-  @Override
-  public long getRegionOffset() {
-    assertValid();
-    return regionOffsetBytes;
   }
 
   @Override

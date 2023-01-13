@@ -36,7 +36,6 @@ final class MapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   private final long capacityBytes;
   private final int typeId;
   private long cumOffsetBytes;
-  private long regionOffsetBytes;
   private final StepBoolean valid; //a reference only
 
   MapNonNativeWritableBufferImpl(
@@ -52,7 +51,6 @@ final class MapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
     this.capacityBytes = capacityBytes;
     this.typeId = removeNnBuf(typeId) | MAP | BUFFER | NONNATIVE;
     this.cumOffsetBytes = cumOffsetBytes;
-    this.regionOffsetBytes = 0;
     this.valid = valid;
   }
 
@@ -62,19 +60,18 @@ final class MapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
       final long capacityBytes,
       final boolean readOnly,
       final ByteOrder byteOrder) {
-    this.regionOffsetBytes = regionOffsetBytes;
     final long newOffsetBytes = offsetBytes + regionOffsetBytes;
-    cumOffsetBytes += regionOffsetBytes;
+    final long newCumOffsetBytes = cumOffsetBytes + regionOffsetBytes;
     int typeIdOut = removeNnBuf(typeId) | MAP | REGION | (readOnly ? READONLY : 0);
 
     if (Util.isNativeByteOrder(byteOrder)) {
       typeIdOut |= NATIVE;
       return new MapWritableBufferImpl(
-          nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, valid);
+          nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, valid);
     } else {
       typeIdOut |= NONNATIVE;
       return new MapNonNativeWritableBufferImpl(
-          nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, valid);
+          nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, valid);
     }
   }
 
@@ -136,15 +133,9 @@ final class MapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   }
 
   @Override
-  public long getOffset() {
+  public long getTotalOffset() {
     assertValid();
     return offsetBytes;
-  }
-
-  @Override
-  public long getRegionOffset() {
-    assertValid();
-    return regionOffsetBytes;
   }
 
   @Override

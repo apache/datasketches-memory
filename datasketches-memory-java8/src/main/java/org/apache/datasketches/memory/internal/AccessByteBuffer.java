@@ -47,6 +47,7 @@ final class AccessByteBuffer {
       UnsafeUtil.getFieldOffset(java.nio.ByteBuffer.class, "offset");
 
   final long nativeBaseOffset;
+  final long initialCumOffset;
   final long capacityBytes;
   final long offsetBytes;
   final Object unsafeObj;
@@ -65,14 +66,17 @@ final class AccessByteBuffer {
     if (direct) {
       nativeBaseOffset = ((sun.nio.ch.DirectBuffer) byteBuf).address();
       unsafeObj = null;
-      offsetBytes = 0L; //address() is already adjusted for direct slices, so regionOffset = 0
+      offsetBytes = 0L; //address() is already adjusted for direct slices, so offset = 0
+      initialCumOffset = nativeBaseOffset;
     } else {
       nativeBaseOffset = 0L;
       // ByteBuffer.arrayOffset() and ByteBuffer.array() throw ReadOnlyBufferException if
-      // ByteBuffer is read-only. This uses reflection for both writable and read-only cases.
-      // Includes the slice() offset for heap.
+      // ByteBuffer is read-only, so this uses reflection for both writable and read-only cases.
+      // OffsetBytes includes the slice() offset for heap.  The original array is still there because
+      // this is a view.
       offsetBytes = unsafe.getInt(byteBuf, BYTE_BUFFER_OFFSET_FIELD_OFFSET);
       unsafeObj = unsafe.getObject(byteBuf, BYTE_BUFFER_HB_FIELD_OFFSET);
+      initialCumOffset = UnsafeUtil.getArrayBaseOffset(unsafeObj.getClass()) + offsetBytes;
     }
   }
 

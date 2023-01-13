@@ -62,22 +62,22 @@ public class AllocateDirectMapMemoryTest {
     try (MapHandle rh = Memory.map(file))
     {
       Memory mem = rh.get();
-      println("Mem Cap:    " + mem.getCapacity());
-      println("Native Off: " + ((BaseStateImpl)mem).getNativeBaseOffset());
-      println("Offset:     " + ((BaseStateImpl)mem).getOffset());
-      println("Cum Offset: " + mem.getCumulativeOffset(0));
-      println("Region Offset: " + mem.getRegionOffset());
+      println("Mem Cap:       " + mem.getCapacity());
+      println("Native Off:    " + ((BaseStateImpl)mem).getNativeBaseOffset());
+      println("Total Offset:  " + mem.getTotalOffset());
+      println("Cum Offset:    " + ((BaseStateImpl)mem).getCumulativeOffset(0));
+      println("Region Offset: " + mem.getTotalOffset());
       StringBuilder sb = new StringBuilder();
       mem.getCharsFromUtf8(43, 176, sb);
       println(sb.toString());
 
       println("");
       Memory mem2 = mem.region(43+76, 20);
-      println("Mem Cap: " + mem2.getCapacity());
-      println("Native Off: " + ((BaseStateImpl)mem).getNativeBaseOffset());
-      println("Offset:     " + ((BaseStateImpl)mem).getOffset());
-      println("Cum Offset: " + mem2.getCumulativeOffset(0));
-      println("Region Offset: " + mem2.getRegionOffset());
+      println("Mem Cap:       " + mem2.getCapacity());
+      println("Native Off:    " + ((BaseStateImpl)mem).getNativeBaseOffset());
+      println("Offset:        " + mem.getTotalOffset());
+      println("Cum Offset:    " + ((BaseStateImpl)mem2).getCumulativeOffset(0));
+      println("Region Offset: " + mem2.getTotalOffset());
       StringBuilder sb2 = new StringBuilder();
       mem2.getCharsFromUtf8(0, 12, sb2);
       println(sb2.toString());

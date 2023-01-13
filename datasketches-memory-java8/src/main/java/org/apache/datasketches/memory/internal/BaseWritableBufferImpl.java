@@ -77,7 +77,7 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
       final MemoryRequestServer memReqSvr) {
     final AccessByteBuffer abb = new AccessByteBuffer(byteBuf);
     final int typeId = (abb.resourceReadOnly || localReadOnly) ? READONLY : 0;
-    final long cumOffsetBytes = 0;
+    final long cumOffsetBytes = abb.initialCumOffset;
     final BaseWritableBufferImpl bwbi = Util.isNativeByteOrder(byteOrder)
         ? new BBWritableBufferImpl(abb.unsafeObj, abb.nativeBaseOffset,
             abb.offsetBytes, abb.capacityBytes, typeId, cumOffsetBytes, memReqSvr, byteBuf)
@@ -90,7 +90,7 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
   //REGIONS
   @Override
   public Buffer region() {
-    return writableRegionImpl(getPosition(), getEnd() - getPosition(), true, getTypeByteOrder());
+    return writableRegionImpl(getPosition(), getEnd() - getPosition(), true, getByteOrder());
   }
 
   @Override
@@ -102,7 +102,7 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
 
   @Override
   public WritableBuffer writableRegion() {
-    return writableRegionImpl(getPosition(), getEnd() - getPosition(), false, getTypeByteOrder());
+    return writableRegionImpl(getPosition(), getEnd() - getPosition(), false, getByteOrder());
   }
 
   @Override
@@ -130,7 +130,7 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
   //DUPLICATES
   @Override
   public Buffer duplicate() {
-    return writableDuplicateImpl(true, getTypeByteOrder());
+    return writableDuplicateImpl(true, getByteOrder());
   }
 
   @Override
@@ -140,7 +140,7 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
 
   @Override
   public WritableBuffer writableDuplicate() {
-    return writableDuplicateImpl(false, getTypeByteOrder());
+    return writableDuplicateImpl(false, getByteOrder());
   }
 
   @Override

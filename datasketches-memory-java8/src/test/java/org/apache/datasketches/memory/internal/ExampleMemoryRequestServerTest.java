@@ -131,7 +131,7 @@ public class ExampleMemoryRequestServerTest {
 
     @Override
     public WritableMemory request(WritableMemory currentWMem, long capacityBytes) {
-     ByteOrder order = currentWMem.getTypeByteOrder();
+     ByteOrder order = currentWMem.getByteOrder();
      WritableHandle handle = WritableMemory.allocateDirect(capacityBytes, order, this);
      WritableMemory wmem = handle.getWritable();
      map.put(wmem, handle); //We track the newly allocated memory and its handle.

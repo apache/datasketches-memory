@@ -38,7 +38,7 @@ import org.testng.annotations.Test;
 public class Buffer2Test {
 
   @Test
-  public void testWrapByteBuf() {
+  public void testWrapHeapByteBuf() {
     ByteBuffer bb = ByteBuffer.allocate(64).order(ByteOrder.nativeOrder());
 
     Byte b = 0;
@@ -330,7 +330,7 @@ public class Buffer2Test {
     }
     bb.position(10);
 
-    Buffer buffer = Buffer.wrap(bb.slice().order(ByteOrder.nativeOrder())); //slice = 54
+    Buffer buffer = Buffer.wrap(bb.slice().order(ByteOrder.nativeOrder())); //slice size = 54
     buffer.setPosition(30);//remaining = 24
     Buffer dupBuffer = buffer.duplicate(); //all 54
     Buffer regionBuffer = buffer.region(); //24
@@ -353,7 +353,7 @@ public class Buffer2Test {
     for (int i = 0; i < n; i++) { arr[i] = i; }
     Memory mem = Memory.wrap(arr);
     Buffer buf = mem.asBuffer();
-    Buffer reg = buf.region(n2 * 8, n2 * 8, buf.getTypeByteOrder()); //top half
+    Buffer reg = buf.region(n2 * 8, n2 * 8, buf.getByteOrder()); //top half
     for (int i = 0; i < n2; i++) {
       long v = reg.getLong(i * 8);
       long e = i + n2;

@@ -210,8 +210,8 @@ public class MemoryTest {
     ByteBuffer bb = ByteBuffer.allocate(n * 8);
     bb.order(ByteOrder.BIG_ENDIAN);
     Memory mem = Memory.wrap(bb);
-    assertFalse(mem.getTypeByteOrder() == ByteOrder.nativeOrder());
-    assertEquals(mem.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertFalse(mem.getByteOrder() == ByteOrder.nativeOrder());
+    assertEquals(mem.getByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test

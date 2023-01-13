@@ -85,7 +85,7 @@ public class BaseStateTest {
   }
 
   @Test
-  public void checkGetNativeBaseOffset_Heap() throws Exception {
+  public void checkGetNativeBaseOffset_Heap() {
     WritableMemory wmem = WritableMemory.allocate(8); //heap
     final long offset = ((BaseStateImpl)wmem).getNativeBaseOffset();
     assertEquals(offset, 0L);

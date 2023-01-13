@@ -66,7 +66,7 @@ public class AllocateDirectMapMemoryTest {
       println("Native Off:    " + ((BaseStateImpl)mem).getNativeBaseOffset());
       println("Total Offset:  " + mem.getTotalOffset());
       println("Cum Offset:    " + ((BaseStateImpl)mem).getCumulativeOffset(0));
-      println("Region Offset: " + mem.getTotalOffset());
+      println("Total Offset: " + mem.getTotalOffset());
       StringBuilder sb = new StringBuilder();
       mem.getCharsFromUtf8(43, 176, sb);
       println(sb.toString());
@@ -77,7 +77,7 @@ public class AllocateDirectMapMemoryTest {
       println("Native Off:    " + ((BaseStateImpl)mem).getNativeBaseOffset());
       println("Offset:        " + mem.getTotalOffset());
       println("Cum Offset:    " + ((BaseStateImpl)mem2).getCumulativeOffset(0));
-      println("Region Offset: " + mem2.getTotalOffset());
+      println("Total Offset: " + mem2.getTotalOffset());
       StringBuilder sb2 = new StringBuilder();
       mem2.getCharsFromUtf8(0, 12, sb2);
       println(sb2.toString());

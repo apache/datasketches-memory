@@ -175,9 +175,9 @@ public class LeafImplTest {
 
     assertEquals(mem.writableRegion(off, cap, bo).getShort(0), 1);
     assertEquals(mem.writableRegion(off, cap, oo).getShort(0), 256);
-
     assertEquals(mem.asWritableBuffer(bo).getShort(0), 1);
     assertEquals(mem.asWritableBuffer(oo).getShort(0), 256);
+    assertEquals(mem.getTotalOffset(), 0);
 
     ByteBuffer bb = mem.getByteBuffer();
     assertTrue( hasByteBuffer ? bb != null : bb == null);
@@ -185,14 +185,17 @@ public class LeafImplTest {
     assertTrue(mem.getByteOrder() == bo);
 
     if (hasMemReqSvr) { assertTrue(mem.getMemoryRequestServer() instanceof DummyMemoryRequestServer); }
+    else { assertNull(mem.getMemoryRequestServer()); }
 
     Object obj = ((BaseStateImpl)mem).getUnsafeObject();
     if (direct) {
       assertTrue(mem.isDirect());
       assertNull(obj);
+      assertTrue(((BaseStateImpl)mem).getNativeBaseOffset() != 0);
     } else {
       assertFalse(mem.isDirect());
       assertNotNull(obj);
+      assertTrue(((BaseStateImpl)mem).getNativeBaseOffset() == 0);
     }
 
     assertTrue(mem.isValid() == true);
@@ -203,6 +206,7 @@ public class LeafImplTest {
     assertEquals(buf.writableRegion(off, cap, oo).getShort(0), 256);
     assertEquals(buf.writableDuplicate(bo).getShort(0), 1);
     assertEquals(buf.writableDuplicate(oo).getShort(0), 256);
+    assertEquals(buf.getTotalOffset(), 0);
 
     bb = buf.getByteBuffer();
     assertTrue(hasByteBuffer ? bb != null : bb == null);
@@ -210,14 +214,17 @@ public class LeafImplTest {
     assertTrue(buf.getByteOrder() == bo);
 
     if (hasMemReqSvr) { assertTrue(buf.getMemoryRequestServer() instanceof DummyMemoryRequestServer); }
+    else { assertNull(buf.getMemoryRequestServer()); }
 
     obj = ((BaseStateImpl)buf).getUnsafeObject();
     if (direct) {
       assertTrue(buf.isDirect());
       assertNull(obj);
+      assertTrue(((BaseStateImpl)buf).getNativeBaseOffset() != 0);
     } else {
       assertFalse(buf.isDirect());
       assertNotNull(obj);
+      assertTrue(((BaseStateImpl)buf).getNativeBaseOffset() == 0);
     }
 
     assertTrue(buf.isValid() == true);
@@ -240,9 +247,11 @@ public class LeafImplTest {
     if (direct) {
       assertTrue(nnMem.isDirect());
       assertNull(obj);
+      assertTrue(((BaseStateImpl)nnMem).getNativeBaseOffset() != 0);
     } else {
       assertFalse(nnMem.isDirect());
       assertNotNull(obj);
+      assertTrue(((BaseStateImpl)nnMem).getNativeBaseOffset() == 0);
     }
 
     assertTrue(nnMem.isValid() == true);
@@ -265,9 +274,11 @@ public class LeafImplTest {
     if (direct) {
       assertTrue(nnBuf.isDirect());
       assertNull(obj);
+      assertTrue(((BaseStateImpl)nnBuf).getNativeBaseOffset() != 0);
     } else {
       assertFalse(nnBuf.isDirect());
       assertNotNull(obj);
+      assertTrue(((BaseStateImpl)nnBuf).getNativeBaseOffset() == 0);
     }
 
     assertTrue(nnBuf.isValid() == true);

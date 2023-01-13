@@ -466,24 +466,4 @@ public abstract class BaseStateImpl implements BaseState {
     return XxHash64.hash(in, seed);
   }
 
-//@Override
-//public final long getCumulativeOffset(final long offsetBytes) {
-//  assertValid();
-//  return cumBaseOffset_ + offsetBytes;
-//}
-
-//@Override
-//public final long getRegionOffset() {
-//  final Object unsafeObj = getUnsafeObject();
-//  final long nativeBaseOff = getNativeBaseOffset();
-//  return unsafeObj == null
-//      ? cumBaseOffset_ - nativeBaseOff
-//      : cumBaseOffset_ - UnsafeUtil.getArrayBaseOffset(unsafeObj.getClass());
-//}
-
-//@Override
-//public final long getRegionOffset(final long offsetBytes) {
-//  return getRegionOffset() + offsetBytes;
-//}
-
 }

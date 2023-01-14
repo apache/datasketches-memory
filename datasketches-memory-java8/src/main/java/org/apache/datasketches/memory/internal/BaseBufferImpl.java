@@ -51,7 +51,6 @@ public abstract class BaseBufferImpl extends BaseStateImpl implements BaseBuffer
     capacity = end = capacityBytes;
   }
 
-
   @Override
   public final BaseBufferImpl incrementPosition(final long increment) {
     incrementAndAssertPositionForRead(pos, increment);

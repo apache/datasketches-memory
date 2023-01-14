@@ -25,7 +25,7 @@ package org.apache.datasketches.memory;
  * <p>The purpose of a Handle is to
  * <ul><li>Provide a <i>strong reference</i> to an external <i>resource</i>.</li>
  * <li>Extend <i>AutoCloseable</i>, which provides a means to close the resource.</li>
- * <li>Provide other capabilites unique to a particular resource.</li>
+ * <li>Provide other capabilities unique to a particular resource.</li>
  * </ul>
  *
  * <p>Maintaining strong references to external resources is critical to avoid accidental

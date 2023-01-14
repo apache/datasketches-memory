@@ -71,6 +71,7 @@ public abstract class BaseStateImpl implements BaseState {
 
   // X000 0000
   static final int BYTEBUF = 1 << 7;
+
   /**
    * The root of the Memory inheritance hierarchy
    */
@@ -159,7 +160,7 @@ public abstract class BaseStateImpl implements BaseState {
    * @return the cumulative offset in bytes of this object from the backing resource including the
    * given offsetBytes.
    */
-  public long getCumulativeOffset(long localOffsetBytes) {
+  public long getCumulativeOffset(final long localOffsetBytes) {
     return getCumulativeOffset() + localOffsetBytes;
   }
 

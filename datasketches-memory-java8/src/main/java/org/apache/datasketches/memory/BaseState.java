@@ -31,45 +31,11 @@ import org.apache.datasketches.memory.internal.BaseStateImpl;
  * @author Lee Rhodes
  */
 public interface BaseState {
+
   /**
    * The placeholder for the default MemoryRequestServer, if set at all.
    */
   static final MemoryRequestServer defaultMemReqSvr = null; //new DefaultMemoryRequestServer();
-
-  //Monitoring
-
-  /**
-   * Gets the current size of active direct memory allocated.
-   * @return the current size of active direct memory allocated.
-   */
-  static long getCurrentDirectMemoryAllocated() {
-    return BaseStateImpl.getCurrentDirectMemoryAllocated();
-  }
-
-  /**
-   * Gets the current number of active direct memory allocations.
-   * @return the current number of active direct memory allocations.
-   */
-  static long getCurrentDirectMemoryAllocations() {
-    return BaseStateImpl.getCurrentDirectMemoryAllocations();
-  }
-
-  /**
-   * Gets the current size of active direct memory map allocated.
-   * @return the current size of active direct memory map allocated.
-   */
-  static long getCurrentDirectMemoryMapAllocated() {
-    return BaseStateImpl.getCurrentDirectMemoryMapAllocated();
-  }
-
-  /**
-   * Gets the current number of active direct memory map allocations.
-   * @return the current number of active direct memory map allocations.
-   */
-  static long getCurrentDirectMemoryMapAllocations() {
-    return BaseStateImpl.getCurrentDirectMemoryMapAllocations();
-  }
-  //End Monitoring
 
   /**
    * Checks that the specified range of bytes is within bounds of this object, throws
@@ -109,10 +75,51 @@ public interface BaseState {
   ByteBuffer getByteBuffer();
 
   /**
+   * Gets the current ByteOrder.
+   * This may be different from the ByteOrder of the backing resource and {@link ByteOrder#nativeOrder()}
+   * @return the current ByteOrder.
+   */
+  ByteOrder getByteOrder();
+
+  /**
    * Gets the capacity of this object in bytes
    * @return the capacity of this object in bytes
    */
   long getCapacity();
+
+  //Monitoring
+  /**
+   * Gets the current size of active direct memory allocated.
+   * @return the current size of active direct memory allocated.
+   */
+  static long getCurrentDirectMemoryAllocated() {
+    return BaseStateImpl.getCurrentDirectMemoryAllocated();
+  }
+
+  /**
+   * Gets the current number of active direct memory allocations.
+   * @return the current number of active direct memory allocations.
+   */
+  static long getCurrentDirectMemoryAllocations() {
+    return BaseStateImpl.getCurrentDirectMemoryAllocations();
+  }
+
+  /**
+   * Gets the current size of active direct memory map allocated.
+   * @return the current size of active direct memory map allocated.
+   */
+  static long getCurrentDirectMemoryMapAllocated() {
+    return BaseStateImpl.getCurrentDirectMemoryMapAllocated();
+  }
+
+  /**
+   * Gets the current number of active direct memory map allocations.
+   * @return the current number of active direct memory map allocations.
+   */
+  static long getCurrentDirectMemoryMapAllocations() {
+    return BaseStateImpl.getCurrentDirectMemoryMapAllocations();
+  }
+  //End Monitoring
 
   /**
    * Returns the offset of address zero of this object relative to the base address of the
@@ -122,13 +129,6 @@ public interface BaseState {
    * backing resource.
    */
   long getTotalOffset();
-
-  /**
-   * Gets the current ByteOrder.
-   * This may be different from the ByteOrder of the backing resource and {@link ByteOrder#nativeOrder()}
-   * @return the current ByteOrder.
-   */
-  ByteOrder getByteOrder();
 
   /**
    * Returns true if this object is backed by an on-heap primitive array

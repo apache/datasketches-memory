@@ -176,67 +176,67 @@ public class CommonMemoryTest {
   }
 
   public static void setGetPartialArraysWithOffsetTests(WritableMemory mem) {
-    int items= 4;
+    int items = 4;
     boolean[] srcArray1 = {true, false, true, false};
     boolean[] dstArray1 = new boolean[items];
-    mem.putBooleanArray(0, srcArray1, 2, items/2);
-    mem.getBooleanArray(0, dstArray1, 2, items/2);
+    mem.putBooleanArray(0, srcArray1, 2, items / 2);
+    mem.getBooleanArray(0, dstArray1, 2, items / 2);
     for (int i = 2; i < items; i++) {
       assertEquals(dstArray1[i], srcArray1[i]);
     }
 
     byte[] srcArray2 = { 1, -2, 3, -4 };
     byte[] dstArray2 = new byte[items];
-    mem.putByteArray(0, srcArray2, 2, items/2);
-    mem.getByteArray(0, dstArray2, 2, items/2);
+    mem.putByteArray(0, srcArray2, 2, items / 2);
+    mem.getByteArray(0, dstArray2, 2, items / 2);
     for (int i = 2; i < items; i++) {
       assertEquals(dstArray2[i], srcArray2[i]);
     }
 
     char[] srcArray3 = { 'A', 'B', 'C', 'D' };
     char[] dstArray3 = new char[items];
-    mem.putCharArray(0, srcArray3, 2, items/2);
-    mem.getCharArray(0, dstArray3, 2, items/2);
+    mem.putCharArray(0, srcArray3, 2, items / 2);
+    mem.getCharArray(0, dstArray3, 2, items / 2 );
     for (int i = 2; i < items; i++) {
       assertEquals(dstArray3[i], srcArray3[i]);
     }
 
     double[] srcArray4 = { 1.0, -2.0, 3.0, -4.0 };
     double[] dstArray4 = new double[items];
-    mem.putDoubleArray(0, srcArray4, 2, items/2);
-    mem.getDoubleArray(0, dstArray4, 2, items/2);
+    mem.putDoubleArray(0, srcArray4, 2, items / 2 );
+    mem.getDoubleArray(0, dstArray4, 2, items / 2 );
     for (int i = 2; i < items; i++) {
       assertEquals(dstArray4[i], srcArray4[i], 0.0);
     }
 
     float[] srcArray5 = { (float)1.0, (float)-2.0, (float)3.0, (float)-4.0 };
     float[] dstArray5 = new float[items];
-    mem.putFloatArray(0, srcArray5, 2, items/2);
-    mem.getFloatArray(0, dstArray5, 2, items/2);
+    mem.putFloatArray(0, srcArray5, 2, items / 2 );
+    mem.getFloatArray(0, dstArray5, 2, items / 2 );
     for (int i = 2; i < items; i++) {
       assertEquals(dstArray5[i], srcArray5[i], 0.0);
     }
 
     int[] srcArray6 = { 1, -2, 3, -4 };
     int[] dstArray6 = new int[items];
-    mem.putIntArray(0, srcArray6, 2, items/2);
-    mem.getIntArray(0, dstArray6, 2, items/2);
+    mem.putIntArray(0, srcArray6, 2, items / 2 );
+    mem.getIntArray(0, dstArray6, 2, items / 2 );
     for (int i = 2; i < items; i++) {
       assertEquals(dstArray6[i], srcArray6[i]);
     }
 
     long[] srcArray7 = { 1, -2, 3, -4 };
     long[] dstArray7 = new long[items];
-    mem.putLongArray(0, srcArray7, 2, items/2);
-    mem.getLongArray(0, dstArray7, 2, items/2);
+    mem.putLongArray(0, srcArray7, 2, items / 2 );
+    mem.getLongArray(0, dstArray7, 2, items / 2 );
     for (int i = 2; i < items; i++) {
       assertEquals(dstArray7[i], srcArray7[i]);
     }
 
     short[] srcArray8 = { 1, -2, 3, -4 };
     short[] dstArray8 = new short[items];
-    mem.putShortArray(0, srcArray8, 2, items/2);
-    mem.getShortArray(0, dstArray8, 2, items/2);
+    mem.putShortArray(0, srcArray8, 2, items / 2 );
+    mem.getShortArray(0, dstArray8, 2, items / 2 );
     for (int i = 2; i < items; i++) {
       assertEquals(dstArray8[i], srcArray8[i]);
     }
@@ -336,7 +336,7 @@ public class CommonMemoryTest {
     //set region 1
     byte b1 = 5;
     mem.fill(reg1Start, reg1Len, b1);
-    for (int i = reg1Start; i < (reg1Len+reg1Start); i++) {
+    for (int i = reg1Start; i < (reg1Len + reg1Start); i++) {
       assertEquals(mem.getByte(i), b1);
     }
     //println(mem.toHexString("Region1 to 5", reg1Start, reg1Len));
@@ -345,7 +345,7 @@ public class CommonMemoryTest {
     byte b2 = 7;
     mem.fill(reg2Start, reg2Len, b2);
     //println(mem.toHexString("Fill", 0, (int)mem.getCapacity()));
-    for (int i = reg2Start; i < (reg2Len+reg2Start); i++) {
+    for (int i = reg2Start; i < (reg2Len + reg2Start); i++) {
       assertEquals(mem.getByte(i), b2);
     }
     //println(mem.toHexString("Region2 to 7", reg2Start, reg2Len));
@@ -353,14 +353,14 @@ public class CommonMemoryTest {
     //clear region 1
     byte zeroByte = 0;
     mem.clear(reg1Start, reg1Len);
-    for (int i = reg1Start; i < (reg1Len+reg1Start); i++) {
+    for (int i = reg1Start; i < (reg1Len + reg1Start); i++) {
       assertEquals(mem.getByte(i), zeroByte);
     }
     //println(mem.toHexString("Region1 cleared", reg1Start, reg1Len));
 
     //clear region 2
     mem.clear(reg2Start, reg2Len);
-    for (int i = reg2Start; i < (reg2Len+reg2Start); i++) {
+    for (int i = reg2Start; i < (reg2Len + reg2Start); i++) {
       assertEquals(mem.getByte(i), zeroByte);
     }
     //println(mem.toHexString("Region2 cleared", reg2Start, reg2Len));
@@ -368,7 +368,7 @@ public class CommonMemoryTest {
     //set all to ones
     byte b4 = 127;
     mem.fill(b4);
-    for (int i=0; i<accessCapacity; i++) {
+    for (int i = 0; i < accessCapacity; i++) {
       assertEquals(mem.getByte(i), b4);
     }
     //println(mem.toHexString("Region1 + Region2 all ones", 0, accessCapacity));
@@ -404,7 +404,7 @@ public class CommonMemoryTest {
 
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+    println("PRINTING: " + this.getClass().getName());
   }
 
   /**

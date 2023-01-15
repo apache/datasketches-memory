@@ -40,9 +40,9 @@ import com.google.protobuf.ByteString;
  * Adapted version of
  * https://github.com/protocolbuffers/protobuf/blob/master/java/core/src/test/java/com/google/protobuf/DecodeUtf8Test.java
  *
- * Copyright 2008 Google Inc.  All rights reserved.
+ * <pre>Copyright 2008 Google Inc.  All rights reserved.
  * https://developers.google.com/protocol-buffers/
- * See LICENSE.
+ * See LICENSE.</pre>
  */
 public class Utf8Test {
 
@@ -415,7 +415,7 @@ public class Utf8Test {
   /**
    * Performs round-trip test using the given reference string
    * @param refStr the reference string
-   * @throws IOException
+   * @throws IOException when IOException occurs
    */
   private static void assertRoundTrips(String refStr) throws IOException {
     assertRoundTrips(refStr, refStr.toCharArray().length, 0, -1);
@@ -427,7 +427,7 @@ public class Utf8Test {
    * @param refSubCharLen the number of characters expected to be decoded
    * @param offsetBytes starting utf8 byte offset
    * @param utf8LengthBytes length of utf8 bytes
-   * @throws IOException
+   * @throws IOException when IOException occurs
    */
   private static void assertRoundTrips(String refStr, int refSubCharLen, int offsetBytes,
       int utf8LengthBytes) throws IOException {
@@ -504,7 +504,7 @@ public class Utf8Test {
 
   @Test
   public void printlnTest() {
-   println("PRINTING: "+this.getClass().getName());
+   println("PRINTING: " + this.getClass().getName());
   }
 
   /**

@@ -21,8 +21,8 @@ package org.apache.datasketches.memory.internal;
 
 import static org.testng.Assert.assertEquals;
 
-import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
@@ -43,8 +43,8 @@ public class CopyMemoryOverlapTest {
     copyUsingDirectMemory(copyLongs, overlap, false);
     long end2_mS = System.currentTimeMillis();
 
-    println("CopyUp Time Sec: " + ((end1_mS - start_mS)/1000.0));
-    println("CopyDn Time Sec: " + ((end2_mS - end1_mS)/1000.0));
+    println("CopyUp Time Sec: " + ((end1_mS - start_mS) / 1000.0));
+    println("CopyDn Time Sec: " + ((end2_mS - end1_mS) / 1000.0));
   }
 
   @Test
@@ -59,8 +59,8 @@ public class CopyMemoryOverlapTest {
     copyUsingDirectRegions(copyLongs, overlap, false);
     long end2_mS = System.currentTimeMillis();
 
-    println("CopyUp Time Sec: " + ((end1_mS - start_mS)/1000.0));
-    println("CopyDn Time Sec: " + ((end2_mS - end1_mS)/1000.0));
+    println("CopyUp Time Sec: " + ((end1_mS - start_mS) / 1000.0));
+    println("CopyDn Time Sec: " + ((end2_mS - end1_mS) / 1000.0));
   }
 
   private static final void copyUsingDirectMemory(long copyLongs, double overlap, boolean copyUp) throws Exception {
@@ -171,7 +171,7 @@ public class CopyMemoryOverlapTest {
 
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+    println("PRINTING: " + this.getClass().getName());
   }
 
   /**

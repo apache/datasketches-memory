@@ -19,7 +19,6 @@
 
 package org.apache.datasketches.memory.internal;
 
-import org.apache.datasketches.memory.internal.VirtualMachineMemory;
 import org.testng.annotations.Test;
 
 @SuppressWarnings({"unused"})
@@ -27,13 +26,13 @@ public class VirtualMachineMemoryTest {
 
     @Test
     public void maxDirectBufferMemory() {
-       assert(VirtualMachineMemory.getMaxDBBMemory() >= 0);
+       assert (VirtualMachineMemory.getMaxDBBMemory() >= 0);
     }
 
     @Test
     public void inertPageAlignment() {
       boolean result = VirtualMachineMemory.getIsPageAligned();
       //System.out.println("VM page alignment:" + result);
-      assert(true); //no exception was thrown
+      assert (true); //no exception was thrown
     }
 }

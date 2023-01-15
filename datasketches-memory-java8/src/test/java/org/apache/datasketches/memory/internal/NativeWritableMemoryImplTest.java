@@ -61,13 +61,13 @@ public class NativeWritableMemoryImplTest {
 
     Memory mem = Memory.wrap(srcArray);
     mem.getBooleanArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
     WritableMemory wmem = WritableMemory.writableWrap(srcArray);
     wmem.getBooleanArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
     assertTrue(mem.hasArray());
@@ -80,13 +80,13 @@ public class NativeWritableMemoryImplTest {
 
     Memory mem = Memory.wrap(srcArray);
     mem.getByteArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
     WritableMemory wmem = WritableMemory.writableWrap(srcArray);
     wmem.getByteArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
   }
@@ -98,13 +98,13 @@ public class NativeWritableMemoryImplTest {
 
     Memory mem = Memory.wrap(srcArray);
     mem.getCharArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
     WritableMemory wmem = WritableMemory.writableWrap(srcArray);
     wmem.getCharArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
   }
@@ -116,13 +116,13 @@ public class NativeWritableMemoryImplTest {
 
     Memory mem = Memory.wrap(srcArray);
     mem.getShortArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
     WritableMemory wmem = WritableMemory.writableWrap(srcArray);
     wmem.getShortArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
   }
@@ -134,13 +134,13 @@ public class NativeWritableMemoryImplTest {
 
     Memory mem = Memory.wrap(srcArray);
     mem.getIntArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
     WritableMemory wmem = WritableMemory.writableWrap(srcArray);
     wmem.getIntArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
   }
@@ -152,13 +152,13 @@ public class NativeWritableMemoryImplTest {
 
     Memory mem = Memory.wrap(srcArray);
     mem.getLongArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
     WritableMemory wmem = WritableMemory.writableWrap(srcArray);
     wmem.getLongArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
   }
@@ -170,13 +170,13 @@ public class NativeWritableMemoryImplTest {
 
     Memory mem = Memory.wrap(srcArray);
     mem.getFloatArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
     WritableMemory wmem = WritableMemory.writableWrap(srcArray);
     wmem.getFloatArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
   }
@@ -188,13 +188,13 @@ public class NativeWritableMemoryImplTest {
 
     Memory mem = Memory.wrap(srcArray);
     mem.getDoubleArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
     WritableMemory wmem = WritableMemory.writableWrap(srcArray);
     wmem.getDoubleArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
   }
@@ -233,19 +233,19 @@ public class NativeWritableMemoryImplTest {
   @Test
   public void checkCopyWithinNativeSmall() throws Exception {
     int memCapacity = 64;
-    int half = memCapacity/2;
+    int half = memCapacity / 2;
     try (WritableHandle wrh = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem = wrh.getWritable();
       mem.clear();
 
-      for (int i=0; i<half; i++) { //fill first half
+      for (int i = 0; i < half; i++) { //fill first half
         mem.putByte(i, (byte) i);
       }
 
       mem.copyTo(0, mem, half, half);
 
-      for (int i=0; i<half; i++) {
-        assertEquals(mem.getByte(i+half), (byte) i);
+      for (int i = 0; i < half; i++) {
+        assertEquals(mem.getByte(i + half), (byte) i);
       }
     }
   }
@@ -260,14 +260,14 @@ public class NativeWritableMemoryImplTest {
       WritableMemory mem = wrh.getWritable();
       mem.clear();
 
-      for (int i=0; i < halfLongs; i++) {
-        mem.putLong(i*8, i);
+      for (int i = 0; i < halfLongs; i++) {
+        mem.putLong(i * 8, i);
       }
 
       mem.copyTo(0, mem, halfBytes, halfBytes);
 
-      for (int i=0; i < halfLongs; i++) {
-        assertEquals(mem.getLong((i + halfLongs)*8), i);
+      for (int i = 0; i < halfLongs; i++) {
+        assertEquals(mem.getLong((i + halfLongs) * 8), i);
       }
     }
   }
@@ -308,13 +308,13 @@ public class NativeWritableMemoryImplTest {
       WritableMemory mem1 = wrh1.getWritable();
       WritableMemory mem2 = wrh2.getWritable();
 
-      for (int i=0; i < memCapacity; i++) {
+      for (int i = 0; i < memCapacity; i++) {
         mem1.putByte(i, (byte) i);
       }
       mem2.clear();
       mem1.copyTo(0, mem2, 0, memCapacity);
 
-      for (int i=0; i<memCapacity; i++) {
+      for (int i = 0; i < memCapacity; i++) {
         assertEquals(mem2.getByte(i), (byte) i);
       }
       wrh1.close();
@@ -324,7 +324,7 @@ public class NativeWritableMemoryImplTest {
 
   @Test
   public void checkCopyCrossNativeLarge() throws Exception {
-    int memCapacity = (2<<20) + 64;
+    int memCapacity = (2 << 20) + 64;
     int memCapLongs = memCapacity / 8;
 
     try (WritableHandle wrh1 = WritableMemory.allocateDirect(memCapacity);
@@ -333,15 +333,15 @@ public class NativeWritableMemoryImplTest {
       WritableMemory mem1 = wrh1.getWritable();
       WritableMemory mem2 = wrh2.getWritable();
 
-      for (int i=0; i < memCapLongs; i++) {
-        mem1.putLong(i*8, i);
+      for (int i = 0; i < memCapLongs; i++) {
+        mem1.putLong(i * 8, i);
       }
       mem2.clear();
 
       mem1.copyTo(0, mem2, 0, memCapacity);
 
-      for (int i=0; i<memCapLongs; i++) {
-        assertEquals(mem2.getLong(i*8), i);
+      for (int i = 0; i < memCapLongs; i++) {
+        assertEquals(mem2.getLong(i * 8), i);
       }
     }
   }
@@ -352,15 +352,15 @@ public class NativeWritableMemoryImplTest {
     try (WritableHandle wrh1 = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem1 = wrh1.getWritable();
 
-      for (int i= 0; i < mem1.getCapacity(); i++) {
+      for (int i = 0; i < mem1.getCapacity(); i++) {
         mem1.putByte(i, (byte) i);
       }
 
       WritableMemory mem2 = WritableMemory.allocate(memCapacity);
       mem1.copyTo(8, mem2, 16, 16);
 
-      for (int i=0; i<16; i++) {
-        assertEquals(mem1.getByte(8+i), mem2.getByte(16+i));
+      for (int i = 0; i < 16; i++) {
+        assertEquals(mem1.getByte(8 + i), mem2.getByte(16 + i));
       }
       //println(mem2.toHexString("Mem2", 0, (int)mem2.getCapacity()));
     }
@@ -373,7 +373,7 @@ public class NativeWritableMemoryImplTest {
     try (WritableHandle wrh1 = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem1 = wrh1.getWritable();
 
-      for (int i= 0; i < mem1.getCapacity(); i++) {
+      for (int i = 0; i < mem1.getCapacity(); i++) {
         mem1.putByte(i, (byte) i);
       }
       //println(mem1.toHexString("Mem1", 0, (int)mem1.getCapacity()));
@@ -385,9 +385,9 @@ public class NativeWritableMemoryImplTest {
       //println(reg2.toHexString("Reg2", 0, (int)reg2.getCapacity()));
       reg1.copyTo(0, reg2, 0, 16);
 
-      for (int i=0; i<16; i++) {
+      for (int i = 0; i < 16; i++) {
         assertEquals(reg1.getByte(i), reg2.getByte(i));
-        assertEquals(mem1.getByte(8+i), mem1.getByte(24+i));
+        assertEquals(mem1.getByte(8 + i), mem1.getByte(24 + i));
       }
       //println(mem1.toHexString("Mem1", 0, (int)mem1.getCapacity()));
     }
@@ -399,7 +399,7 @@ public class NativeWritableMemoryImplTest {
     try (WritableHandle wrh1 = WritableMemory.allocateDirect(memCapacity)) {
       WritableMemory mem1 = wrh1.getWritable();
 
-      for (int i= 0; i < mem1.getCapacity(); i++) { //fill with numbers
+      for (int i = 0; i < mem1.getCapacity(); i++) { //fill with numbers
         mem1.putByte(i, (byte) i);
       }
       //println(mem1.toHexString("Mem1", 0, (int)mem1.getCapacity()));
@@ -438,13 +438,13 @@ public class NativeWritableMemoryImplTest {
     ByteBuffer byteBuf = ByteBuffer.allocate(memCapacity);
     byteBuf.order(ByteOrder.nativeOrder());
 
-    for (int i=0; i<memCapacity; i++) {
+    for (int i = 0; i < memCapacity; i++) {
       byteBuf.put(i, (byte) i);
     }
 
     WritableMemory wmem = WritableMemory.writableWrap(byteBuf);
 
-    for (int i=0; i<memCapacity; i++) {
+    for (int i = 0; i < memCapacity; i++) {
       assertEquals(wmem.getByte(i), byteBuf.get(i));
     }
 
@@ -520,13 +520,13 @@ public class NativeWritableMemoryImplTest {
     ByteBuffer byteBuf = ByteBuffer.allocateDirect(memCapacity);
     byteBuf.order(ByteOrder.nativeOrder());
 
-    for (int i=0; i<memCapacity; i++) {
+    for (int i = 0; i < memCapacity; i++) {
       byteBuf.put(i, (byte) i);
     }
 
     Memory mem = Memory.wrap(byteBuf);
 
-    for (int i=0; i<memCapacity; i++) {
+    for (int i = 0; i < memCapacity; i++) {
       assertEquals(mem.getByte(i), byteBuf.get(i));
     }
 
@@ -709,7 +709,7 @@ public class NativeWritableMemoryImplTest {
 
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+    println("PRINTING: " + this.getClass().getName());
   }
 
   /**

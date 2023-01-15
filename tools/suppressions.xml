@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE suppressions PUBLIC
+  "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+  "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<suppressions>
+  <!-- Tone down the checking for test code -->
+  <suppress checks="FinalLocalVariable" files=".*[\\/]src[\\/](test|it)[\\/]"/>
+  <suppress checks="AvoidEscapedUnicodeCharacters" files=".*[\\/]src[\\/](test|it)[\\/]"/>
+  <suppress checks="JavadocPackage" files=".*[\\/]src[\\/](test|it)[\\/]"/>
+</suppressions>

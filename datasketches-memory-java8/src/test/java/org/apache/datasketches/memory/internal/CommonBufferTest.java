@@ -21,8 +21,8 @@ package org.apache.datasketches.memory.internal;
 
 import static org.testng.Assert.assertEquals;
 
-import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableBuffer;
+import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
@@ -152,7 +152,7 @@ public class CommonBufferTest {
     buf.putBooleanArray(srcArray1, 0, words);
     buf.resetPosition();
     buf.getBooleanArray(dstArray1, 0, words);
-    for (int i=0; i<words; i++) {
+    for (int i = 0; i < words; i++) {
       assertEquals(dstArray1[i], srcArray1[i]);
     }
 
@@ -162,7 +162,7 @@ public class CommonBufferTest {
     buf.putByteArray(srcArray2, 0, words);
     buf.resetPosition();
     buf.getByteArray(dstArray2, 0, words);
-    for (int i=0; i<words; i++) {
+    for (int i = 0; i < words; i++) {
       assertEquals(dstArray2[i], srcArray2[i]);
     }
 
@@ -172,7 +172,7 @@ public class CommonBufferTest {
     buf.putCharArray(srcArray3, 0, words);
     buf.resetPosition();
     buf.getCharArray(dstArray3, 0, words);
-    for (int i=0; i<words; i++) {
+    for (int i = 0; i < words; i++) {
       assertEquals(dstArray3[i], srcArray3[i]);
     }
 
@@ -182,7 +182,7 @@ public class CommonBufferTest {
     buf.putDoubleArray(srcArray4, 0, words);
     buf.resetPosition();
     buf.getDoubleArray(dstArray4, 0, words);
-    for (int i=0; i<words; i++) {
+    for (int i = 0; i < words; i++) {
       assertEquals(dstArray4[i], srcArray4[i], 0.0);
     }
 
@@ -192,7 +192,7 @@ public class CommonBufferTest {
     buf.putFloatArray(srcArray5, 0, words);
     buf.resetPosition();
     buf.getFloatArray(dstArray5, 0, words);
-    for (int i=0; i<words; i++) {
+    for (int i = 0; i < words; i++) {
       assertEquals(dstArray5[i], srcArray5[i], 0.0);
     }
 
@@ -202,7 +202,7 @@ public class CommonBufferTest {
     buf.putIntArray(srcArray6, 0, words);
     buf.resetPosition();
     buf.getIntArray(dstArray6, 0, words);
-    for (int i=0; i<words; i++) {
+    for (int i = 0; i < words; i++) {
       assertEquals(dstArray6[i], srcArray6[i]);
     }
 
@@ -212,7 +212,7 @@ public class CommonBufferTest {
     buf.putLongArray(srcArray7, 0, words);
     buf.resetPosition();
     buf.getLongArray(dstArray7, 0, words);
-    for (int i=0; i<words; i++) {
+    for (int i = 0; i < words; i++) {
       assertEquals(dstArray7[i], srcArray7[i]);
     }
 
@@ -222,7 +222,7 @@ public class CommonBufferTest {
     buf.putShortArray(srcArray8, 0, words);
     buf.resetPosition();
     buf.getShortArray(dstArray8, 0, words);
-    for (int i=0; i<words; i++) {
+    for (int i = 0; i < words; i++) {
       assertEquals(dstArray8[i], srcArray8[i]);
     }
   }
@@ -239,84 +239,84 @@ public class CommonBufferTest {
   }
 
   public static void setGetPartialArraysWithOffsetTests(WritableBuffer buf) {
-    int items= 4;
+    int items = 4;
     boolean[] srcArray1 = {true, false, true, false};
     boolean[] dstArray1 = new boolean[items];
     buf.resetPosition();
-    buf.putBooleanArray(srcArray1, 2, items/2);
+    buf.putBooleanArray(srcArray1, 2, items / 2);
     buf.resetPosition();
-    buf.getBooleanArray(dstArray1, 2, items/2);
-    for (int i=2; i<items; i++) {
+    buf.getBooleanArray(dstArray1, 2, items / 2);
+    for (int i = 2; i < items; i++) {
       assertEquals(dstArray1[i], srcArray1[i]);
     }
 
     byte[] srcArray2 = { 1, -2, 3, -4 };
     byte[] dstArray2 = new byte[items];
     buf.resetPosition();
-    buf.putByteArray(srcArray2, 2, items/2);
+    buf.putByteArray(srcArray2, 2, items / 2);
     buf.resetPosition();
-    buf.getByteArray(dstArray2, 2, items/2);
-    for (int i=2; i<items; i++) {
+    buf.getByteArray(dstArray2, 2, items / 2);
+    for (int i = 2; i < items; i++) {
       assertEquals(dstArray2[i], srcArray2[i]);
     }
 
     char[] srcArray3 = { 'A', 'B', 'C', 'D' };
     char[] dstArray3 = new char[items];
     buf.resetPosition();
-    buf.putCharArray(srcArray3, 2, items/2);
+    buf.putCharArray(srcArray3, 2, items / 2);
     buf.resetPosition();
-    buf.getCharArray(dstArray3, 2, items/2);
-    for (int i=2; i<items; i++) {
+    buf.getCharArray(dstArray3, 2, items / 2);
+    for (int i = 2; i < items; i++) {
       assertEquals(dstArray3[i], srcArray3[i]);
     }
 
     double[] srcArray4 = { 1.0, -2.0, 3.0, -4.0 };
     double[] dstArray4 = new double[items];
     buf.resetPosition();
-    buf.putDoubleArray(srcArray4, 2, items/2);
+    buf.putDoubleArray(srcArray4, 2, items / 2);
     buf.resetPosition();
-    buf.getDoubleArray(dstArray4, 2, items/2);
-    for (int i=2; i<items; i++) {
+    buf.getDoubleArray(dstArray4, 2, items / 2);
+    for (int i = 2; i < items; i++) {
       assertEquals(dstArray4[i], srcArray4[i], 0.0);
     }
 
     float[] srcArray5 = { (float)1.0, (float)-2.0, (float)3.0, (float)-4.0 };
     float[] dstArray5 = new float[items];
     buf.resetPosition();
-    buf.putFloatArray(srcArray5, 2, items/2);
+    buf.putFloatArray(srcArray5, 2, items / 2);
     buf.resetPosition();
-    buf.getFloatArray(dstArray5, 2, items/2);
-    for (int i=2; i<items; i++) {
+    buf.getFloatArray(dstArray5, 2, items / 2);
+    for (int i = 2; i < items; i++) {
       assertEquals(dstArray5[i], srcArray5[i], 0.0);
     }
 
     int[] srcArray6 = { 1, -2, 3, -4 };
     int[] dstArray6 = new int[items];
     buf.resetPosition();
-    buf.putIntArray(srcArray6, 2, items/2);
+    buf.putIntArray(srcArray6, 2, items / 2);
     buf.resetPosition();
-    buf.getIntArray(dstArray6, 2, items/2);
-    for (int i=2; i<items; i++) {
+    buf.getIntArray(dstArray6, 2, items / 2);
+    for (int i = 2; i < items; i++) {
       assertEquals(dstArray6[i], srcArray6[i]);
     }
 
     long[] srcArray7 = { 1, -2, 3, -4 };
     long[] dstArray7 = new long[items];
     buf.resetPosition();
-    buf.putLongArray(srcArray7, 2, items/2);
+    buf.putLongArray(srcArray7, 2, items / 2);
     buf.resetPosition();
-    buf.getLongArray(dstArray7, 2, items/2);
-    for (int i=2; i<items; i++) {
+    buf.getLongArray(dstArray7, 2, items / 2);
+    for (int i = 2; i < items; i++) {
       assertEquals(dstArray7[i], srcArray7[i]);
     }
 
     short[] srcArray8 = { 1, -2, 3, -4 };
     short[] dstArray8 = new short[items];
     buf.resetPosition();
-    buf.putShortArray(srcArray8, 2, items/2);
+    buf.putShortArray(srcArray8, 2, items / 2);
     buf.resetPosition();
-    buf.getShortArray(dstArray8, 2, items/2);
-    for (int i=2; i<items; i++) {
+    buf.getShortArray(dstArray8, 2, items / 2);
+    for (int i = 2; i < items; i++) {
       assertEquals(dstArray8[i], srcArray8[i]);
     }
   }
@@ -352,7 +352,7 @@ public class CommonBufferTest {
     buf.setStartPositionEnd(reg1Start, reg1Start, reg1Len);
     buf.fill(b1);
     buf.resetPosition();
-    for (int i=reg1Start; i<(reg1Len+reg1Start); i++) {
+    for (int i = reg1Start; i < (reg1Len + reg1Start); i++) {
       assertEquals(buf.getByte(), b1);
     }
     //println(buf.toHexString("Region1 to 5", reg1Start, reg1Len));
@@ -363,7 +363,7 @@ public class CommonBufferTest {
     buf.fill(b2);
     //println(mem.toHexString("Fill", 0, (int)mem.getCapacity()));
     buf.resetPosition();
-    for (int i=reg2Start; i<(reg2Start+reg2Len); i++) {
+    for (int i = reg2Start; i < (reg2Start + reg2Len); i++) {
       assertEquals(buf.getByte(), b2);
     }
     //println(buf.toHexString("Region2 to 7", reg2Start, reg2Len));
@@ -374,7 +374,7 @@ public class CommonBufferTest {
     buf.resetPosition();
     buf.clear();
     buf.resetPosition();
-    for (int i=reg1Start; i<(reg1Start+reg1Len); i++) {
+    for (int i = reg1Start; i < (reg1Start + reg1Len); i++) {
       assertEquals(buf.getByte(), zeroByte);
     }
     //println(buf.toHexString("Region1 cleared", reg1Start, reg1Len));
@@ -384,7 +384,7 @@ public class CommonBufferTest {
     buf.resetPosition();
     buf.clear();
     buf.resetPosition();
-    for (int i=reg2Start; i<(reg2Len+reg2Start); i++) {
+    for (int i = reg2Start; i < (reg2Len + reg2Start); i++) {
       assertEquals(buf.getByte(), zeroByte);
     }
     //println(buf.toHexString("Region2 cleared", reg2Start, reg2Len));
@@ -395,7 +395,7 @@ public class CommonBufferTest {
     buf.resetPosition();
     buf.fill(b4);
     buf.resetPosition();
-    for (int i=0; i<accessCapacity; i++) {
+    for (int i = 0; i < accessCapacity; i++) {
       assertEquals(buf.getByte(), b4);
     }
     //println(buf.toHexString("Region1 + Region2 all ones", 0, accessCapacity));
@@ -404,7 +404,7 @@ public class CommonBufferTest {
     buf.resetPosition();
     buf.clear();
     buf.resetPosition();
-    for (int i=0; i<accessCapacity; i++) {
+    for (int i = 0; i < accessCapacity; i++) {
       assertEquals(buf.getByte(), zeroByte);
     }
     //println(buf.toHexString("Region1 + Region2 cleared", 0, accessCapacity));
@@ -425,7 +425,7 @@ public class CommonBufferTest {
   public static void toHexStringAllMemTests(WritableBuffer buf) {
     int memCapacity = (int)buf.getCapacity();
 
-    for (int i=0; i<memCapacity; i++) {
+    for (int i = 0; i < memCapacity; i++) {
       buf.putByte((byte)i);
     }
 
@@ -435,7 +435,7 @@ public class CommonBufferTest {
 
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+    println("PRINTING: " + this.getClass().getName());
   }
 
   /**

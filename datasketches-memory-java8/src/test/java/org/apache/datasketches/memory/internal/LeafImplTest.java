@@ -48,8 +48,10 @@ public class LeafImplTest {
   private static final MemoryRequestServer dummyMemReqSvr = new DummyMemoryRequestServer();
 
   static class DummyMemoryRequestServer implements MemoryRequestServer {
+
     @Override
     public WritableMemory request(WritableMemory currentWMem, long capacityBytes) { return null; }
+
     @Override
     public void requestClose(WritableMemory memToClose, WritableMemory newMemory) { }
   }

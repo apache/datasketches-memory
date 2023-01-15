@@ -109,7 +109,7 @@ public class BaseStateTest {
     try {
       Util.isNativeByteOrder(null);
       fail();
-    } catch (final IllegalArgumentException e) {}
+    } catch (final IllegalArgumentException e) { }
   }
 
   @Test
@@ -129,7 +129,7 @@ public class BaseStateTest {
   /********************/
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+    println("PRINTING: " + this.getClass().getName());
   }
 
   /**

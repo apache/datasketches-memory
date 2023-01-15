@@ -28,11 +28,11 @@ public class MemoryCloseExceptionTest {
   public void checkNoArgs() {
     try {
       throw new MemoryCloseException();
-    } catch (final MemoryCloseException e) {}
+    } catch (final MemoryCloseException e) { }
 
     try {
       throw new MemoryCloseException("Test Exception");
-    } catch (final MemoryCloseException e) {}
+    } catch (final MemoryCloseException e) { }
   }
 }
 

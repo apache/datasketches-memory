@@ -258,7 +258,7 @@ public class MurmurHash3v2Test {
       long[] out = new long[2];
       Memory mem = wh.get();
       out = hash(mem, 0L, 4L, 1L, out);
-    } catch (Exception ee) {}
+    } catch (Exception ee) { }
   }
 
   @Test
@@ -388,7 +388,7 @@ public class MurmurHash3v2Test {
 
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+    println("PRINTING: " + this.getClass().getName());
   }
 
   /**

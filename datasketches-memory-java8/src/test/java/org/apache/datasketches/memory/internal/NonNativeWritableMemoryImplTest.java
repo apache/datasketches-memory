@@ -167,7 +167,6 @@ public class NonNativeWritableMemoryImplTest {
 
   //check Atomic Write Methods
 
-
   @Test
   public void testGetAndAddLong() {
     wmem.getAndAddLong(0, 1L);

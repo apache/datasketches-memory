@@ -377,7 +377,7 @@ public class Buffer2Test {
 
     assertEquals(buffer.getCapacity(), memory.getCapacity());
 
-    while(buffer.hasRemaining()){
+    while (buffer.hasRemaining()) {
       assertEquals(memory.getByte(buffer.getPosition()), buffer.getByte());
     }
   }
@@ -451,7 +451,7 @@ public class Buffer2Test {
 
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+    println("PRINTING: " + this.getClass().getName());
   }
 
   /**

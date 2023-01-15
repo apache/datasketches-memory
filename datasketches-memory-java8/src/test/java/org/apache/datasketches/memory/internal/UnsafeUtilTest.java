@@ -28,13 +28,11 @@ import java.util.List;
 
 import org.testng.annotations.Test;
 
-
 /**
  * @author Lee Rhodes
  */
 public class UnsafeUtilTest {
   long testField = 1; //Do not remove & cannot be static. Used in reflection check.
-
 
   @Test
   public void checkJdkString() {
@@ -138,7 +136,7 @@ public class UnsafeUtilTest {
 
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+    println("PRINTING: " + this.getClass().getName());
   }
 
   /**

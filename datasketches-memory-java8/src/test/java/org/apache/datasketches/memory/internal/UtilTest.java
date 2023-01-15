@@ -56,8 +56,8 @@ public class UtilTest {
     for (int i = 0; i < k; i++) { wMem.putLong(i << 3, i); }
     long idx = Util.binarySearchLongs(wMem, 0, k - 1, k / 2);
     long val = wMem.getLong(idx << 3);
-    assertEquals(idx, k/2);
-    assertEquals(val, k/2);
+    assertEquals(idx, k / 2);
+    assertEquals(val, k / 2);
 
     idx = Util.binarySearchLongs(wMem, 0, k - 1, k);
     assertEquals(idx, -1024);
@@ -184,7 +184,7 @@ public class UtilTest {
 
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+    println("PRINTING: " + this.getClass().getName());
   }
 
   static void println(final Object o) {

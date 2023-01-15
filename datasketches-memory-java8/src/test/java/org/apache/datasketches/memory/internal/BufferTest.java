@@ -311,10 +311,9 @@ public class BufferTest {
     wbuf.setStartPositionEnd(1, 0, 2); //out of order
   }
 
-
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+    println("PRINTING: " + this.getClass().getName());
   }
 
   /**

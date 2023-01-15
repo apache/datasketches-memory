@@ -63,13 +63,13 @@ public class NativeWritableBufferImplTest {
 
     Buffer buf = Memory.wrap(srcArray).asBuffer();
     buf.getBooleanArray(dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
     WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
     wbuf.getBooleanArray(dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
     assertTrue(buf.hasArray());
@@ -82,13 +82,13 @@ public class NativeWritableBufferImplTest {
 
     Buffer buf = Memory.wrap(srcArray).asBuffer();
     buf.getByteArray(dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
     WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
     wbuf.getByteArray(dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
   }
@@ -100,13 +100,13 @@ public class NativeWritableBufferImplTest {
 
     Buffer buf = Memory.wrap(srcArray).asBuffer();
     buf.getCharArray(dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
     WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
     wbuf.getCharArray(dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
   }
@@ -118,13 +118,13 @@ public class NativeWritableBufferImplTest {
 
     Buffer buf = Memory.wrap(srcArray).asBuffer();
     buf.getShortArray(dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
     WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
     wbuf.getShortArray(dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
   }
@@ -136,13 +136,13 @@ public class NativeWritableBufferImplTest {
 
     Buffer buf = Memory.wrap(srcArray).asBuffer();
     buf.getIntArray(dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
     WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
     wbuf.getIntArray(dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
   }
@@ -154,13 +154,13 @@ public class NativeWritableBufferImplTest {
 
     Buffer buf = Memory.wrap(srcArray).asBuffer();
     buf.getLongArray(dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
     WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
     wbuf.getLongArray(dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
   }
@@ -172,13 +172,13 @@ public class NativeWritableBufferImplTest {
 
     Buffer buf = Memory.wrap(srcArray).asBuffer();
     buf.getFloatArray(dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
     WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
     wbuf.getFloatArray(dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
   }
@@ -190,13 +190,13 @@ public class NativeWritableBufferImplTest {
 
     Buffer buf = Memory.wrap(srcArray).asBuffer();
     buf.getDoubleArray(dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
 
     WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
     wbuf.getDoubleArray(dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
   }
@@ -226,7 +226,6 @@ public class NativeWritableBufferImplTest {
     }
   }
 
-
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void checkRegionBounds() throws Exception {
     int memCapacity = 64;
@@ -243,13 +242,13 @@ public class NativeWritableBufferImplTest {
     ByteBuffer byteBuf = ByteBuffer.allocate(memCapacity);
     byteBuf.order(ByteOrder.nativeOrder());
 
-    for (int i=0; i<memCapacity; i++) {
+    for (int i = 0; i < memCapacity; i++) {
       byteBuf.put(i, (byte) i);
     }
 
     WritableBuffer wbuf = WritableBuffer.writableWrap(byteBuf);
 
-    for (int i=0; i<memCapacity; i++) {
+    for (int i = 0; i < memCapacity; i++) {
       assertEquals(wbuf.getByte(), byteBuf.get(i));
     }
 
@@ -327,13 +326,13 @@ public class NativeWritableBufferImplTest {
     ByteBuffer byteBuf = ByteBuffer.allocateDirect(memCapacity);
     byteBuf.order(ByteOrder.nativeOrder());
 
-    for (int i=0; i<memCapacity; i++) {
+    for (int i = 0; i < memCapacity; i++) {
       byteBuf.put(i, (byte) i);
     }
 
     Buffer buf = Buffer.wrap(byteBuf);
 
-    for (int i=0; i<memCapacity; i++) {
+    for (int i = 0; i < memCapacity; i++) {
       assertEquals(buf.getByte(), byteBuf.get(i));
     }
 
@@ -585,7 +584,7 @@ public class NativeWritableBufferImplTest {
 
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+    println("PRINTING: " + this.getClass().getName());
   }
 
   /**

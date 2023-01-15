@@ -302,14 +302,13 @@ public class BufferInvariantsTest {
 //    printbuf(reg);
   }
 
-
   static void printbb(ByteBuffer bb) {
     println("pos: " + bb.position() + ", lim: " + bb.limit() + ", cap: " + bb.capacity());
     int rem = bb.remaining();
     int pos = bb.position();
     int i;
-    for (i = 0; i < (rem-1); i++) {
-      print(bb.get(i+ pos) + ", ");
+    for (i = 0; i < (rem - 1); i++) {
+      print(bb.get(i + pos) + ", ");
     }
     println(bb.get(i + pos) + "\n");
   }
@@ -319,8 +318,8 @@ public class BufferInvariantsTest {
     long rem = buf.getRemaining();
     long pos = buf.getPosition();
     int i;
-    for (i = 0; i < (rem-1); i++) {
-      print(buf.getByte(i+ pos) + ", ");
+    for (i = 0; i < (rem - 1); i++) {
+      print(buf.getByte(i + pos) + ", ");
     }
     println(buf.getByte(i + pos) + "\n");
   }

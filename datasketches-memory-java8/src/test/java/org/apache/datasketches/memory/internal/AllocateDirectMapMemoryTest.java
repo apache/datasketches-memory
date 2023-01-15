@@ -72,7 +72,7 @@ public class AllocateDirectMapMemoryTest {
       println(sb.toString());
 
       println("");
-      Memory mem2 = mem.region(43+76, 20);
+      Memory mem2 = mem.region(43 + 76, 20);
       println("Mem Cap:       " + mem2.getCapacity());
       println("Native Off:    " + ((BaseStateImpl)mem).getNativeBaseOffset());
       println("Offset:        " + mem.getTotalOffset());
@@ -85,7 +85,6 @@ public class AllocateDirectMapMemoryTest {
       rh.close();
     }
   }
-
 
   @Test
   public void testIllegalArguments() throws Exception {
@@ -181,7 +180,7 @@ public class AllocateDirectMapMemoryTest {
 
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+    println("PRINTING: " + this.getClass().getName());
   }
 
   static void println(final Object o) {

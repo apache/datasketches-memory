@@ -49,17 +49,18 @@ jobs:
 
         - name: Test
           run: >
-              mvn clean test
+              mvn clean test -B -X
               -Dmaven.javadoc.skip=true
               -Dgpg.skip=true
 
         - name: Install
           run: >
-              mvn clean install -B
+              mvn clean install -B -X
               -DskipTests=true
               -Dgpg.skip=true
 
 # Lifecycle: validate, compile, test, package, verify, install, deploy
 # -B batch mode
 # -V show Version without stopping
+# -X debug mode
 # -q quiet, only show errors

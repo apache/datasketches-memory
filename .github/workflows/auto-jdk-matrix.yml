@@ -13,21 +13,24 @@ jobs:
     build:
         name: Build, Test, Install
         runs-on: ubuntu-latest
+
         strategy:
           fail-fast: false
-          matrix:
-              jdk: [ 8,11 ]
-        env:
-          JDK_VERSION: ${{ matrix.jdk }}
+
+#          matrix:
+#              jdk: [ 8,11 ]
+
+#        env:
+#          JDK_VERSION: ${{ matrix.jdk }}
 
         steps:
         - name: "Checkout ${{ github.ref }} ( ${{ github.sha }} )"
-          uses: actions/checkout@v3
+          uses: actions/checkout@v3.3.0
           with:
               persist-credentials: false
 
         - name: Cache local Maven repository
-          uses: actions/cache@v3
+          uses: actions/cache@v3.2.3
           with:
               path: ~/.m2/repository
               key: build-${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -36,7 +39,10 @@ jobs:
         - name: Install Matrix JDK
           uses: actions/setup-java@v3
           with:
-              java-version: ${{ matrix.jdk }}
+#              java-version: ${{ matrix.jdk }}
+              java-version: |
+                  8
+                  11
               distribution: 'temurin'
               java-package: jdk
               architecture: x64 

@@ -1,7 +1,7 @@
 name: Manual share data
 
 on:
-    workflow_dispatch
+    workflow_dispatch:
 
 jobs:
   job_1:

@@ -50,4 +50,4 @@ jobs:
         run: |
           value=`cat math-homework.txt`
           echo The result is $value
-          ls -la
+          echo HOME: $HOME

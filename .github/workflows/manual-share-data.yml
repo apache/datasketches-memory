@@ -1,9 +1,7 @@
 name: Manual share data
 
 on:
-    push:
-        branches: [ master, master_tempfix ]
-    workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
   job_1:
@@ -52,3 +50,4 @@ jobs:
         run: |
           value=`cat math-homework.txt`
           echo The result is $value
+          ls -la

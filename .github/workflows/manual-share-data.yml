@@ -50,4 +50,8 @@ jobs:
         run: |
           value=`cat math-homework.txt`
           echo The result is $value
-          echo HOME: $HOME
+         mkdir ~/deb
+         cd ~/deb
+         apt download tree
+         dpkg-deb -xv ./*dep ./
+         ~deb/usr/bin/tree

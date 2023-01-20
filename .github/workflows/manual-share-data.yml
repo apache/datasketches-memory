@@ -6,12 +6,14 @@ on:
 jobs:
   job_1:
     name: Add 3 and 7
-    runs-on: ubuntu-latest
+    runs-on: macOS-latest
+
     steps:
       - shell: bash
         run: |
           expr 3 + 7 > math-homework.txt
-      - name: Upload math result for job 1
+
+      - name: Upload math result for job_2
         uses: actions/upload-artifact@v3
         with:
           name: homework
@@ -20,17 +22,20 @@ jobs:
   job_2:
     name: Multiply by 9
     needs: job_1
-    runs-on: windows-latest
+    runs-on: macOS-latest
+
     steps:
-      - name: Download math result for job 1
+      - name: Download math result from job_1
         uses: actions/download-artifact@v3
         with:
           name: homework
+
       - shell: bash
         run: |
           value=`cat math-homework.txt`
           expr $value \* 9 > math-homework.txt
-      - name: Upload math result for job 2
+
+      - name: Upload math result from job_2 to job_3
         uses: actions/upload-artifact@v3
         with:
           name: homework
@@ -40,18 +45,41 @@ jobs:
     name: Display results
     needs: job_2
     runs-on: macOS-latest
+
     steps:
-      - name: Download math result for job 2
+      - name: Download math result from job_2
         uses: actions/download-artifact@v3
         with:
           name: homework
+
       - name: Print the final result
         shell: bash
         run: |
           value=`cat math-homework.txt`
           echo The result is $value
-          mkdir ~/deb
-          cd ~/deb
-          apt download tree
-          dpkg-deb -xv ./*dep ./
-          ~deb/usr/bin/tree
+
+      - name: Upload result from job_3 to job_4
+        uses: actions/upload-artifact@v3
+        with:
+          name: homework
+          path: math-homework.txt
+
+  job_4:
+    name: Install tree and output
+    needs: job_3
+    runs-on: macOS-latest
+
+    steps:
+      - name: Download math result from job-3
+        uses: actions/donload-artifact@v3
+        with:
+          name: homework
+
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: updte brew, install tree, output
+        run: |
+          brew update
+          brew install tree
+          tree

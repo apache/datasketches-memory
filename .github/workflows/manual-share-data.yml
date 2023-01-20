@@ -82,5 +82,5 @@ jobs:
         run: |
           brew update
           brew install tree
-          tree /Users/runner
+          tree /Users/runner/work
           

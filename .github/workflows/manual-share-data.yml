@@ -57,7 +57,6 @@ jobs:
         run: |
           value=`cat math-homework.txt`
           echo The result is $value
-<<<<<<< HEAD
 
       - name: Upload result from job_3 to job_4
         uses: actions/upload-artifact@v3
@@ -84,10 +83,3 @@ jobs:
           brew update
           brew install tree
           tree
-=======
-          mkdir ~/deb
-          cd ~/deb
-          apt download tree
-          dpkg-deb -xv ./*dep ./
-          ~deb/usr/bin/tree
->>>>>>> 2aeac3799756c695d55b892da941a8d0601a2d97

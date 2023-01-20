@@ -71,7 +71,7 @@ jobs:
 
     steps:
       - name: Download math result from job-3
-        uses: actions/donload-artifact@v3
+        uses: actions/download-artifact@v3
         with:
           name: homework
 

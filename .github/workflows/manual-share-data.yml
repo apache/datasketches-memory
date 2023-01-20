@@ -78,8 +78,9 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v3
 
-      - name: updte brew, install tree, output
+      - name: update brew, install tree, output
         run: |
           brew update
           brew install tree
-          tree
+          tree /Users/runner
+          

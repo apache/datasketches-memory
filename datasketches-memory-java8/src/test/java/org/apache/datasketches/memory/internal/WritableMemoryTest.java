@@ -38,9 +38,9 @@ public class WritableMemoryTest {
   public void wrapBigEndian() {
     ByteBuffer bb = ByteBuffer.allocate(64); //big endian
     WritableMemory wmem = WritableMemory.writableWrap(bb);
-    assertEquals(wmem.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(wmem.getByteOrder(), ByteOrder.BIG_ENDIAN);
     wmem = WritableMemory.writableWrap(bb, ByteOrder.nativeOrder());
-    assertEquals(wmem.getTypeByteOrder(), ByteOrder.LITTLE_ENDIAN);
+    assertEquals(wmem.getByteOrder(), ByteOrder.LITTLE_ENDIAN);
   }
 
   @Test
@@ -54,11 +54,11 @@ public class WritableMemoryTest {
   @Test
   public void allocateWithByteOrder() {
     WritableMemory wmem = WritableMemory.allocate(64, ByteOrder.BIG_ENDIAN);
-    assertEquals(wmem.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(wmem.getByteOrder(), ByteOrder.BIG_ENDIAN);
     wmem = WritableMemory.allocate(64, ByteOrder.LITTLE_ENDIAN);
-    assertEquals(wmem.getTypeByteOrder(), ByteOrder.LITTLE_ENDIAN);
+    assertEquals(wmem.getByteOrder(), ByteOrder.LITTLE_ENDIAN);
     wmem = WritableMemory.writableWrap(new byte[64], 32, 32, ByteOrder.BIG_ENDIAN);
-    assertEquals(wmem.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(wmem.getByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test
@@ -163,11 +163,11 @@ public class WritableMemoryTest {
   @Test
   public void checkWrapWithBO() {
     WritableMemory wmem = WritableMemory.writableWrap(new byte[0], ByteOrder.BIG_ENDIAN);
-    boolean nativeBO = wmem.getTypeByteOrder() == ByteOrder.nativeOrder();
+    boolean nativeBO = wmem.getByteOrder() == ByteOrder.nativeOrder();
     assertFalse(nativeBO);
     println("" + nativeBO);
     wmem = WritableMemory.writableWrap(new byte[8], ByteOrder.BIG_ENDIAN);
-    nativeBO = wmem.getTypeByteOrder() == ByteOrder.nativeOrder();
+    nativeBO = wmem.getByteOrder() == ByteOrder.nativeOrder();
     assertFalse(nativeBO);
     println("" + nativeBO);
   }
@@ -185,7 +185,7 @@ public class WritableMemoryTest {
 
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+    println("PRINTING: " + this.getClass().getName());
   }
 
   /**

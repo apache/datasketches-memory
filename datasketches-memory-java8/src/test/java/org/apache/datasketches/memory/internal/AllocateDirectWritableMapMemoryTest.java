@@ -87,8 +87,8 @@ public class AllocateDirectWritableMapMemoryTest {
       }
     }
     assertTrue(file.createNewFile());
-    assertTrue (file.setWritable(true, false)); //writable=true, ownerOnly=false
-    assertTrue (file.isFile());
+    assertTrue(file.setWritable(true, false)); //writable=true, ownerOnly=false
+    assertTrue(file.isFile());
     file.deleteOnExit();  //comment out if you want to examine the file.
 
     try (
@@ -226,14 +226,14 @@ public class AllocateDirectWritableMapMemoryTest {
   public void checkDirectCounter() {
     long count =  BaseState.getCurrentDirectMemoryMapAllocations();
       if (count != 0) {
-        println(""+count);
+        println("" + count);
         fail();
       }
     }
 
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+    println("PRINTING: " + this.getClass().getName());
   }
 
   static void println(final Object o) {

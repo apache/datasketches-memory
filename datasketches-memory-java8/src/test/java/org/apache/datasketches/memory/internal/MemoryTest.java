@@ -210,8 +210,8 @@ public class MemoryTest {
     ByteBuffer bb = ByteBuffer.allocate(n * 8);
     bb.order(ByteOrder.BIG_ENDIAN);
     Memory mem = Memory.wrap(bb);
-    assertFalse(mem.getTypeByteOrder() == ByteOrder.nativeOrder());
-    assertEquals(mem.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertFalse(mem.getByteOrder() == ByteOrder.nativeOrder());
+    assertEquals(mem.getByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test
@@ -444,9 +444,9 @@ public class MemoryTest {
     WritableMemory wmem = WritableMemory.allocate(len);
     for (int i = 0; i < len; i++) { wmem.putByte(i, (byte) i); }
     assertTrue(wmem.equalTo(0, wmem, 0, len));
-    assertFalse(wmem.equalTo(0, wmem, len/2, len/2));
+    assertFalse(wmem.equalTo(0, wmem, len / 2, len / 2));
     assertEquals(wmem.compareTo(0, len, wmem, 0, len), 0);
-    assertTrue(wmem.compareTo(0, 0, wmem, len/2, len/2) < 0);
+    assertTrue(wmem.compareTo(0, 0, wmem, len / 2, len / 2) < 0);
   }
 
   @Test
@@ -459,7 +459,7 @@ public class MemoryTest {
 
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+    println("PRINTING: " + this.getClass().getName());
   }
 
   static void println(final Object o) {

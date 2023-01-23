@@ -37,8 +37,14 @@ under the License.
   <property name="severity" value="warning"/>
   <property name="fileExtensions" value="java"/>
 
+  <module name="SuppressionFilter">
+    <property name="file" value="${samedir}/suppressions.xml"/>
+    <property name="optional" value="false"/>
+  </module>
+
+  <!-- Exclude module-info.java files -->
   <module name="BeforeExecutionExclusionFileFilter">
-    <property name="fileNamePattern" value="src[\\/]test[\\/]java[\\/].+$|module\-info\.java.+$"/>
+    <property name="fileNamePattern" value="module\-info\.java$"/>
   </module>
 
   <module name="FileTabCharacter">
@@ -235,6 +241,7 @@ under the License.
       <property name="severity" value="warning"/>
       <property name="allowEscapesForControlCharacters" value="true"/>
       <property name="allowByTailComment" value="true"/>
+      <property name="allowIfAllCharactersEscaped" value="true"/>
       <property name="allowNonPrintableEscapes" value="true"/>
       <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>

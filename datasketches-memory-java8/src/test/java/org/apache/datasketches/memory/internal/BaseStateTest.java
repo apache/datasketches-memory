@@ -85,7 +85,7 @@ public class BaseStateTest {
   }
 
   @Test
-  public void checkGetNativeBaseOffset_Heap() throws Exception {
+  public void checkGetNativeBaseOffset_Heap() {
     WritableMemory wmem = WritableMemory.allocate(8); //heap
     final long offset = ((BaseStateImpl)wmem).getNativeBaseOffset();
     assertEquals(offset, 0L);
@@ -105,11 +105,11 @@ public class BaseStateTest {
 
   @Test
   public void checkIsNativeByteOrder() {
-    assertTrue(BaseStateImpl.isNativeByteOrder(ByteOrder.nativeOrder()));
+    assertTrue(Util.isNativeByteOrder(ByteOrder.nativeOrder()));
     try {
-      BaseStateImpl.isNativeByteOrder(null);
+      Util.isNativeByteOrder(null);
       fail();
-    } catch (final IllegalArgumentException e) {}
+    } catch (final IllegalArgumentException e) { }
   }
 
   @Test
@@ -129,7 +129,7 @@ public class BaseStateTest {
   /********************/
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+    println("PRINTING: " + this.getClass().getName());
   }
 
   /**

@@ -36,15 +36,10 @@ import org.apache.datasketches.memory.Memory;
  * @author Lee Rhodes
  */
 public final class Util {
+
+  private Util() { }
+
   public static final String LS = System.getProperty("line.separator");
-
-  //Byte Order related
-  public static final ByteOrder NON_NATIVE_BYTE_ORDER = ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN
-      ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
-
-  public static ByteOrder otherByteOrder(final ByteOrder order) {
-    return (order == ByteOrder.nativeOrder()) ? NON_NATIVE_BYTE_ORDER : ByteOrder.nativeOrder();
-  }
 
   /**
    * Don't use sun.misc.Unsafe#copyMemory to copy blocks of memory larger than this
@@ -58,9 +53,15 @@ public final class Util {
    */
   public static final int UNSAFE_COPY_THRESHOLD_BYTES = 1024 * 1024;
 
-  private Util() { }
+  //Byte Order related
+  public static final ByteOrder NATIVE_BYTE_ORDER = ByteOrder.nativeOrder();
 
-  //Byte Order Related
+  public static final ByteOrder NON_NATIVE_BYTE_ORDER = NATIVE_BYTE_ORDER == ByteOrder.LITTLE_ENDIAN
+      ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
+
+  public static ByteOrder otherByteOrder(final ByteOrder order) {
+    return (order == NATIVE_BYTE_ORDER) ? NON_NATIVE_BYTE_ORDER : NATIVE_BYTE_ORDER;
+  }
 
   /**
    * Returns true if the given byteOrder is the same as the native byte order.

@@ -19,7 +19,16 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.XxHash.*;
+import static org.apache.datasketches.memory.XxHash.hashBooleanArr;
+import static org.apache.datasketches.memory.XxHash.hashByteArr;
+import static org.apache.datasketches.memory.XxHash.hashCharArr;
+import static org.apache.datasketches.memory.XxHash.hashDoubleArr;
+import static org.apache.datasketches.memory.XxHash.hashFloatArr;
+import static org.apache.datasketches.memory.XxHash.hashIntArr;
+import static org.apache.datasketches.memory.XxHash.hashLong;
+import static org.apache.datasketches.memory.XxHash.hashLongArr;
+import static org.apache.datasketches.memory.XxHash.hashShortArr;
+import static org.apache.datasketches.memory.XxHash.hashString;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -68,7 +77,7 @@ public class XxHash64Test {
       WritableMemory wmem = WritableMemory.writableWrap(in);
       for (int i = 0; i < j; i++) { wmem.putByte(i, (byte) (-128 + i)); }
 
-      long hash =wmem.xxHash64(offset, bytes, seed);
+      long hash = wmem.xxHash64(offset, bytes, seed);
       assertTrue(hash != 0);
     }
   }

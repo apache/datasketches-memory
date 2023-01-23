@@ -32,76 +32,115 @@ import org.apache.datasketches.memory.WritableMemory;
  * @author Lee Rhodes
  */
 final class BBNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
-  private static final int id = MEMORY | NONNATIVE | BYTEBUF;
-  private final Object unsafeObj;
-  private final long nativeBaseOffset; //used to compute cumBaseOffset
   private final ByteBuffer byteBuf; //holds a reference to a ByteBuffer until we are done with it.
+  private final Object unsafeObj;
+  private final long nativeBaseOffset;
+  private final long offsetBytes;
+  private final long capacityBytes;
+  private final int typeId;
+  private long cumOffsetBytes;
   private final MemoryRequestServer memReqSvr;
-  private final byte typeId;
 
   BBNonNativeWritableMemoryImpl(
       final Object unsafeObj,
       final long nativeBaseOffset,
-      final long regionOffset,
+      final long offsetBytes,
       final long capacityBytes,
       final int typeId,
-      final ByteBuffer byteBuf,
-      final MemoryRequestServer memReqSvr) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
+      final long cumOffsetBytes,
+      final MemoryRequestServer memReqSvr,
+      final ByteBuffer byteBuf) {
+    super();
     this.unsafeObj = unsafeObj;
     this.nativeBaseOffset = nativeBaseOffset;
-    this.byteBuf = byteBuf;
+    this.offsetBytes = offsetBytes;
+    this.capacityBytes = capacityBytes;
+    this.typeId = removeNnBuf(typeId) | BYTEBUF | MEMORY | NONNATIVE;
+    this.cumOffsetBytes = cumOffsetBytes;
     this.memReqSvr = memReqSvr;
-    this.typeId = (byte) (id | (typeId & 0x7));
+    this.byteBuf = byteBuf;
   }
 
   @Override
-  BaseWritableMemoryImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
-      final boolean readOnly, final ByteOrder byteOrder) {
-    final int type = setReadOnlyType(typeId, readOnly) | REGION;
-    return Util.isNativeByteOrder(byteOrder)
-        ? new BBWritableMemoryImpl(
-            unsafeObj, nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, type, getByteBuffer(), memReqSvr)
-        : new BBNonNativeWritableMemoryImpl(
-            unsafeObj, nativeBaseOffset, getRegionOffset(offsetBytes), capacityBytes, type, getByteBuffer(), memReqSvr);
+  BaseWritableMemoryImpl toWritableRegion(
+      final long regionOffsetBytes,
+      final long capacityBytes,
+      final boolean readOnly,
+      final ByteOrder byteOrder) {
+    final long newOffsetBytes = offsetBytes + regionOffsetBytes;
+    final long newCumOffsetBytes = cumOffsetBytes + regionOffsetBytes;
+    int typeIdOut = removeNnBuf(typeId) | MEMORY | REGION | (readOnly ? READONLY : 0);
+
+    if (Util.isNativeByteOrder(byteOrder)) {
+      typeIdOut |= NATIVE;
+      return new BBWritableMemoryImpl(
+          unsafeObj, nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, memReqSvr, byteBuf);
+    } else {
+      typeIdOut |= NONNATIVE;
+      return new BBNonNativeWritableMemoryImpl(
+          unsafeObj, nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, memReqSvr, byteBuf);
+    }
   }
 
   @Override
   BaseWritableBufferImpl toWritableBuffer(final boolean readOnly, final ByteOrder byteOrder) {
-    final int type = setReadOnlyType(typeId, readOnly);
-    return Util.isNativeByteOrder(byteOrder)
-        ? new BBWritableBufferImpl(
-            unsafeObj, nativeBaseOffset, getRegionOffset(), getCapacity(), type, byteBuf, memReqSvr)
-        : new BBNonNativeWritableBufferImpl(
-            unsafeObj, nativeBaseOffset, getRegionOffset(), getCapacity(), type, byteBuf, memReqSvr);
+    int typeIdOut = removeNnBuf(typeId) | BUFFER | (readOnly ? READONLY : 0);
+
+    if (byteOrder == ByteOrder.nativeOrder()) {
+      typeIdOut |= NATIVE;
+      return new BBWritableBufferImpl(
+          unsafeObj, nativeBaseOffset, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr, byteBuf);
+    } else {
+      typeIdOut |= NONNATIVE;
+      return new BBNonNativeWritableBufferImpl(
+          unsafeObj, nativeBaseOffset, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr, byteBuf);
+    }
   }
 
   @Override
-  public ByteBuffer getByteBuffer() {
+  public long getCapacity() {
     assertValid();
-    return byteBuf;
+    return capacityBytes;
+  }
+
+  @Override
+  public long getCumulativeOffset() {
+    assertValid();
+    return cumOffsetBytes;
   }
 
   @Override
   public MemoryRequestServer getMemoryRequestServer() {
-    assertValid();
     return memReqSvr;
   }
 
   @Override
-  long getNativeBaseOffset() {
+  public long getNativeBaseOffset() {
     return nativeBaseOffset;
   }
 
   @Override
+  public long getTotalOffset() {
+    assertValid();
+    return offsetBytes;
+  }
+
+  @Override
   int getTypeId() {
-    return typeId & 0xff;
+    assertValid();
+    return typeId;
   }
 
   @Override
   Object getUnsafeObject() {
     assertValid();
     return unsafeObj;
+  }
+
+  @Override
+  public ByteBuffer getByteBuffer() {
+    assertValid();
+    return byteBuf;
   }
 
 }

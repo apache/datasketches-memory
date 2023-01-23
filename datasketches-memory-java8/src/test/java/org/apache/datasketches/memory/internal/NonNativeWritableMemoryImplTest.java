@@ -167,7 +167,6 @@ public class NonNativeWritableMemoryImplTest {
 
   //check Atomic Write Methods
 
-
   @Test
   public void testGetAndAddLong() {
     wmem.getAndAddLong(0, 1L);
@@ -205,7 +204,7 @@ public class NonNativeWritableMemoryImplTest {
   @Test
   public void checkRegion() {
     WritableMemory wreg = wmem.writableRegion(0, wmem.getCapacity());
-    assertEquals(wreg.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(wreg.getByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test
@@ -213,7 +212,7 @@ public class NonNativeWritableMemoryImplTest {
     byte[] bArr1 = new byte[0];
     WritableMemory wmem1 = WritableMemory.writableWrap(bArr1, ByteOrder.BIG_ENDIAN);
     Memory reg = wmem1.region(0, wmem1.getCapacity());
-    assertEquals(reg.getTypeByteOrder(), ByteOrder.LITTLE_ENDIAN);
+    assertEquals(reg.getByteOrder(), ByteOrder.LITTLE_ENDIAN);
   }
 
 }

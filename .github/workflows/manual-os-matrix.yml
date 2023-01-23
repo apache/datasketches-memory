@@ -9,9 +9,10 @@ env:
 jobs:
     build:
         name: Build, Test, Install
-        runs-on: ${{matrix.os}}
+
         strategy:
           fail-fast: false
+
           matrix:
             jdk: [ 8, 11 ]
             os: [ windows-latest, ubuntu-latest, macos-latest ]
@@ -25,6 +26,8 @@ jobs:
               - os: macos-latest
                 skip_javadoc: -Dmaven.javadoc.skip=true
                 skip_gpg: -Dgpg.skip=true
+
+        runs-on: ${{matrix.os}}
 
         env:
           JDK_VERSION: ${{ matrix.jdk }}

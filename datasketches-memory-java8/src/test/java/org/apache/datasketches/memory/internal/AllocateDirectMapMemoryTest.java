@@ -23,7 +23,7 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.Util.*;
+import static org.apache.datasketches.memory.internal.Util.getResourceFile;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -52,6 +52,36 @@ public class AllocateDirectMapMemoryTest {
     File file = getResourceFile("GettysburgAddress.txt");
     assertTrue(AllocateDirectMap.isFileReadOnly(file));
     try (MapHandle rh = Memory.map(file)) {
+      rh.close();
+    }
+  }
+
+  @Test
+  public void simpleMap2() throws Exception {
+    File file = getResourceFile("GettysburgAddress.txt");
+    try (MapHandle rh = Memory.map(file))
+    {
+      Memory mem = rh.get();
+      println("Mem Cap:       " + mem.getCapacity());
+      println("Native Off:    " + ((BaseStateImpl)mem).getNativeBaseOffset());
+      println("Total Offset:  " + mem.getTotalOffset());
+      println("Cum Offset:    " + ((BaseStateImpl)mem).getCumulativeOffset(0));
+      println("Total Offset: " + mem.getTotalOffset());
+      StringBuilder sb = new StringBuilder();
+      mem.getCharsFromUtf8(43, 176, sb);
+      println(sb.toString());
+
+      println("");
+      Memory mem2 = mem.region(43 + 76, 20);
+      println("Mem Cap:       " + mem2.getCapacity());
+      println("Native Off:    " + ((BaseStateImpl)mem).getNativeBaseOffset());
+      println("Offset:        " + mem.getTotalOffset());
+      println("Cum Offset:    " + ((BaseStateImpl)mem2).getCumulativeOffset(0));
+      println("Total Offset: " + mem2.getTotalOffset());
+      StringBuilder sb2 = new StringBuilder();
+      mem2.getCharsFromUtf8(0, 12, sb2);
+      println(sb2.toString());
+
       rh.close();
     }
   }
@@ -150,7 +180,7 @@ public class AllocateDirectMapMemoryTest {
 
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+    println("PRINTING: " + this.getClass().getName());
   }
 
   static void println(final Object o) {

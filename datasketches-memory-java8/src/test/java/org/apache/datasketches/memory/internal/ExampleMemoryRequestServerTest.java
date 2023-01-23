@@ -77,7 +77,7 @@ public class ExampleMemoryRequestServerTest {
   public void checkZeroCapacity() throws Exception {
     ExampleMemoryRequestServer svr = new ExampleMemoryRequestServer();
     try (WritableHandle wh = WritableMemory.allocateDirect(0, ByteOrder.nativeOrder(), svr)) {
-
+      //empty
     }
   }
 
@@ -131,7 +131,7 @@ public class ExampleMemoryRequestServerTest {
 
     @Override
     public WritableMemory request(WritableMemory currentWMem, long capacityBytes) {
-     ByteOrder order = currentWMem.getTypeByteOrder();
+     ByteOrder order = currentWMem.getByteOrder();
      WritableHandle handle = WritableMemory.allocateDirect(capacityBytes, order, this);
      WritableMemory wmem = handle.getWritable();
      map.put(wmem, handle); //We track the newly allocated memory and its handle.
@@ -165,7 +165,7 @@ public class ExampleMemoryRequestServerTest {
 
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+    println("PRINTING: " + this.getClass().getName());
   }
 
   /**

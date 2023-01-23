@@ -162,12 +162,12 @@ public interface WritableMemory extends Memory {
    * <li>Returned object's capacity = <i>capacityBytes</i></li>
    * </ul>
    *
-   * @param offsetBytes the starting offset with respect to this object. It must be &ge; 0.
+   * @param regionOffsetBytes the starting offset with respect to this object. It must be &ge; 0.
    * @param capacityBytes the capacity of the returned object in bytes. It must be &ge; 0.
    * @return a new <i>WritableMemory</i> representing the defined writable region.
    */
-  default WritableMemory writableRegion(long offsetBytes, long capacityBytes) {
-    return writableRegion(offsetBytes, capacityBytes, getTypeByteOrder());
+  default WritableMemory writableRegion(long regionOffsetBytes, long capacityBytes) {
+    return writableRegion(regionOffsetBytes, capacityBytes, getByteOrder());
   }
 
   /**
@@ -201,7 +201,7 @@ public interface WritableMemory extends Memory {
    * @return a new <i>WritableBuffer</i> with a view of this WritableMemory
    */
   default WritableBuffer asWritableBuffer() {
-    return asWritableBuffer(getTypeByteOrder());
+    return asWritableBuffer(getByteOrder());
   }
 
   /**

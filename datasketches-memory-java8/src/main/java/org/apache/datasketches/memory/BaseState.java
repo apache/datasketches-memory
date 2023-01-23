@@ -31,28 +31,20 @@ import org.apache.datasketches.memory.internal.BaseStateImpl;
  * @author Lee Rhodes
  */
 public interface BaseState {
+
   /**
    * The placeholder for the default MemoryRequestServer, if set at all.
    */
   static final MemoryRequestServer defaultMemReqSvr = null; //new DefaultMemoryRequestServer();
 
-  //Byte Order Related
-
   /**
-   * Gets the current Type ByteOrder.
-   * This may be different from the ByteOrder of the backing resource and of the Native Byte Order.
-   * @return the current Type ByteOrder.
+   * Checks that the specified range of bytes is within bounds of this object, throws
+   * {@link IllegalArgumentException} if it's not: i. e. if offsetBytes &lt; 0, or length &lt; 0,
+   * or offsetBytes + length &gt; {@link #getCapacity()}.
+   * @param offsetBytes the given offset in bytes of this object
+   * @param lengthBytes the given length in bytes of this object
    */
-  ByteOrder getTypeByteOrder();
-
-  /**
-   * Returns true if the Native ByteOrder is the same as the ByteOrder of the
-   * current Buffer or Memory and the same ByteOrder as the given byteOrder.
-   * @param byteOrder the given ByteOrder
-   * @return true if the Native ByteOrder is the same as the ByteOrder of the
-   * current Buffer or Memory and the same ByteOrder as the given byteOrder.
-   */
-  boolean isByteOrderCompatible(ByteOrder byteOrder);
+  void checkValidAndBounds(long offsetBytes, long lengthBytes);
 
   /**
    * Returns true if the given object is an instance of this class and has equal data contents.
@@ -83,55 +75,72 @@ public interface BaseState {
   ByteBuffer getByteBuffer();
 
   /**
+   * Gets the current ByteOrder.
+   * This may be different from the ByteOrder of the backing resource and {@link ByteOrder#nativeOrder()}
+   * @return the current ByteOrder.
+   */
+  ByteOrder getByteOrder();
+
+  /**
    * Gets the capacity of this object in bytes
    * @return the capacity of this object in bytes
    */
   long getCapacity();
 
+  //Monitoring
   /**
-   * Gets the cumulative offset in bytes of this object from the backing resource.
-   * This offset may also include other offset components such as the native off-heap
-   * memory address, DirectByteBuffer split offsets, region offsets, and unsafe arrayBaseOffsets.
-   *
-   * @return the cumulative offset in bytes of this object from the backing resource.
+   * Gets the current size of active direct memory allocated.
+   * @return the current size of active direct memory allocated.
    */
-  long getCumulativeOffset();
+  static long getCurrentDirectMemoryAllocated() {
+    return BaseStateImpl.getCurrentDirectMemoryAllocated();
+  }
 
   /**
-   * Gets the cumulative offset in bytes of this object from the backing resource including the given
-   * offsetBytes. This offset may also include other offset components such as the native off-heap
-   * memory address, DirectByteBuffer split offsets, region offsets, and unsafe arrayBaseOffsets.
-   *
-   * @param offsetBytes offset to be added to the cumulative offset.
-   * @return the cumulative offset in bytes of this object from the backing resource including the
-   * given offsetBytes.
+   * Gets the current number of active direct memory allocations.
+   * @return the current number of active direct memory allocations.
    */
-  long getCumulativeOffset(long offsetBytes);
+  static long getCurrentDirectMemoryAllocations() {
+    return BaseStateImpl.getCurrentDirectMemoryAllocations();
+  }
 
   /**
-   * Returns the offset of address zero of this object relative to the address zero of the
-   * backing resource but not including the size of any Java object header.
-   * @return the offset of address zero of this object relative to the address zero of the
-   * backing resource but not including the size of any Java object header.
+   * Gets the current size of active direct memory map allocated.
+   * @return the current size of active direct memory map allocated.
    */
-  long getRegionOffset();
+  static long getCurrentDirectMemoryMapAllocated() {
+    return BaseStateImpl.getCurrentDirectMemoryMapAllocated();
+  }
 
   /**
-   * Returns the offset of address zero of this object relative to the address zero of the
-   * backing resource plus the given offsetBytes but not including the size of any Java object
-   * header.
-   * @param offsetBytes the given offsetBytes
-   * @return the offset of address zero of this object relative to the address zero of the
-   * backing resource plus the given offsetBytes but not including the size of any Java object
-   * header.
+   * Gets the current number of active direct memory map allocations.
+   * @return the current number of active direct memory map allocations.
    */
-  long getRegionOffset(long offsetBytes);
+  static long getCurrentDirectMemoryMapAllocations() {
+    return BaseStateImpl.getCurrentDirectMemoryMapAllocations();
+  }
+  //End Monitoring
+
+  /**
+   * Returns the offset of address zero of this object relative to the base address of the
+   * backing resource. This does not include the object header for heap arrays nor the initial
+   * offset of a memory-mapped file.
+   * @return the offset of address zero of this object relative to the base address of the
+   * backing resource.
+   */
+  long getTotalOffset();
 
   /**
    * Returns true if this object is backed by an on-heap primitive array
    * @return true if this object is backed by an on-heap primitive array
    */
   boolean hasArray();
+
+  /**
+   * Returns true if this Memory is backed by a ByteBuffer.
+   * @return true if this Memory is backed by a ByteBuffer.
+   */
+  boolean hasByteBuffer();
 
   /**
    * Returns the hashCode of this object.
@@ -149,32 +158,13 @@ public interface BaseState {
   int hashCode();
 
   /**
-   * Returns the 64-bit hash of the sequence of bytes in this object specified by
-   * <i>offsetBytes</i>, <i>lengthBytes</i> and a <i>seed</i>.  Note that the sequence of bytes is
-   * always processed in the same order independent of endianness.
-   *
-   * @param offsetBytes the given offset in bytes to the first byte of the byte sequence.
-   * @param lengthBytes the given length in bytes of the byte sequence.
-   * @param seed the given long seed.
-   * @return the 64-bit hash of the sequence of bytes in this object specified by
-   * <i>offsetBytes</i> and <i>lengthBytes</i>.
+   * Returns true if the Native ByteOrder is the same as the ByteOrder of the
+   * current Buffer or Memory and the same ByteOrder as the given byteOrder.
+   * @param byteOrder the given ByteOrder
+   * @return true if the Native ByteOrder is the same as the ByteOrder of the
+   * current Buffer or Memory and the same ByteOrder as the given byteOrder.
    */
-  long xxHash64(long offsetBytes, long lengthBytes, long seed);
-
-  /**
-   * Returns a 64-bit hash from a single long. This method has been optimized for speed when only
-   * a single hash of a long is required.
-   * @param in A long.
-   * @param seed A long valued seed.
-   * @return the hash.
-   */
-  long xxHash64(long in, long seed);
-
-  /**
-   * Returns true if this Memory is backed by a ByteBuffer.
-   * @return true if this Memory is backed by a ByteBuffer.
-   */
-  boolean hasByteBuffer();
+  boolean isByteOrderCompatible(ByteOrder byteOrder);
 
   /**
    * Returns true if the backing resource is direct (off-heap) memory.
@@ -207,51 +197,6 @@ public interface BaseState {
   boolean isValid();
 
   /**
-   * Checks that the specified range of bytes is within bounds of this object, throws
-   * {@link IllegalArgumentException} if it's not: i. e. if offsetBytes &lt; 0, or length &lt; 0,
-   * or offsetBytes + length &gt; {@link #getCapacity()}.
-   * @param offsetBytes the given offset in bytes of this object
-   * @param lengthBytes the given length in bytes of this object
-   */
-  void checkValidAndBounds(long offsetBytes, long lengthBytes);
-
-  //Monitoring
-
-  /**
-   * Gets the current number of active direct memory allocations.
-   * @return the current number of active direct memory allocations.
-   */
-  static long getCurrentDirectMemoryAllocations() {
-    return BaseStateImpl.getCurrentDirectMemoryAllocations();
-  }
-
-  /**
-   * Gets the current size of active direct memory allocated.
-   * @return the current size of active direct memory allocated.
-   */
-  static long getCurrentDirectMemoryAllocated() {
-    return BaseStateImpl.getCurrentDirectMemoryAllocated();
-  }
-
-  /**
-   * Gets the current number of active direct memory map allocations.
-   * @return the current number of active direct memory map allocations.
-   */
-  static long getCurrentDirectMemoryMapAllocations() {
-    return BaseStateImpl.getCurrentDirectMemoryMapAllocations();
-  }
-
-  /**
-   * Gets the current size of active direct memory map allocated.
-   * @return the current size of active direct memory map allocated.
-   */
-  static long getCurrentDirectMemoryMapAllocated() {
-    return BaseStateImpl.getCurrentDirectMemoryMapAllocated();
-  }
-
-  //TO STRING
-
-  /**
    * Returns a formatted hex string of a range of this object.
    * Used primarily for testing.
    * @param header a descriptive header
@@ -260,5 +205,27 @@ public interface BaseState {
    * @return a formatted hex string in a human readable array
    */
   String toHexString(String header, long offsetBytes, int lengthBytes);
+
+  /**
+   * Returns the 64-bit hash of the sequence of bytes in this object specified by
+   * <i>offsetBytes</i>, <i>lengthBytes</i> and a <i>seed</i>.  Note that the sequence of bytes is
+   * always processed in the same order independent of endianness.
+   *
+   * @param offsetBytes the given offset in bytes to the first byte of the byte sequence.
+   * @param lengthBytes the given length in bytes of the byte sequence.
+   * @param seed the given long seed.
+   * @return the 64-bit hash of the sequence of bytes in this object specified by
+   * <i>offsetBytes</i> and <i>lengthBytes</i>.
+   */
+  long xxHash64(long offsetBytes, long lengthBytes, long seed);
+
+  /**
+   * Returns a 64-bit hash from a single long. This method has been optimized for speed when only
+   * a single hash of a long is required.
+   * @param in A long.
+   * @param seed A long valued seed.
+   * @return the hash.
+   */
+  long xxHash64(long in, long seed);
 
 }

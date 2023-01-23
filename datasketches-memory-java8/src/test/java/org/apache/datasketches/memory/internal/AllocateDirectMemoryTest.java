@@ -39,7 +39,7 @@ public class AllocateDirectMemoryTest {
     WritableMemory wMem;
     try (WritableHandle wh = WritableMemory.allocateDirect(longs << 3)) {
       wMem = wh.getWritable();
-      for (int i = 0; i<longs; i++) {
+      for (int i = 0; i < longs; i++) {
         wMem.putLong(i << 3, i);
         assertEquals(wMem.getLong(i << 3), i);
       }
@@ -62,7 +62,7 @@ public class AllocateDirectMemoryTest {
     int bytes1 = longs1 << 3;
     try (WritableHandle wh = WritableMemory.allocateDirect(bytes1)) {
       WritableMemory origWmem = wh.getWritable();
-      for (int i = 0; i<longs1; i++) { //puts data in wMem1
+      for (int i = 0; i < longs1; i++) { //puts data in wMem1
         origWmem.putLong(i << 3, i);
         assertEquals(origWmem.getLong(i << 3), i);
       }
@@ -105,20 +105,19 @@ public class AllocateDirectMemoryTest {
     } //end of scope call to Cleaner/Deallocator also will be redundant
   }
 
-
   @AfterClass
   public void checkDirectCounter() {
     WritableMemory.writableWrap(new byte[8]);
     long count = BaseState.getCurrentDirectMemoryAllocations();
     if (count != 0) {
-      println(""+count);
+      println("" + count);
       fail();
     }
   }
 
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+    println("PRINTING: " + this.getClass().getName());
   }
 
   /**

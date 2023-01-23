@@ -24,8 +24,8 @@ import static org.testng.Assert.assertEquals;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -84,11 +84,11 @@ public class CopyMemoryTest {
     //gen baseMem of k1 longs w data
     WritableMemory baseMem = genMem(k1, false); //!empty
     //gen src region of k1/2 longs, off= k1/2
-    WritableMemory srcReg = baseMem.writableRegion((k1/2) << 3, (k1/2) << 3);
+    WritableMemory srcReg = baseMem.writableRegion((k1 / 2) << 3, (k1 / 2) << 3);
     WritableMemory dstMem = genMem(2 * k1, true); //empty
-    srcReg.copyTo(0, dstMem, k1 << 3, (k1/2) << 3);
+    srcReg.copyTo(0, dstMem, k1 << 3, (k1 / 2) << 3);
     //println(dstMem.toHexString("dstMem: ", k1 << 3, (k1/2) << 3));
-    check(dstMem, k1, k1/2, (k1/2) + 1);
+    check(dstMem, k1, k1 / 2, (k1 / 2) + 1);
   }
 
   @Test
@@ -97,10 +97,10 @@ public class CopyMemoryTest {
     //gen baseMem of k1 longs w data
     WritableMemory baseMem = genMem(k1, false); //!empty
     //gen src region of k1/2 longs, off= k1/2
-    Memory srcReg = baseMem.region((k1/2) << 3, (k1/2) << 3);
+    Memory srcReg = baseMem.region((k1 / 2) << 3, (k1 / 2) << 3);
     WritableMemory dstMem = genMem(2 * k1, true); //empty
-    srcReg.copyTo(0, dstMem, k1 << 3, (k1/2) << 3);
-    check(dstMem, k1, k1/2, (k1/2) + 1);
+    srcReg.copyTo(0, dstMem, k1 << 3, (k1 / 2) << 3);
+    check(dstMem, k1, k1 / 2, (k1 / 2) + 1);
   }
 
   @Test
@@ -110,10 +110,10 @@ public class CopyMemoryTest {
     try (WritableHandle wrh = genWRH(k1, false)) {
       Memory baseMem = wrh.get();
       //gen src region of k1/2 longs, off= k1/2
-      Memory srcReg = baseMem.region((k1/2) << 3, (k1/2) << 3);
+      Memory srcReg = baseMem.region((k1 / 2) << 3, (k1 / 2) << 3);
       WritableMemory dstMem = genMem(2 * k1, true); //empty
-      srcReg.copyTo(0, dstMem, k1 << 3, (k1/2) << 3);
-      check(dstMem, k1, k1/2, (k1/2) + 1);
+      srcReg.copyTo(0, dstMem, k1 << 3, (k1 / 2) << 3);
+      check(dstMem, k1, k1 / 2, (k1 / 2) + 1);
     }
   }
 
@@ -161,7 +161,6 @@ public class CopyMemoryTest {
     return wrh;
   }
 
-
   private static WritableMemory genMem(int longs, boolean empty) {
     WritableMemory mem = WritableMemory.allocate(longs << 3);
     if (!empty) {
@@ -172,7 +171,7 @@ public class CopyMemoryTest {
 
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+    println("PRINTING: " + this.getClass().getName());
   }
 
   /**

@@ -61,11 +61,8 @@ import org.apache.datasketches.memory.WritableMemory;
 @SuppressWarnings("restriction")
 public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements WritableBuffer {
 
-  //Pass-through ctor
-  BaseWritableBufferImpl(final Object unsafeObj, final long nativeBaseOffset,
-      final long regionOffset, final long capacityBytes) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
-  }
+  //Pass-through constructor
+  BaseWritableBufferImpl(final long capacityBytes) { super(capacityBytes); }
 
   /**
    * The static constructor that chooses the correct ByteBuffer leaf node based on the byte order.
@@ -80,11 +77,12 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
       final MemoryRequestServer memReqSvr) {
     final AccessByteBuffer abb = new AccessByteBuffer(byteBuf);
     final int typeId = (abb.resourceReadOnly || localReadOnly) ? READONLY : 0;
+    final long cumOffsetBytes = abb.initialCumOffset;
     final BaseWritableBufferImpl bwbi = Util.isNativeByteOrder(byteOrder)
         ? new BBWritableBufferImpl(abb.unsafeObj, abb.nativeBaseOffset,
-            abb.regionOffset, abb.capacityBytes, typeId, byteBuf, memReqSvr)
+            abb.offsetBytes, abb.capacityBytes, typeId, cumOffsetBytes, memReqSvr, byteBuf)
         : new BBNonNativeWritableBufferImpl(abb.unsafeObj, abb.nativeBaseOffset,
-            abb.regionOffset, abb.capacityBytes,  typeId, byteBuf, memReqSvr);
+            abb.offsetBytes, abb.capacityBytes,  typeId, cumOffsetBytes, memReqSvr, byteBuf);
     bwbi.setStartPositionEnd(0, byteBuf.position(), byteBuf.limit());
     return bwbi;
   }
@@ -92,7 +90,7 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
   //REGIONS
   @Override
   public Buffer region() {
-    return writableRegionImpl(getPosition(), getEnd() - getPosition(), true, getTypeByteOrder());
+    return writableRegionImpl(getPosition(), getEnd() - getPosition(), true, getByteOrder());
   }
 
   @Override
@@ -104,7 +102,7 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
 
   @Override
   public WritableBuffer writableRegion() {
-    return writableRegionImpl(getPosition(), getEnd() - getPosition(), false, getTypeByteOrder());
+    return writableRegionImpl(getPosition(), getEnd() - getPosition(), false, getByteOrder());
   }
 
   @Override
@@ -132,7 +130,7 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
   //DUPLICATES
   @Override
   public Buffer duplicate() {
-    return writableDuplicateImpl(true, getTypeByteOrder());
+    return writableDuplicateImpl(true, getByteOrder());
   }
 
   @Override
@@ -142,7 +140,7 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
 
   @Override
   public WritableBuffer writableDuplicate() {
-    return writableDuplicateImpl(false, getTypeByteOrder());
+    return writableDuplicateImpl(false, getByteOrder());
   }
 
   @Override
@@ -154,8 +152,8 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
     if (isReadOnly() && !localReadOnly) {
       throw new ReadOnlyException("Writable duplicate of a read-only Buffer is not allowed.");
     }
-    final boolean readOnly = isReadOnly() || localReadOnly;
-    final WritableBuffer wbuf = toDuplicate(readOnly, byteOrder);
+    final boolean finalReadOnly = isReadOnly() || localReadOnly;
+    final WritableBuffer wbuf = toDuplicate(finalReadOnly, byteOrder);
     wbuf.setStartPositionEnd(getStart(), getPosition(), getEnd());
     return wbuf;
   }
@@ -179,8 +177,8 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
       throw new ReadOnlyException(
           "Converting a read-only Buffer to a writable Memory is not allowed.");
     }
-    final boolean readOnly = isReadOnly() || localReadOnly;
-    final WritableMemory wmem = toWritableMemory(readOnly, byteOrder);
+    final boolean finalReadOnly = isReadOnly() || localReadOnly;
+    final WritableMemory wmem = toWritableMemory(finalReadOnly, byteOrder);
     return wmem;
   }
 
@@ -297,7 +295,7 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
   }
 
   /*
-   * Develper notes: There is no copyTo for Buffers because of the ambiguity of what to do with
+   * Developer notes: There is no copyTo for Buffers because of the ambiguity of what to do with
    * the positional values. Switch to MemoryImpl view to do copyTo.
    */
 

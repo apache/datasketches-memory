@@ -40,10 +40,10 @@ import org.testng.annotations.Test;
  * uncovered this until August 2021.  Nonetheless, the fix involves instrumenting all the paths involved
  * in providing this callback mechanism for wrapped ByteBuffers.
  *
- * This issues was first identified in Druid Issue #11544 and then posted as DataSketches-java Issue #358.
- * But the actual source of the problem was in Memory.
+ * <p>This issue was first identified in Druid Issue #11544 and then posted as DataSketches-java Issue #358.
+ * But the actual source of the problem was in Memory.</p>
  *
- * This test mimics the Druid issue but at a much smaller scale.
+ * <p>This test mimics the Druid issue but at a much smaller scale.</p>
  *
  * @author Lee Rhodes
  *

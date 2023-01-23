@@ -31,42 +31,75 @@ import org.apache.datasketches.memory.WritableMemory;
  * @author Lee Rhodes
  */
 final class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
-  private static final int id = MEMORY | NONNATIVE | HEAP;
   private final Object unsafeObj;
+  private final long offsetBytes;
+  private final long capacityBytes;
+  private final int typeId;
+  private long cumOffsetBytes;
   private final MemoryRequestServer memReqSvr;
-  private final byte typeId;
 
   HeapNonNativeWritableMemoryImpl(
       final Object unsafeObj,
-      final long regionOffset,
+      final long offsetBytes,
       final long capacityBytes,
       final int typeId,
+      final long cumOffsetBytes,
       final MemoryRequestServer memReqSvr) {
-    super(unsafeObj, 0L, regionOffset, capacityBytes);
+    super();
     this.unsafeObj = unsafeObj;
+    this.offsetBytes = offsetBytes;
+    this.capacityBytes = capacityBytes;
+    this.typeId = removeNnBuf(typeId) | HEAP | MEMORY | NONNATIVE;
+    this.cumOffsetBytes = cumOffsetBytes;
     this.memReqSvr = memReqSvr;
-    this.typeId = (byte) (id | (typeId & 0x7));
   }
 
   @Override
-  BaseWritableMemoryImpl toWritableRegion(final long offsetBytes, final long capacityBytes,
-      final boolean readOnly, final ByteOrder byteOrder) {
-    final int type = setReadOnlyType(typeId, readOnly) | REGION;
-    return Util.isNativeByteOrder(byteOrder)
-        ? new HeapWritableMemoryImpl(
-            unsafeObj, getRegionOffset(offsetBytes), capacityBytes, type, memReqSvr)
-        : new HeapNonNativeWritableMemoryImpl(
-            unsafeObj, getRegionOffset(offsetBytes), capacityBytes, type, memReqSvr);
+  BaseWritableMemoryImpl toWritableRegion(
+      final long regionOffsetBytes,
+      final long capacityBytes,
+      final boolean readOnly,
+      final ByteOrder byteOrder) {
+    final long newOffsetBytes = offsetBytes + regionOffsetBytes;
+    final long newCumOffsetBytes = cumOffsetBytes + regionOffsetBytes;
+    int typeIdOut = removeNnBuf(typeId) | MEMORY | REGION | (readOnly ? READONLY : 0);
+
+    if (Util.isNativeByteOrder(byteOrder)) {
+      typeIdOut |= NATIVE;
+      return new HeapWritableMemoryImpl(
+          unsafeObj, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, memReqSvr);
+    } else {
+      typeIdOut |= NONNATIVE;
+      return new HeapNonNativeWritableMemoryImpl(
+          unsafeObj, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, memReqSvr);
+    }
   }
 
   @Override
   BaseWritableBufferImpl toWritableBuffer(final boolean readOnly, final ByteOrder byteOrder) {
-    final int type = setReadOnlyType(typeId, readOnly);
-    return Util.isNativeByteOrder(byteOrder)
-        ? new HeapWritableBufferImpl(
-            unsafeObj, getRegionOffset(), getCapacity(), type, memReqSvr)
-        : new HeapNonNativeWritableBufferImpl(
-            unsafeObj, getRegionOffset(), getCapacity(), type, memReqSvr);
+    int typeIdOut = removeNnBuf(typeId) | BUFFER | (readOnly ? READONLY : 0);
+
+    if (byteOrder == ByteOrder.nativeOrder()) {
+      typeIdOut |= NATIVE;
+      return new HeapWritableBufferImpl(
+          unsafeObj, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr);
+    } else {
+      typeIdOut |= NONNATIVE;
+      return new HeapNonNativeWritableBufferImpl(
+          unsafeObj, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr);
+    }
+  }
+
+  @Override
+  public long getCapacity() {
+    assertValid();
+    return capacityBytes;
+  }
+
+  @Override
+  public long getCumulativeOffset() {
+    assertValid();
+    return cumOffsetBytes;
   }
 
   @Override
@@ -75,12 +108,25 @@ final class HeapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl 
   }
 
   @Override
+  public long getNativeBaseOffset() {
+    return 0;
+  }
+
+  @Override
+  public long getTotalOffset() {
+    assertValid();
+    return offsetBytes;
+  }
+
+  @Override
   int getTypeId() {
-    return typeId & 0xff;
+    assertValid();
+    return typeId;
   }
 
   @Override
   Object getUnsafeObject() {
+    assertValid();
     return unsafeObj;
   }
 

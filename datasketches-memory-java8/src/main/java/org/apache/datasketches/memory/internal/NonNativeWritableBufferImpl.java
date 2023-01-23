@@ -52,11 +52,8 @@ import org.apache.datasketches.memory.WritableBuffer;
 @SuppressWarnings("restriction")
 abstract class NonNativeWritableBufferImpl extends BaseWritableBufferImpl {
 
-  //Pass-through ctor
-  NonNativeWritableBufferImpl(final Object unsafeObj, final long nativeBaseOffset, final long regionOffset,
-      final long capacityBytes) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
-  }
+  //Pass-through constructor
+  NonNativeWritableBufferImpl(final long capacityBytes) { super(capacityBytes); }
 
   //PRIMITIVE getX() and getXArray()
   @Override

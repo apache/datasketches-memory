@@ -222,6 +222,7 @@ public class MemoryReadWriteSafetyTest {
     tempFile.deleteOnExit();
     new RandomAccessFile(tempFile, "rw").setLength(8);
     try (MapHandle unused = Memory.map(tempFile, 0, 16, ByteOrder.nativeOrder())) {
+      //empty
     }
   }
 }

@@ -25,10 +25,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
 
-import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableBuffer;
+import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 import org.testng.collections.Lists;
@@ -203,7 +203,7 @@ public class BufferTest {
     ByteBuffer bb = ByteBuffer.allocate(n * 8);
     bb.order(ByteOrder.BIG_ENDIAN);
     Buffer buf = Buffer.wrap(bb);
-    assertEquals(buf.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(buf.getByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test
@@ -262,20 +262,21 @@ public class BufferTest {
     int n = 16;
     int n2 = n / 2;
     long[] arr = new long[n];
-    for (int i = 0; i < n; i++) { arr[i] = i; }
-    WritableBuffer wbuf = WritableMemory.writableWrap(arr).asWritableBuffer();
+    for (int i = 0; i < n; i++) { arr[i] = i; } //0...n-1
+    WritableMemory mem = WritableMemory.writableWrap(arr);
+    WritableBuffer wbuf = mem.asWritableBuffer();
     for (int i = 0; i < n; i++) {
-      assertEquals(wbuf.getLong(), i); //write all
-      //println("" + wmem.getLong(i * 8));
+      assertEquals(wbuf.getLong(), i); //0...n-1
+      println("" + wbuf.getLong(i * 8));
     }
-    //println("");
+    println("");
     wbuf.setPosition(n2 * 8);
     WritableBuffer reg = wbuf.writableRegion();
     for (int i = 0; i < n2; i++) { reg.putLong(i); } //rewrite top half
     wbuf.resetPosition();
     for (int i = 0; i < n; i++) {
-      assertEquals(wbuf.getLong(), i % 8);
-      //println("" + wmem.getLong(i * 8));
+      println("" + wbuf.getLong(i * 8));
+      assertEquals(wbuf.getLong(), i % 8); //fail got 1 not 0
     }
   }
 
@@ -310,10 +311,9 @@ public class BufferTest {
     wbuf.setStartPositionEnd(1, 0, 2); //out of order
   }
 
-
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+    println("PRINTING: " + this.getClass().getName());
   }
 
   /**

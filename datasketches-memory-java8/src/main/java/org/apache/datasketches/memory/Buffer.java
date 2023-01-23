@@ -143,7 +143,7 @@ public interface Buffer extends BaseBuffer {
    * @return Memory
    */
   default Memory asMemory() {
-    return asMemory(getTypeByteOrder());
+    return asMemory(getByteOrder());
   }
 
   /**

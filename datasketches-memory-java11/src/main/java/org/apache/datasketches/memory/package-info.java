@@ -17,23 +17,4 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
-
-import org.apache.datasketches.memory.MemoryCloseException;
-import org.testng.annotations.Test;
-
-public class MemoryCloseExceptionTest {
-
-  @Test
-  public void checkNoArgs() {
-    try {
-      throw new MemoryCloseException();
-    } catch (final MemoryCloseException e) { }
-
-    try {
-      throw new MemoryCloseException("Test Exception");
-    } catch (final MemoryCloseException e) { }
-  }
-}
-
-
+package org.apache.datasketches.memory;

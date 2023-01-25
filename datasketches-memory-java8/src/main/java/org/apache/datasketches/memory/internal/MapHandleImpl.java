@@ -24,10 +24,10 @@ import org.apache.datasketches.memory.Memory;
 
 class MapHandleImpl implements MapHandle {
 
-  final AllocateDirectMap dirMap;
+  final AllocateDirectWritableMap dirMap;
   BaseWritableMemoryImpl wMem;
 
-  MapHandleImpl(final AllocateDirectMap dirMap, final BaseWritableMemoryImpl wMem) {
+  MapHandleImpl(final AllocateDirectWritableMap dirMap, final BaseWritableMemoryImpl wMem) {
     this.dirMap = dirMap;
     this.wMem = wMem;
   }

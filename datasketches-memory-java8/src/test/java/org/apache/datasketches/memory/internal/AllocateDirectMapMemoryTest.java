@@ -50,7 +50,7 @@ public class AllocateDirectMapMemoryTest {
   @Test
   public void simpleMap() throws Exception {
     File file = getResourceFile("GettysburgAddress.txt");
-    assertTrue(AllocateDirectMap.isFileReadOnly(file));
+    assertTrue(AllocateDirectWritableMap.isFileReadOnly(file));
     try (MapHandle rh = Memory.map(file)) {
       rh.close();
     }

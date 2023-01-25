@@ -28,9 +28,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.ReadOnlyException;
+import org.apache.datasketches.memory.Resource;
 
 /**
  * Keeps key configuration state for MemoryImpl and BufferImpl plus some common static variables
@@ -39,7 +39,7 @@ import org.apache.datasketches.memory.ReadOnlyException;
  * @author Lee Rhodes
  */
 @SuppressWarnings("restriction")
-public abstract class BaseStateImpl implements BaseState {
+public abstract class ResourceImpl implements Resource {
 
   //Monitoring
   static final AtomicLong currentDirectMemoryAllocations_ = new AtomicLong();
@@ -75,7 +75,7 @@ public abstract class BaseStateImpl implements BaseState {
   /**
    * The root of the Memory inheritance hierarchy
    */
-  BaseStateImpl() { }
+  ResourceImpl() { }
 
   final void assertValid() {
     assert isValid() : "MemoryImpl not valid.";
@@ -123,16 +123,16 @@ public abstract class BaseStateImpl implements BaseState {
   @Override
   public final boolean equals(final Object that) {
     if (this == that) { return true; }
-    return that instanceof BaseStateImpl
-      ? CompareAndCopy.equals(this, (BaseStateImpl) that)
+    return that instanceof ResourceImpl
+      ? CompareAndCopy.equals(this, (ResourceImpl) that)
       : false;
   }
 
   @Override
   public final boolean equalTo(final long thisOffsetBytes, final Object that,
       final long thatOffsetBytes, final long lengthBytes) {
-    return that instanceof BaseStateImpl
-      ? CompareAndCopy.equals(this, thisOffsetBytes, (BaseStateImpl) that, thatOffsetBytes, lengthBytes)
+    return that instanceof ResourceImpl
+      ? CompareAndCopy.equals(this, thisOffsetBytes, (ResourceImpl) that, thatOffsetBytes, lengthBytes)
       : false;
   }
 
@@ -171,7 +171,7 @@ public abstract class BaseStateImpl implements BaseState {
    * @return the current size of active direct memory allocated.
    */
   public static final long getCurrentDirectMemoryAllocated() {
-    return BaseStateImpl.currentDirectMemoryAllocated_.get();
+    return ResourceImpl.currentDirectMemoryAllocated_.get();
   }
 
   /**
@@ -179,7 +179,7 @@ public abstract class BaseStateImpl implements BaseState {
    * @return the current number of active direct memory allocations.
    */
   public static final long getCurrentDirectMemoryAllocations() {
-    return BaseStateImpl.currentDirectMemoryAllocations_.get();
+    return ResourceImpl.currentDirectMemoryAllocations_.get();
   }
 
   /**
@@ -187,7 +187,7 @@ public abstract class BaseStateImpl implements BaseState {
    * @return the current size of active direct memory map allocated.
    */
   public static final long getCurrentDirectMemoryMapAllocated() {
-    return BaseStateImpl.currentDirectMemoryMapAllocated_.get();
+    return ResourceImpl.currentDirectMemoryMapAllocated_.get();
   }
 
   /**
@@ -195,7 +195,7 @@ public abstract class BaseStateImpl implements BaseState {
    * @return the current number of active direct memory map allocations.
    */
   public static final long getCurrentDirectMemoryMapAllocations() {
-    return BaseStateImpl.currentDirectMemoryMapAllocations_.get();
+    return ResourceImpl.currentDirectMemoryMapAllocations_.get();
   }
   //END monitoring
 
@@ -314,7 +314,7 @@ public abstract class BaseStateImpl implements BaseState {
   public boolean isSameResource(final Object that) {
     checkValid();
     if (that == null) { return false; }
-    final BaseStateImpl that1 = (BaseStateImpl) that;
+    final ResourceImpl that1 = (ResourceImpl) that;
     that1.checkValid();
     if (this == that1) { return true; }
 
@@ -338,13 +338,13 @@ public abstract class BaseStateImpl implements BaseState {
   /**
    * Returns a formatted hex string of an area of this object.
    * Used primarily for testing.
-   * @param state the BaseStateImpl
+   * @param state the ResourceImpl
    * @param preamble a descriptive header
    * @param offsetBytes offset bytes relative to the MemoryImpl start
    * @param lengthBytes number of bytes to convert to a hex string
    * @return a formatted hex string in a human readable array
    */
-  static final String toHex(final BaseStateImpl state, final String preamble, final long offsetBytes,
+  static final String toHex(final ResourceImpl state, final String preamble, final long offsetBytes,
       final int lengthBytes) {
     final long capacity = state.getCapacity();
     UnsafeUtil.checkBounds(offsetBytes, lengthBytes, capacity);

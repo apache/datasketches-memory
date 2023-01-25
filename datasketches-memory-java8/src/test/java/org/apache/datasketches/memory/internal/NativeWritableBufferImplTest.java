@@ -476,7 +476,7 @@ public class NativeWritableBufferImplTest {
     WritableMemory reg = wmem.writableRegion(32, 32);
     WritableBuffer buf = reg.asWritableBuffer();
     assertEquals(buf.getTotalOffset(), 32);
-    assertEquals(((BaseStateImpl)buf).getCumulativeOffset(0), 32 + 16);
+    assertEquals(((ResourceImpl)buf).getCumulativeOffset(0), 32 + 16);
   }
 
   @Test

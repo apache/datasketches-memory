@@ -22,7 +22,7 @@ package org.apache.datasketches.memory;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
 
-import org.apache.datasketches.memory.internal.BaseStateImpl;
+import org.apache.datasketches.memory.internal.ResourceImpl;
 
 /**
  * <p>The MurmurHash3 is a fast, non-cryptographic, 128-bit hash function that has
@@ -179,7 +179,7 @@ public final class MurmurHash3v2 {
     if (uObj == null) {
       throw new IllegalArgumentException("The backing resource of input mem is not on-heap.");
     }
-    long cumOff = ((BaseStateImpl)mem).getCumulativeOffset(offsetBytes);
+    long cumOff = ((ResourceImpl)mem).getCumulativeOffset(offsetBytes);
 
     long h1 = seed;
     long h2 = seed;

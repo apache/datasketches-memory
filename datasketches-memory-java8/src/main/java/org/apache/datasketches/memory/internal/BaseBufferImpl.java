@@ -39,7 +39,7 @@ import org.apache.datasketches.memory.ReadOnlyException;
  *
  * @author Lee Rhodes
  */
-public abstract class BaseBufferImpl extends BaseStateImpl implements BaseBuffer {
+public abstract class BaseBufferImpl extends ResourceImpl implements BaseBuffer {
   private long capacity;
   private long start = 0;
   private long pos = 0;

@@ -290,8 +290,8 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
   @Override
   public final int compareTo(final long thisOffsetBytes, final long thisLengthBytes,
       final Buffer thatBuf, final long thatOffsetBytes, final long thatLengthBytes) {
-    return CompareAndCopy.compare((BaseStateImpl)this, thisOffsetBytes, thisLengthBytes,
-        (BaseStateImpl)thatBuf, thatOffsetBytes, thatLengthBytes);
+    return CompareAndCopy.compare((ResourceImpl)this, thisOffsetBytes, thisLengthBytes,
+        (ResourceImpl)thatBuf, thatOffsetBytes, thatLengthBytes);
   }
 
   /*

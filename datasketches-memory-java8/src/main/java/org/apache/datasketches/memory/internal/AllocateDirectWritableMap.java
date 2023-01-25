@@ -189,7 +189,7 @@ class AllocateDirectWritableMap implements WritableMap {
     } catch (final Exception e) {
         throw new MemoryCloseException(resource);
     } finally {
-      BaseStateImpl.reachabilityFence(this);
+      ResourceImpl.reachabilityFence(this);
     }
   }
 
@@ -279,8 +279,8 @@ class AllocateDirectWritableMap implements WritableMap {
 
     Deallocator(final long nativeBaseOffset, final long capacityBytes,
         final RandomAccessFile raf) {
-      BaseStateImpl.currentDirectMemoryMapAllocations_.incrementAndGet();
-      BaseStateImpl.currentDirectMemoryMapAllocated_.addAndGet(capacityBytes);
+      ResourceImpl.currentDirectMemoryMapAllocations_.incrementAndGet();
+      ResourceImpl.currentDirectMemoryMapAllocated_.addAndGet(capacityBytes);
       myRaf = raf;
       assert myRaf != null;
       myFc = myRaf.getChannel();
@@ -309,8 +309,8 @@ class AllocateDirectWritableMap implements WritableMap {
           unmap();
         }
         finally {
-          BaseStateImpl.currentDirectMemoryMapAllocations_.decrementAndGet();
-          BaseStateImpl.currentDirectMemoryMapAllocated_.addAndGet(-myCapacity);
+          ResourceImpl.currentDirectMemoryMapAllocations_.decrementAndGet();
+          ResourceImpl.currentDirectMemoryMapAllocated_.addAndGet(-myCapacity);
         }
         return true;
       }

@@ -79,7 +79,7 @@ final class AllocateDirect {
       }
       return false;
     } finally {
-      BaseStateImpl.reachabilityFence(this);
+      ResourceImpl.reachabilityFence(this);
     }
   }
 
@@ -99,8 +99,8 @@ final class AllocateDirect {
     private final StepBoolean valid = new StepBoolean(true); //only place for this
 
     Deallocator(final long nativeAddress, final long allocationSize, final long capacity) {
-      BaseStateImpl.currentDirectMemoryAllocations_.incrementAndGet();
-      BaseStateImpl.currentDirectMemoryAllocated_.addAndGet(capacity);
+      ResourceImpl.currentDirectMemoryAllocations_.incrementAndGet();
+      ResourceImpl.currentDirectMemoryAllocated_.addAndGet(capacity);
       this.nativeAddress = nativeAddress;
       this.allocationSize = allocationSize;
       this.capacity = capacity;
@@ -124,8 +124,8 @@ final class AllocateDirect {
         }
         unsafe.freeMemory(nativeAddress);
         NioBits.unreserveMemory(allocationSize, capacity);
-        BaseStateImpl.currentDirectMemoryAllocations_.decrementAndGet();
-        BaseStateImpl.currentDirectMemoryAllocated_.addAndGet(-capacity);
+        ResourceImpl.currentDirectMemoryAllocations_.decrementAndGet();
+        ResourceImpl.currentDirectMemoryAllocated_.addAndGet(-capacity);
         return true;
       }
       return false;

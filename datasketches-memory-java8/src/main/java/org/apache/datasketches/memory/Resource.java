@@ -22,7 +22,7 @@ package org.apache.datasketches.memory;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.internal.BaseStateImpl;
+import org.apache.datasketches.memory.internal.ResourceImpl;
 
 /**
  * Keeps key configuration state for Memory and Buffer plus some common static variables
@@ -30,7 +30,7 @@ import org.apache.datasketches.memory.internal.BaseStateImpl;
  *
  * @author Lee Rhodes
  */
-public interface BaseState {
+public interface Resource {
 
   /**
    * The placeholder for the default MemoryRequestServer, if set at all.
@@ -93,7 +93,7 @@ public interface BaseState {
    * @return the current size of active direct memory allocated.
    */
   static long getCurrentDirectMemoryAllocated() {
-    return BaseStateImpl.getCurrentDirectMemoryAllocated();
+    return ResourceImpl.getCurrentDirectMemoryAllocated();
   }
 
   /**
@@ -101,7 +101,7 @@ public interface BaseState {
    * @return the current number of active direct memory allocations.
    */
   static long getCurrentDirectMemoryAllocations() {
-    return BaseStateImpl.getCurrentDirectMemoryAllocations();
+    return ResourceImpl.getCurrentDirectMemoryAllocations();
   }
 
   /**
@@ -109,7 +109,7 @@ public interface BaseState {
    * @return the current size of active direct memory map allocated.
    */
   static long getCurrentDirectMemoryMapAllocated() {
-    return BaseStateImpl.getCurrentDirectMemoryMapAllocated();
+    return ResourceImpl.getCurrentDirectMemoryMapAllocated();
   }
 
   /**
@@ -117,7 +117,7 @@ public interface BaseState {
    * @return the current number of active direct memory map allocations.
    */
   static long getCurrentDirectMemoryMapAllocations() {
-    return BaseStateImpl.getCurrentDirectMemoryMapAllocations();
+    return ResourceImpl.getCurrentDirectMemoryMapAllocations();
   }
   //End Monitoring
 

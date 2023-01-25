@@ -36,7 +36,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.BaseState;
+import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.MapHandle;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.ReadOnlyException;
@@ -224,7 +224,7 @@ public class AllocateDirectWritableMapMemoryTest {
 
   @AfterClass
   public void checkDirectCounter() {
-    long count =  BaseState.getCurrentDirectMemoryMapAllocations();
+    long count =  Resource.getCurrentDirectMemoryMapAllocations();
       if (count != 0) {
         println("" + count);
         fail();

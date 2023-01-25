@@ -65,7 +65,7 @@ import org.apache.datasketches.memory.WritableMemory;
  * Contains methods which are agnostic to the byte order.
  */
 @SuppressWarnings("restriction")
-public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements WritableMemory {
+public abstract class BaseWritableMemoryImpl extends ResourceImpl implements WritableMemory {
 
   //1KB of empty bytes for speedy clear()
   private final static byte[] EMPTY_BYTES;
@@ -326,14 +326,14 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
   @Override
   public final int compareTo(final long thisOffsetBytes, final long thisLengthBytes,
       final Memory thatMem, final long thatOffsetBytes, final long thatLengthBytes) {
-    return CompareAndCopy.compare((BaseStateImpl)this, thisOffsetBytes, thisLengthBytes,
-        (BaseStateImpl)thatMem, thatOffsetBytes, thatLengthBytes);
+    return CompareAndCopy.compare((ResourceImpl)this, thisOffsetBytes, thisLengthBytes,
+        (ResourceImpl)thatMem, thatOffsetBytes, thatLengthBytes);
   }
 
   @Override
   public final void copyTo(final long srcOffsetBytes, final WritableMemory destination,
       final long dstOffsetBytes, final long lengthBytes) {
-    CompareAndCopy.copy((BaseStateImpl)this, srcOffsetBytes, (BaseStateImpl)destination,
+    CompareAndCopy.copy((ResourceImpl)this, srcOffsetBytes, (ResourceImpl)destination,
         dstOffsetBytes, lengthBytes);
   }
 

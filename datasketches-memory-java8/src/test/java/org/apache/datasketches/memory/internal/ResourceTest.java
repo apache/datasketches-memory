@@ -33,7 +33,7 @@ import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
-public class BaseStateTest {
+public class ResourceTest {
 
   @Test
   public void checkPrimOffset() {
@@ -87,7 +87,7 @@ public class BaseStateTest {
   @Test
   public void checkGetNativeBaseOffset_Heap() {
     WritableMemory wmem = WritableMemory.allocate(8); //heap
-    final long offset = ((BaseStateImpl)wmem).getNativeBaseOffset();
+    final long offset = ((ResourceImpl)wmem).getNativeBaseOffset();
     assertEquals(offset, 0L);
   }
 
@@ -122,7 +122,7 @@ public class BaseStateTest {
   @Test
   public void checkTypeDecode() {
     for (int i = 0; i < 128; i++) {
-      BaseStateImpl.typeDecode(i);
+      ResourceImpl.typeDecode(i);
     }
   }
 

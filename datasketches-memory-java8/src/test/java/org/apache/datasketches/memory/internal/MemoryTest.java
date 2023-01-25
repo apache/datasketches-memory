@@ -35,7 +35,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
 
-import org.apache.datasketches.memory.BaseState;
+import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.MapHandle;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableBuffer;
@@ -345,23 +345,23 @@ public class MemoryTest {
   @Test
   public void checkMonitorDirectStats() throws Exception {
     int bytes = 1024;
-    long curAllocations = BaseState.getCurrentDirectMemoryAllocations();
-    long curAllocated   = BaseState.getCurrentDirectMemoryAllocated();
+    long curAllocations = Resource.getCurrentDirectMemoryAllocations();
+    long curAllocated   = Resource.getCurrentDirectMemoryAllocated();
     if (curAllocations != 0) { System.err.println(curAllocations + " should be zero!"); }
     WritableHandle wh1 = WritableMemory.allocateDirect(bytes);
     WritableHandle wh2 = WritableMemory.allocateDirect(bytes);
-    assertEquals(BaseState.getCurrentDirectMemoryAllocations(), 2L + curAllocations);
-    assertEquals(BaseState.getCurrentDirectMemoryAllocated(), 2 * bytes + curAllocated);
+    assertEquals(Resource.getCurrentDirectMemoryAllocations(), 2L + curAllocations);
+    assertEquals(Resource.getCurrentDirectMemoryAllocated(), 2 * bytes + curAllocated);
 
     wh1.close();
-    assertEquals(BaseState.getCurrentDirectMemoryAllocations(), 1L + curAllocations);
-    assertEquals(BaseState.getCurrentDirectMemoryAllocated(), bytes + curAllocated);
+    assertEquals(Resource.getCurrentDirectMemoryAllocations(), 1L + curAllocations);
+    assertEquals(Resource.getCurrentDirectMemoryAllocated(), bytes + curAllocated);
 
     wh2.close();
     wh2.close(); //check that it doesn't go negative.
     //even though the handles are closed, these methods are static access
-    assertEquals(BaseState.getCurrentDirectMemoryAllocations(), 0L + curAllocations);
-    assertEquals(BaseState.getCurrentDirectMemoryAllocated(), 0L + curAllocated);
+    assertEquals(Resource.getCurrentDirectMemoryAllocations(), 0L + curAllocations);
+    assertEquals(Resource.getCurrentDirectMemoryAllocated(), 0L + curAllocated);
   }
 
   @Test
@@ -372,25 +372,25 @@ public class MemoryTest {
     MapHandle mmh1 = Memory.map(file);
     MapHandle mmh2 = Memory.map(file);
 
-    assertEquals(BaseState.getCurrentDirectMemoryMapAllocations(), 2L);
-    assertEquals(BaseState.getCurrentDirectMemoryMapAllocated(), 2 * bytes);
+    assertEquals(Resource.getCurrentDirectMemoryMapAllocations(), 2L);
+    assertEquals(Resource.getCurrentDirectMemoryMapAllocated(), 2 * bytes);
 
     mmh1.close();
-    assertEquals(BaseState.getCurrentDirectMemoryMapAllocations(), 1L);
-    assertEquals(BaseState.getCurrentDirectMemoryMapAllocated(), bytes);
+    assertEquals(Resource.getCurrentDirectMemoryMapAllocations(), 1L);
+    assertEquals(Resource.getCurrentDirectMemoryMapAllocated(), bytes);
 
     mmh2.close();
     mmh2.close(); //check that it doesn't go negative.
     //even though the handles are closed, these methods are static access
-    assertEquals(BaseState.getCurrentDirectMemoryMapAllocations(), 0L);
-    assertEquals(BaseState.getCurrentDirectMemoryMapAllocated(), 0L);
+    assertEquals(Resource.getCurrentDirectMemoryMapAllocations(), 0L);
+    assertEquals(Resource.getCurrentDirectMemoryMapAllocated(), 0L);
   }
 
   @Test
   public void checkMemReqSvr() throws Exception {
     WritableMemory wmem;
     WritableBuffer wbuf;
-    if (BaseState.defaultMemReqSvr == null) { //This is a policy choice
+    if (Resource.defaultMemReqSvr == null) { //This is a policy choice
       //ON HEAP
       wmem = WritableMemory.writableWrap(new byte[16]);
       assertNull(wmem.getMemoryRequestServer());

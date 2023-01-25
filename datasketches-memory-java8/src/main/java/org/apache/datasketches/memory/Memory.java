@@ -37,7 +37,7 @@ import org.apache.datasketches.memory.internal.UnsafeUtil;
  *
  * @author Lee Rhodes
  */
-public interface Memory extends BaseState {
+public interface Memory extends Resource {
 
   //BYTE BUFFER
 

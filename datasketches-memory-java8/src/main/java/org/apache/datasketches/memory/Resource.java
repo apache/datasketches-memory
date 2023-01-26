@@ -25,17 +25,11 @@ import java.nio.ByteOrder;
 import org.apache.datasketches.memory.internal.ResourceImpl;
 
 /**
- * Keeps key configuration state for Memory and Buffer plus some common static variables
- * and check methods.
+ *  Methods common to all memory access resources, including attributes like byte order and capacity.
  *
  * @author Lee Rhodes
  */
 public interface Resource {
-
-  /**
-   * The placeholder for the default MemoryRequestServer, if set at all.
-   */
-  static final MemoryRequestServer defaultMemReqSvr = null; //new DefaultMemoryRequestServer();
 
   /**
    * Checks that the specified range of bytes is within bounds of this object, throws
@@ -45,6 +39,13 @@ public interface Resource {
    * @param lengthBytes the given length in bytes of this object
    */
   void checkValidAndBounds(long offsetBytes, long lengthBytes);
+
+  /**
+   * The placeholder for the default MemoryRequestServer, if set at all.
+   */
+  static final MemoryRequestServer defaultMemReqSvr = null; //new DefaultMemoryRequestServer();
+
+
 
   /**
    * Returns true if the given object is an instance of this class and has equal data contents.

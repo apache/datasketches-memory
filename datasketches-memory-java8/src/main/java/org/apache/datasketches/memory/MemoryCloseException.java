@@ -23,10 +23,9 @@ package org.apache.datasketches.memory;
  * Specific RuntimeException for the AutoCloseable.close() method.
  *
  * @author Lee Rhodes
- *
  */
 public class MemoryCloseException extends MemoryException {
-  private static final long serialVersionUID = 2L;
+  private static final long serialVersionUID = 1L;
 
   /**
    * The associated resource failed to close.

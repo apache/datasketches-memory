@@ -56,9 +56,11 @@ public class ResourceTest {
 
   @Test
   public void checkNotEqualTo() {
-    byte[] arr = new byte[8];
-    Memory mem = Memory.wrap(arr);
-    assertFalse(mem.equalTo(0, arr, 0, 8));
+    byte[] arr1 = {1,2,3,4,5,6,7,8};
+    Memory mem1 = Memory.wrap(arr1);
+    byte[] arr2 = {1,2,3,4,5,6,7,9};
+    Memory mem2 = Memory.wrap(arr2);
+    assertFalse(mem1.equalTo(mem2));
   }
 
   //StepBoolean checks

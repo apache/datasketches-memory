@@ -19,7 +19,6 @@
 
 package org.apache.datasketches.memory.internal;
 
-import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -27,19 +26,17 @@ import org.testng.annotations.Test;
 
 public class IgnoredArrayOverflowTest {
 
-  private WritableHandle h;
   private WritableMemory memory;
-  private static final long MAX_SIZE = (1L << 10); // use 1L << 31 to test int overrange
+  private static final long MAX_SIZE = (1L << 10); // use 1L << 31 to test int over range
 
   @BeforeClass
   public void allocate() {
-    h = WritableMemory.allocateDirect(MAX_SIZE);
-    memory = h.getWritable();
+    memory = WritableMemory.allocateDirect(MAX_SIZE);
   }
 
   @AfterClass
-  public void close() throws Exception {
-    h.close();
+  public void close() {
+    memory.close();
   }
 
   @Test

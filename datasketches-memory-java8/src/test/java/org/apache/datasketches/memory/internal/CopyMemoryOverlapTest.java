@@ -22,7 +22,6 @@ package org.apache.datasketches.memory.internal;
 import static org.testng.Assert.assertEquals;
 
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
@@ -92,8 +91,7 @@ public class CopyMemoryOverlapTest {
     println("CopyUp       : " + copyUp);
     println("Backing longs: " + backingLongs + "\t bytes: " + backingBytes);
 
-    try (WritableHandle backHandle = WritableMemory.allocateDirect(backingBytes)) {
-      WritableMemory backingMem = backHandle.getWritable();
+    try (WritableMemory backingMem = WritableMemory.allocateDirect(backingBytes)) {
       fill(backingMem); //fill mem with 0 thru copyLongs -1
       //listMem(backingMem, "Original");
       backingMem.copyTo(fromOffsetBytes, backingMem, toOffsetBytes, copyBytes);
@@ -132,8 +130,7 @@ public class CopyMemoryOverlapTest {
     println("CopyUp       : " + copyUp);
     println("Backing longs: " + backingLongs + "\t bytes: " + backingBytes);
 
-    try (WritableHandle backHandle = WritableMemory.allocateDirect(backingBytes)) {
-      WritableMemory backingMem = backHandle.getWritable();
+    try (WritableMemory backingMem = WritableMemory.allocateDirect(backingBytes)) {
       fill(backingMem); //fill mem with 0 thru copyLongs -1
       //listMem(backingMem, "Original");
       WritableMemory reg1 = backingMem.writableRegion(fromOffsetBytes, copyBytes);

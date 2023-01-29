@@ -25,7 +25,6 @@ import static org.testng.Assert.assertEquals;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -58,8 +57,7 @@ public class CopyMemoryTest {
   public void directWSource() throws Exception {
     int k1 = 1 << 20; //longs
     int k2 = 2 * k1;
-    try (WritableHandle wrh = genWRH(k1, false)) {
-      WritableMemory srcMem = wrh.getWritable();
+    try (WritableMemory srcMem = genWRH(k1, false)) {
       WritableMemory dstMem = genMem(k2, true);
       srcMem.copyTo(0, dstMem, k1 << 3, k1 << 3);
       check(dstMem, k1, k1, 1);
@@ -70,8 +68,7 @@ public class CopyMemoryTest {
   public void directROSource() throws Exception {
     int k1 = 1 << 20; //longs
     int k2 = 2 * k1;
-    try (WritableHandle wrh = genWRH(k1, false)) {
-      Memory srcMem = wrh.get();
+    try (Memory srcMem = genWRH(k1, false)) {
       WritableMemory dstMem = genMem(k2, true);
       srcMem.copyTo(0, dstMem, k1 << 3, k1 << 3);
       check(dstMem, k1, k1, 1);
@@ -107,8 +104,7 @@ public class CopyMemoryTest {
   public void directROSrcRegion() throws Exception {
     int k1 = 1 << 20; //longs
     //gen baseMem of k1 longs w data, direct
-    try (WritableHandle wrh = genWRH(k1, false)) {
-      Memory baseMem = wrh.get();
+    try (Memory baseMem = genWRH(k1, false)) {
       //gen src region of k1/2 longs, off= k1/2
       Memory srcReg = baseMem.region((k1 / 2) << 3, (k1 / 2) << 3);
       WritableMemory dstMem = genMem(2 * k1, true); //empty
@@ -150,15 +146,14 @@ public class CopyMemoryTest {
     }
   }
 
-  private static WritableHandle genWRH(int longs, boolean empty) {
-    WritableHandle wrh = WritableMemory.allocateDirect(longs << 3);
-    WritableMemory mem = wrh.getWritable();
+  private static WritableMemory genWRH(int longs, boolean empty) {
+    WritableMemory mem = WritableMemory.allocateDirect(longs << 3);
     if (empty) {
       mem.clear();
     } else {
       for (int i = 0; i < longs; i++) { mem.putLong(i << 3, i + 1); }
     }
-    return wrh;
+    return mem;
   }
 
   private static WritableMemory genMem(int longs, boolean empty) {

@@ -30,7 +30,7 @@ import java.util.Objects;
 
 import org.apache.datasketches.memory.internal.BaseWritableMemoryImpl;
 import org.apache.datasketches.memory.internal.Prim;
-import org.apache.datasketches.memory.internal.UnsafeUtil;
+import org.apache.datasketches.memory.internal.ResourceImpl;
 
 /**
  * Defines the read-only API for offset access to a resource.
@@ -71,10 +71,9 @@ public interface Memory extends Resource {
    * Calling this method is equivalent to calling
    * {@link #map(File, long, long, ByteOrder) map(file, 0, file.length(), ByteOrder.nativeOrder())}.
    * @param file the given file to map. It must be non-null, length &ge; 0, and readable.
-   * @return <i>MapHandle</i> for managing the mapped memory.
-   * Please read Javadocs for {@link Handle}.
+   * @return <i>Memory</i> for managing the mapped memory.
    */
-  static MapHandle map(File file) {
+  static Memory map(File file) {
     return map(file, 0, file.length(), ByteOrder.nativeOrder());
   }
 
@@ -84,16 +83,15 @@ public interface Memory extends Resource {
    * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
    * @param capacityBytes the size of the mapped memory. It must not be negative.
    * @param byteOrder the byte order to be used for the mapped memory. It must be non-null.
-   * @return <i>MapHandle</i> for managing the mapped memory.
-   * Please read Javadocs for {@link Handle}.
+   * @return <i>Memory</i> for managing the mapped memory.
    */
-  static MapHandle map(File file, long fileOffsetBytes, long capacityBytes, ByteOrder byteOrder) {
+  static Memory map(File file, long fileOffsetBytes, long capacityBytes, ByteOrder byteOrder) {
     Objects.requireNonNull(file, "file must be non-null.");
     Objects.requireNonNull(byteOrder, "byteOrder must be non-null.");
-    if (!file.canRead()) { throw new IllegalArgumentException("file must be readable."); }
+    if (!file.canRead()) { throw new ReadOnlyException("file must be readable."); }
     negativeCheck(fileOffsetBytes, "fileOffsetBytes");
     negativeCheck(capacityBytes, "capacityBytes");
-    return (MapHandle) BaseWritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, true, byteOrder);
+    return BaseWritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, true, byteOrder);
   }
 
   //REGIONS
@@ -194,7 +192,7 @@ public interface Memory extends Resource {
     Objects.requireNonNull(byteOrder, "byteOrder must be non-null");
     negativeCheck(offsetBytes, "offsetBytes");
     negativeCheck(lengthBytes, "lengthBytes");
-    UnsafeUtil.checkBounds(offsetBytes, lengthBytes, array.length);
+    ResourceImpl.checkBounds(offsetBytes, lengthBytes, array.length);
     return BaseWritableMemoryImpl.wrapHeapArray(array, 0, lengthBytes, true, ByteOrder.nativeOrder(), null);
   }
 
@@ -484,5 +482,3 @@ public interface Memory extends Resource {
       throws IOException;
 
 }
-
-

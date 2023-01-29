@@ -28,7 +28,7 @@ import java.util.Objects;
 
 import org.apache.datasketches.memory.internal.BaseWritableMemoryImpl;
 import org.apache.datasketches.memory.internal.Prim;
-import org.apache.datasketches.memory.internal.UnsafeUtil;
+import org.apache.datasketches.memory.internal.ResourceImpl;
 
 /**
  * Defines the writable API for offset access to a resource.
@@ -84,10 +84,9 @@ public interface WritableMemory extends Memory {
    * Calling this method is equivalent to calling
    * {@link #writableMap(File, long, long, ByteOrder) writableMap(file, 0, file.length(), ByteOrder.nativeOrder())}.
    * @param file the given file to map. It must be non-null, with length &ge; 0, and writable.
-   * @return WritableMapHandle for managing the mapped Memory.
-   * Please read Javadocs for {@link Handle}.
+   * @return WritableMemory for managing the mapped Memory.
    */
-  static WritableMapHandle writableMap(File file) {
+  static WritableMemory writableMap(File file) {
     return writableMap(file, 0, file.length(), ByteOrder.nativeOrder());
   }
 
@@ -100,10 +99,9 @@ public interface WritableMemory extends Memory {
    * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
    * @param capacityBytes the size of the mapped Memory. It must not be negative.
    * @param byteOrder the byte order to be used for the given file. It must be non-null.
-   * @return WritableMapHandle for managing the mapped Memory.
-   * Please read Javadocs for {@link Handle}.
+   * @return WritableMemory for managing the mapped Memory.
    */
-  static WritableMapHandle writableMap(File file, long fileOffsetBytes, long capacityBytes, ByteOrder byteOrder) {
+  static WritableMemory writableMap(File file, long fileOffsetBytes, long capacityBytes, ByteOrder byteOrder) {
     Objects.requireNonNull(file, "file must be non-null.");
     Objects.requireNonNull(byteOrder, "byteOrder must be non-null.");
     if (!file.canWrite()) { throw new ReadOnlyException("file must be writable."); }
@@ -124,10 +122,9 @@ public interface WritableMemory extends Memory {
    * and to call <i>close()</i> when done.</p>
    *
    * @param capacityBytes the size of the desired memory in bytes. It must be &ge; 0.
-   * @return WritableHandle for this off-heap resource.
-   * Please read Javadocs for {@link Handle}.
+   * @return WritableMemory for this off-heap resource.
    */
-  static WritableHandle allocateDirect(long capacityBytes) {
+  static WritableMemory allocateDirect(long capacityBytes) {
     return allocateDirect(capacityBytes, ByteOrder.nativeOrder(), defaultMemReqSvr);
   }
 
@@ -143,10 +140,9 @@ public interface WritableMemory extends Memory {
    * @param byteOrder the given byte order. It must be non-null.
    * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
    * This is a callback mechanism for a user client of direct memory to request more memory.
-   * @return WritableHandle for this off-heap resource.
-   * Please read Javadocs for {@link Handle}.
+   * @return WritableMemory for this off-heap resource.
    */
-  static WritableHandle allocateDirect(long capacityBytes, ByteOrder byteOrder, MemoryRequestServer memReqSvr) {
+  static WritableMemory allocateDirect(long capacityBytes, ByteOrder byteOrder, MemoryRequestServer memReqSvr) {
     Objects.requireNonNull(byteOrder, "byteOrder must be non-null");
     negativeCheck(capacityBytes, "capacityBytes");
     return BaseWritableMemoryImpl.wrapDirect(capacityBytes, byteOrder, memReqSvr);
@@ -317,7 +313,7 @@ public interface WritableMemory extends Memory {
     Objects.requireNonNull(byteOrder, "byteOrder must be non-null");
     negativeCheck(offsetBytes, "offsetBytes");
     negativeCheck(lengthBytes, "lengthBytes");
-    UnsafeUtil.checkBounds(offsetBytes, lengthBytes, array.length);
+    ResourceImpl.checkBounds(offsetBytes, lengthBytes, array.length);
     return BaseWritableMemoryImpl.wrapHeapArray(array, offsetBytes, lengthBytes, false, byteOrder, memReqSvr);
   }
 
@@ -634,6 +630,7 @@ public interface WritableMemory extends Memory {
    * in the test tree.
    * @return the MemoryRequestServer object or null.
    */
+  @Override
   MemoryRequestServer getMemoryRequestServer();
 
 }

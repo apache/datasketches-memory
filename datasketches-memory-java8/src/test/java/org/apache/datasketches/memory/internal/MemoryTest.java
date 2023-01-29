@@ -23,30 +23,29 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.Util.getResourceFile;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
-import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
 
-import org.apache.datasketches.memory.Resource;
-import org.apache.datasketches.memory.MapHandle;
+import org.apache.datasketches.memory.DefaultMemoryRequestServer;
 import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.memory.MemoryInvalidException;
+import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.WritableBuffer;
-import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.testng.collections.Lists;
 
 public class MemoryTest {
-  private static final String LS = System.getProperty("line.separator");
+  private static final String LS = Util.LS;
 
   @BeforeClass
   public void setReadOnly() {
@@ -56,8 +55,7 @@ public class MemoryTest {
   @Test
   public void checkDirectRoundTrip() throws Exception {
     int n = 1024; //longs
-    try (WritableHandle wh = WritableMemory.allocateDirect(n * 8)) {
-      WritableMemory mem = wh.getWritable();
+    try (WritableMemory mem = WritableMemory.allocateDirect(n * 8)) {
       for (int i = 0; i < n; i++) {
         mem.putLong(i * 8, i);
       }
@@ -319,71 +317,21 @@ public class MemoryTest {
     }
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = MemoryInvalidException.class)
   public void checkParentUseAfterFree() throws Exception {
     int bytes = 64 * 8;
-    WritableHandle wh = WritableMemory.allocateDirect(bytes);
-    WritableMemory wmem = wh.getWritable();
-    wh.close();
-    //with -ea assert: Memory not valid.
-    //with -da sometimes segfaults, sometimes passes!
+    WritableMemory wmem = WritableMemory.allocateDirect(bytes);
+    wmem.close();
     wmem.getLong(0);
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = MemoryInvalidException.class)
   public void checkRegionUseAfterFree() throws Exception {
     int bytes = 64;
-    WritableHandle wh = WritableMemory.allocateDirect(bytes);
-    Memory wmem = wh.get();
-    Memory region = wmem.region(0L, bytes);
-    wh.close();
-    //with -ea assert: Memory not valid.
-    //with -da sometimes segfaults, sometimes passes!
+    Memory mem = WritableMemory.allocateDirect(bytes);
+    Memory region = mem.region(0L, bytes);
+    mem.close();
     region.getByte(0);
-  }
-
-  @Test
-  public void checkMonitorDirectStats() throws Exception {
-    int bytes = 1024;
-    long curAllocations = Resource.getCurrentDirectMemoryAllocations();
-    long curAllocated   = Resource.getCurrentDirectMemoryAllocated();
-    if (curAllocations != 0) { System.err.println(curAllocations + " should be zero!"); }
-    WritableHandle wh1 = WritableMemory.allocateDirect(bytes);
-    WritableHandle wh2 = WritableMemory.allocateDirect(bytes);
-    assertEquals(Resource.getCurrentDirectMemoryAllocations(), 2L + curAllocations);
-    assertEquals(Resource.getCurrentDirectMemoryAllocated(), 2 * bytes + curAllocated);
-
-    wh1.close();
-    assertEquals(Resource.getCurrentDirectMemoryAllocations(), 1L + curAllocations);
-    assertEquals(Resource.getCurrentDirectMemoryAllocated(), bytes + curAllocated);
-
-    wh2.close();
-    wh2.close(); //check that it doesn't go negative.
-    //even though the handles are closed, these methods are static access
-    assertEquals(Resource.getCurrentDirectMemoryAllocations(), 0L + curAllocations);
-    assertEquals(Resource.getCurrentDirectMemoryAllocated(), 0L + curAllocated);
-  }
-
-  @Test
-  public void checkMonitorDirectMapStats() throws Exception {
-    File file = getResourceFile("GettysburgAddress.txt");
-    long bytes = file.length();
-
-    MapHandle mmh1 = Memory.map(file);
-    MapHandle mmh2 = Memory.map(file);
-
-    assertEquals(Resource.getCurrentDirectMemoryMapAllocations(), 2L);
-    assertEquals(Resource.getCurrentDirectMemoryMapAllocated(), 2 * bytes);
-
-    mmh1.close();
-    assertEquals(Resource.getCurrentDirectMemoryMapAllocations(), 1L);
-    assertEquals(Resource.getCurrentDirectMemoryMapAllocated(), bytes);
-
-    mmh2.close();
-    mmh2.close(); //check that it doesn't go negative.
-    //even though the handles are closed, these methods are static access
-    assertEquals(Resource.getCurrentDirectMemoryMapAllocations(), 0L);
-    assertEquals(Resource.getCurrentDirectMemoryMapAllocated(), 0L);
   }
 
   @Test
@@ -397,10 +345,9 @@ public class MemoryTest {
       wbuf = wmem.asWritableBuffer();
       assertNull(wbuf.getMemoryRequestServer());
       //OFF HEAP
-      try (WritableHandle wdh = WritableMemory.allocateDirect(16)) { //OFF HEAP
-        wmem = wdh.getWritable();
-        assertNull(wmem.getMemoryRequestServer());
-        wbuf = wmem.asWritableBuffer();
+      try (WritableMemory wmem2 = WritableMemory.allocateDirect(16)) { //OFF HEAP
+        assertNull(wmem2.getMemoryRequestServer());
+        wbuf = wmem2.asWritableBuffer();
         assertNull(wbuf.getMemoryRequestServer());
       }
       //ByteBuffer
@@ -409,26 +356,28 @@ public class MemoryTest {
       assertNull(wmem.getMemoryRequestServer());
       wbuf = wmem.asWritableBuffer();
       assertNull(wbuf.getMemoryRequestServer());
-    } else {
-      //ON HEAP
-      wmem = WritableMemory.writableWrap(new byte[16]);
-      assertNotNull(wmem.getMemoryRequestServer());
-      wbuf = wmem.asWritableBuffer();
-      assertNotNull(wbuf.getMemoryRequestServer());
-      //OFF HEAP
-      try (WritableHandle wdh = WritableMemory.allocateDirect(16)) {
-        WritableMemory wmem2 = wdh.getWritable();
-        assertNotNull(wmem2.getMemoryRequestServer());
-        wbuf = wmem.asWritableBuffer();
-        assertNotNull(wbuf.getMemoryRequestServer());
-      }
-      //ByteBuffer
-      ByteBuffer bb = ByteBuffer.allocate(16);
-      wmem = WritableMemory.writableWrap(bb);
-      assertNotNull(wmem.getMemoryRequestServer());
+    }
+
+    MemoryRequestServer memReqSvr = new DefaultMemoryRequestServer();
+
+    //ON HEAP
+    wmem = WritableMemory.writableWrap(new byte[16], 0, 16, Util.NATIVE_BYTE_ORDER, memReqSvr);
+    assertNotNull(wmem.getMemoryRequestServer());
+    wbuf = wmem.asWritableBuffer();
+    assertNotNull(wbuf.getMemoryRequestServer());
+    //OFF HEAP
+    try (WritableMemory wmem3 = WritableMemory.allocateDirect(16, Util.NATIVE_BYTE_ORDER, memReqSvr)) {
+      assertNotNull(wmem3.getMemoryRequestServer());
       wbuf = wmem.asWritableBuffer();
       assertNotNull(wbuf.getMemoryRequestServer());
     }
+    //ByteBuffer
+    ByteBuffer bb = ByteBuffer.allocate(16);
+    wmem = WritableMemory.writableWrap(bb, Util.NATIVE_BYTE_ORDER, memReqSvr);
+    assertNotNull(wmem.getMemoryRequestServer());
+    wbuf = wmem.asWritableBuffer();
+    assertNotNull(wbuf.getMemoryRequestServer());
+
   }
 
   @Test

@@ -19,17 +19,18 @@
 
 package org.apache.datasketches.memory;
 
+import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-
-import org.apache.datasketches.memory.internal.ResourceImpl;
 
 /**
  *  Methods common to all memory access resources, including attributes like byte order and capacity.
  *
  * @author Lee Rhodes
  */
-public interface Resource {
+public interface Resource extends AutoCloseable {
+
+  static MemoryRequestServer defaultMemReqSvr = null; //policy choice
 
   /**
    * Checks that the specified range of bytes is within bounds of this object, throws
@@ -41,39 +42,85 @@ public interface Resource {
   void checkValidAndBounds(long offsetBytes, long lengthBytes);
 
   /**
-   * The placeholder for the default MemoryRequestServer, if set at all.
-   */
-  static final MemoryRequestServer defaultMemReqSvr = null; //new DefaultMemoryRequestServer();
-
-
-
-  /**
-   * Returns true if the given object is an instance of this class and has equal data contents.
-   * @param that the given object
-   * @return true if the given Object is an instance of this class and has equal data contents.
+   * Closes this resource if this can be closed via <em>AutoCloseable</em>.
+   * If this operation completes without exceptions, this resource will be marked as <em>not alive</em>,
+   * and subsequent operations on this resource will fail with {@link IllegalStateException}.
+   *
+   * @apiNote This operation is not idempotent; that is, closing an already closed resource <em>always</em>
+   * results in an exception being thrown. This reflects a deliberate design choice: resource state transitions
+   * should be manifest in the client code; a failure in any of these transitions reveals a bug in the underlying
+   * application logic.
+   *
+   * @throws IllegalStateException if this is an AutoCloseable Resource (Memory mapped files and direct, off-heap
+   * memory allocations), and:
+   * <ul>
+   *  <li>this resource is already closed, or
+   *  <li>this method is called from a thread other than the thread owning this resource</li>.
+   * </ul>
+   *
+   * @throws UnsupportedOperationException if this resource is not {@link AutoCloseable}.
    */
   @Override
-  boolean equals(Object that);
+  default void close() {/* Overridden by the actual AutoCloseable sub-classes. */ }
 
   /**
-   * Returns true if the given object is an instance of this class and has equal contents to
+   * Returns true if the given object (<em>that</em>) is an instance of this class and has contents equal to
+   * this object.
+   * @param that the given Resource object
+   * @return true if the given object has equal contents to this object.
+   */
+  default boolean equalTo(Resource that) {
+    if (that == null || this.getCapacity() != that.getCapacity()) { return false; }
+    else { return equalTo(0, that, 0, that.getCapacity()); }
+  }
+
+  /**
+   * Returns true if the given Resource has equal contents to
    * this object in the given range of bytes. This will also check two distinct ranges within the
    * same object for equals.
    * @param thisOffsetBytes the starting offset in bytes for this object.
-   * @param that the given object
-   * @param thatOffsetBytes the starting offset in bytes for the given object
+   * @param that the given Resource
+   * @param thatOffsetBytes the starting offset in bytes for the given Resource object
    * @param lengthBytes the size of the range in bytes
-   * @return true if the given object has equal contents to this object in the given range of
-   * bytes.
+   * @return true if the given Resource object has equal contents to this object in the given range of bytes.
    */
-  boolean equalTo(long thisOffsetBytes, Object that,
-      long thatOffsetBytes, long lengthBytes);
+  boolean equalTo(long thisOffsetBytes, Resource that, long thatOffsetBytes, long lengthBytes);
+
+  /**
+   * Forces any changes made to the contents of this memory-mapped Resource to be written to the storage
+   * device described by the configured file descriptor.
+   *
+   * <p>If the file descriptor associated with this memory-mapped Resource resides on a local storage device then when
+   * this method returns, it is guaranteed that all changes made to this mapped Resource since it was created, or since
+   * this method was last invoked, will have been written to that device.</p>
+   *
+   * <p>If the file descriptor associated with this memory-mapped Resource does not reside on a local device then no
+   * such guarantee is made.</p>
+   *
+   * <p>If this memory-mapped Resource was not mapped in read/write mode
+   * ({@link java.nio.channels.FileChannel.MapMode#READ_WRITE}) then invoking this method may have no effect.
+   * In particular, this method has no effect for files mapped in read-only or private
+   * mapping modes. This method may or may not have an effect for implementation-specific mapping modes.</p>
+   *
+   * @throws IllegalStateException if:
+   * <ul>
+   *  <li>this memory-mapped Resource is not <em>alive</em></li>, or
+   *  <li>this method is called from a thread other than the thread owning this resource</li>.
+   * </ul>
+   *
+   * @throws UnsupportedOperationException if this Resource is not memory-mapped, e.g. if
+   * {@code isMapped() == false}.
+   *
+   * @throws UncheckedIOException if there is an I/O error writing the contents of this
+   * memory-mapped Resource to the associated storage device
+   */
+  void force();
 
   /**
    * Gets the backing ByteBuffer if it exists, otherwise returns null.
    * @return the backing ByteBuffer if it exists, otherwise returns null.
    */
-  ByteBuffer getByteBuffer();
+  ByteBuffer getByteBuffer(); //TODO Deprecate
 
   /**
    * Gets the current ByteOrder.
@@ -88,39 +135,11 @@ public interface Resource {
    */
   long getCapacity();
 
-  //Monitoring
   /**
-   * Gets the current size of active direct memory allocated.
-   * @return the current size of active direct memory allocated.
+   * Returns the MemoryRequestSever or null, if it has not been configured.
+   * @return the MemoryRequestSever or null, if it has not been configured.
    */
-  static long getCurrentDirectMemoryAllocated() {
-    return ResourceImpl.getCurrentDirectMemoryAllocated();
-  }
-
-  /**
-   * Gets the current number of active direct memory allocations.
-   * @return the current number of active direct memory allocations.
-   */
-  static long getCurrentDirectMemoryAllocations() {
-    return ResourceImpl.getCurrentDirectMemoryAllocations();
-  }
-
-  /**
-   * Gets the current size of active direct memory map allocated.
-   * @return the current size of active direct memory map allocated.
-   */
-  static long getCurrentDirectMemoryMapAllocated() {
-    return ResourceImpl.getCurrentDirectMemoryMapAllocated();
-  }
-
-  /**
-   * Gets the current number of active direct memory map allocations.
-   * @return the current number of active direct memory map allocations.
-   */
-  static long getCurrentDirectMemoryMapAllocations() {
-    return ResourceImpl.getCurrentDirectMemoryMapAllocations();
-  }
-  //End Monitoring
+  MemoryRequestServer getMemoryRequestServer();
 
   /**
    * Returns the offset of address zero of this object relative to the base address of the
@@ -135,28 +154,20 @@ public interface Resource {
    * Returns true if this object is backed by an on-heap primitive array
    * @return true if this object is backed by an on-heap primitive array
    */
-  boolean hasArray();
+  boolean hasArray(); //TODO Change to isHeapResource
+
+  /**
+   * Returns true if this object is valid and has not been closed.
+   * This is relevant only for direct (off-heap) memory and Mapped Files.
+   * @return true if this object is valid and has not been closed.
+   */
+  boolean isValid(); //TODO isAlive()
 
   /**
    * Returns true if this Memory is backed by a ByteBuffer.
    * @return true if this Memory is backed by a ByteBuffer.
    */
-  boolean hasByteBuffer();
-
-  /**
-   * Returns the hashCode of this object.
-   *
-   * <p>The hash code of this object depends upon all of its contents.
-   * Because of this, it is inadvisable to use these objects as keys in hash maps
-   * or similar data structures unless it is known that their contents will not change.</p>
-   *
-   * <p>If it is desirable to use these objects in a hash map depending only on object identity,
-   * than the {@link java.util.IdentityHashMap} can be used.</p>
-   *
-   * @return the hashCode of this object.
-   */
-  @Override
-  int hashCode();
+  boolean isByteBufferResource();
 
   /**
    * Returns true if the Native ByteOrder is the same as the ByteOrder of the
@@ -168,11 +179,74 @@ public interface Resource {
   boolean isByteOrderCompatible(ByteOrder byteOrder);
 
   /**
-   * Returns true if the backing resource is direct (off-heap) memory.
-   * This is the case for allocated direct memory, memory mapped files,
+   * If true, the backing resource is direct (off-heap) memory.
+   * This is the case for allocated direct memory, memory-mapped files,
+   * or from a wrapped ByteBuffer that was allocated direct.
+   * If false, the backing resource is the Java heap.
    * @return true if the backing resource is direct (off-heap) memory.
    */
-  boolean isDirect();
+  boolean isDirectResource();
+
+  /**
+   * Returns true if this instance is a duplicate of a Buffer instance.
+   * @return true if this instance is a duplicate of a Buffer instance.
+   */
+  boolean isDuplicateBufferView();
+
+  /**
+   * Tells whether or not the contents of this memory-mapped Resource is resident in physical memory.
+   *
+   * <p>A return value of {@code true} implies that it is highly likely that all of the data in this memory-mapped
+   * Resource is resident in physical memory and may therefore be accessed without incurring any virtual-memory page
+   * faults or I/O operations.</p>
+   *
+   * <p>A return value of {@code false} does not necessarily imply that all of the data in this memory-mapped Resource
+   * is not resident in physical memory.</p>
+   *
+   * <p>The returned value is a hint, rather than a guarantee, because the underlying operating system may have paged
+   * out some of this Resource's data by the time that an invocation of this method returns.</p>
+   *
+   * @return true if it is likely that all of the data in this memory-mapped Resource is resident in physical memory
+   *
+   * @throws IllegalStateException if:
+   * <ul>
+   *  <li>this memory-mapped Resource  is not <em>alive</em></li>, or
+   *  <li>this method is called from a thread other than the thread owning this resource</li>.
+   * </ul>
+   *
+   * @throws UnsupportedOperationException if this Resource is not memory-mapped, e.g. if
+   * {@code isMapped() == false}.
+   */
+  boolean isLoaded();
+
+  /**
+   * If true, this is a <i>Memory</i> or <i>WritableMemory</i> instance, which provides the Memory API.
+   * The Memory API is the principal API for this Memory Component.
+   * It provides a rich variety of direct manipulations of four types of resources:
+   * On-heap memory, direct (off-heap) memory, memory-mapped files, and ByteBuffers.
+   * If false, this is a <i>Buffer</i> or <i>WritableBuffer</i> instance, which provides the Buffer API.
+   *
+   * <p>The Buffer API is largely parallel to the Memory API except that it adds a positional API
+   * similar to that in <i>ByteBuffer</i>.  The positional API is a convenience when iterating over structured
+   * arrays, or buffering input or output streams (thus the name).</p>
+   *
+   * @return true if this is a <i>Memory</i> or <i>WritableMemory</i> instance, which provides the Memory API,
+   * otherwise this is a <i>Buffer</i> or <i>WritableBuffer</i> instance, which provides the Buffer API.
+   */
+  boolean isMemoryApi();
+
+  /**
+   * Returns true if the backing resource is a memory-mapped file.
+   * @return true if the backing resource is a memory-mapped file.
+   */
+  boolean isMapped();
+
+  /**
+   * If true, all put and get operations will assume the non-native ByteOrder.
+   * Otherwise, all put and get operations will assume the native ByteOrder.
+   * @return true, if all put and get operations will assume the non-native ByteOrder.
+   */
+  boolean isNonNativeOrder();
 
   /**
    * Returns true if this object or the backing resource is read-only.
@@ -181,28 +255,52 @@ public interface Resource {
   boolean isReadOnly();
 
   /**
+   * Returns true if this instance is a region view of another Memory or Buffer
+   * @return true if this instance is a region view of another Memory or Buffer
+   */
+  boolean isRegionView();
+
+  /**
    * Returns true if the backing resource of <i>this</i> is identical with the backing resource
    * of <i>that</i>. The capacities must be the same.  If <i>this</i> is a region,
    * the region offset must also be the same.
-   * @param that A different non-null object
+   * @param that A different non-null Resource
    * @return true if the backing resource of <i>this</i> is the same as the backing resource
    * of <i>that</i>.
    */
-  boolean isSameResource(Object that);
+  boolean isSameResource(Resource that);
 
   /**
-   * Returns true if this object is valid and has not been closed.
-   * This is relevant only for direct (off-heap) memory and Mapped Files.
-   * @return true if this object is valid and has not been closed.
+   * Loads the contents of this memory-mapped Resource into physical memory.
+   *
+   * <p>This method makes a best effort to ensure that, when it returns, this contents of the memory-mapped Resource is
+   * resident in physical memory. Invoking this method may cause some number of page faults and
+   * I/O operations to occur.</p>
+   *
+   * @throws IllegalStateException if:
+   * <ul>
+   *  <li>this memory-mapped Resource  is not <em>alive</em></li>, or
+   *  <li>this method is called from a thread other than the thread owning this Resource</li>.
+   * </ul>
+   *
+   * @throws UnsupportedOperationException if this Resource is not memory-mapped, e.g. if
+   * {@code isMapped() == false}.
    */
-  boolean isValid();
+  void load();
 
   /**
-   * Returns a formatted hex string of a range of this object.
-   * Used primarily for testing.
+   * Sets the MemoryRequestServer.
+   * @param memReqSvr the given MemoryRequestServer.
+   */
+  void setMemoryRequestServer(MemoryRequestServer memReqSvr);
+
+  /**
+   * Returns a description of this object with an optional formatted hex string of the data
+   * for the specified a range. Used primarily for testing.
    * @param header a descriptive header
    * @param offsetBytes offset bytes relative to this object start
    * @param lengthBytes number of bytes to convert to a hex string
+// @param withData include output listing of byte data in the given range
    * @return a formatted hex string in a human readable array
    */
   String toHexString(String header, long offsetBytes, int lengthBytes);

@@ -20,27 +20,19 @@
 package org.apache.datasketches.memory;
 
 /**
- * Read only interface for a memory mapped file
+ * Specific RuntimeException for invalid Memory.
  *
- * @author Roman Leventov
  * @author Lee Rhodes
- * @author Praveenkumar Venkatesan
  */
-public interface Map extends AutoCloseable {
+public class MemoryInvalidException extends MemoryException {
+  private static final long serialVersionUID = 1L;
 
   /**
-   * @see <a href="https://docs.oracle.com/javase/8/docs/api/java/nio/MappedByteBuffer.html#load--">
-   * java/nio/MappedByteBuffer.load</a>
+   * The associated resource failed to close.
    */
-  void load();
-
-  /**
-   * @return true if loaded
-   *
-   * @see <a href=
-   * "https://docs.oracle.com/javase/8/docs/api/java/nio/MappedByteBuffer.html#isLoaded--"> java
-   * /nio/MappedByteBuffer.isLoaded</a>
-   */
-  boolean isLoaded();
+  public MemoryInvalidException() {
+    super("The associated Memory is invalid.");
+  }
 
 }
+

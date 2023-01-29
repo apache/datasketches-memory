@@ -33,82 +33,82 @@ public class BufferReadWriteSafetyTest {
 
   private final WritableBuffer buf = (WritableBuffer) Buffer.wrap(ByteBuffer.allocate(8));
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = ReadOnlyException.class)
   public void testPutByte() {
     buf.putByte(0, (byte) 1);
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = ReadOnlyException.class)
   public void testPutBytePositional() {
     buf.putByte((byte) 1);
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = ReadOnlyException.class)
   public void testPutBoolean() {
     buf.putBoolean(0, true);
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = ReadOnlyException.class)
   public void testPutBooleanPositional() {
     buf.putBoolean(true);
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = ReadOnlyException.class)
   public void testPutShort() {
     buf.putShort(0, (short) 1);
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = ReadOnlyException.class)
   public void testPutShortPositional() {
     buf.putShort((short) 1);
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = ReadOnlyException.class)
   public void testPutChar() {
     buf.putChar(0, (char) 1);
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = ReadOnlyException.class)
   public void testPutCharPositional() {
     buf.putChar((char) 1);
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = ReadOnlyException.class)
   public void testPutInt() {
     buf.putInt(0, 1);
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = ReadOnlyException.class)
   public void testPutIntPositional() {
     buf.putInt(1);
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = ReadOnlyException.class)
   public void testPutLong() {
     buf.putLong(0, 1);
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = ReadOnlyException.class)
   public void testPutLongPositional() {
     buf.putLong(1);
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = ReadOnlyException.class)
   public void testPutFloat() {
     buf.putFloat(0, 1);
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = ReadOnlyException.class)
   public void testPutFloatPositional() {
     buf.putFloat(1);
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = ReadOnlyException.class)
   public void testPutDouble() {
     buf.putDouble(0, 1);
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = ReadOnlyException.class)
   public void testPutDoublePositional() {
     buf.putDouble(1);
   }
@@ -155,19 +155,19 @@ public class BufferReadWriteSafetyTest {
 
   // Now, test that various ways to obtain a read-only buffer produce a read-only buffer indeed
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = ReadOnlyException.class)
   public void testWritableMemoryAsBuffer() {
     WritableBuffer buf1 = (WritableBuffer) WritableMemory.allocate(8).asBuffer();
     buf1.putInt(1);
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = ReadOnlyException.class)
   public void testWritableBufferRegion() {
     WritableBuffer buf1 = (WritableBuffer) WritableMemory.allocate(8).asWritableBuffer().region();
     buf1.putInt(1);
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = ReadOnlyException.class)
   public void testWritableBufferDuplicate() {
     WritableBuffer buf1 = (WritableBuffer) WritableMemory.allocate(8).asWritableBuffer().duplicate();
     buf1.putInt(1);

@@ -31,27 +31,24 @@ import org.apache.datasketches.memory.WritableMemory;
  * @author Lee Rhodes
  */
 final class MapWritableMemoryImpl extends NativeWritableMemoryImpl {
-  private final long nativeBaseOffset;
+  private final AllocateDirectWritableMap dirWMap;
   private final long offsetBytes;
   private final long capacityBytes;
   private final int typeId;
   private long cumOffsetBytes;
-  private final StepBoolean valid; //a reference only
 
   MapWritableMemoryImpl(
-      final long nativeBaseOffset,
+      final AllocateDirectWritableMap dirWMap,
       final long offsetBytes,
       final long capacityBytes,
       final int typeId,
-      final long cumOffsetBytes,
-      final StepBoolean valid) {
+      final long cumOffsetBytes) {
     super();
-    this.nativeBaseOffset = nativeBaseOffset;
+    this.dirWMap = dirWMap;
     this.offsetBytes = offsetBytes;
     this.capacityBytes = capacityBytes;
     this.typeId = removeNnBuf(typeId) | MAP | MEMORY | NATIVE;
     this.cumOffsetBytes = cumOffsetBytes;
-    this.valid = valid;
   }
 
   @Override
@@ -60,7 +57,6 @@ final class MapWritableMemoryImpl extends NativeWritableMemoryImpl {
       final long capacityBytes,
       final boolean readOnly,
       final ByteOrder byteOrder) {
-    //this.regionOffsetBytes = regionOffsetBytes;
     final long newOffsetBytes = offsetBytes + regionOffsetBytes;
     final long newCumOffsetBytes = cumOffsetBytes + regionOffsetBytes;
     int typeIdOut = removeNnBuf(typeId) | MAP | REGION | (readOnly ? READONLY : 0);
@@ -68,11 +64,11 @@ final class MapWritableMemoryImpl extends NativeWritableMemoryImpl {
     if (Util.isNativeByteOrder(byteOrder)) {
       typeIdOut |= NATIVE;
       return new MapWritableMemoryImpl(
-          nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, valid);
+          dirWMap, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes);
     } else {
       typeIdOut |= NONNATIVE;
       return new MapNonNativeWritableMemoryImpl(
-          nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, valid);
+          dirWMap, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes);
     }
   }
 
@@ -83,28 +79,28 @@ final class MapWritableMemoryImpl extends NativeWritableMemoryImpl {
     if (byteOrder == ByteOrder.nativeOrder()) {
       typeIdOut |= NATIVE;
       return new MapWritableBufferImpl(
-          nativeBaseOffset, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, valid);
+          dirWMap, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes);
     } else {
       typeIdOut |= NONNATIVE;
       return new MapNonNativeWritableBufferImpl(
-          nativeBaseOffset, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, valid);
+          dirWMap, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes);
     }
   }
 
   @Override
   public boolean isValid() {
-    return valid.get();
+    return dirWMap.getValid().get();
   }
 
   @Override
   public long getCapacity() {
-    assertValid();
+    checkValid();
     return capacityBytes;
   }
 
   @Override
   public long getCumulativeOffset() {
-    assertValid();
+    checkValid();
     return cumOffsetBytes;
   }
 
@@ -115,25 +111,45 @@ final class MapWritableMemoryImpl extends NativeWritableMemoryImpl {
 
   @Override
   public long getNativeBaseOffset() {
-    return nativeBaseOffset;
+    return dirWMap.nativeBaseOffset;
   }
 
   @Override
   public long getTotalOffset() {
-    assertValid();
+    checkValid();
     return offsetBytes;
   }
 
   @Override
   int getTypeId() {
-    assertValid();
+    checkValid();
     return typeId;
   }
 
   @Override
   Object getUnsafeObject() {
-    assertValid();
+    checkValid();
     return null;
+  }
+
+  @Override
+  public void close() {
+    dirWMap.close();
+  }
+
+  @Override
+  public void force() {
+    dirWMap.force();
+  }
+
+  @Override
+  public boolean isLoaded() {
+    return dirWMap.isLoaded();
+  }
+
+  @Override
+  public void load() {
+    dirWMap.load();
   }
 
 }

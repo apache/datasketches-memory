@@ -19,6 +19,8 @@
 
 package org.apache.datasketches.memory.internal;
 
+import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -36,6 +38,8 @@ public final class VirtualMachineMemory {
     private static final Method VM_IS_DIRECT_MEMORY_PAGE_ALIGNED_METHOD;
     private static final long maxDBBMemory;
     private static final boolean isPageAligned;
+    @SuppressWarnings("restriction")
+    private static int pageSize = unsafe.pageSize();
 
     static {
         try {
@@ -70,5 +74,9 @@ public final class VirtualMachineMemory {
      */
     public static boolean getIsPageAligned() {
         return isPageAligned;
+    }
+
+    public static int getPageSize() {
+      return pageSize;
     }
 }

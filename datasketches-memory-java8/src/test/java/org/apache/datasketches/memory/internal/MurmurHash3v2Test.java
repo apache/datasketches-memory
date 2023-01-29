@@ -25,7 +25,6 @@ import static org.testng.Assert.fail;
 
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.MurmurHash3v2;
-import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -254,9 +253,8 @@ public class MurmurHash3v2Test {
       Memory mem = Memory.wrap(new byte[0]);
       out = hash(mem, 0L, 4L, 1L, out);
     } catch (final IllegalArgumentException e) { }
-    try (WritableHandle wh = WritableMemory.allocateDirect(8)) {
+    try (Memory mem = WritableMemory.allocateDirect(8)) {
       long[] out = new long[2];
-      Memory mem = wh.get();
       out = hash(mem, 0L, 4L, 1L, out);
     } catch (Exception ee) { }
   }

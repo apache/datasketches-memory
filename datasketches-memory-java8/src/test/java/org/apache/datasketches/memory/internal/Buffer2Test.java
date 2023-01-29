@@ -56,7 +56,7 @@ public class Buffer2Test {
     }
 
     assertEquals(true, buffer.hasArray());
-    assertEquals(true, buffer.hasByteBuffer());
+    assertEquals(true, buffer.isByteBufferResource());
   }
 
   @Test
@@ -76,7 +76,7 @@ public class Buffer2Test {
     }
 
     assertEquals(false, buffer.hasArray());
-    assertEquals(true, buffer.hasByteBuffer());
+    assertEquals(true, buffer.isByteBufferResource());
   }
 
   @Test
@@ -99,7 +99,7 @@ public class Buffer2Test {
     assertEquals(byteArray, copyByteArray);
 
     assertEquals(true, buffer.hasArray());
-    assertEquals(false, buffer.hasByteBuffer());
+    assertEquals(false, buffer.isByteBufferResource());
   }
 
   @Test
@@ -382,7 +382,7 @@ public class Buffer2Test {
     }
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = ReadOnlyException.class)
   public void testROByteBuffer() {
     byte[] arr = new byte[64];
     ByteBuffer roBB = ByteBuffer.wrap(arr).asReadOnlyBuffer();

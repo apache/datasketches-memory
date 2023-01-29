@@ -25,8 +25,8 @@ import static org.testng.Assert.fail;
 import java.nio.ByteBuffer;
 
 import org.apache.datasketches.memory.Buffer;
+import org.apache.datasketches.memory.BufferPositionInvariantsException;
 import org.apache.datasketches.memory.WritableBuffer;
-import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
@@ -161,15 +161,14 @@ public class BufferInvariantsTest {
 
   @Test
   public void checkLimitsDirect() throws Exception {
-    try (WritableHandle hand = WritableMemory.allocateDirect(100)) {
-      WritableMemory wmem = hand.getWritable();
+    try (WritableMemory wmem = WritableMemory.allocateDirect(100)) {
       Buffer buf = wmem.asBuffer();
       buf.setStartPositionEnd(40, 45, 50);
       buf.setStartPositionEnd(0, 0, 100);
       try {
         buf.setStartPositionEnd(0, 0, 101);
         fail();
-      } catch (AssertionError e) {
+      } catch (BufferPositionInvariantsException e) {
         //ok
       }
     }
@@ -232,8 +231,7 @@ public class BufferInvariantsTest {
   @Test
   public void testBufDirect() throws Exception {
     int n = 25;
-    try (WritableHandle whand = WritableMemory.allocateDirect(n)) {
-    WritableMemory wmem = whand.getWritable();
+    try (WritableMemory wmem = WritableMemory.allocateDirect(n)) {
     WritableBuffer buf = wmem.asWritableBuffer();
     for (byte i = 0; i < n; i++) { buf.putByte(i); }
     buf.setPosition(0);

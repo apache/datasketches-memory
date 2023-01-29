@@ -19,18 +19,16 @@
 
 package org.apache.datasketches.memory;
 
-/**
- * A Handle for writable direct memory or a memory-mapped, writable file resource.
- * Please read Javadocs for {@link Handle}.
- *
- * @author Lee Rhodes
- * @author Roman Leventov
- */
-public interface WritableHandle extends Handle {
+public class BufferPositionInvariantsException extends MemoryException {
+  private static final long serialVersionUID = 1L;
 
   /**
-   * Gets a WritableMemory
-   * @return a WritableMemory
+   * The associated position operation used violated the positional invariants equation with required details
+   *
+   * @param details of the violation.
    */
-  WritableMemory getWritable();
+  public BufferPositionInvariantsException(final String details) {
+    super(details);
+  }
 }
+

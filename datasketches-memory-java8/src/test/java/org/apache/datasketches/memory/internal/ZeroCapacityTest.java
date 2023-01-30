@@ -24,12 +24,12 @@ import static org.testng.Assert.assertEquals;
 import java.nio.ByteBuffer;
 
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
+ * Although allocating zero bytes may be a bug, it is tolerated in Java.
+ *
  * @author Lee Rhodes
  */
 public class ZeroCapacityTest {
@@ -43,14 +43,8 @@ public class ZeroCapacityTest {
     Memory.wrap(ByteBuffer.allocate(0));
     Memory mem3 = Memory.wrap(ByteBuffer.allocateDirect(0));
     mem3.region(0, 0);
-    WritableHandle wh = null;
-    try {
-      wh = WritableMemory.allocateDirect(0);
-      Assert.fail();
-    } catch (IllegalArgumentException ignore) {
-      if (wh != null) { wh.close(); }
-      // expected
-    }
+    WritableMemory mem = WritableMemory.allocateDirect(0);
+    mem.close();
   }
 
   @Test

@@ -189,34 +189,4 @@ public final class UnsafeUtil {
     }
   }
 
-  /**
-   * Assert the requested offset and length against the allocated size.
-   * The invariants equation is: {@code 0 <= reqOff <= reqLen <= reqOff + reqLen <= allocSize}.
-   * If this equation is violated and assertions are enabled, an {@link AssertionError} will
-   * be thrown.
-   * @param reqOff the requested offset
-   * @param reqLen the requested length
-   * @param allocSize the allocated size.
-   */
-  public static void assertBounds(final long reqOff, final long reqLen, final long allocSize) {
-    assert ((reqOff | reqLen | (reqOff + reqLen) | (allocSize - (reqOff + reqLen))) >= 0) :
-      "reqOffset: " + reqOff + ", reqLength: " + reqLen
-      + ", (reqOff + reqLen): " + (reqOff + reqLen) + ", allocSize: " + allocSize;
-  }
-
-  /**
-   * Check the requested offset and length against the allocated size.
-   * The invariants equation is: {@code 0 <= reqOff <= reqLen <= reqOff + reqLen <= allocSize}.
-   * If this equation is violated an {@link IllegalArgumentException} will be thrown.
-   * @param reqOff the requested offset
-   * @param reqLen the requested length
-   * @param allocSize the allocated size.
-   */
-  public static void checkBounds(final long reqOff, final long reqLen, final long allocSize) {
-    if ((reqOff | reqLen | (reqOff + reqLen) | (allocSize - (reqOff + reqLen))) < 0) {
-      throw new IllegalArgumentException(
-          "reqOffset: " + reqOff + ", reqLength: " + reqLen
-              + ", (reqOff + reqLen): " + (reqOff + reqLen) + ", allocSize: " + allocSize);
-    }
-  }
 }

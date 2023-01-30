@@ -20,18 +20,21 @@
 package org.apache.datasketches.memory;
 
 /**
- * Writable interface for a memory mapped file
+ * Specific RuntimeException for bounds violations.
  *
- * @author Roman Leventov
  * @author Lee Rhodes
- * @author Praveenkumar Venkatesan
  */
-public interface WritableMap extends Map {
+public class MemoryBoundsException extends MemoryException {
+  private static final long serialVersionUID = 1L;
 
   /**
-   * @see <a href="https://docs.oracle.com/javase/8/docs/api/java/nio/MappedByteBuffer.html#force--">
-   * java/nio/MappedByteBuffer.force</a>
+   * The associated operation violated access bounds with required details.
+   *
+   * @param details of the violation.
    */
-  void force();
+  public MemoryBoundsException(final String details) {
+    super(details);
+  }
 
 }
+

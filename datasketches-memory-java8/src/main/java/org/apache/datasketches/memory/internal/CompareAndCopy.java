@@ -25,7 +25,6 @@ import static org.apache.datasketches.memory.internal.UnsafeUtil.FLOAT_SHIFT;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.INT_SHIFT;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.LONG_SHIFT;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.SHORT_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.checkBounds;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
 import static org.apache.datasketches.memory.internal.Util.UNSAFE_COPY_THRESHOLD_BYTES;
 
@@ -38,12 +37,12 @@ final class CompareAndCopy {
   private CompareAndCopy() { }
 
   static int compare(
-      final BaseStateImpl state1, final long offsetBytes1, final long lengthBytes1,
-      final BaseStateImpl state2, final long offsetBytes2, final long lengthBytes2) {
+      final ResourceImpl state1, final long offsetBytes1, final long lengthBytes1,
+      final ResourceImpl state2, final long offsetBytes2, final long lengthBytes2) {
     state1.checkValid();
-    checkBounds(offsetBytes1, lengthBytes1, state1.getCapacity());
+    ResourceImpl.checkBounds(offsetBytes1, lengthBytes1, state1.getCapacity());
     state2.checkValid();
-    checkBounds(offsetBytes2, lengthBytes2, state2.getCapacity());
+    ResourceImpl.checkBounds(offsetBytes2, lengthBytes2, state2.getCapacity());
     final long cumOff1 = state1.getCumulativeOffset(offsetBytes1);
     final long cumOff2 = state2.getCumulativeOffset(offsetBytes2);
     final Object arr1 = state1.getUnsafeObject();
@@ -60,7 +59,7 @@ final class CompareAndCopy {
     return Long.compare(lengthBytes1, lengthBytes2);
   }
 
-  static boolean equals(final BaseStateImpl state1, final BaseStateImpl state2) {
+  static boolean equals(final ResourceImpl state1, final ResourceImpl state2) {
     final long cap1 = state1.getCapacity();
     final long cap2 = state2.getCapacity();
     return (cap1 == cap2) && equals(state1, 0, state2, 0, cap1);
@@ -70,12 +69,12 @@ final class CompareAndCopy {
   // stop if the arrays and offsets are the same as there is only one length.  Also this can take
   // advantage of chunking with longs, while compare cannot.
   static boolean equals(
-      final BaseStateImpl state1, final long offsetBytes1,
-      final BaseStateImpl state2, final long offsetBytes2, long lengthBytes) {
+      final ResourceImpl state1, final long offsetBytes1,
+      final ResourceImpl state2, final long offsetBytes2, long lengthBytes) {
     state1.checkValid();
-    checkBounds(offsetBytes1, lengthBytes, state1.getCapacity());
+    ResourceImpl.checkBounds(offsetBytes1, lengthBytes, state1.getCapacity());
     state2.checkValid();
-    checkBounds(offsetBytes2, lengthBytes, state2.getCapacity());
+    ResourceImpl.checkBounds(offsetBytes2, lengthBytes, state2.getCapacity());
     long cumOff1 = state1.getCumulativeOffset(offsetBytes1);
     long cumOff2 = state2.getCumulativeOffset(offsetBytes2);
     final Object arr1 = state1.getUnsafeObject(); //could be null
@@ -112,12 +111,12 @@ final class CompareAndCopy {
     return true;
   }
 
-  static void copy(final BaseStateImpl srcState, final long srcOffsetBytes,
-      final BaseStateImpl dstState, final long dstOffsetBytes, final long lengthBytes) {
+  static void copy(final ResourceImpl srcState, final long srcOffsetBytes,
+      final ResourceImpl dstState, final long dstOffsetBytes, final long lengthBytes) {
     srcState.checkValid();
-    checkBounds(srcOffsetBytes, lengthBytes, srcState.getCapacity());
+    ResourceImpl.checkBounds(srcOffsetBytes, lengthBytes, srcState.getCapacity());
     dstState.checkValid();
-    checkBounds(dstOffsetBytes, lengthBytes, dstState.getCapacity());
+    ResourceImpl.checkBounds(dstOffsetBytes, lengthBytes, dstState.getCapacity());
     final long srcAdd = srcState.getCumulativeOffset(srcOffsetBytes);
     final long dstAdd = dstState.getCumulativeOffset(dstOffsetBytes);
     copyMemory(srcState.getUnsafeObject(), srcAdd, dstState.getUnsafeObject(), dstAdd,
@@ -201,7 +200,7 @@ final class CompareAndCopy {
   static void getNonNativeChars(final Object unsafeObj, long cumOffsetBytes,
       long copyBytes, final char[] dstArray, int dstOffsetChars,
       int lengthChars) {
-    checkBounds(dstOffsetChars, lengthChars, dstArray.length);
+    ResourceImpl.checkBounds(dstOffsetChars, lengthChars, dstArray.length);
     while (copyBytes > UNSAFE_COPY_THRESHOLD_BYTES) {
       final long chunkBytes = Math.min(copyBytes, UNSAFE_COPY_THRESHOLD_BYTES);
       final int chunkChars = (int) (chunkBytes >> CHAR_SHIFT);
@@ -228,7 +227,7 @@ final class CompareAndCopy {
   static void getNonNativeDoubles(final Object unsafeObj, long cumOffsetBytes,
       long copyBytes, final double[] dstArray, int dstOffsetDoubles,
       int lengthDoubles) {
-    checkBounds(dstOffsetDoubles, lengthDoubles, dstArray.length);
+    ResourceImpl.checkBounds(dstOffsetDoubles, lengthDoubles, dstArray.length);
     while (copyBytes > UNSAFE_COPY_THRESHOLD_BYTES) {
       final long chunkBytes = Math.min(copyBytes, UNSAFE_COPY_THRESHOLD_BYTES);
       final int chunkDoubles = (int) (chunkBytes >> DOUBLE_SHIFT);
@@ -257,7 +256,7 @@ final class CompareAndCopy {
   static void getNonNativeFloats(final Object unsafeObj, long cumOffsetBytes,
       long copyBytes, final float[] dstArray, int dstOffsetFloats,
       int lengthFloats) {
-    checkBounds(dstOffsetFloats, lengthFloats, dstArray.length);
+    ResourceImpl.checkBounds(dstOffsetFloats, lengthFloats, dstArray.length);
     while (copyBytes > UNSAFE_COPY_THRESHOLD_BYTES) {
       final long chunkBytes = Math.min(copyBytes, UNSAFE_COPY_THRESHOLD_BYTES);
       final int chunkFloats = (int) (chunkBytes >> FLOAT_SHIFT);
@@ -284,7 +283,7 @@ final class CompareAndCopy {
   static void getNonNativeInts(final Object unsafeObj, long cumOffsetBytes,
       long copyBytes, final int[] dstArray, int dstOffsetInts,
       int lengthInts) {
-    checkBounds(dstOffsetInts, lengthInts, dstArray.length);
+    ResourceImpl.checkBounds(dstOffsetInts, lengthInts, dstArray.length);
     while (copyBytes > UNSAFE_COPY_THRESHOLD_BYTES) {
       final long chunkBytes = Math.min(copyBytes, UNSAFE_COPY_THRESHOLD_BYTES);
       final int chunkInts = (int) (chunkBytes >> INT_SHIFT);
@@ -311,7 +310,7 @@ final class CompareAndCopy {
   static void getNonNativeLongs(final Object unsafeObj, long cumOffsetBytes,
       long copyBytes, final long[] dstArray, int dstOffsetLongs,
       int lengthLongs) {
-    checkBounds(dstOffsetLongs, lengthLongs, dstArray.length);
+    ResourceImpl.checkBounds(dstOffsetLongs, lengthLongs, dstArray.length);
     while (copyBytes > UNSAFE_COPY_THRESHOLD_BYTES) {
       final long chunkBytes = Math.min(copyBytes, UNSAFE_COPY_THRESHOLD_BYTES);
       final int chunkLongs = (int) (chunkBytes >> LONG_SHIFT);
@@ -338,7 +337,7 @@ final class CompareAndCopy {
   static void getNonNativeShorts(final Object unsafeObj, long cumOffsetBytes,
       long copyBytes, final short[] dstArray, int dstOffsetShorts,
       int lengthShorts) {
-    checkBounds(dstOffsetShorts, lengthShorts, dstArray.length);
+    ResourceImpl.checkBounds(dstOffsetShorts, lengthShorts, dstArray.length);
     while (copyBytes > UNSAFE_COPY_THRESHOLD_BYTES) {
       final long chunkBytes = Math.min(copyBytes, UNSAFE_COPY_THRESHOLD_BYTES);
       final int chunkShorts = (int) (chunkBytes >> SHORT_SHIFT);
@@ -364,7 +363,7 @@ final class CompareAndCopy {
 
   static void putNonNativeChars(final char[] srcArray, int srcOffsetChars, int lengthChars,
       long copyBytes, final Object unsafeObj, long cumOffsetBytes) {
-    checkBounds(srcOffsetChars, lengthChars, srcArray.length);
+    ResourceImpl.checkBounds(srcOffsetChars, lengthChars, srcArray.length);
     while (copyBytes > UNSAFE_COPY_THRESHOLD_BYTES) {
       final long chunkBytes = Math.min(copyBytes, UNSAFE_COPY_THRESHOLD_BYTES);
       final int chunkChars = (int) (chunkBytes >> CHAR_SHIFT);
@@ -390,7 +389,7 @@ final class CompareAndCopy {
 
   static void putNonNativeDoubles(final double[] srcArray, int srcOffsetDoubles,
       int lengthDoubles, long copyBytes, final Object unsafeObj, long cumOffsetBytes) {
-    checkBounds(srcOffsetDoubles, lengthDoubles, srcArray.length);
+    ResourceImpl.checkBounds(srcOffsetDoubles, lengthDoubles, srcArray.length);
     while (copyBytes > UNSAFE_COPY_THRESHOLD_BYTES) {
       final long chunkBytes = Math.min(copyBytes, UNSAFE_COPY_THRESHOLD_BYTES);
       final int chunkDoubles = (int) (chunkBytes >> DOUBLE_SHIFT);
@@ -418,7 +417,7 @@ final class CompareAndCopy {
 
   static void putNonNativeFloats(final float[] srcArray, int srcOffsetFloats,
       int lengthFloats, long copyBytes, final Object unsafeObj, long cumOffsetBytes) {
-    checkBounds(srcOffsetFloats, lengthFloats, srcArray.length);
+    ResourceImpl.checkBounds(srcOffsetFloats, lengthFloats, srcArray.length);
     while (copyBytes > UNSAFE_COPY_THRESHOLD_BYTES) {
       final long chunkBytes = Math.min(copyBytes, UNSAFE_COPY_THRESHOLD_BYTES);
       final int chunkFloats = (int) (chunkBytes >> FLOAT_SHIFT);
@@ -444,7 +443,7 @@ final class CompareAndCopy {
 
   static void putNonNativeInts(final int[] srcArray, int srcOffsetInts, int lengthInts,
       long copyBytes, final Object unsafeObj, long cumOffsetBytes) {
-    checkBounds(srcOffsetInts, lengthInts, srcArray.length);
+    ResourceImpl.checkBounds(srcOffsetInts, lengthInts, srcArray.length);
     while (copyBytes > UNSAFE_COPY_THRESHOLD_BYTES) {
       final long chunkBytes = Math.min(copyBytes, UNSAFE_COPY_THRESHOLD_BYTES);
       final int chunkInts = (int) (chunkBytes >> INT_SHIFT);
@@ -470,7 +469,7 @@ final class CompareAndCopy {
 
   static void putNonNativeLongs(final long[] srcArray, int srcOffsetLongs, int lengthLongs,
       long copyBytes, final Object unsafeObj, long cumOffsetBytes) {
-    checkBounds(srcOffsetLongs, lengthLongs, srcArray.length);
+    ResourceImpl.checkBounds(srcOffsetLongs, lengthLongs, srcArray.length);
     while (copyBytes > UNSAFE_COPY_THRESHOLD_BYTES) {
       final long chunkBytes = Math.min(copyBytes, UNSAFE_COPY_THRESHOLD_BYTES);
       final int chunkLongs = (int) (chunkBytes >> LONG_SHIFT);
@@ -496,7 +495,7 @@ final class CompareAndCopy {
 
   static void putNonNativeShorts(final short[] srcArray, int srcOffsetShorts,
       int lengthShorts, long copyBytes, final Object unsafeObj, long cumOffsetBytes) {
-    checkBounds(srcOffsetShorts, lengthShorts, srcArray.length);
+    ResourceImpl.checkBounds(srcOffsetShorts, lengthShorts, srcArray.length);
     while (copyBytes > UNSAFE_COPY_THRESHOLD_BYTES) {
       final long chunkBytes = Math.min(copyBytes, UNSAFE_COPY_THRESHOLD_BYTES);
       final int chunkShorts = (int) (chunkBytes >> SHORT_SHIFT);

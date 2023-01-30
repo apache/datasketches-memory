@@ -19,6 +19,7 @@
 
 package org.apache.datasketches.memory.internal;
 
+import org.apache.datasketches.memory.MemoryBoundsException;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
@@ -26,212 +27,98 @@ public class BufferBoundaryCheckTest {
 
   private final WritableMemory writableMemory = WritableMemory.allocate(8);
 
-  @Test
+  @Test(expectedExceptions = MemoryBoundsException.class)
   public void testGetBoolean() {
-    writableMemory.getBoolean(7);
-    try {
-      writableMemory.getBoolean(8);
-      throw new RuntimeException("Expected AssertionError");
-    } catch (final AssertionError expected) {
-      // ignore
-    }
+    writableMemory.getBoolean(8);
   }
 
-  @Test
+  @Test(expectedExceptions = MemoryBoundsException.class)
   public void testPutBoolean() {
-    writableMemory.putBoolean(7, true);
-    try {
-      writableMemory.putBoolean(8, true);
-      throw new RuntimeException("Expected AssertionError");
-    } catch (final AssertionError expected) {
-      // ignore
-    }
+    writableMemory.putBoolean(8, true);
   }
 
-  @Test
+  @Test(expectedExceptions = MemoryBoundsException.class)
   public void testGetByte() {
-    writableMemory.getByte(7);
-    try {
-      writableMemory.getByte(8);
-      throw new RuntimeException("Expected AssertionError");
-    } catch (final AssertionError expected) {
-      // ignore
-    }
+    writableMemory.getByte(8);
   }
 
-  @Test
+  @Test(expectedExceptions = MemoryBoundsException.class)
   public void testPutByte() {
-    writableMemory.putByte(7, (byte) 1);
-    try {
-      writableMemory.putByte(8, (byte) 1);
-      throw new RuntimeException("Expected AssertionError");
-    } catch (final AssertionError expected) {
-      // ignore
-    }
+    writableMemory.putByte(8, (byte) 1);
   }
 
-  @Test
+  @Test(expectedExceptions = MemoryBoundsException.class)
   public void testGetChar() {
-    writableMemory.getChar(6);
-    try {
-      writableMemory.getChar(7);
-      throw new RuntimeException("Expected AssertionError");
-    } catch (final AssertionError expected) {
-      // ignore
-    }
+    writableMemory.getChar(7);
   }
 
-  @Test
+  @Test(expectedExceptions = MemoryBoundsException.class)
   public void testPutChar() {
-    writableMemory.putChar(6, 'a');
-    try {
-      writableMemory.putChar(7, 'a');
-      throw new RuntimeException("Expected AssertionError");
-    } catch (final AssertionError expected) {
-      // ignore
-    }
+    writableMemory.putChar(7, 'a');
   }
 
-  @Test
+  @Test(expectedExceptions = MemoryBoundsException.class)
   public void testGetShort() {
-    writableMemory.getShort(6);
-    try {
-      writableMemory.getShort(7);
-      throw new RuntimeException("Expected AssertionError");
-    } catch (final AssertionError expected) {
-      // ignore
-    }
+    writableMemory.getShort(7);
   }
 
-  @Test
+  @Test(expectedExceptions = MemoryBoundsException.class)
   public void testPutShort() {
-    writableMemory.putShort(6, (short) 1);
-    try {
-      writableMemory.putShort(7, (short) 1);
-      throw new RuntimeException("Expected AssertionError");
-    } catch (final AssertionError expected) {
-      // ignore
-    }
+    writableMemory.putShort(7, (short) 1);
   }
 
-  @Test
+  @Test(expectedExceptions = MemoryBoundsException.class)
   public void testGetInt() {
-    writableMemory.getInt(4);
-    try {
-      writableMemory.getInt(5);
-      throw new RuntimeException("Expected AssertionError");
-    } catch (final AssertionError expected) {
-      // ignore
-    }
+    writableMemory.getInt(5);
   }
 
-  @Test
+  @Test(expectedExceptions = MemoryBoundsException.class)
   public void testPutInt() {
-    writableMemory.putInt(4, 1);
-    try {
-      writableMemory.putInt(5, 1);
-      throw new RuntimeException("Expected AssertionError");
-    } catch (final AssertionError expected) {
-      // ignore
-    }
+    writableMemory.putInt(5, 1);
   }
 
-  @Test
+  @Test(expectedExceptions = MemoryBoundsException.class)
   public void testGetFloat() {
-    writableMemory.getFloat(4);
-    try {
-      writableMemory.getFloat(5);
-      throw new RuntimeException("Expected AssertionError");
-    } catch (final AssertionError expected) {
-      // ignore
-    }
+    writableMemory.getFloat(5);
   }
 
-  @Test
+  @Test(expectedExceptions = MemoryBoundsException.class)
   public void testPutFloat() {
-    writableMemory.putFloat(4, 1f);
-    try {
-      writableMemory.putFloat(5, 1f);
-      throw new RuntimeException("Expected AssertionError");
-    } catch (final AssertionError expected) {
-      // ignore
-    }
+    writableMemory.putFloat(5, 1f);
   }
 
-  @Test
+  @Test(expectedExceptions = MemoryBoundsException.class)
   public void testGetLong() {
-    writableMemory.getLong(0);
-    try {
-      writableMemory.getLong(1);
-      throw new RuntimeException("Expected AssertionError");
-    } catch (final AssertionError expected) {
-      // ignore
-    }
+    writableMemory.getLong(1);
   }
 
-  @Test
+  @Test(expectedExceptions = MemoryBoundsException.class)
   public void testPutLong() {
-    writableMemory.putLong(0, 1L);
-    try {
-      writableMemory.putLong(1, 1L);
-      throw new RuntimeException("Expected AssertionError");
-    } catch (final AssertionError expected) {
-      // ignore
-    }
+    writableMemory.putLong(1, 1L);
   }
 
-  @Test
+  @Test(expectedExceptions = MemoryBoundsException.class)
   public void testGetDouble() {
-    writableMemory.getDouble(0);
-    try {
-      writableMemory.getDouble(1);
-      throw new RuntimeException("Expected AssertionError");
-    } catch (final AssertionError expected) {
-      // ignore
-    }
+    writableMemory.getDouble(1);
   }
 
-  @Test
+  @Test(expectedExceptions = MemoryBoundsException.class)
   public void testPutDouble() {
-    writableMemory.putDouble(0, 1d);
-    try {
-      writableMemory.putDouble(1, 1d);
-      throw new RuntimeException("Expected AssertionError");
-    } catch (final AssertionError expected) {
-      // ignore
-    }
+    writableMemory.putDouble(1, 1d);
   }
 
-  @Test
+  @Test(expectedExceptions = MemoryBoundsException.class)
   public void testGetAndAddLong() {
-    writableMemory.getAndAddLong(0, 1L);
-    try {
-      writableMemory.getAndAddLong(1, 1L);
-      throw new RuntimeException("Expected AssertionError");
-    } catch (final AssertionError expected) {
-      // ignore
-    }
+    writableMemory.getAndAddLong(1, 1L);
   }
 
-  @Test
+  @Test(expectedExceptions = MemoryBoundsException.class)
   public void testGetAndSetLong() {
-    writableMemory.getAndSetLong(0, 1L);
-    try {
-      writableMemory.getAndSetLong(1, 1L);
-      throw new RuntimeException("Expected AssertionError");
-    } catch (final AssertionError expected) {
-      // ignore
-    }
+    writableMemory.getAndSetLong(1, 1L);
   }
 
-  @Test
+  @Test(expectedExceptions = MemoryBoundsException.class)
   public void testCompareAndSwapLong() {
-    writableMemory.compareAndSwapLong(0, 0L, 1L);
-    try {
-      writableMemory.compareAndSwapLong(1, 0L, 1L);
-      throw new RuntimeException("Expected AssertionError");
-    } catch (final AssertionError expected) {
-      // ignore
-    }
+    writableMemory.compareAndSwapLong(1, 0L, 1L);
   }
 }

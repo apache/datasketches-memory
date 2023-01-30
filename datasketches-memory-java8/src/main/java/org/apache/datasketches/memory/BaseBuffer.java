@@ -24,7 +24,7 @@ package org.apache.datasketches.memory;
  *
  * @author Lee Rhodes
  */
-public interface BaseBuffer extends BaseState {
+public interface BaseBuffer extends Resource {
 
   /**
    * Increments the current position by the given increment.

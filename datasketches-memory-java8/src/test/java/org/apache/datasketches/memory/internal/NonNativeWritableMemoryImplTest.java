@@ -20,10 +20,12 @@
 package org.apache.datasketches.memory.internal;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.memory.MemoryBoundsException;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
@@ -172,8 +174,8 @@ public class NonNativeWritableMemoryImplTest {
     wmem.getAndAddLong(0, 1L);
     try {
       wmem.getAndAddLong(1, 1L);
-      throw new RuntimeException("Expected AssertionError");
-    } catch (final AssertionError expected) {
+      fail("Expected MemoryBoundsException");
+    } catch (final MemoryBoundsException expected) {
       // ignore
     }
   }
@@ -183,8 +185,8 @@ public class NonNativeWritableMemoryImplTest {
     wmem.getAndSetLong(0, 1L);
     try {
       wmem.getAndSetLong(1, 1L);
-      throw new RuntimeException("Expected AssertionError");
-    } catch (final AssertionError expected) {
+      fail("Expected MemoryBoundsException");
+    } catch (final MemoryBoundsException expected) {
       // ignore
     }
   }
@@ -194,8 +196,8 @@ public class NonNativeWritableMemoryImplTest {
     wmem.compareAndSwapLong(0, 0L, 1L);
     try {
       wmem.compareAndSwapLong(1, 0L, 1L);
-      throw new RuntimeException("Expected AssertionError");
-    } catch (final AssertionError expected) {
+      fail("Expected MemoryBoundsException");
+    } catch (final MemoryBoundsException expected) {
       // ignore
     }
   }

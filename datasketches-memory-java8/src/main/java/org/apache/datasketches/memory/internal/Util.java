@@ -92,7 +92,7 @@ public final class Util {
    */
   public static long binarySearchLongs(final Memory mem, final long fromLongIndex,
       final long toLongIndex, final long key) {
-    UnsafeUtil.checkBounds(fromLongIndex << 3, (toLongIndex - fromLongIndex) << 3, mem.getCapacity());
+    ResourceImpl.checkBounds(fromLongIndex << 3, (toLongIndex - fromLongIndex) << 3, mem.getCapacity());
     long low = fromLongIndex;
     long high = toLongIndex - 1L;
 

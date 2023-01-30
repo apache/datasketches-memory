@@ -33,7 +33,7 @@ import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
-public class BaseStateTest {
+public class ResourceTest {
 
   @Test
   public void checkPrimOffset() {
@@ -56,9 +56,11 @@ public class BaseStateTest {
 
   @Test
   public void checkNotEqualTo() {
-    byte[] arr = new byte[8];
-    Memory mem = Memory.wrap(arr);
-    assertFalse(mem.equalTo(0, arr, 0, 8));
+    byte[] arr1 = {1,2,3,4,5,6,7,8};
+    Memory mem1 = Memory.wrap(arr1);
+    byte[] arr2 = {1,2,3,4,5,6,7,9};
+    Memory mem2 = Memory.wrap(arr2);
+    assertFalse(mem1.equalTo(mem2));
   }
 
   //StepBoolean checks
@@ -87,7 +89,7 @@ public class BaseStateTest {
   @Test
   public void checkGetNativeBaseOffset_Heap() {
     WritableMemory wmem = WritableMemory.allocate(8); //heap
-    final long offset = ((BaseStateImpl)wmem).getNativeBaseOffset();
+    final long offset = ((ResourceImpl)wmem).getNativeBaseOffset();
     assertEquals(offset, 0L);
   }
 
@@ -122,7 +124,7 @@ public class BaseStateTest {
   @Test
   public void checkTypeDecode() {
     for (int i = 0; i < 128; i++) {
-      BaseStateImpl.typeDecode(i);
+      ResourceImpl.typeDecode(i);
     }
   }
 

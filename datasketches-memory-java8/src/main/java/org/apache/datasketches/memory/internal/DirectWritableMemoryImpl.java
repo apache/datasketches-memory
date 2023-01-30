@@ -31,30 +31,27 @@ import org.apache.datasketches.memory.WritableMemory;
  * @author Lee Rhodes
  */
 final class DirectWritableMemoryImpl extends NativeWritableMemoryImpl {
-  private final long nativeBaseOffset;
+  private final AllocateDirect direct;
   private final long offsetBytes;
   private final long capacityBytes;
   private final int typeId;
   private long cumOffsetBytes;
   private final MemoryRequestServer memReqSvr;
-  private final StepBoolean valid; //a reference only
 
   DirectWritableMemoryImpl(
-      final long nativeBaseOffset,
+      final AllocateDirect direct,
       final long offsetBytes,
       final long capacityBytes,
       final int typeId,
       final long cumOffsetBytes,
-      final MemoryRequestServer memReqSvr,
-      final StepBoolean valid) {
+      final MemoryRequestServer memReqSvr) {
     super();
-    this.nativeBaseOffset = nativeBaseOffset;
+    this.direct = direct;
     this.offsetBytes = offsetBytes;
     this.capacityBytes = capacityBytes;
     this.typeId = removeNnBuf(typeId) | DIRECT | MEMORY | NATIVE; //initially cannot be ReadOnly
     this.cumOffsetBytes = cumOffsetBytes;
     this.memReqSvr = memReqSvr;
-    this.valid = valid;
   }
 
   @Override
@@ -70,11 +67,11 @@ final class DirectWritableMemoryImpl extends NativeWritableMemoryImpl {
     if (Util.isNativeByteOrder(byteOrder)) {
       typeIdOut |= NATIVE;
       return new DirectWritableMemoryImpl(
-          nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, memReqSvr, valid);
+          direct, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, memReqSvr);
     } else {
       typeIdOut |= NONNATIVE;
       return new DirectNonNativeWritableMemoryImpl(
-          nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, memReqSvr, valid);
+          direct, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, memReqSvr);
     }
   }
 
@@ -85,56 +82,63 @@ final class DirectWritableMemoryImpl extends NativeWritableMemoryImpl {
     if (byteOrder == ByteOrder.nativeOrder()) {
       typeIdOut |= NATIVE;
       return new DirectWritableBufferImpl(
-          nativeBaseOffset, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr, valid);
+          direct, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr);
     } else {
       typeIdOut |= NONNATIVE;
       return new DirectNonNativeWritableBufferImpl(
-          nativeBaseOffset, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr, valid);
+          direct, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr);
     }
   }
 
   @Override
   public boolean isValid() {
-    return valid.get();
+    return direct.getValid().get();
   }
 
   @Override
   public long getCapacity() {
-    assertValid();
+    checkValid();
     return capacityBytes;
   }
 
   @Override
+  public void close() {
+    direct.close();
+  }
+
+  @Override
   public long getCumulativeOffset() {
-    assertValid();
+    checkValid();
     return cumOffsetBytes;
   }
 
   @Override
   public MemoryRequestServer getMemoryRequestServer() {
+    checkValid();
     return memReqSvr;
   }
 
   @Override
   public long getNativeBaseOffset() {
-    return nativeBaseOffset;
+    checkValid();
+    return direct.getNativeBaseOffset();
   }
 
   @Override
   public long getTotalOffset() {
-    assertValid();
+    checkValid();
     return offsetBytes;
   }
 
   @Override
   int getTypeId() {
-    assertValid();
+    checkValid();
     return typeId;
   }
 
   @Override
   Object getUnsafeObject() {
-    assertValid();
+    checkValid();
     return null;
   }
 

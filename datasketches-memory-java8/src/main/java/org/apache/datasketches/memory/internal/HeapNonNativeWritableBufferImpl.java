@@ -107,41 +107,43 @@ final class HeapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl 
 
   @Override
   public long getCapacity() {
-    assertValid();
+    checkValid();
     return capacityBytes;
   }
 
   @Override
   public long getCumulativeOffset() {
-    assertValid();
+    checkValid();
     return cumOffsetBytes;
   }
 
   @Override
   public MemoryRequestServer getMemoryRequestServer() {
+    checkValid();
     return memReqSvr;
   }
 
   @Override
   public long getNativeBaseOffset() {
+    checkValid();
     return 0;
   }
 
   @Override
   public long getTotalOffset() {
-    assertValid();
+    checkValid();
     return offsetBytes;
   }
 
   @Override
   int getTypeId() {
-    assertValid();
+    checkValid();
     return typeId;
   }
 
   @Override
   Object getUnsafeObject() {
-    assertValid();
+    checkValid();
     return unsafeObj;
   }
 

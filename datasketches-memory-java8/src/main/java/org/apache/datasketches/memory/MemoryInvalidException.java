@@ -17,41 +17,22 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory;
 
-import org.apache.datasketches.memory.MapHandle;
-import org.apache.datasketches.memory.Memory;
+/**
+ * Specific RuntimeException for invalid Memory.
+ *
+ * @author Lee Rhodes
+ */
+public class MemoryInvalidException extends MemoryException {
+  private static final long serialVersionUID = 1L;
 
-class MapHandleImpl implements MapHandle {
-
-  final AllocateDirectMap dirMap;
-  BaseWritableMemoryImpl wMem;
-
-  MapHandleImpl(final AllocateDirectMap dirMap, final BaseWritableMemoryImpl wMem) {
-    this.dirMap = dirMap;
-    this.wMem = wMem;
-  }
-
-  @Override
-  public Memory get() {
-    return wMem;
-  }
-
-  @Override
-  public void close() {
-    if (dirMap.doClose("MapHandle")) {
-      wMem = null;
-    }
-  }
-
-  @Override
-  public void load() {
-    dirMap.load();
-  }
-
-  @Override
-  public boolean isLoaded() {
-    return dirMap.isLoaded();
+  /**
+   * The associated resource failed to close.
+   */
+  public MemoryInvalidException() {
+    super("The associated Memory is invalid.");
   }
 
 }
+

@@ -32,7 +32,7 @@ import org.apache.datasketches.memory.MemoryCloseException;
  * @author Lee Rhodes
  */
 @SuppressWarnings("restriction")
-final class AllocateDirect  {
+final class AllocateDirect {
   static final Logger LOG = Logger.getLogger(AllocateDirect.class.getCanonicalName());
 
   private final Deallocator deallocator;

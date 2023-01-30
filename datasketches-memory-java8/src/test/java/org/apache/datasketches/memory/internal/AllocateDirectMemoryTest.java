@@ -21,8 +21,10 @@ package org.apache.datasketches.memory.internal;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import org.apache.datasketches.memory.DefaultMemoryRequestServer;
+import org.apache.datasketches.memory.MemoryCloseException;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.WritableMemory;
@@ -30,7 +32,7 @@ import org.testng.annotations.Test;
 
 public class AllocateDirectMemoryTest {
 
-  @Test
+  @Test(expectedExceptions = MemoryCloseException.class)
   public void simpleAllocateDirect()  {
     int longs = 32;
     try (WritableMemory wMem = WritableMemory.allocateDirect(longs << 3)) {
@@ -40,8 +42,8 @@ public class AllocateDirectMemoryTest {
       }
       //inside the TWR block the memory should be valid
       ((ResourceImpl)wMem).checkValid();
-      //OK
-    }
+      wMem.close(); //Redundant close
+    } //normal TWR close will throw
   }
 
   @Test
@@ -87,7 +89,9 @@ public class AllocateDirectMemoryTest {
   public void checkExplicitClose() {
     final long cap = 128;
     WritableMemory wMem = WritableMemory.allocateDirect(cap);
+    assertTrue(wMem.isValid());
     wMem.close();
+    assertFalse(wMem.isValid());
   }
 
   @Test

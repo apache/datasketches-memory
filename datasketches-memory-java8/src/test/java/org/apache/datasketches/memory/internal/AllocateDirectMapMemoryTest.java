@@ -45,13 +45,15 @@ public class AllocateDirectMapMemoryTest {
     UtilTest.setGettysburgAddressFileToReadOnly();
   }
 
-  @Test
+  @Test(expectedExceptions = MemoryCloseException.class)
   public void simpleMap() {
     File file = getResourceFile("GettysburgAddress.txt");
     assertTrue(AllocateDirectWritableMap.isFileReadOnly(file));
     try (Memory mem = Memory.map(file)) {
       mem.close(); //redundant close
-    } catch (MemoryCloseException e) { }
+    }
+    //The Try-With-Resources will throw at the close of the block,
+    // because of the redundant close before the close of the block.
   }
 
   @Test
@@ -97,37 +99,25 @@ public class AllocateDirectMapMemoryTest {
     }
   }
 
-  @Test
-  public void testMapAndMultipleClose() {
+  @Test(expectedExceptions = MemoryInvalidException.class)
+  public void testMapAndMultipleCloseTypes() {
     File file = getResourceFile("GettysburgAddress.txt");
     long memCapacity = file.length();
     try (Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
       assertEquals(memCapacity, mem.getCapacity());
-    }
-    try {
-      Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder());
-      mem.close();
-      mem.close(); //redundant close
-    } catch (MemoryCloseException e) { /* OK */ }
-    try {
-      Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder());
-      mem.close();
-      mem.getCapacity(); //already closed
-    }
-    catch (MemoryInvalidException e) { /* OK */ }
+    } //normal close via TWR
+    Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder());
+    mem.close(); //normal manual close
+    mem.getCapacity(); //already closed, invalid
   }
 
-  @Test
+  @Test(expectedExceptions = MemoryInvalidException.class)
   public void testReadFailAfterClose()  {
     File file = getResourceFile("GettysburgAddress.txt");
     long memCapacity = file.length();
-    try {
-      Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder());
-      mem.close();
-      mem.getByte(0);
-    } catch (MemoryInvalidException e) {
-      //OK
-    }
+    Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder());
+    mem.close();
+    mem.getByte(0);
   }
 
   @Test

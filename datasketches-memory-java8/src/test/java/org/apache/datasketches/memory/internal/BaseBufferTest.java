@@ -74,16 +74,14 @@ public class BaseBufferTest {
     }
   }
 
-  @Test
+  @Test(expectedExceptions = MemoryInvalidException.class)
   public void checkCheckValid() {
 
     Buffer buf;
     try (WritableMemory wmem = WritableMemory.allocateDirect(100)) {
       buf = wmem.asBuffer();
     }
-    try {
-      @SuppressWarnings("unused")
-      Memory mem = buf.asMemory(); //wmem, buf no longer valid
-    } catch (MemoryInvalidException ae) { }
+    @SuppressWarnings("unused")
+    Memory mem = buf.asMemory(); //wmem, buf no longer valid
   }
 }

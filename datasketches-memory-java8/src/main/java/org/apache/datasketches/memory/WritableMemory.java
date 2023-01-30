@@ -446,7 +446,7 @@ public interface WritableMemory extends Memory {
 
   /**
    * Encodes characters from the given CharSequence into UTF-8 bytes and puts them into this
-   * <i>WritableMemory</i> begining at the given offsetBytes.
+   * <i>WritableMemory</i> beginning at the given offsetBytes.
    * This is specifically designed to reduce the production of intermediate objects (garbage),
    * thus significantly reducing pressure on the JVM Garbage Collector.
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start

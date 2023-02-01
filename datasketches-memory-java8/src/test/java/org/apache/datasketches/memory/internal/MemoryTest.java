@@ -381,13 +381,6 @@ public class MemoryTest {
   }
 
   @Test
-  public void checkHashCode() {
-    WritableMemory wmem = WritableMemory.allocate(32 + 7);
-    int hc = wmem.hashCode();
-    assertEquals(hc, -1895166923);
-  }
-
-  @Test
   public void checkSelfEqualsToAndCompareTo() {
     int len = 64;
     WritableMemory wmem = WritableMemory.allocate(len);

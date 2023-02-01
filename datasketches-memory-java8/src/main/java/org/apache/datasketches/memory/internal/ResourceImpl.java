@@ -115,6 +115,13 @@ public abstract class ResourceImpl implements Resource {
     }
   }
 
+  static void checkJavaVersion(final String jdkVer, final int p0, final int p1 ) {
+    final boolean ok = ((p0 == 1) && (p1 == 8)) || (p0 == 8) || (p0 == 11);
+    if (!ok) { throw new IllegalArgumentException(
+        "Unsupported JDK Major Version. It must be one of 1.8, 8, 11: " + jdkVer);
+    }
+  }
+
   public static final void checkThread(final Thread owner) {
     if (owner != Thread.currentThread()) {
       throw new IllegalStateException("Attempted access outside owning thread");
@@ -142,14 +149,6 @@ public abstract class ResourceImpl implements Resource {
   }
 
   @Override
-  public final boolean equals(final Object that) {
-    if (this == that) { return true; }
-    return that instanceof ResourceImpl
-      ? CompareAndCopy.equals(this, (ResourceImpl) that)
-      : false;
-  }
-
-  @Override
   public final boolean equalTo(final long thisOffsetBytes, final Resource that,
       final long thatOffsetBytes, final long lengthBytes) {
     if (that == null) { return false; }
@@ -162,9 +161,13 @@ public abstract class ResourceImpl implements Resource {
   }
 
   //Overridden by ByteBuffer Leafs
-  @Override
-  public ByteBuffer getByteBuffer() {
+  ByteBuffer getByteBuffer() {
     return null;
+  }
+
+  @Override
+  public final ByteOrder getByteOrder() {
+    return isNonNativeType(getTypeId()) ? Util.NON_NATIVE_BYTE_ORDER : ByteOrder.nativeOrder();
   }
 
   /**
@@ -197,11 +200,6 @@ public abstract class ResourceImpl implements Resource {
   //Overridden by ByteBuffer, Direct and Map Leaves
   abstract long getNativeBaseOffset();
 
-  @Override
-  public final ByteOrder getByteOrder() {
-    return isNonNativeType(getTypeId()) ? Util.NON_NATIVE_BYTE_ORDER : ByteOrder.nativeOrder();
-  }
-
   //Overridden by all leafs
   abstract int getTypeId();
 
@@ -209,17 +207,6 @@ public abstract class ResourceImpl implements Resource {
   // WritableBufferImpl
   Object getUnsafeObject() {
     return null;
-  }
-
-  @Override
-  public final boolean hasArray() {
-    checkValid();
-    return getUnsafeObject() != null;
-  }
-
-  @Override
-  public final int hashCode() {
-    return (int) xxHash64(0, getCapacity(), 0); //xxHash64() calls checkValid()
   }
 
   @Override
@@ -255,6 +242,12 @@ public abstract class ResourceImpl implements Resource {
     return (typeId & DUPLICATE) > 0;
   }
 
+  @Override
+  public final boolean isHeapResource() {
+    checkValid();
+    return getUnsafeObject() != null;
+  }
+
   final boolean isHeapType(final int typeId) {
     return (typeId & (MAP | DIRECT)) == 0;
   }
@@ -265,7 +258,7 @@ public abstract class ResourceImpl implements Resource {
   }
 
   @Override
-  public boolean isMapped() {
+  public boolean isMemoryMappedResource() {
     return (getTypeId() & MAP) > 0;
   }
 
@@ -314,21 +307,6 @@ public abstract class ResourceImpl implements Resource {
     return (typeId & REGION) > 0;
   }
 
-  final boolean isWritableType(final int typeId) { //not used
-    return (typeId & READONLY) == 0;
-  }
-
-  @Override
-  public void load() { //overridden by Map leafs
-    throw new IllegalStateException("This resource is not a memory-mapped file type.");
-  }
-
-  final static int removeNnBuf(final int typeId) { return typeId & ~NONNATIVE & ~BUFFER; }
-
-  final static int setReadOnlyType(final int typeId, final boolean readOnly) {
-    return readOnly ? typeId | READONLY : typeId & ~READONLY;
-  }
-
   @Override
   public boolean isSameResource(final Resource that) {
     checkValid();
@@ -336,7 +314,6 @@ public abstract class ResourceImpl implements Resource {
     final ResourceImpl that1 = (ResourceImpl) that;
     that1.checkValid();
     if (this == that1) { return true; }
-
     return getCumulativeOffset(0) == that1.getCumulativeOffset(0)
             && getCapacity() == that1.getCapacity()
             && getUnsafeObject() == that1.getUnsafeObject()
@@ -349,11 +326,13 @@ public abstract class ResourceImpl implements Resource {
     return true;
   }
 
-  static void checkJavaVersion(final String jdkVer, final int p0, final int p1 ) {
-    final boolean ok = ((p0 == 1) && (p1 == 8)) || (p0 == 8) || (p0 == 11);
-    if (!ok) { throw new IllegalArgumentException(
-        "Unsupported JDK Major Version. It must be one of 1.8, 8, 11: " + jdkVer);
-    }
+  final boolean isWritableType(final int typeId) { //not used
+    return (typeId & READONLY) == 0;
+  }
+
+  @Override
+  public void load() { //overridden by Map leafs
+    throw new IllegalStateException("This resource is not a memory-mapped file type.");
   }
 
   private static String pad(final String s, final int fieldLen) {
@@ -383,9 +362,15 @@ public abstract class ResourceImpl implements Resource {
   //REACHABILITY FENCE
   static void reachabilityFence(final Object obj) { }
 
+  final static int removeNnBuf(final int typeId) { return typeId & ~NONNATIVE & ~BUFFER; }
+
   @Override
   public void setMemoryRequestServer(final MemoryRequestServer memReqSvr) {
     this.memReqSvr = memReqSvr;
+  }
+
+  final static int setReadOnlyType(final int typeId, final boolean readOnly) {
+    return readOnly ? typeId | READONLY : typeId & ~READONLY;
   }
 
   /**

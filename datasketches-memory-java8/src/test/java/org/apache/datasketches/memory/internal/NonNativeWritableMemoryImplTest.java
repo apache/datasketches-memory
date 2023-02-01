@@ -20,12 +20,10 @@
 package org.apache.datasketches.memory.internal;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
 
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.MemoryBoundsException;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
@@ -165,41 +163,6 @@ public class NonNativeWritableMemoryImplTest {
     WritableMemory wmem2 = WritableMemory.writableWrap(arr2, ByteOrder.BIG_ENDIAN);
     wmem2.putShortArray(0, shortArr, 0, n);
     assertEquals(arr2, arr1);
-  }
-
-  //check Atomic Write Methods
-
-  @Test
-  public void testGetAndAddLong() {
-    wmem.getAndAddLong(0, 1L);
-    try {
-      wmem.getAndAddLong(1, 1L);
-      fail("Expected MemoryBoundsException");
-    } catch (final MemoryBoundsException expected) {
-      // ignore
-    }
-  }
-
-  @Test
-  public void testGetAndSetLong() {
-    wmem.getAndSetLong(0, 1L);
-    try {
-      wmem.getAndSetLong(1, 1L);
-      fail("Expected MemoryBoundsException");
-    } catch (final MemoryBoundsException expected) {
-      // ignore
-    }
-  }
-
-  @Test
-  public void testCompareAndSwapLong() {
-    wmem.compareAndSwapLong(0, 0L, 1L);
-    try {
-      wmem.compareAndSwapLong(1, 0L, 1L);
-      fail("Expected MemoryBoundsException");
-    } catch (final MemoryBoundsException expected) {
-      // ignore
-    }
   }
 
   //check Region

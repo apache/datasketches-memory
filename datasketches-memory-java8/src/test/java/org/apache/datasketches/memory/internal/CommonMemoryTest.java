@@ -279,32 +279,6 @@ public class CommonMemoryTest {
   }
 
   @Test
-  public void checkAtomicMethods() throws Exception {
-    int memCapacity = 8;
-    try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity)) {
-      assertEquals(mem.getCapacity(), memCapacity);
-      atomicMethodTests(mem);
-    }
-  }
-
-  public static void atomicMethodTests(WritableMemory mem) {
-    mem.putLong(0, 500);
-    mem.getAndAddLong(0, 1);
-    assertEquals(mem.getLong(0), 501);
-
-    mem.putInt(0, 500);
-    boolean b = mem.compareAndSwapLong(0, 500, 501);
-    assertTrue(b);
-    assertEquals(mem.getLong(0), 501);
-
-    mem.putLong(0, 500);
-    long oldLong = mem.getAndSetLong(0, 501);
-    long newLong = mem.getLong(0);
-    assertEquals(oldLong, 500);
-    assertEquals(newLong, 501);
-  }
-
-  @Test
   public void checkSetClearMemoryRegions() throws Exception {
     int memCapacity = 64; //must be 64
     try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity)) {

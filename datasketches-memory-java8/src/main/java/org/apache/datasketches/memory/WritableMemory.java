@@ -538,40 +538,7 @@ public interface WritableMemory extends Memory {
    */
   void putShortArray(long offsetBytes, short[] srcArray, int srcOffsetShorts, int lengthShorts);
 
-  //Atomic Methods
-  /**
-   * Atomically adds the given value to the long located at offsetBytes.
-   * @param offsetBytes offset bytes relative to this Memory start
-   * @param delta the amount to add
-   * @return the the previous value
-   */
-  long getAndAddLong(long offsetBytes, long delta);
-
-  /**
-   * Atomically sets the current value at the memory location to the given updated value
-   * if and only if the current value {@code ==} the expected value.
-   * @param offsetBytes offset bytes relative to this Memory start
-   * @param expect the expected value
-   * @param update the new value
-   * @return {@code true} if successful. False return indicates that
-   * the current value at the memory location was not equal to the expected value.
-   */
-  boolean compareAndSwapLong(long offsetBytes, long expect, long update);
-
-  /**
-   * Atomically exchanges the given value with the current value located at offsetBytes.
-   * @param offsetBytes offset bytes relative to this Memory start
-   * @param newValue new value
-   * @return the previous value
-   */
-  long getAndSetLong(long offsetBytes, long newValue);
-
   //OTHER WRITE METHODS
-  /**
-   * Returns the primitive backing array, otherwise null.
-   * @return the primitive backing array, otherwise null.
-   */
-  Object getArray();
 
   /**
    * Clears all bytes of this Memory to zero

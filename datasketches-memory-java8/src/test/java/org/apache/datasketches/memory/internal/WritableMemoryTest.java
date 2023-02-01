@@ -65,9 +65,9 @@ public class WritableMemoryTest {
   public void checkGetArray() {
     byte[] byteArr = new byte[64];
     WritableMemory wmem = WritableMemory.writableWrap(byteArr);
-    assertTrue(wmem.getArray() == byteArr);
+    assertTrue(((BaseWritableMemoryImpl) wmem).getArray() == byteArr);
     WritableBuffer wbuf = wmem.asWritableBuffer();
-    assertTrue(wbuf.getArray() == byteArr);
+    assertTrue(((BaseWritableBufferImpl)wbuf).getArray() == byteArr);
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)

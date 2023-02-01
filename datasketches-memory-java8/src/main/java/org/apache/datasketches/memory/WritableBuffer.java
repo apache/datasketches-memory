@@ -364,11 +364,6 @@ public interface WritableBuffer extends Buffer {
   // NO ATOMIC METHODS
 
   //OTHER WRITE METHODS
-  /**
-   * Returns the primitive backing array, otherwise null.
-   * @return the primitive backing array, otherwise null.
-   */
-  Object getArray();
 
   /**
    * Clears all bytes of this Buffer from position to end to zero. The position will be set to end.
@@ -405,6 +400,7 @@ public interface WritableBuffer extends Buffer {
    * in the test tree.
    * @return the MemoryRequestServer object or null.
    */
+  @Override
   public MemoryRequestServer getMemoryRequestServer();
 
 }

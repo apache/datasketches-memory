@@ -67,7 +67,7 @@ public class NativeWritableMemoryImplTest {
     for (int i = 0; i < 8; i++) {
       assertEquals(dstArray[i], srcArray[i]);
     }
-    assertTrue(mem.hasArray());
+    assertTrue(mem.isHeapResource());
   }
 
   @Test
@@ -428,7 +428,7 @@ public class NativeWritableMemoryImplTest {
     }
 
     assertTrue(wmem.isByteBufferResource());
-    ByteBuffer byteBuf2 = wmem.getByteBuffer();
+    ByteBuffer byteBuf2 = ((ResourceImpl)wmem).getByteBuffer();
     assertEquals(byteBuf2, byteBuf);
     //println( mem.toHexString("HeapBB", 0, memCapacity));
   }

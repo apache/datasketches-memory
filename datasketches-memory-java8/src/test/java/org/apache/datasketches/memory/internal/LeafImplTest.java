@@ -175,7 +175,7 @@ public class LeafImplTest {
     assertEquals(mem.asWritableBuffer(oo).getShort(0), 256);
     assertEquals(mem.getTotalOffset(), 0);
 
-    ByteBuffer bb = mem.getByteBuffer();
+    ByteBuffer bb = ((ResourceImpl)mem).getByteBuffer();
     assertTrue( hasByteBuffer ? bb != null : bb == null);
 
     assertTrue(mem.getByteOrder() == bo);
@@ -204,7 +204,7 @@ public class LeafImplTest {
     assertEquals(buf.writableDuplicate(oo).getShort(0), 256);
     assertEquals(buf.getTotalOffset(), 0);
 
-    bb = buf.getByteBuffer();
+    bb = ((ResourceImpl)buf).getByteBuffer();
     assertTrue(hasByteBuffer ? bb != null : bb == null);
 
     assertTrue(buf.getByteOrder() == bo);
@@ -232,7 +232,7 @@ public class LeafImplTest {
     assertEquals(nnMem.asWritableBuffer(bo).getShort(0), 1);
     assertEquals(nnMem.asWritableBuffer(oo).getShort(0), 256);
 
-    bb = nnMem.getByteBuffer();
+    bb = ((ResourceImpl)nnMem).getByteBuffer();
     assertTrue( hasByteBuffer ? bb != null : bb == null);
 
     assertTrue(nnMem.getByteOrder() == oo);
@@ -259,7 +259,7 @@ public class LeafImplTest {
     assertEquals(nnBuf.writableDuplicate(bo).getShort(0), 1);
     assertEquals(nnBuf.writableDuplicate(oo).getShort(0), 256);
 
-    bb = nnBuf.getByteBuffer();
+    bb = ((ResourceImpl)nnBuf).getByteBuffer();
     assertTrue( hasByteBuffer ? bb != null : bb == null);
 
     assertTrue(nnBuf.getByteOrder() == oo);

@@ -26,7 +26,6 @@ import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_FLOAT_BAS
 import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_FLOAT_INDEX_SCALE;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_INT_BASE_OFFSET;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_LONG_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_LONG_INDEX_SCALE;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_SHORT_BASE_OFFSET;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
 
@@ -281,28 +280,6 @@ abstract class NativeWritableMemoryImpl extends BaseWritableMemoryImpl {
         getCumulativeOffset(offsetBytes),
         copyBytes
     );
-  }
-
-  //Atomic Write Methods
-  @Override
-  public long getAndAddLong(final long offsetBytes, final long delta) { //JDK 8+
-    checkValidAndBoundsForWrite(offsetBytes, ARRAY_LONG_INDEX_SCALE);
-    final long addr = getCumulativeOffset(offsetBytes);
-    return unsafe.getAndAddLong(getUnsafeObject(), addr, delta);
-  }
-
-  @Override
-  public long getAndSetLong(final long offsetBytes, final long newValue) { //JDK 8+
-    checkValidAndBoundsForWrite(offsetBytes, ARRAY_LONG_INDEX_SCALE);
-    final long addr = getCumulativeOffset(offsetBytes);
-    return unsafe.getAndSetLong(getUnsafeObject(), addr, newValue);
-  }
-
-  @Override
-  public boolean compareAndSwapLong(final long offsetBytes, final long expect, final long update) {
-    checkValidAndBoundsForWrite(offsetBytes, ARRAY_LONG_INDEX_SCALE);
-    return unsafe.compareAndSwapLong(
-        getUnsafeObject(), getCumulativeOffset(offsetBytes), expect, update);
   }
 
 }

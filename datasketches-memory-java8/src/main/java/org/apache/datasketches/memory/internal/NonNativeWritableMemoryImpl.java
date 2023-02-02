@@ -21,7 +21,6 @@ package org.apache.datasketches.memory.internal;
 
 import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_DOUBLE_INDEX_SCALE;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_FLOAT_INDEX_SCALE;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_LONG_INDEX_SCALE;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
 
 import org.apache.datasketches.memory.WritableMemory;
@@ -215,34 +214,4 @@ abstract class NonNativeWritableMemoryImpl extends BaseWritableMemoryImpl {
         getUnsafeObject(), getCumulativeOffset(offsetBytes));
   }
 
-  //Atomic Write Methods
-  @Override
-  public long getAndAddLong(final long offsetBytes, final long delta) { //JDK 8+
-    checkValidAndBoundsForWrite(offsetBytes, ARRAY_LONG_INDEX_SCALE);
-    final long addr = getCumulativeOffset(offsetBytes);
-    long oldValReverseBytes, oldVal, newValReverseBytes;
-    final Object unsafeObj = getUnsafeObject();
-    do {
-      oldValReverseBytes = unsafe.getLongVolatile(unsafeObj, addr);
-      oldVal = Long.reverseBytes(oldValReverseBytes);
-      newValReverseBytes = Long.reverseBytes(oldVal + delta);
-    } while (!unsafe.compareAndSwapLong(unsafeObj, addr, oldValReverseBytes, newValReverseBytes));
-
-    return oldVal;
-  }
-
-  @Override
-  public long getAndSetLong(final long offsetBytes, final long newValue) { //JDK 8+
-    checkValidAndBoundsForWrite(offsetBytes, ARRAY_LONG_INDEX_SCALE);
-    final long addr = getCumulativeOffset(offsetBytes);
-    final long newValueReverseBytes = Long.reverseBytes(newValue);
-    return Long.reverseBytes(unsafe.getAndSetLong(getUnsafeObject(), addr, newValueReverseBytes));
-  }
-
-  @Override
-  public boolean compareAndSwapLong(final long offsetBytes, final long expect, final long update) {
-    checkValidAndBoundsForWrite(offsetBytes, ARRAY_LONG_INDEX_SCALE);
-    return unsafe.compareAndSwapLong(getUnsafeObject(), getCumulativeOffset(offsetBytes),
-        Long.reverseBytes(expect), Long.reverseBytes(update));
-  }
 }

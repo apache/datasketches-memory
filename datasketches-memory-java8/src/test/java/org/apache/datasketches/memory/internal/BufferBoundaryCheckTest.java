@@ -107,18 +107,4 @@ public class BufferBoundaryCheckTest {
     writableMemory.putDouble(1, 1d);
   }
 
-  @Test(expectedExceptions = MemoryBoundsException.class)
-  public void testGetAndAddLong() {
-    writableMemory.getAndAddLong(1, 1L);
-  }
-
-  @Test(expectedExceptions = MemoryBoundsException.class)
-  public void testGetAndSetLong() {
-    writableMemory.getAndSetLong(1, 1L);
-  }
-
-  @Test(expectedExceptions = MemoryBoundsException.class)
-  public void testCompareAndSwapLong() {
-    writableMemory.compareAndSwapLong(1, 0L, 1L);
-  }
 }

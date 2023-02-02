@@ -55,7 +55,7 @@ public class Buffer2Test {
       assertEquals(a1, b1);
     }
 
-    assertEquals(true, buffer.hasArray());
+    assertEquals(true, buffer.isHeapResource());
     assertEquals(true, buffer.isByteBufferResource());
   }
 
@@ -75,7 +75,7 @@ public class Buffer2Test {
       assertEquals(bb.get(), buffer.getByte());
     }
 
-    assertEquals(false, buffer.hasArray());
+    assertEquals(false, buffer.isHeapResource());
     assertEquals(true, buffer.isByteBufferResource());
   }
 
@@ -98,7 +98,7 @@ public class Buffer2Test {
     buffer.getByteArray(copyByteArray, 0, 64);
     assertEquals(byteArray, copyByteArray);
 
-    assertEquals(true, buffer.hasArray());
+    assertEquals(true, buffer.isHeapResource());
     assertEquals(false, buffer.isByteBufferResource());
   }
 

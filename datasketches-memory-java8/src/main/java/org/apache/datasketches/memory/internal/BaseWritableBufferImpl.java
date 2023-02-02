@@ -387,9 +387,13 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
     unsafe.putShort(getUnsafeObject(), getCumulativeOffset(offsetBytes), value);
   }
 
-  //OTHER
-  @Override
-  public final Object getArray() {
+  //OTHER WRITE METHODS
+
+  /**
+   * Returns the primitive backing array, otherwise null.
+   * @return the primitive backing array, otherwise null.
+   */
+  final Object getArray() {
     checkValid();
     return getUnsafeObject();
   }

@@ -20,7 +20,6 @@
 package org.apache.datasketches.memory;
 
 import java.io.UncheckedIOException;
-import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
@@ -117,12 +116,6 @@ public interface Resource extends AutoCloseable {
   void force();
 
   /**
-   * Gets the backing ByteBuffer if it exists, otherwise returns null.
-   * @return the backing ByteBuffer if it exists, otherwise returns null.
-   */
-  ByteBuffer getByteBuffer(); //TODO Deprecate
-
-  /**
    * Gets the current ByteOrder.
    * This may be different from the ByteOrder of the backing resource and {@link ByteOrder#nativeOrder()}
    * @return the current ByteOrder.
@@ -149,19 +142,6 @@ public interface Resource extends AutoCloseable {
    * backing resource.
    */
   long getTotalOffset();
-
-  /**
-   * Returns true if this object is backed by an on-heap primitive array
-   * @return true if this object is backed by an on-heap primitive array
-   */
-  boolean hasArray(); //TODO Change to isHeapResource
-
-  /**
-   * Returns true if this object is valid and has not been closed.
-   * This is relevant only for direct (off-heap) memory and Mapped Files.
-   * @return true if this object is valid and has not been closed.
-   */
-  boolean isValid(); //TODO isAlive()
 
   /**
    * Returns true if this Memory is backed by a ByteBuffer.
@@ -192,6 +172,12 @@ public interface Resource extends AutoCloseable {
    * @return true if this instance is a duplicate of a Buffer instance.
    */
   boolean isDuplicateBufferView();
+
+  /**
+   * Returns true if this object is backed by an on-heap primitive array
+   * @return true if this object is backed by an on-heap primitive array
+   */
+  boolean isHeapResource();
 
   /**
    * Tells whether or not the contents of this memory-mapped Resource is resident in physical memory.
@@ -239,7 +225,7 @@ public interface Resource extends AutoCloseable {
    * Returns true if the backing resource is a memory-mapped file.
    * @return true if the backing resource is a memory-mapped file.
    */
-  boolean isMapped();
+  boolean isMemoryMappedResource();
 
   /**
    * If true, all put and get operations will assume the non-native ByteOrder.
@@ -269,6 +255,13 @@ public interface Resource extends AutoCloseable {
    * of <i>that</i>.
    */
   boolean isSameResource(Resource that);
+
+  /**
+   * Returns true if this object is valid and has not been closed.
+   * This is relevant only for direct (off-heap) memory and Mapped Files.
+   * @return true if this object is valid and has not been closed.
+   */
+  boolean isValid();
 
   /**
    * Loads the contents of this memory-mapped Resource into physical memory.

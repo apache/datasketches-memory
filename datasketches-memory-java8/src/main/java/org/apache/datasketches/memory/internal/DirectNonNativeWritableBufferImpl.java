@@ -36,7 +36,6 @@ final class DirectNonNativeWritableBufferImpl extends NonNativeWritableBufferImp
   private final long capacityBytes;
   private final int typeId;
   private long cumOffsetBytes;
-  private final MemoryRequestServer memReqSvr;
 
   DirectNonNativeWritableBufferImpl(
       final AllocateDirect direct,
@@ -52,6 +51,10 @@ final class DirectNonNativeWritableBufferImpl extends NonNativeWritableBufferImp
     this.typeId = removeNnBuf(typeId) | DIRECT | BUFFER | NONNATIVE; //initially cannot be ReadOnly
     this.cumOffsetBytes = cumOffsetBytes;
     this.memReqSvr = memReqSvr;
+    if ((this.owner != null) && (this.owner != Thread.currentThread())) {
+      throw new IllegalStateException(THREAD_EXCEPTION_TEXT);
+    }
+    this.owner = Thread.currentThread();
   }
 
   @Override
@@ -63,6 +66,7 @@ final class DirectNonNativeWritableBufferImpl extends NonNativeWritableBufferImp
     final long newOffsetBytes = offsetBytes + regionOffsetBytes;
     final long newCumOffsetBytes = cumOffsetBytes + regionOffsetBytes;
     int typeIdOut = removeNnBuf(typeId) | BUFFER | REGION | (readOnly ? READONLY : 0);
+
     if (Util.isNativeByteOrder(byteOrder)) {
       typeIdOut |= NATIVE;
       return new DirectWritableBufferImpl(
@@ -105,8 +109,10 @@ final class DirectNonNativeWritableBufferImpl extends NonNativeWritableBufferImp
   }
 
   @Override
-  public boolean isValid() {
-    return direct.getValid().get();
+  public void close() {
+    checkValid();
+    checkThread(owner);
+    direct.close();
   }
 
   @Override
@@ -116,25 +122,12 @@ final class DirectNonNativeWritableBufferImpl extends NonNativeWritableBufferImp
   }
 
   @Override
-  public void close() {
-    direct.close();
-  }
-
-  @Override
   public long getCumulativeOffset() {
-    checkValid();
     return cumOffsetBytes;
   }
 
   @Override
-  public MemoryRequestServer getMemoryRequestServer() {
-    checkValid();
-    return memReqSvr;
-  }
-
-  @Override
   public long getNativeBaseOffset() {
-    checkValid();
     return direct.getNativeBaseOffset();
   }
 
@@ -146,14 +139,17 @@ final class DirectNonNativeWritableBufferImpl extends NonNativeWritableBufferImp
 
   @Override
   int getTypeId() {
-    checkValid();
     return typeId;
   }
 
   @Override
   Object getUnsafeObject() {
-    checkValid();
     return null;
+  }
+
+  @Override
+  public boolean isValid() {
+    return direct.getValid().get();
   }
 
 }

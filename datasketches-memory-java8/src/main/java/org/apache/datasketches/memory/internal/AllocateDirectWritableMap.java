@@ -29,10 +29,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.logging.Logger;
-
-import org.apache.datasketches.memory.MemoryCloseException;
-import org.apache.datasketches.memory.ReadOnlyException;
 
 import sun.nio.ch.FileChannelImpl;
 
@@ -48,13 +44,11 @@ import sun.nio.ch.FileChannelImpl;
  * <a href="http://hg.openjdk.java.net/jdk8u/jdk8u/jdk/file/f940e7a48b72/src/solaris/native/java/nio/MappedByteBuffer.c">
  * MappedByteBuffer.c</a></p>
  *
- * @author Roman Leventov
  * @author Lee Rhodes
  * @author Praveenkumar Venkatesan
  */
 @SuppressWarnings("restriction")
 class AllocateDirectWritableMap {
-  static final Logger LOG = Logger.getLogger(AllocateDirectWritableMap.class.getCanonicalName());
 
   private static final int MAP_RO = 0;
   private static final int MAP_RW = 1;
@@ -65,6 +59,7 @@ class AllocateDirectWritableMap {
   private static final Method MAPPED_BYTE_BUFFER_LOAD0_METHOD;
   private static final Method MAPPED_BYTE_BUFFER_ISLOADED0_METHOD;
   static final Method MAPPED_BYTE_BUFFER_FORCE0_METHOD;
+  private static int pageSize = unsafe.pageSize();
 
   static {
     try { //The FileChannelImpl methods map0 and unmap0 still exist in 16
@@ -96,7 +91,6 @@ class AllocateDirectWritableMap {
 
   private final Deallocator deallocator;
   private final MemoryCleaner cleaner;
-  private final Thread owner;
 
   private final File file;
   final long capacityBytes;
@@ -107,7 +101,6 @@ class AllocateDirectWritableMap {
   AllocateDirectWritableMap(final File file, final long fileOffsetBytes, final long capacityBytes,
       final boolean localReadOnly) {
     this.file = file;
-    this.owner = Thread.currentThread();
     this.capacityBytes = capacityBytes;
     resourceReadOnly = isFileReadOnly(file);
     final long fileLength = file.length();
@@ -123,13 +116,7 @@ class AllocateDirectWritableMap {
     cleaner = new MemoryCleaner(this, deallocator);
   }
 
-  public final void checkValidAndThread() {
-    if (!getValid().get()) { throw new MemoryCloseException("Already closed"); }
-    ResourceImpl.checkThread(owner);
-  }
-
   public void close() {
-    checkValidAndThread(); //we must be valid and called from the owner thread
     try {
       if (deallocator.deallocate(false)) {
         // This Cleaner.clean() call effectively just removes the Cleaner from the internal linked
@@ -138,18 +125,14 @@ class AllocateDirectWritableMap {
         cleaner.clean();
       }
 
-    } catch (final Exception e) {
-        throw new MemoryCloseException("Memory-Mapped File: " + file.getName() + " " + e);
+    } catch (final Exception e) { throw new IllegalStateException("Attempted close of Memory-Mapped File: "
+        + file.getName() + " " + e);
     } finally {
       ResourceImpl.reachabilityFence(this);
     }
   }
 
   public void force() {
-    checkValidAndThread();
-    if (resourceReadOnly) {
-      throw new ReadOnlyException("MemoryImpl Mapped File is Read Only.");
-    }
     try {
       MAPPED_BYTE_BUFFER_FORCE0_METHOD
           //force0 is effectively static, so ZERO_READ_ONLY_DIRECT_BYTE_BUFFER is not modified
@@ -158,7 +141,7 @@ class AllocateDirectWritableMap {
               nativeBaseOffset,
               capacityBytes);
     } catch (final IOException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new RuntimeException(String.format("Encountered %s exception in force. " + e.getClass()));
+      throw new RuntimeException(String.format("Encountered %s exception in force. " + e.toString()));
     }
   }
 
@@ -171,15 +154,13 @@ class AllocateDirectWritableMap {
   }
 
   public boolean isLoaded() {
-    checkValidAndThread();
     try {
-      final int pageCount = NioBits.pageCount(capacityBytes);
       return (boolean) MAPPED_BYTE_BUFFER_ISLOADED0_METHOD
           //isLoaded0 is effectively static, so ZERO_READ_ONLY_DIRECT_BYTE_BUFFER is not modified
           .invoke(AccessByteBuffer.ZERO_READ_ONLY_DIRECT_BYTE_BUFFER,
               nativeBaseOffset,
               capacityBytes,
-              pageCount);
+              pageCount(capacityBytes));
     } catch (final  IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(
               String.format("Encountered %s exception while loading", e.getClass()));
@@ -187,15 +168,13 @@ class AllocateDirectWritableMap {
   }
 
   public void load() {
-    checkValidAndThread();
     madvise();
     // Performance optimization. Read a byte from each page to bring it into memory.
-    final int ps = NioBits.pageSize();
-    final int count = NioBits.pageCount(capacityBytes);
+    final int count = pageCount(capacityBytes);
     long offset = nativeBaseOffset;
     for (int i = 0; i < count; i++) {
       unsafe.getByte(offset);
-      offset += ps;
+      offset += pageSize;
     }
   }
 
@@ -216,6 +195,10 @@ class AllocateDirectWritableMap {
       throw new RuntimeException(
           String.format("Encountered %s exception while loading", e.getClass()));
     }
+  }
+
+  private static int pageCount(final long bytes) {
+    return (int)((bytes + pageSize) - 1L) / pageSize;
   }
 
   //Does the actual mapping work, resourceReadOnly must already be set
@@ -291,15 +274,15 @@ class AllocateDirectWritableMap {
     }
 
     @Override
-    public void run() throws MemoryCloseException {
+    public void run() throws IllegalStateException {
       deallocate(true);
     }
 
-    boolean deallocate(final boolean calledFromCleaner) throws MemoryCloseException {
+    boolean deallocate(final boolean calledFromCleaner) throws IllegalStateException {
       if (valid.change()) {
         if (calledFromCleaner) {
           // Warn about non-deterministic resource cleanup.
-          LOG.warning("A WritableMapHandleImpl was not closed manually");
+          //LOG.warning("A WritableMapHandleImpl was not closed manually");
         }
         unmap();
         return true;
@@ -311,13 +294,12 @@ class AllocateDirectWritableMap {
      * Removes existing mapping.  <i>unmap0</i> is a native method in FileChannelImpl.c. See
      * reference at top of class.
      */
-    private void unmap() throws MemoryCloseException {
+    private void unmap() throws IllegalStateException {
       try {
         FILE_CHANNEL_IMPL_UNMAP0_METHOD.invoke(myFc, actualNativeBaseOffset, myCapacity);
         myRaf.close();
       } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException | IOException e) {
-        throw new MemoryCloseException(
-            String.format("Encountered %s exception while freeing memory", e.getClass()));
+        throw new IllegalStateException(String.format("Encountered %s exception while freeing memory", e.getClass()));
       }
     }
   } //End of class Deallocator

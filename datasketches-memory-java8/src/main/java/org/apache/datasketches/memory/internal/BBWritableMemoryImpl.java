@@ -34,12 +34,11 @@ import org.apache.datasketches.memory.WritableMemory;
 final class BBWritableMemoryImpl extends NativeWritableMemoryImpl {
   private final ByteBuffer byteBuf; //holds a reference to a ByteBuffer until we are done with it.
   private final Object unsafeObj;
-  private final long nativeBaseOffset; //raw off-heap address of root allocation (whether direct or ByteBuffer)
+  private final long nativeBaseOffset; //raw off-heap address of allocation base if ByteBuffer direct, else 0
   private final long offsetBytes;      //from the root resource including original ByteBuffer position or region offset
   private final long capacityBytes;
   private final int typeId;
-  private long cumOffsetBytes;         //includes array header if heap and nativeBaseOffset if off-heap
-  private final MemoryRequestServer memReqSvr;
+  private long cumOffsetBytes;         //includes array header if heap, and nativeBaseOffset if off-heap
 
   BBWritableMemoryImpl(
       final Object unsafeObj,
@@ -59,6 +58,10 @@ final class BBWritableMemoryImpl extends NativeWritableMemoryImpl {
     this.cumOffsetBytes = cumOffsetBytes;
     this.memReqSvr = memReqSvr;
     this.byteBuf = byteBuf;
+    if ((this.owner != null) && (this.owner != Thread.currentThread())) {
+      throw new IllegalStateException(THREAD_EXCEPTION_TEXT);
+    }
+    this.owner = Thread.currentThread();
   }
 
   @Override
@@ -98,50 +101,38 @@ final class BBWritableMemoryImpl extends NativeWritableMemoryImpl {
   }
 
   @Override
+  public ByteBuffer getByteBuffer() {
+    return byteBuf;
+  }
+
+  @Override
   public long getCapacity() {
-    checkValid();
     return capacityBytes;
   }
 
   @Override
   public long getCumulativeOffset() {
-    checkValid();
     return cumOffsetBytes;
   }
 
   @Override
-  public MemoryRequestServer getMemoryRequestServer() {
-    checkValid();
-    return memReqSvr;
-  }
-
-  @Override
   public long getNativeBaseOffset() {
-    checkValid();
     return nativeBaseOffset;
   }
 
   @Override
   public long getTotalOffset() {
-    checkValid();
     return offsetBytes;
   }
 
   @Override
   int getTypeId() {
-    checkValid();
     return typeId;
   }
 
   @Override
   Object getUnsafeObject() {
-    checkValid();
     return unsafeObj;
   }
 
-  @Override
-  public ByteBuffer getByteBuffer() {
-    checkValid();
-    return byteBuf;
-  }
 }

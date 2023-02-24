@@ -24,7 +24,6 @@ import static org.testng.Assert.fail;
 import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.BufferPositionInvariantsException;
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.MemoryInvalidException;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
@@ -49,17 +48,17 @@ public class BaseBufferTest {
   @Test
   public void checkLimitsAndCheck() {
     Buffer buf = Memory.wrap(new byte[100]).asBuffer();
-    buf.setAndCheckStartPositionEnd(40, 45, 50);
-    buf.setAndCheckStartPositionEnd(0, 0, 100);
+    buf.setStartPositionEnd(40, 45, 50);
+    buf.setStartPositionEnd(0, 0, 100);
     try {
-      buf.setAndCheckStartPositionEnd(0, 0, 101);
+      buf.setStartPositionEnd(0, 0, 101);
       fail();
     } catch (BufferPositionInvariantsException e) {
       //ok
     }
-    buf.setAndCheckPosition(100);
+    buf.setPosition(100);
     try {
-      buf.setAndCheckPosition(101);
+      buf.setPosition(101);
       fail();
     } catch (BufferPositionInvariantsException e) {
       //ok
@@ -74,7 +73,7 @@ public class BaseBufferTest {
     }
   }
 
-  @Test(expectedExceptions = MemoryInvalidException.class)
+  @Test(expectedExceptions = IllegalStateException.class)
   public void checkCheckValid() {
 
     Buffer buf;

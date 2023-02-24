@@ -32,8 +32,6 @@ import java.io.File;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.MemoryCloseException;
-import org.apache.datasketches.memory.MemoryInvalidException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -45,19 +43,17 @@ public class AllocateDirectMapMemoryTest {
     UtilTest.setGettysburgAddressFileToReadOnly();
   }
 
-  @Test(expectedExceptions = MemoryCloseException.class)
+  @Test(expectedExceptions = IllegalStateException.class)
   public void simpleMap() {
     File file = getResourceFile("GettysburgAddress.txt");
     assertTrue(AllocateDirectWritableMap.isFileReadOnly(file));
     try (Memory mem = Memory.map(file)) {
-      mem.close(); //redundant close
-    }
-    //The Try-With-Resources will throw at the close of the block,
-    // because of the redundant close before the close of the block.
+      mem.close(); //explicit close
+    } //The Try-With-Resources will throw if already closed
   }
 
   @Test
-  public void simpleMap2()  {
+  public void printGettysbergAddress()  {
     File file = getResourceFile("GettysburgAddress.txt");
     try (Memory mem = Memory.map(file))
     {
@@ -99,8 +95,8 @@ public class AllocateDirectMapMemoryTest {
     }
   }
 
-  @Test(expectedExceptions = MemoryInvalidException.class)
-  public void testMapAndMultipleCloseTypes() {
+  @Test(expectedExceptions = IllegalStateException.class)
+  public void testAccessAfterClose() {
     File file = getResourceFile("GettysburgAddress.txt");
     long memCapacity = file.length();
     try (Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
@@ -108,16 +104,16 @@ public class AllocateDirectMapMemoryTest {
     } //normal close via TWR
     Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder());
     mem.close(); //normal manual close
-    mem.getCapacity(); //already closed, invalid
+    mem.getCapacity(); //isLoaded(); //already closed, invalid
   }
 
-  @Test(expectedExceptions = MemoryInvalidException.class)
+  @Test(expectedExceptions = IllegalStateException.class)
   public void testReadFailAfterClose()  {
     File file = getResourceFile("GettysburgAddress.txt");
     long memCapacity = file.length();
     Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder());
     mem.close();
-    mem.getByte(0);
+    mem.isLoaded();
   }
 
   @Test
@@ -127,7 +123,7 @@ public class AllocateDirectMapMemoryTest {
     try (Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
       mem.load();
       assertTrue(mem.isLoaded());
-    }
+    } //normal TWR close
   }
 
   @Test

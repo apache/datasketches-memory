@@ -55,7 +55,7 @@ public class LeafImplTest {
   }
 
   @Test
-  public void checkDirectLeafs() throws Exception {
+  public void checkDirectLeaves() throws Exception {
     long off = 0;
     long cap = 128;
     // Off Heap, Native order, No ByteBuffer, has MemReqSvr
@@ -75,7 +75,7 @@ public class LeafImplTest {
   }
 
   @Test
-  public void checkByteBufferLeafs() {
+  public void checkByteBufferLeaves() {
     long off = 0;
     long cap = 128;
     //BB on heap, native order, has ByteBuffer, has MemReqSvr
@@ -116,7 +116,7 @@ public class LeafImplTest {
   }
 
   @Test
-  public void checkMapLeafs() throws Exception {
+  public void checkMapLeaves() throws Exception {
     long off = 0;
     long cap = 128;
     File file = new File("TestFile2.bin");
@@ -148,7 +148,7 @@ public class LeafImplTest {
   }
 
   @Test
-  public void checkHeapLeafs() {
+  public void checkHeapLeaves() {
     long off = 0;
     long cap = 128;
     // On Heap, Native order, No ByteBuffer, No MemReqSvr

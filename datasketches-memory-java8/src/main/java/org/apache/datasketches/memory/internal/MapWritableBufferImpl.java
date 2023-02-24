@@ -21,7 +21,6 @@ package org.apache.datasketches.memory.internal;
 
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableBuffer;
 
 /**
@@ -49,6 +48,10 @@ final class MapWritableBufferImpl extends NativeWritableBufferImpl {
     this.capacityBytes = capacityBytes;
     this.typeId = removeNnBuf(typeId) | MAP | BUFFER | NATIVE;
     this.cumOffsetBytes = cumOffsetBytes;
+    if ((this.owner != null) && (this.owner != Thread.currentThread())) {
+      throw new IllegalStateException(THREAD_EXCEPTION_TEXT);
+    }
+    this.owner = Thread.currentThread();
   }
 
   @Override
@@ -103,8 +106,18 @@ final class MapWritableBufferImpl extends NativeWritableBufferImpl {
   }
 
   @Override
-  public boolean isValid() {
-    return dirWMap.getValid().get();
+  public void close() {
+    checkValid();
+    checkThread(owner);
+    dirWMap.close(); //checksValidAndThread
+  }
+
+  @Override
+  public void force() {
+    checkValid();
+    checkThread(owner);
+    checkNotReadOnly();
+    dirWMap.force(); //checksValidAndThread
   }
 
   @Override
@@ -115,19 +128,11 @@ final class MapWritableBufferImpl extends NativeWritableBufferImpl {
 
   @Override
   public long getCumulativeOffset() {
-    checkValid();
     return cumOffsetBytes;
   }
 
   @Override
-  public MemoryRequestServer getMemoryRequestServer() {
-    checkValid();
-    return null;
-  }
-
-  @Override
   public long getNativeBaseOffset() {
-    checkValid();
     return dirWMap.nativeBaseOffset;
   }
 
@@ -139,34 +144,31 @@ final class MapWritableBufferImpl extends NativeWritableBufferImpl {
 
   @Override
   int getTypeId() {
-    checkValid();
     return typeId;
   }
 
   @Override
   Object getUnsafeObject() {
-    checkValid();
     return null;
   }
 
   @Override
-  public void close() {
-    dirWMap.close();
-  }
-
-  @Override
-  public void force() {
-    dirWMap.force();
-  }
-
-  @Override
   public boolean isLoaded() {
-    return dirWMap.isLoaded();
+    checkValid();
+    checkThread(owner);
+    return dirWMap.isLoaded(); //checksValidAndThread
+  }
+
+  @Override
+  public boolean isValid() {
+    return dirWMap.getValid().get();
   }
 
   @Override
   public void load() {
-    dirWMap.load();
+    checkValid();
+    checkThread(owner);
+    dirWMap.load(); //checksValidAndThread
   }
 
 }

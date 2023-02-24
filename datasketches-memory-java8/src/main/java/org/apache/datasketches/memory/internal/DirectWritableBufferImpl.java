@@ -36,7 +36,6 @@ final class DirectWritableBufferImpl extends NativeWritableBufferImpl {
   private final long capacityBytes;
   private final int typeId;
   private long cumOffsetBytes;
-  private final MemoryRequestServer memReqSvr;
 
   DirectWritableBufferImpl(
       final AllocateDirect direct,
@@ -52,6 +51,10 @@ final class DirectWritableBufferImpl extends NativeWritableBufferImpl {
     this.typeId = removeNnBuf(typeId) | DIRECT | BUFFER | NATIVE; //initially cannot be ReadOnly
     this.cumOffsetBytes = cumOffsetBytes;
     this.memReqSvr = memReqSvr;
+    if ((this.owner != null) && (this.owner != Thread.currentThread())) {
+      throw new IllegalStateException(THREAD_EXCEPTION_TEXT);
+    }
+    this.owner = Thread.currentThread();
   }
 
   @Override
@@ -106,8 +109,10 @@ final class DirectWritableBufferImpl extends NativeWritableBufferImpl {
   }
 
   @Override
-  public boolean isValid() {
-    return direct.getValid().get();
+  public void close() {
+    checkValid();
+    checkThread(owner);
+    direct.close();
   }
 
   @Override
@@ -117,25 +122,12 @@ final class DirectWritableBufferImpl extends NativeWritableBufferImpl {
   }
 
   @Override
-  public void close() {
-    direct.close();
-  }
-
-  @Override
   public long getCumulativeOffset() {
-    checkValid();
     return cumOffsetBytes;
   }
 
   @Override
-  public MemoryRequestServer getMemoryRequestServer() {
-    checkValid();
-    return memReqSvr;
-  }
-
-  @Override
   public long getNativeBaseOffset() {
-    checkValid();
     return direct.getNativeBaseOffset();
   }
 
@@ -147,14 +139,17 @@ final class DirectWritableBufferImpl extends NativeWritableBufferImpl {
 
   @Override
   int getTypeId() {
-    checkValid();
     return typeId;
   }
 
   @Override
   Object getUnsafeObject() {
-    checkValid();
     return null;
+  }
+
+  @Override
+  public boolean isValid() {
+    return direct.getValid().get();
   }
 
 }

@@ -21,7 +21,6 @@ package org.apache.datasketches.memory.internal;
 
 import org.apache.datasketches.memory.BaseBuffer;
 import org.apache.datasketches.memory.BufferPositionInvariantsException;
-import org.apache.datasketches.memory.ReadOnlyException;
 
 /**
  * A new positional API. This is different from and simpler than Java BufferImpl positional approach.
@@ -97,31 +96,12 @@ public abstract class BaseBufferImpl extends ResourceImpl implements BaseBuffer 
 
   @Override
   public final BaseBufferImpl setPosition(final long position) {
-    checkInvariants(start, position, end, capacity);
-    pos = position;
-    return this;
+    return setStartPositionEnd(start, position, end);
   }
 
   @Override
-  public final BaseBufferImpl setAndCheckPosition(final long position) {
-    checkInvariants(start, position, end, capacity);
-    pos = position;
-    return this;
-  }
-
-  @Override
-  public final BaseBufferImpl setStartPositionEnd(final long start, final long position,
-      final long end) {
-    checkInvariants(start, position, end, capacity);
-    this.start = start;
-    this.end = end;
-    pos = position;
-    return this;
-  }
-
-  @Override
-  public final BaseBufferImpl setAndCheckStartPositionEnd(final long start, final long position,
-      final long end) {
+  public final BaseBufferImpl setStartPositionEnd(final long start, final long position, final long end) {
+    checkValid();
     checkInvariants(start, position, end, capacity);
     this.start = start;
     this.end = end;
@@ -131,7 +111,7 @@ public abstract class BaseBufferImpl extends ResourceImpl implements BaseBuffer 
 
   //RESTRICTED
 
-  //checks are used for arrays and apply at runtime
+  //used for buffer arrays and apply at runtime
   final void incrementAndCheckPositionForRead(final long position, final long increment) {
     checkValid();
     final long newPos = position + increment;
@@ -139,30 +119,21 @@ public abstract class BaseBufferImpl extends ResourceImpl implements BaseBuffer 
     pos = newPos;
   }
 
+  //used for buffer arrays and apply at runtime
   final void incrementAndCheckPositionForWrite(final long position, final long increment) {
-    checkValidForWrite();
-    final long newPos = position + increment;
-    checkInvariants(start, newPos, end, capacity);
-    pos = newPos;
-  }
-
-  final void checkValidForWrite() {
-    checkValid();
-    if (isReadOnly()) {
-      throw new ReadOnlyException("BufferImpl is read-only.");
-    }
+    checkNotReadOnly();
+    incrementAndCheckPositionForRead(position, increment);
   }
 
   /**
    * The invariants equation is: {@code 0 <= start <= position <= end <= capacity}.
-   * If this equation is violated an <i>IllegalArgumentException</i> will be thrown.
+   * If this equation is violated a <i>BufferPositionInvariantsException</i> will be thrown.
    * @param start the lowest start position
    * @param pos the current position
    * @param end the highest position
    * @param cap the capacity of the backing buffer.
    */
-  static final void checkInvariants(final long start, final long pos, final long end,
-        final long cap) {
+  static final void checkInvariants(final long start, final long pos, final long end, final long cap) {
     if ((start | pos | end | cap | (pos - start) | (end - pos) | (cap - end) ) < 0L) {
       throw new BufferPositionInvariantsException(
           "Violation of Invariants: "

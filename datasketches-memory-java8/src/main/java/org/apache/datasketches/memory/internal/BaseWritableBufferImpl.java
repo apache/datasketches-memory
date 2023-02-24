@@ -82,7 +82,7 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
   @Override
   public Buffer region(final long offsetBytes, final long capacityBytes, final ByteOrder byteOrder) {
     final WritableBuffer buf = writableRegionImpl(offsetBytes, capacityBytes, true, byteOrder);
-    buf.setAndCheckStartPositionEnd(0, 0, capacityBytes);
+    buf.setStartPositionEnd(0, 0, capacityBytes);
     return buf;
   }
 
@@ -94,7 +94,7 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
   @Override
   public WritableBuffer writableRegion(final long offsetBytes, final long capacityBytes, final ByteOrder byteOrder) {
     final WritableBuffer wbuf = writableRegionImpl(offsetBytes, capacityBytes, false, byteOrder);
-    wbuf.setAndCheckStartPositionEnd(0, 0, capacityBytes);
+    wbuf.setStartPositionEnd(0, 0, capacityBytes);
     return wbuf;
   }
 
@@ -405,7 +405,7 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
 
   @Override
   public final void fill(final byte value) {
-    checkValidForWrite();
+    checkNotReadOnly();
     long pos = getPosition();
     long len = getEnd() - pos;
     checkInvariants(getStart(), pos + len, getEnd(), getCapacity());

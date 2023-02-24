@@ -28,7 +28,6 @@ import java.util.List;
 import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.BufferPositionInvariantsException;
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.MemoryInvalidException;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
@@ -280,18 +279,16 @@ public class BufferTest {
     }
   }
 
-  @Test(expectedExceptions = MemoryInvalidException.class)
+  @Test(expectedExceptions = IllegalStateException.class)
   public void checkParentUseAfterFree() throws Exception {
     int bytes = 64 * 8;
     WritableMemory wmem = WritableMemory.allocateDirect(bytes);
     WritableBuffer wbuf = wmem.asWritableBuffer();
     wmem.close();
-    //with -ea assert: Memory not valid.
-    //with -da sometimes segfaults, sometimes passes!
     wbuf.getLong();
   }
 
-  @Test(expectedExceptions = MemoryInvalidException.class)
+  @Test(expectedExceptions = IllegalStateException.class)
   public void checkRegionUseAfterFree() throws Exception {
     int bytes = 64;
     WritableMemory wmem = WritableMemory.allocateDirect(bytes);

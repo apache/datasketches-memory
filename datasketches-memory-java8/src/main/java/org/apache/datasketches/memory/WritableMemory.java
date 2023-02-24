@@ -325,7 +325,8 @@ public interface WritableMemory extends Memory {
   static WritableMemory writableWrap(boolean[] array) {
     Objects.requireNonNull(array, "array must be non-null");
     final long lengthBytes = array.length << Prim.BOOLEAN.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(array, 0, lengthBytes, false, ByteOrder.nativeOrder(), null);
+    return BaseWritableMemoryImpl.wrapHeapArray(array, 0, lengthBytes, false, ByteOrder.nativeOrder(),
+        defaultMemReqSvr);
   }
 
   /**
@@ -336,7 +337,8 @@ public interface WritableMemory extends Memory {
   static WritableMemory writableWrap(char[] array) {
     Objects.requireNonNull(array, "array must be non-null");
     final long lengthBytes = array.length << Prim.CHAR.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, false, ByteOrder.nativeOrder(), null);
+    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, false, ByteOrder.nativeOrder(),
+        defaultMemReqSvr);
   }
 
   /**
@@ -347,7 +349,8 @@ public interface WritableMemory extends Memory {
   static WritableMemory writableWrap(short[] array) {
     Objects.requireNonNull(array, "arr must be non-null");
     final long lengthBytes = array.length << Prim.SHORT.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, false, ByteOrder.nativeOrder(), null);
+    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, false, ByteOrder.nativeOrder(),
+        defaultMemReqSvr);
   }
 
   /**
@@ -358,7 +361,8 @@ public interface WritableMemory extends Memory {
   static WritableMemory writableWrap(int[] array) {
     Objects.requireNonNull(array, "arr must be non-null");
     final long lengthBytes = array.length << Prim.INT.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, false, ByteOrder.nativeOrder(), null);
+    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, false, ByteOrder.nativeOrder(),
+        defaultMemReqSvr);
   }
 
   /**
@@ -369,7 +373,8 @@ public interface WritableMemory extends Memory {
   static WritableMemory writableWrap(long[] array) {
     Objects.requireNonNull(array, "arr must be non-null");
     final long lengthBytes = array.length << Prim.LONG.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, false, ByteOrder.nativeOrder(), null);
+    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, false, ByteOrder.nativeOrder(),
+        defaultMemReqSvr);
   }
 
   /**
@@ -380,7 +385,8 @@ public interface WritableMemory extends Memory {
   static WritableMemory writableWrap(float[] array) {
     Objects.requireNonNull(array, "arr must be non-null");
     final long lengthBytes = array.length << Prim.FLOAT.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, false, ByteOrder.nativeOrder(), null);
+    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, false, ByteOrder.nativeOrder(),
+        defaultMemReqSvr);
   }
 
   /**
@@ -391,7 +397,8 @@ public interface WritableMemory extends Memory {
   static WritableMemory writableWrap(double[] array) {
     Objects.requireNonNull(array, "arr must be non-null");
     final long lengthBytes = array.length << Prim.DOUBLE.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, false, ByteOrder.nativeOrder(), null);
+    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, false, ByteOrder.nativeOrder(),
+        defaultMemReqSvr);
   }
   //END OF CONSTRUCTOR-TYPE METHODS
 

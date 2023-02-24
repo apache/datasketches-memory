@@ -44,6 +44,7 @@ public class MemoryCleaner {
 
     /**
      * Runs this cleaner, if it has not been run before.
+     * If there is any error, the system will exit.
      */
     public void clean() {
         cleaner.clean();

@@ -19,10 +19,13 @@
 
 package org.apache.datasketches.memory;
 
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
  *  Methods common to all memory access resources, including attributes like byte order and capacity.
+ *
+ * <p>The classes in this package are not thread-safe.</p>
  *
  * @author Lee Rhodes
  */
@@ -112,8 +115,35 @@ public interface Resource extends AutoCloseable {
   long getCapacity();
 
   /**
-   * Returns the MemoryRequestSever or null, if it has not been configured.
-   * @return the MemoryRequestSever or null, if it has not been configured.
+   * Gets the MemoryRequestServer object, if set, for the below resources to request additional memory.
+   *
+   * <p>WritableMemory enables this for ByteBuffer, Heap and Direct Memory backed resources.</p>
+   *
+   * <p>WritableBuffer enables this for ByteBuffer backed resources. However, the object returned is in the form of
+   * a WritableMemory. To convert to WritableBuffer use asWritableBuffer(). To enable for Heap and Direct Buffer
+   * resources, use the WritableMemory to configure and then call asWritableBuffer().</p>
+   *
+   * <p>Map backed resources will always return null.</p>
+   *
+   * <p>The user must customize the actions of the MemoryRequestServer by
+   * implementing the MemoryRequestServer interface.</p>
+   *
+   * <p>For WritableMemory, to enable at runtime set your custom MemoryRequestServer using one of these methods:</p>
+   * <ul><li>{@link WritableMemory#allocateDirect(long, ByteOrder, MemoryRequestServer)}</li>
+   * <li>{@link WritableMemory#allocate(int, ByteOrder, MemoryRequestServer)}</li>
+   * <li>{@link WritableMemory#writableWrap(ByteBuffer, ByteOrder, MemoryRequestServer)}</li>
+   * </ul>
+   *
+   * <p>ForWritableBuffer, to enable at runtime set your custom MemoryRequestServer using the following method:</p>
+   * <ul>
+   * <li>{@link WritableBuffer#writableWrap(ByteBuffer, ByteOrder, MemoryRequestServer)}</li>
+   * </ul>
+   *
+   * <p>Simple implementation examples include the DefaultMemoryRequestServer in the main source tree, as well as
+   * the ExampleMemoryRequestServerTest and the use with ByteBuffer documented in the DruidIssue11544Test
+   * in the test source tree.</p>
+   *
+   * @return the MemoryRequestServer object or null.
    */
   MemoryRequestServer getMemoryRequestServer();
 
@@ -236,7 +266,7 @@ public interface Resource extends AutoCloseable {
 
   /**
    * Returns true if this object is valid and has not been closed.
-   * This is relevant only for direct (off-heap) memory and Mapped Files.
+   * This is relevant only for direct (off-heap) memory and memory-mapped Files.
    * @return true if this object is valid and has not been closed.
    */
   boolean isValid();

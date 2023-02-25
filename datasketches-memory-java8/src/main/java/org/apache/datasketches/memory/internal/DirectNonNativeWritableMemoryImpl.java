@@ -32,10 +32,6 @@ import org.apache.datasketches.memory.WritableMemory;
  */
 final class DirectNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
   private final AllocateDirect direct;
-  private final long offsetBytes;
-  private final long capacityBytes;
-  private final int typeId;
-  private long cumOffsetBytes;
 
   DirectNonNativeWritableMemoryImpl(
       final AllocateDirect direct,
@@ -50,7 +46,7 @@ final class DirectNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImp
     this.capacityBytes = capacityBytes;
     this.typeId = removeNnBuf(typeId) | DIRECT | MEMORY | NONNATIVE; //initially cannot be ReadOnly
     this.cumOffsetBytes = cumOffsetBytes;
-    this.memReqSvr = memReqSvr;
+    this.memReqSvr = memReqSvr; //in ResourceImpl
     if ((this.owner != null) && (this.owner != Thread.currentThread())) {
       throw new IllegalStateException(THREAD_EXCEPTION_TEXT);
     }
@@ -98,33 +94,6 @@ final class DirectNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImp
     checkValid();
     checkThread(owner);
     direct.close();
-  }
-
-  @Override
-  public long getCapacity() {
-    checkValid();
-    return capacityBytes;
-  }
-
-  @Override
-  public long getCumulativeOffset() {
-    return cumOffsetBytes;
-  }
-
-  @Override
-  public long getNativeBaseOffset() {
-    return direct.getNativeBaseOffset();
-  }
-
-  @Override
-  public long getTotalOffset() {
-    checkValid();
-    return offsetBytes;
-  }
-
-  @Override
-  int getTypeId() {
-    return typeId;
   }
 
   @Override

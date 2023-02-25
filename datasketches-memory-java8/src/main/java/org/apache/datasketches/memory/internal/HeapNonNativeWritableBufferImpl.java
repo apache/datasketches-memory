@@ -32,10 +32,6 @@ import org.apache.datasketches.memory.WritableBuffer;
  */
 final class HeapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl {
   private final Object unsafeObj;
-  private final long offsetBytes;
-  private final long capacityBytes;
-  private final int typeId;
-  private long cumOffsetBytes;
 
   HeapNonNativeWritableBufferImpl(
       final Object unsafeObj,
@@ -50,7 +46,7 @@ final class HeapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl 
     this.capacityBytes = capacityBytes;
     this.typeId = removeNnBuf(typeId) | HEAP | BUFFER | NONNATIVE;
     this.cumOffsetBytes = cumOffsetBytes;
-    this.memReqSvr = memReqSvr;
+    this.memReqSvr = memReqSvr; //in ResourceImpl
     if ((this.owner != null) && (this.owner != Thread.currentThread())) {
       throw new IllegalStateException(THREAD_EXCEPTION_TEXT);
     }
@@ -106,31 +102,6 @@ final class HeapNonNativeWritableBufferImpl extends NonNativeWritableBufferImpl 
       return new HeapNonNativeWritableBufferImpl(
           unsafeObj, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr);
     }
-  }
-
-  @Override
-  public long getCapacity() {
-    return capacityBytes;
-  }
-
-  @Override
-  public long getCumulativeOffset() {
-    return cumOffsetBytes;
-  }
-
-  @Override
-  public long getNativeBaseOffset() {
-    return 0;
-  }
-
-  @Override
-  public long getTotalOffset() {
-    return offsetBytes;
-  }
-
-  @Override
-  int getTypeId() {
-    return typeId;
   }
 
   @Override

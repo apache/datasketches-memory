@@ -94,9 +94,13 @@ public abstract class ResourceImpl implements Resource {
     JDK_MAJOR = (p[0] == 1) ? p[1] : p[0];
   }
 
-  MemoryRequestServer memReqSvr = null; //set by the user.
-
-  Thread owner = null; //set by the leaf nodes.
+  //set by the leaf nodes
+  long capacityBytes;
+  long cumOffsetBytes;
+  long offsetBytes;
+  int typeId;
+  MemoryRequestServer memReqSvr = null; //set by the user via the leaf nodes
+  Thread owner = null;
 
   /**
    * The root of the Memory inheritance hierarchy
@@ -219,38 +223,37 @@ public abstract class ResourceImpl implements Resource {
     return isNativeOrder(getTypeId()) ? NATIVE_BYTE_ORDER : NON_NATIVE_BYTE_ORDER;
   }
 
-  /**
-   * Gets the cumulative offset in bytes of this object from the backing resource.
-   * This offset may also include other offset components such as the native off-heap
-   * memory address, DirectByteBuffer split offsets, region offsets, and unsafe arrayBaseOffsets.
-   *
-   * @return the cumulative offset in bytes of this object from the backing resource.
-   */
-  abstract long getCumulativeOffset();
+  @Override
+  public long getCapacity() {
+    checkValid();
+    return capacityBytes;
+  }
 
   /**
    * Gets the cumulative offset in bytes of this object from the backing resource including the given
    * localOffsetBytes. This offset may also include other offset components such as the native off-heap
    * memory address, DirectByteBuffer split offsets, region offsets, and object arrayBaseOffsets.
    *
-   * @param localOffsetBytes offset to be added to the cumulative offset.
+   * @param addOffsetBytes offset to be added to the cumulative offset.
    * @return the cumulative offset in bytes of this object from the backing resource including the
    * given offsetBytes.
    */
-  public long getCumulativeOffset(final long localOffsetBytes) {
-    return getCumulativeOffset() + localOffsetBytes;
+  long getCumulativeOffset(final long addOffsetBytes) {
+    return cumOffsetBytes + addOffsetBytes;
   }
 
-  //Documented in WritableMemory and WritableBuffer interfaces.
-  //Implemented in the Leaf nodes; Required here by toHex(...).
   @Override
   public MemoryRequestServer getMemoryRequestServer() { return memReqSvr; }
 
-  //Overridden by ByteBuffer, Direct and Map Leaves
-  abstract long getNativeBaseOffset();
+  @Override
+  public long getTotalOffset() {
+    return offsetBytes;
+  }
 
   //Overridden by all leaves
-  abstract int getTypeId();
+  int getTypeId() {
+    return typeId;
+  }
 
   //Overridden by Heap and ByteBuffer leaves. Made public as getArray() in WritableMemoryImpl and
   // WritableBufferImpl

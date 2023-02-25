@@ -58,7 +58,6 @@ public class AllocateDirectMapMemoryTest {
     try (Memory mem = Memory.map(file))
     {
       println("Mem Cap:       " + mem.getCapacity());
-      println("Native Off:    " + ((ResourceImpl)mem).getNativeBaseOffset());
       println("Total Offset:  " + mem.getTotalOffset());
       println("Cum Offset:    " + ((ResourceImpl)mem).getCumulativeOffset(0));
       println("Total Offset: " + mem.getTotalOffset());
@@ -69,7 +68,6 @@ public class AllocateDirectMapMemoryTest {
       println("");
       Memory mem2 = mem.region(43 + 76, 20);
       println("Mem Cap:       " + mem2.getCapacity());
-      println("Native Off:    " + ((ResourceImpl)mem).getNativeBaseOffset());
       println("Offset:        " + mem.getTotalOffset());
       println("Cum Offset:    " + ((ResourceImpl)mem2).getCumulativeOffset(0));
       println("Total Offset: " + mem2.getTotalOffset());

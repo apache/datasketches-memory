@@ -33,6 +33,8 @@ import org.apache.datasketches.memory.internal.ResourceImpl;
 /**
  * Defines the writable API for offset access to a resource.
  *
+ * <p>The classes in this package are not thread-safe.</p>
+ *
  * @author Lee Rhodes
  */
 public interface WritableMemory extends Memory {
@@ -586,25 +588,5 @@ public interface WritableMemory extends Memory {
    * @param bitMask the bits set to one will be set
    */
   void setBits(long offsetBytes, byte bitMask);
-
-
-  //OTHER WRITABLE API METHODS
-  /**
-   * WritableMemory enables this for ByteBuffer, Heap and Direct Memory backed resources.
-   * Map backed resources will always return null.
-   * Gets the MemoryRequestServer object, if set, for the above resources to request additional memory.
-   * The user must customize the actions of the MemoryRequestServer by
-   * implementing the MemoryRequestServer interface and set using one of these methods:
-   * <ul><li>{@link WritableMemory#allocateDirect(long, ByteOrder, MemoryRequestServer)}</li>
-   * <li>{@link WritableMemory#allocate(int, ByteOrder, MemoryRequestServer)}</li>
-   * <li>{@link WritableMemory#writableWrap(ByteBuffer, ByteOrder, MemoryRequestServer)}</li>
-   * </ul>
-   * Simple implementation examples include the DefaultMemoryRequestServer in the main tree, as well as
-   * the ExampleMemoryRequestServerTest and the use with ByteBuffer documented in the DruidIssue11544Test
-   * in the test tree.
-   * @return the MemoryRequestServer object or null.
-   */
-  @Override
-  MemoryRequestServer getMemoryRequestServer();
 
 }

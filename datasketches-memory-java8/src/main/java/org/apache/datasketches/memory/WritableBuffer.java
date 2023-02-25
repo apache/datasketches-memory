@@ -29,6 +29,8 @@ import org.apache.datasketches.memory.internal.Util;
 /**
  * Defines the writable API for relative positional access to a resource
  *
+ * <p>The classes in this package are not thread-safe.</p>
+ *
  * @author Lee Rhodes
  */
 public interface WritableBuffer extends Buffer {
@@ -382,25 +384,5 @@ public interface WritableBuffer extends Buffer {
   //NO fill(offsetBytes, lengthBytes, value)
 
   //NO setBits(...)
-
-  //OTHER WRITABLE API METHODS
-  /**
-   * WritableBuffer enables this for ByteBuffer backed resources. However, the object returned is in the form of
-   * a WritableMemory. To convert to WritableBuffer use asWritableBuffer(). To enable for Heap and Direct Memory
-   * resources, use the WritableMemory to configure and then call asWritableBuffer().
-   * Map backed resources will always return null.
-   * Gets the MemoryRequestServer object, if set, for the above resources to request additional memory.
-   * The user must customize the actions of the MemoryRequestServer by
-   * implementing the MemoryRequestServer interface and set using the following method:
-   * <ul>
-   * <li>{@link WritableBuffer#writableWrap(ByteBuffer, ByteOrder, MemoryRequestServer)}</li>
-   * </ul>
-   * Simple implementation examples include the DefaultMemoryRequestServer in the main tree, as well as
-   * the ExampleMemoryRequestServerTest and the use with ByteBuffer documented in the DruidIssue11544Test
-   * in the test tree.
-   * @return the MemoryRequestServer object or null.
-   */
-  @Override
-  public MemoryRequestServer getMemoryRequestServer();
 
 }

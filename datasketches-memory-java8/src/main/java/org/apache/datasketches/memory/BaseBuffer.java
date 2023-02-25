@@ -22,6 +22,8 @@ package org.apache.datasketches.memory;
 /**
  * Defines the relative positional API.
  *
+ * <p>The classes in this package are not thread-safe.</p>
+ *
  * @author Lee Rhodes
  */
 public interface BaseBuffer extends Resource {

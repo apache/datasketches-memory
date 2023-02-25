@@ -187,11 +187,11 @@ public class LeafImplTest {
     if (direct) {
       assertTrue(mem.isDirectResource());
       assertNull(obj);
-      assertTrue(((ResourceImpl)mem).getNativeBaseOffset() != 0);
+      assertTrue(((ResourceImpl)mem).getCumulativeOffset(0) != 0);
     } else {
       assertFalse(mem.isDirectResource());
       assertNotNull(obj);
-      assertTrue(((ResourceImpl)mem).getNativeBaseOffset() == 0);
+      assertTrue(((ResourceImpl)mem).getCumulativeOffset(0) != 0);
     }
 
     assertTrue(mem.isValid() == true);
@@ -216,11 +216,11 @@ public class LeafImplTest {
     if (direct) {
       assertTrue(buf.isDirectResource());
       assertNull(obj);
-      assertTrue(((ResourceImpl)buf).getNativeBaseOffset() != 0);
+      assertTrue(((ResourceImpl)buf).getCumulativeOffset(0) != 0);
     } else {
       assertFalse(buf.isDirectResource());
       assertNotNull(obj);
-      assertTrue(((ResourceImpl)buf).getNativeBaseOffset() == 0);
+      assertTrue(((ResourceImpl)buf).getCumulativeOffset(0) != 0);
     }
 
     assertTrue(buf.isValid() == true);
@@ -243,11 +243,11 @@ public class LeafImplTest {
     if (direct) {
       assertTrue(nnMem.isDirectResource());
       assertNull(obj);
-      assertTrue(((ResourceImpl)nnMem).getNativeBaseOffset() != 0);
+      assertTrue(((ResourceImpl)nnMem).getCumulativeOffset(0) != 0);
     } else {
       assertFalse(nnMem.isDirectResource());
       assertNotNull(obj);
-      assertTrue(((ResourceImpl)nnMem).getNativeBaseOffset() == 0);
+      assertTrue(((ResourceImpl)nnMem).getCumulativeOffset(0) != 0);
     }
 
     assertTrue(nnMem.isValid() == true);
@@ -270,11 +270,11 @@ public class LeafImplTest {
     if (direct) {
       assertTrue(nnBuf.isDirectResource());
       assertNull(obj);
-      assertTrue(((ResourceImpl)nnBuf).getNativeBaseOffset() != 0);
+      assertTrue(((ResourceImpl)nnBuf).getCumulativeOffset(0) != 0);
     } else {
       assertFalse(nnBuf.isDirectResource());
       assertNotNull(obj);
-      assertTrue(((ResourceImpl)nnBuf).getNativeBaseOffset() == 0);
+      assertTrue(((ResourceImpl)nnBuf).getCumulativeOffset(0) != 0);
     }
 
     assertTrue(nnBuf.isValid() == true);

@@ -35,10 +35,6 @@ final class BBWritableBufferImpl extends NativeWritableBufferImpl {
   private final ByteBuffer byteBuf;    //holds a reference to a ByteBuffer until we are done with it.
   private final Object unsafeObj;
   private final long nativeBaseOffset; //raw off-heap address of allocation base if ByteBuffer direct, else 0
-  private final long offsetBytes;      //from the root resource including original ByteBuffer position or split offset
-  private final long capacityBytes;
-  private final int typeId;
-  private long cumOffsetBytes;         //includes array header if heap, and nativeBaseOffset if off-heap
 
   BBWritableBufferImpl(
       final Object unsafeObj,
@@ -52,16 +48,16 @@ final class BBWritableBufferImpl extends NativeWritableBufferImpl {
     super(capacityBytes);
     this.unsafeObj = unsafeObj;
     this.nativeBaseOffset = nativeBaseOffset;
-    this.offsetBytes = offsetBytes;
-    this.capacityBytes = capacityBytes;
-    this.typeId = removeNnBuf(typeId) | BYTEBUF | BUFFER | NATIVE;
-    this.cumOffsetBytes = cumOffsetBytes;
-    this.memReqSvr = memReqSvr;
+    this.offsetBytes = offsetBytes; //in ResourceImpl
+    this.capacityBytes = capacityBytes; //in ResourceImpl
+    this.typeId = removeNnBuf(typeId) | BYTEBUF | BUFFER | NATIVE; //in ResourceImpl
+    this.cumOffsetBytes = cumOffsetBytes; //in ResourceImpl
+    this.memReqSvr = memReqSvr; //in ResourceImpl
     this.byteBuf = byteBuf;
     if ((this.owner != null) && (this.owner != Thread.currentThread())) {
       throw new IllegalStateException(THREAD_EXCEPTION_TEXT);
     }
-    this.owner = Thread.currentThread();
+    this.owner = Thread.currentThread(); //in ResourceImpl
   }
 
   @Override
@@ -118,31 +114,6 @@ final class BBWritableBufferImpl extends NativeWritableBufferImpl {
   @Override
   public ByteBuffer getByteBuffer() {
     return byteBuf;
-  }
-
-  @Override
-  public long getCapacity() {
-    return capacityBytes;
-  }
-
-  @Override
-  public long getCumulativeOffset() {
-    return cumOffsetBytes;
-  }
-
-  @Override
-  public long getNativeBaseOffset() {
-    return nativeBaseOffset;
-  }
-
-  @Override
-  public long getTotalOffset() {
-    return offsetBytes;
-  }
-
-  @Override
-  int getTypeId() {
-    return typeId;
   }
 
   @Override

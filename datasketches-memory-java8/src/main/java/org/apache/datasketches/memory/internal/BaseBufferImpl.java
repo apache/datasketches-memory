@@ -23,7 +23,7 @@ import org.apache.datasketches.memory.BaseBuffer;
 import org.apache.datasketches.memory.BufferPositionInvariantsException;
 
 /**
- * A new positional API. This is different from and simpler than Java BufferImpl positional approach.
+ * A new positional API. This is different from and simpler than Java Buffer positional approach.
  * <ul><li>All based on longs instead of ints.</li>
  * <li>Eliminated "mark". Rarely used and confusing with its silent side effects.</li>
  * <li>The invariants are {@code 0 <= start <= position <= end <= capacity}.</li>

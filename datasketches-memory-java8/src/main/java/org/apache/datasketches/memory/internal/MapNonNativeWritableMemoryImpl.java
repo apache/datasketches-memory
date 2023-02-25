@@ -31,10 +31,6 @@ import org.apache.datasketches.memory.WritableMemory;
  */
 final class MapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
   private final AllocateDirectWritableMap dirWMap;
-  private final long offsetBytes;
-  private final long capacityBytes;
-  private final int typeId;
-  private long cumOffsetBytes;
 
   MapNonNativeWritableMemoryImpl(
       final AllocateDirectWritableMap dirWMap,
@@ -103,33 +99,6 @@ final class MapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
     checkThread(owner);
     checkNotReadOnly();
     dirWMap.force(); //checksValidAndThread
-  }
-
-  @Override
-  public long getCapacity() {
-    checkValid();
-    return capacityBytes;
-  }
-
-  @Override
-  public long getCumulativeOffset() {
-    return cumOffsetBytes;
-  }
-
-  @Override
-  public long getNativeBaseOffset() {
-    return dirWMap.nativeBaseOffset;
-  }
-
-  @Override
-  public long getTotalOffset() {
-    checkValid();
-    return offsetBytes;
-  }
-
-  @Override
-  int getTypeId() {
-    return typeId;
   }
 
   @Override

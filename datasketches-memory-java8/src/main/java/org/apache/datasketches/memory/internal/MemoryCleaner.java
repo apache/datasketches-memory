@@ -30,24 +30,22 @@ import sun.misc.Cleaner;
  */
 @SuppressWarnings("restriction")
 public class MemoryCleaner {
-    private final Cleaner cleaner;
+  private final Cleaner cleaner;
 
-    /**
-     * Creates a new `sun.misc.Cleaner`.
-     * @param referent the object to be cleaned
-     * @param deallocator - the cleanup code to be run when the cleaner is invoked.
-     * return MemoryCleaner
-     */
-    public MemoryCleaner(final Object referent, final Runnable deallocator) {
-        cleaner = Cleaner.create(referent, deallocator);
-    }
+  /**
+   * Creates a new `sun.misc.Cleaner`.
+   * @param referent the object to be cleaned
+   * @param deallocator - the cleanup code to be run when the cleaner is invoked.
+   * return MemoryCleaner
+   */
+  public MemoryCleaner(final Object referent, final Runnable deallocator) {
+    cleaner = Cleaner.create(referent, deallocator);
+  }
 
-    /**
-     * Runs this cleaner, if it has not been run before.
-     * If there is any error, the system will exit.
-     */
-    public void clean() {
-        cleaner.clean();
-    }
+  /**
+   * Runs this cleaner, if it has not been run before.
+   */
+  public void clean() {
+    cleaner.clean();
+  }
 }
-

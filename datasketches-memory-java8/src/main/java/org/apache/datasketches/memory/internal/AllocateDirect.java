@@ -42,7 +42,7 @@ final class AllocateDirect {
    */
   AllocateDirect(final long capacityBytes) {
     final boolean pageAligned = VirtualMachineMemory.getIsPageAligned();
-    final long pageSize = VirtualMachineMemory.getPageSize();
+    final long pageSize = getPageSize();
     final long allocationSize = capacityBytes + (pageAligned ? pageSize : 0);
     final long nativeAddress;
     try {
@@ -75,6 +75,10 @@ final class AllocateDirect {
 
   long getNativeBaseOffset() {
     return nativeBaseOffset;
+  }
+
+  public static int getPageSize() {
+    return unsafe.pageSize();
   }
 
   public StepBoolean getValid() {

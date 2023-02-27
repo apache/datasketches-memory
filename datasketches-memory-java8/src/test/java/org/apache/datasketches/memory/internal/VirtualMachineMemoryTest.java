@@ -25,11 +25,6 @@ import org.testng.annotations.Test;
 public class VirtualMachineMemoryTest {
 
     @Test
-    public void maxDirectBufferMemory() {
-       assert (VirtualMachineMemory.getMaxDBBMemory() >= 0);
-    }
-
-    @Test
     public void inertPageAlignment() {
       boolean result = VirtualMachineMemory.getIsPageAligned();
       //System.out.println("VM page alignment:" + result);

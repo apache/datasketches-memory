@@ -28,7 +28,7 @@ import jdk.internal.ref.Cleaner;
  * depending on the Java version that is used.
  * For more information, see: https://openjdk.java.net/jeps/238
  */
-//
+//@SuppressWarnings("restriction")
 public class MemoryCleaner {
   private final Cleaner cleaner;
 

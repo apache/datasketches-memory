@@ -29,6 +29,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.logging.Logger;
 
 import sun.nio.ch.FileChannelImpl;
 
@@ -44,11 +45,13 @@ import sun.nio.ch.FileChannelImpl;
  * <a href="http://hg.openjdk.java.net/jdk8u/jdk8u/jdk/file/f940e7a48b72/src/solaris/native/java/nio/MappedByteBuffer.c">
  * MappedByteBuffer.c</a></p>
  *
+ * @author Roman Leventov
  * @author Lee Rhodes
  * @author Praveenkumar Venkatesan
  */
 @SuppressWarnings("restriction")
 class AllocateDirectWritableMap {
+  static final Logger LOG = Logger.getLogger(AllocateDirectWritableMap.class.getCanonicalName());
 
   private static final int MAP_RO = 0;
   private static final int MAP_RW = 1;
@@ -282,7 +285,7 @@ class AllocateDirectWritableMap {
       if (valid.change()) {
         if (calledFromCleaner) {
           // Warn about non-deterministic resource cleanup.
-          //LOG.warning("A WritableMapHandleImpl was not closed manually");
+          LOG.warning("A direct mapped resource was not closed explicitly");
         }
         unmap();
         return true;

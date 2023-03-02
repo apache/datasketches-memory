@@ -21,13 +21,18 @@ package org.apache.datasketches.memory.internal;
 
 import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
 
+import java.util.logging.Logger;
+
 /**
  * Provides access to direct (native) memory.
  *
+ * @author Roman Leventov
  * @author Lee Rhodes
  */
 @SuppressWarnings("restriction")
 final class AllocateDirect {
+  static final Logger LOG = Logger.getLogger(AllocateDirect.class.getCanonicalName());
+
   private final Deallocator deallocator;
   private final long nativeBaseOffset;
   private final MemoryCleaner cleaner;
@@ -107,7 +112,7 @@ final class AllocateDirect {
       if (valid.change()) {
         if (calledFromCleaner) {
           // Warn about non-deterministic resource cleanup.
-          //LOG.warning("A direct resource was not closed explicitly");
+          LOG.warning("A direct resource was not closed explicitly");
         }
         unsafe.freeMemory(nativeAddress);
         return true;

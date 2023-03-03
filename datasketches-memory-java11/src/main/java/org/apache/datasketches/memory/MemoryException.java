@@ -17,17 +17,26 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory;
 
 /**
- * Extracts version-dependent field names into standalone class.
- * Some field names in the VM internal class have changed in
- * later versions. The appropriate class will be loaded by the class loader
- * depending on the Java version that is used.
- * For more information, see: https://openjdk.java.net/jeps/238
+ * Specific RuntimeExceptions for the datasketches-memory component.
+ *
+ * @author Lee Rhodes
+ *
  */
-class NioBitsFields {
-    static String COUNT_FIELD_NAME = "count";
-    static String RESERVED_MEMORY_FIELD_NAME = "reservedMemory";
-    static String TOTAL_CAPACITY_FIELD_NAME = "totalCapacity";
+public class MemoryException extends RuntimeException {
+  private static final long serialVersionUID = 1L;
+
+  /**
+   * Constructs a new runtime exception with the specified detail message. The cause is not
+   * initialized, and may subsequently be initialized by a call to
+   * Throwable.initCause(java.lang.Throwable).
+   *
+   * @param message the detail message. The detail message is saved for later retrieval by the
+   * Throwable.getMessage() method.
+   */
+  public MemoryException(final String message) {
+    super(message);
+  }
 }

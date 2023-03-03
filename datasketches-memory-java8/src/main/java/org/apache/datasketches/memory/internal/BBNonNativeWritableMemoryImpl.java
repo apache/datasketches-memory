@@ -34,12 +34,7 @@ import org.apache.datasketches.memory.WritableMemory;
 final class BBNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
   private final ByteBuffer byteBuf; //holds a reference to a ByteBuffer until we are done with it.
   private final Object unsafeObj;
-  private final long nativeBaseOffset;
-  private final long offsetBytes;
-  private final long capacityBytes;
-  private final int typeId;
-  private long cumOffsetBytes;
-  private final MemoryRequestServer memReqSvr;
+  private final long nativeBaseOffset; //raw off-heap address of allocation base if ByteBuffer direct, else 0
 
   BBNonNativeWritableMemoryImpl(
       final Object unsafeObj,
@@ -57,8 +52,12 @@ final class BBNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
     this.capacityBytes = capacityBytes;
     this.typeId = removeNnBuf(typeId) | BYTEBUF | MEMORY | NONNATIVE;
     this.cumOffsetBytes = cumOffsetBytes;
-    this.memReqSvr = memReqSvr;
+    this.memReqSvr = memReqSvr; //in ResourceImpl
     this.byteBuf = byteBuf;
+    if ((this.owner != null) && (this.owner != Thread.currentThread())) {
+      throw new IllegalStateException(THREAD_EXCEPTION_TEXT);
+    }
+    this.owner = Thread.currentThread();
   }
 
   @Override
@@ -98,51 +97,13 @@ final class BBNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
   }
 
   @Override
-  public long getCapacity() {
-    checkValid();
-    return capacityBytes;
-  }
-
-  @Override
-  public long getCumulativeOffset() {
-    checkValid();
-    return cumOffsetBytes;
-  }
-
-  @Override
-  public MemoryRequestServer getMemoryRequestServer() {
-    checkValid();
-    return memReqSvr;
-  }
-
-  @Override
-  public long getNativeBaseOffset() {
-    checkValid();
-    return nativeBaseOffset;
-  }
-
-  @Override
-  public long getTotalOffset() {
-    checkValid();
-    return offsetBytes;
-  }
-
-  @Override
-  int getTypeId() {
-    checkValid();
-    return typeId;
+  public ByteBuffer getByteBuffer() {
+    return byteBuf;
   }
 
   @Override
   Object getUnsafeObject() {
-    checkValid();
     return unsafeObj;
-  }
-
-  @Override
-  public ByteBuffer getByteBuffer() {
-    checkValid();
-    return byteBuf;
   }
 
 }

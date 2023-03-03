@@ -35,6 +35,8 @@ import org.apache.datasketches.memory.internal.ResourceImpl;
 /**
  * Defines the read-only API for offset access to a resource.
  *
+ * <p>The classes in this package are not thread-safe.</p>
+ *
  * @author Lee Rhodes
  */
 public interface Memory extends Resource {

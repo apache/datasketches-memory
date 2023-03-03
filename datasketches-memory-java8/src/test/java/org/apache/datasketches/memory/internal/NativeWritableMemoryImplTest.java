@@ -568,7 +568,7 @@ public class NativeWritableMemoryImplTest {
     assertEquals(comp, 0);
     comp = mem3.compareTo(0, 4, mem4, 1, 4);
     assertEquals(comp, -1);
-    mem3.checkValidAndBounds(0, 5);
+    ((ResourceImpl)mem3).checkValidAndBounds(0, 5);
   }
 
   @Test

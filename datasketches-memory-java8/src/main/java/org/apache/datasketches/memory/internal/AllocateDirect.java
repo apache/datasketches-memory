@@ -23,8 +23,6 @@ import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
 
 import java.util.logging.Logger;
 
-import org.apache.datasketches.memory.MemoryCloseException;
-
 /**
  * Provides access to direct (native) memory.
  *
@@ -38,7 +36,6 @@ final class AllocateDirect {
   private final Deallocator deallocator;
   private final long nativeBaseOffset;
   private final MemoryCleaner cleaner;
-  private final Thread owner;
 
   /**
    * Base Constructor for allocate native memory.
@@ -50,14 +47,12 @@ final class AllocateDirect {
    */
   AllocateDirect(final long capacityBytes) {
     final boolean pageAligned = VirtualMachineMemory.getIsPageAligned();
-    final long pageSize = VirtualMachineMemory.getPageSize();
+    final long pageSize = getPageSize();
     final long allocationSize = capacityBytes + (pageAligned ? pageSize : 0);
-    this.owner = Thread.currentThread();
     final long nativeAddress;
     try {
       nativeAddress = unsafe.allocateMemory(allocationSize);
     } catch (final OutOfMemoryError err) {
-      NioBits.unreserveMemory(allocationSize, capacityBytes);
       throw new RuntimeException(err);
     }
     if (pageAligned && ((nativeAddress % pageSize) != 0)) {
@@ -71,7 +66,6 @@ final class AllocateDirect {
   }
 
   public void close() {
-    checkValidAndThread(); //we must be valid and called from the owner thread
     try {
       if (deallocator.deallocate(false)) {
         // This Cleaner.clean() call effectively just removes the Cleaner from the internal linked
@@ -84,13 +78,12 @@ final class AllocateDirect {
     }
   }
 
-  public final void checkValidAndThread() {
-    if (!getValid().get()) { throw new MemoryCloseException("Already closed"); }
-    ResourceImpl.checkThread(owner);
-  }
-
   long getNativeBaseOffset() {
     return nativeBaseOffset;
+  }
+
+  public static int getPageSize() {
+    return unsafe.pageSize();
   }
 
   public StepBoolean getValid() {
@@ -111,15 +104,15 @@ final class AllocateDirect {
     }
 
     @Override
-    public void run() throws MemoryCloseException {
+    public void run() throws IllegalStateException {
       deallocate(true);
     }
 
-    boolean deallocate(final boolean calledFromCleaner) throws MemoryCloseException {
+    boolean deallocate(final boolean calledFromCleaner) throws IllegalStateException {
       if (valid.change()) {
         if (calledFromCleaner) {
           // Warn about non-deterministic resource cleanup.
-          LOG.warning("A WritableHandle was not closed manually");
+          LOG.warning("A direct resource was not closed explicitly");
         }
         unsafe.freeMemory(nativeAddress);
         return true;

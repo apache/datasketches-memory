@@ -442,7 +442,7 @@ public class NativeWritableBufferImplTest {
     for (int i = 0; i < 64; i++) { wmem.putByte(i, (byte)i); }
 
     WritableBuffer wbuf = wmem.asWritableBuffer().writableDuplicate();
-    wbuf.checkValidAndBounds(0, 64);
+    ((ResourceImpl)wbuf).checkValidAndBounds(0, 64);
     for (int i = 0; i < 64; i++) {
       assertEquals(wbuf.getByte(), i);
     }
@@ -456,7 +456,7 @@ public class NativeWritableBufferImplTest {
       assertEquals(wmem2.getByte(i), i);
     }
     WritableMemory wmem3 = wbuf.asWritableMemory();
-    wmem3.checkValidAndBounds(0, 64);
+    ((ResourceImpl)wmem3).checkValidAndBounds(0, 64);
   }
 
   @Test

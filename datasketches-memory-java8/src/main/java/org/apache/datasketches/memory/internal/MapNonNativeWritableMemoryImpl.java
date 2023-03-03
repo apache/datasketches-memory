@@ -21,7 +21,6 @@ package org.apache.datasketches.memory.internal;
 
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableMemory;
 
 /**
@@ -32,10 +31,6 @@ import org.apache.datasketches.memory.WritableMemory;
  */
 final class MapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
   private final AllocateDirectWritableMap dirWMap;
-  private final long offsetBytes;
-  private final long capacityBytes;
-  private final int typeId;
-  private long cumOffsetBytes;
 
   MapNonNativeWritableMemoryImpl(
       final AllocateDirectWritableMap dirWMap,
@@ -49,6 +44,10 @@ final class MapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
     this.capacityBytes = capacityBytes;
     this.typeId = removeNnBuf(typeId) | MAP | MEMORY | NONNATIVE;
     this.cumOffsetBytes = cumOffsetBytes;
+    if ((this.owner != null) && (this.owner != Thread.currentThread())) {
+      throw new IllegalStateException(THREAD_EXCEPTION_TEXT);
+    }
+    this.owner = Thread.currentThread();
   }
 
   @Override
@@ -88,70 +87,42 @@ final class MapNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
   }
 
   @Override
+  public void close() {
+    checkValid();
+    checkThread(owner);
+    dirWMap.close(); //checksValidAndThread
+  }
+
+  @Override
+  public void force() {
+    checkValid();
+    checkThread(owner);
+    checkNotReadOnly();
+    dirWMap.force(); //checksValidAndThread
+  }
+
+  @Override
+  Object getUnsafeObject() {
+    return null;
+  }
+
+  @Override
+  public boolean isLoaded() {
+    checkValid();
+    checkThread(owner);
+    return dirWMap.isLoaded(); //checksValidAndThread
+  }
+
+  @Override
   public boolean isValid() {
     return dirWMap.getValid().get();
   }
 
   @Override
-  public long getCapacity() {
-    checkValid();
-    return capacityBytes;
-  }
-
-  @Override
-  public long getCumulativeOffset() {
-    checkValid();
-    return cumOffsetBytes;
-  }
-
-  @Override
-  public MemoryRequestServer getMemoryRequestServer() {
-    checkValid();
-    return null;
-  }
-
-  @Override
-  public long getNativeBaseOffset() {
-    checkValid();
-    return dirWMap.nativeBaseOffset;
-  }
-
-  @Override
-  public long getTotalOffset() {
-    checkValid();
-    return offsetBytes;
-  }
-
-  @Override
-  int getTypeId() {
-    checkValid();
-    return typeId;
-  }
-
-  @Override
-  Object getUnsafeObject() {
-    checkValid();
-    return null;
-  }
-
-  @Override
-  public void close() {
-    dirWMap.close();
-  }
-
-  @Override
-  public void force() {
-    dirWMap.force();
-  }
-
-  @Override
-  public boolean isLoaded() {
-    return dirWMap.isLoaded();
-  }
-
-  @Override
   public void load() {
-    dirWMap.load();
+    checkValid();
+    checkThread(owner);
+    dirWMap.load(); //checksValidAndThread
   }
 
 }

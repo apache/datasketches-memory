@@ -35,7 +35,6 @@ import java.util.List;
 
 import org.apache.datasketches.memory.DefaultMemoryRequestServer;
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.MemoryInvalidException;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.WritableBuffer;
@@ -317,7 +316,7 @@ public class MemoryTest {
     }
   }
 
-  @Test(expectedExceptions = MemoryInvalidException.class)
+  @Test(expectedExceptions = IllegalStateException.class)
   public void checkParentUseAfterFree() throws Exception {
     int bytes = 64 * 8;
     WritableMemory wmem = WritableMemory.allocateDirect(bytes);
@@ -325,7 +324,7 @@ public class MemoryTest {
     wmem.getLong(0);
   }
 
-  @Test(expectedExceptions = MemoryInvalidException.class)
+  @Test(expectedExceptions = IllegalStateException.class)
   public void checkRegionUseAfterFree() throws Exception {
     int bytes = 64;
     Memory mem = WritableMemory.allocateDirect(bytes);

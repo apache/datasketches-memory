@@ -32,11 +32,6 @@ import org.apache.datasketches.memory.WritableMemory;
  */
 final class DirectNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImpl {
   private final AllocateDirect direct;
-  private final long offsetBytes;
-  private final long capacityBytes;
-  private final int typeId;
-  private long cumOffsetBytes;
-  private final MemoryRequestServer memReqSvr;
 
   DirectNonNativeWritableMemoryImpl(
       final AllocateDirect direct,
@@ -51,7 +46,11 @@ final class DirectNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImp
     this.capacityBytes = capacityBytes;
     this.typeId = removeNnBuf(typeId) | DIRECT | MEMORY | NONNATIVE; //initially cannot be ReadOnly
     this.cumOffsetBytes = cumOffsetBytes;
-    this.memReqSvr = memReqSvr;
+    this.memReqSvr = memReqSvr; //in ResourceImpl
+    if ((this.owner != null) && (this.owner != Thread.currentThread())) {
+      throw new IllegalStateException(THREAD_EXCEPTION_TEXT);
+    }
+    this.owner = Thread.currentThread();
   }
 
   @Override
@@ -91,56 +90,20 @@ final class DirectNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImp
   }
 
   @Override
-  public boolean isValid() {
-    return direct.getValid().get();
-  }
-
-  @Override
-  public long getCapacity() {
-    checkValid();
-    return capacityBytes;
-  }
-
-  @Override
   public void close() {
+    checkValid();
+    checkThread(owner);
     direct.close();
   }
 
   @Override
-  public long getCumulativeOffset() {
-    checkValid();
-    return cumOffsetBytes;
-  }
-
-  @Override
-  public MemoryRequestServer getMemoryRequestServer() {
-    checkValid();
-    return memReqSvr;
-  }
-
-  @Override
-  public long getNativeBaseOffset() {
-    checkValid();
-    checkValid();
-    return direct.getNativeBaseOffset();
-  }
-
-  @Override
-  public long getTotalOffset() {
-    checkValid();
-    return offsetBytes;
-  }
-
-  @Override
-  int getTypeId() {
-    checkValid();
-    return typeId;
-  }
-
-  @Override
   Object getUnsafeObject() {
-    checkValid();
     return null;
+  }
+
+  @Override
+  public boolean isValid() {
+    return direct.getValid().get();
   }
 
 }

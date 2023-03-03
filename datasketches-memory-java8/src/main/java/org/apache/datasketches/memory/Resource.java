@@ -19,26 +19,19 @@
 
 package org.apache.datasketches.memory;
 
-import java.io.UncheckedIOException;
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
  *  Methods common to all memory access resources, including attributes like byte order and capacity.
+ *
+ * <p>The classes in this package are not thread-safe.</p>
  *
  * @author Lee Rhodes
  */
 public interface Resource extends AutoCloseable {
 
   static MemoryRequestServer defaultMemReqSvr = null; //policy choice
-
-  /**
-   * Checks that the specified range of bytes is within bounds of this object, throws
-   * {@link IllegalArgumentException} if it's not: i. e. if offsetBytes &lt; 0, or length &lt; 0,
-   * or offsetBytes + length &gt; {@link #getCapacity()}.
-   * @param offsetBytes the given offset in bytes of this object
-   * @param lengthBytes the given length in bytes of this object
-   */
-  void checkValidAndBounds(long offsetBytes, long lengthBytes);
 
   /**
    * Closes this resource if this can be closed via <em>AutoCloseable</em>.
@@ -50,23 +43,19 @@ public interface Resource extends AutoCloseable {
    * should be manifest in the client code; a failure in any of these transitions reveals a bug in the underlying
    * application logic.
    *
-   * @throws IllegalStateException if this is an AutoCloseable Resource (Memory mapped files and direct, off-heap
-   * memory allocations), and:
-   * <ul>
-   *  <li>this resource is already closed, or
-   *  <li>this method is called from a thread other than the thread owning this resource</li>.
-   * </ul>
-   *
+   * @throws IllegalStateException if this Resource is not <em>valid</em>.
+   * @throws IllegalStateException if this method is not accessed from the owning thread.
    * @throws UnsupportedOperationException if this resource is not {@link AutoCloseable}.
    */
   @Override
-  default void close() {/* Overridden by the actual AutoCloseable sub-classes. */ }
+  void close();
 
   /**
    * Returns true if the given object (<em>that</em>) is an instance of this class and has contents equal to
    * this object.
    * @param that the given Resource object
    * @return true if the given object has equal contents to this object.
+   * @see #equalTo(long, Resource, long, long)
    */
   default boolean equalTo(Resource that) {
     if (that == null || this.getCapacity() != that.getCapacity()) { return false; }
@@ -82,6 +71,8 @@ public interface Resource extends AutoCloseable {
    * @param thatOffsetBytes the starting offset in bytes for the given Resource object
    * @param lengthBytes the size of the range in bytes
    * @return true if the given Resource object has equal contents to this object in the given range of bytes.
+   * @throws IllegalStateException if either resource is not <em>valid</em>.
+   * @throws MemoryBoundsException if there is a bounds violation.
    */
   boolean equalTo(long thisOffsetBytes, Resource that, long thatOffsetBytes, long lengthBytes);
 
@@ -101,17 +92,12 @@ public interface Resource extends AutoCloseable {
    * In particular, this method has no effect for files mapped in read-only or private
    * mapping modes. This method may or may not have an effect for implementation-specific mapping modes.</p>
    *
-   * @throws IllegalStateException if:
-   * <ul>
-   *  <li>this memory-mapped Resource is not <em>alive</em></li>, or
-   *  <li>this method is called from a thread other than the thread owning this resource</li>.
-   * </ul>
-   *
-   * @throws UnsupportedOperationException if this Resource is not memory-mapped, e.g. if
-   * {@code isMapped() == false}.
-   *
-   * @throws UncheckedIOException if there is an I/O error writing the contents of this
-   * memory-mapped Resource to the associated storage device
+   * @throws IllegalStateException if this Resource is not <em>valid</em>.
+   * @throws IllegalStateException if this method is not accessed from the owning thread.
+   * @throws UnsupportedOperationException if this Resource is not memory-mapped, e.g. if {@code isMapped() == false}.
+   * @throws ReadOnlyException if this Resource is read-only.
+   * @throws RuntimeException if there is some other error writing the contents of this
+   * memory-mapped Resource to the associated storage device.
    */
   void force();
 
@@ -129,8 +115,35 @@ public interface Resource extends AutoCloseable {
   long getCapacity();
 
   /**
-   * Returns the MemoryRequestSever or null, if it has not been configured.
-   * @return the MemoryRequestSever or null, if it has not been configured.
+   * Gets the MemoryRequestServer object, if set, for the below resources to request additional memory.
+   *
+   * <p>WritableMemory enables this for ByteBuffer, Heap and Direct Memory backed resources.</p>
+   *
+   * <p>WritableBuffer enables this for ByteBuffer backed resources. However, the object returned is in the form of
+   * a WritableMemory. To convert to WritableBuffer use asWritableBuffer(). To enable for Heap and Direct Buffer
+   * resources, use the WritableMemory to configure and then call asWritableBuffer().</p>
+   *
+   * <p>Map backed resources will always return null.</p>
+   *
+   * <p>The user must customize the actions of the MemoryRequestServer by
+   * implementing the MemoryRequestServer interface.</p>
+   *
+   * <p>For WritableMemory, to enable at runtime set your custom MemoryRequestServer using one of these methods:</p>
+   * <ul><li>{@link WritableMemory#allocateDirect(long, ByteOrder, MemoryRequestServer)}</li>
+   * <li>{@link WritableMemory#allocate(int, ByteOrder, MemoryRequestServer)}</li>
+   * <li>{@link WritableMemory#writableWrap(ByteBuffer, ByteOrder, MemoryRequestServer)}</li>
+   * </ul>
+   *
+   * <p>ForWritableBuffer, to enable at runtime set your custom MemoryRequestServer using the following method:</p>
+   * <ul>
+   * <li>{@link WritableBuffer#writableWrap(ByteBuffer, ByteOrder, MemoryRequestServer)}</li>
+   * </ul>
+   *
+   * <p>Simple implementation examples include the DefaultMemoryRequestServer in the main source tree, as well as
+   * the ExampleMemoryRequestServerTest and the use with ByteBuffer documented in the DruidIssue11544Test
+   * in the test source tree.</p>
+   *
+   * @return the MemoryRequestServer object or null.
    */
   MemoryRequestServer getMemoryRequestServer();
 
@@ -174,8 +187,8 @@ public interface Resource extends AutoCloseable {
   boolean isDuplicateBufferView();
 
   /**
-   * Returns true if this object is backed by an on-heap primitive array
-   * @return true if this object is backed by an on-heap primitive array
+   * Returns true if this object is backed by an on-heap primitive array or an on-heap ByteBuffer.
+   * @return true if this object is backed by an on-heap primitive array or an on-heap ByteBuffer.
    */
   boolean isHeapResource();
 
@@ -194,14 +207,9 @@ public interface Resource extends AutoCloseable {
    *
    * @return true if it is likely that all of the data in this memory-mapped Resource is resident in physical memory
    *
-   * @throws IllegalStateException if:
-   * <ul>
-   *  <li>this memory-mapped Resource  is not <em>alive</em></li>, or
-   *  <li>this method is called from a thread other than the thread owning this resource</li>.
-   * </ul>
-   *
-   * @throws UnsupportedOperationException if this Resource is not memory-mapped, e.g. if
-   * {@code isMapped() == false}.
+   * @throws IllegalStateException if this Resource is not <em>valid</em>.
+   * @throws IllegalStateException if this method is not accessed from the owning thread.
+   * @throws UnsupportedOperationException if this Resource is not memory-mapped, e.g. if {@code isMapped() == false}.
    */
   boolean isLoaded();
 
@@ -258,7 +266,7 @@ public interface Resource extends AutoCloseable {
 
   /**
    * Returns true if this object is valid and has not been closed.
-   * This is relevant only for direct (off-heap) memory and Mapped Files.
+   * This is relevant only for direct (off-heap) memory and memory-mapped Files.
    * @return true if this object is valid and has not been closed.
    */
   boolean isValid();
@@ -270,19 +278,14 @@ public interface Resource extends AutoCloseable {
    * resident in physical memory. Invoking this method may cause some number of page faults and
    * I/O operations to occur.</p>
    *
-   * @throws IllegalStateException if:
-   * <ul>
-   *  <li>this memory-mapped Resource  is not <em>alive</em></li>, or
-   *  <li>this method is called from a thread other than the thread owning this Resource</li>.
-   * </ul>
-   *
-   * @throws UnsupportedOperationException if this Resource is not memory-mapped, e.g. if
-   * {@code isMapped() == false}.
+   * @throws IllegalStateException if this Resource is not <em>valid</em>.
+   * @throws IllegalStateException if this method is not accessed from the owning thread.
+   * @throws UnsupportedOperationException if this Resource is not memory-mapped, e.g. if {@code isMapped() == false}.
    */
   void load();
 
   /**
-   * Sets the MemoryRequestServer.
+   * Sets the Default MemoryRequestServer
    * @param memReqSvr the given MemoryRequestServer.
    */
   void setMemoryRequestServer(MemoryRequestServer memReqSvr);

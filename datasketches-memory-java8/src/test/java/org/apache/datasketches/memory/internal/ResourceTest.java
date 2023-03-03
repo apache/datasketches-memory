@@ -87,13 +87,6 @@ public class ResourceTest {
   }
 
   @Test
-  public void checkGetNativeBaseOffset_Heap() {
-    WritableMemory wmem = WritableMemory.allocate(8); //heap
-    final long offset = ((ResourceImpl)wmem).getNativeBaseOffset();
-    assertEquals(offset, 0L);
-  }
-
-  @Test
   public void checkIsByteOrderCompatible() {
     WritableMemory wmem = WritableMemory.allocate(8);
     assertTrue(wmem.isByteOrderCompatible(ByteOrder.nativeOrder()));

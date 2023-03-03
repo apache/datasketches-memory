@@ -26,7 +26,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.MemoryBoundsException;
-import org.apache.datasketches.memory.MemoryInvalidException;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.ReadOnlyException;
 import org.apache.datasketches.memory.Resource;
@@ -85,6 +84,9 @@ public abstract class ResourceImpl implements Resource {
   public static final ByteOrder NON_NATIVE_BYTE_ORDER =
       (NATIVE_BYTE_ORDER == ByteOrder.LITTLE_ENDIAN) ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
 
+  static final String NOT_MAPPED_FILE_RESOURCE = "This is not a memory-mapped file resource";
+  static final String THREAD_EXCEPTION_TEXT = "Attempted access outside owning thread";
+
   static {
     final String jdkVer = System.getProperty("java.version");
     final int[] p = parseJavaVersion(jdkVer);
@@ -92,7 +94,13 @@ public abstract class ResourceImpl implements Resource {
     JDK_MAJOR = (p[0] == 1) ? p[1] : p[0];
   }
 
-  MemoryRequestServer memReqSvr = null; //selected by the user
+  //set by the leaf nodes
+  long capacityBytes;
+  long cumOffsetBytes;
+  long offsetBytes;
+  int typeId;
+  MemoryRequestServer memReqSvr = null; //set by the user via the leaf nodes
+  Thread owner = null;
 
   /**
    * The root of the Memory inheritance hierarchy
@@ -102,10 +110,12 @@ public abstract class ResourceImpl implements Resource {
   /**
    * Check the requested offset and length against the allocated size.
    * The invariants equation is: {@code 0 <= reqOff <= reqLen <= reqOff + reqLen <= allocSize}.
-   * If this equation is violated an {@link IllegalArgumentException} will be thrown.
+   * If this equation is violated an {@link MemoryBoundsException} will be thrown.
    * @param reqOff the requested offset
    * @param reqLen the requested length
    * @param allocSize the allocated size.
+   * @Throws MemoryBoundsException if the given arguments constitute a violation
+   * of the invariants equation expressed above.
    */
   public static void checkBounds(final long reqOff, final long reqLen, final long allocSize) {
     if ((reqOff | reqLen | (reqOff + reqLen) | (allocSize - (reqOff + reqLen))) < 0) {
@@ -116,36 +126,79 @@ public abstract class ResourceImpl implements Resource {
   }
 
   static void checkJavaVersion(final String jdkVer, final int p0, final int p1 ) {
-    final boolean ok = ((p0 == 1) && (p1 == 8)) || (p0 == 8) || (p0 == 11);
+    final boolean ok = ((p0 == 1) && (p1 == 8)) || (p0 == 8) || (p0 == 11) || (p0 == 17);
     if (!ok) { throw new IllegalArgumentException(
-        "Unsupported JDK Major Version. It must be one of 1.8, 8, 11: " + jdkVer);
+        "Unsupported JDK Major Version. It must be one of 1.8, 8, 11, 17: " + jdkVer);
     }
   }
 
-  public static final void checkThread(final Thread owner) {
+  void checkNotReadOnly() {
+    if (isReadOnly()) {
+      throw new ReadOnlyException("Cannot write to a read-only Resource.");
+    }
+  }
+
+  /**
+   * This checks that the current thread is the same as the given owner thread.
+   * @Throws IllegalStateException if it is not.
+   * @param owner the given owner thread.
+   */
+  static final void checkThread(final Thread owner) {
     if (owner != Thread.currentThread()) {
-      throw new IllegalStateException("Attempted access outside owning thread");
+      throw new IllegalStateException(THREAD_EXCEPTION_TEXT);
     }
   }
 
+  /**
+   * @throws IllegalStateException if this Resource is AutoCloseable, and already closed, i.e., not <em>valid</em>.
+   */
   void checkValid() {
     if (!isValid()) {
-      throw new MemoryInvalidException();
+      throw new IllegalStateException("this Resource is AutoCloseable, and already closed, i.e., not <em>valid</em>.");
+    }
+  }
+
+  /**
+   * Checks that this resource is still valid and throws a MemoryInvalidException if it is not.
+   * Checks that the specified range of bytes is within bounds of this resource, throws
+   * {@link MemoryBoundsException} if it's not: i. e. if offsetBytes &lt; 0, or length &lt; 0,
+   * or offsetBytes + length &gt; {@link #getCapacity()}.
+   * @param offsetBytes the given offset in bytes of this object
+   * @param lengthBytes the given length in bytes of this object
+   * @Throws MemoryInvalidException if this resource is AutoCloseable and is no longer valid, i.e.,
+   * it has already been closed.
+   * @Throws MemoryBoundsException if this resource violates the memory bounds of this resource.
+   */
+  public final void checkValidAndBounds(final long offsetBytes, final long lengthBytes) {
+    checkValid();
+    checkBounds(offsetBytes, lengthBytes, getCapacity());
+  }
+
+  /**
+   * Checks that this resource is still valid and throws a MemoryInvalidException if it is not.
+   * Checks that the specified range of bytes is within bounds of this resource, throws
+   * {@link MemoryBoundsException} if it's not: i. e. if offsetBytes &lt; 0, or length &lt; 0,
+   * or offsetBytes + length &gt; {@link #getCapacity()}.
+   * Checks that this operation is a read-only operation and throws a ReadOnlyException if not.
+   * @param offsetBytes the given offset in bytes of this object
+   * @param lengthBytes the given length in bytes of this object
+   * @Throws MemoryInvalidException if this resource is AutoCloseable and is no longer valid, i.e.,
+   * it has already been closed.
+   * @Throws MemoryBoundsException if this resource violates the memory bounds of this resource.
+   * @Throws ReadOnlyException if the associated operation is not a Read-only operation.
+   */
+  final void checkValidAndBoundsForWrite(final long offsetBytes, final long lengthBytes) {
+    checkValid();
+    checkBounds(offsetBytes, lengthBytes, getCapacity());
+    if (isReadOnly()) {
+      throw new ReadOnlyException("Memory is read-only.");
     }
   }
 
   @Override
-  public final void checkValidAndBounds(final long offsetBytes, final long lengthBytes) {
-    checkValid();
-    ResourceImpl.checkBounds(offsetBytes, lengthBytes, getCapacity());
-  }
-
-  final void checkValidAndBoundsForWrite(final long offsetBytes, final long lengthBytes) {
-    checkValid();
-    ResourceImpl.checkBounds(offsetBytes, lengthBytes, getCapacity());
-    if (isReadOnly()) {
-      throw new ReadOnlyException("Memory is read-only.");
-    }
+  public void close() {
+    /* Overridden by the actual AutoCloseable leaf sub-classes. */
+    throw new UnsupportedOperationException("This resource is not AutoCloseable.");
   }
 
   @Override
@@ -157,53 +210,52 @@ public abstract class ResourceImpl implements Resource {
 
   @Override
   public void force() { //overridden by Map Leaves
-    throw new IllegalStateException("This resource is not a memory-mapped file type.");
+    throw new UnsupportedOperationException(NOT_MAPPED_FILE_RESOURCE);
   }
 
-  //Overridden by ByteBuffer Leafs
+  //Overridden by ByteBuffer Leaves. Used internally and for tests.
   ByteBuffer getByteBuffer() {
     return null;
   }
 
   @Override
   public final ByteOrder getByteOrder() {
-    return isNonNativeType(getTypeId()) ? Util.NON_NATIVE_BYTE_ORDER : ByteOrder.nativeOrder();
+    return isNativeOrder(getTypeId()) ? NATIVE_BYTE_ORDER : NON_NATIVE_BYTE_ORDER;
   }
 
-  /**
-   * Gets the cumulative offset in bytes of this object from the backing resource.
-   * This offset may also include other offset components such as the native off-heap
-   * memory address, DirectByteBuffer split offsets, region offsets, and unsafe arrayBaseOffsets.
-   *
-   * @return the cumulative offset in bytes of this object from the backing resource.
-   */
-  abstract long getCumulativeOffset();
+  @Override
+  public long getCapacity() {
+    checkValid();
+    return capacityBytes;
+  }
 
   /**
    * Gets the cumulative offset in bytes of this object from the backing resource including the given
    * localOffsetBytes. This offset may also include other offset components such as the native off-heap
    * memory address, DirectByteBuffer split offsets, region offsets, and object arrayBaseOffsets.
    *
-   * @param localOffsetBytes offset to be added to the cumulative offset.
+   * @param addOffsetBytes offset to be added to the cumulative offset.
    * @return the cumulative offset in bytes of this object from the backing resource including the
    * given offsetBytes.
    */
-  public long getCumulativeOffset(final long localOffsetBytes) {
-    return getCumulativeOffset() + localOffsetBytes;
+  long getCumulativeOffset(final long addOffsetBytes) {
+    return cumOffsetBytes + addOffsetBytes;
   }
 
-  //Documented in WritableMemory and WritableBuffer interfaces.
-  //Implemented in the Leaf nodes; Required here by toHex(...).
   @Override
-  public abstract MemoryRequestServer getMemoryRequestServer();
+  public MemoryRequestServer getMemoryRequestServer() { return memReqSvr; }
 
-  //Overridden by ByteBuffer, Direct and Map Leaves
-  abstract long getNativeBaseOffset();
+  @Override
+  public long getTotalOffset() {
+    return offsetBytes;
+  }
 
-  //Overridden by all leafs
-  abstract int getTypeId();
+  //Overridden by all leaves
+  int getTypeId() {
+    return typeId;
+  }
 
-  //Overridden by Heap and ByteBuffer Leafs. Made public as getArray() in WritableMemoryImpl and
+  //Overridden by Heap and ByteBuffer leaves. Made public as getArray() in WritableMemoryImpl and
   // WritableBufferImpl
   Object getUnsafeObject() {
     return null;
@@ -214,17 +266,13 @@ public abstract class ResourceImpl implements Resource {
     return (getTypeId() & BYTEBUF) > 0;
   }
 
-  final boolean isByteBufferType(final int typeId) {
-    return (typeId & BYTEBUF) > 0;
-  }
-
   @Override
   public final boolean isByteOrderCompatible(final ByteOrder byteOrder) {
     final ByteOrder typeBO = getByteOrder();
     return typeBO == ByteOrder.nativeOrder() && typeBO == byteOrder;
   }
 
-  final boolean isBufferType(final int typeId) {
+  final boolean isBufferApi(final int typeId) {
     return (typeId & BUFFER) > 0;
   }
 
@@ -238,23 +286,15 @@ public abstract class ResourceImpl implements Resource {
     return (getTypeId() & DUPLICATE) > 0;
   }
 
-  final boolean isDuplicateType(final int typeId) {
-    return (typeId & DUPLICATE) > 0;
-  }
-
   @Override
   public final boolean isHeapResource() {
     checkValid();
     return getUnsafeObject() != null;
   }
 
-  final boolean isHeapType(final int typeId) {
-    return (typeId & (MAP | DIRECT)) == 0;
-  }
-
   @Override
   public boolean isLoaded() { //overridden by Map Leaves
-    throw new IllegalStateException("This resource is not a memory-mapped file type.");
+    throw new IllegalStateException(NOT_MAPPED_FILE_RESOURCE);
   }
 
   @Override
@@ -262,20 +302,12 @@ public abstract class ResourceImpl implements Resource {
     return (getTypeId() & MAP) > 0;
   }
 
-  final boolean isMapType(final int typeId) { //not used
-    return (typeId & MAP) > 0;
-  }
-
   @Override
   public boolean isMemoryApi() {
     return (getTypeId() & BUFFER) == 0;
   }
 
-  final boolean isMemoryType(final int typeId) { //not used
-    return (typeId & BUFFER) == 0;
-  }
-
-  final boolean isNativeType(final int typeId) { //not used
+  final boolean isNativeOrder(final int typeId) { //not used
     return (typeId & NONNATIVE) == 0;
   }
 
@@ -284,27 +316,15 @@ public abstract class ResourceImpl implements Resource {
     return (getTypeId() & NONNATIVE) > 0;
   }
 
-  final boolean isNonNativeType(final int typeId) {
-    return (typeId & NONNATIVE) > 0;
-  }
-
   @Override
   public final boolean isReadOnly() {
     checkValid();
-    return isReadOnlyType(getTypeId());
-  }
-
-  final boolean isReadOnlyType(final int typeId) {
-    return (typeId & READONLY) > 0;
+    return (getTypeId() & READONLY) > 0;
   }
 
   @Override
   public boolean isRegionView() {
     return (getTypeId() & REGION) > 0;
-  }
-
-  final boolean isRegionType(final int typeId) {
-    return (typeId & REGION) > 0;
   }
 
   @Override
@@ -320,19 +340,15 @@ public abstract class ResourceImpl implements Resource {
             && getByteBuffer() == that1.getByteBuffer();
   }
 
-  //Overridden by Direct and Map leafs
+  //Overridden by Direct and Map leaves
   @Override
   public boolean isValid() {
     return true;
   }
 
-  final boolean isWritableType(final int typeId) { //not used
-    return (typeId & READONLY) == 0;
-  }
-
   @Override
-  public void load() { //overridden by Map leafs
-    throw new IllegalStateException("This resource is not a memory-mapped file type.");
+  public void load() { //overridden by Map leaves
+    throw new IllegalStateException(NOT_MAPPED_FILE_RESOURCE);
   }
 
   private static String pad(final String s, final int fieldLen) {
@@ -364,14 +380,12 @@ public abstract class ResourceImpl implements Resource {
 
   final static int removeNnBuf(final int typeId) { return typeId & ~NONNATIVE & ~BUFFER; }
 
-  @Override
-  public void setMemoryRequestServer(final MemoryRequestServer memReqSvr) {
-    this.memReqSvr = memReqSvr;
-  }
-
-  final static int setReadOnlyType(final int typeId, final boolean readOnly) {
+  final static int setReadOnlyBit(final int typeId, final boolean readOnly) {
     return readOnly ? typeId | READONLY : typeId & ~READONLY;
   }
+
+  @Override
+  public void setMemoryRequestServer(final MemoryRequestServer memReqSvr) { this.memReqSvr = memReqSvr; }
 
   /**
    * Returns a formatted hex string of an area of this object.

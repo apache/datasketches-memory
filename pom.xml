@@ -88,18 +88,17 @@ under the License.
        from this root module as a parent; so that there is no runtime dependency on the parent project (root module).
        As a result, some properties from this POM (including the version) are duplicated in the datasketches-memory
        module for inclusion in the assembled artifacts.  For more information, see:
-       https://maven.apache.org/guides/introduction/introduction-to-the-pom.html#Project_Aggregation -->
-
+       https://maven.apache.org/guides/introduction/introduction-to-the-pom.html#Project_Aggregation 
+  -->
 
   <properties>
     <!-- UNIQUE FOR THIS JAVA COMPONENT -->
     <protobuf-java.version>4.0.0-rc-2</protobuf-java.version>
     <!-- Used for UTF8 testing -->
     <zero-allocation-hashing.version>0.15</zero-allocation-hashing.version>
-    <!-- END:UNIQUE FOR THIS JAVA COMPONENT -->
-
     <!-- Test -->
-    <testng.version>7.4.0</testng.version>
+    <testng.version>7.5</testng.version>
+    <!-- END:UNIQUE FOR THIS JAVA COMPONENT -->
 
     <!-- System-wide properties -->
     <maven.version>3.5.0</maven.version>
@@ -173,12 +172,6 @@ under the License.
 
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>org.testng</groupId>
-        <artifactId>testng</artifactId>
-        <version>${testng.version}</version>
-        <scope>test</scope>
-      </dependency>
       <dependency>
         <!-- Used for UTF8 testing -->
         <groupId>com.google.protobuf</groupId>
@@ -538,6 +531,7 @@ under the License.
   <modules>
     <module>datasketches-memory-java8</module>
     <module>datasketches-memory-java11</module>
+    <module>datasketches-memory-java17</module>
   </modules>
 
 </project>

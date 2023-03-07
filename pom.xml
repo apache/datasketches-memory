@@ -82,8 +82,8 @@ under the License.
     </developer>
   </developers>
 
-  <!--
-       NOTE:
+
+  <!-- Note
        The datasketches-memory submodule uses the Maven project-aggregation feature and does not inherit
        from this root module as a parent; so that there is no runtime dependency on the parent project (root module).
        As a result, some properties from this POM (including the version) are duplicated in the datasketches-memory

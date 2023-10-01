@@ -24,7 +24,7 @@
 package org.apache.datasketches.memory.internal;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.apache.datasketches.memory.internal.Util.getResourceFile;
+import static org.apache.datasketches.memory.internal.TestUtil.gettysPath;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -42,6 +42,7 @@ import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+@SuppressWarnings("javadoc")
 public class AllocateDirectWritableMapMemoryTest {
   private static final String LS = System.getProperty("line.separator");
 
@@ -52,7 +53,7 @@ public class AllocateDirectWritableMapMemoryTest {
 
   @Test
   public void simpleMap() throws Exception {
-    File file = getResourceFile("GettysburgAddress.txt");
+    File file = gettysPath.resolve("GettysburgAddress.txt").toFile();
     try (Memory mem = Memory.map(file)) {
       byte[] bytes = new byte[(int)mem.getCapacity()];
       mem.getByteArray(0, bytes, 0, bytes.length);
@@ -133,7 +134,7 @@ public class AllocateDirectWritableMapMemoryTest {
 
   @Test(expectedExceptions = ReadOnlyException.class)
   public void simpleMap2() throws IOException {
-    File file = getResourceFile("GettysburgAddress.txt");
+    File file = gettysPath.resolve("GettysburgAddress.txt").toFile();
     assertTrue(file.canRead() && !file.canWrite());
     try (WritableMemory wmem = WritableMemory.writableMap(file)) { //throws
       //
@@ -142,7 +143,7 @@ public class AllocateDirectWritableMapMemoryTest {
 
   @Test(expectedExceptions = ReadOnlyException.class)
   public void checkOverLength() throws Exception  {
-    File file = getResourceFile("GettysburgAddress.txt");
+    File file = gettysPath.resolve("GettysburgAddress.txt").toFile();
     WritableMemory.writableMap(file, 0, 1 << 20, ByteOrder.nativeOrder());
   }
 

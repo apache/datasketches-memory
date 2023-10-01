@@ -24,6 +24,7 @@
 package org.apache.datasketches.memory.internal;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.apache.datasketches.memory.internal.TestUtil.gettysPath;
 import static org.apache.datasketches.memory.internal.Util.getResourceFile;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -59,7 +60,7 @@ public class AllocateDirectWritableMapMemoryTest {
   public void simpleMap()
       throws IllegalArgumentException, InvalidPathException, IllegalStateException, UnsupportedOperationException,
       IOException, SecurityException {
-    File file = getResourceFile("GettysburgAddress.txt");
+    File file = gettysPath.resolve("GettysburgAddress.txt").toFile();
     Memory mem = null;
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
       mem = Memory.map(file,scope);
@@ -143,7 +144,7 @@ public class AllocateDirectWritableMapMemoryTest {
   public void simpleMap2()
       throws IllegalArgumentException, InvalidPathException, IllegalStateException, UnsupportedOperationException,
       IOException, SecurityException {
-    File file = getResourceFile("GettysburgAddress.txt");
+    File file = gettysPath.resolve("GettysburgAddress.txt").toFile();
     assertTrue(file.canRead());
     assertFalse(file.canWrite());
     WritableMemory wmem = null;
@@ -157,7 +158,7 @@ public class AllocateDirectWritableMapMemoryTest {
   public void checkReadException()
       throws IllegalArgumentException, InvalidPathException, IllegalStateException, UnsupportedOperationException,
       IOException, SecurityException {
-    File file = getResourceFile("GettysburgAddress.txt");
+    File file = gettysPath.resolve("GettysburgAddress.txt").toFile();
     WritableMemory wmem = null;
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
       wmem = WritableMemory.writableMap(file, 0, 1 << 20, scope, ByteOrder.nativeOrder());

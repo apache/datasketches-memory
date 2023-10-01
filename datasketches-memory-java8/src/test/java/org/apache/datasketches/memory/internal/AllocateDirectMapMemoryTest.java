@@ -23,7 +23,7 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.Util.getResourceFile;
+import static org.apache.datasketches.memory.internal.TestUtil.gettysPath;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -45,7 +45,7 @@ public class AllocateDirectMapMemoryTest {
 
   @Test(expectedExceptions = IllegalStateException.class)
   public void simpleMap() {
-    File file = getResourceFile("GettysburgAddress.txt");
+    File file = gettysPath.resolve("GettysburgAddress.txt").toFile();
     assertTrue(AllocateDirectWritableMap.isFileReadOnly(file));
     try (Memory mem = Memory.map(file)) {
       mem.close(); //explicit close
@@ -54,7 +54,7 @@ public class AllocateDirectMapMemoryTest {
 
   @Test
   public void printGettysbergAddress()  {
-    File file = getResourceFile("GettysburgAddress.txt");
+    File file = gettysPath.resolve("GettysburgAddress.txt").toFile();
     try (Memory mem = Memory.map(file))
     {
       println("Mem Cap:       " + mem.getCapacity());
@@ -79,7 +79,7 @@ public class AllocateDirectMapMemoryTest {
 
   @Test
   public void testIllegalArguments() {
-    File file = getResourceFile("GettysburgAddress.txt");
+    File file = gettysPath.resolve("GettysburgAddress.txt").toFile();
     try (Memory mem = Memory.map(file, -1, Integer.MAX_VALUE, ByteOrder.nativeOrder())) {
       fail("Failed: Position was negative.");
     } catch (IllegalArgumentException e) {
@@ -95,7 +95,7 @@ public class AllocateDirectMapMemoryTest {
 
   @Test(expectedExceptions = IllegalStateException.class)
   public void testAccessAfterClose() {
-    File file = getResourceFile("GettysburgAddress.txt");
+    File file = gettysPath.resolve("GettysburgAddress.txt").toFile();
     long memCapacity = file.length();
     try (Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
       assertEquals(memCapacity, mem.getCapacity());
@@ -107,7 +107,7 @@ public class AllocateDirectMapMemoryTest {
 
   @Test(expectedExceptions = IllegalStateException.class)
   public void testReadFailAfterClose()  {
-    File file = getResourceFile("GettysburgAddress.txt");
+    File file = gettysPath.resolve("GettysburgAddress.txt").toFile();
     long memCapacity = file.length();
     Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder());
     mem.close();
@@ -116,7 +116,7 @@ public class AllocateDirectMapMemoryTest {
 
   @Test
   public void testLoad()  {
-    File file = getResourceFile("GettysburgAddress.txt");
+    File file = gettysPath.resolve("GettysburgAddress.txt").toFile();
     long memCapacity = file.length();
     try (Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
       mem.load();
@@ -139,7 +139,7 @@ public class AllocateDirectMapMemoryTest {
    */
   static void print(final Object o) {
     if (o != null) {
-      //System.out.print(o.toString()); //disable here
+      System.out.print(o.toString()); //disable here
     }
   }
 

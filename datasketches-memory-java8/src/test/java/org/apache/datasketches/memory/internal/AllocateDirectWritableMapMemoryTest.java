@@ -42,7 +42,6 @@ import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-@SuppressWarnings("javadoc")
 public class AllocateDirectWritableMapMemoryTest {
   private static final String LS = System.getProperty("line.separator");
 

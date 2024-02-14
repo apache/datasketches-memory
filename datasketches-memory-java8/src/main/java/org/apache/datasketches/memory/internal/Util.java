@@ -316,7 +316,7 @@ public final class Util {
    * @return the absolute path of the given resource file's shortName.
    */
   public static String getResourcePath(final String shortFileName) {
-    Objects.requireNonNull(shortFileName, "input parameter " + shortFileName + " cannot be null.");
+    Objects.requireNonNull(shortFileName, "input parameter 'String shortFileName' cannot be null.");
     try {
       final URL url = Util.class.getClassLoader().getResource(shortFileName);
       Objects.requireNonNull(url, "resource " + shortFileName + " could not be acquired.");

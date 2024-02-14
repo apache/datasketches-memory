@@ -127,7 +127,7 @@ under the License.
     <maven-release-plugin.version>3.0.0-M4</maven-release-plugin.version> <!-- overrides parent -->
     <maven-remote-resources-plugin.version>1.7.0</maven-remote-resources-plugin.version> <!-- overrides parent -->
     <maven-source-plugin.version>3.2.1</maven-source-plugin.version> <!-- overrides parent -->
-    <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version> <!-- overrides parent -->
+    <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version> <!-- overrides parent -->
     <maven-toolchains-plugin.version>3.0.0</maven-toolchains-plugin.version>
     <maven-install-plugin.version>3.0.0-M1</maven-install-plugin.version>
     <maven-exec-plugin.version>3.0.0</maven-exec-plugin.version>

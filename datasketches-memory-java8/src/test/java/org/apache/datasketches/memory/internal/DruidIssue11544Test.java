@@ -40,10 +40,10 @@ import org.testng.annotations.Test;
  * uncovered this until August 2021.  Nonetheless, the fix involves instrumenting all the paths involved
  * in providing this callback mechanism for wrapped ByteBuffers.
  *
- * This issues was first identified in Druid Issue #11544 and then posted as DataSketches-java Issue #358.
- * But the actual source of the problem was in Memory.
+ * <p>This issue was first identified in Druid Issue #11544 and then posted as DataSketches-java Issue #358.
+ * But the actual source of the problem was in Memory.</p>
  *
- * This test mimics the Druid issue but at a much smaller scale.
+ * <p>This test mimics the Druid issue but at a much smaller scale.</p>
  *
  * @author Lee Rhodes
  *
@@ -61,7 +61,7 @@ public class DruidIssue11544Test {
 
     //Wrap bb into WritableMemory
     WritableMemory mem1 = WritableMemory.writableWrap(bb);
-    assertTrue(mem1.isDirect()); //confirm mem1 is off-heap
+    assertTrue(mem1.isDirectResource()); //confirm mem1 is off-heap
 
     //Acquire the DefaultMemoryRequestServer
     //NOTE: it is a policy decision to allow the DefaultMemoryServer to be set as a default.
@@ -77,7 +77,7 @@ public class DruidIssue11544Test {
     WritableMemory mem2 = svr.request(mem1, size2);
 
     //Confirm that mem2 is on the heap (the default) and 2X size1
-    assertFalse(mem2.isDirect());
+    assertFalse(mem2.isDirectResource());
     assertEquals(mem2.getCapacity(), size2);
 
     //Move data to new memory
@@ -94,7 +94,7 @@ public class DruidIssue11544Test {
     WritableMemory mem3 = svr.request(mem2, size3);
 
     //Confirm that mem3 is still on the heap and 2X of size2
-    assertFalse(mem3.isDirect());
+    assertFalse(mem3.isDirectResource());
     assertEquals(mem3.getCapacity(), size3);
 
     //Move data to new memory

@@ -17,17 +17,18 @@
  * under the License.
  */
 
-package org.apache.datasketches.memory.internal;
+package org.apache.datasketches.memory;
 
-/**
- * Extracts version-dependent field names into standalone class.
- * Some field names in the VM internal class have changed in
- * later versions. The appropriate class will be loaded by the class loader
- * depending on the Java version that is used.
- * For more information, see: https://openjdk.java.net/jeps/238
- */
-class NioBitsFields {
-    static String COUNT_FIELD_NAME = "COUNT";
-    static String RESERVED_MEMORY_FIELD_NAME = "RESERVED_MEMORY";
-    static String TOTAL_CAPACITY_FIELD_NAME = "TOTAL_CAPACITY";
+public class BufferPositionInvariantsException extends MemoryException {
+  private static final long serialVersionUID = 1L;
+
+  /**
+   * The associated position operation used violated the positional invariants equation with required details
+   *
+   * @param details of the violation.
+   */
+  public BufferPositionInvariantsException(final String details) {
+    super(details);
+  }
 }
+

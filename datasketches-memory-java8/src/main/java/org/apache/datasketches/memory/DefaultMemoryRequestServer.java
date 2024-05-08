@@ -73,7 +73,7 @@ public final class DefaultMemoryRequestServer implements MemoryRequestServer {
    */
   @Override
   public WritableMemory request(final WritableMemory currentWritableMemory, final long capacityBytes) {
-    final WritableMemory wmem = WritableMemory.allocate((int)capacityBytes, currentWritableMemory.getTypeByteOrder());
+    final WritableMemory wmem = WritableMemory.allocate((int)capacityBytes, currentWritableMemory.getByteOrder());
     return wmem;
   }
 

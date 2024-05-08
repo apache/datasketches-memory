@@ -28,10 +28,12 @@ import java.util.Objects;
 
 import org.apache.datasketches.memory.internal.BaseWritableMemoryImpl;
 import org.apache.datasketches.memory.internal.Prim;
-import org.apache.datasketches.memory.internal.UnsafeUtil;
+import org.apache.datasketches.memory.internal.ResourceImpl;
 
 /**
  * Defines the writable API for offset access to a resource.
+ *
+ * <p>The classes in this package are not thread-safe.</p>
  *
  * @author Lee Rhodes
  */
@@ -84,10 +86,9 @@ public interface WritableMemory extends Memory {
    * Calling this method is equivalent to calling
    * {@link #writableMap(File, long, long, ByteOrder) writableMap(file, 0, file.length(), ByteOrder.nativeOrder())}.
    * @param file the given file to map. It must be non-null, with length &ge; 0, and writable.
-   * @return WritableMapHandle for managing the mapped Memory.
-   * Please read Javadocs for {@link Handle}.
+   * @return WritableMemory for managing the mapped Memory.
    */
-  static WritableMapHandle writableMap(File file) {
+  static WritableMemory writableMap(File file) {
     return writableMap(file, 0, file.length(), ByteOrder.nativeOrder());
   }
 
@@ -100,10 +101,9 @@ public interface WritableMemory extends Memory {
    * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
    * @param capacityBytes the size of the mapped Memory. It must not be negative.
    * @param byteOrder the byte order to be used for the given file. It must be non-null.
-   * @return WritableMapHandle for managing the mapped Memory.
-   * Please read Javadocs for {@link Handle}.
+   * @return WritableMemory for managing the mapped Memory.
    */
-  static WritableMapHandle writableMap(File file, long fileOffsetBytes, long capacityBytes, ByteOrder byteOrder) {
+  static WritableMemory writableMap(File file, long fileOffsetBytes, long capacityBytes, ByteOrder byteOrder) {
     Objects.requireNonNull(file, "file must be non-null.");
     Objects.requireNonNull(byteOrder, "byteOrder must be non-null.");
     if (!file.canWrite()) { throw new ReadOnlyException("file must be writable."); }
@@ -124,10 +124,9 @@ public interface WritableMemory extends Memory {
    * and to call <i>close()</i> when done.</p>
    *
    * @param capacityBytes the size of the desired memory in bytes. It must be &ge; 0.
-   * @return WritableHandle for this off-heap resource.
-   * Please read Javadocs for {@link Handle}.
+   * @return WritableMemory for this off-heap resource.
    */
-  static WritableHandle allocateDirect(long capacityBytes) {
+  static WritableMemory allocateDirect(long capacityBytes) {
     return allocateDirect(capacityBytes, ByteOrder.nativeOrder(), defaultMemReqSvr);
   }
 
@@ -143,10 +142,9 @@ public interface WritableMemory extends Memory {
    * @param byteOrder the given byte order. It must be non-null.
    * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
    * This is a callback mechanism for a user client of direct memory to request more memory.
-   * @return WritableHandle for this off-heap resource.
-   * Please read Javadocs for {@link Handle}.
+   * @return WritableMemory for this off-heap resource.
    */
-  static WritableHandle allocateDirect(long capacityBytes, ByteOrder byteOrder, MemoryRequestServer memReqSvr) {
+  static WritableMemory allocateDirect(long capacityBytes, ByteOrder byteOrder, MemoryRequestServer memReqSvr) {
     Objects.requireNonNull(byteOrder, "byteOrder must be non-null");
     negativeCheck(capacityBytes, "capacityBytes");
     return BaseWritableMemoryImpl.wrapDirect(capacityBytes, byteOrder, memReqSvr);
@@ -162,12 +160,12 @@ public interface WritableMemory extends Memory {
    * <li>Returned object's capacity = <i>capacityBytes</i></li>
    * </ul>
    *
-   * @param offsetBytes the starting offset with respect to this object. It must be &ge; 0.
+   * @param regionOffsetBytes the starting offset with respect to this object. It must be &ge; 0.
    * @param capacityBytes the capacity of the returned object in bytes. It must be &ge; 0.
    * @return a new <i>WritableMemory</i> representing the defined writable region.
    */
-  default WritableMemory writableRegion(long offsetBytes, long capacityBytes) {
-    return writableRegion(offsetBytes, capacityBytes, getTypeByteOrder());
+  default WritableMemory writableRegion(long regionOffsetBytes, long capacityBytes) {
+    return writableRegion(regionOffsetBytes, capacityBytes, getByteOrder());
   }
 
   /**
@@ -201,7 +199,7 @@ public interface WritableMemory extends Memory {
    * @return a new <i>WritableBuffer</i> with a view of this WritableMemory
    */
   default WritableBuffer asWritableBuffer() {
-    return asWritableBuffer(getTypeByteOrder());
+    return asWritableBuffer(getByteOrder());
   }
 
   /**
@@ -317,7 +315,7 @@ public interface WritableMemory extends Memory {
     Objects.requireNonNull(byteOrder, "byteOrder must be non-null");
     negativeCheck(offsetBytes, "offsetBytes");
     negativeCheck(lengthBytes, "lengthBytes");
-    UnsafeUtil.checkBounds(offsetBytes, lengthBytes, array.length);
+    ResourceImpl.checkBounds(offsetBytes, lengthBytes, array.length);
     return BaseWritableMemoryImpl.wrapHeapArray(array, offsetBytes, lengthBytes, false, byteOrder, memReqSvr);
   }
 
@@ -329,7 +327,8 @@ public interface WritableMemory extends Memory {
   static WritableMemory writableWrap(boolean[] array) {
     Objects.requireNonNull(array, "array must be non-null");
     final long lengthBytes = array.length << Prim.BOOLEAN.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(array, 0, lengthBytes, false, ByteOrder.nativeOrder(), null);
+    return BaseWritableMemoryImpl.wrapHeapArray(array, 0, lengthBytes, false, ByteOrder.nativeOrder(),
+        defaultMemReqSvr);
   }
 
   /**
@@ -340,7 +339,8 @@ public interface WritableMemory extends Memory {
   static WritableMemory writableWrap(char[] array) {
     Objects.requireNonNull(array, "array must be non-null");
     final long lengthBytes = array.length << Prim.CHAR.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, false, ByteOrder.nativeOrder(), null);
+    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, false, ByteOrder.nativeOrder(),
+        defaultMemReqSvr);
   }
 
   /**
@@ -351,7 +351,8 @@ public interface WritableMemory extends Memory {
   static WritableMemory writableWrap(short[] array) {
     Objects.requireNonNull(array, "arr must be non-null");
     final long lengthBytes = array.length << Prim.SHORT.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, false, ByteOrder.nativeOrder(), null);
+    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, false, ByteOrder.nativeOrder(),
+        defaultMemReqSvr);
   }
 
   /**
@@ -362,7 +363,8 @@ public interface WritableMemory extends Memory {
   static WritableMemory writableWrap(int[] array) {
     Objects.requireNonNull(array, "arr must be non-null");
     final long lengthBytes = array.length << Prim.INT.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, false, ByteOrder.nativeOrder(), null);
+    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, false, ByteOrder.nativeOrder(),
+        defaultMemReqSvr);
   }
 
   /**
@@ -373,7 +375,8 @@ public interface WritableMemory extends Memory {
   static WritableMemory writableWrap(long[] array) {
     Objects.requireNonNull(array, "arr must be non-null");
     final long lengthBytes = array.length << Prim.LONG.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, false, ByteOrder.nativeOrder(), null);
+    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, false, ByteOrder.nativeOrder(),
+        defaultMemReqSvr);
   }
 
   /**
@@ -384,7 +387,8 @@ public interface WritableMemory extends Memory {
   static WritableMemory writableWrap(float[] array) {
     Objects.requireNonNull(array, "arr must be non-null");
     final long lengthBytes = array.length << Prim.FLOAT.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, false, ByteOrder.nativeOrder(), null);
+    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, false, ByteOrder.nativeOrder(),
+        defaultMemReqSvr);
   }
 
   /**
@@ -395,7 +399,8 @@ public interface WritableMemory extends Memory {
   static WritableMemory writableWrap(double[] array) {
     Objects.requireNonNull(array, "arr must be non-null");
     final long lengthBytes = array.length << Prim.DOUBLE.shift();
-    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, false, ByteOrder.nativeOrder(), null);
+    return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, false, ByteOrder.nativeOrder(),
+        defaultMemReqSvr);
   }
   //END OF CONSTRUCTOR-TYPE METHODS
 
@@ -450,7 +455,7 @@ public interface WritableMemory extends Memory {
 
   /**
    * Encodes characters from the given CharSequence into UTF-8 bytes and puts them into this
-   * <i>WritableMemory</i> begining at the given offsetBytes.
+   * <i>WritableMemory</i> beginning at the given offsetBytes.
    * This is specifically designed to reduce the production of intermediate objects (garbage),
    * thus significantly reducing pressure on the JVM Garbage Collector.
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
@@ -542,40 +547,7 @@ public interface WritableMemory extends Memory {
    */
   void putShortArray(long offsetBytes, short[] srcArray, int srcOffsetShorts, int lengthShorts);
 
-  //Atomic Methods
-  /**
-   * Atomically adds the given value to the long located at offsetBytes.
-   * @param offsetBytes offset bytes relative to this Memory start
-   * @param delta the amount to add
-   * @return the the previous value
-   */
-  long getAndAddLong(long offsetBytes, long delta);
-
-  /**
-   * Atomically sets the current value at the memory location to the given updated value
-   * if and only if the current value {@code ==} the expected value.
-   * @param offsetBytes offset bytes relative to this Memory start
-   * @param expect the expected value
-   * @param update the new value
-   * @return {@code true} if successful. False return indicates that
-   * the current value at the memory location was not equal to the expected value.
-   */
-  boolean compareAndSwapLong(long offsetBytes, long expect, long update);
-
-  /**
-   * Atomically exchanges the given value with the current value located at offsetBytes.
-   * @param offsetBytes offset bytes relative to this Memory start
-   * @param newValue new value
-   * @return the previous value
-   */
-  long getAndSetLong(long offsetBytes, long newValue);
-
   //OTHER WRITE METHODS
-  /**
-   * Returns the primitive backing array, otherwise null.
-   * @return the primitive backing array, otherwise null.
-   */
-  Object getArray();
 
   /**
    * Clears all bytes of this Memory to zero
@@ -616,24 +588,5 @@ public interface WritableMemory extends Memory {
    * @param bitMask the bits set to one will be set
    */
   void setBits(long offsetBytes, byte bitMask);
-
-
-  //OTHER WRITABLE API METHODS
-  /**
-   * WritableMemory enables this for ByteBuffer, Heap and Direct Memory backed resources.
-   * Map backed resources will always return null.
-   * Gets the MemoryRequestServer object, if set, for the above resources to request additional memory.
-   * The user must customize the actions of the MemoryRequestServer by
-   * implementing the MemoryRequestServer interface and set using one of these methods:
-   * <ul><li>{@link WritableMemory#allocateDirect(long, ByteOrder, MemoryRequestServer)}</li>
-   * <li>{@link WritableMemory#allocate(int, ByteOrder, MemoryRequestServer)}</li>
-   * <li>{@link WritableMemory#writableWrap(ByteBuffer, ByteOrder, MemoryRequestServer)}</li>
-   * </ul>
-   * Simple implementation examples include the DefaultMemoryRequestServer in the main tree, as well as
-   * the ExampleMemoryRequestServerTest and the use with ByteBuffer documented in the DruidIssue11544Test
-   * in the test tree.
-   * @return the MemoryRequestServer object or null.
-   */
-  MemoryRequestServer getMemoryRequestServer();
 
 }

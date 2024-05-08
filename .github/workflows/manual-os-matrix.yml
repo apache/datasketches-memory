@@ -1,0 +1,78 @@
+name: DataSketches-Memory Manual OS Matrix Test & Install
+
+on:
+    workflow_dispatch:
+
+env:
+    MAVEN_OPTS: -Xmx4g -Xms1g
+
+jobs:
+    build:
+        name: Build, Test, Install
+
+        strategy:
+          fail-fast: false
+
+          matrix:
+            jdk: [ 8, 11 ]
+            os: [ windows-latest, ubuntu-latest, macos-latest ]
+            include:
+              - os: windows-latest
+                skip_javadoc: "`-Dmaven`.javadoc`.skip=true"
+                skip_gpg: "`-Dgpg`.skip=true"
+              - os: ubuntu-latest
+                skip_javadoc: -Dmaven.javadoc.skip=true
+                skip_gpg: -Dgpg.skip=true
+              - os: macos-latest
+                skip_javadoc: -Dmaven.javadoc.skip=true
+                skip_gpg: -Dgpg.skip=true
+
+        runs-on: ${{matrix.os}}
+
+        env:
+          JDK_VERSION: ${{ matrix.jdk }}
+
+        steps:
+        - name: "Checkout ${{ github.ref }} ( ${{ github.sha }} )"
+          uses: actions/checkout@v3
+          with:
+              persist-credentials: false
+
+        - name: Cache local Maven repository
+          uses: actions/cache@v3
+          with:
+              path: ~/.m2/repository
+              key: build-${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+              restore-keys: build-${{ runner.os }}-maven-
+
+        - name: Install Matrix JDK
+          uses: actions/setup-java@v3
+          with:
+              java-version: ${{ matrix.jdk }}
+              distribution: 'temurin'
+              java-package: jdk
+              architecture: x64 
+# Architecture options: x86, x64, armv7, aarch64, ppc64le
+# setup-java@v3 has a "with cache" option
+
+        - name: Echo Java Version
+          run: >
+              java -version
+
+        - name: Test
+          run: >
+              mvn clean test
+              ${{matrix.os.skip_javadoc}}
+              ${{matrix.os.skip_gpg}}
+
+        - name: Install
+          run: >
+              mvn clean install -B
+              ${{matrix.os.skip_javadoc}}
+              -D skipTests=true
+              ${{matrix.os.skip_gpg}}
+
+# Lifecycle: validate, compile, test, package, verify, install, deploy
+# -B batch mode
+# -V show Version without stopping
+# -q quiet, only show errors

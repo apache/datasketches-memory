@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.memory.MemoryBoundsException;
 import org.apache.datasketches.memory.Utf8CodingException;
 import org.apache.datasketches.memory.WritableMemory;
 import org.apache.datasketches.memory.internal.Util.RandomCodePoints;
@@ -40,9 +41,9 @@ import com.google.protobuf.ByteString;
  * Adapted version of
  * https://github.com/protocolbuffers/protobuf/blob/master/java/core/src/test/java/com/google/protobuf/DecodeUtf8Test.java
  *
- * Copyright 2008 Google Inc.  All rights reserved.
+ * <pre>Copyright 2008 Google Inc.  All rights reserved.
  * https://developers.google.com/protocol-buffers/
- * See LICENSE.
+ * See LICENSE.</pre>
  */
 public class Utf8Test {
 
@@ -141,7 +142,7 @@ public class Utf8Test {
     for (int i = Byte.MIN_VALUE; i <= Byte.MAX_VALUE; i++) {
       ByteString bs = ByteString.copyFrom(new byte[] {(byte) i });
       if (!bs.isValidUtf8()) { //from -128 to -1
-        assertInvalid(bs.toByteArray());
+        checkInvalidBytes(bs.toByteArray());
       } else {
         valid++; //from 0 to 127
       }
@@ -156,7 +157,7 @@ public class Utf8Test {
       for (int j = Byte.MIN_VALUE; j <= Byte.MAX_VALUE; j++) {
         ByteString bs = ByteString.copyFrom(new byte[]{(byte) i, (byte) j});
         if (!bs.isValidUtf8()) {
-          assertInvalid(bs.toByteArray());
+          checkInvalidBytes(bs.toByteArray());
         } else {
           valid++;
         }
@@ -179,7 +180,7 @@ public class Utf8Test {
             byte[] bytes = new byte[]{(byte) i, (byte) j, (byte) k};
             ByteString bs = ByteString.copyFrom(bytes);
             if (!bs.isValidUtf8()) {
-              assertInvalid(bytes);
+              checkInvalidBytes(bytes);
             } else {
               valid++;
             }
@@ -253,12 +254,12 @@ public class Utf8Test {
   @Test
   public void testInvalid_4BytesSamples() {
     // Bad trailing bytes
-    assertInvalid(0xF0, 0xA4, 0xAD, 0x7F);
-    assertInvalid(0xF0, 0xA4, 0xAD, 0xC0);
+    checkInvalidInts(0xF0, 0xA4, 0xAD, 0x7F);
+    checkInvalidInts(0xF0, 0xA4, 0xAD, 0xC0);
 
     // Special cases for byte2
-    assertInvalid(0xF0, 0x8F, 0xAD, 0xA2);
-    assertInvalid(0xF4, 0x90, 0xAD, 0xA2);
+    checkInvalidInts(0xF0, 0x8F, 0xAD, 0xA2);
+    checkInvalidInts(0xF4, 0x90, 0xAD, 0xA2);
   }
 
   @Test
@@ -324,41 +325,41 @@ public class Utf8Test {
 
   @Test
   public void testOverlong() {
-    assertInvalid(0xc0, 0xaf);
-    assertInvalid(0xe0, 0x80, 0xaf);
-    assertInvalid(0xf0, 0x80, 0x80, 0xaf);
+    checkInvalidInts(0xc0, 0xaf);
+    checkInvalidInts(0xe0, 0x80, 0xaf);
+    checkInvalidInts(0xf0, 0x80, 0x80, 0xaf);
 
     // Max overlong
-    assertInvalid(0xc1, 0xbf);
-    assertInvalid(0xe0, 0x9f, 0xbf);
-    assertInvalid(0xf0 ,0x8f, 0xbf, 0xbf);
+    checkInvalidInts(0xc1, 0xbf);
+    checkInvalidInts(0xe0, 0x9f, 0xbf);
+    checkInvalidInts(0xf0 ,0x8f, 0xbf, 0xbf);
 
     // null overlong
-    assertInvalid(0xc0, 0x80);
-    assertInvalid(0xe0, 0x80, 0x80);
-    assertInvalid(0xf0, 0x80, 0x80, 0x80);
+    checkInvalidInts(0xc0, 0x80);
+    checkInvalidInts(0xe0, 0x80, 0x80);
+    checkInvalidInts(0xf0, 0x80, 0x80, 0x80);
   }
 
   @Test
   public void testIllegalCodepoints() {
     // Single surrogate
-    assertInvalid(0xed, 0xa0, 0x80);
-    assertInvalid(0xed, 0xad, 0xbf);
-    assertInvalid(0xed, 0xae, 0x80);
-    assertInvalid(0xed, 0xaf, 0xbf);
-    assertInvalid(0xed, 0xb0, 0x80);
-    assertInvalid(0xed, 0xbe, 0x80);
-    assertInvalid(0xed, 0xbf, 0xbf);
+    checkInvalidInts(0xed, 0xa0, 0x80);
+    checkInvalidInts(0xed, 0xad, 0xbf);
+    checkInvalidInts(0xed, 0xae, 0x80);
+    checkInvalidInts(0xed, 0xaf, 0xbf);
+    checkInvalidInts(0xed, 0xb0, 0x80);
+    checkInvalidInts(0xed, 0xbe, 0x80);
+    checkInvalidInts(0xed, 0xbf, 0xbf);
 
     // Paired surrogates
-    assertInvalid(0xed, 0xa0, 0x80, 0xed, 0xb0, 0x80);
-    assertInvalid(0xed, 0xa0, 0x80, 0xed, 0xbf, 0xbf);
-    assertInvalid(0xed, 0xad, 0xbf, 0xed, 0xb0, 0x80);
-    assertInvalid(0xed, 0xad, 0xbf, 0xed, 0xbf, 0xbf);
-    assertInvalid(0xed, 0xae, 0x80, 0xed, 0xb0, 0x80);
-    assertInvalid(0xed, 0xae, 0x80, 0xed, 0xbf, 0xbf);
-    assertInvalid(0xed, 0xaf, 0xbf, 0xed, 0xb0, 0x80);
-    assertInvalid(0xed, 0xaf, 0xbf, 0xed, 0xbf, 0xbf);
+    checkInvalidInts(0xed, 0xa0, 0x80, 0xed, 0xb0, 0x80);
+    checkInvalidInts(0xed, 0xa0, 0x80, 0xed, 0xbf, 0xbf);
+    checkInvalidInts(0xed, 0xad, 0xbf, 0xed, 0xb0, 0x80);
+    checkInvalidInts(0xed, 0xad, 0xbf, 0xed, 0xbf, 0xbf);
+    checkInvalidInts(0xed, 0xae, 0x80, 0xed, 0xb0, 0x80);
+    checkInvalidInts(0xed, 0xae, 0x80, 0xed, 0xbf, 0xbf);
+    checkInvalidInts(0xed, 0xaf, 0xbf, 0xed, 0xb0, 0x80);
+    checkInvalidInts(0xed, 0xaf, 0xbf, 0xed, 0xbf, 0xbf);
   }
 
   @Test
@@ -371,21 +372,21 @@ public class Utf8Test {
   @Test
   public void testInvalidBufferSlice() { //these are pure Memory bounds violations
     byte[] bytes  = "The quick brown fox jumps over the lazy dog".getBytes(UTF_8);
-    assertInvalidSlice(bytes, bytes.length - 3, 4);
-    assertInvalidSlice(bytes, bytes.length, 1);
-    assertInvalidSlice(bytes, bytes.length + 1, 0);
-    assertInvalidSlice(bytes, 0, bytes.length + 1);
+    checkInvalidSlice(bytes, bytes.length - 3, 4);
+    checkInvalidSlice(bytes, bytes.length, 1);
+    checkInvalidSlice(bytes, bytes.length + 1, 0);
+    checkInvalidSlice(bytes, 0, bytes.length + 1);
   }
 
-  private static void assertInvalid(int... bytesAsInt) { //invalid byte sequences
+  private static void checkInvalidInts(int... bytesAsInt) { //invalid byte sequences
     byte[] bytes = new byte[bytesAsInt.length];
     for (int i = 0; i < bytesAsInt.length; i++) {
       bytes[i] = (byte) bytesAsInt[i];
     }
-    assertInvalid(bytes);
+    checkInvalidBytes(bytes);
   }
 
-  private static void assertInvalid(byte[] bytes) {
+  private static void checkInvalidBytes(byte[] bytes) {
     int bytesLen = bytes.length;
     try {
       Memory.wrap(bytes).getCharsFromUtf8(0, bytesLen, new StringBuilder());
@@ -402,12 +403,12 @@ public class Utf8Test {
     }
   }
 
-  private static void assertInvalidSlice(byte[] bytes, int index, int size) {
+  private static void checkInvalidSlice(byte[] bytes, int index, int size) {
     try {
       Memory mem = Memory.wrap(bytes);
       mem.getCharsFromUtf8(index, size, new StringBuilder());
       fail();
-    } catch (IllegalArgumentException e) { //Pure bounds violation
+    } catch (MemoryBoundsException e) { //Pure bounds violation
       // Expected.
     }
   }
@@ -415,7 +416,7 @@ public class Utf8Test {
   /**
    * Performs round-trip test using the given reference string
    * @param refStr the reference string
-   * @throws IOException
+   * @throws IOException when IOException occurs
    */
   private static void assertRoundTrips(String refStr) throws IOException {
     assertRoundTrips(refStr, refStr.toCharArray().length, 0, -1);
@@ -427,7 +428,7 @@ public class Utf8Test {
    * @param refSubCharLen the number of characters expected to be decoded
    * @param offsetBytes starting utf8 byte offset
    * @param utf8LengthBytes length of utf8 bytes
-   * @throws IOException
+   * @throws IOException when IOException occurs
    */
   private static void assertRoundTrips(String refStr, int refSubCharLen, int offsetBytes,
       int utf8LengthBytes) throws IOException {
@@ -504,7 +505,7 @@ public class Utf8Test {
 
   @Test
   public void printlnTest() {
-   println("PRINTING: "+this.getClass().getName());
+   println("PRINTING: " + this.getClass().getName());
   }
 
   /**

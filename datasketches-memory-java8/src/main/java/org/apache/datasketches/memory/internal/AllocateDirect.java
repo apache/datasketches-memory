@@ -46,16 +46,13 @@ final class AllocateDirect {
    * @param capacityBytes the the requested capacity of off-heap memory. Cannot be zero.
    */
   AllocateDirect(final long capacityBytes) {
-    final boolean pageAligned = NioBits.isPageAligned();
-    final long pageSize = NioBits.pageSize();
+    final boolean pageAligned = VirtualMachineMemory.getIsPageAligned();
+    final long pageSize = getPageSize();
     final long allocationSize = capacityBytes + (pageAligned ? pageSize : 0);
-    NioBits.reserveMemory(allocationSize, capacityBytes);
-
     final long nativeAddress;
     try {
       nativeAddress = unsafe.allocateMemory(allocationSize);
     } catch (final OutOfMemoryError err) {
-      NioBits.unreserveMemory(allocationSize, capacityBytes);
       throw new RuntimeException(err);
     }
     if (pageAligned && ((nativeAddress % pageSize) != 0)) {
@@ -64,22 +61,20 @@ final class AllocateDirect {
     } else {
       nativeBaseOffset = nativeAddress;
     }
-    deallocator = new Deallocator(nativeAddress, allocationSize, capacityBytes);
+    deallocator = new Deallocator(nativeAddress);
     cleaner = new MemoryCleaner(this, deallocator);
   }
 
-  boolean doClose() {
+  public void close() {
     try {
       if (deallocator.deallocate(false)) {
         // This Cleaner.clean() call effectively just removes the Cleaner from the internal linked
         // list of all cleaners. It will delegate to Deallocator.deallocate() which will be a no-op
         // because the valid state is already changed.
         cleaner.clean();
-        return true;
       }
-      return false;
     } finally {
-      BaseStateImpl.reachabilityFence(this);
+      ResourceImpl.reachabilityFence(this);
     }
   }
 
@@ -87,24 +82,21 @@ final class AllocateDirect {
     return nativeBaseOffset;
   }
 
-  StepBoolean getValid() {
+  public static int getPageSize() {
+    return unsafe.pageSize();
+  }
+
+  public StepBoolean getValid() {
     return deallocator.getValid();
   }
 
-  static final class Deallocator implements Runnable {
+  private static final class Deallocator implements Runnable {
     //This is the only place the actual native address is kept for use by unsafe.freeMemory();
     private final long nativeAddress;
-    private final long allocationSize;
-    private final long capacity;
     private final StepBoolean valid = new StepBoolean(true); //only place for this
 
-    Deallocator(final long nativeAddress, final long allocationSize, final long capacity) {
-      BaseStateImpl.currentDirectMemoryAllocations_.incrementAndGet();
-      BaseStateImpl.currentDirectMemoryAllocated_.addAndGet(capacity);
+    Deallocator(final long nativeAddress) {
       this.nativeAddress = nativeAddress;
-      this.allocationSize = allocationSize;
-      this.capacity = capacity;
-      assert (nativeAddress != 0);
     }
 
     StepBoolean getValid() {
@@ -112,20 +104,17 @@ final class AllocateDirect {
     }
 
     @Override
-    public void run() {
+    public void run() throws IllegalStateException {
       deallocate(true);
     }
 
-    boolean deallocate(final boolean calledFromCleaner) {
+    boolean deallocate(final boolean calledFromCleaner) throws IllegalStateException {
       if (valid.change()) {
         if (calledFromCleaner) {
           // Warn about non-deterministic resource cleanup.
-          LOG.warning("A WritableHandle was not closed manually");
+          LOG.warning("A direct resource was not closed explicitly");
         }
         unsafe.freeMemory(nativeAddress);
-        NioBits.unreserveMemory(allocationSize, capacity);
-        BaseStateImpl.currentDirectMemoryAllocations_.decrementAndGet();
-        BaseStateImpl.currentDirectMemoryAllocated_.addAndGet(-capacity);
         return true;
       }
       return false;

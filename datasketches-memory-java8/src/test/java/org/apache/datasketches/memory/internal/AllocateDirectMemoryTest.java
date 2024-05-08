@@ -21,48 +21,36 @@ package org.apache.datasketches.memory.internal;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.fail;
+import static org.testng.Assert.assertTrue;
 
-import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.DefaultMemoryRequestServer;
 import org.apache.datasketches.memory.MemoryRequestServer;
-import org.apache.datasketches.memory.WritableHandle;
+import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.WritableMemory;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 public class AllocateDirectMemoryTest {
 
-  @Test
-  public void simpleAllocateDirect() throws Exception {
+  @Test(expectedExceptions = IllegalStateException.class)
+  public void simpleAllocateDirect()  {
     int longs = 32;
-    WritableMemory wMem;
-    try (WritableHandle wh = WritableMemory.allocateDirect(longs << 3)) {
-      wMem = wh.getWritable();
-      for (int i = 0; i<longs; i++) {
+    try (WritableMemory wMem = WritableMemory.allocateDirect(longs << 3)) {
+      for (int i = 0; i < longs; i++) {
         wMem.putLong(i << 3, i);
         assertEquals(wMem.getLong(i << 3), i);
       }
       //inside the TWR block the memory should be valid
-      ((BaseStateImpl)wMem).checkValid();
-      //OK
-    }
-    //The TWR block has exited, so the memory should be invalid
-    try {
-      ((BaseStateImpl)wMem).checkValid();
-      fail();
-    } catch (final RuntimeException e) {
-      //OK
-    }
+      ((ResourceImpl)wMem).checkValid();
+      wMem.close(); //explicit close
+    } //normal TWR close will not throw if already closed
   }
 
   @Test
-  public void checkDefaultMemoryRequestServer() throws Exception {
+  public void checkDefaultMemoryRequestServer()  {
     int longs1 = 32;
     int bytes1 = longs1 << 3;
-    try (WritableHandle wh = WritableMemory.allocateDirect(bytes1)) {
-      WritableMemory origWmem = wh.getWritable();
-      for (int i = 0; i<longs1; i++) { //puts data in wMem1
+    try (WritableMemory origWmem = WritableMemory.allocateDirect(bytes1)) {
+      for (int i = 0; i < longs1; i++) { //puts data in wMem1
         origWmem.putLong(i << 3, i);
         assertEquals(origWmem.getLong(i << 3), i);
       }
@@ -71,13 +59,13 @@ public class AllocateDirectMemoryTest {
       int longs2 = 64;
       int bytes2 = longs2 << 3;
       MemoryRequestServer memReqSvr;
-      if (BaseState.defaultMemReqSvr == null) {
+      if (Resource.defaultMemReqSvr == null) {
         memReqSvr = new DefaultMemoryRequestServer();
       } else {
         memReqSvr = origWmem.getMemoryRequestServer();
       }
       WritableMemory newWmem = memReqSvr.request(origWmem, bytes2);
-      assertFalse(newWmem.isDirect()); //on heap by default
+      assertFalse(newWmem.isDirectResource()); //on heap by default
       for (int i = 0; i < longs2; i++) {
           newWmem.putLong(i << 3, i);
           assertEquals(newWmem.getLong(i << 3), i);
@@ -89,36 +77,25 @@ public class AllocateDirectMemoryTest {
   }
 
   @Test
-  public void checkNonNativeDirect() throws Exception {
-    try (WritableHandle h = WritableMemory.allocateDirect(128, Util.NON_NATIVE_BYTE_ORDER, null)) {
-      WritableMemory wmem = h.getWritable();
+  public void checkNonNativeDirect()  {
+    try (WritableMemory wmem = WritableMemory.allocateDirect(128, Util.NON_NATIVE_BYTE_ORDER, null)) {
       wmem.putChar(0, (char) 1);
       assertEquals(wmem.getByte(1), (byte) 1);
     }
   }
 
   @Test
-  public void checkExplicitClose() throws Exception {
+  public void checkExplicitClose() {
     final long cap = 128;
-    try (WritableHandle wdh = WritableMemory.allocateDirect(cap)) {
-      wdh.close(); //explicit close. Does the work of closing
-    } //end of scope call to Cleaner/Deallocator also will be redundant
-  }
-
-
-  @AfterClass
-  public void checkDirectCounter() {
-    WritableMemory.writableWrap(new byte[8]);
-    long count = BaseState.getCurrentDirectMemoryAllocations();
-    if (count != 0) {
-      println(""+count);
-      fail();
-    }
+    WritableMemory wMem = WritableMemory.allocateDirect(cap);
+    assertTrue(wMem.isValid());
+    wMem.close();
+    assertFalse(wMem.isValid());
   }
 
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+    println("PRINTING: " + this.getClass().getName());
   }
 
   /**

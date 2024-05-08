@@ -67,7 +67,6 @@ final class Utf8 {
     //Decode Direct CharBuffers and all other Appendables
 
     final long address = cumBaseOffset + offsetBytes;
-
     // Optimize for 100% ASCII (Hotspot loves small simple top-level loops like this).
     // This simple loop stops when we encounter a byte >= 0x80 (i.e. non-ASCII).
     // Need to keep this loop int-indexed, because it's faster for Hotspot JIT, it doesn't insert

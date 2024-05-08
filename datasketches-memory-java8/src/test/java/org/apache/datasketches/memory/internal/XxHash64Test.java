@@ -19,14 +19,23 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.XxHash.*;
+import static org.apache.datasketches.memory.XxHash.hashBooleanArr;
+import static org.apache.datasketches.memory.XxHash.hashByteArr;
+import static org.apache.datasketches.memory.XxHash.hashCharArr;
+import static org.apache.datasketches.memory.XxHash.hashDoubleArr;
+import static org.apache.datasketches.memory.XxHash.hashFloatArr;
+import static org.apache.datasketches.memory.XxHash.hashIntArr;
+import static org.apache.datasketches.memory.XxHash.hashLong;
+import static org.apache.datasketches.memory.XxHash.hashLongArr;
+import static org.apache.datasketches.memory.XxHash.hashShortArr;
+import static org.apache.datasketches.memory.XxHash.hashString;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.datasketches.memory.BaseState;
+import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
@@ -68,7 +77,7 @@ public class XxHash64Test {
       WritableMemory wmem = WritableMemory.writableWrap(in);
       for (int i = 0; i < j; i++) { wmem.putByte(i, (byte) (-128 + i)); }
 
-      long hash =wmem.xxHash64(offset, bytes, seed);
+      long hash = wmem.xxHash64(offset, bytes, seed);
       assertTrue(hash != 0);
     }
   }
@@ -101,7 +110,7 @@ public class XxHash64Test {
   }
 
   /**
-   * This simple test compares the output of {@link BaseState#xxHash64(long, long, long)} with the
+   * This simple test compares the output of {@link Resource#xxHash64(long, long, long)} with the
    * output of {@link net.openhft.hashing.LongHashFunction}, that itself is tested against the
    * reference implementation in C.  This increase confidence that the xxHash function implemented
    * in this package is in fact the same xxHash function implemented in C.

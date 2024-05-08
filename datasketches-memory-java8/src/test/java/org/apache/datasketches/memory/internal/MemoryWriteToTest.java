@@ -27,7 +27,6 @@ import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.Assert;
@@ -57,9 +56,8 @@ public class MemoryWriteToTest {
 
   @Test
   public void testOffHeap() throws Exception {
-    try (WritableHandle handle =
+    try (WritableMemory mem =
         WritableMemory.allocateDirect((UNSAFE_COPY_THRESHOLD_BYTES * 5) + 10)) {
-      WritableMemory mem = handle.getWritable();
       testWriteTo(mem.region(0, 0));
       testOffHeap(mem, 7);
       testOffHeap(mem, 1023);
@@ -91,6 +89,6 @@ public class MemoryWriteToTest {
       mem.writeTo(0, mem.getCapacity(), out);
     }
     byte[] result = baos.toByteArray();
-    Assert.assertTrue(mem.equals(Memory.wrap(result)));
+    Assert.assertTrue(mem.equalTo(Memory.wrap(result)));
   }
 }

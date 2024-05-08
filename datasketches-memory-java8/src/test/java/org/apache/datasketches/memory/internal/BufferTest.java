@@ -25,8 +25,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
 
-import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.Buffer;
+import org.apache.datasketches.memory.BufferPositionInvariantsException;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
@@ -38,8 +38,7 @@ public class BufferTest {
   @Test
   public void checkDirectRoundTrip() throws Exception {
     int n = 1024; //longs
-    try (WritableHandle wh = WritableMemory.allocateDirect(n * 8)) {
-      WritableMemory wmem = wh.getWritable();
+    try (WritableMemory wmem = WritableMemory.allocateDirect(n * 8)) {
       WritableBuffer wbuf = wmem.asWritableBuffer();
       for (int i = 0; i < n; i++) {
         wbuf.putLong(i);
@@ -203,7 +202,7 @@ public class BufferTest {
     ByteBuffer bb = ByteBuffer.allocate(n * 8);
     bb.order(ByteOrder.BIG_ENDIAN);
     Buffer buf = Buffer.wrap(bb);
-    assertEquals(buf.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(buf.getByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test
@@ -262,58 +261,54 @@ public class BufferTest {
     int n = 16;
     int n2 = n / 2;
     long[] arr = new long[n];
-    for (int i = 0; i < n; i++) { arr[i] = i; }
-    WritableBuffer wbuf = WritableMemory.writableWrap(arr).asWritableBuffer();
+    for (int i = 0; i < n; i++) { arr[i] = i; } //0...n-1
+    WritableMemory mem = WritableMemory.writableWrap(arr);
+    WritableBuffer wbuf = mem.asWritableBuffer();
     for (int i = 0; i < n; i++) {
-      assertEquals(wbuf.getLong(), i); //write all
-      //println("" + wmem.getLong(i * 8));
+      assertEquals(wbuf.getLong(), i); //0...n-1
+      println("" + wbuf.getLong(i * 8));
     }
-    //println("");
+    println("");
     wbuf.setPosition(n2 * 8);
     WritableBuffer reg = wbuf.writableRegion();
     for (int i = 0; i < n2; i++) { reg.putLong(i); } //rewrite top half
     wbuf.resetPosition();
     for (int i = 0; i < n; i++) {
+      println("" + wbuf.getLong(i * 8));
       assertEquals(wbuf.getLong(), i % 8);
-      //println("" + wmem.getLong(i * 8));
     }
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = IllegalStateException.class)
   public void checkParentUseAfterFree() throws Exception {
     int bytes = 64 * 8;
-    WritableHandle wh = WritableMemory.allocateDirect(bytes);
-    WritableMemory wmem = wh.getWritable();
+    WritableMemory wmem = WritableMemory.allocateDirect(bytes);
     WritableBuffer wbuf = wmem.asWritableBuffer();
-    wh.close();
-    //with -ea assert: Memory not valid.
-    //with -da sometimes segfaults, sometimes passes!
+    wmem.close();
     wbuf.getLong();
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = IllegalStateException.class)
   public void checkRegionUseAfterFree() throws Exception {
     int bytes = 64;
-    WritableHandle wh = WritableMemory.allocateDirect(bytes);
-    Memory wmem = wh.get();
+    WritableMemory wmem = WritableMemory.allocateDirect(bytes);
 
     Buffer reg = wmem.asBuffer().region();
-    wh.close();
+    wmem.close();
     //with -ea assert: Memory not valid.
     //with -da sometimes segfaults, sometimes passes!
     reg.getByte();
   }
 
-  @Test(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = BufferPositionInvariantsException.class)
   public void checkBaseBufferInvariants() {
     WritableBuffer wbuf = WritableMemory.allocate(64).asWritableBuffer();
     wbuf.setStartPositionEnd(1, 0, 2); //out of order
   }
 
-
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+    println("PRINTING: " + this.getClass().getName());
   }
 
   /**

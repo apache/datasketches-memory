@@ -42,6 +42,7 @@ import java.nio.file.attribute.PosixFileAttributeView;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermissions;
 
+import org.apache.datasketches.memory.MemoryBoundsException;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
@@ -56,16 +57,16 @@ public class UtilTest {
     for (int i = 0; i < k; i++) { wMem.putLong(i << 3, i); }
     long idx = Util.binarySearchLongs(wMem, 0, k - 1, k / 2);
     long val = wMem.getLong(idx << 3);
-    assertEquals(idx, k/2);
-    assertEquals(val, k/2);
+    assertEquals(idx, k / 2);
+    assertEquals(val, k / 2);
 
     idx = Util.binarySearchLongs(wMem, 0, k - 1, k);
     assertEquals(idx, -1024);
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test(expectedExceptions = MemoryBoundsException.class)
   public void checkBoundsTest() {
-    UnsafeUtil.checkBounds(999, 2, 1000);
+    ResourceImpl.checkBounds(999, 2, 1000);
   }
 
   @Test
@@ -184,7 +185,7 @@ public class UtilTest {
 
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+    println("PRINTING: " + this.getClass().getName());
   }
 
   static void println(final Object o) {

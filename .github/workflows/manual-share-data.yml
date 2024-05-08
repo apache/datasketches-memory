@@ -1,0 +1,86 @@
+name: Manual share data
+
+on:
+    workflow_dispatch:
+
+jobs:
+  job_1:
+    name: Add 3 and 7
+    runs-on: macOS-latest
+
+    steps:
+      - shell: bash
+        run: |
+          expr 3 + 7 > math-homework.txt
+
+      - name: Upload math result for job_2
+        uses: actions/upload-artifact@v3
+        with:
+          name: homework
+          path: math-homework.txt
+
+  job_2:
+    name: Multiply by 9
+    needs: job_1
+    runs-on: macOS-latest
+
+    steps:
+      - name: Download math result from job_1
+        uses: actions/download-artifact@v3
+        with:
+          name: homework
+
+      - shell: bash
+        run: |
+          value=`cat math-homework.txt`
+          expr $value \* 9 > math-homework.txt
+
+      - name: Upload math result from job_2 to job_3
+        uses: actions/upload-artifact@v3
+        with:
+          name: homework
+          path: math-homework.txt
+
+  job_3:
+    name: Display results
+    needs: job_2
+    runs-on: macOS-latest
+
+    steps:
+      - name: Download math result from job_2
+        uses: actions/download-artifact@v3
+        with:
+          name: homework
+
+      - name: Print the final result
+        shell: bash
+        run: |
+          value=`cat math-homework.txt`
+          echo The result is $value
+
+      - name: Upload result from job_3 to job_4
+        uses: actions/upload-artifact@v3
+        with:
+          name: homework
+          path: math-homework.txt
+
+  job_4:
+    name: Install tree and output
+    needs: job_3
+    runs-on: macOS-latest
+
+    steps:
+      - name: Download math result from job-3
+        uses: actions/download-artifact@v3
+        with:
+          name: homework
+
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: update brew, install tree, output
+        run: |
+          brew update
+          brew install tree
+          tree /Users/runner/work
+          

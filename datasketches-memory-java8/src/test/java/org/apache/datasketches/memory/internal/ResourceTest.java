@@ -33,7 +33,7 @@ import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
-public class BaseStateTest {
+public class ResourceTest {
 
   @Test
   public void checkPrimOffset() {
@@ -56,9 +56,11 @@ public class BaseStateTest {
 
   @Test
   public void checkNotEqualTo() {
-    byte[] arr = new byte[8];
-    Memory mem = Memory.wrap(arr);
-    assertFalse(mem.equalTo(0, arr, 0, 8));
+    byte[] arr1 = {1,2,3,4,5,6,7,8};
+    Memory mem1 = Memory.wrap(arr1);
+    byte[] arr2 = {1,2,3,4,5,6,7,9};
+    Memory mem2 = Memory.wrap(arr2);
+    assertFalse(mem1.equalTo(mem2));
   }
 
   //StepBoolean checks
@@ -85,13 +87,6 @@ public class BaseStateTest {
   }
 
   @Test
-  public void checkGetNativeBaseOffset_Heap() throws Exception {
-    WritableMemory wmem = WritableMemory.allocate(8); //heap
-    final long offset = ((BaseStateImpl)wmem).getNativeBaseOffset();
-    assertEquals(offset, 0L);
-  }
-
-  @Test
   public void checkIsByteOrderCompatible() {
     WritableMemory wmem = WritableMemory.allocate(8);
     assertTrue(wmem.isByteOrderCompatible(ByteOrder.nativeOrder()));
@@ -105,11 +100,11 @@ public class BaseStateTest {
 
   @Test
   public void checkIsNativeByteOrder() {
-    assertTrue(BaseStateImpl.isNativeByteOrder(ByteOrder.nativeOrder()));
+    assertTrue(Util.isNativeByteOrder(ByteOrder.nativeOrder()));
     try {
-      BaseStateImpl.isNativeByteOrder(null);
+      Util.isNativeByteOrder(null);
       fail();
-    } catch (final IllegalArgumentException e) {}
+    } catch (final IllegalArgumentException e) { }
   }
 
   @Test
@@ -122,14 +117,14 @@ public class BaseStateTest {
   @Test
   public void checkTypeDecode() {
     for (int i = 0; i < 128; i++) {
-      BaseStateImpl.typeDecode(i);
+      ResourceImpl.typeDecode(i);
     }
   }
 
   /********************/
   @Test
   public void printlnTest() {
-    println("PRINTING: "+this.getClass().getName());
+    println("PRINTING: " + this.getClass().getName());
   }
 
   /**

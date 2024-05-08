@@ -30,6 +30,8 @@ import org.apache.datasketches.memory.internal.BaseWritableBufferImpl;
 /**
  * Defines the read-only API for relative positional access to a resource.
  *
+ * <p>The classes in this package are not thread-safe.</p>
+ *
  * @author Lee Rhodes
  */
 public interface Buffer extends BaseBuffer {
@@ -143,7 +145,7 @@ public interface Buffer extends BaseBuffer {
    * @return Memory
    */
   default Memory asMemory() {
-    return asMemory(getTypeByteOrder());
+    return asMemory(getByteOrder());
   }
 
   /**

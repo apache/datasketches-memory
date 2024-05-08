@@ -20,10 +20,10 @@
 package org.apache.datasketches.memory.internal;
 
 import org.apache.datasketches.memory.BaseBuffer;
-import org.apache.datasketches.memory.ReadOnlyException;
+import org.apache.datasketches.memory.BufferPositionInvariantsException;
 
 /**
- * A new positional API. This is different from and simpler than Java BufferImpl positional approach.
+ * A new positional API. This is different from and simpler than Java Buffer positional approach.
  * <ul><li>All based on longs instead of ints.</li>
  * <li>Eliminated "mark". Rarely used and confusing with its silent side effects.</li>
  * <li>The invariants are {@code 0 <= start <= position <= end <= capacity}.</li>
@@ -39,22 +39,21 @@ import org.apache.datasketches.memory.ReadOnlyException;
  *
  * @author Lee Rhodes
  */
-public abstract class BaseBufferImpl extends BaseStateImpl implements BaseBuffer {
+public abstract class BaseBufferImpl extends ResourceImpl implements BaseBuffer {
   private long capacity;
   private long start = 0;
   private long pos = 0;
   private long end;
 
-  //Pass-through ctor
-  BaseBufferImpl(final Object unsafeObj, final long nativeBaseOffset,
-      final long regionOffset, final long capacityBytes) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
+  //Pass-through constructor
+  BaseBufferImpl(final long capacityBytes) {
+    super();
     capacity = end = capacityBytes;
   }
 
   @Override
   public final BaseBufferImpl incrementPosition(final long increment) {
-    incrementAndAssertPositionForRead(pos, increment);
+    incrementAndCheckPositionForRead(pos, increment);
     return this;
   }
 
@@ -97,31 +96,12 @@ public abstract class BaseBufferImpl extends BaseStateImpl implements BaseBuffer
 
   @Override
   public final BaseBufferImpl setPosition(final long position) {
-    assertInvariants(start, position, end, capacity);
-    pos = position;
-    return this;
+    return setStartPositionEnd(start, position, end);
   }
 
   @Override
-  public final BaseBufferImpl setAndCheckPosition(final long position) {
-    checkInvariants(start, position, end, capacity);
-    pos = position;
-    return this;
-  }
-
-  @Override
-  public final BaseBufferImpl setStartPositionEnd(final long start, final long position,
-      final long end) {
-    assertInvariants(start, position, end, capacity);
-    this.start = start;
-    this.end = end;
-    pos = position;
-    return this;
-  }
-
-  @Override
-  public final BaseBufferImpl setAndCheckStartPositionEnd(final long start, final long position,
-      final long end) {
+  public final BaseBufferImpl setStartPositionEnd(final long start, final long position, final long end) {
+    checkValid();
     checkInvariants(start, position, end, capacity);
     this.start = start;
     this.end = end;
@@ -130,24 +110,8 @@ public abstract class BaseBufferImpl extends BaseStateImpl implements BaseBuffer
   }
 
   //RESTRICTED
-  //Position checks are only used for Buffers
-  //asserts are used for primitives, not used at runtime
-  final void incrementAndAssertPositionForRead(final long position, final long increment) {
-    assertValid();
-    final long newPos = position + increment;
-    assertInvariants(start, newPos, end, capacity);
-    pos = newPos;
-  }
 
-  final void incrementAndAssertPositionForWrite(final long position, final long increment) {
-    assertValid();
-    assert !isReadOnly() : "BufferImpl is read-only.";
-    final long newPos = position + increment;
-    assertInvariants(start, newPos, end, capacity);
-    pos = newPos;
-  }
-
-  //checks are used for arrays and apply at runtime
+  //used for buffer arrays and apply at runtime
   final void incrementAndCheckPositionForRead(final long position, final long increment) {
     checkValid();
     final long newPos = position + increment;
@@ -155,54 +119,23 @@ public abstract class BaseBufferImpl extends BaseStateImpl implements BaseBuffer
     pos = newPos;
   }
 
+  //used for buffer arrays and apply at runtime
   final void incrementAndCheckPositionForWrite(final long position, final long increment) {
-    checkValidForWrite();
-    final long newPos = position + increment;
-    checkInvariants(start, newPos, end, capacity);
-    pos = newPos;
-  }
-
-  final void checkValidForWrite() {
-    checkValid();
-    if (isReadOnly()) {
-      throw new ReadOnlyException("BufferImpl is read-only.");
-    }
+    checkNotReadOnly();
+    incrementAndCheckPositionForRead(position, increment);
   }
 
   /**
    * The invariants equation is: {@code 0 <= start <= position <= end <= capacity}.
-   * If this equation is violated and assertions are enabled,
-   * an <i>AssertionError</i> will be thrown.
+   * If this equation is violated a <i>BufferPositionInvariantsException</i> will be thrown.
    * @param start the lowest start position
    * @param pos the current position
    * @param end the highest position
    * @param cap the capacity of the backing buffer.
    */
-  static final void assertInvariants(final long start, final long pos, final long end,
-      final long cap) {
-    assert (start | pos | end | cap | (pos - start) | (end - pos) | (cap - end) ) >= 0L
-        : "Violation of Invariants: "
-        + "start: " + start
-        + " <= pos: " + pos
-        + " <= end: " + end
-        + " <= cap: " + cap
-        + "; (pos - start): " + (pos - start)
-        + ", (end - pos): " + (end - pos)
-        + ", (cap - end): " + (cap - end);
-  }
-
-  /**
-   * The invariants equation is: {@code 0 <= start <= position <= end <= capacity}.
-   * If this equation is violated an <i>IllegalArgumentException</i> will be thrown.
-   * @param start the lowest start position
-   * @param pos the current position
-   * @param end the highest position
-   * @param cap the capacity of the backing buffer.
-   */
-  static final void checkInvariants(final long start, final long pos, final long end,
-        final long cap) {
+  static final void checkInvariants(final long start, final long pos, final long end, final long cap) {
     if ((start | pos | end | cap | (pos - start) | (end - pos) | (cap - end) ) < 0L) {
-      throw new IllegalArgumentException(
+      throw new BufferPositionInvariantsException(
           "Violation of Invariants: "
               + "start: " + start
               + " <= pos: " + pos

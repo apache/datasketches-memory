@@ -21,28 +21,9 @@ package org.apache.datasketches.memory.internal;
 
 import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_DOUBLE_INDEX_SCALE;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_FLOAT_INDEX_SCALE;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_LONG_INDEX_SCALE;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.CHAR_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.DOUBLE_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.FLOAT_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.INT_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.LONG_SHIFT;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.SHORT_SHIFT;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
 
 import org.apache.datasketches.memory.WritableMemory;
-
-/*
- * Developer notes: The heavier methods, such as put/get arrays, duplicate, region, clear, fill,
- * compareTo, etc., use hard checks (checkValid*() and checkBounds()), which execute at runtime and
- * throw exceptions if violated. The cost of the runtime checks are minor compared to the rest of
- * the work these methods are doing.
- *
- * <p>The light weight methods, such as put/get primitives, use asserts (assertValid*()), which only
- * execute when asserts are enabled and JIT will remove them entirely from production runtime code.
- * The light weight methods will simplify to a single unsafe call, which is further simplified by
- * JIT to an intrinsic that is often a single CPU instruction.
- */
 
 /**
  * Implementation of {@link WritableMemory} for non-native endian byte order.
@@ -52,11 +33,8 @@ import org.apache.datasketches.memory.WritableMemory;
 @SuppressWarnings("restriction")
 abstract class NonNativeWritableMemoryImpl extends BaseWritableMemoryImpl {
 
-  //Pass-through ctor
-  NonNativeWritableMemoryImpl(final Object unsafeObj, final long nativeBaseOffset,
-      final long regionOffset, final long capacityBytes) {
-    super(unsafeObj, nativeBaseOffset, regionOffset, capacityBytes);
-  }
+  //Pass-through constructor
+  NonNativeWritableMemoryImpl() { }
 
   ///PRIMITIVE getX() and getXArray()
   @Override
@@ -75,7 +53,7 @@ abstract class NonNativeWritableMemoryImpl extends BaseWritableMemoryImpl {
 
   @Override
   public double getDouble(final long offsetBytes) {
-    assertValidAndBoundsForRead(offsetBytes, ARRAY_DOUBLE_INDEX_SCALE);
+    checkValidAndBounds(offsetBytes, ARRAY_DOUBLE_INDEX_SCALE);
     return Double.longBitsToDouble(
         Long.reverseBytes(unsafe.getLong(getUnsafeObject(), getCumulativeOffset(offsetBytes))));
   }
@@ -91,7 +69,7 @@ abstract class NonNativeWritableMemoryImpl extends BaseWritableMemoryImpl {
 
   @Override
   public float getFloat(final long offsetBytes) {
-    assertValidAndBoundsForRead(offsetBytes, ARRAY_FLOAT_INDEX_SCALE);
+    checkValidAndBounds(offsetBytes, ARRAY_FLOAT_INDEX_SCALE);
     return Float.intBitsToFloat(
         Integer.reverseBytes(unsafe.getInt(getUnsafeObject(), getCumulativeOffset(offsetBytes))));
   }
@@ -164,7 +142,7 @@ abstract class NonNativeWritableMemoryImpl extends BaseWritableMemoryImpl {
 
   @Override
   public void putDouble(final long offsetBytes, final double value) {
-    assertValidAndBoundsForWrite(offsetBytes, ARRAY_DOUBLE_INDEX_SCALE);
+    checkValidAndBoundsForWrite(offsetBytes, ARRAY_DOUBLE_INDEX_SCALE);
     unsafe.putLong(getUnsafeObject(), getCumulativeOffset(offsetBytes),
         Long.reverseBytes(Double.doubleToRawLongBits(value)));
   }
@@ -180,7 +158,7 @@ abstract class NonNativeWritableMemoryImpl extends BaseWritableMemoryImpl {
 
   @Override
   public void putFloat(final long offsetBytes, final float value) {
-    assertValidAndBoundsForWrite(offsetBytes, ARRAY_FLOAT_INDEX_SCALE);
+    checkValidAndBoundsForWrite(offsetBytes, ARRAY_FLOAT_INDEX_SCALE);
     unsafe.putInt(getUnsafeObject(), getCumulativeOffset(offsetBytes),
         Integer.reverseBytes(Float.floatToRawIntBits(value)));
   }
@@ -236,34 +214,4 @@ abstract class NonNativeWritableMemoryImpl extends BaseWritableMemoryImpl {
         getUnsafeObject(), getCumulativeOffset(offsetBytes));
   }
 
-  //Atomic Write Methods
-  @Override
-  public long getAndAddLong(final long offsetBytes, final long delta) { //JDK 8+
-    assertValidAndBoundsForWrite(offsetBytes, ARRAY_LONG_INDEX_SCALE);
-    final long addr = getCumulativeOffset(offsetBytes);
-    long oldValReverseBytes, oldVal, newValReverseBytes;
-    final Object unsafeObj = getUnsafeObject();
-    do {
-      oldValReverseBytes = unsafe.getLongVolatile(unsafeObj, addr);
-      oldVal = Long.reverseBytes(oldValReverseBytes);
-      newValReverseBytes = Long.reverseBytes(oldVal + delta);
-    } while (!unsafe.compareAndSwapLong(unsafeObj, addr, oldValReverseBytes, newValReverseBytes));
-
-    return oldVal;
-  }
-
-  @Override
-  public long getAndSetLong(final long offsetBytes, final long newValue) { //JDK 8+
-    assertValidAndBoundsForWrite(offsetBytes, ARRAY_LONG_INDEX_SCALE);
-    final long addr = getCumulativeOffset(offsetBytes);
-    final long newValueReverseBytes = Long.reverseBytes(newValue);
-    return Long.reverseBytes(unsafe.getAndSetLong(getUnsafeObject(), addr, newValueReverseBytes));
-  }
-
-  @Override
-  public boolean compareAndSwapLong(final long offsetBytes, final long expect, final long update) {
-    assertValidAndBoundsForWrite(offsetBytes, ARRAY_LONG_INDEX_SCALE);
-    return unsafe.compareAndSwapLong(getUnsafeObject(), getCumulativeOffset(offsetBytes),
-        Long.reverseBytes(expect), Long.reverseBytes(update));
-  }
 }

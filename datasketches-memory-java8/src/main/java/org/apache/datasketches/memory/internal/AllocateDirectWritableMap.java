@@ -19,36 +19,123 @@
 
 package org.apache.datasketches.memory.internal;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
 
-import org.apache.datasketches.memory.ReadOnlyException;
-import org.apache.datasketches.memory.WritableMap;
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.logging.Logger;
+
+import sun.nio.ch.FileChannelImpl;
 
 /**
- * Allocates direct memory used to memory map files for write operations
+ * Allocates direct memory used to memory map files for read or write operations.
  * (including those &gt; 2GB).
  *
- * @author Lee Rhodes
+ * <p>To understand how it works, reference native code for map0, unmap0:
+ * <a href="http://hg.openjdk.java.net/jdk8u/jdk8u/jdk/file/f940e7a48b72/src/solaris/native/sun/nio/ch/FileChannelImpl.c">
+ * FileChannelImpl.c</a></p>
+ *
+ * <p>To understand how it works, reference native code for load0(), isLoaded0(), and force0():
+ * <a href="http://hg.openjdk.java.net/jdk8u/jdk8u/jdk/file/f940e7a48b72/src/solaris/native/java/nio/MappedByteBuffer.c">
+ * MappedByteBuffer.c</a></p>
+ *
  * @author Roman Leventov
+ * @author Lee Rhodes
  * @author Praveenkumar Venkatesan
  */
-//Called from WritableMemoryImpl, implements combo of WritableMemoryImpl with WritableMap resource
-final class AllocateDirectWritableMap extends AllocateDirectMap implements WritableMap {
+@SuppressWarnings("restriction")
+class AllocateDirectWritableMap {
+  static final Logger LOG = Logger.getLogger(AllocateDirectWritableMap.class.getCanonicalName());
 
-  AllocateDirectWritableMap(final File file, final long fileOffsetBytes,
-      final long capacityBytes, final boolean localReadOnly) {
-    super(file, fileOffsetBytes, capacityBytes, localReadOnly);
+  private static final int MAP_RO = 0;
+  private static final int MAP_RW = 1;
+
+  private static final Method FILE_CHANNEL_IMPL_MAP0_METHOD;
+  static final Method FILE_CHANNEL_IMPL_UNMAP0_METHOD;
+
+  private static final Method MAPPED_BYTE_BUFFER_LOAD0_METHOD;
+  private static final Method MAPPED_BYTE_BUFFER_ISLOADED0_METHOD;
+  static final Method MAPPED_BYTE_BUFFER_FORCE0_METHOD;
+  private static int pageSize = unsafe.pageSize();
+
+  static {
+    try { //The FileChannelImpl methods map0 and unmap0 still exist in 16
+      FILE_CHANNEL_IMPL_MAP0_METHOD = FileChannelImpl.class
+          .getDeclaredMethod("map0", int.class, long.class, long.class); //JDK14 add boolean.class
+      FILE_CHANNEL_IMPL_MAP0_METHOD.setAccessible(true);
+
+      FILE_CHANNEL_IMPL_UNMAP0_METHOD = FileChannelImpl.class
+          .getDeclaredMethod("unmap0", long.class, long.class); //OK through jDK16
+      FILE_CHANNEL_IMPL_UNMAP0_METHOD.setAccessible(true);
+
+
+      //The MappedByteBuffer methods load0, isLoaded0 and force0 are removed in 15
+      MAPPED_BYTE_BUFFER_LOAD0_METHOD = MappedByteBuffer.class
+          .getDeclaredMethod("load0", long.class, long.class); //JDK15 removed
+      MAPPED_BYTE_BUFFER_LOAD0_METHOD.setAccessible(true);
+
+      MAPPED_BYTE_BUFFER_ISLOADED0_METHOD = MappedByteBuffer.class
+          .getDeclaredMethod("isLoaded0", long.class, long.class, int.class); //JDK15 removed
+      MAPPED_BYTE_BUFFER_ISLOADED0_METHOD.setAccessible(true);
+
+      MAPPED_BYTE_BUFFER_FORCE0_METHOD = MappedByteBuffer.class
+          .getDeclaredMethod("force0", FileDescriptor.class, long.class, long.class); //JDK15 removed
+      MAPPED_BYTE_BUFFER_FORCE0_METHOD.setAccessible(true);
+    } catch (final SecurityException | NoSuchMethodException e) {
+      throw new RuntimeException("Could not reflect static methods: " + e);
+    }
   }
 
-  //Added by WritableMap Interface
+  private final Deallocator deallocator;
+  private final MemoryCleaner cleaner;
 
-  @Override
-  public void force() {
-    if (resourceReadOnly) {
-      throw new ReadOnlyException("MemoryImpl Mapped File is Read Only.");
+  private final File file;
+  final long capacityBytes;
+  final RandomAccessFile raf;
+  final long nativeBaseOffset;
+  final boolean resourceReadOnly;
+
+  AllocateDirectWritableMap(final File file, final long fileOffsetBytes, final long capacityBytes,
+      final boolean localReadOnly) {
+    this.file = file;
+    this.capacityBytes = capacityBytes;
+    resourceReadOnly = isFileReadOnly(file);
+    final long fileLength = file.length();
+    if ((localReadOnly || resourceReadOnly) && fileOffsetBytes + capacityBytes > fileLength) {
+      throw new IllegalArgumentException(
+          "Read-only mode and requested map length is greater than current file length: "
+          + "Requested Length = " + (fileOffsetBytes + capacityBytes)
+          + ", Current File Length = " + fileLength);
     }
+    raf = mapper(file, fileOffsetBytes, capacityBytes, resourceReadOnly);
+    nativeBaseOffset = map(raf.getChannel(), resourceReadOnly, fileOffsetBytes, capacityBytes);
+    deallocator = new Deallocator(nativeBaseOffset, capacityBytes, raf);
+    cleaner = new MemoryCleaner(this, deallocator);
+  }
+
+  public void close() {
+    try {
+      if (deallocator.deallocate(false)) {
+        // This Cleaner.clean() call effectively just removes the Cleaner from the internal linked
+        // list of all cleaners. It will delegate to Deallocator.deallocate() which will be a no-op
+        // because the valid state is already changed.
+        cleaner.clean();
+      }
+
+    } catch (final Exception e) { throw new IllegalStateException("Attempted close of Memory-Mapped File: "
+        + file.getName() + " " + e);
+    } finally {
+      ResourceImpl.reachabilityFence(this);
+    }
+  }
+
+  public void force() {
     try {
       MAPPED_BYTE_BUFFER_FORCE0_METHOD
           //force0 is effectively static, so ZERO_READ_ONLY_DIRECT_BYTE_BUFFER is not modified
@@ -57,7 +144,167 @@ final class AllocateDirectWritableMap extends AllocateDirectMap implements Writa
               nativeBaseOffset,
               capacityBytes);
     } catch (final IOException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new RuntimeException(String.format("Encountered %s exception in force. " + e.getClass()));
+      throw new RuntimeException(String.format("Encountered %s exception in force. " + e.toString()));
     }
   }
+
+  public StepBoolean getValid() {
+    return deallocator.getValid();
+  }
+
+  public static boolean isFileReadOnly(final File file) {
+    return (!file.canWrite());
+  }
+
+  public boolean isLoaded() {
+    try {
+      return (boolean) MAPPED_BYTE_BUFFER_ISLOADED0_METHOD
+          //isLoaded0 is effectively static, so ZERO_READ_ONLY_DIRECT_BYTE_BUFFER is not modified
+          .invoke(AccessByteBuffer.ZERO_READ_ONLY_DIRECT_BYTE_BUFFER,
+              nativeBaseOffset,
+              capacityBytes,
+              pageCount(capacityBytes));
+    } catch (final  IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(
+              String.format("Encountered %s exception while loading", e.getClass()));
+    }
+  }
+
+  public void load() {
+    madvise();
+    // Performance optimization. Read a byte from each page to bring it into memory.
+    final int count = pageCount(capacityBytes);
+    long offset = nativeBaseOffset;
+    for (int i = 0; i < count; i++) {
+      unsafe.getByte(offset);
+      offset += pageSize;
+    }
+  }
+
+  // Private methods
+  /**
+   * called by load(). Calls the native method load0 in MappedByteBuffer.java, implemented
+   * in MappedByteBuffer.c. See reference at top of class. load0 allows setting a mapping length
+   * of greater than 2GB.
+   */
+  private void madvise() {
+    try {
+      MAPPED_BYTE_BUFFER_LOAD0_METHOD
+        //load0 is effectively static, so ZERO_READ_ONLY_DIRECT_BYTE_BUFFER is not modified
+        .invoke(AccessByteBuffer.ZERO_READ_ONLY_DIRECT_BYTE_BUFFER,
+            nativeBaseOffset,
+            capacityBytes);
+    } catch (final  IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(
+          String.format("Encountered %s exception while loading", e.getClass()));
+    }
+  }
+
+  private static int pageCount(final long bytes) {
+    return (int)((bytes + pageSize) - 1L) / pageSize;
+  }
+
+  //Does the actual mapping work, resourceReadOnly must already be set
+  private static RandomAccessFile mapper(final File file, final long fileOffset,
+      final long capacityBytes, final boolean resourceReadOnly)  {
+
+    final String mode = resourceReadOnly ? "r" : "rw";
+    final RandomAccessFile raf;
+    try {
+      raf = new RandomAccessFile(file, mode);
+      if (fileOffset + capacityBytes > raf.length()) {
+        raf.setLength(fileOffset + capacityBytes);
+      }
+    } catch (final IOException e) {
+      throw new RuntimeException(e);
+    }
+    return raf;
+  }
+
+  /**
+   * Creates a mapping of the FileChannel starting at position and of size length to pages
+   * in the OS. This may throw OutOfMemory error if you have exhausted memory.
+   * You can try to force garbage collection and re-attempt.
+   *
+   * <p>map0 is a native method of FileChannelImpl.java implemented in FileChannelImpl.c.
+   * See reference at top of class.</p>
+   *
+   * @param fileChannel the FileChannel
+   * @param position the offset in bytes into the FileChannel
+   * @param lengthBytes the length in bytes
+   * @return the native base offset address
+   * @throws RuntimeException Encountered an exception while mapping
+   */
+  private static long map(final FileChannel fileChannel, final boolean resourceReadOnly,
+      final long position, final long lengthBytes) {
+    final int pagePosition = (int) (position % unsafe.pageSize());
+    final long mapPosition = position - pagePosition;
+    final long mapSize = lengthBytes + pagePosition;
+    final int mapMode = resourceReadOnly ? MAP_RO : MAP_RW;
+    //final boolean isSync = true; //required as of JDK14, but it is more complex
+    try {
+      final long nativeBaseOffset = //JDK14 add isSync
+        (long) FILE_CHANNEL_IMPL_MAP0_METHOD.invoke(fileChannel, mapMode, mapPosition, mapSize);
+      return nativeBaseOffset;
+    } catch (final InvocationTargetException e) {
+      throw new RuntimeException("Exception while mapping", e.getTargetException());
+    } catch (final IllegalAccessException e) {
+      throw new RuntimeException("Exception while mapping", e);
+    }
+  }
+
+  private static final class Deallocator implements Runnable {
+    private final RandomAccessFile myRaf;
+    private final FileChannel myFc;
+    //This is the only place the actual native offset is kept for use by unsafe.freeMemory();
+    private final long actualNativeBaseOffset;
+    private final long myCapacity;
+    private final StepBoolean valid = new StepBoolean(true); //only place for this
+
+    Deallocator(final long nativeBaseOffset, final long capacityBytes,
+        final RandomAccessFile raf) {
+      myRaf = raf;
+      assert myRaf != null;
+      myFc = myRaf.getChannel();
+      actualNativeBaseOffset = nativeBaseOffset;
+      assert actualNativeBaseOffset != 0;
+      myCapacity = capacityBytes;
+      assert myCapacity != 0;
+    }
+
+    StepBoolean getValid() {
+      return valid;
+    }
+
+    @Override
+    public void run() throws IllegalStateException {
+      deallocate(true);
+    }
+
+    boolean deallocate(final boolean calledFromCleaner) throws IllegalStateException {
+      if (valid.change()) {
+        if (calledFromCleaner) {
+          // Warn about non-deterministic resource cleanup.
+          LOG.warning("A direct mapped resource was not closed explicitly");
+        }
+        unmap();
+        return true;
+      }
+      return false;
+    }
+
+    /**
+     * Removes existing mapping.  <i>unmap0</i> is a native method in FileChannelImpl.c. See
+     * reference at top of class.
+     */
+    private void unmap() throws IllegalStateException {
+      try {
+        FILE_CHANNEL_IMPL_UNMAP0_METHOD.invoke(myFc, actualNativeBaseOffset, myCapacity);
+        myRaf.close();
+      } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException | IOException e) {
+        throw new IllegalStateException(String.format("Encountered %s exception while freeing memory", e.getClass()));
+      }
+    }
+  } //End of class Deallocator
+
 }

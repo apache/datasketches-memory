@@ -114,25 +114,23 @@ under the License.
     <project.reporting.outputEncoding>${charset.encoding}</project.reporting.outputEncoding>
 
     <!-- org.codehaus plugins -->
-    <!-- used for strict profile testing-->
-    <plexus-compiler-javac-errorprone.version>2.8.5</plexus-compiler-javac-errorprone.version>
-    <versions-maven-plugin.version>2.8.1</versions-maven-plugin.version>
+    <versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
+    <exec-maven-plugin.version>3.2.0</exec-maven-plugin.version>
 
     <!--  Maven Plugins -->
     <maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version> <!-- may override parent -->
     <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version> <!-- may override parent -->
-    <maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version> <!-- may override parent -->
+    <maven-deploy-plugin.version>3.1.2</maven-deploy-plugin.version> <!-- may override parent -->
     <maven-enforcer-plugin.version>3.4.1</maven-enforcer-plugin.version> <!-- may override parent -->
     <maven-gpg-plugin.version>3.2.3</maven-gpg-plugin.version> <!-- may override parent -->
-    <maven-jar-plugin.version>3.4.0</maven-jar-plugin.version> <!-- may override parent -->
+    <maven-jar-plugin.version>3.4.1</maven-jar-plugin.version> <!-- may override parent -->
     <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version> <!-- may override parent -->
     <maven-release-plugin.version>3.0.1</maven-release-plugin.version> <!-- may override parent -->
     <maven-remote-resources-plugin.version>3.2.0</maven-remote-resources-plugin.version> <!-- may override parent -->
     <maven-source-plugin.version>3.3.1</maven-source-plugin.version> <!-- may override parent -->
     <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version> <!-- for surefire, failsafe and surefire-report, may override parent-->
-    <maven-toolchains-plugin.version>3.0.0</maven-toolchains-plugin.version>
+    <maven-toolchains-plugin.version>3.2.0</maven-toolchains-plugin.version>
     <maven-install-plugin.version>3.0.0-M1</maven-install-plugin.version>
-    <maven-exec-plugin.version>3.0.0</maven-exec-plugin.version>
     <!-- Apache Plugins -->
     <apache-rat-plugin.version>0.16.1</apache-rat-plugin.version> <!-- may override parent -->
     <!-- org.jacoco Maven Plugins -->
@@ -283,7 +281,7 @@ under the License.
               <configuration>
                 <rules>
                   <requireJavaVersion>
-                    <version>[1.8,1.9),[8],[11,14),[17,18)</version>
+                    <version>[1.8,1.9),[11,12)</version>
                   </requireJavaVersion>
                   <requireMavenVersion>
                     <version>[${maven.version},)</version>
@@ -321,7 +319,7 @@ under the License.
             <excludes>
               <exclude>**/*.yaml</exclude>
               <exclude>**/*.yml</exclude>
-              <exclude>**/.*/**/*</exclude>
+              <exclude>**/.*</exclude>
               <exclude>**/.clover/**/*</exclude>
               <exclude>**/test/resources/**/*.txt</exclude>
               <exclude>**/test-output/**/*</exclude>
@@ -380,7 +378,7 @@ under the License.
           <configuration>
             <toolchains>
               <jdk>
-                <version>[1.8,1.9),[8],[11,14),[17,18)</version>
+                <version>[1.8,1.9),[8,9),[11,12)</version>
               </jdk>
             </toolchains>
           </configuration>
@@ -433,7 +431,7 @@ under the License.
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>exec-maven-plugin</artifactId>
-          <version>${maven-exec-plugin.version}</version>
+          <version>${exec-maven-plugin.version}</version>
         </plugin>
 
       </plugins>

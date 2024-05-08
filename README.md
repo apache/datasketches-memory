@@ -45,7 +45,7 @@ If you are interested in making contributions to this Memory component please se
 [Community](https://datasketches.apache.org/docs/Community/) page.
 
 ## Release 2.0.0+
-Starting with release *datasketches-memory-2.0.0*, this Memory component supports Java 8 through Java 13. Providing access to the four contiguous byte resources (mentioned above) in Java 8 only requires reflection. However, **Java 9 introduced the Java Platform Module System (JPMS) where access to these internal classes requires starting up the JVM with special JPMS arguments.**   The actual JVM arguments required will depend on how the user intends to use the Memory API, the Java version used to run the user's application and whether the user's application is a JPMS application or not.
+Starting with release *datasketches-memory-2.0.0*, this Memory component supports Java 8 through Java 11. Providing access to the four contiguous byte resources (mentioned above) in Java 8 only requires reflection. However, **Java 9 introduced the Java Platform Module System (JPMS) where access to these internal classes requires starting up the JVM with special JPMS arguments.**   The actual JVM arguments required will depend on how the user intends to use the Memory API, the Java version used to run the user's application and whether the user's application is a JPMS application or not.
 
 Also see the [usage examples](docs/usage-examples.md) for more information.
 

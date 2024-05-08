@@ -399,6 +399,18 @@ public class MemoryTest {
   }
 
   @Test
+  public void checkIssue178() {
+    int n = 8;
+    byte[] bArr = new byte[n];
+    for (int i = 0; i < n; i++) { bArr[i] = (byte)i; }
+    Memory mem = Memory.wrap(bArr, n / 2, n / 2, ByteOrder.nativeOrder());
+    for (int i = 0; i < n / 2; i++) {
+      println(mem.getByte(i));
+      assertEquals(mem.getByte(i), n / 2 + i);
+    }
+  }
+
+  @Test
   public void printlnTest() {
     println("PRINTING: " + this.getClass().getName());
   }

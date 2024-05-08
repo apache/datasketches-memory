@@ -195,7 +195,7 @@ public interface Memory extends Resource {
     negativeCheck(offsetBytes, "offsetBytes");
     negativeCheck(lengthBytes, "lengthBytes");
     ResourceImpl.checkBounds(offsetBytes, lengthBytes, array.length);
-    return BaseWritableMemoryImpl.wrapHeapArray(array, 0, lengthBytes, true, ByteOrder.nativeOrder(), null);
+    return BaseWritableMemoryImpl.wrapHeapArray(array, offsetBytes, lengthBytes, true, ByteOrder.nativeOrder(), null);
   }
 
   /**

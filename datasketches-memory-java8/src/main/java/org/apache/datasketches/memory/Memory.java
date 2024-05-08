@@ -195,7 +195,7 @@ public interface Memory extends BaseState {
     negativeCheck(offsetBytes, "offsetBytes");
     negativeCheck(lengthBytes, "lengthBytes");
     UnsafeUtil.checkBounds(offsetBytes, lengthBytes, array.length);
-    return BaseWritableMemoryImpl.wrapHeapArray(array, 0, lengthBytes, true, ByteOrder.nativeOrder(), null);
+    return BaseWritableMemoryImpl.wrapHeapArray(array, offsetBytes, lengthBytes, true, ByteOrder.nativeOrder(), null);
   }
 
   /**

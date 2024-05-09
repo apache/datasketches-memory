@@ -47,6 +47,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven-compiler-plugin.version}</version>
                     <configuration>
+                        <source>${maven.compiler.source}</source>
+                        <target>${maven.compiler.target}</target>
                         <compilerArgs>
                             <arg>--add-exports</arg>
                             <arg>java.base/jdk.internal.ref=org.apache.datasketches.memory</arg>

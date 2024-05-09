@@ -68,6 +68,7 @@ jobs:
 
       - name: Compile
         run: >
+          mvn help:effective-pom
           mvn clean compile
           -Dmaven.javadoc.skip=true
           -Dgpg.skip=true

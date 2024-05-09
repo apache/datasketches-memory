@@ -66,9 +66,12 @@ jobs:
         run: >
           java -version
 
-      - name: Compile
+      - name: Print POM
         run: >
           mvn help:effective-pom
+
+      - name: Compile
+        run: >
           mvn clean compile
           -Dmaven.javadoc.skip=true
           -Dgpg.skip=true

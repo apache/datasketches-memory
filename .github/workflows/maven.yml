@@ -1,4 +1,4 @@
-name: Java Test Coverage with Maven, Coveralls
+name: Java Build, Test with JDK 8,11 
 
 on:
   pull_request:
@@ -20,7 +20,8 @@ jobs:
       matrix:
         jdk: [8,11]
 
-    # All JDKs are installed per build machine which is inefficient
+    # All JDKs are installed per build machine which I realize is inefficient
+    # I'm not sure how to fix it.
 
     env:
       JDK_VERSION: ${{ matrix.jdk }}
@@ -39,23 +40,25 @@ jobs:
           restore-keys: build-${{ runner.os }}-maven-
 
       - name: Install JDK 8
-        uses: AdoptOpenJDK/install-jdk@v1
+        uses: actions/install-jdk@v2
         with:
           version: '8'
           architecture: x64
+          distribution: 'adopt'
           impl: hotspot
           targets: 'JAVA8_HOME'
 
       - name: Install JDK 11
-        uses: AdoptOpenJDK/install-jdk@v1
+        uses: actions/install-jdk@v2
         with:
           version: '11'
           architecture: x64
+          distribution: 'adopt'
           impl: hotspot
           targets: 'JAVA11_HOME'
 
       - name: Install Matrix JDK
-        uses: AdoptOpenJDK/install-jdk@v1
+        uses: actions/install-jdk@v2
         with:
           version: ${{ matrix.jdk }}
           architecture: x64
@@ -66,16 +69,13 @@ jobs:
         run: >
           java -version
 
-      - name: Print POM
-        run: >
-          mvn help:effective-pom
-
       - name: Compile
         run: >
           mvn clean compile
           -Dmaven.javadoc.skip=true
           -Dgpg.skip=true
           --toolchains .github/workflows/.toolchains.xml
+          -Dmaven.compiler.arguments="-source ${{ matrix.jdk }} -target ${{ matrix.jdk }}"
 
       - name: Install Dependencies
         run: >
@@ -91,7 +91,6 @@ jobs:
           -Dgpg.skip=true
           --toolchains .github/workflows/.toolchains.xml
 
-      # The GitTag for CI purposes is irrelevant
       - name: Custom build script
         run: |
           ./tools/scripts/package-single-release-jar.sh $JAVA_HOME x.y.z .

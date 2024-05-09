@@ -74,14 +74,15 @@ jobs:
           mvn clean compile
           -Dmaven.javadoc.skip=true
           -Dgpg.skip=true
-          --toolchains .github/workflows/.toolchains.xml
           -Dmaven.compiler.arguments="-source ${{ matrix.jdk }} -target ${{ matrix.jdk }}"
+          --toolchains .github/workflows/.toolchains.xml
 
       - name: Install Dependencies
         run: >
           mvn clean install
           -DskipTests=true
           -Dgpg.skip=true
+          -Dmaven.compiler.arguments="-source ${{ matrix.jdk }} -target ${{ matrix.jdk }}"
           --toolchains .github/workflows/.toolchains.xml
 
       - name: Package
@@ -89,6 +90,7 @@ jobs:
           mvn package
           -Dmaven.javadoc.skip=false
           -Dgpg.skip=true
+          -Dmaven.compiler.arguments="-source ${{ matrix.jdk }} -target ${{ matrix.jdk }}"
           --toolchains .github/workflows/.toolchains.xml
 
       - name: Custom build script
@@ -103,4 +105,5 @@ jobs:
           -Dcoveralls-repo-token=${repo_token}
           -Dmaven.javadoc.skip=true
           -Dgpg.skip=true
+          -Dmaven.compiler.arguments="-source ${{ matrix.jdk }} -target ${{ matrix.jdk }}"
           --toolchains .github/workflows/.toolchains.xml

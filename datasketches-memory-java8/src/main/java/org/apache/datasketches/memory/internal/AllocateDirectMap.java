@@ -103,22 +103,50 @@ class AllocateDirectMap implements Map {
   final boolean resourceReadOnly;
 
   //called from AllocateDirectWritableMap constructor
-  AllocateDirectMap(final File file, final long fileOffsetBytes, final long capacityBytes,
+  AllocateDirectMap(
+      final File file,
+      final long fileOffsetBytes,
+      final long capacityBytes,
+      final boolean localReadOnly) {
+    this(check(file, fileOffsetBytes, capacityBytes, localReadOnly),
+        //SpotBugs CT_CONSTRUCTOR_THROW is false positive.
+        //this construction scheme is compliant with SEI CERT Oracle Coding Standard for Java / OBJ11-J
+        file,
+        fileOffsetBytes,
+        capacityBytes,
+        localReadOnly);
+  }
+
+  private AllocateDirectMap(
+      final boolean secure, //required part of Finalizer Attack prevention
+      final File file,
+      final long fileOffsetBytes,
+      final long capacityBytes,
       final boolean localReadOnly) {
     this.capacityBytes = capacityBytes;
-    resourceReadOnly = isFileReadOnly(file);
+    this.resourceReadOnly = isFileReadOnly(file);
+    this.raf = mapper(file, fileOffsetBytes, capacityBytes, resourceReadOnly);
+    this.nativeBaseOffset = map(raf.getChannel(), resourceReadOnly, fileOffsetBytes, capacityBytes);
+    this.deallocator = new Deallocator(nativeBaseOffset, capacityBytes, raf);
+    this.cleaner = new MemoryCleaner(this, deallocator);
+  }
+
+  private static final boolean check(
+      final File file,
+      final long fileOffsetBytes,
+      final long capacityBytes,
+      final boolean localReadOnly) {
     final long fileLength = file.length();
+    final boolean resourceReadOnly = isFileReadOnly(file);
     if ((localReadOnly || resourceReadOnly) && fileOffsetBytes + capacityBytes > fileLength) {
       throw new IllegalArgumentException(
           "Read-only mode and requested map length is greater than current file length: "
           + "Requested Length = " + (fileOffsetBytes + capacityBytes)
           + ", Current File Length = " + fileLength);
     }
-    raf = mapper(file, fileOffsetBytes, capacityBytes, resourceReadOnly);
-    nativeBaseOffset = map(raf.getChannel(), resourceReadOnly, fileOffsetBytes, capacityBytes);
-    deallocator = new Deallocator(nativeBaseOffset, capacityBytes, raf);
-    cleaner = new MemoryCleaner(this, deallocator);
+    return true;
   }
+
 
   //Map Interface
 

@@ -3,11 +3,11 @@ name: DataSketches-Memory Auto JDK Matrix Test & Install
 on:
     pull_request:
     push:
-    #    branches: [ master ]
+        branches: [ master, 2.2.X ]
     workflow_dispatch:
 
 env:
-    MAVEN_OPTS: -Xmx4g -Xms1g
+    MAVEN_OPTS: -Xmx1g -Xms1g
 
 jobs:
     build:

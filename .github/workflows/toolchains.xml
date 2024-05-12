@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF8"?>
+<toolchains>
+    <toolchain>
+        <type>jdk</type>
+        <provides>
+            <version>8</version>
+            <vendor>temerin</vendor>
+        </provides>
+        <configuration>
+            <jdkHome>${env.JAVA_HOME_8}</jdkHome>
+        </configuration>
+    </toolchain>
+    <toolchain>
+        <type>jdk</type>
+        <provides>
+            <version>11</version>
+            <vendor>temerin</vendor>
+        </provides>
+        <configuration>
+            <jdkHome>${env.JAVA_HOME_11}</jdkHome>
+        </configuration>
+    </toolchain>
+</toolchains>

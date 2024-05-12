@@ -47,6 +47,9 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven-compiler-plugin.version}</version>
                     <configuration>
+                        <jdkToolchain>
+                          <version>${jdk-toolchain.version}</version>
+                        </jdkToolchain>
                         <source>${maven.compiler.source}</source>
                         <target>${maven.compiler.target}</target>
                         <compilerArgs>

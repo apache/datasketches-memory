@@ -103,7 +103,7 @@ under the License.
 
     <!-- System-wide properties -->
     <maven.version>3.6.3</maven.version>
-    <java.version>1.8</java.version>
+    <java.version>8</java.version>
     <jdk-toolchain.version>8</jdk-toolchain.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -281,7 +281,7 @@ under the License.
               <configuration>
                 <rules>
                   <requireJavaVersion>
-                    <version>[1.8,1.9),[11,12)</version>
+                    <version>[8,9),[11,12)</version>
                   </requireJavaVersion>
                   <requireMavenVersion>
                     <version>[${maven.version},)</version>
@@ -319,6 +319,7 @@ under the License.
             <excludes>
               <exclude>**/*.yaml</exclude>
               <exclude>**/*.yml</exclude>
+              <exclude>**/toolchains.xml</exclude>
               <exclude>**/.*</exclude>
               <exclude>**/.clover/**/*</exclude>
               <exclude>**/test/resources/**/*.txt</exclude>
@@ -378,7 +379,7 @@ under the License.
           <configuration>
             <toolchains>
               <jdk>
-                <version>[1.8,1.9),[8,9),[11,12)</version>
+                <version>[8,9),[11,12)</version>
               </jdk>
             </toolchains>
           </configuration>

@@ -21,76 +21,31 @@ under the License.
 
 <FindBugsFilter> <!-- memory -->
 
+  <!-- Ignore all test code -->
+  <Match>
+    <Class name="~.*\.*Test" />
+  </Match>
+
   <!-- Too many false positives to be useful.  I could not make it happy :( -->
   <Match>
     <Bug pattern="SF_SWITCH_NO_DEFAULT" />
   </Match>
 
-  <Match>   <!-- Exclude for test classes; too many False Positives. -->
-    <Bug pattern="NP_NULL_PARAM_DEREF_NONVIRTUAL" />
-    <Class name="~.*\.*Test" />
+  <!-- Complaining about copying of data from one internal class to another. 
+       This is harmless since both classes are part of our library internals and work together. -->
+  <Match>
+    <Bug pattern="EI_EXPOSE_REP"/>
+    <Or>
+      <Class name="org.apache.datasketches.memory.internal.WritableDirectHandleImpl"/>
+      <Class name="org.apache.datasketches.memory.internal.WritableMapHandleImpl"/>
+      <Class name="org.apache.datasketches.memory.internal.MapHandleImpl"/>
+    </Or>
   </Match>
   
-  <Match>   <!-- Exclude for test classes; too many False Positives. -->
-    <Bug pattern="DLS_DEAD_LOCAL_STORE" />
-    <Class name="~.*\.*Test" />
+  <Match> <!-- False Positive: Code is the recommended solution for preventing a Finalizer Attack. -->
+    <Bug pattern="CT_CONSTRUCTOR_THROW" />
+    <Class name="org.apache.datasketches.memory.internal.AllocateDirectMap"/>
   </Match>
   
 </FindBugsFilter>
 
-
-
-<!--  Examples: -->
-
-<!-- Exclude java.* classes -->
-  <!--
-  <Match>
-    <Package name="java\.*" />
-  </Match>
--->
-
-  <!-- Exclude test classes -->
-<!-- 
-  <Match>
-    <Class name="~.*\.*Test" />
-  </Match>
--->
-
-<!--
-     <Match>
-       <Class name="com.foobar.ClassNotToBeAnalyzed" />
-     </Match>
--->
-<!--
-     <Match>
-       <Class name="com.foobar.ClassWithSomeBugsMatched" />
-       <Bug code="DE,UrF,SIC" />
-     </Match>
--->
-     <!-- Match all XYZ violations. -->
-<!--
-     <Match>
-       <Bug code="XYZ" />
-     </Match>
--->
-     <!-- Match all doublecheck violations in these methods of "AnotherClass". -->
-<!--
-     <Match>
-       <Class name="com.foobar.AnotherClass" />
-       <Or>
-         <Method name="nonOverloadedMethod" />
-         <Method name="frob" params="int,java.lang.String" returns="void" />
-         <Method name="blat" params="" returns="boolean" />
-       </Or>
-       <Bug code="DC" />
-     </Match>
--->
-     <!-- A method with a dead local store false positive (medium priority). -->
-<!--
-     <Match>
-       <Class name="com.foobar.MyClass" />
-       <Method name="someMethod" />
-       <Bug pattern="DLS_DEAD_LOCAL_STORE" />
-       <Priority value="2" />
-     </Match>
--->

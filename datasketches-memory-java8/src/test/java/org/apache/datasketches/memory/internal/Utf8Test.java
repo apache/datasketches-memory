@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.Utf8CodingException;
@@ -244,6 +245,7 @@ public class Utf8Test {
     //checks the non-deterministic constructor
     @SuppressWarnings("unused")
     RandomCodePoints rcp = new RandomCodePoints(false);
+    Objects.requireNonNull(rcp);
   }
 
 

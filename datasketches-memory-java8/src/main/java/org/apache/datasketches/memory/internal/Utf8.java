@@ -410,7 +410,7 @@ final class Utf8 {
    *
    * @see <a href="https://en.wikipedia.org/wiki/UTF-8">Wikipedia: UTF-8</a>
    */
-  private static class DecodeUtil {
+  private static final class DecodeUtil {
 
     /**
      * Returns whether this is a single-byte UTF-8 encoding.

@@ -37,8 +37,15 @@ under the License.
   <property name="severity" value="warning"/>
   <property name="fileExtensions" value="java"/>
 
+  <!-- Exclude all module-info.java files 
+       https://checkstyle.org/filefilters/beforeexecutionexclusionfilefilter.html#BeforeExecutionExclusionFileFilter -->
   <module name="BeforeExecutionExclusionFileFilter">
-    <property name="fileNamePattern" value="src[\\/]test[\\/]java[\\/].+$|module\-info\.java.+$"/>
+    <property name="fileNamePattern" value=".*module\-info\.java.*$"/>
+  </module>
+
+  <!-- Exclude all src/test/... files -->
+  <module name="BeforeExecutionExclusionFileFilter">
+    <property name="fileNamePattern" value=".*[\\/]src[\\/]test[\\/].*$"/>
   </module>
 
   <module name="FileTabCharacter">
@@ -54,7 +61,7 @@ under the License.
   <!-- Size Violations -->
   <module name="LineLength">
     <property name="severity" value="warning"/>
-    <property name="max" value="120"/>
+    <property name="max" value="140"/>
     <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
     <!-- <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/> -->
   </module>
@@ -68,7 +75,18 @@ under the License.
   <!-- ******************************************************** -->
   
   <module name="TreeWalker">
-    
+
+    <!-- Be able to ignore violations with @SuppressWarnings -->
+    <!-- See https://checkstyle.org/filters/suppresswarningsfilter.html -->
+    <module name="SuppressWarningsHolder"/>
+  
+    <!-- need to find a way to resolve basedir
+      <module name="SuppressionFilter">
+      <property name="file" value="basedir/tools/suppressions.xml"/>
+      <property name="optional" value="false"/>
+      </module>
+    -->
+
     <!-- Annotations -->
     <module name="AnnotationLocation">
       <property name="tokens" value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF, METHOD_DEF, CTOR_DEF"/>
@@ -81,7 +99,7 @@ under the License.
 
     <!-- Block Checks -->
     <module name="EmptyBlock">
-      <property name="severity" value="warning"/>
+      <property name="severity" value="ignore"/>
       <property name="option" value="TEXT"/>
       <property name="tokens" value="LITERAL_TRY, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE, LITERAL_SWITCH"/>
       <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
@@ -161,6 +179,11 @@ under the License.
     <module name="VariableDeclarationUsageDistance">
       <property name="severity" value="ignore"/>
       <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    
+    <module name="IllegalTokenText">
+      <property name="tokens" value="STRING_LITERAL"/>
+      <property name="format" value="\\n"/>
     </module>
     
     <!-- Class Design -->

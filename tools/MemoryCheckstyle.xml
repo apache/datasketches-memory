@@ -36,12 +36,11 @@ under the License.
   <property name="charset" value="UTF-8"/>
   <property name="severity" value="warning"/>
   <property name="fileExtensions" value="java"/>
-  <property name="basedir" value="${basedir}"/>
 
   <!-- Exclude all module-info.java files 
        https://checkstyle.org/filefilters/beforeexecutionexclusionfilefilter.html#BeforeExecutionExclusionFileFilter -->
   <module name="BeforeExecutionExclusionFileFilter">
-    <property name="fileNamePattern" value="module\-info\.java$"/>
+    <property name="fileNamePattern" value=".*module\-info\.java.*$"/>
   </module>
 
   <!-- Exclude all src/test/... files -->
@@ -81,7 +80,7 @@ under the License.
     <!-- See https://checkstyle.org/filters/suppresswarningsfilter.html -->
     <module name="SuppressWarningsHolder"/>
   
-    <!--
+    <!-- need to find a way to resolve basedir
       <module name="SuppressionFilter">
       <property name="file" value="basedir/tools/suppressions.xml"/>
       <property name="optional" value="false"/>

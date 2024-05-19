@@ -32,7 +32,7 @@ under the License.
 
   <groupId>org.apache.datasketches</groupId>
   <artifactId>datasketches-memory</artifactId>
-  <version>2.2.0</version>
+  <version>2.2.1</version>
   <!-- Required for multi-module project -->
   <packaging>pom</packaging>
 

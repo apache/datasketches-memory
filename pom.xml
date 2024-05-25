@@ -24,16 +24,9 @@ under the License.
 
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.apache</groupId>
-    <artifactId>apache</artifactId>
-    <version>32</version>
-  </parent>
-
   <groupId>org.apache.datasketches</groupId>
   <artifactId>datasketches-memory</artifactId>
   <version>2.2.1</version>
-  <!-- Required for multi-module project -->
   <packaging>pom</packaging>
 
   <name>${project.artifactId}</name>
@@ -66,8 +59,8 @@ under the License.
   </scm>
 
   <issueManagement>
-    <!-- <system>jira</system>
-      <url>https://issues.apache.org/jira/browse/DATASKETCHES</url> -->
+    <!-- <system>jira</system> --> 
+    <!-- <url>https://issues.apache.org/jira/browse/DATASKETCHES</url> -->
     <system>GitHub</system>
     <url>https://github.com/apache/${project.artifactId}/issues</url>
   </issueManagement>
@@ -82,21 +75,10 @@ under the License.
     </developer>
   </developers>
 
-  <!--
-       NOTE:
-       The datasketches-memory submodule uses the Maven project-aggregation feature and does not inherit
-       from this root module as a parent; so that there is no runtime dependency on the parent project (root module).
-       As a result, some properties from this POM (including the version) are duplicated in the datasketches-memory
-       module for inclusion in the assembled artifacts.  For more information, see:
-       https://maven.apache.org/guides/introduction/introduction-to-the-pom.html#Project_Aggregation -->
-
-
   <properties>
-    <!-- UNIQUE FOR THIS JAVA COMPONENT -->
     <protobuf-java.version>4.0.0-rc-1</protobuf-java.version>
     <!-- Used for UTF8 testing -->
     <zero-allocation-hashing.version>0.16</zero-allocation-hashing.version>
-    <!-- END:UNIQUE FOR THIS JAVA COMPONENT -->
 
     <!-- Test -->
     <testng.version>7.5.1</testng.version>
@@ -118,21 +100,21 @@ under the License.
     <exec-maven-plugin.version>3.2.0</exec-maven-plugin.version>
 
     <!--  Maven Plugins -->
-    <maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version> <!-- may override parent -->
-    <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version> <!-- may override parent -->
-    <maven-deploy-plugin.version>3.1.2</maven-deploy-plugin.version> <!-- may override parent -->
-    <maven-enforcer-plugin.version>3.4.1</maven-enforcer-plugin.version> <!-- may override parent -->
-    <maven-gpg-plugin.version>3.2.3</maven-gpg-plugin.version> <!-- may override parent -->
-    <maven-jar-plugin.version>3.4.1</maven-jar-plugin.version> <!-- may override parent -->
-    <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version> <!-- may override parent -->
-    <maven-release-plugin.version>3.0.1</maven-release-plugin.version> <!-- may override parent -->
-    <maven-remote-resources-plugin.version>3.2.0</maven-remote-resources-plugin.version> <!-- may override parent -->
-    <maven-source-plugin.version>3.3.1</maven-source-plugin.version> <!-- may override parent -->
-    <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version> <!-- for surefire, failsafe and surefire-report, may override parent-->
+    <maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>
+    <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+    <maven-deploy-plugin.version>3.1.2</maven-deploy-plugin.version>
+    <maven-enforcer-plugin.version>3.4.1</maven-enforcer-plugin.version>
+    <maven-gpg-plugin.version>3.2.3</maven-gpg-plugin.version>
+    <maven-jar-plugin.version>3.4.1</maven-jar-plugin.version>
+    <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
+    <maven-release-plugin.version>3.0.1</maven-release-plugin.version>
+    <maven-remote-resources-plugin.version>3.2.0</maven-remote-resources-plugin.version>
+    <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
+    <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version> <!-- for surefire, failsafe and surefire-report -->
     <maven-toolchains-plugin.version>3.2.0</maven-toolchains-plugin.version>
     <maven-install-plugin.version>3.0.0-M1</maven-install-plugin.version>
     <!-- Apache Plugins -->
-    <apache-rat-plugin.version>0.16.1</apache-rat-plugin.version> <!-- may override parent -->
+    <apache-rat-plugin.version>0.16.1</apache-rat-plugin.version>
     <!-- org.jacoco Maven Plugins -->
     <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
     <!-- org.eluder Maven Plugins -->
@@ -141,6 +123,7 @@ under the License.
     <!-- other -->
     <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
     <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
+    <exec-maven-plugin.version>3.3.0</exec-maven-plugin.version>
     <maven.deploy.skip>true</maven.deploy.skip>
     <maven.install.skip>true</maven.install.skip>
     <maven.javadoc.skip>true</maven.javadoc.skip>
@@ -215,14 +198,12 @@ under the License.
         </plugin>
 
         <plugin>
-          <!-- Apache Parent pom, pluginManagement-->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
           <version>${maven-release-plugin.version}</version>
         </plugin>
 
         <plugin>
-          <!-- Extends Apache Parent pom, pluginManagement-->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
           <version>${maven-jar-plugin.version}</version>
@@ -245,7 +226,6 @@ under the License.
         </plugin>
 
         <plugin>
-          <!-- Extends Apache Parent pom, apache-release profile -->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>${maven-javadoc-plugin.version}</version>
@@ -300,7 +280,6 @@ under the License.
         </plugin>
 
         <plugin>
-          <!-- Apache Parent pom, pluginManagement-->
           <groupId>org.apache.rat</groupId>
           <artifactId>apache-rat-plugin</artifactId>
           <version>${apache-rat-plugin.version}</version>
@@ -334,7 +313,6 @@ under the License.
         </plugin>
 
         <plugin>
-          <!-- Extends Apache Parent pom, apache-release profile -->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
           <version>${maven-source-plugin.version}</version>
@@ -357,7 +335,6 @@ under the License.
         </plugin>
 
         <plugin>
-          <!-- Apache Parent pom, pluginManagement-->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>${maven-surefire-plugin.version}</version>
@@ -385,7 +362,9 @@ under the License.
           </configuration>
           <executions>
             <execution>
-              <goals><goal>toolchain</goal></goals>
+              <goals>
+                <goal>toolchain</goal>
+              </goals>
             </execution>
           </executions>
         </plugin>

@@ -20,20 +20,13 @@ under the License.
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.apache</groupId>
-    <artifactId>apache</artifactId>
-    <version>23</version>
-  </parent>
-
   <groupId>org.apache.datasketches</groupId>
-  <artifactId>datasketches-memory-root</artifactId>
+  <artifactId>datasketches-memory</artifactId>
   <version>2.3.0-SNAPSHOT</version>
-  <!-- Required for multi-module project -->
   <packaging>pom</packaging>
 
   <name>${project.artifactId}</name>
@@ -66,8 +59,8 @@ under the License.
   </scm>
 
   <issueManagement>
-    <!-- <system>jira</system>
-      <url>https://issues.apache.org/jira/browse/DATASKETCHES</url> -->
+    <!-- <system>jira</system> --> 
+    <!-- <url>https://issues.apache.org/jira/browse/DATASKETCHES</url> -->
     <system>GitHub</system>
     <url>https://github.com/apache/${project.artifactId}/issues</url>
   </issueManagement>
@@ -82,27 +75,17 @@ under the License.
     </developer>
   </developers>
 
-
-  <!-- Note
-       The datasketches-memory submodule uses the Maven project-aggregation feature and does not inherit
-       from this root module as a parent; so that there is no runtime dependency on the parent project (root module).
-       As a result, some properties from this POM (including the version) are duplicated in the datasketches-memory
-       module for inclusion in the assembled artifacts.  For more information, see:
-       https://maven.apache.org/guides/introduction/introduction-to-the-pom.html#Project_Aggregation 
-  -->
-
   <properties>
-    <!-- UNIQUE FOR THIS JAVA COMPONENT -->
-    <protobuf-java.version>4.0.0-rc-2</protobuf-java.version>
+    <protobuf-java.version>4.0.0-rc-1</protobuf-java.version>
     <!-- Used for UTF8 testing -->
-    <zero-allocation-hashing.version>0.15</zero-allocation-hashing.version>
+    <zero-allocation-hashing.version>0.16</zero-allocation-hashing.version>
+
     <!-- Test -->
-    <testng.version>7.5</testng.version>
-    <!-- END:UNIQUE FOR THIS JAVA COMPONENT -->
+    <testng.version>7.5.1</testng.version>
 
     <!-- System-wide properties -->
-    <maven.version>3.5.0</maven.version>
-    <java.version>1.8</java.version>
+    <maven.version>3.6.3</maven.version>
+    <java.version>8</java.version>
     <jdk-toolchain.version>8</jdk-toolchain.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -113,33 +96,34 @@ under the License.
     <project.reporting.outputEncoding>${charset.encoding}</project.reporting.outputEncoding>
 
     <!-- org.codehaus plugins -->
-    <!-- used for strict profile testing-->
-    <plexus-compiler-javac-errorprone.version>2.8.5</plexus-compiler-javac-errorprone.version>
-    <versions-maven-plugin.version>2.8.1</versions-maven-plugin.version>
+    <versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
+    <exec-maven-plugin.version>3.2.0</exec-maven-plugin.version>
 
     <!--  Maven Plugins -->
-    <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version> <!-- overrides parent -->
-    <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version> <!-- overrides parent -->
-    <maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version> <!-- overrides parent -->
-    <maven-enforcer-plugin.version>3.0.0</maven-enforcer-plugin.version> <!-- overrides parent -->
-    <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version> <!-- overrides parent -->
-    <maven-javadoc-plugin.version>3.3.1</maven-javadoc-plugin.version> <!-- overrides parent -->
-    <maven-release-plugin.version>3.0.0-M4</maven-release-plugin.version> <!-- overrides parent -->
-    <maven-remote-resources-plugin.version>1.7.0</maven-remote-resources-plugin.version> <!-- overrides parent -->
-    <maven-source-plugin.version>3.2.1</maven-source-plugin.version> <!-- overrides parent -->
-    <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version> <!-- overrides parent -->
-    <maven-toolchains-plugin.version>3.0.0</maven-toolchains-plugin.version>
+    <maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>
+    <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+    <maven-deploy-plugin.version>3.1.2</maven-deploy-plugin.version>
+    <maven-enforcer-plugin.version>3.4.1</maven-enforcer-plugin.version>
+    <maven-gpg-plugin.version>3.2.3</maven-gpg-plugin.version>
+    <maven-jar-plugin.version>3.4.1</maven-jar-plugin.version>
+    <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
+    <maven-release-plugin.version>3.0.1</maven-release-plugin.version>
+    <maven-remote-resources-plugin.version>3.2.0</maven-remote-resources-plugin.version>
+    <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
+    <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version> <!-- for surefire, failsafe and surefire-report -->
+    <maven-toolchains-plugin.version>3.2.0</maven-toolchains-plugin.version>
     <maven-install-plugin.version>3.0.0-M1</maven-install-plugin.version>
-    <maven-exec-plugin.version>3.0.0</maven-exec-plugin.version>
     <!-- Apache Plugins -->
-    <apache-rat-plugin.version>0.13</apache-rat-plugin.version> <!-- overrides parent -->
+    <apache-rat-plugin.version>0.16.1</apache-rat-plugin.version>
     <!-- org.jacoco Maven Plugins -->
-    <jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
+    <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
     <!-- org.eluder Maven Plugins -->
     <coveralls-repo-token></coveralls-repo-token>
     <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
     <!-- other -->
     <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
+    <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
+    <exec-maven-plugin.version>3.3.0</exec-maven-plugin.version>
     <maven.deploy.skip>true</maven.deploy.skip>
     <maven.install.skip>true</maven.install.skip>
     <maven.javadoc.skip>true</maven.javadoc.skip>
@@ -172,6 +156,12 @@ under the License.
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.testng</groupId>
+        <artifactId>testng</artifactId>
+        <version>${testng.version}</version>
+        <scope>test</scope>
+      </dependency>
       <dependency>
         <!-- Used for UTF8 testing -->
         <groupId>com.google.protobuf</groupId>
@@ -208,14 +198,12 @@ under the License.
         </plugin>
 
         <plugin>
-          <!-- Apache Parent pom, pluginManagement-->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
           <version>${maven-release-plugin.version}</version>
         </plugin>
 
         <plugin>
-          <!-- Extends Apache Parent pom, pluginManagement-->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
           <version>${maven-jar-plugin.version}</version>
@@ -238,7 +226,6 @@ under the License.
         </plugin>
 
         <plugin>
-          <!-- Extends Apache Parent pom, apache-release profile -->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>${maven-javadoc-plugin.version}</version>
@@ -274,7 +261,7 @@ under the License.
               <configuration>
                 <rules>
                   <requireJavaVersion>
-                    <version>[1.8,1.9),[8],[11,14),[17,18)</version>
+                    <version>[8,9),[11,12)</version>
                   </requireJavaVersion>
                   <requireMavenVersion>
                     <version>[${maven.version},)</version>
@@ -293,7 +280,6 @@ under the License.
         </plugin>
 
         <plugin>
-          <!-- Apache Parent pom, pluginManagement-->
           <groupId>org.apache.rat</groupId>
           <artifactId>apache-rat-plugin</artifactId>
           <version>${apache-rat-plugin.version}</version>
@@ -312,7 +298,8 @@ under the License.
             <excludes>
               <exclude>**/*.yaml</exclude>
               <exclude>**/*.yml</exclude>
-              <exclude>**/.*/**/*</exclude>
+              <exclude>**/toolchains.xml</exclude>
+              <exclude>**/.*</exclude>
               <exclude>**/.clover/**/*</exclude>
               <exclude>**/test/resources/**/*.txt</exclude>
               <exclude>**/test-output/**/*</exclude>
@@ -326,7 +313,6 @@ under the License.
         </plugin>
 
         <plugin>
-          <!-- Extends Apache Parent pom, apache-release profile -->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
           <version>${maven-source-plugin.version}</version>
@@ -349,7 +335,6 @@ under the License.
         </plugin>
 
         <plugin>
-          <!-- Apache Parent pom, pluginManagement-->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>${maven-surefire-plugin.version}</version>
@@ -371,13 +356,15 @@ under the License.
           <configuration>
             <toolchains>
               <jdk>
-                <version>[1.8,1.9),[8],[11,14),[17,18)</version>
+                <version>[8,9),[11,12)</version>
               </jdk>
             </toolchains>
           </configuration>
           <executions>
             <execution>
-              <goals><goal>toolchain</goal></goals>
+              <goals>
+                <goal>toolchain</goal>
+              </goals>
             </execution>
           </executions>
         </plugin>
@@ -424,7 +411,7 @@ under the License.
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>exec-maven-plugin</artifactId>
-          <version>${maven-exec-plugin.version}</version>
+          <version>${exec-maven-plugin.version}</version>
         </plugin>
 
       </plugins>

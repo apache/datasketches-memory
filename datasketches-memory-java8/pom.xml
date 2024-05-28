@@ -17,14 +17,14 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.apache.datasketches</groupId>
-    <artifactId>datasketches-memory-root</artifactId>
+    <artifactId>datasketches-memory</artifactId>
     <version>2.3.0-SNAPSHOT</version>
   </parent>
 
@@ -33,8 +33,7 @@
   <packaging>jar</packaging>
 
   <properties>
-    <java.version>1.8</java.version>
-    <testng.version>7.5</testng.version>
+    <java.version>8</java.version>
     <jdk-toolchain.version>8</jdk-toolchain.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -46,7 +45,6 @@
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
-      <version>${testng.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -64,6 +62,11 @@
   </dependencies>
 
   <build>
+    <resources>
+      <resource>
+        <directory>${project.basedir}/src/main/javadoc</directory>
+      </resource>
+    </resources>
     <pluginManagement>
       <plugins>
         <plugin>

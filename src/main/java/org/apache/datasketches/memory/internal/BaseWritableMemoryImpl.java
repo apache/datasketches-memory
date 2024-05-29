@@ -122,7 +122,7 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
 
   //MAP FILE RESOURCE
 
-  @SuppressWarnings("resource")
+  //@SuppressWarnings("resource")
   public static WritableMemory wrapMap(
       final File file,
       final long fileOffsetBytes,
@@ -161,7 +161,7 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
    * This is a callback mechanism for a user client of direct memory to request more memory.
    * @return WritableMemory
    */
-  @SuppressWarnings("resource")
+  //@SuppressWarnings("resource")
   public static WritableMemory wrapDirect(
       final long capacityBytes,
       final long alignmentBytes,
@@ -363,6 +363,11 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
     slice.fill(value);
   }
 
+  @Override
+  public final byte[] getArray() {
+	return seg.toByteArray();
+  }
+  
   @Override
   public final void setBits(final long offsetBytes, final byte bitMask) {
     final byte b = MemoryAccess.getByteAtOffset(seg, offsetBytes);

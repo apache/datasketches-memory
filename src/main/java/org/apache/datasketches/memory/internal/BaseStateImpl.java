@@ -271,7 +271,7 @@ abstract class BaseStateImpl implements BaseState {
     return byteBuf;
   }
 
-  @SuppressWarnings("resource")
+  //@SuppressWarnings("resource")
   @Override
   public void close() {
     if (seg != null && seg.scope().isAlive() && !seg.scope().isImplicit()) {
@@ -322,7 +322,7 @@ abstract class BaseStateImpl implements BaseState {
     return memReqSvr != null;
   }
 
-  @SuppressWarnings("resource")
+  //@SuppressWarnings("resource")
   @Override
   public boolean isAlive() { return seg.scope().isAlive(); }
 

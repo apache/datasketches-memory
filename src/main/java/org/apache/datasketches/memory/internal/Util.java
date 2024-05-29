@@ -31,7 +31,7 @@ import java.util.Objects;
 /**
  * @author Lee Rhodes
  */
-@SuppressWarnings("javadoc")
+//@SuppressWarnings("javadoc")
 final class Util {
   static final String LS = System.getProperty("line.separator");
 

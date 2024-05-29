@@ -543,6 +543,12 @@ public interface WritableMemory extends Memory {
 
   //OTHER WRITABLE API METHODS
   /**
+   * Returns a copy of the primitive backing byte array.
+   * @return a copy of the primitive backing byte array.
+   */
+  byte[] getArray();
+  
+  /**
    * WritableMemory enables the MemoryRequestServer Direct (Native) Memory backed resources.
    * Other backed resources will always return null.
    * Gets the MemoryRequestServer implementation, if set, to request additional memory.

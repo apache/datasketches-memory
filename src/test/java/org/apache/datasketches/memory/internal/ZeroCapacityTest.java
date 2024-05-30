@@ -22,6 +22,7 @@ package org.apache.datasketches.memory.internal;
 import static org.testng.Assert.assertEquals;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.Memory;
@@ -51,7 +52,7 @@ public class ZeroCapacityTest {
     WritableMemory nullMem = null;
     ResourceScope scope = ResourceScope.newConfinedScope();
     try { //Invalid allocation size : 0
-      nullMem = WritableMemory.allocateDirect(0, scope, memReqSvr);
+      nullMem = WritableMemory.allocateDirect(0, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
       Assert.fail();
     } catch (IllegalArgumentException ignore) {
       if (nullMem != null) {

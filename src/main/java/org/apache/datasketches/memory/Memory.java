@@ -71,10 +71,9 @@ public interface Memory extends BaseState {
   /**
    * Maps the given file into <i>Memory</i> for read operations
    * Calling this method is equivalent to calling
-   * {@link #map(File, long, long, ResourceScope, ByteOrder)
+   * {@link #map(File, long, long, ByteOrder)
    * map(file, 0, file.length(), scope, ByteOrder.nativeOrder())}.
    * @param file the given file to map. It must be non-null with a non-negative length and readable.
-   * @param scope the given ResourceScope. It must be non-null.
    * @return mapped Memory.
    * @throws IllegalArgumentException -- if file is not readable.
    * @throws IllegalStateException - if scope has been already closed, or if access occurs from a thread other
@@ -83,9 +82,9 @@ public interface Memory extends BaseState {
    * @throws SecurityException - If a security manager is installed and it denies an unspecified permission
    * required by the implementation.
    */
-  static Memory map(File file, ResourceScope scope)
+  static Memory map(File file)
       throws IllegalArgumentException, IllegalStateException, IOException, SecurityException {
-    return map(file, 0, file.length(), scope, ByteOrder.nativeOrder());
+    return map(file, 0, file.length(), ByteOrder.nativeOrder());
   }
 
   /**
@@ -93,7 +92,27 @@ public interface Memory extends BaseState {
    * @param file the given file to map. It must be non-null,readable and length &ge; 0.
    * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
    * @param capacityBytes the size of the mapped memory. It must not be negative..
-   * @param scope the given ResourceScope. It must be non-null.
+   * @param byteOrder the byte order to be used.  It must be non-null.
+   * @return mapped Memory
+   * @throws IllegalArgumentException -- if file is not readable.
+   * @throws IllegalStateException - if scope has been already closed, or if access occurs from a thread other
+   * than the thread owning scope.
+   * @throws IOException - if the specified path does not point to an existing file, or if some other I/O error occurs.
+   * @throws SecurityException - If a security manager is installed and it denies an unspecified permission
+   * required by the implementation.
+   */
+  static Memory map(File file, long fileOffsetBytes, long capacityBytes, ByteOrder byteOrder)
+      throws IllegalArgumentException, IllegalStateException, IOException, SecurityException {
+	  final ResourceScope scope = ResourceScope.newConfinedScope();
+    return BaseWritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, true, byteOrder);
+  }
+
+  /**
+   * Maps the specified portion of the given file into <i>Memory</i> for read operations with a ResourceScope.
+   * @param file the given file to map. It must be non-null,readable and length &ge; 0.
+   * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
+   * @param capacityBytes the size of the mapped memory. It must not be negative.
+   * @param scope the given ResourceScope.
    * @param byteOrder the byte order to be used.  It must be non-null.
    * @return mapped Memory
    * @throws IllegalArgumentException -- if file is not readable.
@@ -107,7 +126,7 @@ public interface Memory extends BaseState {
       throws IllegalArgumentException, IllegalStateException, IOException, SecurityException {
     return BaseWritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, true, byteOrder);
   }
-
+  
   //NO ALLOCATE DIRECT, makes no sense
 
   //REGIONS

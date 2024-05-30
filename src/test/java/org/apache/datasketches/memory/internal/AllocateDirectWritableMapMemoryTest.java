@@ -61,8 +61,7 @@ public class AllocateDirectWritableMapMemoryTest {
       UnsupportedOperationException, IOException, SecurityException {
     File file = getResourceFile("GettysburgAddress.txt");
     Memory mem = null;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      mem = Memory.map(file,scope);
+    try (ResourceScope scope = (mem = Memory.map(file)).scope()) {
       byte[] byteArr = new byte[(int)mem.getCapacity()];
       mem.getByteArray(0, byteArr, 0, byteArr.length);
       String text = new String(byteArr, UTF_8);
@@ -88,11 +87,10 @@ public class AllocateDirectWritableMapMemoryTest {
     file.deleteOnExit();  //comment out if you want to examine the file.
 
     WritableMemory dstMem = null;
+    WritableMemory srcMem = null;
     try (ResourceScope scope = ResourceScope.newConfinedScope()) { //this scope manages two Memory objects
-      dstMem = WritableMemory.writableMap(file, 0, numBytes, scope, ByteOrder.nativeOrder());
-
-      WritableMemory srcMem
-        = WritableMemory.allocateDirect(numBytes, 8, scope, ByteOrder.nativeOrder(), memReqSvr);
+      dstMem = WritableMemory.writableMap(file, 0, numBytes, scope, ByteOrder.nativeOrder());	
+      srcMem = WritableMemory.allocateDirect(numBytes, 8, scope, ByteOrder.nativeOrder(), memReqSvr);
 
       //load source with consecutive longs
       for (long i = 0; i < numLongs; i++) {
@@ -147,8 +145,7 @@ public class AllocateDirectWritableMapMemoryTest {
     assertTrue(file.canRead());
     assertFalse(file.canWrite());
     WritableMemory wmem = null;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      wmem = WritableMemory.writableMap(file, scope); //throws ReadOnlyException
+    try (ResourceScope scope = (wmem = WritableMemory.writableMap(file)).scope()) { //throws ReadOnlyException
       wmem.getCapacity();
     }
   }

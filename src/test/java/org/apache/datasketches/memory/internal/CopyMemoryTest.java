@@ -21,6 +21,7 @@ package org.apache.datasketches.memory.internal;
 
 import static org.testng.Assert.assertEquals;
 
+import java.nio.ByteOrder;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.datasketches.memory.BaseState;
@@ -151,7 +152,7 @@ public class CopyMemoryTest {
 
   @SuppressWarnings("resource")
   private static WritableMemory genWmem(int longs, boolean empty) {
-    WritableMemory wmem = WritableMemory.allocateDirect(longs << 3, ResourceScope.newConfinedScope(), memReqSvr);
+    WritableMemory wmem = WritableMemory.allocateDirect(longs << 3, 1, ResourceScope.newConfinedScope(), ByteOrder.nativeOrder(), memReqSvr);
     if (empty) {
       wmem.clear();
     } else {

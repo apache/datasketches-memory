@@ -182,9 +182,9 @@ public class MemoryReadWriteSafetyTest {
     tempFile.deleteOnExit();
     try (RandomAccessFile raf = new RandomAccessFile(tempFile, "rw")) {
       raf.setLength(8);
+      Memory mem = null;
       //System.out.println(UtilTest.getFileAttributes(tempFile));
-      try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-        Memory mem = Memory.map(tempFile, scope);
+      try (ResourceScope scope = (mem = Memory.map(tempFile)).scope()) {
         ((WritableMemory) mem).putInt(0, 1);
       }
     }

@@ -59,7 +59,7 @@ public class MemoryTest {
   public void checkDirectRoundTrip() throws Exception {
     int n = 1024; //longs
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory mem = WritableMemory.allocateDirect(n * 8, scope, memReqSvr);
+      WritableMemory mem = WritableMemory.allocateDirect(n * 8, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
       for (int i = 0; i < n; i++) {
         mem.putLong(i * 8, i);
       }
@@ -356,7 +356,7 @@ public class MemoryTest {
   public void checkParentUseAfterFree() throws Exception {
     int bytes = 64 * 8;
     ResourceScope scope = ResourceScope.newConfinedScope();
-    WritableMemory wmem = WritableMemory.allocateDirect(bytes, scope, memReqSvr);
+    WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
     wmem.close();
     //with -ea assert: Memory not valid.
     //with -da sometimes segfaults, sometimes passes!
@@ -368,7 +368,7 @@ public class MemoryTest {
   public void checkRegionUseAfterFree() throws Exception {
     int bytes = 64;
     ResourceScope scope = ResourceScope.newConfinedScope();
-    WritableMemory wmem = WritableMemory.allocateDirect(bytes, scope, memReqSvr);
+    WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
     Memory region = wmem.region(0L, bytes);
     wmem.close();
     //with -ea assert: Memory not valid.
@@ -388,7 +388,7 @@ public class MemoryTest {
     assertNull(wbuf.getMemoryRequestServer());
     //OFF HEAP
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-       wmem = WritableMemory.allocateDirect(16, scope, memReqSvr);  //OFF HEAP
+       wmem = WritableMemory.allocateDirect(16, 1, scope, ByteOrder.nativeOrder(), memReqSvr);  //OFF HEAP
       assertNotNull(wmem.getMemoryRequestServer());
       wbuf = wmem.asWritableBuffer();
       assertNotNull(wbuf.getMemoryRequestServer());
@@ -407,7 +407,7 @@ public class MemoryTest {
     assertNotNull(wbuf.getMemoryRequestServer());
     //OFF HEAP
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory wmem2 = WritableMemory.allocateDirect(16, scope, memReqSvr);
+      WritableMemory wmem2 = WritableMemory.allocateDirect(16, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
       assertNotNull(wmem2.getMemoryRequestServer());
       wbuf = wmem.asWritableBuffer();
       assertNotNull(wbuf.getMemoryRequestServer());

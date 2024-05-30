@@ -75,7 +75,7 @@ public class SpecificLeafTest {
   public void checkDirectLeafs() throws Exception {
     int bytes = 128;
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(bytes, scope, memReqSvr);
+      WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
       assertFalse(((BaseStateImpl)wmem).isReadOnly());
       assertTrue(wmem.isDirect());
       assertFalse(wmem.isHeap());

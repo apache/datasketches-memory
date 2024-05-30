@@ -38,8 +38,7 @@ public class AllocateDirectMemoryTest {
   public void simpleAllocateDirect() {
     int longs = 32;
     WritableMemory wMem = null;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      wMem = WritableMemory.allocateDirect(longs << 3, scope, memReqSvr);
+    try (ResourceScope scope = (wMem = WritableMemory.allocateDirect(longs << 3, memReqSvr)).scope()) {
       for (int i = 0; i<longs; i++) {
         wMem.putLong(i << 3, i);
         assertEquals(wMem.getLong(i << 3), i);
@@ -56,9 +55,7 @@ public class AllocateDirectMemoryTest {
     int longs1 = 32;
     int bytes1 = longs1 << 3;
     WritableMemory wmem = null;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      wmem = WritableMemory.allocateDirect(bytes1, scope, memReqSvr);
-
+    try (ResourceScope scope = (wmem = WritableMemory.allocateDirect(bytes1, memReqSvr)).scope()) {
       for (int i = 0; i < longs1; i++) { //puts data in origWmem
         wmem.putLong(i << 3, i);
         assertEquals(wmem.getLong(i << 3), i);
@@ -81,9 +78,7 @@ public class AllocateDirectMemoryTest {
   @Test
   public void checkNonNativeDirect() {
     WritableMemory wmem = null;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      wmem = WritableMemory.allocateDirect( 128, 8, scope,
-          BaseState.NON_NATIVE_BYTE_ORDER, memReqSvr);
+    try (ResourceScope scope = (wmem = WritableMemory.allocateDirect(128, 8, BaseState.NON_NATIVE_BYTE_ORDER, memReqSvr)).scope()) {
       wmem.putChar(0, (char) 1);
       assertEquals(wmem.getByte(1), (byte) 1);
     }
@@ -94,8 +89,7 @@ public class AllocateDirectMemoryTest {
   public void checkExplicitCloseNoTWR() {
     final long cap = 128;
     WritableMemory wmem = null;
-    ResourceScope scope = ResourceScope.newConfinedScope();
-    wmem = WritableMemory.allocateDirect(cap, scope, memReqSvr);
+    wmem = WritableMemory.allocateDirect(cap, memReqSvr);
     wmem.close(); //explicit close
   }
 

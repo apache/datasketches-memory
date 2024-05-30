@@ -72,22 +72,19 @@ public interface WritableMemory extends Memory {
   /**
    * Maps the entire given file into native-ordered WritableMemory for write operations
    * Calling this method is equivalent to calling
-   * {@link #writableMap(File, long, long, ResourceScope, ByteOrder)
+   * {@link #writableMap(File, long, long, ByteOrder)
    *   writableMap(file, 0, file.length(), scope, ByteOrder.nativeOrder())}.
    * @param file the given file to map. It must be non-null with a non-negative length and writable.
-   * @param scope the give Resource Scope. It must be non-null.
    * @return mapped WritableMemory
    * @throws IllegalArgumentException -- if file is not readable.
    * @throws IllegalArgumentException -- if file is not writable.
-   * @throws IllegalStateException - if scope has been already closed, or if access occurs from a thread other
-   * than the thread owning scope.
    * @throws IOException - if the specified path does not point to an existing file, or if some other I/O error occurs.
    * @throws SecurityException - If a security manager is installed and it denies an unspecified permission
    * required by the implementation.
    */
-  static WritableMemory writableMap(File file, ResourceScope scope)
+  static WritableMemory writableMap(File file)
       throws IllegalArgumentException, IllegalStateException, IOException, SecurityException {
-    return writableMap(file, 0, file.length(), scope, ByteOrder.nativeOrder());
+    return writableMap(file, 0, file.length(), ByteOrder.nativeOrder());
   }
 
   /**
@@ -95,22 +92,39 @@ public interface WritableMemory extends Memory {
    * @param file the given file to map. It must be non-null with a non-negative length and writable.
    * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
    * @param capacityBytes the size of the mapped Memory. It must be &ge; 0.
-   * @param scope the give Resource Scope. It must be non-null.
    * @param byteOrder the byte order to be used.  It must be non-null.
    * @return mapped WritableMemory.
    * @throws IllegalArgumentException -- if file is not readable or writable.
    * @throws IllegalArgumentException -- if file is not writable.
-   * @throws IllegalStateException - if scope has been already closed, or if access occurs from a thread other
-   * than the thread owning scope.
    * @throws IOException - if the specified path does not point to an existing file, or if some other I/O error occurs.
    * @throws SecurityException - If a security manager is installed and it denies an unspecified permission
    * required by the implementation.
    */
-  static WritableMemory writableMap(File file, long fileOffsetBytes, long capacityBytes, ResourceScope scope,
-      ByteOrder byteOrder) throws IllegalArgumentException, IllegalStateException, IOException, SecurityException {
+  static WritableMemory writableMap(File file, long fileOffsetBytes, long capacityBytes, ByteOrder byteOrder) 
+		  throws IllegalArgumentException, IllegalStateException, IOException, SecurityException {
+	  ResourceScope scope = ResourceScope.newConfinedScope();
     return BaseWritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, false, byteOrder);
   }
 
+  /**
+   * Maps the specified portion of the given file into Memory for write operations with a ResourceScope.
+   * @param file the given file to map. It must be non-null with a non-negative length and writable.
+   * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
+   * @param capacityBytes the size of the mapped Memory. It must be &ge; 0.
+   * @param scope the given ResourceScope.
+   * @param byteOrder the byte order to be used.  It must be non-null.
+   * @return mapped WritableMemory.
+   * @throws IllegalArgumentException -- if file is not readable or writable.
+   * @throws IllegalArgumentException -- if file is not writable.
+   * @throws IOException - if the specified path does not point to an existing file, or if some other I/O error occurs.
+   * @throws SecurityException - If a security manager is installed and it denies an unspecified permission
+   * required by the implementation.
+   */
+  static WritableMemory writableMap(File file, long fileOffsetBytes, long capacityBytes, ResourceScope scope, ByteOrder byteOrder) 
+		  throws IllegalArgumentException, IllegalStateException, IOException, SecurityException {
+    return BaseWritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, false, byteOrder);
+  }
+  
   //ALLOCATE DIRECT
 
   /**
@@ -121,12 +135,11 @@ public interface WritableMemory extends Memory {
    * <p><b>NOTICE:</b> It is the responsibility of the using application to call <i>close()</i> when done.</p>
    *
    * @param capacityBytes the size of the desired memory in bytes.
-   * @param scope the given ResourceScope. It must be non-null.
    * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
    * @return WritableMemory for this off-heap, native resource.
    */
-  static WritableMemory allocateDirect(long capacityBytes, ResourceScope scope, MemoryRequestServer memReqSvr) {
-    return allocateDirect(capacityBytes, 8, scope, ByteOrder.nativeOrder(), memReqSvr);
+  static WritableMemory allocateDirect(long capacityBytes, MemoryRequestServer memReqSvr) {
+    return allocateDirect(capacityBytes, 8, ByteOrder.nativeOrder(), memReqSvr);
   }
 
   /**
@@ -138,7 +151,30 @@ public interface WritableMemory extends Memory {
    *
    * @param capacityBytes the size of the desired memory in bytes.
    * @param alignmentBytes requested segment alignment. Typically 1, 2, 4 or 8.
-   * @param scope the given ResourceScope. It must be non-null.
+   * @param byteOrder the byte order to be used.  It must be non-null.
+   * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
+   * This is a callback mechanism for a user client of direct memory to request more memory.
+   * @return WritableMemory
+   */
+  static WritableMemory allocateDirect(
+      long capacityBytes,
+      long alignmentBytes,
+      ByteOrder byteOrder,
+      MemoryRequestServer memReqSvr) {
+	  final ResourceScope scope = ResourceScope.newConfinedScope();
+    return BaseWritableMemoryImpl.wrapDirect(capacityBytes, alignmentBytes, scope, byteOrder, memReqSvr);
+  }
+
+  /**
+   * Allocates and provides access to capacityBytes directly in native (off-heap) memory with a ResourceScope.
+   * The allocated memory will be aligned to the given <i>alignmentBytes</i>.
+   *
+   * <p><b>NOTICE:</b> It is the responsibility of the using application to
+   * call <i>close()</i> when done.</p>
+   *
+   * @param capacityBytes the size of the desired memory in bytes.
+   * @param alignmentBytes requested segment alignment. Typically 1, 2, 4 or 8.
+   * @param scope the given ResourceScope.
    * @param byteOrder the byte order to be used.  It must be non-null.
    * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
    * This is a callback mechanism for a user client of direct memory to request more memory.
@@ -152,7 +188,7 @@ public interface WritableMemory extends Memory {
       MemoryRequestServer memReqSvr) {
     return BaseWritableMemoryImpl.wrapDirect(capacityBytes, alignmentBytes, scope, byteOrder, memReqSvr);
   }
-
+  
   //REGIONS
   /**
    * A writable region is a writable view of this object.
@@ -554,7 +590,7 @@ public interface WritableMemory extends Memory {
    * Gets the MemoryRequestServer implementation, if set, to request additional memory.
    * The user must customize the actions of the MemoryRequestServer by
    * implementing the MemoryRequestServer interface and set using this method:
-   * {@link WritableMemory#allocateDirect(long, long, ResourceScope, ByteOrder, MemoryRequestServer)}.
+   * {@link WritableMemory#allocateDirect(long, long, ByteOrder, MemoryRequestServer)}.
    * Simple implementation examples include the DefaultMemoryRequestServer in the main tree, as well as
    * the ExampleMemoryRequestServerTest and the use with ByteBuffer documented in the DruidIssue11544Test
    * in the test tree.

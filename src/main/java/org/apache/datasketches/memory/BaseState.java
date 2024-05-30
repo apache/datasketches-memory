@@ -64,8 +64,8 @@ public interface BaseState {
   ByteBuffer asByteBufferView(ByteOrder order);
 
   /**
-   * For off-heap segments, this closes the controlling ResourceScope. If the segment is
-   * not off-heap, this does nothing.
+   * For off-heap segments, this closes the underlying ResourceScope. If the segment is
+   * on-heap, this does nothing.
    */
   void close();
 
@@ -105,6 +105,13 @@ public interface BaseState {
   long getCapacity();
 
   /**
+   * Gets the base offset of <i>that</i> with respect to the base of <i>this</i>.
+   * @param that
+   * @return
+   */
+  long getCumulativeOffset(BaseState that);
+  
+  /**
    * Returns the configured MemoryRequestSever or null, if it has not been configured.
    * @return the configured MemoryRequestSever or null, if it has not been configured.
    */
@@ -116,6 +123,12 @@ public interface BaseState {
    * @return the current Type ByteOrder.
    */
   ByteOrder getByteOrder();
+
+  /**
+   * Return the owner thread of the underlying ResourceScope, or null.
+   * @return the owner thread of the underlying ResourceScope, or null.
+   */
+  Thread getOwnerThread();
 
   /**
    * Returns true if this Memory is backed by a ByteBuffer.
@@ -202,7 +215,12 @@ public interface BaseState {
    * @return true if this instance is a region view of another Memory or Buffer
    */
   boolean isRegion();
-
+  
+  /**
+   * Returns true if the underlying resource is the same underlying resource as <i>that</i>.
+   */
+  boolean isSameResource(BaseState that);
+  
   /**
    * Loads the contents of this mapped segment into physical memory. Please refer to
    * <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#load()">load()</a>
@@ -227,7 +245,7 @@ public interface BaseState {
    * otherwise -1 if no mismatch
    */
   long mismatch(BaseState that);
-
+  
   /**
    * Returns the resource scope associated with this memory segment.
    * @return the resource scope associated with this memory segment.

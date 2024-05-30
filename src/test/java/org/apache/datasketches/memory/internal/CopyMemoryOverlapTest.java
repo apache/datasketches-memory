@@ -21,6 +21,8 @@ package org.apache.datasketches.memory.internal;
 
 import static org.testng.Assert.assertEquals;
 
+import java.nio.ByteOrder;
+
 import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.MemoryRequestServer;
@@ -97,7 +99,7 @@ public class CopyMemoryOverlapTest {
     println("Backing longs: " + backingLongs + "\t bytes: " + backingBytes);
 
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory backingMem = WritableMemory.allocateDirect(backingBytes, scope, memReqSvr);
+      WritableMemory backingMem = WritableMemory.allocateDirect(backingBytes,  1, scope, ByteOrder.nativeOrder(), memReqSvr);
       fill(backingMem); //fill mem with 0 thru copyLongs -1
       //listMem(backingMem, "Original");
       backingMem.copyTo(fromOffsetBytes, backingMem, toOffsetBytes, copyBytes);
@@ -137,7 +139,7 @@ public class CopyMemoryOverlapTest {
     println("Backing longs: " + backingLongs + "\t bytes: " + backingBytes);
 
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory backingMem = WritableMemory.allocateDirect(backingBytes, scope, memReqSvr);
+      WritableMemory backingMem = WritableMemory.allocateDirect(backingBytes, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
       fill(backingMem); //fill mem with 0 thru copyLongs -1
       //listMem(backingMem, "Original");
       WritableMemory reg1 = backingMem.writableRegion(fromOffsetBytes, copyBytes);

@@ -81,8 +81,7 @@ public class BaseBufferTest {
   public void checkCheckNotAliveAfterTWR() {
     WritableMemory wmem;
     Buffer buf;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      wmem = WritableMemory.allocateDirect(100, scope, memReqSvr);
+    try (ResourceScope scope = (wmem = WritableMemory.allocateDirect(100, memReqSvr)).scope()) {
       buf = wmem.asBuffer();
     }
     try {

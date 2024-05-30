@@ -27,6 +27,8 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.nio.ByteOrder;
+
 import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableMemory;
@@ -40,7 +42,7 @@ public class CommonMemoryTest {
   public void checkSetGet() throws Exception {
     int memCapacity = 16; //must be at least 8
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, scope, memReqSvr);
+      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
       assertEquals(mem.getCapacity(), memCapacity);
       setGetTests(mem);
     }
@@ -92,7 +94,7 @@ public class CommonMemoryTest {
   public void checkSetGetArrays() throws Exception {
     int memCapacity = 32;
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, scope, memReqSvr);
+      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
       assertEquals(memCapacity, mem.getCapacity());
       setGetArraysTests(mem);
     }
@@ -162,7 +164,7 @@ public class CommonMemoryTest {
   public void checkSetGetPartialArraysWithOffset() throws Exception {
     int memCapacity = 32;
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, scope, memReqSvr);
+      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
       assertEquals(memCapacity, mem.getCapacity());
       setGetPartialArraysWithOffsetTests(mem);
     }
@@ -232,7 +234,7 @@ public class CommonMemoryTest {
   public void checkSetClearIsBits() throws Exception {
     int memCapacity = 8;
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, scope, memReqSvr);
+      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
       assertEquals(memCapacity, mem.getCapacity());
       mem.clear();
       setClearIsBitsTests(mem);
@@ -273,7 +275,7 @@ public class CommonMemoryTest {
   public void checkSetClearMemoryRegions() throws Exception {
     int memCapacity = 64; //must be 64
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, scope, memReqSvr);
+      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
 
       setClearMemoryRegionsTests(mem); //requires println enabled to visually check
       for (int i = 0; i < memCapacity; i++) {
@@ -344,7 +346,7 @@ public class CommonMemoryTest {
   public void checkToHexStringAllMem() throws Exception {
     int memCapacity = 48; //must be 48
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, scope, memReqSvr);
+      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
       toHexStringAllMemTests(mem); //requires println enabled to visually check
     }
   }

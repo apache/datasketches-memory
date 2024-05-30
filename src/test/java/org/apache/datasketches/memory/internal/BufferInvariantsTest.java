@@ -23,6 +23,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.Buffer;
@@ -166,7 +167,7 @@ public class BufferInvariantsTest {
   @Test
   public void checkLimitsDirect() throws Exception {
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(100, scope, memReqSvr);
+      WritableMemory wmem = WritableMemory.allocateDirect(100, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
       Buffer buf = wmem.asBuffer();
       buf.setStartPositionEnd(40, 45, 50);
       buf.setStartPositionEnd(0, 0, 100);
@@ -237,7 +238,7 @@ public class BufferInvariantsTest {
   public void testBufDirect() throws Exception {
     int n = 25;
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-    WritableMemory wmem = WritableMemory.allocateDirect(n, scope, memReqSvr);
+    WritableMemory wmem = WritableMemory.allocateDirect(n, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
     WritableBuffer buf = wmem.asWritableBuffer();
     for (byte i = 0; i < n; i++) { buf.putByte(i); }
     buf.setPosition(0);

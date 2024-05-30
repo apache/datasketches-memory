@@ -23,6 +23,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.datasketches.memory.MurmurHash3.*;
 import static org.testng.Assert.fail;
 
+import java.nio.ByteOrder;
+
 import org.apache.datasketches.memory.BaseState;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.MemoryRequestServer;
@@ -275,7 +277,7 @@ public class MurmurHash3v3Test {
       out = hash(mem, 0L, 4L, 1L, out);
     } catch (final IllegalArgumentException e) { }
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      Memory mem = WritableMemory.allocateDirect(8, scope, memReqSvr);
+      Memory mem = WritableMemory.allocateDirect(8, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
       long[] out = new long[2];
       out = hash(mem, 0L, 4L, 1L, out);
     } catch (Exception ee) {}

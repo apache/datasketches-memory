@@ -401,7 +401,7 @@ public class Buffer2Test {
   public void checkIndependence() {
     int cap = 64;
     ResourceScope scope = ResourceScope.newImplicitScope();
-    WritableMemory wmem = WritableMemory.allocateDirect(cap, scope, null);
+    WritableMemory wmem = WritableMemory.allocateDirect(cap, 8, scope, ByteOrder.nativeOrder(), null);
     WritableBuffer wbuf1 = wmem.asWritableBuffer();
     WritableBuffer wbuf2 = wmem.asWritableBuffer();
     assertFalse(wbuf1 == wbuf2);

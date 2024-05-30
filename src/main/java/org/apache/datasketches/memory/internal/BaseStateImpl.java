@@ -303,6 +303,12 @@ abstract class BaseStateImpl implements BaseState {
   }
 
   @Override
+  public final long getCumulativeOffset(final BaseState that) {
+	  final BaseStateImpl that2 = (BaseStateImpl) that;
+	  return this.seg.address().segmentOffset(that2.seg);
+  }
+  
+  @Override
   public MemoryRequestServer getMemoryRequestServer() {
     return memReqSvr;
   }
@@ -312,6 +318,11 @@ abstract class BaseStateImpl implements BaseState {
     return (typeId & NONNATIVE) > 0 ? NON_NATIVE_BYTE_ORDER : ByteOrder.nativeOrder();
   }
 
+  @Override
+  public Thread getOwnerThread() {
+	  return seg.scope().ownerThread();
+  }
+  
   @Override
   public final boolean hasByteBuffer() {
     return (typeId & BYTEBUF) > 0;
@@ -377,7 +388,13 @@ abstract class BaseStateImpl implements BaseState {
   public final boolean isRegion() {
     return (typeId & REGION) > 0;
   }
-
+  
+  @Override
+  public final boolean isSameResource(BaseState that) {
+	  BaseStateImpl that2 = (BaseStateImpl) that;
+	  return this.seg.address().equals(that2.seg.address());
+  }
+  
   @Override
   public void load() { seg.load(); }
 

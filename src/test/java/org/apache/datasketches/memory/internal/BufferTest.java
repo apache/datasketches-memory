@@ -42,7 +42,7 @@ public class BufferTest {
   public void checkDirectRoundTrip() throws Exception {
     int n = 1024; //longs
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-    WritableMemory wmem = WritableMemory.allocateDirect(n * 8, scope, memReqSvr);
+    WritableMemory wmem = WritableMemory.allocateDirect(n * 8, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
       WritableBuffer wbuf = wmem.asWritableBuffer();
       for (int i = 0; i < n; i++) {
         wbuf.putLong(i);
@@ -285,7 +285,7 @@ public class BufferTest {
   @Test(expectedExceptions = IllegalStateException.class)
   public void checkParentUseAfterFree() throws Exception {
     int bytes = 64 * 8;
-    WritableMemory wmem = WritableMemory.allocateDirect(bytes, ResourceScope.newConfinedScope(), memReqSvr);
+    WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, ResourceScope.newConfinedScope(), ByteOrder.nativeOrder(), memReqSvr);
     WritableBuffer wbuf = wmem.asWritableBuffer();
     wbuf.close();
     //with -ea assert: Memory not valid.
@@ -297,7 +297,7 @@ public class BufferTest {
   @Test(expectedExceptions = IllegalStateException.class)
   public void checkRegionUseAfterFree() throws Exception {
     int bytes = 64;
-    WritableMemory wmem = WritableMemory.allocateDirect(bytes, ResourceScope.newConfinedScope(), memReqSvr);
+    WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, ResourceScope.newConfinedScope(), ByteOrder.nativeOrder(), memReqSvr);
     Buffer region = wmem.asBuffer().region();
     region.close();
     //with -ea assert: Memory not valid.

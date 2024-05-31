@@ -216,7 +216,7 @@ public class NativeWritableBufferImplTest {
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
       WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
       WritableBuffer wbuf = wmem.asWritableBuffer();
-      wbuf.writableRegion(1, 64, wbuf.getByteOrder()); //wrong!
+      wbuf.writableRegion(1, 64, wbuf.getTypeByteOrder()); //wrong!
     }
   }
 
@@ -515,13 +515,13 @@ public class NativeWritableBufferImplTest {
     ByteBuffer bb = ByteBuffer.allocate(64);
     WritableBuffer wbuf = WritableBuffer.writableWrap(bb);
     @SuppressWarnings("unused")
-    WritableBuffer wreg = wbuf.writableRegion(0, 1, wbuf.getByteOrder());
+    WritableBuffer wreg = wbuf.writableRegion(0, 1, wbuf.getTypeByteOrder());
 
     try {
       Buffer buf = Buffer.wrap(bb);
       wbuf = (WritableBuffer) buf;
       @SuppressWarnings("unused")
-      WritableBuffer wreg2 = wbuf.writableRegion(0, 1, wbuf.getByteOrder());
+      WritableBuffer wreg2 = wbuf.writableRegion(0, 1, wbuf.getTypeByteOrder());
       Assert.fail();
     } catch (IllegalArgumentException expected) {
       // ignore
@@ -532,7 +532,7 @@ public class NativeWritableBufferImplTest {
   public void checkZeroBuffer() {
     WritableMemory wmem = WritableMemory.allocate(8);
     WritableBuffer wbuf = wmem.asWritableBuffer();
-    WritableBuffer reg = wbuf.writableRegion(0, 0, wbuf.getByteOrder());
+    WritableBuffer reg = wbuf.writableRegion(0, 0, wbuf.getTypeByteOrder());
     assertEquals(reg.getCapacity(), 0);
   }
 

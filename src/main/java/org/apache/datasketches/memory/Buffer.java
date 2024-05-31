@@ -81,7 +81,7 @@ public interface Buffer extends BaseBuffer {
    * <i>start</i>, <i>position</i> and <i>end</i>.
    */
   default Buffer duplicate() {
-    return duplicate(getByteOrder());
+    return duplicate(getTypeByteOrder());
   }
 
   /**
@@ -122,7 +122,7 @@ public interface Buffer extends BaseBuffer {
    * <i>position</i> and <i>end</i>.
    */
   default Buffer region() {
-    return region(getPosition(), getEnd() - getPosition(), getByteOrder());
+    return region(getPosition(), getEnd() - getPosition(), getTypeByteOrder());
   }
 
   /**
@@ -154,7 +154,7 @@ public interface Buffer extends BaseBuffer {
    * @return Memory
    */
   default Memory asMemory() {
-    return asMemory(getByteOrder());
+    return asMemory(getTypeByteOrder());
   }
 
   /**

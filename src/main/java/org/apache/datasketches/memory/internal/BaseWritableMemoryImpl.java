@@ -365,7 +365,7 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
 
   @Override
   public final byte[] getArray() {
-	return seg.toByteArray();
+	  return seg.toByteArray();
   }
   
   @Override

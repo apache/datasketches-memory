@@ -205,7 +205,7 @@ public class BufferTest {
     ByteBuffer bb = ByteBuffer.allocate(n * 8);
     bb.order(BaseState.NON_NATIVE_BYTE_ORDER);
     Buffer buf = Buffer.wrap(bb);
-    assertEquals(buf.getByteOrder(), ByteOrder.nativeOrder());
+    assertEquals(buf.getTypeByteOrder(), ByteOrder.nativeOrder());
   }
 
   @Test

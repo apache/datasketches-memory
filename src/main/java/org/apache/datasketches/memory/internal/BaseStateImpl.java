@@ -245,7 +245,7 @@ abstract class BaseStateImpl implements BaseState {
     sb.append("MemoryAddress hashCode : ").append(addHCStr).append(LS);
     sb.append("MemReqSvr, hashCode    : ").append(memReqStr).append(LS);
     sb.append("Read Only              : ").append(state.isReadOnly()).append(LS);
-    sb.append("Type Byte Order        : ").append(state.getByteOrder().toString()).append(LS);
+    sb.append("Type Byte Order        : ").append(state.getTypeByteOrder().toString()).append(LS);
     sb.append("Native Byte Order      : ").append(ByteOrder.nativeOrder().toString()).append(LS);
     sb.append("JDK Runtime Version    : ").append(JDK).append(LS);
     //Data detail
@@ -303,7 +303,7 @@ abstract class BaseStateImpl implements BaseState {
   }
 
   @Override
-  public final long getCumulativeOffset(final BaseState that) {
+  public final long getRelativeOffset(final BaseState that) {
 	  final BaseStateImpl that2 = (BaseStateImpl) that;
 	  return this.seg.address().segmentOffset(that2.seg);
   }
@@ -314,7 +314,7 @@ abstract class BaseStateImpl implements BaseState {
   }
 
   @Override
-  public final ByteOrder getByteOrder() {
+  public final ByteOrder getTypeByteOrder() {
     return (typeId & NONNATIVE) > 0 ? NON_NATIVE_BYTE_ORDER : ByteOrder.nativeOrder();
   }
 
@@ -339,7 +339,7 @@ abstract class BaseStateImpl implements BaseState {
 
   @Override
   public final boolean isByteOrderCompatible(final ByteOrder byteOrder) {
-    final ByteOrder typeBO = getByteOrder();
+    final ByteOrder typeBO = getTypeByteOrder();
     return typeBO == ByteOrder.nativeOrder() && typeBO == byteOrder;
   }
 

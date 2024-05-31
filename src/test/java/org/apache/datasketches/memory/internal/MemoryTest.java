@@ -238,12 +238,12 @@ public class MemoryTest {
     ByteBuffer bb = ByteBuffer.allocate(n * 8);
     bb.order(ByteOrder.BIG_ENDIAN); //ignored
     Memory mem = Memory.wrap(bb); //Defaults to LE
-    assertTrue(mem.getByteOrder() == ByteOrder.nativeOrder());
-    assertEquals(mem.getByteOrder(), ByteOrder.LITTLE_ENDIAN);
+    assertTrue(mem.getTypeByteOrder() == ByteOrder.nativeOrder());
+    assertEquals(mem.getTypeByteOrder(), ByteOrder.LITTLE_ENDIAN);
     //Now explicitly set it
     mem = Memory.wrap(bb, BaseState.NON_NATIVE_BYTE_ORDER);
-    assertFalse(mem.getByteOrder() == ByteOrder.nativeOrder());
-    assertEquals(mem.getByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertFalse(mem.getTypeByteOrder() == ByteOrder.nativeOrder());
+    assertEquals(mem.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test

@@ -105,11 +105,13 @@ public interface BaseState {
   long getCapacity();
 
   /**
-   * Gets the base offset of <i>that</i> with respect to the base of <i>this</i>.
-   * @param that
-   * @return
+   * Gets the relative base offset of <i>this</i> with respect to <i>that</i>, defined as: <i>this</i> - <i>that</i>. 
+   * This method is only valid for <i>native</i> (off-heap) allocated resources.
+   * @throws IllegalArgumentException if one of the resources is on-heap.
+   * @param that the given resource.
+   * @return <i>this</i> - <i>that</i> offset
    */
-  long getCumulativeOffset(BaseState that);
+  long getRelativeOffset(BaseState that);
   
   /**
    * Returns the configured MemoryRequestSever or null, if it has not been configured.
@@ -122,7 +124,7 @@ public interface BaseState {
    * This may be different from the ByteOrder of the backing resource and of the Native Byte Order.
    * @return the current Type ByteOrder.
    */
-  ByteOrder getByteOrder();
+  ByteOrder getTypeByteOrder();
 
   /**
    * Return the owner thread of the underlying ResourceScope, or null.

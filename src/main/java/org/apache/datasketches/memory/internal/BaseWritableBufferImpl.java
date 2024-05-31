@@ -150,7 +150,7 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
   //DUPLICATES, DERIVED
   @Override
   public Buffer duplicate() {
-    return duplicateImpl(true, getByteOrder());
+    return duplicateImpl(true, getTypeByteOrder());
   }
 
   @Override
@@ -163,7 +163,7 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
     if (isReadOnly()) {
       throw new IllegalArgumentException("Cannot create a writable duplicate from a read-only Buffer.");
     }
-    return duplicateImpl(false, getByteOrder());
+    return duplicateImpl(false, getTypeByteOrder());
   }
 
   @Override
@@ -329,5 +329,10 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
   @Override
   public final void fill(final byte value) {
     seg.fill(value);
+  }
+  
+  @Override
+  public final byte[] getArray() {
+    return seg.toByteArray();
   }
 }

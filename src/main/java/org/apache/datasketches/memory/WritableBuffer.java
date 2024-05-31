@@ -120,7 +120,7 @@ public interface WritableBuffer extends Buffer {
    * @return a new <i>WritableBuffer</i> representing the defined writable region.
    */
   default WritableBuffer writableRegion() {
-    return writableRegion(getPosition(), getEnd() - getPosition(), getByteOrder());
+    return writableRegion(getPosition(), getEnd() - getPosition(), getTypeByteOrder());
   }
 
   /**
@@ -374,6 +374,12 @@ public interface WritableBuffer extends Buffer {
    */
   void fill(byte value);
 
+  /**
+   * Returns a copy of the primitive backing byte array.
+   * @return a copy of the primitive backing byte array.
+   */
+  byte[] getArray();
+  
   //NO fill(offsetBytes, lengthBytes, value)
 
   //NO setBits(...)

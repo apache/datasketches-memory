@@ -139,7 +139,7 @@ public interface WritableMemory extends Memory {
    * @return WritableMemory for this off-heap, native resource.
    */
   static WritableMemory allocateDirect(long capacityBytes, MemoryRequestServer memReqSvr) {
-    return allocateDirect(capacityBytes, 8, ByteOrder.nativeOrder(), memReqSvr);
+    return allocateDirect(capacityBytes, 1, ByteOrder.nativeOrder(), memReqSvr);
   }
 
   /**
@@ -204,7 +204,7 @@ public interface WritableMemory extends Memory {
    * @return a new <i>WritableMemory</i> representing the defined writable region.
    */
   default WritableMemory writableRegion(long offsetBytes, long capacityBytes) {
-    return writableRegion(offsetBytes, capacityBytes, getByteOrder());
+    return writableRegion(offsetBytes, capacityBytes, getTypeByteOrder());
   }
 
   /**
@@ -238,7 +238,7 @@ public interface WritableMemory extends Memory {
    * @return a new <i>WritableBuffer</i> with a view of this WritableMemory
    */
   default WritableBuffer asWritableBuffer() {
-    return asWritableBuffer(getByteOrder());
+    return asWritableBuffer(getTypeByteOrder());
   }
 
   /**

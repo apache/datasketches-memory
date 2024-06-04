@@ -540,7 +540,7 @@ public class NativeWritableMemoryImplTest {
 
   @Test
   public void checkGoodBounds() {
-    BaseStateImpl.checkBounds(50, 50, 100);
+    ResourceImpl.checkBounds(50, 50, 100);
   }
 
   @Test
@@ -569,7 +569,7 @@ public class NativeWritableMemoryImplTest {
     assertEquals(comp, 0);
     comp = mem3.compareTo(0, 4, mem4, 1, 4);
     assertEquals(comp, -1);
-    BaseStateImpl.checkBounds(0, 5, mem3.getCapacity());
+    ResourceImpl.checkBounds(0, 5, mem3.getCapacity());
   }
 
   @Test

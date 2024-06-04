@@ -42,7 +42,7 @@ import jdk.incubator.foreign.MemorySegment;
  *
  * @author Lee Rhodes
  */
-abstract class BaseBufferImpl extends BaseStateImpl implements BaseBuffer {
+abstract class BaseBufferImpl extends ResourceImpl implements BaseBuffer {
   private long capacity;
   private long start = 0;
   private long pos = 0;

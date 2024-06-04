@@ -22,12 +22,12 @@ package org.apache.datasketches.memory.internal;
 import static jdk.incubator.foreign.MemoryAccess.getByteAtOffset;
 import static jdk.incubator.foreign.MemoryAccess.getIntAtOffset;
 import static jdk.incubator.foreign.MemoryAccess.getLongAtOffset;
-import static org.apache.datasketches.memory.internal.BaseStateImpl.CHAR_SHIFT;
-import static org.apache.datasketches.memory.internal.BaseStateImpl.DOUBLE_SHIFT;
-import static org.apache.datasketches.memory.internal.BaseStateImpl.FLOAT_SHIFT;
-import static org.apache.datasketches.memory.internal.BaseStateImpl.INT_SHIFT;
-import static org.apache.datasketches.memory.internal.BaseStateImpl.LONG_SHIFT;
-import static org.apache.datasketches.memory.internal.BaseStateImpl.SHORT_SHIFT;
+import static org.apache.datasketches.memory.internal.ResourceImpl.CHAR_SHIFT;
+import static org.apache.datasketches.memory.internal.ResourceImpl.DOUBLE_SHIFT;
+import static org.apache.datasketches.memory.internal.ResourceImpl.FLOAT_SHIFT;
+import static org.apache.datasketches.memory.internal.ResourceImpl.INT_SHIFT;
+import static org.apache.datasketches.memory.internal.ResourceImpl.LONG_SHIFT;
+import static org.apache.datasketches.memory.internal.ResourceImpl.SHORT_SHIFT;
 
 import jdk.incubator.foreign.MemorySegment;
 

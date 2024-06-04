@@ -353,7 +353,7 @@ public class NativeWritableBufferImplTest {
 
   @Test
   public void checkGoodBounds() {
-   BaseStateImpl.checkBounds(50, 50, 100);
+   ResourceImpl.checkBounds(50, 50, 100);
   }
 
   @Test

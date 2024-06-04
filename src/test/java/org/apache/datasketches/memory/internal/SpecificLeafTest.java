@@ -76,7 +76,7 @@ public class SpecificLeafTest {
     int bytes = 128;
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
       WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
-      assertFalse(((BaseStateImpl)wmem).isReadOnly());
+      assertFalse(((ResourceImpl)wmem).isReadOnly());
       assertTrue(wmem.isDirect());
       assertFalse(wmem.isHeap());
       assertFalse(wmem.isReadOnly());
@@ -143,7 +143,7 @@ public class SpecificLeafTest {
     int bytes = 128;
     Memory mem = Memory.wrap(new byte[bytes]);
     assertTrue(mem.isHeap());
-    assertTrue(((BaseStateImpl)mem).isReadOnly());
+    assertTrue(((ResourceImpl)mem).isReadOnly());
     checkCrossLeafTypeIds(mem);
     Memory nnreg = mem.region(0, bytes, Resource.NON_NATIVE_BYTE_ORDER);
 

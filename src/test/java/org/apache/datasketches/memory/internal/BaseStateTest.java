@@ -39,36 +39,36 @@ public class BaseStateTest {
   public void checkNativeOverlap() {
     MemorySegment par = MemorySegment.allocateNative(100, ResourceScope.newImplicitScope());
     //Equal sizes
-    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 20), getSeg(par, 40, 60)),   0);
-    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 20), getSeg(par, 20, 40)),   0);
-    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 20), getSeg(par,  0, 20)),  20);
-    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 20), getSeg(par, 10, 30)),  10);
-    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 10, 30), getSeg(par,  0, 20)), -10);
-    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 20, 40), getSeg(par,  0, 20)),   0);
-    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0,  0), getSeg(par,  0,  0)),   0);
+    assertEquals(ResourceImpl.nativeOverlap(getSeg(par,  0, 20), getSeg(par, 40, 60)),   0);
+    assertEquals(ResourceImpl.nativeOverlap(getSeg(par,  0, 20), getSeg(par, 20, 40)),   0);
+    assertEquals(ResourceImpl.nativeOverlap(getSeg(par,  0, 20), getSeg(par,  0, 20)),  20);
+    assertEquals(ResourceImpl.nativeOverlap(getSeg(par,  0, 20), getSeg(par, 10, 30)),  10);
+    assertEquals(ResourceImpl.nativeOverlap(getSeg(par, 10, 30), getSeg(par,  0, 20)), -10);
+    assertEquals(ResourceImpl.nativeOverlap(getSeg(par, 20, 40), getSeg(par,  0, 20)),   0);
+    assertEquals(ResourceImpl.nativeOverlap(getSeg(par,  0,  0), getSeg(par,  0,  0)),   0);
     //Unequal Sizes A > B
-    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 40), getSeg(par, 60, 80)),   0);
-    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 40), getSeg(par, 40, 60)),   0);
-    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 40), getSeg(par, 30, 50)),  10);
-    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 40), getSeg(par, 20, 40)),  20);
-    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 40), getSeg(par, 10, 30)),  20);
-    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 40), getSeg(par,  0, 20)),  20);
-    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 10, 50), getSeg(par,  0, 20)), -10);
-    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 20, 60), getSeg(par,  0, 20)),   0);
-    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 40, 80), getSeg(par,  0, 20)),   0);
-    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 40, 80), getSeg(par,  0,  0)),   0);
+    assertEquals(ResourceImpl.nativeOverlap(getSeg(par,  0, 40), getSeg(par, 60, 80)),   0);
+    assertEquals(ResourceImpl.nativeOverlap(getSeg(par,  0, 40), getSeg(par, 40, 60)),   0);
+    assertEquals(ResourceImpl.nativeOverlap(getSeg(par,  0, 40), getSeg(par, 30, 50)),  10);
+    assertEquals(ResourceImpl.nativeOverlap(getSeg(par,  0, 40), getSeg(par, 20, 40)),  20);
+    assertEquals(ResourceImpl.nativeOverlap(getSeg(par,  0, 40), getSeg(par, 10, 30)),  20);
+    assertEquals(ResourceImpl.nativeOverlap(getSeg(par,  0, 40), getSeg(par,  0, 20)),  20);
+    assertEquals(ResourceImpl.nativeOverlap(getSeg(par, 10, 50), getSeg(par,  0, 20)), -10);
+    assertEquals(ResourceImpl.nativeOverlap(getSeg(par, 20, 60), getSeg(par,  0, 20)),   0);
+    assertEquals(ResourceImpl.nativeOverlap(getSeg(par, 40, 80), getSeg(par,  0, 20)),   0);
+    assertEquals(ResourceImpl.nativeOverlap(getSeg(par, 40, 80), getSeg(par,  0,  0)),   0);
 
     //Unequal Sizes B > A
-    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 60, 80), getSeg(par,  0, 40)),   0);
-    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 40, 60), getSeg(par,  0, 40)),   0);
-    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 30, 50), getSeg(par,  0, 40)), -10);
-    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 20, 40), getSeg(par,  0, 40)), -20);
-    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par, 10, 30), getSeg(par,  0, 40)), -20);
-    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 20), getSeg(par,  0, 40)),  20);
-    assertEquals(BaseStateImpl.nativeOverlap( getSeg(par, 0, 20), getSeg(par, 10, 50)),  10);
-    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 20), getSeg(par, 20, 60)),   0);
-    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0, 20), getSeg(par, 40, 80)),   0);
-    assertEquals(BaseStateImpl.nativeOverlap(getSeg(par,  0,  0), getSeg(par, 40, 80)),   0);
+    assertEquals(ResourceImpl.nativeOverlap(getSeg(par, 60, 80), getSeg(par,  0, 40)),   0);
+    assertEquals(ResourceImpl.nativeOverlap(getSeg(par, 40, 60), getSeg(par,  0, 40)),   0);
+    assertEquals(ResourceImpl.nativeOverlap(getSeg(par, 30, 50), getSeg(par,  0, 40)), -10);
+    assertEquals(ResourceImpl.nativeOverlap(getSeg(par, 20, 40), getSeg(par,  0, 40)), -20);
+    assertEquals(ResourceImpl.nativeOverlap(getSeg(par, 10, 30), getSeg(par,  0, 40)), -20);
+    assertEquals(ResourceImpl.nativeOverlap(getSeg(par,  0, 20), getSeg(par,  0, 40)),  20);
+    assertEquals(ResourceImpl.nativeOverlap( getSeg(par, 0, 20), getSeg(par, 10, 50)),  10);
+    assertEquals(ResourceImpl.nativeOverlap(getSeg(par,  0, 20), getSeg(par, 20, 60)),   0);
+    assertEquals(ResourceImpl.nativeOverlap(getSeg(par,  0, 20), getSeg(par, 40, 80)),   0);
+    assertEquals(ResourceImpl.nativeOverlap(getSeg(par,  0,  0), getSeg(par, 40, 80)),   0);
   }
 
   private static MemorySegment getSeg(MemorySegment parent, long left, long right) {
@@ -101,7 +101,7 @@ public class BaseStateTest {
   @Test
   public void checkTypeDecode() {
     for (int i = 0; i < 256; i++) {
-      String str = BaseStateImpl.typeDecode(i);
+      String str = ResourceImpl.typeDecode(i);
       println(i + "\t" + str);
     }
   }

@@ -34,12 +34,12 @@ import jdk.incubator.foreign.MemorySegment;
 import jdk.incubator.foreign.ResourceScope;
 
 /**
- * Keeps key configuration state for MemoryImpl and BufferImpl plus some common static variables
+ * Base implementation class for MemoryImpl and BufferImpl plus some common static variables
  * and check methods.
  *
  * @author Lee Rhodes
  */
-abstract class BaseStateImpl implements Resource {
+abstract class ResourceImpl implements Resource {
   static final String JDK; //must be at least "1.8"
   static final int JDK_MAJOR; //8, 11, 12, etc
 
@@ -86,7 +86,7 @@ abstract class BaseStateImpl implements Resource {
 
   MemoryRequestServer memReqSvr;
 
-  BaseStateImpl(final MemorySegment seg, final int typeId, final MemoryRequestServer memReqSvr) {
+  ResourceImpl(final MemorySegment seg, final int typeId, final MemoryRequestServer memReqSvr) {
     this.seg = seg;
     this.typeId = typeId;
     this.memReqSvr = memReqSvr;
@@ -217,35 +217,35 @@ abstract class BaseStateImpl implements Resource {
   /**
    * Returns a formatted hex string of an area of this object.
    * Used primarily for testing.
-   * @param state the BaseStateImpl
+   * @param resourceImpl the ResourceImpl
    * @param comment optional unique description
    * @param offsetBytes offset bytes relative to the MemoryImpl start
    * @param lengthBytes number of bytes to convert to a hex string
    * @return a formatted hex string in a human readable array
    */
-  static final String toHex(final BaseStateImpl state, final String comment, final long offsetBytes,
+  static final String toHex(final ResourceImpl resourceImpl, final String comment, final long offsetBytes,
       final int lengthBytes, final boolean withData) {
-    final MemorySegment seg = state.seg;
+    final MemorySegment seg = resourceImpl.seg;
     final long capacity = seg.byteSize();
     checkBounds(offsetBytes, lengthBytes, capacity);
     final StringBuilder sb = new StringBuilder();
     final String theComment = (comment != null) ? comment : "";
     final String addHCStr = "" + Integer.toHexString(seg.address().hashCode());
-    final MemoryRequestServer memReqSvr = state.getMemoryRequestServer();
+    final MemoryRequestServer memReqSvr = resourceImpl.getMemoryRequestServer();
     final String memReqStr = memReqSvr != null
         ? memReqSvr.getClass().getSimpleName() + ", " + Integer.toHexString(memReqSvr.hashCode())
         : "null";
 
     sb.append(LS + "### DataSketches Memory Component SUMMARY ###").append(LS);
     sb.append("Optional Comment       : ").append(theComment).append(LS);
-    sb.append("TypeId String          : ").append(typeDecode(state.typeId)).append(LS);
+    sb.append("TypeId String          : ").append(typeDecode(resourceImpl.typeId)).append(LS);
     sb.append("OffsetBytes            : ").append(offsetBytes).append(LS);
     sb.append("LengthBytes            : ").append(lengthBytes).append(LS);
     sb.append("Capacity               : ").append(capacity).append(LS);
     sb.append("MemoryAddress hashCode : ").append(addHCStr).append(LS);
     sb.append("MemReqSvr, hashCode    : ").append(memReqStr).append(LS);
-    sb.append("Read Only              : ").append(state.isReadOnly()).append(LS);
-    sb.append("Type Byte Order        : ").append(state.getTypeByteOrder().toString()).append(LS);
+    sb.append("Read Only              : ").append(resourceImpl.isReadOnly()).append(LS);
+    sb.append("Type Byte Order        : ").append(resourceImpl.getTypeByteOrder().toString()).append(LS);
     sb.append("Native Byte Order      : ").append(ByteOrder.nativeOrder().toString()).append(LS);
     sb.append("JDK Runtime Version    : ").append(JDK).append(LS);
     //Data detail
@@ -291,7 +291,7 @@ abstract class BaseStateImpl implements Resource {
   public final boolean equalTo(final long thisOffsetBytes, final Resource that,
       final long thatOffsetBytes, final long lengthBytes) {
     Objects.requireNonNull(that);
-   return CompareAndCopy.equals(seg, thisOffsetBytes, ((BaseStateImpl) that).seg, thatOffsetBytes, lengthBytes);
+   return CompareAndCopy.equals(seg, thisOffsetBytes, ((ResourceImpl) that).seg, thatOffsetBytes, lengthBytes);
   }
 
   @Override
@@ -304,7 +304,7 @@ abstract class BaseStateImpl implements Resource {
 
   @Override
   public final long getRelativeOffset(final Resource that) {
-    final BaseStateImpl that2 = (BaseStateImpl) that;
+    final ResourceImpl that2 = (ResourceImpl) that;
     return this.seg.address().segmentOffset(that2.seg);
   }
   
@@ -391,7 +391,7 @@ abstract class BaseStateImpl implements Resource {
   
   @Override
   public final boolean isSameResource(final Resource that) {
-    final BaseStateImpl that2 = (BaseStateImpl) that;
+    final ResourceImpl that2 = (ResourceImpl) that;
     return this.seg.address().equals(that2.seg.address());
   }
   
@@ -402,7 +402,7 @@ abstract class BaseStateImpl implements Resource {
   public long mismatch(final Resource that) {
     Objects.requireNonNull(that);
     if (!that.isAlive()) { throw new IllegalArgumentException("Given argument is not alive."); }
-    final BaseStateImpl thatBSI = (BaseStateImpl) that;
+    final ResourceImpl thatBSI = (ResourceImpl) that;
     return seg.mismatch(thatBSI.seg);
   }
 
@@ -410,7 +410,7 @@ abstract class BaseStateImpl implements Resource {
   public final long nativeOverlap(final Resource that) {
     if (that == null) { return 0; }
     if (!that.isAlive()) { return 0; }
-    final BaseStateImpl thatBSI = (BaseStateImpl) that;
+    final ResourceImpl thatBSI = (ResourceImpl) that;
     if (this == thatBSI) { return seg.byteSize(); }
     return nativeOverlap(seg, thatBSI.seg);
   }

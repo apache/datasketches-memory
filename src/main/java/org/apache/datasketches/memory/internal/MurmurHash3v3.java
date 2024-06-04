@@ -182,7 +182,7 @@ public final class MurmurHash3v3 {
   public static long[] hash(final Memory mem, final long offsetBytes, final long lengthBytes,
       final long seed, final long[] hashOut) {
     Objects.requireNonNull(mem, "Input Memory is null");
-    final MemorySegment seg = ((BaseStateImpl)mem).seg;
+    final MemorySegment seg = ((ResourceImpl)mem).seg;
     return hash(seg, offsetBytes, lengthBytes, seed, hashOut);
   }
 

@@ -285,7 +285,7 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
   public final int compareTo(final long thisOffsetBytes, final long thisLengthBytes,
       final Buffer that, final long thatOffsetBytes, final long thatLengthBytes) {
     return CompareAndCopy.compare(seg, thisOffsetBytes, thisLengthBytes,
-        ((BaseStateImpl)that).seg, thatOffsetBytes, thatLengthBytes);
+        ((ResourceImpl)that).seg, thatOffsetBytes, thatLengthBytes);
   }
 
   /*

@@ -56,7 +56,7 @@ import jdk.incubator.foreign.ResourceScope;
  * Common base of native-ordered and non-native-ordered {@link WritableMemory} implementations.
  * Contains methods which are agnostic to the byte order.
  */
-public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements WritableMemory {
+public abstract class BaseWritableMemoryImpl extends ResourceImpl implements WritableMemory {
 
   //Pass-through constructor
   BaseWritableMemoryImpl(
@@ -319,14 +319,14 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
   public final int compareTo(final long thisOffsetBytes, final long thisLengthBytes,
       final Memory that, final long thatOffsetBytes, final long thatLengthBytes) {
     return CompareAndCopy.compare(seg, thisOffsetBytes, thisLengthBytes,
-        ((BaseStateImpl)that).seg, thatOffsetBytes, thatLengthBytes);
+        ((ResourceImpl)that).seg, thatOffsetBytes, thatLengthBytes);
   }
 
   @Override
   public final void copyTo(final long srcOffsetBytes,
       final WritableMemory destination, final long dstOffsetBytes, final long lengthBytes) {
     CompareAndCopy.copy(seg, srcOffsetBytes,
-        ((BaseStateImpl)destination).seg, dstOffsetBytes, lengthBytes);
+        ((ResourceImpl)destination).seg, dstOffsetBytes, lengthBytes);
   }
 
   @Override

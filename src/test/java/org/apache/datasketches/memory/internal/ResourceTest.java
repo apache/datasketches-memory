@@ -33,7 +33,7 @@ import org.testng.annotations.Test;
 import jdk.incubator.foreign.MemorySegment;
 import jdk.incubator.foreign.ResourceScope;
 
-public class BaseStateTest {
+public class ResourceTest {
 
   @Test
   public void checkNativeOverlap() {

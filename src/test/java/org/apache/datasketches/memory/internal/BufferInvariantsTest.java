@@ -307,7 +307,6 @@ public class BufferInvariantsTest {
 //    printbuf(reg);
   }
 
-
   static void printbb(ByteBuffer bb) {
     println("pos: " + bb.position() + ", lim: " + bb.limit() + ", cap: " + bb.capacity());
     int rem = bb.remaining();

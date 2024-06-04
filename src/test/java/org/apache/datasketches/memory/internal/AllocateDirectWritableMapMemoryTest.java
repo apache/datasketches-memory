@@ -82,14 +82,14 @@ public class AllocateDirectWritableMapMemoryTest {
       java.nio.file.Files.delete(file.toPath());
     }
     assertTrue(file.createNewFile());
-    assertTrue (file.setWritable(true, false)); //writable=true, ownerOnly=false
-    assertTrue (file.isFile());
+    assertTrue(file.setWritable(true, false)); //writable=true, ownerOnly=false
+    assertTrue(file.isFile());
     file.deleteOnExit();  //comment out if you want to examine the file.
 
     WritableMemory dstMem = null;
     WritableMemory srcMem = null;
     try (ResourceScope scope = ResourceScope.newConfinedScope()) { //this scope manages two Memory objects
-      dstMem = WritableMemory.writableMap(file, 0, numBytes, scope, ByteOrder.nativeOrder());	
+      dstMem = WritableMemory.writableMap(file, 0, numBytes, scope, ByteOrder.nativeOrder());
       srcMem = WritableMemory.allocateDirect(numBytes, 8, scope, ByteOrder.nativeOrder(), memReqSvr);
 
       //load source with consecutive longs

@@ -130,7 +130,7 @@ abstract class BaseStateImpl implements BaseState {
       p0 = Integer.parseInt(parts[0]); //the first number group
       p1 = (parts.length > 1) ? Integer.parseInt(parts[1]) : 0; //2nd number group, or 0
     } catch (final NumberFormatException | ArrayIndexOutOfBoundsException  e) {
-      throw new IllegalArgumentException("Improper Java -version string: " + jdkVer + "\n" + e);
+      throw new IllegalArgumentException("Improper Java -version string: " + jdkVer + LS + e);
     }
     checkJavaVersion(jdkVer, p0);
     return new int[] {p0, p1};
@@ -320,7 +320,7 @@ abstract class BaseStateImpl implements BaseState {
 
   @Override
   public Thread getOwnerThread() {
-	  return seg.scope().ownerThread();
+    return seg.scope().ownerThread();
   }
   
   @Override
@@ -390,9 +390,9 @@ abstract class BaseStateImpl implements BaseState {
   }
   
   @Override
-  public final boolean isSameResource(BaseState that) {
-	  BaseStateImpl that2 = (BaseStateImpl) that;
-	  return this.seg.address().equals(that2.seg.address());
+  public final boolean isSameResource(final BaseState that) {
+    final BaseStateImpl that2 = (BaseStateImpl) that;
+    return this.seg.address().equals(that2.seg.address());
   }
   
   @Override
@@ -402,7 +402,7 @@ abstract class BaseStateImpl implements BaseState {
   public long mismatch(final BaseState that) {
     Objects.requireNonNull(that);
     if (!that.isAlive()) { throw new IllegalArgumentException("Given argument is not alive."); }
-    BaseStateImpl thatBSI = (BaseStateImpl) that;
+    final BaseStateImpl thatBSI = (BaseStateImpl) that;
     return seg.mismatch(thatBSI.seg);
   }
 
@@ -410,7 +410,7 @@ abstract class BaseStateImpl implements BaseState {
   public final long nativeOverlap(final BaseState that) {
     if (that == null) { return 0; }
     if (!that.isAlive()) { return 0; }
-    BaseStateImpl thatBSI = (BaseStateImpl) that;
+    final BaseStateImpl thatBSI = (BaseStateImpl) that;
     if (this == thatBSI) { return seg.byteSize(); }
     return nativeOverlap(seg, thatBSI.seg);
   }
@@ -447,7 +447,7 @@ abstract class BaseStateImpl implements BaseState {
         : biggerSmaller(lB, rB, lA, rA); //B bigger than A, reverse parameters
   }
 
-  private static final long biggerSmaller(long lLarge, long rLarge, long lSmall, long rSmall) {
+  private static final long biggerSmaller(final long lLarge, final long rLarge, final long lSmall, final long rSmall) {
     if ((rSmall <= rLarge) && (lLarge <= lSmall)) { return rSmall - lSmall; } //Small is totally within Large
     return (rLarge < rSmall)
         ? rLarge - lSmall  //Partial overlap on right portion of Large

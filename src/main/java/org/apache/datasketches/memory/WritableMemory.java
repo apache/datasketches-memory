@@ -101,8 +101,8 @@ public interface WritableMemory extends Memory {
    * required by the implementation.
    */
   static WritableMemory writableMap(File file, long fileOffsetBytes, long capacityBytes, ByteOrder byteOrder) 
-		  throws IllegalArgumentException, IllegalStateException, IOException, SecurityException {
-	  ResourceScope scope = ResourceScope.newConfinedScope();
+      throws IllegalArgumentException, IllegalStateException, IOException, SecurityException {
+    final ResourceScope scope = ResourceScope.newConfinedScope();
     return BaseWritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, false, byteOrder);
   }
 
@@ -121,7 +121,7 @@ public interface WritableMemory extends Memory {
    * required by the implementation.
    */
   static WritableMemory writableMap(File file, long fileOffsetBytes, long capacityBytes, ResourceScope scope, ByteOrder byteOrder) 
-		  throws IllegalArgumentException, IllegalStateException, IOException, SecurityException {
+      throws IllegalArgumentException, IllegalStateException, IOException, SecurityException {
     return BaseWritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, false, byteOrder);
   }
   
@@ -161,7 +161,7 @@ public interface WritableMemory extends Memory {
       long alignmentBytes,
       ByteOrder byteOrder,
       MemoryRequestServer memReqSvr) {
-	  final ResourceScope scope = ResourceScope.newConfinedScope();
+    final ResourceScope scope = ResourceScope.newConfinedScope();
     return BaseWritableMemoryImpl.wrapDirect(capacityBytes, alignmentBytes, scope, byteOrder, memReqSvr);
   }
 

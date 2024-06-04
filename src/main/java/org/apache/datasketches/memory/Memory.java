@@ -103,7 +103,7 @@ public interface Memory extends BaseState {
    */
   static Memory map(File file, long fileOffsetBytes, long capacityBytes, ByteOrder byteOrder)
       throws IllegalArgumentException, IllegalStateException, IOException, SecurityException {
-	  final ResourceScope scope = ResourceScope.newConfinedScope();
+    final ResourceScope scope = ResourceScope.newConfinedScope();
     return BaseWritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, true, byteOrder);
   }
 

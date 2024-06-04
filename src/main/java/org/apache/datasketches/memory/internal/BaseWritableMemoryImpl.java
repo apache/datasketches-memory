@@ -68,6 +68,13 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
 
   //WRAP HEAP ARRAY RESOURCE
 
+  /**
+   * Wrap a <i>MemorySegment</i> as an array
+   * @param seg the given <i>MemorySegment</i>.
+   * @param byteOrder the given <i>ByteOrder</i>.
+   * @param memReqSvr the given <i>MemoryRequestServer</i>.
+   * @return a <i>WritableMemory</i>.
+   */
   public static WritableMemory wrapSegmentAsArray(
       final MemorySegment seg,
       final ByteOrder byteOrder,
@@ -84,6 +91,14 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
 
   //BYTE BUFFER RESOURCE
 
+  /**
+   * The implementation of <i>wrapByteBuffer</i> for WritableMemory.
+   * @param byteBuffer the given <i>ByteBuffer</i>
+   * @param localReadOnly true if read-only is being imposed locally, independent of the read-only state of the given ByteBuffer.
+   * @param byteOrder the given <i>ByteOrder</i>.
+   * @param memReqSvr the given <i>MemoryRequestServer</i>.
+   * @return a <i>WritableMemory</i>.
+   */
   public static WritableMemory wrapByteBuffer(
       final ByteBuffer byteBuffer,
       final boolean localReadOnly,
@@ -122,7 +137,18 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
 
   //MAP FILE RESOURCE
 
-  //@SuppressWarnings("resource")
+  /**
+   * The implementation of <i>wrapMap</i> for <i>WritableMemory</i>.
+   * @param file the given file to map.
+   * @param fileOffsetBytes the file starting offset in bytes.
+   * @param capacityBytes the capacity of the mapped memory.
+   * @param scope the given scope
+   * @param localReadOnly true if read-only is being imposed locally, independent of the read-only state of the given ByteBuffer.
+   * @param byteOrder the given <i>ByteOrder</i>
+   * @return a <i>WritableMemory</i>
+   * @throws IllegalArgumentException if file is not readable.
+   * @throws IOException if mapping is not successful.
+   */
   public static WritableMemory wrapMap(
       final File file,
       final long fileOffsetBytes,
@@ -130,7 +156,7 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
       final ResourceScope scope,
       final boolean localReadOnly,
       final ByteOrder byteOrder)
-          throws IllegalArgumentException, IllegalStateException, IOException, SecurityException {
+          throws IllegalArgumentException, IOException {
     Objects.requireNonNull(file, "File must be non-null.");
     Objects.requireNonNull(byteOrder, "ByteOrder must be non-null.");
     Objects.requireNonNull(scope, "ResourceScope must be non-null.");
@@ -318,7 +344,6 @@ public abstract class BaseWritableMemoryImpl extends BaseStateImpl implements Wr
   public final void putBoolean(final long offsetBytes, final boolean value) {
     putByte(offsetBytes, value ? (byte)1 : 0);
   }
-
 
   @Override
   public final void putByte(final long offsetBytes, final byte value) {

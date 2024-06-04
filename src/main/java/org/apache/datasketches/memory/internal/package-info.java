@@ -17,4 +17,7 @@
  * under the License.
  */
 
+/**
+ * The internal classes for Memory.
+ */
 package org.apache.datasketches.memory.internal;

@@ -63,6 +63,14 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
 
   //BYTE BUFFER RESOURCE
 
+  /**
+   * The implementation of <i>wrapByteBuffer</i> for WritableBuffer.
+   * @param byteBuffer the given <i>ByteBuffer</i>
+   * @param localReadOnly true is read-only is being imposed locally, independent of the read-only state of the given ByteBuffer.
+   * @param byteOrder the given <i>ByteOrder</i>.
+   * @param memReqSvr the given <i>MemoryRequestServer</i>.
+   * @return a <i>WritableBuffer</i>.
+   */
   public static WritableBuffer wrapByteBuffer(
       final ByteBuffer byteBuffer,
       final boolean localReadOnly,

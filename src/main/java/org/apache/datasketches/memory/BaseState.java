@@ -38,7 +38,14 @@ public interface BaseState {
    */
   static final String LS = System.getProperty("line.separator");
 
+  /**
+   * The static final for <i>ByteOrder.nativeOrder()</i>.
+   */
   static final ByteOrder NATIVE_BYTE_ORDER = ByteOrder.nativeOrder();
+  
+  /**
+   * The static final for NON <i>ByteOrder.nativeOrder()</i>.
+   */
   static final ByteOrder NON_NATIVE_BYTE_ORDER =
       (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
 
@@ -93,8 +100,8 @@ public interface BaseState {
 
   /**
    * Forces any changes made to the contents of this mapped segment to be written to the storage device described
-   * by the mapped segment's file descriptor. Please refer to
-   * <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#force()">force()</a>
+   * by the mapped segment's file descriptor. 
+   * @see <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#force()">force()</a>
    */
   void force();
 
@@ -107,9 +114,9 @@ public interface BaseState {
   /**
    * Gets the relative base offset of <i>this</i> with respect to <i>that</i>, defined as: <i>this</i> - <i>that</i>. 
    * This method is only valid for <i>native</i> (off-heap) allocated resources.
-   * @throws IllegalArgumentException if one of the resources is on-heap.
    * @param that the given resource.
    * @return <i>this</i> - <i>that</i> offset
+   * @throws IllegalArgumentException if one of the resources is on-heap.
    */
   long getRelativeOffset(BaseState that);
   
@@ -220,6 +227,8 @@ public interface BaseState {
   
   /**
    * Returns true if the underlying resource is the same underlying resource as <i>that</i>.
+   * @param that the other BaseState object
+   * @return a long value representing the ordering and size of overlap between <i>this</i> and <i>that</i>
    */
   boolean isSameResource(BaseState that);
   
@@ -241,7 +250,7 @@ public interface BaseState {
   long nativeOverlap(BaseState that);
 
   /**
-   * See <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#mismatch(jdk.incubator.foreign.MemorySegment)>mismatch</a>
+   * See <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#mismatch(jdk.incubator.foreign.MemorySegment)">mismatch> </a>
    * @param that the other BaseState
    * @return the relative offset, in bytes, of the first mismatch between this and the given other BaseState object,
    * otherwise -1 if no mismatch

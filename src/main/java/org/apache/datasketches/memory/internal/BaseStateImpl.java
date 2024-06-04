@@ -304,8 +304,8 @@ abstract class BaseStateImpl implements BaseState {
 
   @Override
   public final long getRelativeOffset(final BaseState that) {
-	  final BaseStateImpl that2 = (BaseStateImpl) that;
-	  return this.seg.address().segmentOffset(that2.seg);
+    final BaseStateImpl that2 = (BaseStateImpl) that;
+    return this.seg.address().segmentOffset(that2.seg);
   }
   
   @Override

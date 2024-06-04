@@ -37,7 +37,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteOrder;
 import java.nio.file.InvalidPathException;
 
-import org.apache.datasketches.memory.BaseState;
+import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableMemory;
@@ -48,7 +48,7 @@ import jdk.incubator.foreign.ResourceScope;
 
 public class AllocateDirectWritableMapMemoryTest {
   private static final String LS = System.getProperty("line.separator");
-  private final MemoryRequestServer memReqSvr = BaseState.defaultMemReqSvr;
+  private final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
 
   @BeforeClass
   public void setReadOnly() throws IOException {
@@ -120,7 +120,7 @@ public class AllocateDirectWritableMapMemoryTest {
     final long bytes = 8;
     WritableMemory wmem = null;
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      wmem = WritableMemory.writableMap(file, 0L, bytes, scope, BaseState.NON_NATIVE_BYTE_ORDER);
+      wmem = WritableMemory.writableMap(file, 0L, bytes, scope, Resource.NON_NATIVE_BYTE_ORDER);
       wmem.putChar(0, (char) 1);
       assertEquals(wmem.getByte(1), (byte) 1);
     }

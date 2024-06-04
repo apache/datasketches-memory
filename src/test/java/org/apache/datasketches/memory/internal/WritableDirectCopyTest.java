@@ -24,7 +24,7 @@ import static org.testng.Assert.fail;
 
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.BaseState;
+import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableMemory;
@@ -36,7 +36,7 @@ import jdk.incubator.foreign.ResourceScope;
  * @author Lee Rhodes
  */
 public class WritableDirectCopyTest {
-  private static final MemoryRequestServer memReqSvr = BaseState.defaultMemReqSvr;
+  private static final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
 
 //Copy Within tests
 

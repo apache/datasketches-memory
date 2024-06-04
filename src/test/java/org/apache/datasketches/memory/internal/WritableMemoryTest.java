@@ -27,7 +27,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.datasketches.memory.BaseState;
+import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
@@ -39,7 +39,7 @@ public class WritableMemoryTest {
     ByteBuffer bb = ByteBuffer.allocate(64); //big endian
     WritableMemory wmem = WritableMemory.writableWrap(bb);
     assertEquals(wmem.getTypeByteOrder(), ByteOrder.LITTLE_ENDIAN); //ignore BB endianness
-    wmem = WritableMemory.writableWrap(bb, ByteOrder.nativeOrder(), BaseState.defaultMemReqSvr);
+    wmem = WritableMemory.writableWrap(bb, ByteOrder.nativeOrder(), Resource.defaultMemReqSvr);
     assertEquals(wmem.getTypeByteOrder(), ByteOrder.LITTLE_ENDIAN);
   }
 
@@ -47,7 +47,7 @@ public class WritableMemoryTest {
   public void wrapBigEndianAsLittle() {
     ByteBuffer bb = ByteBuffer.allocate(64);
     bb.putChar(0, (char)1); //as NNO
-    WritableMemory wmem = WritableMemory.writableWrap(bb, ByteOrder.LITTLE_ENDIAN, BaseState.defaultMemReqSvr);
+    WritableMemory wmem = WritableMemory.writableWrap(bb, ByteOrder.LITTLE_ENDIAN, Resource.defaultMemReqSvr);
     assertEquals(wmem.getChar(0), 256);
   }
 

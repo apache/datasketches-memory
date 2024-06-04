@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.BaseState;
+import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.MemoryRequestServer;
@@ -41,7 +41,7 @@ import jdk.incubator.foreign.ResourceScope;
  * @author Lee Rhodes
  */
 public class SpecificLeafTest {
-  private static final MemoryRequestServer memReqSvr = BaseState.defaultMemReqSvr;
+  private static final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
 
   @Test
   public void checkByteBufferLeafs() {
@@ -57,11 +57,11 @@ public class SpecificLeafTest {
     assertFalse(mem.isMapped());
     checkCrossLeafTypeIds(mem);
     Buffer buf = mem.asBuffer().region(0, bytes, ByteOrder.nativeOrder());
-    assertEquals(buf.getTypeByteOrder(), BaseState.NATIVE_BYTE_ORDER);
+    assertEquals(buf.getTypeByteOrder(), Resource.NATIVE_BYTE_ORDER);
 
-    bb.order(BaseState.NON_NATIVE_BYTE_ORDER);
-    Memory mem2 = Memory.wrap(bb).region(0, bytes, BaseState.NON_NATIVE_BYTE_ORDER);
-    Buffer buf2 = mem2.asBuffer().region(0, bytes, BaseState.NON_NATIVE_BYTE_ORDER);
+    bb.order(Resource.NON_NATIVE_BYTE_ORDER);
+    Memory mem2 = Memory.wrap(bb).region(0, bytes, Resource.NON_NATIVE_BYTE_ORDER);
+    Buffer buf2 = mem2.asBuffer().region(0, bytes, Resource.NON_NATIVE_BYTE_ORDER);
     Buffer buf3 = buf2.duplicate();
 
     assertTrue(mem.isRegion());
@@ -81,14 +81,14 @@ public class SpecificLeafTest {
       assertFalse(wmem.isHeap());
       assertFalse(wmem.isReadOnly());
       checkCrossLeafTypeIds(wmem);
-      WritableMemory nnwmem = wmem.writableRegion(0, bytes, BaseState.NON_NATIVE_BYTE_ORDER);
+      WritableMemory nnwmem = wmem.writableRegion(0, bytes, Resource.NON_NATIVE_BYTE_ORDER);
 
       Memory mem = wmem.region(0, bytes, ByteOrder.nativeOrder());
       Buffer buf = mem.asBuffer().region(0, bytes, ByteOrder.nativeOrder());
 
 
-      Memory mem2 = nnwmem.region(0, bytes, BaseState.NON_NATIVE_BYTE_ORDER);
-      Buffer buf2 = mem2.asBuffer().region(0, bytes, BaseState.NON_NATIVE_BYTE_ORDER);
+      Memory mem2 = nnwmem.region(0, bytes, Resource.NON_NATIVE_BYTE_ORDER);
+      Buffer buf2 = mem2.asBuffer().region(0, bytes, Resource.NON_NATIVE_BYTE_ORDER);
       Buffer buf3 = buf2.duplicate();
 
       assertTrue(mem.isRegion());
@@ -117,19 +117,19 @@ public class SpecificLeafTest {
       assertTrue(mem.isMapped());
       assertFalse(mem.isReadOnly());
       checkCrossLeafTypeIds(mem);
-      Memory nnreg = mem.region(0, bytes, BaseState.NON_NATIVE_BYTE_ORDER);
+      Memory nnreg = mem.region(0, bytes, Resource.NON_NATIVE_BYTE_ORDER);
 
       Memory reg = mem.region(0, bytes, ByteOrder.nativeOrder());
       Buffer buf = reg.asBuffer().region(0, bytes, ByteOrder.nativeOrder());
       Buffer buf4 = buf.duplicate();
 
-      Memory reg2 = nnreg.region(0, bytes, BaseState.NON_NATIVE_BYTE_ORDER);
-      Buffer buf2 = reg2.asBuffer().region(0, bytes, BaseState.NON_NATIVE_BYTE_ORDER);
+      Memory reg2 = nnreg.region(0, bytes, Resource.NON_NATIVE_BYTE_ORDER);
+      Buffer buf2 = reg2.asBuffer().region(0, bytes, Resource.NON_NATIVE_BYTE_ORDER);
       Buffer buf3 = buf2.duplicate();
 
       assertTrue(reg.isRegion());
       assertTrue(reg2.isRegion());
-      assertEquals(reg2.getTypeByteOrder(), BaseState.NON_NATIVE_BYTE_ORDER);
+      assertEquals(reg2.getTypeByteOrder(), Resource.NON_NATIVE_BYTE_ORDER);
       assertTrue(buf.isRegion());
       assertFalse(buf.isMemory());
       assertTrue(buf2.isRegion());
@@ -145,14 +145,14 @@ public class SpecificLeafTest {
     assertTrue(mem.isHeap());
     assertTrue(((BaseStateImpl)mem).isReadOnly());
     checkCrossLeafTypeIds(mem);
-    Memory nnreg = mem.region(0, bytes, BaseState.NON_NATIVE_BYTE_ORDER);
+    Memory nnreg = mem.region(0, bytes, Resource.NON_NATIVE_BYTE_ORDER);
 
     Memory reg = mem.region(0, bytes, ByteOrder.nativeOrder());
     Buffer buf = reg.asBuffer().region(0, bytes, ByteOrder.nativeOrder());
     Buffer buf4 = buf.duplicate();
 
-    Memory reg2 = nnreg.region(0, bytes, BaseState.NON_NATIVE_BYTE_ORDER);
-    Buffer buf2 = reg2.asBuffer().region(0, bytes, BaseState.NON_NATIVE_BYTE_ORDER);
+    Memory reg2 = nnreg.region(0, bytes, Resource.NON_NATIVE_BYTE_ORDER);
+    Buffer buf2 = reg2.asBuffer().region(0, bytes, Resource.NON_NATIVE_BYTE_ORDER);
     Buffer buf3 = buf2.duplicate();
 
     assertFalse(mem.isRegion());
@@ -184,18 +184,18 @@ public class SpecificLeafTest {
     assertFalse(mem2.isDuplicate());
     assertTrue(mem2.isReadOnly());
 
-    Buffer buf3 = buf1.duplicate(BaseState.NON_NATIVE_BYTE_ORDER);
+    Buffer buf3 = buf1.duplicate(Resource.NON_NATIVE_BYTE_ORDER);
     assertTrue(buf3.isRegion());
     assertTrue(buf3.isBuffer());
     assertTrue(buf3.isDuplicate());
-    assertEquals(buf3.getTypeByteOrder(), BaseState.NON_NATIVE_BYTE_ORDER);
+    assertEquals(buf3.getTypeByteOrder(), Resource.NON_NATIVE_BYTE_ORDER);
     assertTrue(buf3.isReadOnly());
 
     Memory mem3 = buf3.asMemory();
     assertTrue(mem3.isRegion());
     assertFalse(mem3.isBuffer());
     assertTrue(mem3.isDuplicate());
-    assertEquals(mem3.getTypeByteOrder(), BaseState.NON_NATIVE_BYTE_ORDER);
+    assertEquals(mem3.getTypeByteOrder(), Resource.NON_NATIVE_BYTE_ORDER);
     assertTrue(mem3.isReadOnly());
   }
 

@@ -304,7 +304,7 @@ public final class MurmurHash3v3 {
           k1 ^= (MemoryAccess.getByteAtOffset(seg, cumOff) & 0xFFL);
           break;
         }
-        //default: break; //can't happen
+        default: break; //can't happen
       }
 
       h1 ^= mixK1(k1);

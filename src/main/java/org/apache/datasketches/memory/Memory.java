@@ -35,7 +35,7 @@ import jdk.incubator.foreign.ResourceScope;
  *
  * @author Lee Rhodes
  */
-public interface Memory extends BaseState {
+public interface Memory extends Resource {
 
   //BYTE BUFFER
   /**

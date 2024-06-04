@@ -26,12 +26,12 @@ import jdk.incubator.foreign.MemorySegment;
 import jdk.incubator.foreign.ResourceScope;
 
 /**
- * Keeps key configuration state for Memory and Buffer plus some common static variables
+ * The base class for Memory and Buffer plus some common static variables
  * and check methods.
  *
  * @author Lee Rhodes
  */
-public interface BaseState {
+public interface Resource {
 
   /**
    * The java line separator character as a String.
@@ -79,23 +79,23 @@ public interface BaseState {
   /**
    * Returns true if the given object is an instance of this class and has equal contents to
    * this object.
-   * @param that the given BaseState object
+   * @param that the given Resource object
    * @return true if the given object has equal contents to this object.
    */
-  boolean equalTo(BaseState that);
+  boolean equalTo(Resource that);
 
   /**
    * Returns true if the given object is an instance of this class and has equal contents to
    * this object in the given range of bytes. This will also check two distinct ranges within the
    * same object for equals.
    * @param thisOffsetBytes the starting offset in bytes for this object.
-   * @param that the given BaseState object
+   * @param that the given Resource object
    * @param thatOffsetBytes the starting offset in bytes for the given object
    * @param lengthBytes the size of the range in bytes
    * @return true if the given object has equal contents to this object in the given range of
    * bytes.
    */
-  boolean equalTo(long thisOffsetBytes, BaseState that,
+  boolean equalTo(long thisOffsetBytes, Resource that,
       long thatOffsetBytes, long lengthBytes);
 
   /**
@@ -118,7 +118,7 @@ public interface BaseState {
    * @return <i>this</i> - <i>that</i> offset
    * @throws IllegalArgumentException if one of the resources is on-heap.
    */
-  long getRelativeOffset(BaseState that);
+  long getRelativeOffset(Resource that);
   
   /**
    * Returns the configured MemoryRequestSever or null, if it has not been configured.
@@ -227,10 +227,10 @@ public interface BaseState {
   
   /**
    * Returns true if the underlying resource is the same underlying resource as <i>that</i>.
-   * @param that the other BaseState object
+   * @param that the other Resource object
    * @return a long value representing the ordering and size of overlap between <i>this</i> and <i>that</i>
    */
-  boolean isSameResource(BaseState that);
+  boolean isSameResource(Resource that);
   
   /**
    * Loads the contents of this mapped segment into physical memory. Please refer to
@@ -244,18 +244,18 @@ public interface BaseState {
    * Returns a negative number if <i>this</i> overlaps <i>that</i> and <i>this</i> base address is &gt; <i>that</i>
    * base address.
    * Returns a zero if there is no overlap or if one or both objects are null, not active or on heap.
-   * @param that the other BaseState object
+   * @param that the other Resource object
    * @return a long value representing the ordering and size of overlap between <i>this</i> and <i>that</i>.
    */
-  long nativeOverlap(BaseState that);
+  long nativeOverlap(Resource that);
 
   /**
    * See <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#mismatch(jdk.incubator.foreign.MemorySegment)">mismatch> </a>
-   * @param that the other BaseState
-   * @return the relative offset, in bytes, of the first mismatch between this and the given other BaseState object,
+   * @param that the other Resource
+   * @return the relative offset, in bytes, of the first mismatch between this and the given other Resource object,
    * otherwise -1 if no mismatch
    */
-  long mismatch(BaseState that);
+  long mismatch(Resource that);
   
   /**
    * Returns the resource scope associated with this memory segment.

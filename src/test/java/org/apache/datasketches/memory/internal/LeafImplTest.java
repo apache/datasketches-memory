@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.BaseState;
+import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
@@ -41,7 +41,7 @@ import jdk.incubator.foreign.ResourceScope;
  */
 public class LeafImplTest {
   private static final ByteOrder NBO = ByteOrder.nativeOrder();
-  private static final ByteOrder NNBO = BaseState.NON_NATIVE_BYTE_ORDER;
+  private static final ByteOrder NNBO = Resource.NON_NATIVE_BYTE_ORDER;
   private static final MemoryRequestServer dummyMemReqSvr = new DummyMemoryRequestServer();
 
   static class DummyMemoryRequestServer implements MemoryRequestServer {

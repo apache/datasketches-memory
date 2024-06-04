@@ -25,7 +25,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Objects;
 
-import org.apache.datasketches.memory.BaseState;
+import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
@@ -39,7 +39,7 @@ import jdk.incubator.foreign.ResourceScope;
  *
  * @author Lee Rhodes
  */
-abstract class BaseStateImpl implements BaseState {
+abstract class BaseStateImpl implements Resource {
   static final String JDK; //must be at least "1.8"
   static final int JDK_MAJOR; //8, 11, 12, etc
 
@@ -282,13 +282,13 @@ abstract class BaseStateImpl implements BaseState {
   }
 
   @Override
-  public final boolean equalTo(final BaseState that) {
+  public final boolean equalTo(final Resource that) {
     Objects.requireNonNull(that);
     return equalTo(0, that, 0, that.getCapacity());
   }
 
   @Override
-  public final boolean equalTo(final long thisOffsetBytes, final BaseState that,
+  public final boolean equalTo(final long thisOffsetBytes, final Resource that,
       final long thatOffsetBytes, final long lengthBytes) {
     Objects.requireNonNull(that);
    return CompareAndCopy.equals(seg, thisOffsetBytes, ((BaseStateImpl) that).seg, thatOffsetBytes, lengthBytes);
@@ -303,7 +303,7 @@ abstract class BaseStateImpl implements BaseState {
   }
 
   @Override
-  public final long getRelativeOffset(final BaseState that) {
+  public final long getRelativeOffset(final Resource that) {
     final BaseStateImpl that2 = (BaseStateImpl) that;
     return this.seg.address().segmentOffset(that2.seg);
   }
@@ -390,7 +390,7 @@ abstract class BaseStateImpl implements BaseState {
   }
   
   @Override
-  public final boolean isSameResource(final BaseState that) {
+  public final boolean isSameResource(final Resource that) {
     final BaseStateImpl that2 = (BaseStateImpl) that;
     return this.seg.address().equals(that2.seg.address());
   }
@@ -399,7 +399,7 @@ abstract class BaseStateImpl implements BaseState {
   public void load() { seg.load(); }
 
   @Override
-  public long mismatch(final BaseState that) {
+  public long mismatch(final Resource that) {
     Objects.requireNonNull(that);
     if (!that.isAlive()) { throw new IllegalArgumentException("Given argument is not alive."); }
     final BaseStateImpl thatBSI = (BaseStateImpl) that;
@@ -407,7 +407,7 @@ abstract class BaseStateImpl implements BaseState {
   }
 
   @Override
-  public final long nativeOverlap(final BaseState that) {
+  public final long nativeOverlap(final Resource that) {
     if (that == null) { return 0; }
     if (!that.isAlive()) { return 0; }
     final BaseStateImpl thatBSI = (BaseStateImpl) that;

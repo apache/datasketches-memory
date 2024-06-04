@@ -23,7 +23,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import org.apache.datasketches.memory.BaseState;
+import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
@@ -31,7 +31,7 @@ import org.testng.annotations.Test;
 import jdk.incubator.foreign.ResourceScope;
 
 public class AllocateDirectMemoryTest {
-  private static final MemoryRequestServer memReqSvr = BaseState.defaultMemReqSvr;
+  private static final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
 
   @SuppressWarnings("resource")
   @Test
@@ -78,7 +78,7 @@ public class AllocateDirectMemoryTest {
   @Test
   public void checkNonNativeDirect() {
     WritableMemory wmem = null;
-    try (ResourceScope scope = (wmem = WritableMemory.allocateDirect(128, 8, BaseState.NON_NATIVE_BYTE_ORDER, memReqSvr)).scope()) {
+    try (ResourceScope scope = (wmem = WritableMemory.allocateDirect(128, 8, Resource.NON_NATIVE_BYTE_ORDER, memReqSvr)).scope()) {
       wmem.putChar(0, (char) 1);
       assertEquals(wmem.getByte(1), (byte) 1);
     }

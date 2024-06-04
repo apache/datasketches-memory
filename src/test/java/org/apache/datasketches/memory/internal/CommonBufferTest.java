@@ -23,7 +23,7 @@ import static org.testng.Assert.assertEquals;
 
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.BaseState;
+import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
@@ -32,7 +32,7 @@ import org.testng.annotations.Test;
 import jdk.incubator.foreign.ResourceScope;
 
 public class CommonBufferTest {
-  private final MemoryRequestServer memReqSvr = BaseState.defaultMemReqSvr;
+  private final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
   @Test
   public void checkSetGet() throws Exception {
     int memCapacity = 60; //must be at least 60

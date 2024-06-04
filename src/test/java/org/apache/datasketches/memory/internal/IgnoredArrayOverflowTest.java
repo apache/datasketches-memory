@@ -21,7 +21,7 @@ package org.apache.datasketches.memory.internal;
 
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.BaseState;
+import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.AfterClass;
@@ -31,7 +31,7 @@ import org.testng.annotations.Test;
 import jdk.incubator.foreign.ResourceScope;
 
 public class IgnoredArrayOverflowTest {
-  private static final MemoryRequestServer memReqSvr = BaseState.defaultMemReqSvr;
+  private static final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
 
   private WritableMemory memory;
   private static final long MAX_SIZE = (1L << 10); // use 1L << 31 to test int overrange

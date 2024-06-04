@@ -26,7 +26,7 @@ import static org.testng.Assert.assertTrue;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.datasketches.memory.BaseState;
+import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
@@ -101,7 +101,7 @@ public class XxHash64Test {
   }
 
   /**
-   * This simple test compares the output of {@link BaseState#xxHash64(long, long, long)} with the
+   * This simple test compares the output of {@link Resource#xxHash64(long, long, long)} with the
    * output of {@link net.openhft.hashing.LongHashFunction}, that itself is tested against the
    * reference implementation in C.  This increases confidence that the xxHash function implemented
    * in this package is in fact the same xxHash function implemented in C.

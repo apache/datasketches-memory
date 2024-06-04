@@ -27,7 +27,7 @@ import static org.testng.Assert.assertTrue;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.BaseState;
+import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableBuffer;
@@ -383,7 +383,7 @@ public class Buffer2Test {
   @Test
   public void checkWritableWrap() {
     ByteBuffer bb = ByteBuffer.allocate(16);
-    WritableBuffer buf = WritableBuffer.writableWrap(bb, ByteOrder.nativeOrder(), BaseState.defaultMemReqSvr);
+    WritableBuffer buf = WritableBuffer.writableWrap(bb, ByteOrder.nativeOrder(), Resource.defaultMemReqSvr);
     assertNotNull(buf);
   }
 

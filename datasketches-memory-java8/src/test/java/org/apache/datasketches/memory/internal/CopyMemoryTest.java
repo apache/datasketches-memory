@@ -147,7 +147,7 @@ public class CopyMemoryTest {
   }
 
   private static WritableMemory genWRH(int longs, boolean empty) {
-    WritableMemory mem = WritableMemory.allocateDirect(longs << 3);
+    WritableMemory mem = WritableMemory.allocateDirect(longs << 3, null);
     if (empty) {
       mem.clear();
     } else {

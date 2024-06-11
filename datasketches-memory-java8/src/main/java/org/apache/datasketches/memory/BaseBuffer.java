@@ -21,9 +21,19 @@ package org.apache.datasketches.memory;
 
 /**
  * Defines the relative positional API.
- *
- * <p>The classes in this package are not thread-safe.</p>
- *
+ * This is different from and simpler than Java ByteBuffer positional API.
+ * <ul><li>All based on longs instead of ints.</li>
+ * <li>Eliminated "mark". Rarely used and confusing with its silent side effects.</li>
+ * <li>The invariants are {@code 0 <= start <= position <= end <= capacity}.</li>
+ * <li>It always starts up as (0, 0, capacity, capacity).</li>
+ * <li>You set (start, position, end) in one call with
+ * {@link #setStartPositionEnd(long, long, long)}</li>
+ * <li>Position can be set directly or indirectly when using the positional get/put methods.
+ * <li>Added incrementPosition(long), which is much easier when you know the increment.</li>
+ * <li>This approach eliminated a number of methods and checks, and has no unseen side effects,
+ * e.g., mark being invalidated.</li>
+ * <li>Clearer method naming (IMHO).</li>
+ * </ul>
  * @author Lee Rhodes
  */
 public interface BaseBuffer extends Resource {
@@ -85,6 +95,8 @@ public interface BaseBuffer extends Resource {
 
   /**
    * Sets the current position.
+   * Asserts that the positional invariants are not violated,
+   * otherwise, if asserts are enabled throws an {@link AssertionError}.
    * @param position the given current position.
    * @return BaseBuffer
    * @throws BufferPositionInvariantsException if positional invariants have been violated.
@@ -92,7 +104,18 @@ public interface BaseBuffer extends Resource {
   BaseBuffer setPosition(long position);
 
   /**
+   * Sets the current position.
+   * Checks that the positional invariants are not violated,
+   * otherwise, throws an {@link IllegalArgumentException}.
+   * @param position the given current position.
+   * @return BaseBuffer
+   */
+  BaseBuffer setAndCheckPosition(long position);
+
+  /**
    * Sets start position, current position, and end position.
+   * Asserts that the positional invariants are not violated,
+   * otherwise, if asserts are enabled throws an {@link AssertionError}.
    * @param start the start position in the buffer
    * @param position the current position between the start and end
    * @param end the end position in the buffer
@@ -100,5 +123,16 @@ public interface BaseBuffer extends Resource {
    * @throws BufferPositionInvariantsException if positional invariants have been violated.
    */
   BaseBuffer setStartPositionEnd(long start, long position, long end);
+
+  /**
+   * Sets start position, current position, and end position.
+   * Checks that the positional invariants are not violated,
+   * otherwise, throws an {@link IllegalArgumentException}.
+   * @param start the start position in the buffer
+   * @param position the current position between the start and end
+   * @param end the end position in the buffer
+   * @return BaseBuffer
+   */
+  BaseBuffer setAndCheckStartPositionEnd(long start, long position, long end);
 
 }

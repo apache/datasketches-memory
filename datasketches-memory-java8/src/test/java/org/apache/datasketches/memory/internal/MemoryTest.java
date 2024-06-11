@@ -23,6 +23,7 @@
 
 package org.apache.datasketches.memory.internal;
 
+import static org.apache.datasketches.memory.Resource.defaultMemReqSvr;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
@@ -54,7 +55,7 @@ public class MemoryTest {
   @Test
   public void checkDirectRoundTrip() throws Exception {
     int n = 1024; //longs
-    try (WritableMemory mem = WritableMemory.allocateDirect(n * 8)) {
+    try (WritableMemory mem = WritableMemory.allocateDirect(n * 8, defaultMemReqSvr)) {
       for (int i = 0; i < n; i++) {
         mem.putLong(i * 8, i);
       }
@@ -96,7 +97,7 @@ public class MemoryTest {
       assertEquals(v, i);
     }
     // check 0 length array wraps
-    Memory memZeroLengthArrayBoolean = WritableMemory.writableWrap(new boolean[0]);
+    //Memory memZeroLengthArrayBoolean = WritableMemory.writableWrap(new boolean[0]);
     Memory memZeroLengthArrayByte = WritableMemory.writableWrap(new byte[0]);
     Memory memZeroLengthArrayChar = WritableMemory.writableWrap(new char[0]);
     Memory memZeroLengthArrayShort = WritableMemory.writableWrap(new short[0]);
@@ -104,7 +105,7 @@ public class MemoryTest {
     Memory memZeroLengthArrayLong = WritableMemory.writableWrap(new long[0]);
     Memory memZeroLengthArrayFloat = WritableMemory.writableWrap(new float[0]);
     Memory memZeroLengthArrayDouble = WritableMemory.writableWrap(new double[0]);
-    assertEquals(memZeroLengthArrayBoolean.getCapacity(), 0);
+    //assertEquals(memZeroLengthArrayBoolean.getCapacity(), 0);
     assertEquals(memZeroLengthArrayByte.getCapacity(), 0);
     assertEquals(memZeroLengthArrayChar.getCapacity(), 0);
     assertEquals(memZeroLengthArrayShort.getCapacity(), 0);
@@ -117,7 +118,7 @@ public class MemoryTest {
     List<Memory> memoryToCheck = Lists.newArrayList();
     memoryToCheck.add(WritableMemory.allocate(0));
     memoryToCheck.add(WritableMemory.writableWrap(ByteBuffer.allocate(0)));
-    memoryToCheck.add(WritableMemory.writableWrap(new boolean[0]));
+    //memoryToCheck.add(WritableMemory.writableWrap(new boolean[0]));
     memoryToCheck.add(WritableMemory.writableWrap(new byte[0]));
     memoryToCheck.add(WritableMemory.writableWrap(new char[0]));
     memoryToCheck.add(WritableMemory.writableWrap(new short[0]));
@@ -126,7 +127,7 @@ public class MemoryTest {
     memoryToCheck.add(WritableMemory.writableWrap(new float[0]));
     memoryToCheck.add(WritableMemory.writableWrap(new double[0]));
     memoryToCheck.add(Memory.wrap(ByteBuffer.allocate(0)));
-    memoryToCheck.add(Memory.wrap(new boolean[0]));
+    //memoryToCheck.add(Memory.wrap(new boolean[0]));
     memoryToCheck.add(Memory.wrap(new byte[0]));
     memoryToCheck.add(Memory.wrap(new char[0]));
     memoryToCheck.add(Memory.wrap(new short[0]));
@@ -207,8 +208,8 @@ public class MemoryTest {
     ByteBuffer bb = ByteBuffer.allocate(n * 8);
     bb.order(ByteOrder.BIG_ENDIAN);
     Memory mem = Memory.wrap(bb);
-    assertFalse(mem.getByteOrder() == ByteOrder.nativeOrder());
-    assertEquals(mem.getByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertFalse(mem.getTypeByteOrder() == ByteOrder.nativeOrder());
+    assertEquals(mem.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test
@@ -319,7 +320,7 @@ public class MemoryTest {
   @Test(expectedExceptions = IllegalStateException.class)
   public void checkParentUseAfterFree() throws Exception {
     int bytes = 64 * 8;
-    WritableMemory wmem = WritableMemory.allocateDirect(bytes);
+    WritableMemory wmem = WritableMemory.allocateDirect(bytes, defaultMemReqSvr);
     wmem.close();
     wmem.getLong(0);
   }
@@ -327,7 +328,7 @@ public class MemoryTest {
   @Test(expectedExceptions = IllegalStateException.class)
   public void checkRegionUseAfterFree() throws Exception {
     int bytes = 64;
-    Memory mem = WritableMemory.allocateDirect(bytes);
+    Memory mem = WritableMemory.allocateDirect(bytes, defaultMemReqSvr);
     Memory region = mem.region(0L, bytes);
     mem.close();
     region.getByte(0);
@@ -344,7 +345,7 @@ public class MemoryTest {
       wbuf = wmem.asWritableBuffer();
       assertNull(wbuf.getMemoryRequestServer());
       //OFF HEAP
-      try (WritableMemory wmem2 = WritableMemory.allocateDirect(16)) { //OFF HEAP
+      try (WritableMemory wmem2 = WritableMemory.allocateDirect(16, defaultMemReqSvr)) { //OFF HEAP
         assertNull(wmem2.getMemoryRequestServer());
         wbuf = wmem2.asWritableBuffer();
         assertNull(wbuf.getMemoryRequestServer());

@@ -38,7 +38,7 @@ public class BufferTest {
   @Test
   public void checkDirectRoundTrip() throws Exception {
     int n = 1024; //longs
-    try (WritableMemory wmem = WritableMemory.allocateDirect(n * 8)) {
+    try (WritableMemory wmem = WritableMemory.allocateDirect(n * 8, null)) {
       WritableBuffer wbuf = wmem.asWritableBuffer();
       for (int i = 0; i < n; i++) {
         wbuf.putLong(i);
@@ -93,7 +93,6 @@ public class BufferTest {
     buffersToCheck.add(WritableMemory.allocate(0).asBuffer());
     buffersToCheck.add(WritableBuffer.writableWrap(ByteBuffer.allocate(0)));
     buffersToCheck.add(Buffer.wrap(ByteBuffer.allocate(0)));
-    buffersToCheck.add(Memory.wrap(new boolean[0]).asBuffer());
     buffersToCheck.add(Memory.wrap(new byte[0]).asBuffer());
     buffersToCheck.add(Memory.wrap(new char[0]).asBuffer());
     buffersToCheck.add(Memory.wrap(new short[0]).asBuffer());
@@ -202,7 +201,7 @@ public class BufferTest {
     ByteBuffer bb = ByteBuffer.allocate(n * 8);
     bb.order(ByteOrder.BIG_ENDIAN);
     Buffer buf = Buffer.wrap(bb);
-    assertEquals(buf.getByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(buf.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test
@@ -282,7 +281,7 @@ public class BufferTest {
   @Test(expectedExceptions = IllegalStateException.class)
   public void checkParentUseAfterFree() throws Exception {
     int bytes = 64 * 8;
-    WritableMemory wmem = WritableMemory.allocateDirect(bytes);
+    WritableMemory wmem = WritableMemory.allocateDirect(bytes, null);
     WritableBuffer wbuf = wmem.asWritableBuffer();
     wmem.close();
     wbuf.getLong();
@@ -291,7 +290,7 @@ public class BufferTest {
   @Test(expectedExceptions = IllegalStateException.class)
   public void checkRegionUseAfterFree() throws Exception {
     int bytes = 64;
-    WritableMemory wmem = WritableMemory.allocateDirect(bytes);
+    WritableMemory wmem = WritableMemory.allocateDirect(bytes, null);
 
     Buffer reg = wmem.asBuffer().region();
     wmem.close();

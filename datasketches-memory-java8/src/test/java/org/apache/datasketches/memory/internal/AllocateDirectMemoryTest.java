@@ -34,7 +34,7 @@ public class AllocateDirectMemoryTest {
   @Test(expectedExceptions = IllegalStateException.class)
   public void simpleAllocateDirect()  {
     int longs = 32;
-    try (WritableMemory wMem = WritableMemory.allocateDirect(longs << 3)) {
+    try (WritableMemory wMem = WritableMemory.allocateDirect(longs << 3, null)) {
       for (int i = 0; i < longs; i++) {
         wMem.putLong(i << 3, i);
         assertEquals(wMem.getLong(i << 3), i);
@@ -49,7 +49,7 @@ public class AllocateDirectMemoryTest {
   public void checkDefaultMemoryRequestServer()  {
     int longs1 = 32;
     int bytes1 = longs1 << 3;
-    try (WritableMemory origWmem = WritableMemory.allocateDirect(bytes1)) {
+    try (WritableMemory origWmem = WritableMemory.allocateDirect(bytes1, null)) {
       for (int i = 0; i < longs1; i++) { //puts data in wMem1
         origWmem.putLong(i << 3, i);
         assertEquals(origWmem.getLong(i << 3), i);
@@ -87,7 +87,7 @@ public class AllocateDirectMemoryTest {
   @Test
   public void checkExplicitClose() {
     final long cap = 128;
-    WritableMemory wMem = WritableMemory.allocateDirect(cap);
+    WritableMemory wMem = WritableMemory.allocateDirect(cap, null);
     assertTrue(wMem.isValid());
     wMem.close();
     assertFalse(wMem.isValid());

@@ -29,7 +29,9 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.datasketches.memory.Memory;
 import org.testng.annotations.BeforeClass;
@@ -44,7 +46,7 @@ public class AllocateDirectMapMemoryTest {
   }
 
   @Test(expectedExceptions = IllegalStateException.class)
-  public void simpleMap() {
+  public void simpleMap() throws IOException {
     File file = getResourceFile("GettysburgAddress.txt");
     assertTrue(AllocateDirectWritableMap.isFileReadOnly(file));
     try (Memory mem = Memory.map(file)) {
@@ -53,32 +55,37 @@ public class AllocateDirectMapMemoryTest {
   }
 
   @Test
-  public void printGettysbergAddress()  {
+  public void printGettysbergAddress() throws IOException {
     File file = getResourceFile("GettysburgAddress.txt");
     try (Memory mem = Memory.map(file))
     {
-      println("Mem Cap:       " + mem.getCapacity());
+      int len1 = (int)mem.getCapacity();
+      println("Mem Cap:       " + len1);
       println("Total Offset:  " + mem.getTotalOffset());
       println("Cum Offset:    " + ((ResourceImpl)mem).getCumulativeOffset(0));
       println("Total Offset: " + mem.getTotalOffset());
-      StringBuilder sb = new StringBuilder();
-      mem.getCharsFromUtf8(43, 176, sb);
-      println(sb.toString());
+      byte[] bArr = new byte[len1];
+      mem.getByteArray(0, bArr, 0, len1);
+      String s = new String(bArr, StandardCharsets.UTF_8);
+      println(s);
 
       println("");
-      Memory mem2 = mem.region(43 + 76, 20);
-      println("Mem Cap:       " + mem2.getCapacity());
+      Memory mem2 = mem.region(43 + 76, 34);
+      int len2 = (int)mem2.getCapacity();
+      println("Mem Cap:       " + len2);
       println("Offset:        " + mem.getTotalOffset());
       println("Cum Offset:    " + ((ResourceImpl)mem2).getCumulativeOffset(0));
       println("Total Offset: " + mem2.getTotalOffset());
-      StringBuilder sb2 = new StringBuilder();
-      mem2.getCharsFromUtf8(0, 12, sb2);
-      println(sb2.toString());
+      byte[] bArr2 = new byte[len2];
+      mem2.getByteArray(0, bArr2, 0, len2);
+      String s2 = new String(bArr2,StandardCharsets.UTF_8);
+      println(s2);
+      assertEquals(s2,"a new nation, conceived in Liberty");
     }
   }
 
   @Test
-  public void testIllegalArguments() {
+  public void testIllegalArguments() throws IOException {
     File file = getResourceFile("GettysburgAddress.txt");
     try (Memory mem = Memory.map(file, -1, Integer.MAX_VALUE, ByteOrder.nativeOrder())) {
       fail("Failed: Position was negative.");
@@ -94,7 +101,7 @@ public class AllocateDirectMapMemoryTest {
   }
 
   @Test(expectedExceptions = IllegalStateException.class)
-  public void testAccessAfterClose() {
+  public void testAccessAfterClose() throws IOException {
     File file = getResourceFile("GettysburgAddress.txt");
     long memCapacity = file.length();
     try (Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
@@ -106,7 +113,7 @@ public class AllocateDirectMapMemoryTest {
   }
 
   @Test(expectedExceptions = IllegalStateException.class)
-  public void testReadFailAfterClose()  {
+  public void testReadFailAfterClose() throws IOException  {
     File file = getResourceFile("GettysburgAddress.txt");
     long memCapacity = file.length();
     Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder());
@@ -115,7 +122,7 @@ public class AllocateDirectMapMemoryTest {
   }
 
   @Test
-  public void testLoad()  {
+  public void testLoad() throws IOException  {
     File file = getResourceFile("GettysburgAddress.txt");
     long memCapacity = file.length();
     try (Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {

@@ -85,7 +85,7 @@ public class LeafImplTest {
     WritableMemory mem = WritableMemory.writableWrap(bb, NBO, dummyMemReqSvr);
     assertEquals(bb.isDirect(), mem.isDirectResource());
     assertNotNull(((ResourceImpl)mem).getUnsafeObject());
-    checkCombinations(mem, off, cap, mem.isDirectResource(), mem.getByteOrder(), true, true);
+    checkCombinations(mem, off, cap, mem.isDirectResource(), mem.getTypeByteOrder(), true, true);
 
     //BB off heap, native order, has ByteBuffer, has MemReqSvr
     ByteBuffer dbb = ByteBuffer.allocateDirect((int)cap);
@@ -94,7 +94,7 @@ public class LeafImplTest {
     mem = WritableMemory.writableWrap(dbb, NBO, dummyMemReqSvr);
     assertEquals(dbb.isDirect(), mem.isDirectResource());
     assertNull(((ResourceImpl)mem).getUnsafeObject());
-    checkCombinations(mem, off, cap,  mem.isDirectResource(), mem.getByteOrder(), true, true);
+    checkCombinations(mem, off, cap,  mem.isDirectResource(), mem.getTypeByteOrder(), true, true);
 
     //BB on heap, non native order, has ByteBuffer, has MemReqSvr
     bb = ByteBuffer.allocate((int)cap);
@@ -103,7 +103,7 @@ public class LeafImplTest {
     mem = WritableMemory.writableWrap(bb, NNBO, dummyMemReqSvr);
     assertEquals(bb.isDirect(), mem.isDirectResource());
     assertNotNull(((ResourceImpl)mem).getUnsafeObject());
-    checkCombinations(mem, off, cap, mem.isDirectResource(), mem.getByteOrder(), true, true);
+    checkCombinations(mem, off, cap, mem.isDirectResource(), mem.getTypeByteOrder(), true, true);
 
     //BB off heap, non native order, has ByteBuffer, has MemReqSvr
     dbb = ByteBuffer.allocateDirect((int)cap);
@@ -112,7 +112,7 @@ public class LeafImplTest {
     mem = WritableMemory.writableWrap(dbb, NNBO, dummyMemReqSvr);
     assertEquals(dbb.isDirect(), mem.isDirectResource());
     assertNull(((ResourceImpl)mem).getUnsafeObject());
-    checkCombinations(mem, off, cap,  mem.isDirectResource(), mem.getByteOrder(), true, true);
+    checkCombinations(mem, off, cap,  mem.isDirectResource(), mem.getTypeByteOrder(), true, true);
   }
 
   @Test
@@ -178,7 +178,7 @@ public class LeafImplTest {
     ByteBuffer bb = ((ResourceImpl)mem).getByteBuffer();
     assertTrue( hasByteBuffer ? bb != null : bb == null);
 
-    assertTrue(mem.getByteOrder() == bo);
+    assertTrue(mem.getTypeByteOrder() == bo);
 
     if (hasMemReqSvr) { assertTrue(mem.getMemoryRequestServer() instanceof DummyMemoryRequestServer); }
     else { assertNull(mem.getMemoryRequestServer()); }
@@ -207,7 +207,7 @@ public class LeafImplTest {
     bb = ((ResourceImpl)buf).getByteBuffer();
     assertTrue(hasByteBuffer ? bb != null : bb == null);
 
-    assertTrue(buf.getByteOrder() == bo);
+    assertTrue(buf.getTypeByteOrder() == bo);
 
     if (hasMemReqSvr) { assertTrue(buf.getMemoryRequestServer() instanceof DummyMemoryRequestServer); }
     else { assertNull(buf.getMemoryRequestServer()); }
@@ -235,7 +235,7 @@ public class LeafImplTest {
     bb = ((ResourceImpl)nnMem).getByteBuffer();
     assertTrue( hasByteBuffer ? bb != null : bb == null);
 
-    assertTrue(nnMem.getByteOrder() == oo);
+    assertTrue(nnMem.getTypeByteOrder() == oo);
 
     if (hasMemReqSvr) { assertTrue(nnMem.getMemoryRequestServer() instanceof DummyMemoryRequestServer); }
 
@@ -262,7 +262,7 @@ public class LeafImplTest {
     bb = ((ResourceImpl)nnBuf).getByteBuffer();
     assertTrue( hasByteBuffer ? bb != null : bb == null);
 
-    assertTrue(nnBuf.getByteOrder() == oo);
+    assertTrue(nnBuf.getTypeByteOrder() == oo);
 
     if (hasMemReqSvr) { assertTrue(nnBuf.getMemoryRequestServer() instanceof DummyMemoryRequestServer); }
 

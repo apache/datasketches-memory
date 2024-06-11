@@ -31,11 +31,11 @@ public interface MemoryRequestServer {
    * Request new WritableMemory with the given capacity. The current Writable Memory will be used to
    * determine the byte order of the returned WritableMemory and other checks.
    * @param currentWritableMemory the current writableMemory of the client. It must be non-null.
-   * @param capacityBytes The capacity being requested. It must be &ge; 0.
+   * @param newCapacityBytes The capacity being requested. It must be &ge; 0.
    *
    * @return new WritableMemory with the given capacity.
    */
-  WritableMemory request(WritableMemory currentWritableMemory, long capacityBytes);
+  WritableMemory request(WritableMemory currentWritableMemory, long newCapacityBytes);
 
   /**
    * Request close the AutoCloseable resource. This only applies to resources allocated using

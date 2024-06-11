@@ -43,7 +43,7 @@ public class ZeroCapacityTest {
     Memory.wrap(ByteBuffer.allocate(0));
     Memory mem3 = Memory.wrap(ByteBuffer.allocateDirect(0));
     mem3.region(0, 0);
-    WritableMemory mem = WritableMemory.allocateDirect(0);
+    WritableMemory mem = WritableMemory.allocateDirect(0, null);
     mem.close();
   }
 

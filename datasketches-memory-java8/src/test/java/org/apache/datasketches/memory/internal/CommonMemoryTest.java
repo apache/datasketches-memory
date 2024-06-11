@@ -35,7 +35,7 @@ public class CommonMemoryTest {
   @Test
   public void checkSetGet() throws Exception {
     int memCapacity = 16; //must be at least 8
-    try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity, null)) {
       assertEquals(mem.getCapacity(), memCapacity);
       setGetTests(mem);
     }
@@ -86,7 +86,7 @@ public class CommonMemoryTest {
   @Test
   public void checkSetGetArrays() throws Exception {
     int memCapacity = 32;
-    try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity, null)) {
       assertEquals(memCapacity, mem.getCapacity());
       setGetArraysTests(mem);
     }
@@ -96,14 +96,6 @@ public class CommonMemoryTest {
     int accessCapacity = (int)mem.getCapacity();
 
     int words = 4;
-    boolean[] srcArray1 = {true, false, true, false};
-    boolean[] dstArray1 = new boolean[words];
-    mem.fill(0, accessCapacity, (byte)127);
-    mem.putBooleanArray(0, srcArray1, 0, words);
-    mem.getBooleanArray(0, dstArray1, 0, words);
-    for (int i = 0; i < words; i++) {
-      assertEquals(dstArray1[i], srcArray1[i]);
-    }
 
     byte[] srcArray2 = { 1, -2, 3, -4 };
     byte[] dstArray2 = new byte[4];
@@ -165,7 +157,7 @@ public class CommonMemoryTest {
   @Test
   public void checkSetGetPartialArraysWithOffset() throws Exception {
     int memCapacity = 32;
-    try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity, null)) {
       assertEquals(memCapacity, mem.getCapacity());
       setGetPartialArraysWithOffsetTests(mem);
     }
@@ -173,13 +165,6 @@ public class CommonMemoryTest {
 
   public static void setGetPartialArraysWithOffsetTests(WritableMemory mem) {
     int items = 4;
-    boolean[] srcArray1 = {true, false, true, false};
-    boolean[] dstArray1 = new boolean[items];
-    mem.putBooleanArray(0, srcArray1, 2, items / 2);
-    mem.getBooleanArray(0, dstArray1, 2, items / 2);
-    for (int i = 2; i < items; i++) {
-      assertEquals(dstArray1[i], srcArray1[i]);
-    }
 
     byte[] srcArray2 = { 1, -2, 3, -4 };
     byte[] dstArray2 = new byte[items];
@@ -241,7 +226,7 @@ public class CommonMemoryTest {
   @Test
   public void checkSetClearIsBits() throws Exception {
     int memCapacity = 8;
-    try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity, null)) {
       assertEquals(memCapacity, mem.getCapacity());
       mem.clear();
       setClearIsBitsTests(mem);
@@ -281,7 +266,7 @@ public class CommonMemoryTest {
   @Test
   public void checkSetClearMemoryRegions() throws Exception {
     int memCapacity = 64; //must be 64
-    try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity, null)) {
       setClearMemoryRegionsTests(mem); //requires println enabled to visually check
       for (int i = 0; i < memCapacity; i++) {
         assertEquals(mem.getByte(i), 0);
@@ -350,7 +335,7 @@ public class CommonMemoryTest {
   @Test
   public void checkToHexStringAllMem() throws Exception {
     int memCapacity = 48; //must be 48
-    try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity)) {
+    try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity, null)) {
       toHexStringAllMemTests(mem); //requires println enabled to visually check
     }
   }

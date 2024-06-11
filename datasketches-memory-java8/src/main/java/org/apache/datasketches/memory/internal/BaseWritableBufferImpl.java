@@ -19,7 +19,6 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_BOOLEAN_BASE_OFFSET;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_BOOLEAN_INDEX_SCALE;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_BYTE_INDEX_SCALE;
@@ -52,31 +51,33 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
 
   /**
    * The static constructor that chooses the correct ByteBuffer leaf node based on the byte order.
-   * @param byteBuf the ByteBuffer being wrapped
+   * @param byteBuffer the ByteBuffer being wrapped
    * @param localReadOnly the requested read-only state
    * @param byteOrder the requested byteOrder
    * @param memReqSvr the requested MemoryRequestServer, which may be null.
    * @return this class constructed via the leaf node.
    */
   public static WritableBuffer wrapByteBuffer(
-      final ByteBuffer byteBuf, final boolean localReadOnly, final ByteOrder byteOrder,
+      final ByteBuffer byteBuffer, final boolean localReadOnly, final ByteOrder byteOrder,
       final MemoryRequestServer memReqSvr) {
-    final AccessByteBuffer abb = new AccessByteBuffer(byteBuf);
+    Objects.requireNonNull(byteBuffer, "byteBuffer must not be null");
+    Objects.requireNonNull(byteOrder, "byteOrder must not be null");
+    final AccessByteBuffer abb = new AccessByteBuffer(byteBuffer);
     final int typeId = (abb.resourceReadOnly || localReadOnly) ? READONLY : 0;
     final long cumOffsetBytes = abb.initialCumOffset;
     final BaseWritableBufferImpl bwbi = Util.isNativeByteOrder(byteOrder)
         ? new BBWritableBufferImpl(abb.unsafeObj, abb.nativeBaseOffset,
-            abb.offsetBytes, abb.capacityBytes, typeId, cumOffsetBytes, memReqSvr, byteBuf)
+            abb.offsetBytes, abb.capacityBytes, typeId, cumOffsetBytes, memReqSvr, byteBuffer)
         : new BBNonNativeWritableBufferImpl(abb.unsafeObj, abb.nativeBaseOffset,
-            abb.offsetBytes, abb.capacityBytes,  typeId, cumOffsetBytes, memReqSvr, byteBuf);
-    bwbi.setStartPositionEnd(0, byteBuf.position(), byteBuf.limit());
+            abb.offsetBytes, abb.capacityBytes,  typeId, cumOffsetBytes, memReqSvr, byteBuffer);
+    bwbi.setStartPositionEnd(0, byteBuffer.position(), byteBuffer.limit());
     return bwbi;
   }
 
   //REGIONS
   @Override
   public Buffer region() {
-    return writableRegionImpl(getPosition(), getEnd() - getPosition(), true, getByteOrder());
+    return writableRegionImpl(getPosition(), getEnd() - getPosition(), true, getTypeByteOrder());
   }
 
   @Override
@@ -88,7 +89,7 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
 
   @Override
   public WritableBuffer writableRegion() {
-    return writableRegionImpl(getPosition(), getEnd() - getPosition(), false, getByteOrder());
+    return writableRegionImpl(getPosition(), getEnd() - getPosition(), false, getTypeByteOrder());
   }
 
   @Override
@@ -116,7 +117,7 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
   //DUPLICATES
   @Override
   public Buffer duplicate() {
-    return writableDuplicateImpl(true, getByteOrder());
+    return writableDuplicateImpl(true, getTypeByteOrder());
   }
 
   @Override
@@ -126,7 +127,7 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
 
   @Override
   public WritableBuffer writableDuplicate() {
-    return writableDuplicateImpl(false, getByteOrder());
+    return writableDuplicateImpl(false, getTypeByteOrder());
   }
 
   @Override
@@ -182,21 +183,6 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
   public final boolean getBoolean(final long offsetBytes) {
     checkValidAndBounds(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE);
     return unsafe.getBoolean(getUnsafeObject(), getCumulativeOffset(offsetBytes));
-  }
-
-  @Override
-  public final void getBooleanArray(final boolean[] dstArray, final int dstOffsetBooleans,
-      final int lengthBooleans) {
-    final long pos = getPosition();
-    final long copyBytes = lengthBooleans;
-    incrementAndCheckPositionForRead(pos, copyBytes);
-    ResourceImpl.checkBounds(dstOffsetBooleans, lengthBooleans, dstArray.length);
-    CompareAndCopy.copyMemoryCheckingDifferentObject(
-            getUnsafeObject(),
-            getCumulativeOffset(pos),
-            dstArray,
-            ARRAY_BOOLEAN_BASE_OFFSET + dstOffsetBooleans,
-            copyBytes);
   }
 
   @Override
@@ -297,21 +283,6 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
   public final void putBoolean(final long offsetBytes, final boolean value) {
     checkValidAndBoundsForWrite(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE);
     unsafe.putBoolean(getUnsafeObject(), getCumulativeOffset(offsetBytes), value);
-  }
-
-  @Override
-  public final void putBooleanArray(final boolean[] srcArray, final int srcOffsetBooleans,
-      final int lengthBooleans) {
-    final long pos = getPosition();
-    final long copyBytes = lengthBooleans;
-    incrementAndCheckPositionForWrite(pos, copyBytes);
-    ResourceImpl.checkBounds(srcOffsetBooleans, lengthBooleans, srcArray.length);
-    CompareAndCopy.copyMemoryCheckingDifferentObject(
-            srcArray,
-            ARRAY_BOOLEAN_BASE_OFFSET + srcOffsetBooleans,
-            getUnsafeObject(),
-            getCumulativeOffset(pos),
-            copyBytes);
   }
 
   @Override

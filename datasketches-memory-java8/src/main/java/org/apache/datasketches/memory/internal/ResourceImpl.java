@@ -219,7 +219,7 @@ public abstract class ResourceImpl implements Resource {
   }
 
   @Override
-  public final ByteOrder getByteOrder() {
+  public final ByteOrder getTypeByteOrder() {
     return isNativeOrder(getTypeId()) ? NATIVE_BYTE_ORDER : NON_NATIVE_BYTE_ORDER;
   }
 
@@ -268,7 +268,7 @@ public abstract class ResourceImpl implements Resource {
 
   @Override
   public final boolean isByteOrderCompatible(final ByteOrder byteOrder) {
-    final ByteOrder typeBO = getByteOrder();
+    final ByteOrder typeBO = getTypeByteOrder();
     return typeBO == ByteOrder.nativeOrder() && typeBO == byteOrder;
   }
 
@@ -429,7 +429,7 @@ public abstract class ResourceImpl implements Resource {
     sb.append("MemReq, hashCode    : ").append(memReqStr).append(LS);
     sb.append("Valid               : ").append(state.isValid()).append(LS);
     sb.append("Read Only           : ").append(state.isReadOnly()).append(LS);
-    sb.append("Type Byte Order     : ").append(state.getByteOrder().toString()).append(LS);
+    sb.append("Type Byte Order     : ").append(state.getTypeByteOrder().toString()).append(LS);
     sb.append("Native Byte Order   : ").append(ByteOrder.nativeOrder().toString()).append(LS);
     sb.append("JDK Runtime Version : ").append(UnsafeUtil.JDK).append(LS);
     //Data detail

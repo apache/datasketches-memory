@@ -19,18 +19,13 @@
 
 package org.apache.datasketches.memory;
 
-import static org.apache.datasketches.memory.internal.Util.negativeCheck;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Objects;
 
 import org.apache.datasketches.memory.internal.BaseWritableBufferImpl;
 
 /**
  * Defines the read-only API for relative positional access to a resource.
- *
- * <p>The classes in this package are not thread-safe.</p>
  *
  * @author Lee Rhodes
  */
@@ -38,33 +33,40 @@ public interface Buffer extends BaseBuffer {
 
   //BYTE BUFFER
   /**
-   * Accesses the given ByteBuffer for read-only operations. The returned Buffer object has the
-   * same byte order, as the given ByteBuffer.
+   * Provides a view of the given <i>ByteBuffer</i> for read-only operations.
+   * The view is of the entire ByteBuffer independent of position and limit.
+   * However, the returned <i>WritableBuffer</i> will have a position and end set to the
+   * ByteBuffer's position and limit, respectively.
+   * The returned WritableBuffer will use the native <i>ByteOrder</i>,
+   * ignoring the ByteOrder of the given ByteBuffer.
+   * This does not affect the ByteOrder of data already in the ByteBuffer.
    * @param byteBuffer the given ByteBuffer, must not be null.
-   * @return a new Buffer for read-only operations on the given ByteBuffer.
+   * @return a new <i>Buffer</i> for read-only operations on the given ByteBuffer.
    */
   static Buffer wrap(ByteBuffer byteBuffer) {
     return wrap(byteBuffer, byteBuffer.order());
   }
 
   /**
-   * Accesses the given ByteBuffer for read-only operations. The returned Buffer object has
-   * the given byte order, ignoring the byte order of the given ByteBuffer.
-   * @param byteBuffer the given ByteBuffer, must not be null
-   * @param byteOrder the byte order to be used, which may be independent of the byte order
-   * state of the given ByteBuffer
-   * @return a new Buffer for read-only operations on the given ByteBuffer.
+   * Provides a view of the given <i>ByteBuffer</i> for read-only operations.
+   * The view is of the entire ByteBuffer independent of position and limit.
+   * However, the returned <i>WritableBuffer</i> will have a position and end set to the
+   * ByteBuffer's position and limit, respectively.
+   * The returned WritableBuffer will use the native <i>ByteOrder</i>,
+   * ignoring the ByteOrder of the given ByteBuffer.
+   * This does not affect the ByteOrder of data already in the ByteBuffer.
+   * @param byteBuffer the given ByteBuffer. It must be non-null
+   * @param byteOrder the ByteOrder to be used. It must be non-null.
+   * @return a new <i>Buffer</i> for read-only operations on the given ByteBuffer.
    */
   static Buffer wrap(ByteBuffer byteBuffer, ByteOrder byteOrder) {
-    Objects.requireNonNull(byteBuffer, "byteBuffer must not be null");
-    Objects.requireNonNull(byteOrder, "byteOrder must not be null");
-    negativeCheck(byteBuffer.capacity(), "byteBuffer");
     return BaseWritableBufferImpl.wrapByteBuffer(byteBuffer, true, byteOrder, null);
   }
 
   //DUPLICATES
   /**
-   * Returns a read-only duplicate view of this Buffer with the same but independent values of
+   * Returns a read-only duplicate view of this Buffer with the same byte order,
+   * but independent values of
    * <i>start</i>, <i>position</i> and <i>end</i>.
    * <ul>
    * <li>Returned object's origin = this object's origin</li>
@@ -78,7 +80,9 @@ public interface Buffer extends BaseBuffer {
    * @return a read-only duplicate view of this Buffer with the same but independent values of
    * <i>start</i>, <i>position</i> and <i>end</i>.
    */
-  Buffer duplicate();
+  default Buffer duplicate() {
+    return duplicate(getTypeByteOrder());
+  }
 
   /**
    * Returns a read-only duplicate view of this Buffer with the same but independent values of
@@ -98,11 +102,13 @@ public interface Buffer extends BaseBuffer {
    */
   Buffer duplicate(ByteOrder byteOrder);
 
-  //NO MAP
+  //NO MAP use Memory
+  //NO ALLOCATE DIRECT, makes no sense
 
   //REGIONS
   /**
-   * A region is a read-only view of this object.
+   * A region is a read-only view of this object from <i>position</i> to <i>end</i>
+   * and with the same byte order.
    * <ul>
    * <li>Returned object's origin = this object's <i>position</i></li>
    * <li>Returned object's <i>start</i> = 0</li>
@@ -115,10 +121,13 @@ public interface Buffer extends BaseBuffer {
    * @return a new <i>Buffer</i> representing the defined region based on the current
    * <i>position</i> and <i>end</i>.
    */
-  Buffer region();
+  default Buffer region() {
+    return region(getPosition(), getEnd() - getPosition(), getTypeByteOrder());
+  }
 
   /**
-   * A region is a read-only view of this object.
+   * A region is a read-only view of this object from offsetBytes and with a length of
+   * capacityBytes and with the given byte order.
    * <ul>
    * <li>Returned object's origin = this objects' origin + <i>offsetBytes</i></li>
    * <li>Returned object's <i>start</i> = 0</li>
@@ -145,7 +154,7 @@ public interface Buffer extends BaseBuffer {
    * @return Memory
    */
   default Memory asMemory() {
-    return asMemory(getByteOrder());
+    return asMemory(getTypeByteOrder());
   }
 
   /**
@@ -156,12 +165,16 @@ public interface Buffer extends BaseBuffer {
    */
   Memory asMemory(ByteOrder byteOrder);
 
-  //NO ACCESS PRIMITIVE HEAP ARRAYS for readOnly
+  //NO ALLOCATE HEAP BYTE ARRAYS, makes no sense. Use WritableMemory
+  //NO WRAP - ACCESS PRIMITIVE HEAP ARRAYS for readOnly.
+  //  Because of the ambiguity of positional API with the multibyte primitives. Use Memory instead.
+  //END OF CONSTRUCTOR-TYPE METHODS
 
   //PRIMITIVE getX() and getXArray()
+
   /**
    * Gets the boolean value at the current position.
-   * Increments the position by 1.
+   * Increments the position by <i>Byte.BYTES</i>.
    * @return the boolean at the current position
    */
   boolean getBoolean();
@@ -173,15 +186,6 @@ public interface Buffer extends BaseBuffer {
    * @return the boolean at the given offset
    */
   boolean getBoolean(long offsetBytes);
-
-  /**
-   * Gets the boolean array at the current position.
-   * Increments the position by <i>lengthBooleans - dstOffsetBooleans</i>.
-   * @param dstArray The preallocated destination array.
-   * @param dstOffsetBooleans offset in array units
-   * @param lengthBooleans number of array units to transfer
-   */
-  void getBooleanArray(boolean[] dstArray, int dstOffsetBooleans, int lengthBooleans);
 
   /**
    * Gets the byte value at the current position.
@@ -351,7 +355,9 @@ public interface Buffer extends BaseBuffer {
    */
   void getShortArray(short[] dstArray, int dstOffsetShorts, int lengthShorts);
 
-  //SPECIAL PRIMITIVE READ METHODS: compareTo
+  //SPECIAL PRIMITIVE READ METHODS: compareTo.
+  //   No copyTo, No writeTo. Use Memory for that.
+
   /**
    * Compares the bytes of this Buffer to <i>that</i> Buffer.
    * This uses absolute offsets not the start, position and end.

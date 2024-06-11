@@ -67,7 +67,7 @@ public class SpecificLeafTest {
   @Test
   public void checkDirectLeaves()  {
     int bytes = 128;
-    try (WritableMemory wmem = WritableMemory.allocateDirect(bytes)) {
+    try (WritableMemory wmem = WritableMemory.allocateDirect(bytes, null)) {
       assertTrue(((ResourceImpl)wmem).isDirectResource());
       assertFalse(wmem.isReadOnly());
       checkCrossLeafTypeIds(wmem);

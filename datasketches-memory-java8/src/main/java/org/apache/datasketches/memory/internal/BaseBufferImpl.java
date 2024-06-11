@@ -95,6 +95,22 @@ public abstract class BaseBufferImpl extends ResourceImpl implements BaseBuffer 
   }
 
   @Override
+  public BaseBuffer setAndCheckPosition(final long position) {
+    checkInvariants(start, position, end, capacity);
+    pos = position;
+    return this;
+  }
+
+  @Override
+  public BaseBuffer setAndCheckStartPositionEnd(final long start, final long position, final long end) {
+    checkInvariants(start, position, end, capacity);
+    this.start = start;
+    this.end = end;
+    pos = position;
+    return this;
+  }
+  
+  @Override
   public final BaseBufferImpl setPosition(final long position) {
     return setStartPositionEnd(start, position, end);
   }

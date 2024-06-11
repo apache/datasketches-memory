@@ -24,6 +24,7 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableMemory;
@@ -38,18 +39,18 @@ public class ThreadTest {
   Thread altThread;
 
   @BeforeClass
-  public void prepareFileAndMemory() {
+  public void prepareFileAndMemory() throws IOException {
     UtilTest.setGettysburgAddressFileToReadOnly();
     file = getResourceFile("GettysburgAddress.txt");
     assertTrue(AllocateDirectWritableMap.isFileReadOnly(file));
   }
 
-  void initMap() {
+  void initMap() throws IOException {
     mem = Memory.map(file); assertTrue(mem.isValid());
   }
 
   void initDirectMem() {
-    wmem = WritableMemory.allocateDirect(1024); assertTrue(wmem.isValid());
+    wmem = WritableMemory.allocateDirect(1024, null); assertTrue(wmem.isValid());
   }
 
   Runnable tryMapClose = () -> {
@@ -63,7 +64,7 @@ public class ThreadTest {
   };
 
   @Test
-  public void runTests() {
+  public void runTests() throws IOException {
     initMap();
     altThread = new Thread(tryMapClose, "altThread"); altThread.start();
     mem.close();

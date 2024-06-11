@@ -239,10 +239,10 @@ public class NonNativeWritableBufferImplTest {
     WritableMemory wmem = WritableMemory.writableWrap(bArr, ByteOrder.BIG_ENDIAN);
     WritableBuffer wbuf = wmem.asWritableBuffer();
     WritableBuffer wdup = wbuf.writableDuplicate();
-    assertEquals(wdup.getByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(wdup.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
 
     WritableBuffer wreg = wbuf.writableRegion();
-    assertEquals(wreg.getByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(wreg.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test
@@ -251,10 +251,10 @@ public class NonNativeWritableBufferImplTest {
     WritableMemory wmem = WritableMemory.writableWrap(bArr, ByteOrder.BIG_ENDIAN);
     Buffer buf = wmem.asBuffer();
     Buffer dup = buf.duplicate();
-    assertEquals(dup.getByteOrder(), ByteOrder.LITTLE_ENDIAN);
+    assertEquals(dup.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
 
     Buffer reg = buf.region();
-    assertEquals(reg.getByteOrder(), ByteOrder.LITTLE_ENDIAN);
+    assertEquals(reg.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
 }

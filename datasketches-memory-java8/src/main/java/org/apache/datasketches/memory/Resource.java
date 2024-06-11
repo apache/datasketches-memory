@@ -23,13 +23,17 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
- *  Methods common to all memory access resources, including attributes like byte order and capacity.
- *
- * <p>The classes in this package are not thread-safe.</p>
+ * The base class for Memory and Buffer plus some common static variables
+ * and check methods.
  *
  * @author Lee Rhodes
  */
 public interface Resource extends AutoCloseable {
+
+  /**
+   * The java line separator character as a String.
+   */
+  static final String LS = System.getProperty("line.separator");
 
   static MemoryRequestServer defaultMemReqSvr = null; //policy choice
 
@@ -106,7 +110,7 @@ public interface Resource extends AutoCloseable {
    * This may be different from the ByteOrder of the backing resource and {@link ByteOrder#nativeOrder()}
    * @return the current ByteOrder.
    */
-  ByteOrder getByteOrder();
+  ByteOrder getTypeByteOrder();
 
   /**
    * Gets the capacity of this object in bytes

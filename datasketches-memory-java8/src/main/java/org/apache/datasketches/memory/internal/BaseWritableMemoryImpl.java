@@ -62,7 +62,7 @@ public abstract class BaseWritableMemoryImpl extends ResourceImpl implements Wri
 
   /**
    * The static constructor that chooses the correct Heap leaf node based on the byte order.
-   * @param array the primitive heap array being wrapped. It must be non-null;
+   * @param array the primitive heap array being wrapped. It must be non-null.
    * @param offsetBytes the offset bytes into the array (independent of array type). It must be &ge; 0.
    * @param lengthBytes the length of the wrapped region. It must be &ge; 0.
    * @param localReadOnly the requested read-only status
@@ -85,42 +85,42 @@ public abstract class BaseWritableMemoryImpl extends ResourceImpl implements Wri
 
   /**
    * The static constructor that chooses the correct ByteBuffer leaf node based on the byte order.
-   * @param byteBuf the ByteBuffer being wrapped, 
-   * @param localReadOnly the requested read-only state
-   * @param byteOrder the requested byteOrder
+   * @param byteBuffer the ByteBuffer being wrapped.  It must be non-null.
+   * @param localReadOnly the requested read-only state.
+   * @param byteOrder the requested byteOrder.  It must be non-null.
    * @param memReqSvr the requested MemoryRequestServer, which may be null.
    * @return this class constructed via the leaf node.
    */
   public static WritableMemory wrapByteBuffer(
-      final ByteBuffer byteBuf, final boolean localReadOnly, final ByteOrder byteOrder,
+      final ByteBuffer byteBuffer, final boolean localReadOnly, final ByteOrder byteOrder,
       final MemoryRequestServer memReqSvr) {
-    Objects.requireNonNull(byteBuf, "byteBuf must be non-null");
-    Objects.requireNonNull(byteBuf, "byteOrder must be non-null");
-    final AccessByteBuffer abb = new AccessByteBuffer(byteBuf);
+    Objects.requireNonNull(byteBuffer, "byteBuf must be non-null");
+    Objects.requireNonNull(byteOrder, "byteOrder must be non-null");
+    final AccessByteBuffer abb = new AccessByteBuffer(byteBuffer);
     final int typeId = (abb.resourceReadOnly || localReadOnly) ? READONLY : 0;
     final long cumOffsetBytes = abb.offsetBytes + (abb.unsafeObj == null
         ? abb.nativeBaseOffset
         : UnsafeUtil.getArrayBaseOffset(abb.unsafeObj.getClass()));
     return Util.isNativeByteOrder(byteOrder)
         ? new BBWritableMemoryImpl(abb.unsafeObj, abb.nativeBaseOffset,
-            abb.offsetBytes, abb.capacityBytes, typeId, cumOffsetBytes, memReqSvr, byteBuf)
+            abb.offsetBytes, abb.capacityBytes, typeId, cumOffsetBytes, memReqSvr, byteBuffer)
         : new BBNonNativeWritableMemoryImpl(abb.unsafeObj, abb.nativeBaseOffset,
-            abb.offsetBytes, abb.capacityBytes,  typeId, cumOffsetBytes, memReqSvr, byteBuf);
+            abb.offsetBytes, abb.capacityBytes,  typeId, cumOffsetBytes, memReqSvr, byteBuffer);
   }
 
   /**
    * The static constructor that chooses the correct Map leaf node based on the byte order.
-   * @param file the file being wrapped.
-   * @param fileOffsetBytes the file offset bytes
-   * @param capacityBytes the requested capacity of the memory mapped region
+   * @param file the file being wrapped.  It must be non-null.
+   * @param fileOffsetBytes the file offset bytes. It must be &ge; 0.
+   * @param capacityBytes the requested capacity of the memory mapped region. It must be &ge; 0.
    * @param localReadOnly the requested read-only state
-   * @param byteOrder the requested byte-order
+   * @param byteOrder the requested byte-order. It must be non-null.
    * @return this class constructed via the leaf node.
    */
   public static WritableMemory wrapMap(final File file, final long fileOffsetBytes,
       final long capacityBytes, final boolean localReadOnly, final ByteOrder byteOrder) {
     Objects.requireNonNull(file, "File must be non-null.");
-    Util.negativeCheck(capacityBytes, "fileOffsetBytes");
+    Util.negativeCheck(fileOffsetBytes, "fileOffsetBytes");
     Util.negativeCheck(capacityBytes, "capacityBytes");
     Objects.requireNonNull(byteOrder, "ByteOrder must be non-null.");
     final AllocateDirectWritableMap dirWMap =

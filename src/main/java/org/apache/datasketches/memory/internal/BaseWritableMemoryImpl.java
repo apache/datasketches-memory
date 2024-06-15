@@ -70,9 +70,9 @@ public abstract class BaseWritableMemoryImpl extends ResourceImpl implements Wri
 
   /**
    * Wrap a <i>MemorySegment</i> as an array
-   * @param seg the given <i>MemorySegment</i>.
-   * @param byteOrder the given <i>ByteOrder</i>.
-   * @param memReqSvr the given <i>MemoryRequestServer</i>.
+   * @param seg the given <i>MemorySegment</i>. It must be non-null.
+   * @param byteOrder the given <i>ByteOrder</i>. It must be non-null.
+   * @param memReqSvr the given <i>MemoryRequestServer</i>. It may be null.
    * @return a <i>WritableMemory</i>.
    */
   public static WritableMemory wrapSegmentAsArray(
@@ -93,10 +93,10 @@ public abstract class BaseWritableMemoryImpl extends ResourceImpl implements Wri
 
   /**
    * The implementation of <i>wrapByteBuffer</i> for WritableMemory.
-   * @param byteBuffer the given <i>ByteBuffer</i>
+   * @param byteBuffer the given <i>ByteBuffer</i>. It must be non-null.
    * @param localReadOnly true if read-only is being imposed locally, independent of the read-only state of the given ByteBuffer.
-   * @param byteOrder the given <i>ByteOrder</i>.
-   * @param memReqSvr the given <i>MemoryRequestServer</i>.
+   * @param byteOrder the given <i>ByteOrder</i>. It must be non-null.
+   * @param memReqSvr the given <i>MemoryRequestServer</i>. It may be null.
    * @return a <i>WritableMemory</i>.
    */
   public static WritableMemory wrapByteBuffer(
@@ -117,7 +117,7 @@ public abstract class BaseWritableMemoryImpl extends ResourceImpl implements Wri
       if (byteBuffer.isReadOnly()) {
         throw new IllegalArgumentException("ByteBuffer must be writable.");
       }
-      byteBuf = byteBuffer.duplicate();
+      byteBuf = byteBuffer.duplicate(); //crease another view of the same backing data
     }
     byteBuf.clear(); //resets position to zero and limit to capacity. Does not clear data.
     final MemorySegment seg = MemorySegment.ofByteBuffer(byteBuf); //from 0 to capacity
@@ -139,12 +139,12 @@ public abstract class BaseWritableMemoryImpl extends ResourceImpl implements Wri
 
   /**
    * The implementation of <i>wrapMap</i> for <i>WritableMemory</i>.
-   * @param file the given file to map.
-   * @param fileOffsetBytes the file starting offset in bytes.
-   * @param capacityBytes the capacity of the mapped memory.
-   * @param scope the given scope
+   * @param file the given file to map. It must be non-null.
+   * @param fileOffsetBytes the file starting offset in bytes. It must be &ge; 0.
+   * @param capacityBytes the capacity of the mapped memory. It must be &ge; 0.
+   * @param scope the given scope. It must be non-null.
    * @param localReadOnly true if read-only is being imposed locally, independent of the read-only state of the given ByteBuffer.
-   * @param byteOrder the given <i>ByteOrder</i>
+   * @param byteOrder the given <i>ByteOrder</i>. It must be non-null.
    * @return a <i>WritableMemory</i>
    * @throws IllegalArgumentException if file is not readable.
    * @throws IOException if mapping is not successful.
@@ -180,8 +180,8 @@ public abstract class BaseWritableMemoryImpl extends ResourceImpl implements Wri
    * The static constructor that chooses the correct Direct leaf node based on the byte order.
    * @param capacityBytes the requested capacity for the Direct (off-heap) memory.  It must be &ge; 0.
    * @param alignmentBytes requested segment alignment. Typically 1, 2, 4 or 8.
-   * @param scope ResourceScope for the backing MemorySegment.
-   * Typically <i>ResourceScope.newConfinedScope()</i>.
+   * @param scope ResourceScope for the backing MemorySegment. It must be non-null.
+   * Typically use <i>ResourceScope.newConfinedScope()</i>.
    * @param byteOrder the byte order to be used.  It must be non-null.
    * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
    * This is a callback mechanism for a user client of direct memory to request more memory.

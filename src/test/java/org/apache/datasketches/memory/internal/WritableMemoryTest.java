@@ -36,19 +36,19 @@ public class WritableMemoryTest {
 
   @Test
   public void wrapBigEndian() {
-    ByteBuffer bb = ByteBuffer.allocate(64); //big endian
+    ByteBuffer bb = ByteBuffer.allocate(64); //default big endian
     WritableMemory wmem = WritableMemory.writableWrap(bb);
-    assertEquals(wmem.getTypeByteOrder(), ByteOrder.LITTLE_ENDIAN); //ignore BB endianness
-    wmem = WritableMemory.writableWrap(bb, ByteOrder.nativeOrder(), Resource.defaultMemReqSvr);
+    assertEquals(wmem.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
+    wmem = WritableMemory.writableWrap(bb, ByteOrder.LITTLE_ENDIAN, null); //assume LE
     assertEquals(wmem.getTypeByteOrder(), ByteOrder.LITTLE_ENDIAN);
   }
 
   @Test
   public void wrapBigEndianAsLittle() {
-    ByteBuffer bb = ByteBuffer.allocate(64);
-    bb.putChar(0, (char)1); //as NNO
-    WritableMemory wmem = WritableMemory.writableWrap(bb, ByteOrder.LITTLE_ENDIAN, Resource.defaultMemReqSvr);
-    assertEquals(wmem.getChar(0), 256);
+    ByteBuffer bb = ByteBuffer.allocate(64); //default big endian
+    bb.putChar(0, (char)1); //written as BE
+    WritableMemory wmem = WritableMemory.writableWrap(bb, ByteOrder.LITTLE_ENDIAN, null);
+    assertEquals(wmem.getChar(0), 256); //read as LE
   }
 
   @Test

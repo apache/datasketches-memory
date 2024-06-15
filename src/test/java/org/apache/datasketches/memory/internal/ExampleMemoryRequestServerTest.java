@@ -21,6 +21,7 @@ package org.apache.datasketches.memory.internal;
 
 import java.nio.ByteOrder;
 
+import org.apache.datasketches.memory.DefaultMemoryRequestServer;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
@@ -28,99 +29,78 @@ import org.testng.annotations.Test;
 import jdk.incubator.foreign.ResourceScope;
 
 /**
- * Examples of how to use the MemoryRequestServer with a memory hungry client.
+ * Example of how to use the MemoryRequestServer with a memory hungry client.
+ *
+ * <p>Note: this example only works with Java 17.</p>
+ *
  * @author Lee Rhodes
  */
 public class ExampleMemoryRequestServerTest {
 
   /**
    * This version is without a TWR block. All of the memory allocations are done through the MemoryRequestServer
-   * and each is closed by the MemoryClient when it is done with each.
+   * and each is closed by the MemoryClient when it is done with them.
    * @throws Exception
    */
   @SuppressWarnings("resource")
   @Test
-  public void checkExampleMemoryRequestServer1() throws Exception {
-    int bytes = 8;
-    ExampleMemoryRequestServer svr = new ExampleMemoryRequestServer(true);
-    WritableMemory memStart = null;
+  public void checkExampleMemoryRequestServer1() {
+
+    //Configure the default memReqSvr to create new memory off-heap and copy data from old to new
+    MemoryRequestServer memReqSvr = new DefaultMemoryRequestServer(true, true);
+
+    long workingMemBytes = 8;
+    long alignmentBytes = 8;
     ResourceScope scope = ResourceScope.newConfinedScope();
-    memStart = WritableMemory.allocateDirect(bytes, 8, scope, ByteOrder.nativeOrder(), svr);
-    MemoryClient client = new MemoryClient(memStart);
+
+    //Create the initial working memory for the client
+    WritableMemory workingMem = WritableMemory.allocateDirect(workingMemBytes, alignmentBytes, scope, ByteOrder.nativeOrder(), memReqSvr);
+
+    MemoryHungryClient client = new MemoryHungryClient(workingMem);
     client.process();
   }
 
   /**
    * This little client is never happy with how much memory it has been allocated and keeps
-   * requesting for more. When it does ask for more, it must copy its old data into the new
-   * memory, release the prior memory, and then continue working from there.
+   * requesting for more. When it does ask for more, the DefaultMemoryRequestServer is configured to copy the old data into the new
+   * memory.  The client must request the MemoryRequestServer to release the prior memory.
+   * The client continues working and requesting more memory.
    *
    * <p>In reality, these memory requests should be quite rare.</p>
    */
-  static class MemoryClient {
-    WritableMemory smallMem;
-    MemoryRequestServer svr;
+  static class MemoryHungryClient {
+    WritableMemory workingMem;
+    MemoryRequestServer memReqSvr;
 
-    MemoryClient(WritableMemory memStart) {
-      smallMem = memStart;
-      svr = memStart.getMemoryRequestServer();
+    MemoryHungryClient(WritableMemory workingMemory) {
+      this.workingMem = workingMemory;
+      memReqSvr = workingMemory.getMemoryRequestServer();
     }
 
     void process() {
-      long cap1 = smallMem.getCapacity();
-      smallMem.fill((byte) 1);                //fill it, but not big enough
-      println(smallMem.toHexString("Small", 0, (int)cap1, true));
+      WritableMemory newMem; //placeholder
+      byte itr = 1;
+      int oldWorkingCap = 0;
+      int newWorkingCap = (int)workingMem.getCapacity();
 
-      WritableMemory bigMem = svr.request(smallMem, 2 * cap1); //get bigger mem
-      long cap2 = bigMem.getCapacity();
-      smallMem.copyTo(0, bigMem, 0, cap1);    //copy data from small to big
-      svr.requestClose(smallMem, bigMem);     //done with smallMem, release it, if offheap
+      while (itr <= 4) {
+        //use all the given memory
+        workingMem.fill(oldWorkingCap, newWorkingCap - oldWorkingCap, itr);
 
-      bigMem.fill(cap1, cap1, (byte) 2);      //fill the rest of bigMem, still not big enough
-      println(bigMem.toHexString("Big", 0, (int)cap2, true));
+        println(workingMem.toHexString("Size: " + newWorkingCap + " Bytes", 0, newWorkingCap, true));
 
-      WritableMemory giantMem = svr.request(bigMem, 2 * cap2); //get giant mem
-      long cap3 = giantMem.getCapacity();
-      bigMem.copyTo(0, giantMem, 0, cap2);    //copy data from small to big
-      svr.requestClose(bigMem, giantMem);     //done with bigMem, release it, if offheap
+        //Not big enough, expand
+        oldWorkingCap = newWorkingCap;
+        newWorkingCap = 2 * oldWorkingCap;
+        newMem = memReqSvr.request(workingMem, newWorkingCap); //defaults to new confined scope for each iteration
 
-      giantMem.fill(cap2, cap2, (byte) 3);    //fill the rest of giantMem
-      println(giantMem.toHexString("Giant", 0, (int)cap3, true));
-      svr.requestClose(giantMem, null);       //done with giantMem, release it
-    }
-  }
+        //done with old memory, close it, if applicable
+        memReqSvr.requestClose(workingMem, newMem);
+        workingMem = newMem;
+        itr++;
+      }
 
-  /**
-   * This example MemoryRequestServer is simplistic but demonstrates one of many ways to
-   * possibly manage the continuous requests for larger memory.
-   */
-  public static class ExampleMemoryRequestServer implements MemoryRequestServer {
-    final boolean offHeap;
-
-    public ExampleMemoryRequestServer(final boolean offHeap) {
-      this.offHeap = offHeap;
-    }
-
-    @SuppressWarnings("resource")
-    @Override
-    public WritableMemory request(WritableMemory currentWMem, long newCapacityBytes) {
-     ByteOrder order = currentWMem.getTypeByteOrder();
-     WritableMemory wmem;
-     if (offHeap) {
-       wmem = WritableMemory.allocateDirect(newCapacityBytes, 8, ResourceScope.newConfinedScope(), order, this);
-     } else {
-       if (newCapacityBytes > Integer.MAX_VALUE) {
-         throw new IllegalArgumentException("Requested capacity exceeds Integer.MAX_VALUE.");
-       }
-       wmem = WritableMemory.allocate((int)newCapacityBytes, order, this);
-     }
-     return wmem;
-    }
-
-    @Override
-    //here we actually release it, in reality it might be a lot more complex.
-    public void requestClose(WritableMemory memToRelease, WritableMemory newMemory) {
-      memToRelease.close();
+      workingMem.close();
     }
   }
 

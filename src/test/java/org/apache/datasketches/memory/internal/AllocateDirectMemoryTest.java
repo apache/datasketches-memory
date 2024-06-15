@@ -23,8 +23,8 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
@@ -70,7 +70,7 @@ public class AllocateDirectMemoryTest {
           newWmem.putLong(i << 3, i);
           assertEquals(newWmem.getLong(i << 3), i);
       }
-      memReqSvr.requestClose(wmem, newWmem); //The default MRS doesn't close.
+      //memReqSvr.requestClose(wmem, newWmem); //no need to close
     } // So we let the TWR close it here
   }
 

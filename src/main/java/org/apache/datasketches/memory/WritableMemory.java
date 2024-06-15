@@ -40,29 +40,31 @@ public interface WritableMemory extends Memory {
   /**
    * Provides a view of the given <i>ByteBuffer</i> for write operations.
    * The view is of the entire ByteBuffer independent of position and limit.
-   * The returned <i>WritableMemory</i> will use the native <i>ByteOrder</i>,
-   * independent of the ByteOrder of the given ByteBuffer.
-   * This does not affect the ByteOrder of data already in the ByteBuffer.
+   * The returned <i>WritableMemory</i> will assume the <i>ByteOrder</i> of the given <i>ByteBuffer</i>.
    * @param byteBuffer the given <i>ByteBuffer</i>. It must be non-null and writable.
    * @return a new <i>WritableMemory</i> for write operations on the given <i>ByteBuffer</i>.
    */
   static WritableMemory writableWrap(ByteBuffer byteBuffer) {
-    return writableWrap(byteBuffer, ByteOrder.nativeOrder(), null);
+    return writableWrap(byteBuffer, byteBuffer.order(), null);
   }
 
   /**
    * Provides a view of the given <i>ByteBuffer</i> for write operations.
    * The view is of the entire ByteBuffer independent of position and limit.
-   * The returned <i>WritableMemory</i> will use the native <i>ByteOrder</i>,
+   * The returned <i>WritableMemory</i> will assume the given <i>ByteOrder</i>,
    * independent of the ByteOrder of the given ByteBuffer.
    * This does not affect the ByteOrder of data already in the ByteBuffer.
    * @param byteBuffer the given <i>ByteBuffer</i>. It must be non-null and writable.
    * @param byteOrder the byte order to be used. It must be non-null.
-   * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
+   * @param memReqSvr A user-specified <i>MemoryRequestServer</i>, which may be null.
+   * This is a callback mechanism for a user client to request a larger <i>WritableMemory</i>.
    * @return a new <i>WritableMemory</i> for write operations on the given <i>ByteBuffer</i>.
    * @throws IllegalArgumentException if ByteBuffer is not writable.
    */
-  static WritableMemory writableWrap(ByteBuffer byteBuffer, ByteOrder byteOrder, MemoryRequestServer memReqSvr) {
+  static WritableMemory writableWrap(
+      ByteBuffer byteBuffer, 
+      ByteOrder byteOrder, 
+      MemoryRequestServer memReqSvr) {
     return BaseWritableMemoryImpl.wrapByteBuffer(byteBuffer, false, byteOrder, memReqSvr);
   }
 
@@ -72,36 +74,35 @@ public interface WritableMemory extends Memory {
   /**
    * Maps the entire given file into native-ordered WritableMemory for write operations
    * Calling this method is equivalent to calling
-   * {@link #writableMap(File, long, long, ByteOrder)
-   *   writableMap(file, 0, file.length(), scope, ByteOrder.nativeOrder())}.
-   * @param file the given file to map. It must be non-null with a non-negative length and writable.
-   * @return mapped WritableMemory
-   * @throws IllegalArgumentException -- if file is not readable.
-   * @throws IllegalArgumentException -- if file is not writable.
-   * @throws IOException - if the specified path does not point to an existing file, or if some other I/O error occurs.
-   * @throws SecurityException - If a security manager is installed and it denies an unspecified permission
+   * {@link #writableMap(File, long, long, ByteOrder) writableMap(file, 0, file.length(), scope, ByteOrder.nativeOrder())}.
+   * @param file the given file to map. It must be non-null and writable.
+   * @return a file-mapped WritableMemory
+   * @throws IllegalArgumentException if file is not readable or not writable.
+   * @throws IOException if the specified path does not point to an existing file, or if some other I/O error occurs.
+   * @throws SecurityException If a security manager is installed and it denies an unspecified permission
    * required by the implementation.
    */
-  static WritableMemory writableMap(File file)
-      throws IllegalArgumentException, IllegalStateException, IOException, SecurityException {
+  static WritableMemory writableMap(File file) throws IOException {
     return writableMap(file, 0, file.length(), ByteOrder.nativeOrder());
   }
 
   /**
    * Maps the specified portion of the given file into Memory for write operations.
-   * @param file the given file to map. It must be non-null with a non-negative length and writable.
+   * @param file the given file to map. It must be non-null and writable.
    * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
-   * @param capacityBytes the size of the mapped Memory. It must be &ge; 0.
-   * @param byteOrder the byte order to be used.  It must be non-null.
-   * @return mapped WritableMemory.
-   * @throws IllegalArgumentException -- if file is not readable or writable.
-   * @throws IllegalArgumentException -- if file is not writable.
-   * @throws IOException - if the specified path does not point to an existing file, or if some other I/O error occurs.
-   * @throws SecurityException - If a security manager is installed and it denies an unspecified permission
+   * @param capacityBytes the size of the mapped Memory.
+   * @param byteOrder the given <i>ByteOrder</i>. It must be non-null.
+   * @return a file-mapped WritableMemory.
+   * @throws IllegalArgumentException if file is not readable or not writable.
+   * @throws IOException if the specified path does not point to an existing file, or if some other I/O error occurs.
+   * @throws SecurityException If a security manager is installed and it denies an unspecified permission
    * required by the implementation.
    */
-  static WritableMemory writableMap(File file, long fileOffsetBytes, long capacityBytes, ByteOrder byteOrder) 
-      throws IllegalArgumentException, IllegalStateException, IOException, SecurityException {
+  static WritableMemory writableMap(
+      File file, 
+      long fileOffsetBytes, 
+      long capacityBytes, 
+      ByteOrder byteOrder) throws IOException {
     final ResourceScope scope = ResourceScope.newConfinedScope();
     return BaseWritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, false, byteOrder);
   }
@@ -120,8 +121,12 @@ public interface WritableMemory extends Memory {
    * @throws SecurityException - If a security manager is installed and it denies an unspecified permission
    * required by the implementation.
    */
-  static WritableMemory writableMap(File file, long fileOffsetBytes, long capacityBytes, ResourceScope scope, ByteOrder byteOrder) 
-      throws IllegalArgumentException, IllegalStateException, IOException, SecurityException {
+  static WritableMemory writableMap(
+      File file, 
+      long fileOffsetBytes, 
+      long capacityBytes, 
+      ResourceScope scope, 
+      ByteOrder byteOrder) throws IOException {
     return BaseWritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, false, byteOrder);
   }
   
@@ -132,29 +137,34 @@ public interface WritableMemory extends Memory {
    * Native byte order is assumed.
    * The allocated memory will be 8-byte aligned.
    *
-   * <p><b>NOTICE:</b> It is the responsibility of the using application to call <i>close()</i> when done.</p>
+   * <p><b>NOTE:</b> Native/Direct memory acquired may have garbage in it.
+   * It is the responsibility of the using application to clear this memory, if required,
+   * and to call <i>close()</i> when done.</p>
    *
    * @param capacityBytes the size of the desired memory in bytes.
    * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
    * @return WritableMemory for this off-heap, native resource.
    */
-  static WritableMemory allocateDirect(long capacityBytes, MemoryRequestServer memReqSvr) {
-    return allocateDirect(capacityBytes, 1, ByteOrder.nativeOrder(), memReqSvr);
+  static WritableMemory allocateDirect(
+      long capacityBytes, 
+      MemoryRequestServer memReqSvr) {
+    return allocateDirect(capacityBytes, 8, ByteOrder.nativeOrder(), memReqSvr);
   }
 
   /**
    * Allocates and provides access to capacityBytes directly in native (off-heap) memory.
    * The allocated memory will be aligned to the given <i>alignmentBytes</i>.
    *
-   * <p><b>NOTICE:</b> It is the responsibility of the using application to
-   * call <i>close()</i> when done.</p>
+   * <p><b>NOTE:</b> Native/Direct memory acquired may have garbage in it.
+   * It is the responsibility of the using application to clear this memory, if required,
+   * and to call <i>close()</i> when done.</p>
    *
    * @param capacityBytes the size of the desired memory in bytes.
    * @param alignmentBytes requested segment alignment. Typically 1, 2, 4 or 8.
-   * @param byteOrder the byte order to be used.  It must be non-null.
+   * @param byteOrder the given <i>ByteOrder</i>.  It must be non-null.
    * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
    * This is a callback mechanism for a user client of direct memory to request more memory.
-   * @return WritableMemory
+   * @return a WritableMemory for this off-heap resource.
    */
   static WritableMemory allocateDirect(
       long capacityBytes,
@@ -200,10 +210,12 @@ public interface WritableMemory extends Memory {
    * </ul>
    *
    * @param offsetBytes the starting offset with respect to this object.
-   * @param capacityBytes the capacity of the returned object in bytes
+   * @param capacityBytes the capacity of the returned object in bytes.
    * @return a new <i>WritableMemory</i> representing the defined writable region.
    */
-  default WritableMemory writableRegion(long offsetBytes, long capacityBytes) {
+  default WritableMemory writableRegion(
+      long offsetBytes, 
+      long capacityBytes) {
     return writableRegion(offsetBytes, capacityBytes, getTypeByteOrder());
   }
 
@@ -217,12 +229,15 @@ public interface WritableMemory extends Memory {
    * <li>Returned object's byte order = <i>byteOrder</i></li>
    * </ul>
    *
-   * @param offsetBytes the starting offset with respect to this object
-   * @param capacityBytes the capacity of the returned object in bytes
-   * @param byteOrder the byte order to be used.  It must be non-null.
+   * @param offsetBytes the starting offset with respect to this object.
+   * @param capacityBytes the capacity of the returned object in bytes.
+   * @param byteOrder the given <i>ByteOrder</i>.  It must be non-null.
    * @return a new <i>WritableMemory</i> representing the defined writable region.
    */
-  WritableMemory writableRegion(long offsetBytes, long capacityBytes, ByteOrder byteOrder);
+  WritableMemory writableRegion(
+      long offsetBytes, 
+      long capacityBytes, 
+      ByteOrder byteOrder);
 
   //AS WRITABLE BUFFER
   /**
@@ -252,7 +267,7 @@ public interface WritableMemory extends Memory {
    * <li>Returned object's <i>capacity</i> = this object's capacity</li>
    * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable</li>
    * </ul>
-   * @param byteOrder the byte order to be used.  It must be non-null.
+   * @param byteOrder the given <i>ByteOrder</i>.  It must be non-null.
    * @return a new <i>WritableBuffer</i> with a view of this WritableMemory
    */
   WritableBuffer asWritableBuffer(ByteOrder byteOrder);
@@ -261,7 +276,6 @@ public interface WritableMemory extends Memory {
 
   /**
    * Creates on-heap WritableMemory with the given capacity and the native byte order.
-   * This will utilize the MemoryRequestServer if it has been configured.
    * @param capacityBytes the given capacity in bytes.
    * @return a new WritableMemory for write operations on a new byte array.
    */
@@ -272,22 +286,27 @@ public interface WritableMemory extends Memory {
   /**
    * Creates on-heap WritableMemory with the given capacity and the given byte order.
    * @param capacityBytes the given capacity in bytes.
-   * @param byteOrder the byte order to be used.  It must be non-null.
+   * @param byteOrder the given <i>ByteOrder</i>.  It must be non-null.
    * @return a new WritableMemory for write operations on a new byte array.
    */
-  static WritableMemory allocate(int capacityBytes, ByteOrder byteOrder) {
+  static WritableMemory allocate(
+      int capacityBytes, 
+      ByteOrder byteOrder) {
     return allocate(capacityBytes, byteOrder, null);
   }
 
   /**
    * Creates on-heap WritableMemory with the given capacity and the given byte order.
    * @param capacityBytes the given capacity in bytes.
-   * @param byteOrder the byte order to be used.  It must be non-null.
+   * @param byteOrder the given <i>ByteOrder</i>.  It must be non-null.
    * @param memReqSvr A user-specified <i>MemoryRequestServer</i>, which may be null.
    * This is a callback mechanism for a user client to request a larger <i>WritableMemory</i>.
    * @return a new WritableMemory for write operations on a new byte array.
    */
-  static WritableMemory allocate(int capacityBytes, ByteOrder byteOrder, MemoryRequestServer memReqSvr) {
+  static WritableMemory allocate(
+      int capacityBytes, 
+      ByteOrder byteOrder, 
+      MemoryRequestServer memReqSvr) {
     final byte[] arr = new byte[capacityBytes];
     return writableWrap(arr, 0, capacityBytes, byteOrder, memReqSvr);
   }
@@ -311,11 +330,13 @@ public interface WritableMemory extends Memory {
    *
    * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
    * <i>WritableMemory.wrap(...)</i>.
-   * @param array the given primitive array. It must be non-null
+   * @param array the given primitive array. It must be non-null.
    * @param byteOrder the byte order to be used. It must be non-null.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
-  static WritableMemory writableWrap(byte[] array, ByteOrder byteOrder) {
+  static WritableMemory writableWrap(
+      byte[] array, 
+      ByteOrder byteOrder) {
     return writableWrap(array, 0, array.length, byteOrder, null);
   }
 
@@ -330,7 +351,11 @@ public interface WritableMemory extends Memory {
    * @param byteOrder the byte order to be used. It must be non-null.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
-  static WritableMemory writableWrap(byte[] array, int offsetBytes, int lengthBytes, ByteOrder byteOrder) {
+  static WritableMemory writableWrap(
+      byte[] array, 
+      int offsetBytes, 
+      int lengthBytes, 
+      ByteOrder byteOrder) {
     return writableWrap(array, offsetBytes, lengthBytes, byteOrder, null);
   }
 
@@ -338,15 +363,22 @@ public interface WritableMemory extends Memory {
    * Wraps the given primitive array for write operations with the given byte order. If the given
    * lengthBytes is zero, backing storage, byte order and read-only status of the returned
    * WritableMemory object are unspecified.
+   *
+   * <p><b>Note:</b> Always qualify this method with the class name, e.g.,
+   * <i>WritableMemory.wrap(...)</i>.
    * @param array the given primitive array. It must be non-null.
-   * @param offsetBytes the byte offset into the given array. It must be &ge; 0.
+   * @param offsetBytes the byte offset into the given array.
    * @param lengthBytes the number of bytes to include from the given array.
    * @param byteOrder the byte order to be used. It must be non-null.
    * @param memReqSvr A user-specified <i>MemoryRequestServer</i>, which may be null.
    * This is a callback mechanism for a user client to request a larger <i>WritableMemory</i>.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
-  static WritableMemory writableWrap(byte[] array, int offsetBytes, int lengthBytes, ByteOrder byteOrder,
+  static WritableMemory writableWrap(
+      byte[] array, 
+      int offsetBytes, 
+      int lengthBytes, 
+      ByteOrder byteOrder,
       MemoryRequestServer memReqSvr) {
     final MemorySegment slice = MemorySegment.ofArray(array).asSlice(offsetBytes, lengthBytes);
     return BaseWritableMemoryImpl.wrapSegmentAsArray(slice, byteOrder, memReqSvr);
@@ -404,7 +436,7 @@ public interface WritableMemory extends Memory {
 
   /**
    * Wraps the given primitive array for write operations assuming native byte order.
-   * @param array the given primitive array. It must be non-null .
+   * @param array the given primitive array. It must be non-null.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
   static WritableMemory writableWrap(double[] array) {
@@ -420,14 +452,18 @@ public interface WritableMemory extends Memory {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param value the value to put
    */
-  void putBoolean(long offsetBytes, boolean value);
+  void putBoolean(
+      long offsetBytes, 
+      boolean value);
 
   /**
    * Puts the byte value at the given offset
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param value the value to put
    */
-  void putByte(long offsetBytes, byte value);
+  void putByte(
+      long offsetBytes, 
+      byte value);
 
   /**
    * Puts the byte array at the given offset
@@ -436,14 +472,20 @@ public interface WritableMemory extends Memory {
    * @param srcOffsetBytes offset in array units
    * @param lengthBytes number of array units to transfer
    */
-  void putByteArray(long offsetBytes, byte[] srcArray, int srcOffsetBytes, int lengthBytes);
+  void putByteArray(
+      long offsetBytes, 
+      byte[] srcArray, 
+      int srcOffsetBytes, 
+      int lengthBytes);
 
   /**
    * Puts the char value at the given offset
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param value the value to put
    */
-  void putChar(long offsetBytes, char value);
+  void putChar(
+      long offsetBytes, 
+      char value);
 
   /**
    * Puts the char array at the given offset
@@ -452,14 +494,20 @@ public interface WritableMemory extends Memory {
    * @param srcOffsetChars offset in array units
    * @param lengthChars number of array units to transfer
    */
-  void putCharArray(long offsetBytes, char[] srcArray, int srcOffsetChars, int lengthChars);
+  void putCharArray(
+      long offsetBytes, 
+      char[] srcArray, 
+      int srcOffsetChars, 
+      int lengthChars);
 
   /**
    * Puts the double value at the given offset
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param value the value to put
    */
-  void putDouble(long offsetBytes, double value);
+  void putDouble(
+      long offsetBytes, 
+      double value);
 
   /**
    * Puts the double array at the given offset
@@ -468,14 +516,20 @@ public interface WritableMemory extends Memory {
    * @param srcOffsetDoubles offset in array units
    * @param lengthDoubles number of array units to transfer
    */
-  void putDoubleArray(long offsetBytes, double[] srcArray, int srcOffsetDoubles, int lengthDoubles);
+  void putDoubleArray(
+      long offsetBytes, 
+      double[] srcArray, 
+      int srcOffsetDoubles, 
+      int lengthDoubles);
 
   /**
    * Puts the float value at the given offset
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param value the value to put
    */
-  void putFloat(long offsetBytes, float value);
+  void putFloat(
+      long offsetBytes, 
+      float value);
 
   /**
    * Puts the float array at the given offset
@@ -484,14 +538,20 @@ public interface WritableMemory extends Memory {
    * @param srcOffsetFloats offset in array units
    * @param lengthFloats number of array units to transfer
    */
-  void putFloatArray(long offsetBytes, float[] srcArray, int srcOffsetFloats, int lengthFloats);
+  void putFloatArray(
+      long offsetBytes,
+      float[] srcArray, 
+      int srcOffsetFloats, 
+      int lengthFloats);
 
   /**
    * Puts the int value at the given offset
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param value the value to put
    */
-  void putInt(long offsetBytes, int value);
+  void putInt(
+      long offsetBytes, 
+      int value);
 
   /**
    * Puts the int array at the given offset
@@ -500,14 +560,20 @@ public interface WritableMemory extends Memory {
    * @param srcOffsetInts offset in array units
    * @param lengthInts number of array units to transfer
    */
-  void putIntArray(long offsetBytes, int[] srcArray, int srcOffsetInts, int lengthInts);
+  void putIntArray(
+      long offsetBytes, 
+      int[] srcArray, 
+      int srcOffsetInts, 
+      int lengthInts);
 
   /**
    * Puts the long value at the given offset
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param value the value to put
    */
-  void putLong(long offsetBytes, long value);
+  void putLong(
+      long offsetBytes, 
+      long value);
 
   /**
    * Puts the long array at the given offset
@@ -516,14 +582,20 @@ public interface WritableMemory extends Memory {
    * @param srcOffsetLongs offset in array units
    * @param lengthLongs number of array units to transfer
    */
-  void putLongArray(long offsetBytes, long[] srcArray, int srcOffsetLongs, int lengthLongs);
+  void putLongArray(
+      long offsetBytes, 
+      long[] srcArray, 
+      int srcOffsetLongs,
+      int lengthLongs);
 
   /**
    * Puts the short value at the given offset
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param value the value to put
    */
-  void putShort(long offsetBytes, short value);
+  void putShort(
+      long offsetBytes, 
+      short value);
 
   /**
    * Puts the short array at the given offset
@@ -532,7 +604,11 @@ public interface WritableMemory extends Memory {
    * @param srcOffsetShorts offset in array units
    * @param lengthShorts number of array units to transfer
    */
-  void putShortArray(long offsetBytes, short[] srcArray, int srcOffsetShorts, int lengthShorts);
+  void putShortArray(
+      long offsetBytes, 
+      short[] srcArray, 
+      int srcOffsetShorts, 
+      int lengthShorts);
 
   //OTHER WRITE METHODS
 
@@ -546,14 +622,18 @@ public interface WritableMemory extends Memory {
    * @param offsetBytes offset bytes relative to this Memory start
    * @param lengthBytes the length in bytes
    */
-  void clear(long offsetBytes, long lengthBytes);
+  void clear(
+      long offsetBytes, 
+      long lengthBytes);
 
   /**
    * Clears the bits defined by the bitMask
    * @param offsetBytes offset bytes relative to this Memory start.
    * @param bitMask the bits set to one will be cleared
    */
-  void clearBits(long offsetBytes, byte bitMask);
+  void clearBits(
+      long offsetBytes, 
+      byte bitMask);
 
   /**
    * Fills all bytes of this Memory region to the given byte value.
@@ -567,14 +647,19 @@ public interface WritableMemory extends Memory {
    * @param lengthBytes the length in bytes
    * @param value the given byte value
    */
-  void fill(long offsetBytes, long lengthBytes, byte value);
+  void fill(
+      long offsetBytes, 
+      long lengthBytes, 
+      byte value);
 
   /**
    * Sets the bits defined by the bitMask
    * @param offsetBytes offset bytes relative to this Memory start
    * @param bitMask the bits set to one will be set
    */
-  void setBits(long offsetBytes, byte bitMask);
+  void setBits(
+      long offsetBytes, 
+      byte bitMask);
 
 
   //OTHER WRITABLE API METHODS
@@ -584,19 +669,4 @@ public interface WritableMemory extends Memory {
    */
   byte[] getArray();
   
-  /**
-   * WritableMemory enables the MemoryRequestServer Direct (Native) Memory backed resources.
-   * Other backed resources will always return null.
-   * Gets the MemoryRequestServer implementation, if set, to request additional memory.
-   * The user must customize the actions of the MemoryRequestServer by
-   * implementing the MemoryRequestServer interface and set using this method:
-   * {@link WritableMemory#allocateDirect(long, long, ByteOrder, MemoryRequestServer)}.
-   * Simple implementation examples include the DefaultMemoryRequestServer in the main tree, as well as
-   * the ExampleMemoryRequestServerTest and the use with ByteBuffer documented in the DruidIssue11544Test
-   * in the test tree.
-   * @return the MemoryRequestServer object or null.
-   */
-  @Override
-  MemoryRequestServer getMemoryRequestServer();
-
 }

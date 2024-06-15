@@ -99,6 +99,7 @@ public interface BaseBuffer extends Resource {
    * otherwise, if asserts are enabled throws an {@link AssertionError}.
    * @param position the given current position.
    * @return BaseBuffer
+   * @throws BufferPositionInvariantsException if positional invariants have been violated.
    */
   BaseBuffer setPosition(long position);
 
@@ -119,6 +120,7 @@ public interface BaseBuffer extends Resource {
    * @param position the current position between the start and end
    * @param end the end position in the buffer
    * @return BaseBuffer
+   * @throws BufferPositionInvariantsException if positional invariants have been violated.
    */
   BaseBuffer setStartPositionEnd(long start, long position, long end);
 

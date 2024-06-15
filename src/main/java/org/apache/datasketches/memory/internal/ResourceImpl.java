@@ -25,8 +25,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Objects;
 
-import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 
@@ -40,7 +40,7 @@ import jdk.incubator.foreign.ResourceScope;
  * @author Lee Rhodes
  */
 abstract class ResourceImpl implements Resource {
-  static final String JDK; //must be at least "1.8"
+  static final String JDK; //must be at least "17"
   static final int JDK_MAJOR; //8, 11, 12, etc
 
   static final int BOOLEAN_SHIFT    = 0;
@@ -54,25 +54,25 @@ abstract class ResourceImpl implements Resource {
 
   //class type IDs.
   // 0000 0XXX
-  static final int READONLY  = 1;
-  static final int REGION    = 1 << 1;
-  static final int DUPLICATE = 1 << 2; //for Buffer only
+  static final int READONLY  = 1; //bit 0
+  static final int REGION    = 2; //bit 1
+  static final int DUPLICATE = 4; //bit 2, for Buffer only
 
   // 000X X000
   static final int HEAP   = 0;
-  static final int DIRECT = 1 << 3;
-  static final int MAP    = 1 << 4; //Map is always Direct also
+  static final int DIRECT = 8;    //bit 3
+  static final int MAP    = 16;   //bit 4, Map is always Direct also, -> 24
 
-  // 00X0 0000
+  // 00X0 0000 ByteOrder
   static final int NATIVE    = 0;
-  static final int NONNATIVE = 1 << 5;
+  static final int NONNATIVE = 32;//bit 5
 
   // 0X00 0000
   static final int MEMORY = 0;
-   static final int BUFFER = 1 << 6;
+   static final int BUFFER = 64;  //bit 6
 
   // X000 0000
-  static final int BYTEBUF = 1 << 7;
+  static final int BYTEBUF = 128; //bit 7
 
   static {
     final String jdkVer = System.getProperty("java.version");
@@ -84,7 +84,7 @@ abstract class ResourceImpl implements Resource {
   final MemorySegment seg;
   final int typeId;
 
-  MemoryRequestServer memReqSvr;
+  MemoryRequestServer memReqSvr = null;
 
   ResourceImpl(final MemorySegment seg, final int typeId, final MemoryRequestServer memReqSvr) {
     this.seg = seg;
@@ -267,17 +267,16 @@ abstract class ResourceImpl implements Resource {
 
   @Override
   public final ByteBuffer asByteBufferView(final ByteOrder order) {
-    final ByteBuffer byteBuf = seg.asByteBuffer().order(order);
-    return byteBuf;
+    final ByteBuffer byteBuffer = seg.asByteBuffer().order(order);
+    return byteBuffer;
   }
 
-  //@SuppressWarnings("resource")
   @Override
   public void close() {
-    if (seg != null && seg.scope().isAlive() && !seg.scope().isImplicit()) {
-      if (seg.isNative() || seg.isMapped()) {
-        seg.scope().close();
-      }
+    Objects.requireNonNull(seg, "MemorySegment must not be null.");
+    final ResourceScope scope = seg.scope();
+    if ((seg.isNative() || seg.isMapped()) && scope.isAlive() && !scope.isImplicit()) {
+      scope.close();
     }
   }
 
@@ -307,10 +306,12 @@ abstract class ResourceImpl implements Resource {
     final ResourceImpl that2 = (ResourceImpl) that;
     return this.seg.address().segmentOffset(that2.seg);
   }
-  
+
   @Override
   public MemoryRequestServer getMemoryRequestServer() {
-    return memReqSvr;
+    final int mask = READONLY | MAP | BYTEBUF;
+    final int test = 0; //!READONLY & !MAP & !BYTEBUF
+    return (typeId & mask) != test ? null : memReqSvr != null ? memReqSvr : defaultMemReqSvr;
   }
 
   @Override
@@ -322,7 +323,7 @@ abstract class ResourceImpl implements Resource {
   public Thread getOwnerThread() {
     return seg.scope().ownerThread();
   }
-  
+
   @Override
   public final boolean hasByteBuffer() {
     return (typeId & BYTEBUF) > 0;
@@ -388,13 +389,13 @@ abstract class ResourceImpl implements Resource {
   public final boolean isRegion() {
     return (typeId & REGION) > 0;
   }
-  
+
   @Override
   public final boolean isSameResource(final Resource that) {
     final ResourceImpl that2 = (ResourceImpl) that;
     return this.seg.address().equals(that2.seg.address());
   }
-  
+
   @Override
   public void load() { seg.load(); }
 
@@ -456,6 +457,11 @@ abstract class ResourceImpl implements Resource {
 
   @Override
   public ResourceScope scope() { return seg.scope(); }
+
+  @Override
+  public void setMemoryRequestServer(final MemoryRequestServer memReqSvr) {
+    this.memReqSvr = memReqSvr;
+  }
 
   @Override
   public ByteBuffer toByteBuffer(final ByteOrder order) {

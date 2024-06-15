@@ -383,9 +383,9 @@ public class MemoryTest {
 
     //ON HEAP
     wmem = WritableMemory.writableWrap(new byte[16]);
-    assertNull(wmem.getMemoryRequestServer());
+    assertNotNull(wmem.getMemoryRequestServer());
     wbuf = wmem.asWritableBuffer();
-    assertNull(wbuf.getMemoryRequestServer());
+    assertNotNull(wbuf.getMemoryRequestServer());
     //OFF HEAP
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
        wmem = WritableMemory.allocateDirect(16, 1, scope, ByteOrder.nativeOrder(), memReqSvr);  //OFF HEAP

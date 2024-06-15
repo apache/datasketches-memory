@@ -19,32 +19,57 @@
 
 package org.apache.datasketches.memory;
 
+import jdk.incubator.foreign.ResourceScope;
+
 /**
- * The MemoryRequestServer is a callback interface to provide a means for direct (off-heap), heap and ByteBuffer
- * backed resources to request more memory.
+ * The MemoryRequestServer is a callback interface to provide a means to request more memory
+ * for heap and off-heap WritableMemory resources that are not file-memory-mapped backed resources.
+ *
+ * <p>Note: this only works with Java 17.
  *
  * @author Lee Rhodes
  */
 public interface MemoryRequestServer {
 
   /**
-   * Request new WritableMemory with the given capacity. The current Writable Memory will be used to
-   * determine the byte order of the returned WritableMemory and other checks.
+   * Request new WritableMemory with the given newCapacityBytes. The current WritableMemory can be used to
+   * determine the byte order of the returned WritableMemory and other properties. A new confined ResourceScope is
+   * assigned.
    * @param currentWritableMemory the current writableMemory of the client. It must be non-null.
-   * @param newCapacityBytes The capacity being requested. It must be &ge; 0.
-   *
-   * @return new WritableMemory with the given capacity.
+   * @param newCapacityBytes The capacity being requested. It must be &gt; the capacity of the currentWritableMemory.
+   * @return new WritableMemory with the requested capacity.
    */
-  WritableMemory request(WritableMemory currentWritableMemory, long newCapacityBytes);
+  default WritableMemory request(WritableMemory currentWritableMemory, long newCapacityBytes) {
+    return request(currentWritableMemory, newCapacityBytes, ResourceScope.newConfinedScope());
+  }
 
   /**
-   * Request close the AutoCloseable resource. This only applies to resources allocated using
-   * WritableMemory.allocateDirect(...).
-   * This may be ignored depending on the application implementation.
-   * @param memToClose the relevant WritbleMemory to be considered for closing. It must be non-null.
-   * @param newMemory the newly allocated WritableMemory. It must be non-null.
-   * This is returned from the client to facilitate tracking for the convenience of the resource owner.
+   * Request new WritableMemory with the given newCapacityBytes. The current Writable Memory can be used to
+   * determine the byte order of the returned WritableMemory and other properties.
+   * @param currentWritableMemory the current writableMemory of the client. It must be non-null.
+   * @param newCapacityBytes The capacity being requested. It must be &gt; the capacity of the currentWritableMemory.
+   * @param scope the ResourceScope to be used for the newly allocated memory.
+   * @return new WritableMemory with the requested capacity.
    */
-  void requestClose(final WritableMemory memToClose, WritableMemory newMemory);
+  WritableMemory request(WritableMemory currentWritableMemory, long newCapacityBytes, ResourceScope scope);
+
+  /**
+   * Request to close the resource, if applicable.
+   *
+   * @param memToClose the relevant WritableMemory to be considered for closing. It must be non-null.
+   */
+  default void requestClose(WritableMemory memToClose) {
+    requestClose(memToClose, null);
+  }
+
+  /**
+   * Request to close the resource, if applicable.
+   *
+   * @param memToClose the relevant WritableMemory to be considered for closing. It must be non-null.
+   * @param newMemory the newly allocated WritableMemory.
+   * The newMemory reference is returned from the client for the convenience of the system that
+   * owns the responsibility of memory allocation. It may be null.
+   */
+  void requestClose(WritableMemory memToClose, WritableMemory newMemory);
 
 }

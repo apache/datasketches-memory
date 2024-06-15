@@ -44,7 +44,7 @@ public interface WritableBuffer extends Buffer {
    * @return a new <i>WritableBuffer</i> for write operations on the given <i>ByteBuffer</i>.
    */
   static WritableBuffer writableWrap(ByteBuffer byteBuffer) {
-    return writableWrap(byteBuffer, ByteOrder.nativeOrder(), null);
+    return writableWrap(byteBuffer, byteBuffer.order(), null);
   }
 
   /**
@@ -57,13 +57,17 @@ public interface WritableBuffer extends Buffer {
    * This does not affect the ByteOrder of data already in the ByteBuffer.
    * @param byteBuffer the given ByteBuffer. It must be non-null and writable.
    * @param byteOrder the byte order to be used.  It must be non-null.
-   * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
+   * @param memReqSvr A user-specified <i>MemoryRequestServer</i>, which may be null.
+   * This is a callback mechanism for a user client to request more memory.
    * @return a new <i>WritableBuffer</i> for write operations on the given <i>ByteBuffer</i>.
    * @throws IllegalArgumentException if ByteBuffer is not writable
    */
   static WritableBuffer writableWrap(ByteBuffer byteBuffer, ByteOrder byteOrder, MemoryRequestServer memReqSvr) {
     return BaseWritableBufferImpl.wrapByteBuffer(byteBuffer, false, byteOrder, memReqSvr);
   }
+
+  // NO MAP
+  // NO ALLOCATE DIRECT
 
   //DUPLICATES
   /**
@@ -95,7 +99,7 @@ public interface WritableBuffer extends Buffer {
    * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable and
    * independent of this object's <i>start</i>, <i>position</i> and <i>end</i></li>
    * </ul>
-   * @param byteOrder the byte order to be used.  It must be non-null.
+   * @param byteOrder the given <i>ByteOrder</i>. It must be non-null.
    * @return a duplicate writable view of this Buffer with the same but independent values of
    * <i>start</i>, <i>position</i> and <i>end</i>.
    */
@@ -139,7 +143,7 @@ public interface WritableBuffer extends Buffer {
    * will return the originating <i>Memory</i> byte order.</p>
    * @param offsetBytes the starting offset with respect to the origin of this <i>WritableBuffer</i>
    * @param capacityBytes the <i>capacity</i> of the returned region in bytes
-   * @param byteOrder the byte order to be used.  It must be non-null.
+   * @param byteOrder the given <i>ByteOrder</i>.  It must be non-null.
    * @return a new <i>WritableBuffer</i> representing the defined writable region
    * with the given offsetBytes, capacityBytes and byte order.
    */
@@ -182,10 +186,12 @@ public interface WritableBuffer extends Buffer {
   /**
    * Puts the boolean value at the given offset.
    * This does not change the position.
-   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
+   * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start.
    * @param value the value to put
    */
   void putBoolean(long offsetBytes, boolean value);
+
+  //Missing putBooleanArray(...)
 
   /**
    * Puts the byte value at the current position.

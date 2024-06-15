@@ -42,7 +42,7 @@ public interface Resource {
    * The static final for <i>ByteOrder.nativeOrder()</i>.
    */
   static final ByteOrder NATIVE_BYTE_ORDER = ByteOrder.nativeOrder();
-  
+
   /**
    * The static final for NON <i>ByteOrder.nativeOrder()</i>.
    */
@@ -50,7 +50,7 @@ public interface Resource {
       (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
 
   /**
-   * Currently used only for test, hold for possible future use
+   * The default MemoryRequestServer is used if not specified by the user.
    */
   static final MemoryRequestServer defaultMemReqSvr = new DefaultMemoryRequestServer();
 
@@ -71,8 +71,8 @@ public interface Resource {
   ByteBuffer asByteBufferView(ByteOrder order);
 
   /**
-   * For off-heap segments, this closes the underlying ResourceScope. If the segment is
-   * on-heap, this does nothing.
+   * This will close the backing MemorySegment if and only if the segment is not-null, native (off-heap),
+   * and its scope is alive and not implicit. Otherwise, it does nothing.
    */
   void close();
 
@@ -100,7 +100,7 @@ public interface Resource {
 
   /**
    * Forces any changes made to the contents of this mapped segment to be written to the storage device described
-   * by the mapped segment's file descriptor. 
+   * by the mapped segment's file descriptor.
    * @see <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#force()">force()</a>
    */
   void force();
@@ -112,17 +112,31 @@ public interface Resource {
   long getCapacity();
 
   /**
-   * Gets the relative base offset of <i>this</i> with respect to <i>that</i>, defined as: <i>this</i> - <i>that</i>. 
+   * Gets the relative base offset of <i>this</i> with respect to <i>that</i>, defined as: <i>this</i> - <i>that</i>.
    * This method is only valid for <i>native</i> (off-heap) allocated resources.
    * @param that the given resource.
    * @return <i>this</i> - <i>that</i> offset
    * @throws IllegalArgumentException if one of the resources is on-heap.
    */
   long getRelativeOffset(Resource that);
-  
+
   /**
-   * Returns the configured MemoryRequestSever or null, if it has not been configured.
-   * @return the configured MemoryRequestSever or null, if it has not been configured.
+   * Gets the {@link MemoryRequestServer} to request additional memory
+   * for writable resources that are not file-memory-mapped nor ByteBuffer backed.
+   * Read-only, file-memory-mapped and ByteBuffer backed resources will return null.
+   *
+   * <p>The user can customize the actions of the MemoryRequestServer by
+   * implementing the MemoryRequestServer interface and set it using the
+   * {@link #setMemoryRequestServer(MemoryRequestServer)} method or optionally with the
+   * {@link WritableMemory#allocateDirect(long, long, ByteOrder, MemoryRequestServer)} method.</p>
+   *
+   * <p>If the MemoryRequestServer is not set by the user and additional memory is needed by the sketch,
+   * the {@link DefaultMemoryRequestServer DefaultMemoryRequestServer} will be used.
+   * Simple implementation examples include the DefaultMemoryRequestServer in the main tree, as well as
+   * the ExampleMemoryRequestServerTest and the use with ByteBuffer documented in the DruidIssue11544Test
+   * in the test tree.</p>
+   *
+   * @return a MemoryRequestServer object or null.
    */
   MemoryRequestServer getMemoryRequestServer();
 
@@ -146,8 +160,8 @@ public interface Resource {
   boolean hasByteBuffer();
 
   /**
-   * Returns true if the MemoryRequestServer has been configured.
-   * @return true if the MemoryRequestServer has been configured.
+   * Returns true if the MemoryRequestServer has been configured by the user.
+   * @return true if the MemoryRequestServer has been configured by the user..
    */
   boolean hasMemoryRequestServer();
 
@@ -224,14 +238,14 @@ public interface Resource {
    * @return true if this instance is a region view of another Memory or Buffer
    */
   boolean isRegion();
-  
+
   /**
    * Returns true if the underlying resource is the same underlying resource as <i>that</i>.
    * @param that the other Resource object
    * @return a long value representing the ordering and size of overlap between <i>this</i> and <i>that</i>
    */
   boolean isSameResource(Resource that);
-  
+
   /**
    * Loads the contents of this mapped segment into physical memory. Please refer to
    * <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#load()">load()</a>
@@ -256,25 +270,25 @@ public interface Resource {
    * otherwise -1 if no mismatch
    */
   long mismatch(Resource that);
-  
+
   /**
    * Returns the resource scope associated with this memory segment.
    * @return the resource scope associated with this memory segment.
    */
   ResourceScope scope();
 
-  //  /**
-  //   * Sets the default MemoryRequestServer to be used in case of capacity overflow of off-heap
-  //   * (Direct or Native) allocated Memory or of on-heap allocated Memory.
-  //   * @param memReqSvr the given default MemoryRequestServer
-  //   */
-  //  void setMemoryRequestServer(MemoryRequestServer memReqSvr);
+  /**
+   * Sets the MemoryRequestServer to be used in case of capacity overflow of on-heap or off-heap
+   * allocated Memory.
+   * @param memReqSvr the given MemoryRequestServer
+   */
+  void setMemoryRequestServer(MemoryRequestServer memReqSvr);
 
   /**
    * Returns a new ByteBuffer with a copy of the data from this Memory object.
    * This new ByteBuffer will be writable, on heap, and with the endianness specified
    * by the given ByteOrder.
-   * @param order the given ByteOrder.
+   * @param order the given ByteOrder. It must be non-null.
    * @return a new ByteBuffer with a copy of the data from this Memory object.
    */
   ByteBuffer toByteBuffer(ByteOrder order);

@@ -38,6 +38,7 @@ import jdk.incubator.foreign.ResourceScope;
 public interface Memory extends Resource {
 
   //BYTE BUFFER
+
   /**
    * Provides a view of the given <i>ByteBuffer</i> for read-only operations.
    * The view is of the entire ByteBuffer independent of position and limit.
@@ -74,16 +75,14 @@ public interface Memory extends Resource {
    * {@link #map(File, long, long, ByteOrder)
    * map(file, 0, file.length(), scope, ByteOrder.nativeOrder())}.
    * @param file the given file to map. It must be non-null with a non-negative length and readable.
-   * @return mapped Memory.
-   * @throws IllegalArgumentException -- if file is not readable.
-   * @throws IllegalStateException - if scope has been already closed, or if access occurs from a thread other
-   * than the thread owning scope.
-   * @throws IOException - if the specified path does not point to an existing file, or if some other I/O error occurs.
-   * @throws SecurityException - If a security manager is installed and it denies an unspecified permission
+   * @return <i>Memory</i> for managing the mapped memory.
+   * @throws IllegalArgumentException if path is not associated with the default file system.
+   * @throws IllegalStateException if scope has been already closed, or if access occurs from a thread other than the thread owning scope.
+   * @throws IOException if the specified path does not point to an existing file, or if some other I/O error occurs.
+   * @throws SecurityException If a security manager is installed and it denies an unspecified permission
    * required by the implementation.
    */
-  static Memory map(File file)
-      throws IllegalArgumentException, IllegalStateException, IOException, SecurityException {
+  static Memory map(File file) throws IOException {
     return map(file, 0, file.length(), ByteOrder.nativeOrder());
   }
 
@@ -93,16 +92,15 @@ public interface Memory extends Resource {
    * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
    * @param capacityBytes the size of the mapped memory. It must not be negative..
    * @param byteOrder the byte order to be used.  It must be non-null.
-   * @return mapped Memory
-   * @throws IllegalArgumentException -- if file is not readable.
-   * @throws IllegalStateException - if scope has been already closed, or if access occurs from a thread other
-   * than the thread owning scope.
-   * @throws IOException - if the specified path does not point to an existing file, or if some other I/O error occurs.
-   * @throws SecurityException - If a security manager is installed and it denies an unspecified permission
+   * @return <i>Memory</i> for managing the mapped memory.
+   * @throws IllegalArgumentException if path is not associated with the default file system.
+   * @throws IllegalStateException if scope has been already closed, or if access occurs from a thread other than the thread owning scope.
+   * @throws IOException if the specified path does not point to an existing file, or if some other I/O error occurs.
+   * @throws SecurityException If a security manager is installed and it denies an unspecified permission
    * required by the implementation.
    */
   static Memory map(File file, long fileOffsetBytes, long capacityBytes, ByteOrder byteOrder)
-      throws IllegalArgumentException, IllegalStateException, IOException, SecurityException {
+      throws IOException {
     final ResourceScope scope = ResourceScope.newConfinedScope();
     return BaseWritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, true, byteOrder);
   }
@@ -114,8 +112,8 @@ public interface Memory extends Resource {
    * @param capacityBytes the size of the mapped memory. It must not be negative.
    * @param scope the given ResourceScope.
    * @param byteOrder the byte order to be used.  It must be non-null.
-   * @return mapped Memory
-   * @throws IllegalArgumentException -- if file is not readable.
+   * @return <i>Memory</i> for managing the mapped memory.
+   * @throws IllegalArgumentException  if path is not associated with the default file system.
    * @throws IllegalStateException - if scope has been already closed, or if access occurs from a thread other
    * than the thread owning scope.
    * @throws IOException - if the specified path does not point to an existing file, or if some other I/O error occurs.
@@ -123,7 +121,7 @@ public interface Memory extends Resource {
    * required by the implementation.
    */
   static Memory map(File file, long fileOffsetBytes, long capacityBytes, ResourceScope scope, ByteOrder byteOrder)
-      throws IllegalArgumentException, IllegalStateException, IOException, SecurityException {
+      throws IOException {
     return BaseWritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, true, byteOrder);
   }
   
@@ -154,7 +152,7 @@ public interface Memory extends Resource {
    * </ul>
    * @param offsetBytes the starting offset with respect to the origin of this Memory. It must be &ge; 0.
    * @param capacityBytes the capacity of the region in bytes. It must be &ge; 0.
-   * @param byteOrder the byte order to be used.  It must be non-null.
+   * @param byteOrder the given byte order. It must be non-null.
    * @return a new <i>Memory</i> representing the defined region based on the given
    * offsetBytes, capacityBytes and byteOrder.
    */
@@ -188,7 +186,7 @@ public interface Memory extends Resource {
    * <li>Returned object's <i>capacity</i> = this object's capacity</li>
    * <li>Returned object's <i>start</i>, <i>position</i> and <i>end</i> are mutable</li>
    * </ul>
-   * @param byteOrder the byte order to be used.  It must be non-null.
+   * @param byteOrder the given byte order.  It must be non-null.
    * @return a new <i>Buffer</i> with the given byteOrder.
    */
   Buffer asBuffer(ByteOrder byteOrder);
@@ -227,6 +225,8 @@ public interface Memory extends Resource {
     final MemorySegment slice = MemorySegment.ofArray(array).asSlice(offsetBytes, lengthBytes).asReadOnly();
     return BaseWritableMemoryImpl.wrapSegmentAsArray(slice, byteOrder, null);
   }
+
+  //Missing wrap(boolean[])
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order.
@@ -291,14 +291,14 @@ public interface Memory extends Resource {
 
   //PRIMITIVE getX() and getXArray()
 
-  
-  
   /**
    * Gets the boolean value at the given offset
    * @param offsetBytes offset bytes relative to this Memory start
    * @return the boolean at the given offset
    */
   boolean getBoolean(long offsetBytes);
+
+  //Missing getBooleanArray(...)
 
   /**
    * Gets the byte value at the given offset
@@ -331,6 +331,10 @@ public interface Memory extends Resource {
    * @param lengthChars number of array units to transfer
    */
   void getCharArray(long offsetBytes, char[] dstArray, int dstOffsetChars, int lengthChars);
+
+  //Missing getCharsFromUtf8(long offsetBytes, int utf8LengthBytes, Appendable ds)
+
+  //Missing getCharsFromUtf8(long offsetBytes, int utf8LengthBytes, StringBuilder dst)
 
   /**
    * Gets the double value at the given offset
@@ -412,7 +416,7 @@ public interface Memory extends Resource {
    */
   void getShortArray(long offsetBytes, short[] dstArray, int dstOffsetShorts, int lengthShorts);
 
-  //SPECIAL READ METHODS: compareTo, copyTo, writeTo
+  //SPECIAL PRIMITIVE READ METHODS: compareTo, copyTo, writeTo
 
   /**
    * Compares the bytes of this Memory to <i>that</i> Memory.
@@ -450,7 +454,7 @@ public interface Memory extends Resource {
    * @param offsetBytes the source offset for this Memory
    * @param lengthBytes the number of bytes to copy
    * @param out the destination ByteArrayOutputStream
-   * @throws IOException may occur while writing to the WritableByteChannel
+   * @throws IOException may occur while writing to the ByteArrayOutputStream.
    */
   void writeToByteStream(long offsetBytes, int lengthBytes, ByteArrayOutputStream out)
       throws IOException;

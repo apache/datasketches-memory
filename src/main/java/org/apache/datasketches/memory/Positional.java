@@ -36,7 +36,7 @@ package org.apache.datasketches.memory;
  * </ul>
  * @author Lee Rhodes
  */
-public interface BaseBuffer extends Resource {
+public interface Positional {
 
   /**
    * Increments the current position by the given increment.
@@ -45,7 +45,7 @@ public interface BaseBuffer extends Resource {
    * @param increment the given increment
    * @return BaseBuffer
    */
-  BaseBuffer incrementPosition(long increment);
+  Positional incrementPosition(long increment);
 
   /**
    * Increments the current position by the given increment.
@@ -54,7 +54,7 @@ public interface BaseBuffer extends Resource {
    * @param increment the given increment
    * @return BaseBuffer
    */
-  BaseBuffer incrementAndCheckPosition(final long increment);
+  Positional incrementAndCheckPosition(final long increment);
 
   /**
    * Gets the end position
@@ -91,7 +91,7 @@ public interface BaseBuffer extends Resource {
    * This does not modify any data.
    * @return BaseBuffer
    */
-  BaseBuffer resetPosition();
+  Positional resetPosition();
 
   /**
    * Sets the current position.
@@ -101,7 +101,7 @@ public interface BaseBuffer extends Resource {
    * @return BaseBuffer
    * @throws BufferPositionInvariantsException if positional invariants have been violated.
    */
-  BaseBuffer setPosition(long position);
+  Positional setPosition(long position);
 
   /**
    * Sets the current position.
@@ -110,7 +110,7 @@ public interface BaseBuffer extends Resource {
    * @param position the given current position.
    * @return BaseBuffer
    */
-  BaseBuffer setAndCheckPosition(long position);
+  Positional setAndCheckPosition(long position);
 
   /**
    * Sets start position, current position, and end position.
@@ -122,7 +122,7 @@ public interface BaseBuffer extends Resource {
    * @return BaseBuffer
    * @throws BufferPositionInvariantsException if positional invariants have been violated.
    */
-  BaseBuffer setStartPositionEnd(long start, long position, long end);
+  Positional setStartPositionEnd(long start, long position, long end);
 
   /**
    * Sets start position, current position, and end position.
@@ -133,6 +133,6 @@ public interface BaseBuffer extends Resource {
    * @param end the end position in the buffer
    * @return BaseBuffer
    */
-  BaseBuffer setAndCheckStartPositionEnd(long start, long position, long end);
+  Positional setAndCheckStartPositionEnd(long start, long position, long end);
 
 }

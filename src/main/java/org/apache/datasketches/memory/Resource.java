@@ -31,7 +31,7 @@ import jdk.incubator.foreign.ResourceScope;
  *
  * @author Lee Rhodes
  */
-public interface Resource {
+public interface Resource extends AutoCloseable {
 
   /**
    * The java line separator character as a String.
@@ -73,7 +73,11 @@ public interface Resource {
   /**
    * This will close the backing MemorySegment if and only if the segment is not-null, native (off-heap),
    * and its scope is alive and not implicit. Otherwise, it does nothing.
+   *
+   * <p>This is intentionally idempotent.
+   * <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/ResourceScope.html#close()">ResourceScope.close()</a> is not.</p>
    */
+  @Override
   void close();
 
   /**
@@ -210,7 +214,7 @@ public interface Resource {
 
   /**
    * Tells whether or not the contents of this mapped segment is resident in physical memory. Please refer to
-   * <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#isLoaded()">isLoaded()</a>
+   * <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#isLoaded()">isLoaded()</a>.
    * @return true if it is likely that the contents of this segment is resident in physical memory.
    */
   boolean isLoaded();
@@ -264,7 +268,7 @@ public interface Resource {
   long nativeOverlap(Resource that);
 
   /**
-   * See <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#mismatch(jdk.incubator.foreign.MemorySegment)">mismatch> </a>
+   * See <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#mismatch(jdk.incubator.foreign.MemorySegment)">mismatch(...)</a>
    * @param that the other Resource
    * @return the relative offset, in bytes, of the first mismatch between this and the given other Resource object,
    * otherwise -1 if no mismatch

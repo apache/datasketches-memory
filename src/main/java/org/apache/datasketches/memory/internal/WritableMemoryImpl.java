@@ -56,10 +56,10 @@ import jdk.incubator.foreign.ResourceScope;
  * Common base of native-ordered and non-native-ordered {@link WritableMemory} implementations.
  * Contains methods which are agnostic to the byte order.
  */
-public abstract class BaseWritableMemoryImpl extends ResourceImpl implements WritableMemory {
+public abstract class WritableMemoryImpl extends ResourceImpl implements WritableMemory {
 
   //Pass-through constructor
-  BaseWritableMemoryImpl(
+  WritableMemoryImpl(
       final MemorySegment seg,
       final int typeId,
       final MemoryRequestServer memReqSvr) {

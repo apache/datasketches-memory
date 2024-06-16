@@ -19,11 +19,16 @@
 
 package org.apache.datasketches.memory;
 
+/**
+ * Position operation violation.
+ */
 public class BufferPositionInvariantsException extends RuntimeException {
   private static final long serialVersionUID = 1L;
 
   /**
-   * The associated position operation used violated the positional invariants equation with required details
+   * The associated position operation violated one of the positional invariants.
+   *
+   * <p>The invariants equation is {@code 0 <= start <= position <= end <= capacity}.</p>
    *
    * @param details of the violation.
    */

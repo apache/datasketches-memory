@@ -22,7 +22,7 @@ package org.apache.datasketches.memory;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.internal.BaseWritableBufferImpl;
+import org.apache.datasketches.memory.internal.WritableBufferImpl;
 
 /**
  * Defines the writable API for relative positional access to a resource
@@ -63,7 +63,7 @@ public interface WritableBuffer extends Buffer {
    * @throws IllegalArgumentException if ByteBuffer is not writable
    */
   static WritableBuffer writableWrap(ByteBuffer byteBuffer, ByteOrder byteOrder, MemoryRequestServer memReqSvr) {
-    return BaseWritableBufferImpl.wrapByteBuffer(byteBuffer, false, byteOrder, memReqSvr);
+    return WritableBufferImpl.wrapByteBuffer(byteBuffer, false, byteOrder, memReqSvr);
   }
 
   // NO MAP

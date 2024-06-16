@@ -43,7 +43,7 @@ import jdk.incubator.foreign.MemorySegment;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-final class NativeWritableBufferImpl extends BaseWritableBufferImpl {
+final class NativeWritableBufferImpl extends WritableBufferImpl {
 
   NativeWritableBufferImpl(
       final MemorySegment seg,

@@ -19,8 +19,8 @@
 
 package org.apache.datasketches.memory.internal;
 
-import org.apache.datasketches.memory.BaseBuffer;
 import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.Positional;
 
 import jdk.incubator.foreign.MemorySegment;
 
@@ -42,14 +42,14 @@ import jdk.incubator.foreign.MemorySegment;
  *
  * @author Lee Rhodes
  */
-abstract class BaseBufferImpl extends ResourceImpl implements BaseBuffer {
+abstract class PositionalImpl extends ResourceImpl implements Positional {
   private long capacity;
   private long start = 0;
   private long pos = 0;
   private long end;
 
-  //Pass-through ctor
-  BaseBufferImpl(
+  //Pass-through constructor
+  PositionalImpl(
       final MemorySegment seg,
       final int typeId,
       final MemoryRequestServer memReqSvr) {
@@ -58,13 +58,13 @@ abstract class BaseBufferImpl extends ResourceImpl implements BaseBuffer {
   }
 
   @Override
-  public final BaseBufferImpl incrementPosition(final long increment) {
+  public final PositionalImpl incrementPosition(final long increment) {
     incrementAndAssertPositionForRead(pos, increment);
     return this;
   }
 
   @Override
-  public final BaseBufferImpl incrementAndCheckPosition(final long increment) {
+  public final PositionalImpl incrementAndCheckPosition(final long increment) {
     incrementAndCheckPositionForRead(pos, increment);
     return this;
   }
@@ -95,27 +95,27 @@ abstract class BaseBufferImpl extends ResourceImpl implements BaseBuffer {
   }
 
   @Override
-  public final BaseBufferImpl resetPosition() {
+  public final PositionalImpl resetPosition() {
     pos = start;
     return this;
   }
 
   @Override
-  public final BaseBufferImpl setPosition(final long position) {
+  public final PositionalImpl setPosition(final long position) {
     assertInvariants(start, position, end, capacity);
     pos = position;
     return this;
   }
 
   @Override
-  public final BaseBufferImpl setAndCheckPosition(final long position) {
+  public final PositionalImpl setAndCheckPosition(final long position) {
     checkInvariants(start, position, end, capacity);
     pos = position;
     return this;
   }
 
   @Override
-  public final BaseBufferImpl setStartPositionEnd(final long start, final long position,
+  public final PositionalImpl setStartPositionEnd(final long start, final long position,
       final long end) {
     assertInvariants(start, position, end, capacity);
     this.start = start;
@@ -125,7 +125,7 @@ abstract class BaseBufferImpl extends ResourceImpl implements BaseBuffer {
   }
 
   @Override
-  public final BaseBufferImpl setAndCheckStartPositionEnd(final long start, final long position,
+  public final PositionalImpl setAndCheckStartPositionEnd(final long start, final long position,
       final long end) {
     checkInvariants(start, position, end, capacity);
     this.start = start;

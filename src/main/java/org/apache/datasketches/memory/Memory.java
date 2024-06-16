@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.internal.BaseWritableMemoryImpl;
+import org.apache.datasketches.memory.internal.WritableMemoryImpl;
 
 import jdk.incubator.foreign.MemorySegment;
 import jdk.incubator.foreign.ResourceScope;
@@ -63,7 +63,7 @@ public interface Memory extends Resource {
    * @return a new <i>Memory</i> for read-only operations on the given <i>ByteBuffer</i>.
    */
   static Memory wrap(ByteBuffer byteBuffer, ByteOrder byteOrder) {
-    return BaseWritableMemoryImpl.wrapByteBuffer(byteBuffer, true, byteOrder, null);
+    return WritableMemoryImpl.wrapByteBuffer(byteBuffer, true, byteOrder, null);
   }
 
   //Duplicates make no sense here
@@ -102,7 +102,7 @@ public interface Memory extends Resource {
   static Memory map(File file, long fileOffsetBytes, long capacityBytes, ByteOrder byteOrder)
       throws IOException {
     final ResourceScope scope = ResourceScope.newConfinedScope();
-    return BaseWritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, true, byteOrder);
+    return WritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, true, byteOrder);
   }
 
   /**
@@ -122,7 +122,7 @@ public interface Memory extends Resource {
    */
   static Memory map(File file, long fileOffsetBytes, long capacityBytes, ResourceScope scope, ByteOrder byteOrder)
       throws IOException {
-    return BaseWritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, true, byteOrder);
+    return WritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, true, byteOrder);
   }
   
   //NO ALLOCATE DIRECT, makes no sense
@@ -223,7 +223,7 @@ public interface Memory extends Resource {
    */
   static Memory wrap(byte[] array, int offsetBytes, int lengthBytes, ByteOrder byteOrder) {
     final MemorySegment slice = MemorySegment.ofArray(array).asSlice(offsetBytes, lengthBytes).asReadOnly();
-    return BaseWritableMemoryImpl.wrapSegmentAsArray(slice, byteOrder, null);
+    return WritableMemoryImpl.wrapSegmentAsArray(slice, byteOrder, null);
   }
 
   //Missing wrap(boolean[])
@@ -235,7 +235,7 @@ public interface Memory extends Resource {
    */
   static Memory wrap(char[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array).asReadOnly();
-    return BaseWritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
+    return WritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
   }
 
   /**
@@ -245,7 +245,7 @@ public interface Memory extends Resource {
    */
   static Memory wrap(short[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array).asReadOnly();
-    return BaseWritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
+    return WritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
   }
 
   /**
@@ -255,7 +255,7 @@ public interface Memory extends Resource {
    */
   static Memory wrap(int[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array).asReadOnly();
-    return BaseWritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
+    return WritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
   }
 
   /**
@@ -265,7 +265,7 @@ public interface Memory extends Resource {
    */
   static Memory wrap(long[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array).asReadOnly();
-    return BaseWritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
+    return WritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
   }
 
   /**
@@ -275,7 +275,7 @@ public interface Memory extends Resource {
    */
   static Memory wrap(float[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array).asReadOnly();
-    return BaseWritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
+    return WritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
   }
 
   /**
@@ -285,7 +285,7 @@ public interface Memory extends Resource {
    */
   static Memory wrap(double[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array).asReadOnly();
-    return BaseWritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
+    return WritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
   }
   //END OF CONSTRUCTOR-TYPE METHODS
 

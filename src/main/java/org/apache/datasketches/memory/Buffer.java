@@ -22,14 +22,14 @@ package org.apache.datasketches.memory;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.internal.BaseWritableBufferImpl;
+import org.apache.datasketches.memory.internal.WritableBufferImpl;
 
 /**
  * Defines the read-only API for relative positional access to a resource.
  *
  * @author Lee Rhodes
  */
-public interface Buffer extends BaseBuffer {
+public interface Buffer extends Positional, Resource {
 
   //BYTE BUFFER
   /**
@@ -60,7 +60,7 @@ public interface Buffer extends BaseBuffer {
    * @return a new <i>Buffer</i> for read-only operations on the given ByteBuffer.
    */
   static Buffer wrap(ByteBuffer byteBuffer, ByteOrder byteOrder) {
-    return BaseWritableBufferImpl.wrapByteBuffer(byteBuffer, true, byteOrder, null);
+    return WritableBufferImpl.wrapByteBuffer(byteBuffer, true, byteOrder, null);
   }
 
   //DUPLICATES

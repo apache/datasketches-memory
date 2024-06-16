@@ -21,10 +21,10 @@ package org.apache.datasketches.memory.internal;
 
 import static org.testng.Assert.fail;
 
-import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
@@ -81,7 +81,7 @@ public class BaseBufferTest {
   public void checkCheckNotAliveAfterTWR() {
     WritableMemory wmem;
     Buffer buf;
-    try (ResourceScope scope = (wmem = WritableMemory.allocateDirect(100, memReqSvr)).scope()) {
+    try (ResourceScope scope = (wmem = WritableMemory.allocateDirect(100)).scope()) {
       buf = wmem.asBuffer();
     }
     try {

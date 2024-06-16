@@ -42,7 +42,7 @@ import jdk.incubator.foreign.MemorySegment;
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-final class NonNativeWritableMemoryImpl extends BaseWritableMemoryImpl {
+final class NonNativeWritableMemoryImpl extends WritableMemoryImpl {
 
   //Pass-through ctor
   NonNativeWritableMemoryImpl(

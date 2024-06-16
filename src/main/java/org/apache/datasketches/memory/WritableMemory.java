@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.internal.BaseWritableMemoryImpl;
+import org.apache.datasketches.memory.internal.WritableMemoryImpl;
 
 import jdk.incubator.foreign.MemorySegment;
 import jdk.incubator.foreign.ResourceScope;
@@ -62,10 +62,10 @@ public interface WritableMemory extends Memory {
    * @throws IllegalArgumentException if ByteBuffer is not writable.
    */
   static WritableMemory writableWrap(
-      ByteBuffer byteBuffer, 
-      ByteOrder byteOrder, 
+      ByteBuffer byteBuffer,
+      ByteOrder byteOrder,
       MemoryRequestServer memReqSvr) {
-    return BaseWritableMemoryImpl.wrapByteBuffer(byteBuffer, false, byteOrder, memReqSvr);
+    return WritableMemoryImpl.wrapByteBuffer(byteBuffer, false, byteOrder, memReqSvr);
   }
 
   //Duplicates make no sense here
@@ -99,12 +99,12 @@ public interface WritableMemory extends Memory {
    * required by the implementation.
    */
   static WritableMemory writableMap(
-      File file, 
-      long fileOffsetBytes, 
-      long capacityBytes, 
+      File file,
+      long fileOffsetBytes,
+      long capacityBytes,
       ByteOrder byteOrder) throws IOException {
     final ResourceScope scope = ResourceScope.newConfinedScope();
-    return BaseWritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, false, byteOrder);
+    return WritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, false, byteOrder);
   }
 
   /**
@@ -122,14 +122,14 @@ public interface WritableMemory extends Memory {
    * required by the implementation.
    */
   static WritableMemory writableMap(
-      File file, 
-      long fileOffsetBytes, 
-      long capacityBytes, 
-      ResourceScope scope, 
+      File file,
+      long fileOffsetBytes,
+      long capacityBytes,
+      ResourceScope scope,
       ByteOrder byteOrder) throws IOException {
-    return BaseWritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, false, byteOrder);
+    return WritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, false, byteOrder);
   }
-  
+
   //ALLOCATE DIRECT
 
   /**
@@ -142,13 +142,10 @@ public interface WritableMemory extends Memory {
    * and to call <i>close()</i> when done.</p>
    *
    * @param capacityBytes the size of the desired memory in bytes.
-   * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
    * @return WritableMemory for this off-heap, native resource.
    */
-  static WritableMemory allocateDirect(
-      long capacityBytes, 
-      MemoryRequestServer memReqSvr) {
-    return allocateDirect(capacityBytes, 8, ByteOrder.nativeOrder(), memReqSvr);
+  static WritableMemory allocateDirect(long capacityBytes) {
+    return allocateDirect(capacityBytes, 8, ByteOrder.nativeOrder(), new DefaultMemoryRequestServer());
   }
 
   /**
@@ -172,7 +169,7 @@ public interface WritableMemory extends Memory {
       ByteOrder byteOrder,
       MemoryRequestServer memReqSvr) {
     final ResourceScope scope = ResourceScope.newConfinedScope();
-    return BaseWritableMemoryImpl.wrapDirect(capacityBytes, alignmentBytes, scope, byteOrder, memReqSvr);
+    return WritableMemoryImpl.wrapDirect(capacityBytes, alignmentBytes, scope, byteOrder, memReqSvr);
   }
 
   /**
@@ -196,9 +193,9 @@ public interface WritableMemory extends Memory {
       ResourceScope scope,
       ByteOrder byteOrder,
       MemoryRequestServer memReqSvr) {
-    return BaseWritableMemoryImpl.wrapDirect(capacityBytes, alignmentBytes, scope, byteOrder, memReqSvr);
+    return WritableMemoryImpl.wrapDirect(capacityBytes, alignmentBytes, scope, byteOrder, memReqSvr);
   }
-  
+
   //REGIONS
   /**
    * A writable region is a writable view of this object.
@@ -214,7 +211,7 @@ public interface WritableMemory extends Memory {
    * @return a new <i>WritableMemory</i> representing the defined writable region.
    */
   default WritableMemory writableRegion(
-      long offsetBytes, 
+      long offsetBytes,
       long capacityBytes) {
     return writableRegion(offsetBytes, capacityBytes, getTypeByteOrder());
   }
@@ -235,8 +232,8 @@ public interface WritableMemory extends Memory {
    * @return a new <i>WritableMemory</i> representing the defined writable region.
    */
   WritableMemory writableRegion(
-      long offsetBytes, 
-      long capacityBytes, 
+      long offsetBytes,
+      long capacityBytes,
       ByteOrder byteOrder);
 
   //AS WRITABLE BUFFER
@@ -290,7 +287,7 @@ public interface WritableMemory extends Memory {
    * @return a new WritableMemory for write operations on a new byte array.
    */
   static WritableMemory allocate(
-      int capacityBytes, 
+      int capacityBytes,
       ByteOrder byteOrder) {
     return allocate(capacityBytes, byteOrder, null);
   }
@@ -304,8 +301,8 @@ public interface WritableMemory extends Memory {
    * @return a new WritableMemory for write operations on a new byte array.
    */
   static WritableMemory allocate(
-      int capacityBytes, 
-      ByteOrder byteOrder, 
+      int capacityBytes,
+      ByteOrder byteOrder,
       MemoryRequestServer memReqSvr) {
     final byte[] arr = new byte[capacityBytes];
     return writableWrap(arr, 0, capacityBytes, byteOrder, memReqSvr);
@@ -335,7 +332,7 @@ public interface WritableMemory extends Memory {
    * @return a new WritableMemory for write operations on the given primitive array.
    */
   static WritableMemory writableWrap(
-      byte[] array, 
+      byte[] array,
       ByteOrder byteOrder) {
     return writableWrap(array, 0, array.length, byteOrder, null);
   }
@@ -352,9 +349,9 @@ public interface WritableMemory extends Memory {
    * @return a new WritableMemory for write operations on the given primitive array.
    */
   static WritableMemory writableWrap(
-      byte[] array, 
-      int offsetBytes, 
-      int lengthBytes, 
+      byte[] array,
+      int offsetBytes,
+      int lengthBytes,
       ByteOrder byteOrder) {
     return writableWrap(array, offsetBytes, lengthBytes, byteOrder, null);
   }
@@ -375,13 +372,13 @@ public interface WritableMemory extends Memory {
    * @return a new WritableMemory for write operations on the given primitive array.
    */
   static WritableMemory writableWrap(
-      byte[] array, 
-      int offsetBytes, 
-      int lengthBytes, 
+      byte[] array,
+      int offsetBytes,
+      int lengthBytes,
       ByteOrder byteOrder,
       MemoryRequestServer memReqSvr) {
     final MemorySegment slice = MemorySegment.ofArray(array).asSlice(offsetBytes, lengthBytes);
-    return BaseWritableMemoryImpl.wrapSegmentAsArray(slice, byteOrder, memReqSvr);
+    return WritableMemoryImpl.wrapSegmentAsArray(slice, byteOrder, memReqSvr);
   }
 
   /**
@@ -391,7 +388,7 @@ public interface WritableMemory extends Memory {
    */
   static WritableMemory writableWrap(char[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array);
-    return BaseWritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
+    return WritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
   }
 
   /**
@@ -401,7 +398,7 @@ public interface WritableMemory extends Memory {
    */
   static WritableMemory writableWrap(short[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array);
-    return BaseWritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
+    return WritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
   }
 
   /**
@@ -411,7 +408,7 @@ public interface WritableMemory extends Memory {
    */
   static WritableMemory writableWrap(int[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array);
-    return BaseWritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
+    return WritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
   }
 
   /**
@@ -421,7 +418,7 @@ public interface WritableMemory extends Memory {
    */
   static WritableMemory writableWrap(long[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array);
-    return BaseWritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
+    return WritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
   }
 
   /**
@@ -431,7 +428,7 @@ public interface WritableMemory extends Memory {
    */
   static WritableMemory writableWrap(float[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array);
-    return BaseWritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
+    return WritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
   }
 
   /**
@@ -441,7 +438,7 @@ public interface WritableMemory extends Memory {
    */
   static WritableMemory writableWrap(double[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array);
-    return BaseWritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
+    return WritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
   }
   //END OF CONSTRUCTOR-TYPE METHODS
 
@@ -453,7 +450,7 @@ public interface WritableMemory extends Memory {
    * @param value the value to put
    */
   void putBoolean(
-      long offsetBytes, 
+      long offsetBytes,
       boolean value);
 
   /**
@@ -462,7 +459,7 @@ public interface WritableMemory extends Memory {
    * @param value the value to put
    */
   void putByte(
-      long offsetBytes, 
+      long offsetBytes,
       byte value);
 
   /**
@@ -473,9 +470,9 @@ public interface WritableMemory extends Memory {
    * @param lengthBytes number of array units to transfer
    */
   void putByteArray(
-      long offsetBytes, 
-      byte[] srcArray, 
-      int srcOffsetBytes, 
+      long offsetBytes,
+      byte[] srcArray,
+      int srcOffsetBytes,
       int lengthBytes);
 
   /**
@@ -484,7 +481,7 @@ public interface WritableMemory extends Memory {
    * @param value the value to put
    */
   void putChar(
-      long offsetBytes, 
+      long offsetBytes,
       char value);
 
   /**
@@ -495,9 +492,9 @@ public interface WritableMemory extends Memory {
    * @param lengthChars number of array units to transfer
    */
   void putCharArray(
-      long offsetBytes, 
-      char[] srcArray, 
-      int srcOffsetChars, 
+      long offsetBytes,
+      char[] srcArray,
+      int srcOffsetChars,
       int lengthChars);
 
   /**
@@ -506,7 +503,7 @@ public interface WritableMemory extends Memory {
    * @param value the value to put
    */
   void putDouble(
-      long offsetBytes, 
+      long offsetBytes,
       double value);
 
   /**
@@ -517,9 +514,9 @@ public interface WritableMemory extends Memory {
    * @param lengthDoubles number of array units to transfer
    */
   void putDoubleArray(
-      long offsetBytes, 
-      double[] srcArray, 
-      int srcOffsetDoubles, 
+      long offsetBytes,
+      double[] srcArray,
+      int srcOffsetDoubles,
       int lengthDoubles);
 
   /**
@@ -528,7 +525,7 @@ public interface WritableMemory extends Memory {
    * @param value the value to put
    */
   void putFloat(
-      long offsetBytes, 
+      long offsetBytes,
       float value);
 
   /**
@@ -540,8 +537,8 @@ public interface WritableMemory extends Memory {
    */
   void putFloatArray(
       long offsetBytes,
-      float[] srcArray, 
-      int srcOffsetFloats, 
+      float[] srcArray,
+      int srcOffsetFloats,
       int lengthFloats);
 
   /**
@@ -550,7 +547,7 @@ public interface WritableMemory extends Memory {
    * @param value the value to put
    */
   void putInt(
-      long offsetBytes, 
+      long offsetBytes,
       int value);
 
   /**
@@ -561,9 +558,9 @@ public interface WritableMemory extends Memory {
    * @param lengthInts number of array units to transfer
    */
   void putIntArray(
-      long offsetBytes, 
-      int[] srcArray, 
-      int srcOffsetInts, 
+      long offsetBytes,
+      int[] srcArray,
+      int srcOffsetInts,
       int lengthInts);
 
   /**
@@ -572,7 +569,7 @@ public interface WritableMemory extends Memory {
    * @param value the value to put
    */
   void putLong(
-      long offsetBytes, 
+      long offsetBytes,
       long value);
 
   /**
@@ -583,8 +580,8 @@ public interface WritableMemory extends Memory {
    * @param lengthLongs number of array units to transfer
    */
   void putLongArray(
-      long offsetBytes, 
-      long[] srcArray, 
+      long offsetBytes,
+      long[] srcArray,
       int srcOffsetLongs,
       int lengthLongs);
 
@@ -594,7 +591,7 @@ public interface WritableMemory extends Memory {
    * @param value the value to put
    */
   void putShort(
-      long offsetBytes, 
+      long offsetBytes,
       short value);
 
   /**
@@ -605,9 +602,9 @@ public interface WritableMemory extends Memory {
    * @param lengthShorts number of array units to transfer
    */
   void putShortArray(
-      long offsetBytes, 
-      short[] srcArray, 
-      int srcOffsetShorts, 
+      long offsetBytes,
+      short[] srcArray,
+      int srcOffsetShorts,
       int lengthShorts);
 
   //OTHER WRITE METHODS
@@ -623,7 +620,7 @@ public interface WritableMemory extends Memory {
    * @param lengthBytes the length in bytes
    */
   void clear(
-      long offsetBytes, 
+      long offsetBytes,
       long lengthBytes);
 
   /**
@@ -632,7 +629,7 @@ public interface WritableMemory extends Memory {
    * @param bitMask the bits set to one will be cleared
    */
   void clearBits(
-      long offsetBytes, 
+      long offsetBytes,
       byte bitMask);
 
   /**
@@ -648,8 +645,8 @@ public interface WritableMemory extends Memory {
    * @param value the given byte value
    */
   void fill(
-      long offsetBytes, 
-      long lengthBytes, 
+      long offsetBytes,
+      long lengthBytes,
       byte value);
 
   /**
@@ -658,7 +655,7 @@ public interface WritableMemory extends Memory {
    * @param bitMask the bits set to one will be set
    */
   void setBits(
-      long offsetBytes, 
+      long offsetBytes,
       byte bitMask);
 
 
@@ -668,5 +665,5 @@ public interface WritableMemory extends Memory {
    * @return a copy of the primitive backing byte array.
    */
   byte[] getArray();
-  
+
 }

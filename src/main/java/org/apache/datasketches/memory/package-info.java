@@ -95,7 +95,7 @@
  * <blockquote><pre>
  *     WritableMemory wMem = ...
  *     WritableMemory wReg = wMem.writableRegion(offset, length); //OR
- *     Memory reg = wMem.region(offset, length);
+ *     Memory region = wMem.region(offset, length);
  * </pre></blockquote>
  *
  * @author Lee Rhodes

@@ -58,7 +58,7 @@ under the License.
   </scm>
 
   <issueManagement>
-    <!-- <system>jira</system> --> 
+    <!-- <system>jira</system> -->
     <!-- <url>https://issues.apache.org/jira/browse/DATASKETCHES</url> -->
     <system>GitHub</system>
     <url>https://github.com/apache/${project.artifactId}/issues</url>
@@ -88,6 +88,7 @@ under the License.
     <project.build.sourceEncoding>${charset.encoding}</project.build.sourceEncoding>
     <project.build.resourceEncoding>${charset.encoding}</project.build.resourceEncoding>
     <project.reporting.outputEncoding>${charset.encoding}</project.reporting.outputEncoding>
+    <maven.build.timestamp.format>yyyy-MM-dd'T'HH-mm-ss'Z'</maven.build.timestamp.format>
 
     <!--  Maven Plugins -->
     <maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>
@@ -100,9 +101,8 @@ under the License.
     <maven-release-plugin.version>3.0.1</maven-release-plugin.version>
     <maven-remote-resources-plugin.version>3.2.0</maven-remote-resources-plugin.version>
     <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
-    <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version> <!-- for surefire, failsafe and surefire-report -->
-    <maven-toolchains-plugin.version>3.2.0</maven-toolchains-plugin.version>
-    <maven-install-plugin.version>3.0.0-M1</maven-install-plugin.version>
+    <maven-surefire-failsafe-plugins.version>3.2.5</maven-surefire-failsafe-plugins.version><!-- for surefire, failsafe and surefire-report -->
+    <maven-install-plugin.version>3.1.2</maven-install-plugin.version>
     <!-- Apache Plugins -->
     <apache-rat-plugin.version>0.16.1</apache-rat-plugin.version>
     <!-- org.jacoco Maven Plugins -->
@@ -110,30 +110,25 @@ under the License.
     <!-- org.eluder Maven Plugins -->
     <coveralls-repo-token></coveralls-repo-token>
     <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
-    <!-- org.codehaus plugins -->
+    <!-- mojohaus.org plugins -->
     <versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
-    <exec-maven-plugin.version>3.3.0</exec-maven-plugin.version>
+
     <!-- other -->
-    <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version> <!-- no actual plugin -->
+    <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version> <!-- no actual plugin, referenced by m2e -->
     <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
-    <protobuf-java.version>4.0.0-rc-1</protobuf-java.version>
+    <!-- <protobuf-java.version>4.0.0-rc-1</protobuf-java.version> -->
     <zero-allocation-hashing.version>0.16</zero-allocation-hashing.version>
   </properties>
 
   <dependencies>
+    <!-- Test Scope -->
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
       <version>${testng.version}</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <!-- Used for UTF8 testing -->
-      <groupId>com.google.protobuf</groupId>
-      <artifactId>protobuf-java</artifactId>
-      <version>${protobuf-java.version}</version>
-      <scope>test</scope>
-    </dependency>
+
     <dependency>
       <!-- Used for xxHash testing -->
       <groupId>net.openhft</groupId>
@@ -229,14 +224,13 @@ under the License.
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>${maven-javadoc-plugin.version}</version>
           <configuration>
-            <show>public</show>
             <packages>org.apache.datasketches.memory</packages>
             <excludePackageNames>org.apache.datasketches.memory/internal</excludePackageNames>
+            <show>public</show>
             <additionalOptions>
               <additionalOption>--add-modules=jdk.incubator.foreign</additionalOption>
             </additionalOptions>
           </configuration>
-            
           <executions>
             <execution>
               <id>attach-javadocs</id>
@@ -278,9 +272,9 @@ under the License.
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>${maven-surefire-plugin.version}</version>
+          <version>${maven-surefire-failsafe-plugins.version}</version>
           <configuration>
-			<argLine>--add-modules=jdk.incubator.foreign</argLine>
+            <argLine>--add-modules=jdk.incubator.foreign</argLine>
             <trimStackTrace>false</trimStackTrace>
             <useManifestOnlyJar>false</useManifestOnlyJar>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
@@ -335,7 +329,6 @@ under the License.
           </configuration>
         </plugin>
 
-
         <plugin>
           <!-- Generates code coverage report from website. -->
           <groupId>org.jacoco</groupId>
@@ -348,6 +341,12 @@ under the License.
                 <goal>prepare-agent</goal>
               </goals>
             </execution>
+            <execution>
+              <id>default-report</id>
+              <goals>
+                <goal>report</goal>
+              </goals>
+            </execution>
           </executions>
         </plugin>
 
@@ -355,12 +354,6 @@ under the License.
           <groupId>pl.project13.maven</groupId>
           <artifactId>git-commit-id-plugin</artifactId>
           <version>${git-commit-id-plugin.version}</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>exec-maven-plugin</artifactId>
-          <version>${exec-maven-plugin.version}</version>
         </plugin>
 
       </plugins>
@@ -565,7 +558,7 @@ under the License.
     </profile>
 
     <!-- Disable source release assembly for 'apache-release' profile.
-             This is performed from a script outside Maven -->
+             This is performed from a script outside Maven
     <profile>
       <id>apache-release</id>
       <build>
@@ -582,7 +575,7 @@ under the License.
           </plugin>
         </plugins>
       </build>
-    </profile>
+    </profile> -->
 
   </profiles>
 

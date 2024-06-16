@@ -392,7 +392,7 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
   public final byte[] getArray() {
     return seg.toByteArray();
   }
-  
+
   @Override
   public final void setBits(final long offsetBytes, final byte bitMask) {
     final byte b = MemoryAccess.getByteAtOffset(seg, offsetBytes);

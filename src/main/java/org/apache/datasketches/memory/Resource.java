@@ -330,8 +330,6 @@ public interface Resource extends AutoCloseable {
    */
   long xxHash64(long in, long seed);
 
-  //TO STRING
-
   /**
    * Returns the 64-bit hash of the sequence of bytes in this object specified by
    * <i>offsetBytes</i>, <i>lengthBytes</i> and a <i>seed</i>.  Note that the sequence of bytes is

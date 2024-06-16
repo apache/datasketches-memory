@@ -224,7 +224,6 @@ under the License.
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>${maven-javadoc-plugin.version}</version>
           <configuration>
-            <packages>org.apache.datasketches.memory</packages>
             <excludePackageNames>org.apache.datasketches.memory/internal</excludePackageNames>
             <show>public</show>
             <additionalOptions>

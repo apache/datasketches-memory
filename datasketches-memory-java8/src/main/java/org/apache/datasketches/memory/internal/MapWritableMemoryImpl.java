@@ -42,7 +42,7 @@ final class MapWritableMemoryImpl extends NativeWritableMemoryImpl {
     this.dirWMap = dirWMap;
     this.offsetBytes = offsetBytes;
     this.capacityBytes = capacityBytes;
-    this.typeId = removeNnBuf(typeId) | MAP | MEMORY | NATIVE;
+    this.typeId = removeNnBuf(typeId) | MAP | MEMORY | NATIVE_BO;
     this.cumOffsetBytes = cumOffsetBytes;
     if ((this.owner != null) && (this.owner != Thread.currentThread())) {
       throw new IllegalStateException(THREAD_EXCEPTION_TEXT);
@@ -61,11 +61,11 @@ final class MapWritableMemoryImpl extends NativeWritableMemoryImpl {
     int typeIdOut = removeNnBuf(typeId) | MAP | REGION | (readOnly ? READONLY : 0);
 
     if (Util.isNativeByteOrder(byteOrder)) {
-      typeIdOut |= NATIVE;
+      typeIdOut |= NATIVE_BO;
       return new MapWritableMemoryImpl(
           dirWMap, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes);
     } else {
-      typeIdOut |= NONNATIVE;
+      typeIdOut |= NONNATIVE_BO;
       return new MapNonNativeWritableMemoryImpl(
           dirWMap, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes);
     }
@@ -76,11 +76,11 @@ final class MapWritableMemoryImpl extends NativeWritableMemoryImpl {
     int typeIdOut = removeNnBuf(typeId) | BUFFER | (readOnly ? READONLY : 0);
 
     if (byteOrder == ByteOrder.nativeOrder()) {
-      typeIdOut |= NATIVE;
+      typeIdOut |= NATIVE_BO;
       return new MapWritableBufferImpl(
           dirWMap, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes);
     } else {
-      typeIdOut |= NONNATIVE;
+      typeIdOut |= NONNATIVE_BO;
       return new MapNonNativeWritableBufferImpl(
           dirWMap, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes);
     }
@@ -114,7 +114,7 @@ final class MapWritableMemoryImpl extends NativeWritableMemoryImpl {
   }
 
   @Override
-  public boolean isValid() {
+  public boolean isAlive() {
     return dirWMap.getValid().get();
   }
 

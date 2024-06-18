@@ -364,9 +364,10 @@ public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements W
    * Returns the primitive backing array, otherwise null.
    * @return the primitive backing array, otherwise null.
    */
-  final Object getArray() {
+  @Override
+  public final byte[] getArray() {
     checkValid();
-    return getUnsafeObject();
+    return (byte[])getUnsafeObject();
   }
 
   @Override

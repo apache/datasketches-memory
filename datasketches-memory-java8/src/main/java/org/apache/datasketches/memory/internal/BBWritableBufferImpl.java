@@ -50,7 +50,7 @@ final class BBWritableBufferImpl extends NativeWritableBufferImpl {
     this.nativeBaseOffset = nativeBaseOffset;
     this.offsetBytes = offsetBytes; //in ResourceImpl
     this.capacityBytes = capacityBytes; //in ResourceImpl
-    this.typeId = removeNnBuf(typeId) | BYTEBUF | BUFFER | NATIVE; //in ResourceImpl
+    this.typeId = removeNnBuf(typeId) | BYTEBUF | BUFFER | NATIVE_BO; //in ResourceImpl
     this.cumOffsetBytes = cumOffsetBytes; //in ResourceImpl
     this.memReqSvr = memReqSvr; //in ResourceImpl
     this.byteBuf = byteBuf;
@@ -71,11 +71,11 @@ final class BBWritableBufferImpl extends NativeWritableBufferImpl {
     int typeIdOut = removeNnBuf(typeId) | BUFFER | REGION | (readOnly ? READONLY : 0);
 
     if (Util.isNativeByteOrder(byteOrder)) {
-      typeIdOut |= NATIVE;
+      typeIdOut |= NATIVE_BO;
       return new BBWritableBufferImpl(
           unsafeObj, nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, memReqSvr, byteBuf);
     } else {
-      typeIdOut |= NONNATIVE;
+      typeIdOut |= NONNATIVE_BO;
       return new BBNonNativeWritableBufferImpl(
           unsafeObj, nativeBaseOffset, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, memReqSvr, byteBuf);
     }
@@ -86,11 +86,11 @@ final class BBWritableBufferImpl extends NativeWritableBufferImpl {
     int typeIdOut = removeNnBuf(typeId) | MEMORY | (readOnly ? READONLY : 0);
 
     if (byteOrder == ByteOrder.nativeOrder()) {
-      typeIdOut |= NATIVE;
+      typeIdOut |= NATIVE_BO;
       return new BBWritableMemoryImpl(
           unsafeObj, nativeBaseOffset, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr, byteBuf);
     } else {
-      typeIdOut |= NONNATIVE;
+      typeIdOut |= NONNATIVE_BO;
       return new BBNonNativeWritableMemoryImpl(
           unsafeObj, nativeBaseOffset, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr, byteBuf);
     }
@@ -101,11 +101,11 @@ final class BBWritableBufferImpl extends NativeWritableBufferImpl {
     int typeIdOut = removeNnBuf(typeId) | BUFFER | DUPLICATE | (readOnly ? READONLY : 0);
 
     if (byteOrder == ByteOrder.nativeOrder()) {
-      typeIdOut |= NATIVE;
+      typeIdOut |= NATIVE_BO;
       return new BBWritableBufferImpl(
           unsafeObj, nativeBaseOffset, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr, byteBuf);
     } else {
-      typeIdOut |= NONNATIVE;
+      typeIdOut |= NONNATIVE_BO;
       return new BBNonNativeWritableBufferImpl(
           unsafeObj, nativeBaseOffset, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr, byteBuf);
     }

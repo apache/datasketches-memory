@@ -161,7 +161,7 @@ public class BufferInvariantsTest {
 
   @Test
   public void checkLimitsDirect() throws Exception {
-    try (WritableMemory wmem = WritableMemory.allocateDirect(100, null)) {
+    try (WritableMemory wmem = WritableMemory.allocateDirect(100)) {
       Buffer buf = wmem.asBuffer();
       buf.setStartPositionEnd(40, 45, 50);
       buf.setStartPositionEnd(0, 0, 100);
@@ -231,7 +231,7 @@ public class BufferInvariantsTest {
   @Test
   public void testBufDirect() throws Exception {
     int n = 25;
-    try (WritableMemory wmem = WritableMemory.allocateDirect(n, null)) {
+    try (WritableMemory wmem = WritableMemory.allocateDirect(n)) {
     WritableBuffer buf = wmem.asWritableBuffer();
     for (byte i = 0; i < n; i++) { buf.putByte(i); }
     buf.setPosition(0);

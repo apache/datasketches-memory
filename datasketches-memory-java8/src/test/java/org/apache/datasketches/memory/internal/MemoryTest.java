@@ -23,7 +23,6 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.Resource.defaultMemReqSvr;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
@@ -55,7 +54,7 @@ public class MemoryTest {
   @Test
   public void checkDirectRoundTrip() throws Exception {
     int n = 1024; //longs
-    try (WritableMemory mem = WritableMemory.allocateDirect(n * 8, defaultMemReqSvr)) {
+    try (WritableMemory mem = WritableMemory.allocateDirect(n * 8)) {
       for (int i = 0; i < n; i++) {
         mem.putLong(i * 8, i);
       }
@@ -320,7 +319,7 @@ public class MemoryTest {
   @Test(expectedExceptions = IllegalStateException.class)
   public void checkParentUseAfterFree() throws Exception {
     int bytes = 64 * 8;
-    WritableMemory wmem = WritableMemory.allocateDirect(bytes, defaultMemReqSvr);
+    WritableMemory wmem = WritableMemory.allocateDirect(bytes);
     wmem.close();
     wmem.getLong(0);
   }
@@ -328,7 +327,7 @@ public class MemoryTest {
   @Test(expectedExceptions = IllegalStateException.class)
   public void checkRegionUseAfterFree() throws Exception {
     int bytes = 64;
-    Memory mem = WritableMemory.allocateDirect(bytes, defaultMemReqSvr);
+    Memory mem = WritableMemory.allocateDirect(bytes);
     Memory region = mem.region(0L, bytes);
     mem.close();
     region.getByte(0);
@@ -345,7 +344,7 @@ public class MemoryTest {
       wbuf = wmem.asWritableBuffer();
       assertNull(wbuf.getMemoryRequestServer());
       //OFF HEAP
-      try (WritableMemory wmem2 = WritableMemory.allocateDirect(16, defaultMemReqSvr)) { //OFF HEAP
+      try (WritableMemory wmem2 = WritableMemory.allocateDirect(16)) { //OFF HEAP
         assertNull(wmem2.getMemoryRequestServer());
         wbuf = wmem2.asWritableBuffer();
         assertNull(wbuf.getMemoryRequestServer());

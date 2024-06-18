@@ -77,7 +77,7 @@ public class BaseBufferTest {
   public void checkCheckValid() {
 
     Buffer buf;
-    try (WritableMemory wmem = WritableMemory.allocateDirect(100, null)) {
+    try (WritableMemory wmem = WritableMemory.allocateDirect(100)) {
       buf = wmem.asBuffer();
     }
     @SuppressWarnings("unused")

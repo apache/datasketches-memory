@@ -87,7 +87,7 @@ public class AllocateDirectWritableMapMemoryTest {
 
     try (
         WritableMemory dstMem = WritableMemory.writableMap(file, 0, bytes, ByteOrder.nativeOrder());
-        WritableMemory srcMem = WritableMemory.allocateDirect(bytes, null)) {
+        WritableMemory srcMem = WritableMemory.allocateDirect(bytes)) {
 
       for (long i = 0; i < longs; i++) {
         srcMem.putLong(i << 3, i); //load source with consecutive longs

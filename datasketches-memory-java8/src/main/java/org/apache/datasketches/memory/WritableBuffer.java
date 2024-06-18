@@ -363,7 +363,12 @@ public interface WritableBuffer extends Buffer {
   // NO ATOMIC METHODS
 
   //OTHER WRITE METHODS
-
+  /**
+   * Returns the primitive backing array, otherwise null.
+   * @return the primitive backing array, otherwise null.
+   */
+  byte[] getArray();
+  
   /**
    * Clears all bytes of this Buffer from position to end to zero. The position will be set to end.
    */

@@ -57,7 +57,7 @@ public class MemoryWriteToTest {
   @Test
   public void testOffHeap() throws Exception {
     try (WritableMemory mem =
-        WritableMemory.allocateDirect((UNSAFE_COPY_THRESHOLD_BYTES * 5) + 10, null)) {
+        WritableMemory.allocateDirect((UNSAFE_COPY_THRESHOLD_BYTES * 5) + 10)) {
       testWriteTo(mem.region(0, 0));
       testOffHeap(mem, 7);
       testOffHeap(mem, 1023);

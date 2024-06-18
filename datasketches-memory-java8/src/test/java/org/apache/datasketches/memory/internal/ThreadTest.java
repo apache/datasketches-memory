@@ -46,11 +46,11 @@ public class ThreadTest {
   }
 
   void initMap() throws IOException {
-    mem = Memory.map(file); assertTrue(mem.isValid());
+    mem = Memory.map(file); assertTrue(mem.isAlive());
   }
 
   void initDirectMem() {
-    wmem = WritableMemory.allocateDirect(1024, null); assertTrue(wmem.isValid());
+    wmem = WritableMemory.allocateDirect(1024); assertTrue(wmem.isAlive());
   }
 
   Runnable tryMapClose = () -> {
@@ -74,4 +74,3 @@ public class ThreadTest {
   }
 
 }
-

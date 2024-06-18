@@ -61,9 +61,9 @@ public class AllocateDirectMapMemoryTest {
     {
       int len1 = (int)mem.getCapacity();
       println("Mem Cap:       " + len1);
-      println("Total Offset:  " + mem.getTotalOffset());
+      println("Total Offset:  " + mem.getRelativeOffset());
       println("Cum Offset:    " + ((ResourceImpl)mem).getCumulativeOffset(0));
-      println("Total Offset: " + mem.getTotalOffset());
+      println("Total Offset: " + mem.getRelativeOffset());
       byte[] bArr = new byte[len1];
       mem.getByteArray(0, bArr, 0, len1);
       String s = new String(bArr, StandardCharsets.UTF_8);
@@ -73,9 +73,9 @@ public class AllocateDirectMapMemoryTest {
       Memory mem2 = mem.region(43 + 76, 34);
       int len2 = (int)mem2.getCapacity();
       println("Mem Cap:       " + len2);
-      println("Offset:        " + mem.getTotalOffset());
+      println("Offset:        " + mem.getRelativeOffset());
       println("Cum Offset:    " + ((ResourceImpl)mem2).getCumulativeOffset(0));
-      println("Total Offset: " + mem2.getTotalOffset());
+      println("Total Offset: " + mem2.getRelativeOffset());
       byte[] bArr2 = new byte[len2];
       mem2.getByteArray(0, bArr2, 0, len2);
       String s2 = new String(bArr2,StandardCharsets.UTF_8);

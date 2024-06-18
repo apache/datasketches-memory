@@ -31,7 +31,7 @@ public class IgnoredArrayOverflowTest {
 
   @BeforeClass
   public void allocate() {
-    memory = WritableMemory.allocateDirect(MAX_SIZE, null);
+    memory = WritableMemory.allocateDirect(MAX_SIZE);
   }
 
   @AfterClass

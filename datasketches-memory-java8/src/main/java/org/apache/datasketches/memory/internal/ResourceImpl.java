@@ -31,7 +31,7 @@ import org.apache.datasketches.memory.ReadOnlyException;
 import org.apache.datasketches.memory.Resource;
 
 /**
- * Implements the root Resource methods.
+ * Implements the root Resource methods plus some common static variables and check methods.
  *
  * @author Lee Rhodes
  */
@@ -53,26 +53,26 @@ public abstract class ResourceImpl implements Resource {
   //class type IDs. Do not change the bit orders
   //The lowest 3 bits are set dynamically
   // 0000 0XXX Group 1
-  static final int WRITABLE = 0;
-  static final int READONLY = 1;
-  static final int REGION = 1 << 1;
-  static final int DUPLICATE = 1 << 2; //for Buffer only
+  static final int WRITABLE  = 0; //bit 0 = 0
+  static final int READONLY  = 1; //bit 0
+  static final int REGION    = 2; //bit 1
+  static final int DUPLICATE = 4; //bit 2, for Buffer only
 
   // 000X X000 Group 2
-  static final int HEAP = 0;
-  static final int DIRECT = 1 << 3;
-  static final int MAP = 1 << 4; //Map is always Direct also
+  static final int HEAP   = 0;    //bits 3,4 = 0
+  static final int DIRECT = 8;    //bit 3
+  static final int MAP    = 16;   //bit 4, Map is effectively Direct
 
-  // 00X0 0000 Group 3
-  static final int NATIVE = 0;
-  static final int NONNATIVE = 1 << 5;
+  // 00X0 0000 Group 3 ByteOrder
+  static final int NATIVE_BO    = 0; //bit 5 = 0
+  static final int NONNATIVE_BO = 32;//bit 5 
 
   // 0X00 0000 Group 4
-  static final int MEMORY = 0;
-  static final int BUFFER = 1 << 6;
+  static final int MEMORY = 0;    //bit 6 = 0
+  static final int BUFFER = 64;   //bit 6
 
   // X000 0000 Group 5
-  static final int BYTEBUF = 1 << 7;
+  static final int BYTEBUF = 128; //bit 7
 
   /**
    * The java line separator character as a String.
@@ -99,14 +99,35 @@ public abstract class ResourceImpl implements Resource {
   long cumOffsetBytes;
   long offsetBytes;
   int typeId;
-  MemoryRequestServer memReqSvr = null; //set by the user via the leaf nodes
   Thread owner = null;
-
+  
   /**
    * The root of the Memory inheritance hierarchy
    */
   ResourceImpl() { }
+  
+  //MemoryRequestServer logic
+  
+  /**
+   * User specified MemoryRequestServer. Set here and by leaf nodes.
+   */
+  MemoryRequestServer memReqSvr = null;
+  
+  @Override
+  public MemoryRequestServer getMemoryRequestServer() { 
+    return memReqSvr; 
+  }
 
+  @Override
+  public boolean hasMemoryRequestServer() {
+    return memReqSvr != null;
+  }
+  
+  @Override
+  public void setMemoryRequestServer(final MemoryRequestServer memReqSvr) { this.memReqSvr = memReqSvr; }
+  
+  //***
+  
   /**
    * Check the requested offset and length against the allocated size.
    * The invariants equation is: {@code 0 <= reqOff <= reqLen <= reqOff + reqLen <= allocSize}.
@@ -153,7 +174,7 @@ public abstract class ResourceImpl implements Resource {
    * @throws IllegalStateException if this Resource is AutoCloseable, and already closed, i.e., not <em>valid</em>.
    */
   void checkValid() {
-    if (!isValid()) {
+    if (!isAlive()) {
       throw new IllegalStateException("this Resource is AutoCloseable, and already closed, i.e., not <em>valid</em>.");
     }
   }
@@ -202,6 +223,11 @@ public abstract class ResourceImpl implements Resource {
   }
 
   @Override
+  public boolean isCloseable() {
+    return (getTypeId() & (MAP | DIRECT)) > 0;
+  }
+  
+  @Override
   public final boolean equalTo(final long thisOffsetBytes, final Resource that,
       final long thatOffsetBytes, final long lengthBytes) {
     if (that == null) { return false; }
@@ -243,10 +269,7 @@ public abstract class ResourceImpl implements Resource {
   }
 
   @Override
-  public MemoryRequestServer getMemoryRequestServer() { return memReqSvr; }
-
-  @Override
-  public long getTotalOffset() {
+  public long getRelativeOffset() {
     return offsetBytes;
   }
 
@@ -262,7 +285,7 @@ public abstract class ResourceImpl implements Resource {
   }
 
   @Override
-  public boolean isByteBufferResource() {
+  public boolean hasByteBuffer() {
     return (getTypeId() & BYTEBUF) > 0;
   }
 
@@ -277,17 +300,17 @@ public abstract class ResourceImpl implements Resource {
   }
 
   @Override
-  public final boolean isDirectResource() {
+  public final boolean isDirect() {
     return getUnsafeObject() == null;
   }
 
   @Override
-  public boolean isDuplicateBufferView() {
+  public boolean isDuplicate() {
     return (getTypeId() & DUPLICATE) > 0;
   }
 
   @Override
-  public final boolean isHeapResource() {
+  public final boolean isHeap() {
     checkValid();
     return getUnsafeObject() != null;
   }
@@ -298,22 +321,22 @@ public abstract class ResourceImpl implements Resource {
   }
 
   @Override
-  public boolean isMemoryMappedResource() {
+  public boolean isMapped() {
     return (getTypeId() & MAP) > 0;
   }
 
   @Override
-  public boolean isMemoryApi() {
+  public boolean isMemory() {
     return (getTypeId() & BUFFER) == 0;
   }
 
   final boolean isNativeOrder(final int typeId) { //not used
-    return (typeId & NONNATIVE) == 0;
+    return (typeId & NONNATIVE_BO) == 0;
   }
 
   @Override
   public boolean isNonNativeOrder() {
-    return (getTypeId() & NONNATIVE) > 0;
+    return (getTypeId() & NONNATIVE_BO) > 0;
   }
 
   @Override
@@ -342,7 +365,7 @@ public abstract class ResourceImpl implements Resource {
 
   //Overridden by Direct and Map leaves
   @Override
-  public boolean isValid() {
+  public boolean isAlive() {
     return true;
   }
 
@@ -378,14 +401,11 @@ public abstract class ResourceImpl implements Resource {
   //REACHABILITY FENCE
   static void reachabilityFence(final Object obj) { }
 
-  final static int removeNnBuf(final int typeId) { return typeId & ~NONNATIVE & ~BUFFER; }
+  final static int removeNnBuf(final int typeId) { return typeId & ~NONNATIVE_BO & ~BUFFER; }
 
   final static int setReadOnlyBit(final int typeId, final boolean readOnly) {
     return readOnly ? typeId | READONLY : typeId & ~READONLY;
   }
-
-  @Override
-  public void setMemoryRequestServer(final MemoryRequestServer memReqSvr) { this.memReqSvr = memReqSvr; }
 
   /**
    * Returns a formatted hex string of an area of this object.
@@ -423,11 +443,11 @@ public abstract class ResourceImpl implements Resource {
     sb.append("UnsafeObj, hashCode : ").append(uObjStr).append(LS);
     sb.append("UnsafeObjHeader     : ").append(uObjHeader).append(LS);
     sb.append("ByteBuf, hashCode   : ").append(bbStr).append(LS);
-    sb.append("RegionOffset        : ").append(state.getTotalOffset()).append(LS);
+    sb.append("RegionOffset        : ").append(state.getRelativeOffset()).append(LS);
     sb.append("Capacity            : ").append(capacity).append(LS);
     sb.append("CumBaseOffset       : ").append(cumBaseOffset).append(LS);
     sb.append("MemReq, hashCode    : ").append(memReqStr).append(LS);
-    sb.append("Valid               : ").append(state.isValid()).append(LS);
+    sb.append("Valid               : ").append(state.isAlive()).append(LS);
     sb.append("Read Only           : ").append(state.isReadOnly()).append(LS);
     sb.append("Type Byte Order     : ").append(state.getTypeByteOrder().toString()).append(LS);
     sb.append("Native Byte Order   : ").append(ByteOrder.nativeOrder().toString()).append(LS);

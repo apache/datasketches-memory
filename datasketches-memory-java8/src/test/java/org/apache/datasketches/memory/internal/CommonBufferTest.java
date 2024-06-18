@@ -30,7 +30,7 @@ public class CommonBufferTest {
   @Test
   public void checkSetGet() throws Exception {
     int memCapacity = 60; //must be at least 60
-    try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity, null)) {
+    try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity)) {
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
       setGetTests(buf);
@@ -131,7 +131,7 @@ public class CommonBufferTest {
   @Test
   public void checkSetGetArrays() throws Exception {
     int memCapacity = 32;
-    try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity, null)) {
+    try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity)) {
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
       setGetArraysTests(buf);
@@ -215,7 +215,7 @@ public class CommonBufferTest {
   @Test
   public void checkSetGetPartialArraysWithOffset() throws Exception {
     int memCapacity = 32;
-    try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity, null)) {
+    try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity)) {
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
       setGetPartialArraysWithOffsetTests(buf);
@@ -299,7 +299,7 @@ public class CommonBufferTest {
   @Test
   public void checkSetClearMemoryRegions() throws Exception {
     int memCapacity = 64; //must be 64
-    try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity, null)) {
+    try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity)) {
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
       setClearMemoryRegionsTests(buf); //requires println enabled to visually check
@@ -386,7 +386,7 @@ public class CommonBufferTest {
   @Test
   public void checkToHexStringAllMem() throws Exception {
     int memCapacity = 48; //must be 48
-    try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity, null)) {
+    try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity)) {
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
       toHexStringAllMemTests(buf); //requires println enabled to visually check

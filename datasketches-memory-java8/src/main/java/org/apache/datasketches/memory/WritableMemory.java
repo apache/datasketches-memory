@@ -123,13 +123,10 @@ public interface WritableMemory extends Memory {
    * and to call <i>close()</i> when done.</p>
    *
    * @param capacityBytes the size of the desired memory in bytes.
-   * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
    * @return WritableMemory for this off-heap, native resource.
    */
-  static WritableMemory allocateDirect(
-      long capacityBytes, 
-      MemoryRequestServer memReqSvr) {
-    return allocateDirect(capacityBytes, ByteOrder.nativeOrder(), memReqSvr);
+  static WritableMemory allocateDirect(long capacityBytes) {
+    return allocateDirect(capacityBytes, ByteOrder.nativeOrder(), null);
   }
 
   /**
@@ -573,7 +570,12 @@ public interface WritableMemory extends Memory {
       int lengthShorts);
 
   //OTHER WRITE METHODS
-
+  /**
+   * Returns the primitive backing array, otherwise null.
+   * @return the primitive backing array, otherwise null.
+   */
+  byte[] getArray();
+  
   /**
    * Clears all bytes of this Memory to zero
    */

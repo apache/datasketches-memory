@@ -38,7 +38,7 @@ public class BufferTest {
   @Test
   public void checkDirectRoundTrip() throws Exception {
     int n = 1024; //longs
-    try (WritableMemory wmem = WritableMemory.allocateDirect(n * 8, null)) {
+    try (WritableMemory wmem = WritableMemory.allocateDirect(n * 8)) {
       WritableBuffer wbuf = wmem.asWritableBuffer();
       for (int i = 0; i < n; i++) {
         wbuf.putLong(i);
@@ -281,7 +281,7 @@ public class BufferTest {
   @Test(expectedExceptions = IllegalStateException.class)
   public void checkParentUseAfterFree() throws Exception {
     int bytes = 64 * 8;
-    WritableMemory wmem = WritableMemory.allocateDirect(bytes, null);
+    WritableMemory wmem = WritableMemory.allocateDirect(bytes);
     WritableBuffer wbuf = wmem.asWritableBuffer();
     wmem.close();
     wbuf.getLong();
@@ -290,7 +290,7 @@ public class BufferTest {
   @Test(expectedExceptions = IllegalStateException.class)
   public void checkRegionUseAfterFree() throws Exception {
     int bytes = 64;
-    WritableMemory wmem = WritableMemory.allocateDirect(bytes, null);
+    WritableMemory wmem = WritableMemory.allocateDirect(bytes);
 
     Buffer reg = wmem.asBuffer().region();
     wmem.close();

@@ -365,9 +365,10 @@ public abstract class BaseWritableMemoryImpl extends ResourceImpl implements Wri
    * Returns the primitive backing array, otherwise null.
    * @return the primitive backing array, otherwise null.
    */
-  final Object getArray() {
+  @Override
+  public final byte[] getArray() {
     checkValid();
-    return getUnsafeObject();
+    return (byte[])getUnsafeObject();
   }
 
   @Override

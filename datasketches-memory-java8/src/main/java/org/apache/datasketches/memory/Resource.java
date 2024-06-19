@@ -163,6 +163,28 @@ public interface Resource extends AutoCloseable {
   long getCapacity();
 
   /**
+   * Gets the cumulative offset in bytes of this object from the backing resource.
+   * This offset may also include other offset components such as the native off-heap
+   * memory address, DirectByteBuffer split offsets, region offsets, and unsafe arrayBaseOffsets.
+   *
+   * @return the cumulative offset in bytes of this object from the backing resource.
+   */
+  default long getCumulativeOffset() {
+    return getCumulativeOffset(0);
+  }
+
+  /**
+   * Gets the cumulative offset in bytes of this object from the backing resource including the given
+   * offsetBytes. This offset may also include other offset components such as the native off-heap
+   * memory address, DirectByteBuffer split offsets, region offsets, and unsafe arrayBaseOffsets.
+   *
+   * @param offsetBytes offset to be added to the cumulative offset.
+   * @return the cumulative offset in bytes of this object from the backing resource including the
+   * given offsetBytes.
+   */
+  long getCumulativeOffset(long offsetBytes);
+  
+  /**
    * Returns the offset of address zero of this object relative to the base address of the
    * backing resource. This does not include the object header for heap arrays nor the initial
    * offset of a memory-mapped file.

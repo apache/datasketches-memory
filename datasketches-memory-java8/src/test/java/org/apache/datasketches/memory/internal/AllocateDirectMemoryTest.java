@@ -48,27 +48,26 @@ public class AllocateDirectMemoryTest {
   public void checkDefaultMemoryRequestServer()  {
     int longs1 = 32;
     int bytes1 = longs1 << 3;
-    try (WritableMemory origWmem = WritableMemory.allocateDirect(bytes1)) {
-      for (int i = 0; i < longs1; i++) { //puts data in origWmem
-        origWmem.putLong(i << 3, i);
-        assertEquals(origWmem.getLong(i << 3), i);
-      }
-      println(origWmem.toHexString("Test", 0, 32 * 8));
+    WritableMemory origWmem = WritableMemory.allocateDirect(bytes1); 
+    for (int i = 0; i < longs1; i++) { //puts data in origWmem
+      origWmem.putLong(i << 3, i);
+      assertEquals(origWmem.getLong(i << 3), i);
+    }
+    println(origWmem.toHexString("Test", 0, 32 * 8));
 
-      int longs2 = 64;
-      int bytes2 = longs2 << 3;
-      origWmem.setMemoryRequestServer(Resource.defaultMemReqSvr);
-      MemoryRequestServer myMemReqSvr = origWmem.getMemoryRequestServer();
-      
-      WritableMemory newWmem = myMemReqSvr.request(origWmem, bytes2);
-      assertTrue(newWmem.isHeap()); //on heap by default
-      for (int i = 0; i < longs2; i++) {
-          newWmem.putLong(i << 3, i);
-          assertEquals(newWmem.getLong(i << 3), i);
-      }
-      if (origWmem.isCloseable()) {
-        myMemReqSvr.requestClose(origWmem, newWmem);
-      }
+    int longs2 = 64;
+    int bytes2 = longs2 << 3;
+    origWmem.setMemoryRequestServer(Resource.defaultMemReqSvr);
+    MemoryRequestServer myMemReqSvr = origWmem.getMemoryRequestServer();
+    
+    WritableMemory newWmem = myMemReqSvr.request(origWmem, bytes2);
+    assertTrue(newWmem.isHeap()); //on heap by default
+    for (int i = 0; i < longs2; i++) {
+        newWmem.putLong(i << 3, i);
+        assertEquals(newWmem.getLong(i << 3), i);
+    }
+    if (origWmem.isCloseable()) {
+      myMemReqSvr.requestClose(origWmem, newWmem);
     }
   }
 

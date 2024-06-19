@@ -83,9 +83,7 @@ public class DruidIssue11544Test {
     //Move data to new memory
     mem1.copyTo(0, mem2, 0, size1);
 
-    //Prepare to request deallocation
-    //In the DefaultMemoryRequestServer, this is a no-op, so nothing is actually deallocated.
-    svr.requestClose(mem1, mem2);
+    //ByteBuffer and heap resources are not closeable
     assertTrue(mem1.isAlive());
     assertTrue(mem2.isAlive());
 
@@ -100,9 +98,6 @@ public class DruidIssue11544Test {
     //Move data to new memory
     mem2.copyTo(0, mem3, 0, size2);
 
-    //Prepare to request deallocation
-
-    svr.requestClose(mem2, mem3); //No-op
     assertTrue(mem2.isAlive());
     assertTrue(mem3.isAlive());
   }

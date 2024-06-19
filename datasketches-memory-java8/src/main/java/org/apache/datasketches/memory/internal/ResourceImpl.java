@@ -65,7 +65,7 @@ public abstract class ResourceImpl implements Resource {
 
   // 00X0 0000 Group 3 ByteOrder
   static final int NATIVE_BO    = 0; //bit 5 = 0
-  static final int NONNATIVE_BO = 32;//bit 5 
+  static final int NONNATIVE_BO = 32;//bit 5
 
   // 0X00 0000 Group 4
   static final int MEMORY = 0;    //bit 6 = 0
@@ -78,11 +78,6 @@ public abstract class ResourceImpl implements Resource {
    * The java line separator character as a String.
    */
   public static final String LS = System.getProperty("line.separator");
-
-  public static final ByteOrder NATIVE_BYTE_ORDER = ByteOrder.nativeOrder();
-
-  public static final ByteOrder NON_NATIVE_BYTE_ORDER =
-      (NATIVE_BYTE_ORDER == ByteOrder.LITTLE_ENDIAN) ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
 
   static final String NOT_MAPPED_FILE_RESOURCE = "This is not a memory-mapped file resource";
   static final String THREAD_EXCEPTION_TEXT = "Attempted access outside owning thread";
@@ -100,34 +95,34 @@ public abstract class ResourceImpl implements Resource {
   long offsetBytes;
   int typeId;
   Thread owner = null;
-  
+
   /**
    * The root of the Memory inheritance hierarchy
    */
   ResourceImpl() { }
-  
+
   //MemoryRequestServer logic
-  
+
   /**
    * User specified MemoryRequestServer. Set here and by leaf nodes.
    */
   MemoryRequestServer memReqSvr = null;
-  
+
   @Override
-  public MemoryRequestServer getMemoryRequestServer() { 
-    return memReqSvr; 
+  public MemoryRequestServer getMemoryRequestServer() {
+    return memReqSvr;
   }
 
   @Override
   public boolean hasMemoryRequestServer() {
     return memReqSvr != null;
   }
-  
+
   @Override
   public void setMemoryRequestServer(final MemoryRequestServer memReqSvr) { this.memReqSvr = memReqSvr; }
-  
+
   //***
-  
+
   /**
    * Check the requested offset and length against the allocated size.
    * The invariants equation is: {@code 0 <= reqOff <= reqLen <= reqOff + reqLen <= allocSize}.
@@ -171,11 +166,11 @@ public abstract class ResourceImpl implements Resource {
   }
 
   /**
-   * @throws IllegalStateException if this Resource is AutoCloseable, and already closed, i.e., not <em>valid</em>.
+   * @throws IllegalStateException if this Resource is AutoCloseable, and already closed, i.e., not <em>alive</em>.
    */
   void checkValid() {
     if (!isAlive()) {
-      throw new IllegalStateException("this Resource is AutoCloseable, and already closed, i.e., not <em>valid</em>.");
+      throw new IllegalStateException("this Resource is AutoCloseable, and already closed, i.e., not <em>alive</em>.");
     }
   }
 
@@ -223,11 +218,6 @@ public abstract class ResourceImpl implements Resource {
   }
 
   @Override
-  public boolean isCloseable() {
-    return (getTypeId() & (MAP | DIRECT)) > 0;
-  }
-  
-  @Override
   public final boolean equalTo(final long thisOffsetBytes, final Resource that,
       final long thatOffsetBytes, final long lengthBytes) {
     if (that == null) { return false; }
@@ -246,7 +236,7 @@ public abstract class ResourceImpl implements Resource {
 
   @Override
   public final ByteOrder getTypeByteOrder() {
-    return isNativeOrder(getTypeId()) ? NATIVE_BYTE_ORDER : NON_NATIVE_BYTE_ORDER;
+    return isNativeOrder(getTypeId()) ? Util.NATIVE_BYTE_ORDER : Util.NON_NATIVE_BYTE_ORDER;
   }
 
   @Override
@@ -255,16 +245,8 @@ public abstract class ResourceImpl implements Resource {
     return capacityBytes;
   }
 
-  /**
-   * Gets the cumulative offset in bytes of this object from the backing resource including the given
-   * localOffsetBytes. This offset may also include other offset components such as the native off-heap
-   * memory address, DirectByteBuffer split offsets, region offsets, and object arrayBaseOffsets.
-   *
-   * @param addOffsetBytes offset to be added to the cumulative offset.
-   * @return the cumulative offset in bytes of this object from the backing resource including the
-   * given offsetBytes.
-   */
-  long getCumulativeOffset(final long addOffsetBytes) {
+  @Override
+  public long getCumulativeOffset(final long addOffsetBytes) {
     return cumOffsetBytes + addOffsetBytes;
   }
 
@@ -295,10 +277,15 @@ public abstract class ResourceImpl implements Resource {
     return typeBO == ByteOrder.nativeOrder() && typeBO == byteOrder;
   }
 
-  final boolean isBufferApi(final int typeId) {
+  static final boolean isBufferApi(final int typeId) {
     return (typeId & BUFFER) > 0;
   }
 
+  @Override
+  public boolean isCloseable() {
+    return (getTypeId() & (MAP | DIRECT)) > 0 && isAlive();
+  }
+  
   @Override
   public final boolean isDirect() {
     return getUnsafeObject() == null;
@@ -330,7 +317,7 @@ public abstract class ResourceImpl implements Resource {
     return (getTypeId() & BUFFER) == 0;
   }
 
-  final boolean isNativeOrder(final int typeId) { //not used
+  static final boolean isNativeOrder(final int typeId) { //not used
     return (typeId & NONNATIVE_BO) == 0;
   }
 
@@ -392,7 +379,7 @@ public abstract class ResourceImpl implements Resource {
       p0 = Integer.parseInt(parts[0]); //the first number group
       p1 = (parts.length > 1) ? Integer.parseInt(parts[1]) : 0; //2nd number group, or 0
     } catch (final NumberFormatException | ArrayIndexOutOfBoundsException  e) {
-      throw new IllegalArgumentException("Improper Java -version string: " + jdkVer + "\n" + e);
+      throw new IllegalArgumentException("Improper Java -version string: " + jdkVer + LS + e);
     }
     checkJavaVersion(jdkVer, p0, p1);
     return new int[] {p0, p1};

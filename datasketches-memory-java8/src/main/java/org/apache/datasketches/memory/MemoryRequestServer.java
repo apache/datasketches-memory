@@ -28,22 +28,31 @@ package org.apache.datasketches.memory;
 public interface MemoryRequestServer {
 
   /**
-   * Request new WritableMemory with the given capacity. The current Writable Memory will be used to
-   * determine the byte order of the returned WritableMemory and other checks.
+   * Request new WritableMemory with the given newCapacityBytes. The current Writable Memory will be used to
+   * determine the byte order of the returned WritableMemory and other properties.
    * @param currentWritableMemory the current writableMemory of the client. It must be non-null.
-   * @param newCapacityBytes The capacity being requested. It must be &ge; 0.
+   * @param newCapacityBytes The capacity being requested. It must be &gt; the capacity of the currentWritableMemory.
    *
-   * @return new WritableMemory with the given capacity.
+   * @return new WritableMemory with the requested capacity.
    */
   WritableMemory request(WritableMemory currentWritableMemory, long newCapacityBytes);
 
   /**
-   * Request close the AutoCloseable resource. This only applies to resources allocated using
-   * WritableMemory.allocateDirect(...).
-   * This may be ignored depending on the application implementation.
+   * Request to close the resource, if applicable.
+   *
+   * @param memToClose the relevant WritableMemory to be considered for closing. It must be non-null.
+   */
+  default void requestClose(WritableMemory memToClose) {
+    requestClose(memToClose, null);
+  }
+  
+  /**
+   * Request to close the resource, if applicable.
+   * 
    * @param memToClose the relevant WritbleMemory to be considered for closing. It must be non-null.
-   * @param newMemory the newly allocated WritableMemory. It must be non-null.
-   * This is returned from the client to facilitate tracking for the convenience of the resource owner.
+   * @param newMemory the newly allocated WritableMemory. 
+   * The newMemory reference is returned from the client for the convenience of the system that
+   * owns the responsibility of memory allocation. It may be null.
    */
   void requestClose(final WritableMemory memToClose, WritableMemory newMemory);
 

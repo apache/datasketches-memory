@@ -177,7 +177,7 @@ public abstract class BaseWritableMemoryImpl extends ResourceImpl implements Wri
   }
 
   //REGIONS
-  
+
   @Override
   public Memory region(final long regionOffsetBytes, final long capacityBytes, final ByteOrder byteOrder) {
     return writableRegionImpl(regionOffsetBytes, capacityBytes, true, byteOrder);
@@ -206,7 +206,7 @@ public abstract class BaseWritableMemoryImpl extends ResourceImpl implements Wri
       long regionOffsetBytes, long capacityBytes, boolean finalReadOnly, ByteOrder byteOrder);
 
   //AS BUFFER
-  
+
   @Override
   public Buffer asBuffer(final ByteOrder byteOrder) {
     return asWritableBuffer(true, byteOrder);
@@ -232,7 +232,7 @@ public abstract class BaseWritableMemoryImpl extends ResourceImpl implements Wri
   abstract WritableBuffer toWritableBuffer(boolean finalReadOnly, ByteOrder byteOrder);
 
   //PRIMITIVE getX() and getXArray()
-  
+
   @Override
   public final boolean getBoolean(final long offsetBytes) {
     checkValidAndBounds(offsetBytes, ARRAY_BOOLEAN_INDEX_SCALE);
@@ -366,9 +366,9 @@ public abstract class BaseWritableMemoryImpl extends ResourceImpl implements Wri
    * @return the primitive backing array, otherwise null.
    */
   @Override
-  public final byte[] getArray() {
+  public final Object getArray() {
     checkValid();
-    return (byte[])getUnsafeObject();
+    return getUnsafeObject();
   }
 
   @Override

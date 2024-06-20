@@ -574,7 +574,7 @@ public interface WritableMemory extends Memory {
    * Returns the primitive backing array, otherwise null.
    * @return the primitive backing array, otherwise null.
    */
-  byte[] getArray();
+  Object getArray();
   
   /**
    * Clears all bytes of this Memory to zero

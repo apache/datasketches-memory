@@ -26,33 +26,53 @@ import jdk.incubator.foreign.MemorySegment;
 import jdk.incubator.foreign.ResourceScope;
 
 /**
- * The base class for Memory and Buffer plus some common static variables
- * and check methods.
+ * The base class for Memory and Buffer plus some common static variables and check methods.
  *
  * @author Lee Rhodes
  */
 public interface Resource extends AutoCloseable {
 
-  /**
-   * The java line separator character as a String.
-   */
-  static final String LS = System.getProperty("line.separator");
+  //MemoryRequestServer logic
 
   /**
-   * The static final for <i>ByteOrder.nativeOrder()</i>.
-   */
-  static final ByteOrder NATIVE_BYTE_ORDER = ByteOrder.nativeOrder();
-
-  /**
-   * The static final for NON <i>ByteOrder.nativeOrder()</i>.
-   */
-  static final ByteOrder NON_NATIVE_BYTE_ORDER =
-      (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
-
-  /**
-   * The default MemoryRequestServer is used if not specified by the user.
+   * The default MemoryRequestServer used primarily by test.
    */
   static final MemoryRequestServer defaultMemReqSvr = new DefaultMemoryRequestServer();
+
+  /**
+   * Gets the {@link MemoryRequestServer} to request additional memory
+   * for writable resources that are not file-memory-mapped.
+   * Read-only, file-memory-mapped resources will return null.
+   *
+   * <p>The user can customize the actions of the MemoryRequestServer by
+   * implementing the MemoryRequestServer interface and set it using the
+   * {@link #setMemoryRequestServer(MemoryRequestServer)} method or optionally with the
+   * {@link WritableMemory#allocateDirect(long, long, ByteOrder, MemoryRequestServer)} method.</p>
+   *
+   * <p>If the MemoryRequestServer is not set by the user and additional memory is needed by the sketch,
+   * null will be returned and the sketch will abort.
+   * Simple implementation examples include the DefaultMemoryRequestServer in the main tree, as well as
+   * the ExampleMemoryRequestServerTest and the use with ByteBuffer documented in the DruidIssue11544Test
+   * in the test tree.</p>
+   *
+   * @return a MemoryRequestServer object or null.
+   */
+  MemoryRequestServer getMemoryRequestServer();
+
+  /**
+   * Returns true if the MemoryRequestServer has been configured by the user.
+   * @return true if the MemoryRequestServer has been configured by the user..
+   */
+  boolean hasMemoryRequestServer();
+
+  /**
+   * Sets the MemoryRequestServer to be used in case of capacity overflow of on-heap or off-heap
+   * allocated Memory.
+   * @param memReqSvr the given MemoryRequestServer
+   */
+  void setMemoryRequestServer(MemoryRequestServer memReqSvr);
+
+  //***
 
   /**
    * Returns a ByteBuffer view of this Memory object with the given ByteOrder.
@@ -71,14 +91,33 @@ public interface Resource extends AutoCloseable {
   ByteBuffer asByteBufferView(ByteOrder order);
 
   /**
-   * This will close the backing MemorySegment if and only if the segment is not-null, native (off-heap),
-   * and its scope is alive and not implicit. Otherwise, it does nothing.
+   * <i>From Java 17 ResourceScope::close():</i>
    *
-   * <p>This is intentionally idempotent.
-   * <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/ResourceScope.html#close()">ResourceScope.close()</a> is not.</p>
+   * <p>Closes this resource scope. As a side-effect, if this operation completes without exceptions, this scope will be marked
+   * as <em>not alive</em>, and subsequent operations on resources associated with this scope will fail with {@link IllegalStateException}.
+   * Additionally, upon successful closure, all direct (native) resources associated with this resource scope will be released.</p>
+   *
+   * @apiNote This operation is not idempotent; that is, closing an already closed resource scope <em>always</em> results in an
+   * exception being thrown. This reflects a deliberate design choice: resource scope state transitions should be
+   * manifest in the client code; a failure in any of these transitions reveals a bug in the underlying application
+   * logic.
+   *
+   * @throws IllegalStateException if one of the following condition is met:
+   * <ul>
+   *     <li>this resource scope is not <em>alive</em>
+   *     <li>this resource scope is confined, and this method is called from a thread other than the thread owning this resource scope</li>
+   *     <li>this resource scope is shared and a resource associated with this scope is accessed while this method is called</li>
+   * </ul>
+   * @throws UnsupportedOperationException if this resource scope is <em>implicit</em>}.
    */
   @Override
   void close();
+
+  /**
+   * Return true if this resource is closeable.
+   * @return true if this resource is closeable.
+   */
+  boolean isCloseable();
 
   /**
    * Returns true if the given object is an instance of this class and has equal contents to
@@ -86,12 +125,14 @@ public interface Resource extends AutoCloseable {
    * @param that the given Resource object
    * @return true if the given object has equal contents to this object.
    */
-  boolean equalTo(Resource that);
+  default boolean equalTo(Resource that) {
+    if (that == null || this.getCapacity() != that.getCapacity()) { return false; }
+    return equalTo(0, that, 0, that.getCapacity());
+  }
 
   /**
    * Returns true if the given object is an instance of this class and has equal contents to
-   * this object in the given range of bytes. This will also check two distinct ranges within the
-   * same object for equals.
+   * this object in the given range of bytes. This will also check two distinct ranges within the same object for equals.
    * @param thisOffsetBytes the starting offset in bytes for this object.
    * @param that the given Resource object
    * @param thatOffsetBytes the starting offset in bytes for the given object
@@ -99,8 +140,7 @@ public interface Resource extends AutoCloseable {
    * @return true if the given object has equal contents to this object in the given range of
    * bytes.
    */
-  boolean equalTo(long thisOffsetBytes, Resource that,
-      long thatOffsetBytes, long lengthBytes);
+  boolean equalTo(long thisOffsetBytes, Resource that, long thatOffsetBytes, long lengthBytes);
 
   /**
    * Forces any changes made to the contents of this mapped segment to be written to the storage device described
@@ -116,6 +156,12 @@ public interface Resource extends AutoCloseable {
   long getCapacity();
 
   /**
+   * Return the owner thread of the underlying ResourceScope, or null.
+   * @return the owner thread of the underlying ResourceScope, or null.
+   */
+  Thread getOwnerThread();
+
+  /**
    * Gets the relative base offset of <i>this</i> with respect to <i>that</i>, defined as: <i>this</i> - <i>that</i>.
    * This method is only valid for <i>native</i> (off-heap) allocated resources.
    * @param that the given resource.
@@ -125,26 +171,6 @@ public interface Resource extends AutoCloseable {
   long getRelativeOffset(Resource that);
 
   /**
-   * Gets the {@link MemoryRequestServer} to request additional memory
-   * for writable resources that are not file-memory-mapped nor ByteBuffer backed.
-   * Read-only, file-memory-mapped and ByteBuffer backed resources will return null.
-   *
-   * <p>The user can customize the actions of the MemoryRequestServer by
-   * implementing the MemoryRequestServer interface and set it using the
-   * {@link #setMemoryRequestServer(MemoryRequestServer)} method or optionally with the
-   * {@link WritableMemory#allocateDirect(long, long, ByteOrder, MemoryRequestServer)} method.</p>
-   *
-   * <p>If the MemoryRequestServer is not set by the user and additional memory is needed by the sketch,
-   * the {@link DefaultMemoryRequestServer DefaultMemoryRequestServer} will be used.
-   * Simple implementation examples include the DefaultMemoryRequestServer in the main tree, as well as
-   * the ExampleMemoryRequestServerTest and the use with ByteBuffer documented in the DruidIssue11544Test
-   * in the test tree.</p>
-   *
-   * @return a MemoryRequestServer object or null.
-   */
-  MemoryRequestServer getMemoryRequestServer();
-
-  /**
    * Gets the current Type ByteOrder.
    * This may be different from the ByteOrder of the backing resource and of the Native Byte Order.
    * @return the current Type ByteOrder.
@@ -152,22 +178,10 @@ public interface Resource extends AutoCloseable {
   ByteOrder getTypeByteOrder();
 
   /**
-   * Return the owner thread of the underlying ResourceScope, or null.
-   * @return the owner thread of the underlying ResourceScope, or null.
-   */
-  Thread getOwnerThread();
-
-  /**
    * Returns true if this Memory is backed by a ByteBuffer.
    * @return true if this Memory is backed by a ByteBuffer.
    */
   boolean hasByteBuffer();
-
-  /**
-   * Returns true if the MemoryRequestServer has been configured by the user.
-   * @return true if the MemoryRequestServer has been configured by the user..
-   */
-  boolean hasMemoryRequestServer();
 
   /**
    * Is the underlying resource scope alive?
@@ -280,13 +294,6 @@ public interface Resource extends AutoCloseable {
    * @return the resource scope associated with this memory segment.
    */
   ResourceScope scope();
-
-  /**
-   * Sets the MemoryRequestServer to be used in case of capacity overflow of on-heap or off-heap
-   * allocated Memory.
-   * @param memReqSvr the given MemoryRequestServer
-   */
-  void setMemoryRequestServer(MemoryRequestServer memReqSvr);
 
   /**
    * Returns a new ByteBuffer with a copy of the data from this Memory object.

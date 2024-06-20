@@ -19,6 +19,7 @@
 
 package org.apache.datasketches.memory.internal;
 
+import static org.apache.datasketches.memory.internal.ResourceImpl.NON_NATIVE_BYTE_ORDER;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -29,7 +30,7 @@ import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
 public class AllocateDirectMemoryTest {
-  private static final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
+  //private static final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
 
   @SuppressWarnings("resource")
   @Test
@@ -53,29 +54,33 @@ public class AllocateDirectMemoryTest {
   public void checkDefaultMemoryRequestServer() {
     int longs1 = 32;
     int bytes1 = longs1 << 3;
-    try (WritableMemory wmem = WritableMemory.allocateDirect(bytes1)) {
+    try (WritableMemory origWmem = WritableMemory.allocateDirect(bytes1)) {
       for (int i = 0; i < longs1; i++) { //puts data in origWmem
-        wmem.putLong(i << 3, i);
-        assertEquals(wmem.getLong(i << 3), i);
+        origWmem.putLong(i << 3, i);
+        assertEquals(origWmem.getLong(i << 3), i);
       }
-      println(wmem.toHexString("Test", 0, 32 * 8, true));
+      println(origWmem.toHexString("Test", 0, 32 * 8, true));
 
       int longs2 = 64;
       int bytes2 = longs2 << 3;
-      WritableMemory newWmem = memReqSvr.request(wmem, bytes2); //on the heap
-      assertFalse(newWmem.isDirect()); //on heap by default
+      origWmem.setMemoryRequestServer(Resource.defaultMemReqSvr);
+      MemoryRequestServer myMemReqSvr = origWmem.getMemoryRequestServer();
+
+      WritableMemory newWmem = myMemReqSvr.request(origWmem, bytes2);
+      assertTrue(newWmem.isHeap()); //on heap by default
       for (int i = 0; i < longs2; i++) {
           newWmem.putLong(i << 3, i);
           assertEquals(newWmem.getLong(i << 3), i);
       }
-      //memReqSvr.requestClose(wmem, newWmem); //no need to close
-    } // So we let the TWR close it here
+      //allow the TWR to close the direct origWmem
+    }
   }
 
   @SuppressWarnings("resource")
   @Test
   public void checkNonNativeDirect() {
-    try (WritableMemory wmem = WritableMemory.allocateDirect(128, 8, Resource.NON_NATIVE_BYTE_ORDER, memReqSvr)) {
+    MemoryRequestServer myMemReqSvr = Resource.defaultMemReqSvr;
+    try (WritableMemory wmem = WritableMemory.allocateDirect(128, 8, NON_NATIVE_BYTE_ORDER, myMemReqSvr)) {
       wmem.putChar(0, (char) 1);
       assertEquals(wmem.getByte(1), (byte) 1);
     }

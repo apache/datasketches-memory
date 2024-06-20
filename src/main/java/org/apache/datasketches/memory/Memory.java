@@ -124,7 +124,7 @@ public interface Memory extends Resource {
       throws IOException {
     return WritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, true, byteOrder);
   }
-  
+
   //NO ALLOCATE DIRECT, makes no sense
 
   //REGIONS
@@ -226,7 +226,7 @@ public interface Memory extends Resource {
     return WritableMemoryImpl.wrapSegmentAsArray(slice, byteOrder, null);
   }
 
-  //Missing wrap(boolean[])
+  //intentionally removed wrap(boolean[])
 
   /**
    * Wraps the given primitive array for read operations assuming native byte order.
@@ -298,7 +298,7 @@ public interface Memory extends Resource {
    */
   boolean getBoolean(long offsetBytes);
 
-  //Missing getBooleanArray(...)
+  //intentionally removed getBooleanArray(...)
 
   /**
    * Gets the byte value at the given offset

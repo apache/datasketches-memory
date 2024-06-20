@@ -45,7 +45,8 @@ public final class DefaultMemoryRequestServer implements MemoryRequestServer {
   /**
    * Constructor with parameters
    * @param offHeap if true, the returned new memory will be off heap
-   * @param copyOldToNew if true, the data from the current memory will be copied to the new memory.
+   * @param copyOldToNew if true, the data from the current memory will be copied to the new memory,
+   * starting at address 0, and through the currentMemory capacity.
    */
   public DefaultMemoryRequestServer(final boolean offHeap, final boolean copyOldToNew) {
     this.offHeap = offHeap;
@@ -64,7 +65,8 @@ public final class DefaultMemoryRequestServer implements MemoryRequestServer {
 
     if (offHeap) {
       newWmem = WritableMemory.allocateDirect(newCapacityBytes, 8, scope, order, this);
-    } else {
+    }
+    else { //On-heap
       if (newCapacityBytes > Integer.MAX_VALUE) {
         throw new IllegalArgumentException("Requested capacity exceeds Integer.MAX_VALUE.");
       }

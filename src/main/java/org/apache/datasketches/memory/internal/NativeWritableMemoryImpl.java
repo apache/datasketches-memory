@@ -44,7 +44,7 @@ import jdk.incubator.foreign.MemorySegment;
  */
 final class NativeWritableMemoryImpl extends WritableMemoryImpl {
 
-  //Pass-through ctor
+  //Pass-through constructor
   NativeWritableMemoryImpl(
       final MemorySegment seg,
       final int typeId,
@@ -59,8 +59,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
   }
 
   @Override
-  public void getCharArray(final long offsetBytes, final char[] dstArray, final int dstOffsetChars,
-      final int lengthChars) {
+  public void getCharArray(final long offsetBytes, final char[] dstArray, final int dstOffsetChars, final int lengthChars) {
     final long copyBytes = ((long) lengthChars) << CHAR_SHIFT;
     final MemorySegment srcSlice = seg.asSlice(offsetBytes, copyBytes);
     final MemorySegment dstSlice = MemorySegment.ofArray(dstArray).asSlice(dstOffsetChars << CHAR_SHIFT, copyBytes);
@@ -73,8 +72,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
   }
 
   @Override
-  public void getDoubleArray(final long offsetBytes, final double[] dstArray,
-      final int dstOffsetDoubles, final int lengthDoubles) {
+  public void getDoubleArray(final long offsetBytes, final double[] dstArray, final int dstOffsetDoubles, final int lengthDoubles) {
     final long copyBytes = ((long) lengthDoubles) << DOUBLE_SHIFT;
     final MemorySegment srcSlice = seg.asSlice(offsetBytes, copyBytes);
     final MemorySegment dstSlice = MemorySegment.ofArray(dstArray).asSlice(dstOffsetDoubles << DOUBLE_SHIFT, copyBytes);
@@ -87,8 +85,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
   }
 
   @Override
-  public void getFloatArray(final long offsetBytes, final float[] dstArray,
-      final int dstOffsetFloats, final int lengthFloats) {
+  public void getFloatArray(final long offsetBytes, final float[] dstArray, final int dstOffsetFloats, final int lengthFloats) {
     final long copyBytes = ((long) lengthFloats) << FLOAT_SHIFT;
     final MemorySegment srcSlice = seg.asSlice(offsetBytes, copyBytes);
     final MemorySegment dstSlice = MemorySegment.ofArray(dstArray).asSlice(dstOffsetFloats << FLOAT_SHIFT, copyBytes);
@@ -101,8 +98,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
   }
 
   @Override
-  public void getIntArray(final long offsetBytes, final int[] dstArray, final int dstOffsetInts,
-      final int lengthInts) {
+  public void getIntArray(final long offsetBytes, final int[] dstArray, final int dstOffsetInts, final int lengthInts) {
     final long copyBytes = ((long) lengthInts) << INT_SHIFT;
     final MemorySegment srcSlice = seg.asSlice(offsetBytes, copyBytes);
     final MemorySegment dstSlice = MemorySegment.ofArray(dstArray).asSlice(dstOffsetInts << INT_SHIFT, copyBytes);
@@ -115,8 +111,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
   }
 
   @Override
-  public void getLongArray(final long offsetBytes, final long[] dstArray,
-      final int dstOffsetLongs, final int lengthLongs) {
+  public void getLongArray(final long offsetBytes, final long[] dstArray, final int dstOffsetLongs, final int lengthLongs) {
     final long copyBytes = ((long) lengthLongs) << LONG_SHIFT;
     final MemorySegment srcSlice = seg.asSlice(offsetBytes, copyBytes);
     final MemorySegment dstSlice = MemorySegment.ofArray(dstArray).asSlice(dstOffsetLongs << LONG_SHIFT, copyBytes);
@@ -129,8 +124,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
   }
 
   @Override
-  public void getShortArray(final long offsetBytes, final short[] dstArray,
-      final int dstOffsetShorts, final int lengthShorts) {
+  public void getShortArray(final long offsetBytes, final short[] dstArray, final int dstOffsetShorts, final int lengthShorts) {
     final long copyBytes = ((long) lengthShorts) << SHORT_SHIFT;
     final MemorySegment srcSlice = seg.asSlice(offsetBytes, copyBytes);
     final MemorySegment dstSlice = MemorySegment.ofArray(dstArray).asSlice(dstOffsetShorts << SHORT_SHIFT, copyBytes);
@@ -144,8 +138,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
   }
 
   @Override
-  public void putCharArray(final long offsetBytes, final char[] srcArray,
-      final int srcOffsetChars, final int lengthChars) {
+  public void putCharArray(final long offsetBytes, final char[] srcArray, final int srcOffsetChars, final int lengthChars) {
     final long copyBytes = ((long) lengthChars) << CHAR_SHIFT;
     final MemorySegment srcSlice = MemorySegment.ofArray(srcArray).asSlice(srcOffsetChars << CHAR_SHIFT, copyBytes);
     final MemorySegment dstSlice = seg.asSlice(offsetBytes, copyBytes);
@@ -158,8 +151,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
   }
 
   @Override
-  public void putDoubleArray(final long offsetBytes, final double[] srcArray,
-      final int srcOffsetDoubles, final int lengthDoubles) {
+  public void putDoubleArray(final long offsetBytes, final double[] srcArray, final int srcOffsetDoubles, final int lengthDoubles) {
     final long copyBytes = ((long) lengthDoubles) << DOUBLE_SHIFT;
     final MemorySegment srcSlice = MemorySegment.ofArray(srcArray).asSlice(srcOffsetDoubles << DOUBLE_SHIFT, copyBytes);
     final MemorySegment dstSlice = seg.asSlice(offsetBytes, copyBytes);
@@ -172,8 +164,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
   }
 
   @Override
-  public void putFloatArray(final long offsetBytes, final float[] srcArray,
-      final int srcOffsetFloats, final int lengthFloats) {
+  public void putFloatArray(final long offsetBytes, final float[] srcArray, final int srcOffsetFloats, final int lengthFloats) {
     final long copyBytes = ((long) lengthFloats) << FLOAT_SHIFT;
     final MemorySegment srcSlice = MemorySegment.ofArray(srcArray).asSlice(srcOffsetFloats << FLOAT_SHIFT, copyBytes);
     final MemorySegment dstSlice = seg.asSlice(offsetBytes, copyBytes);
@@ -186,8 +177,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
   }
 
   @Override
-  public void putIntArray(final long offsetBytes, final int[] srcArray, final int srcOffsetInts,
-      final int lengthInts) {
+  public void putIntArray(final long offsetBytes, final int[] srcArray, final int srcOffsetInts, final int lengthInts) {
     final long copyBytes = ((long) lengthInts) << INT_SHIFT;
     final MemorySegment srcSlice = MemorySegment.ofArray(srcArray).asSlice(srcOffsetInts << INT_SHIFT, copyBytes);
     final MemorySegment dstSlice = seg.asSlice(offsetBytes, copyBytes);
@@ -200,8 +190,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
   }
 
   @Override
-  public void putLongArray(final long offsetBytes, final long[] srcArray, final int srcOffsetLongs,
-      final int lengthLongs) {
+  public void putLongArray(final long offsetBytes, final long[] srcArray, final int srcOffsetLongs, final int lengthLongs) {
     final long copyBytes = ((long) lengthLongs) << LONG_SHIFT;
     final MemorySegment srcSlice = MemorySegment.ofArray(srcArray).asSlice(srcOffsetLongs << LONG_SHIFT, copyBytes);
     final MemorySegment dstSlice = seg.asSlice(offsetBytes, copyBytes);
@@ -214,8 +203,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
   }
 
   @Override
-  public void putShortArray(final long offsetBytes, final short[] srcArray,
-      final int srcOffsetShorts, final int lengthShorts) {
+  public void putShortArray(final long offsetBytes, final short[] srcArray, final int srcOffsetShorts, final int lengthShorts) {
     final long copyBytes = ((long) lengthShorts) << SHORT_SHIFT;
     final MemorySegment srcSlice = MemorySegment.ofArray(srcArray).asSlice(srcOffsetShorts << SHORT_SHIFT, copyBytes);
     final MemorySegment dstSlice = seg.asSlice(offsetBytes, copyBytes);

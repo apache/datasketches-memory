@@ -99,7 +99,7 @@ public abstract class WritableBufferImpl extends PositionalImpl implements Writa
         | (seg.isMapped() ? MAP : 0);
     final WritableBuffer wbuf;
     if (byteOrder == NON_NATIVE_BYTE_ORDER) {
-      type |= NONNATIVE;
+      type |= NONNATIVE_BO;
       wbuf = new NonNativeWritableBufferImpl(seg, type, memReqSvr);
     } else {
       wbuf = new NativeWritableBufferImpl(seg, type, memReqSvr);
@@ -147,7 +147,7 @@ public abstract class WritableBufferImpl extends PositionalImpl implements Writa
         | (duplicateType ? DUPLICATE : 0)
         | (mapType ? MAP : 0)
         | (directType ? DIRECT : 0)
-        | (nativeBOType ? NATIVE : NONNATIVE)
+        | (nativeBOType ? NATIVE_BO : NONNATIVE_BO)
         | (byteBufferType ? BYTEBUF : 0);
 
     final WritableBuffer wbuf = selectBuffer(slice, type, memReqSvr, byteBufferType, mapType, nativeBOType);
@@ -196,7 +196,7 @@ public abstract class WritableBufferImpl extends PositionalImpl implements Writa
         | (regionType ? REGION : 0)
         | (mapType ? MAP : 0)
         | (directType ? DIRECT : 0)
-        | (nativeBOType ? NATIVE : NONNATIVE)
+        | (nativeBOType ? NATIVE_BO : NONNATIVE_BO)
         | (byteBufferType ? BYTEBUF : 0);
 
     final WritableBuffer wbuf = selectBuffer(seg2, type, memReqSvr, byteBufferType, mapType, nativeBOType);
@@ -237,7 +237,7 @@ public abstract class WritableBufferImpl extends PositionalImpl implements Writa
         | (duplicateType ? DUPLICATE : 0)
         | (mapType ? MAP : 0)
         | (directType ? DIRECT : 0)
-        | (nativeBOType ? NATIVE : NONNATIVE)
+        | (nativeBOType ? NATIVE_BO : NONNATIVE_BO)
         | (byteBufferType ? BYTEBUF : 0);
 
     final WritableMemory wmem = selectMemory(seg2, type, memReqSvr, byteBufferType, mapType, nativeBOType);
@@ -270,8 +270,7 @@ public abstract class WritableBufferImpl extends PositionalImpl implements Writa
   }
 
   @Override
-  public final void getByteArray(final byte[] dstArray, final int dstOffsetBytes,
-      final int lengthBytes) {
+  public final void getByteArray(final byte[] dstArray, final int dstOffsetBytes, final int lengthBytes) {
     final MemorySegment dstSlice = MemorySegment.ofArray(dstArray).asSlice(dstOffsetBytes, lengthBytes);
     final long pos = getPosition();
     final MemorySegment srcSlice = seg.asSlice(pos, lengthBytes);
@@ -318,8 +317,7 @@ public abstract class WritableBufferImpl extends PositionalImpl implements Writa
   }
 
   @Override
-  public final void putByteArray(final byte[] srcArray, final int srcOffsetBytes,
-      final int lengthBytes) {
+  public final void putByteArray(final byte[] srcArray, final int srcOffsetBytes, final int lengthBytes) {
     final MemorySegment srcSlice = MemorySegment.ofArray(srcArray).asSlice(srcOffsetBytes, lengthBytes);
     final long pos = getPosition();
     final MemorySegment dstSlice = seg.asSlice(pos, lengthBytes);
@@ -338,7 +336,7 @@ public abstract class WritableBufferImpl extends PositionalImpl implements Writa
   public final void fill(final byte value) {
     seg.fill(value);
   }
-  
+
   @Override
   public final byte[] getArray() {
     return seg.toByteArray();

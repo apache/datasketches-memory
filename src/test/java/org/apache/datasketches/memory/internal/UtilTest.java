@@ -23,6 +23,7 @@
 
 package org.apache.datasketches.memory.internal;
 
+import static org.apache.datasketches.memory.internal.ResourceImpl.LS;
 import static org.apache.datasketches.memory.internal.Util.getResourceBytes;
 import static org.apache.datasketches.memory.internal.Util.getResourceFile;
 import static org.testng.Assert.assertTrue;
@@ -38,8 +39,6 @@ import java.nio.file.attribute.PosixFilePermissions;
 import org.testng.annotations.Test;
 
 public class UtilTest {
-  private static final String LS = System.getProperty("line.separator");
-
 
   static final String getFileAttributes(File file) throws IOException {
     PosixFileAttributes attrs = Files.getFileAttributeView(

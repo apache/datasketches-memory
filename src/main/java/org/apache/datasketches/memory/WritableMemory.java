@@ -381,6 +381,8 @@ public interface WritableMemory extends Memory {
     return WritableMemoryImpl.wrapSegmentAsArray(slice, byteOrder, memReqSvr);
   }
 
+  //intentionally removed writableWrap(boolean[])
+
   /**
    * Wraps the given primitive array for write operations assuming native byte order.
    * @param array the given primitive array. It must be non-null.
@@ -452,6 +454,8 @@ public interface WritableMemory extends Memory {
   void putBoolean(
       long offsetBytes,
       boolean value);
+
+  //intentionally removed putBooleanArray(...)
 
   /**
    * Puts the byte value at the given offset

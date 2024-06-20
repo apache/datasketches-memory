@@ -19,6 +19,9 @@
 
 package org.apache.datasketches.memory.internal;
 
+import static java.util.Arrays.fill;
+import static org.apache.datasketches.memory.internal.ResourceImpl.LS;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -33,9 +36,40 @@ import java.util.Objects;
  */
 //@SuppressWarnings("javadoc")
 final class Util {
-  static final String LS = System.getProperty("line.separator");
 
   private Util() { }
+
+  /**
+   * Prepend the given string with zeros. If the given string is equal or greater than the given
+   * field length, it will be returned without modification.
+   * @param s the given string
+   * @param fieldLength desired total field length including the given string
+   * @return the given string prepended with zeros.
+   */
+  public static final String zeroPad(final String s, final int fieldLength) {
+    return characterPad(s, fieldLength, '0', false);
+  }
+
+  /**
+   * Prepend or postpend the given string with the given character to fill the given field length.
+   * If the given string is equal or greater than the given field length, it will be returned
+   * without modification.
+   * @param s the given string
+   * @param fieldLength the desired field length
+   * @param padChar the desired pad character
+   * @param postpend if true append the pacCharacters to the end of the string.
+   * @return prepended or postpended given string with the given character to fill the given field length.
+   */
+  public static final String characterPad(final String s, final int fieldLength, final char padChar, final boolean postpend) {
+    final int sLen = s.length();
+    if (sLen < fieldLength) {
+      final char[] cArr = new char[fieldLength - sLen];
+      fill(cArr, padChar);
+      final String addstr = String.valueOf(cArr);
+      return (postpend) ? s.concat(addstr) : addstr.concat(s);
+    }
+    return s;
+  }
 
   /**
    * Return true if all the masked bits of value are zero

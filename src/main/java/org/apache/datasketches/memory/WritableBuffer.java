@@ -191,7 +191,7 @@ public interface WritableBuffer extends Buffer {
    */
   void putBoolean(long offsetBytes, boolean value);
 
-  //Missing putBooleanArray(...)
+  //intentionally removed putBooleanArray(...)
 
   /**
    * Puts the byte value at the current position.
@@ -384,7 +384,7 @@ public interface WritableBuffer extends Buffer {
    * @return a copy of the primitive backing byte array.
    */
   byte[] getArray();
-  
+
   //NO fill(offsetBytes, lengthBytes, value)
 
   //NO setBits(...)

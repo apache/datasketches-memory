@@ -20,6 +20,7 @@
 package org.apache.datasketches.memory.internal;
 
 import static jdk.incubator.foreign.MemoryAccess.getByteAtOffset;
+import static org.apache.datasketches.memory.internal.Util.characterPad;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -34,15 +35,15 @@ import jdk.incubator.foreign.MemorySegment;
 import jdk.incubator.foreign.ResourceScope;
 
 /**
- * Base implementation class for MemoryImpl and BufferImpl plus some common static variables
- * and check methods.
+ * Implements the root Resource methods plus some common static variables and check methods.
  *
  * @author Lee Rhodes
  */
 abstract class ResourceImpl implements Resource {
   static final String JDK; //must be at least "17"
-  static final int JDK_MAJOR; //8, 11, 12, etc
+  static final int JDK_MAJOR; //8, 11, 17, etc
 
+  //Used to convert "type" to bytes:  bytes = longs << LONG_SHIFT
   static final int BOOLEAN_SHIFT    = 0;
   static final int BYTE_SHIFT       = 0;
   static final long SHORT_SHIFT     = 1;
@@ -52,27 +53,45 @@ abstract class ResourceImpl implements Resource {
   static final long FLOAT_SHIFT     = 2;
   static final long DOUBLE_SHIFT    = 3;
 
-  //class type IDs.
-  // 0000 0XXX
+  //class type IDs. Do not change the bit orders
+  //The lowest 3 bits are set dynamically
+  // 0000 0XXX Group 1
+  static final int WRITABLE  = 0; //bit 0 = 0
   static final int READONLY  = 1; //bit 0
   static final int REGION    = 2; //bit 1
   static final int DUPLICATE = 4; //bit 2, for Buffer only
 
-  // 000X X000
-  static final int HEAP   = 0;
+  // 000X X000 Group 2
+  static final int HEAP   = 0;    //bits 3,4 = 0
   static final int DIRECT = 8;    //bit 3
-  static final int MAP    = 16;   //bit 4, Map is always Direct also, -> 24
+  static final int MAP    = 16;   //bit 4, Map is effectively Direct
 
-  // 00X0 0000 ByteOrder
-  static final int NATIVE    = 0;
-  static final int NONNATIVE = 32;//bit 5
+  // 00X0 0000 Group 3 ByteOrder
+  static final int NATIVE_BO    = 0; //bit 5 = 0
+  static final int NONNATIVE_BO = 32;//bit 5
 
-  // 0X00 0000
-  static final int MEMORY = 0;
+  // 0X00 0000 Group 4
+  static final int MEMORY  = 0;   //bit 6 = 0
    static final int BUFFER = 64;  //bit 6
 
-  // X000 0000
-  static final int BYTEBUF = 128; //bit 7
+  // X000 0000 Group 5
+  static final int BYTEBUF = 128; //bit 7,
+
+  /**
+   * The java line separator character as a String.
+   */
+  static final String LS = System.getProperty("line.separator");
+
+  /**
+   * The static final for <i>ByteOrder.nativeOrder()</i>.
+   */
+  static final ByteOrder NATIVE_BYTE_ORDER = ByteOrder.nativeOrder();
+
+  /**
+   * The static final for NON <i>ByteOrder.nativeOrder()</i>.
+   */
+  static final ByteOrder NON_NATIVE_BYTE_ORDER =
+      (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
 
   static {
     final String jdkVer = System.getProperty("java.version");
@@ -84,13 +103,43 @@ abstract class ResourceImpl implements Resource {
   final MemorySegment seg;
   final int typeId;
 
-  MemoryRequestServer memReqSvr = null;
-
+  /**
+   * Root constructor.
+   * @param seg the given, one and only one MemorySegment
+   * @param typeId the given typeId
+   * @param memReqSvr the given MemoryRequestServer, or null.
+   */
   ResourceImpl(final MemorySegment seg, final int typeId, final MemoryRequestServer memReqSvr) {
     this.seg = seg;
     this.typeId = typeId;
     this.memReqSvr = memReqSvr;
   }
+
+  //MemoryReqestServer logic
+
+  /**
+   * User specified MemoryRequestServer. Set here and by leaf nodes.
+   */
+  MemoryRequestServer memReqSvr = null;
+
+  @Override
+  public MemoryRequestServer getMemoryRequestServer() {
+    final int mask = READONLY | MAP ;
+    final int test = 0; //!READONLY & !MAP
+    return (typeId & mask) != test ? null : memReqSvr;
+  }
+
+  @Override
+  public boolean hasMemoryRequestServer() {
+    return memReqSvr != null;
+  }
+
+  @Override
+  public void setMemoryRequestServer(final MemoryRequestServer memReqSvr) {
+    this.memReqSvr = memReqSvr;
+  }
+
+  //***
 
   /**
    * Check the requested offset and length against the allocated size.
@@ -114,6 +163,10 @@ abstract class ResourceImpl implements Resource {
       throw new IllegalArgumentException(
           "Unsupported JDK Major Version, must be 17; " + jdkVer);
     }
+  }
+
+  private static String pad(final String s, final int fieldLen) {
+    return characterPad(s, fieldLen, ' ' , true);
   }
 
   /**
@@ -144,7 +197,7 @@ abstract class ResourceImpl implements Resource {
   static final String typeDecode(final int typeId) {
     final StringBuilder sb = new StringBuilder();
     final int group1 = typeId & 0x7;
-    switch (group1) {
+    switch (group1) { // 0000 0XXX
       case 0 : sb.append("Writable:\t"); break;
       case 1 : sb.append("ReadOnly:\t"); break;
       case 2 : sb.append("Writable:\tRegion:\t"); break;
@@ -156,7 +209,7 @@ abstract class ResourceImpl implements Resource {
       default: break;
     }
     final int group2 = (typeId >>> 3) & 0x3;
-    switch (group2) {
+    switch (group2) { // 000X X000
       case 0 : sb.append("Heap:\t"); break;
       case 1 : sb.append("Direct:\t"); break;
       case 2 : sb.append("Map:\t"); break;
@@ -166,17 +219,24 @@ abstract class ResourceImpl implements Resource {
     if ((typeId & BYTEBUF) > 0) { sb.append("ByteBuffer:\t"); }
 
     final int group3 = (typeId >>> 5) & 0x1;
-    switch (group3) {
+    switch (group3) { // 00X0 0000
       case 0 : sb.append("NativeOrder:\t"); break;
       case 1 : sb.append("NonNativeOrder:\t"); break;
       default: break;
     }
     final int group4 = (typeId >>> 6) & 0x1;
-    switch (group4) {
+    switch (group4) { // 0X00 0000
       case 0 : sb.append("Memory"); break;
       case 1 : sb.append("Buffer"); break;
       default: break;
     }
+    final int group5 = (typeId >>> 7) & 0x1;
+    switch (group5) { // X000 0000
+      case 0 : sb.append(pad("",10)); break;
+      case 1 : sb.append(pad("ByteBuffer",10)); break;
+      default: break;
+    }
+
     return sb.toString();
   }
 
@@ -273,24 +333,14 @@ abstract class ResourceImpl implements Resource {
 
   @Override
   public void close() {
-    Objects.requireNonNull(seg, "MemorySegment must not be null.");
-    final ResourceScope scope = seg.scope();
-    if ((seg.isNative() || seg.isMapped()) && scope.isAlive() && !scope.isImplicit()) {
-      scope.close();
-    }
-  }
-
-  @Override
-  public final boolean equalTo(final Resource that) {
-    Objects.requireNonNull(that);
-    return equalTo(0, that, 0, that.getCapacity());
+    seg.scope().close(); //not idempotent
   }
 
   @Override
   public final boolean equalTo(final long thisOffsetBytes, final Resource that,
       final long thatOffsetBytes, final long lengthBytes) {
-    Objects.requireNonNull(that);
-   return CompareAndCopy.equals(seg, thisOffsetBytes, ((ResourceImpl) that).seg, thatOffsetBytes, lengthBytes);
+    if (that == null) { return false; }
+    return CompareAndCopy.equals(seg, thisOffsetBytes, ((ResourceImpl) that).seg, thatOffsetBytes, lengthBytes);
   }
 
   @Override
@@ -302,36 +352,24 @@ abstract class ResourceImpl implements Resource {
   }
 
   @Override
+  public Thread getOwnerThread() {
+    return seg.scope().ownerThread();
+  }
+
+  @Override
   public final long getRelativeOffset(final Resource that) {
     final ResourceImpl that2 = (ResourceImpl) that;
     return this.seg.address().segmentOffset(that2.seg);
   }
 
   @Override
-  public MemoryRequestServer getMemoryRequestServer() {
-    final int mask = READONLY | MAP | BYTEBUF;
-    final int test = 0; //!READONLY & !MAP & !BYTEBUF
-    return (typeId & mask) != test ? null : memReqSvr != null ? memReqSvr : defaultMemReqSvr;
-  }
-
-  @Override
   public final ByteOrder getTypeByteOrder() {
-    return (typeId & NONNATIVE) > 0 ? NON_NATIVE_BYTE_ORDER : ByteOrder.nativeOrder();
-  }
-
-  @Override
-  public Thread getOwnerThread() {
-    return seg.scope().ownerThread();
+    return (typeId & NONNATIVE_BO) > 0 ? NON_NATIVE_BYTE_ORDER : ByteOrder.nativeOrder();
   }
 
   @Override
   public final boolean hasByteBuffer() {
     return (typeId & BYTEBUF) > 0;
-  }
-
-  @Override
-  public boolean hasMemoryRequestServer() {
-    return memReqSvr != null;
   }
 
   //@SuppressWarnings("resource")
@@ -347,6 +385,11 @@ abstract class ResourceImpl implements Resource {
   @Override
   public final boolean isBuffer() {
     return (typeId & BUFFER) > 0;
+  }
+
+  @Override
+  public boolean isCloseable() {
+    return ((seg.isNative() || seg.isMapped()) && seg.scope().isAlive() && !seg.scope().isImplicit());
   }
 
   @Override
@@ -457,11 +500,6 @@ abstract class ResourceImpl implements Resource {
 
   @Override
   public ResourceScope scope() { return seg.scope(); }
-
-  @Override
-  public void setMemoryRequestServer(final MemoryRequestServer memReqSvr) {
-    this.memReqSvr = memReqSvr;
-  }
 
   @Override
   public ByteBuffer toByteBuffer(final ByteOrder order) {

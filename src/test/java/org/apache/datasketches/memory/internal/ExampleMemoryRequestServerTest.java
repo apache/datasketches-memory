@@ -83,7 +83,7 @@ public class ExampleMemoryRequestServerTest {
       int oldWorkingCap = 0;
       int newWorkingCap = (int)workingMem.getCapacity();
 
-      while (itr <= 4) {
+      while (itr <= 4) { //limited to 4 iterations to keep the unit test time fast, but it proves the point.
         //use all the given memory
         workingMem.fill(oldWorkingCap, newWorkingCap - oldWorkingCap, itr);
 

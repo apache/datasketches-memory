@@ -23,6 +23,7 @@
 
 package org.apache.datasketches.memory.internal;
 
+import static org.apache.datasketches.memory.internal.ResourceImpl.LS;
 import static org.apache.datasketches.memory.internal.Util.getResourceFile;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -39,16 +40,16 @@ import org.testng.annotations.Test;
 import jdk.incubator.foreign.ResourceScope;
 
 public class AllocateDirectMapMemoryTest {
-  private static final String LS = System.getProperty("line.separator");
 
-  @Test
+  @Test(expectedExceptions = IllegalStateException.class)
   public void simpleMap() throws IOException {
     File file = getResourceFile("GettysburgAddress.txt");
     file.setReadOnly();
     Memory mem2;
     try (Memory mem = Memory.map(file)) {
       mem2 = mem;
-    }
+      mem.close();
+    } //The Try-With-Resources will throw if already closed
     assertFalse(mem2.isAlive());
   }
 
@@ -73,14 +74,18 @@ public class AllocateDirectMapMemoryTest {
   public void testMapAndMultipleClose() throws IOException {
     File file = getResourceFile("GettysburgAddress.txt");
     long memCapacity = file.length();
-    Memory mem2;
-    try (Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
-      mem2 = mem;
-      assertEquals(memCapacity, mem.getCapacity());
-      mem.close(); //an extra close inside the TWR block is ok
-    }
-    mem2.close(); //multiple closes outside the TWR block are OK, but unnecessary
-    mem2.close();
+    Memory mem2 = null;
+    try {
+      try (Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
+        mem2 = mem;
+        assertEquals(memCapacity, mem.getCapacity());
+        mem.close(); //a close inside the TWR block will throw
+      }
+    } catch (IllegalStateException e) { }
+    try {
+      mem2.close(); //closes outside the TWR block will throw
+    } catch (IllegalStateException e) { }
+
   }
 
   @Test

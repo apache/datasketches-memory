@@ -187,6 +187,8 @@ public interface Buffer extends Positional, Resource {
    */
   boolean getBoolean(long offsetBytes);
 
+  //intentionally removed getBooleanArray(...)
+
   /**
    * Gets the byte value at the current position.
    * Increments the position by <i>Byte.BYTES</i>.

@@ -24,6 +24,8 @@
 package org.apache.datasketches.memory.internal;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.apache.datasketches.memory.internal.ResourceImpl.LS;
+import static org.apache.datasketches.memory.internal.ResourceImpl.NON_NATIVE_BYTE_ORDER;
 import static org.apache.datasketches.memory.internal.Util.getResourceFile;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -37,9 +39,9 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteOrder;
 import java.nio.file.InvalidPathException;
 
-import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -47,7 +49,6 @@ import org.testng.annotations.Test;
 import jdk.incubator.foreign.ResourceScope;
 
 public class AllocateDirectWritableMapMemoryTest {
-  private static final String LS = System.getProperty("line.separator");
   private final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
 
   @BeforeClass
@@ -57,7 +58,7 @@ public class AllocateDirectWritableMapMemoryTest {
 
   @Test
   public void simpleMap()
-      throws IllegalArgumentException, InvalidPathException, IllegalStateException, 
+      throws IllegalArgumentException, InvalidPathException, IllegalStateException,
       UnsupportedOperationException, IOException, SecurityException {
     File file = getResourceFile("GettysburgAddress.txt");
     Memory mem = null;
@@ -120,7 +121,7 @@ public class AllocateDirectWritableMapMemoryTest {
     final long bytes = 8;
     WritableMemory wmem = null;
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      wmem = WritableMemory.writableMap(file, 0L, bytes, scope, Resource.NON_NATIVE_BYTE_ORDER);
+      wmem = WritableMemory.writableMap(file, 0L, bytes, scope, NON_NATIVE_BYTE_ORDER);
       wmem.putChar(0, (char) 1);
       assertEquals(wmem.getByte(1), (byte) 1);
     }

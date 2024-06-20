@@ -19,6 +19,7 @@
 
 package org.apache.datasketches.memory.internal;
 
+import static org.apache.datasketches.memory.internal.ResourceImpl.NON_NATIVE_BYTE_ORDER;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -27,10 +28,10 @@ import static org.testng.Assert.fail;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
@@ -50,10 +51,9 @@ public class NativeWritableMemoryImplTest {
     WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
     assertEquals(memCapacity, wmem.getCapacity());
 
-    wmem.close(); //intentional
+    wmem.close();
     assertFalse(wmem.isAlive());
-
-    wmem.close(); //intentional, nothing to free
+    try { wmem.close(); } catch (IllegalStateException e) { }
   }
 
   //Simple Native arrays
@@ -660,7 +660,7 @@ public class NativeWritableMemoryImplTest {
   public void checkAsBufferNonNative() {
     WritableMemory wmem = WritableMemory.allocate(64);
     wmem.putShort(0, (short) 1);
-    Buffer buf = wmem.asBuffer(Resource.NON_NATIVE_BYTE_ORDER);
+    Buffer buf = wmem.asBuffer(NON_NATIVE_BYTE_ORDER);
     assertEquals(buf.getShort(0), 256);
   }
 

@@ -19,6 +19,7 @@
 
 package org.apache.datasketches.memory.internal;
 
+import static org.apache.datasketches.memory.internal.ResourceImpl.NON_NATIVE_BYTE_ORDER;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -30,7 +31,6 @@ import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.DefaultMemoryRequestServer;
 import org.apache.datasketches.memory.MemoryRequestServer;
-import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
@@ -42,7 +42,7 @@ import jdk.incubator.foreign.ResourceScope;
  */
 public class LeafImplTest {
   private static final ByteOrder NBO = ByteOrder.nativeOrder();
-  private static final ByteOrder NNBO = Resource.NON_NATIVE_BYTE_ORDER;
+  private static final ByteOrder NNBO = NON_NATIVE_BYTE_ORDER;
   private static final MemoryRequestServer myMemReqSvr = new DefaultMemoryRequestServer(true, true);
 
   public static ByteOrder otherByteOrder(final ByteOrder order) {

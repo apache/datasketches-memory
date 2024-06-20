@@ -19,16 +19,17 @@
 
 package org.apache.datasketches.memory.internal;
 
+import static org.apache.datasketches.memory.internal.ResourceImpl.NON_NATIVE_BYTE_ORDER;
 import static org.testng.Assert.assertEquals;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
 
-import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
@@ -203,7 +204,7 @@ public class BufferTest {
   public void checkByteBufBigEndianOrder() {
     int n = 1024; //longs
     ByteBuffer bb = ByteBuffer.allocate(n * 8);
-    bb.order(Resource.NON_NATIVE_BYTE_ORDER);
+    bb.order(NON_NATIVE_BYTE_ORDER);
     Buffer buf = Buffer.wrap(bb);
     assertEquals(buf.getTypeByteOrder(), ByteOrder.nativeOrder());
   }

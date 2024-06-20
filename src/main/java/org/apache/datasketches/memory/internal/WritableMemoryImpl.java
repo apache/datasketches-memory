@@ -83,7 +83,7 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
     int type = MEMORY
         | (seg.isReadOnly() ? READONLY : 0);
     if (byteOrder == NON_NATIVE_BYTE_ORDER) {
-      type |= NONNATIVE;
+      type |= NONNATIVE_BO;
       return new NonNativeWritableMemoryImpl(seg, type, memReqSvr);
     }
     return new NativeWritableMemoryImpl(seg, type, memReqSvr);
@@ -127,7 +127,7 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
         | (seg.isMapped() ? MAP : 0);
     final WritableMemory wmem;
     if (byteOrder == NON_NATIVE_BYTE_ORDER) {
-      type |= NONNATIVE;
+      type |= NONNATIVE_BO;
       wmem = new NonNativeWritableMemoryImpl(seg, type, memReqSvr);
     } else {
       wmem = new NativeWritableMemoryImpl(seg, type, memReqSvr);
@@ -168,7 +168,7 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
     final boolean nativeBOType = byteOrder == ByteOrder.nativeOrder();
     final int type = MEMORY | MAP | DIRECT
         | (localReadOnly ? READONLY : 0)
-        | (nativeBOType ? NATIVE : NONNATIVE);
+        | (nativeBOType ? NATIVE_BO : NONNATIVE_BO);
     return nativeBOType
         ? new NativeWritableMemoryImpl(seg, type, null)
         : new NonNativeWritableMemoryImpl(seg, type, null);
@@ -202,7 +202,7 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
         scope);
     final boolean nativeBOType = byteOrder == ByteOrder.nativeOrder();
     final int type = MEMORY | DIRECT
-        | (nativeBOType ? NATIVE : NONNATIVE);
+        | (nativeBOType ? NATIVE_BO : NONNATIVE_BO);
     return nativeBOType
         ? new NativeWritableMemoryImpl(seg, type, memReqSvr)
         : new NonNativeWritableMemoryImpl(seg, type, memReqSvr);
@@ -244,7 +244,7 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
         | (duplicateType ? DUPLICATE : 0)
         | (mapType ? MAP : 0)
         | (directType ? DIRECT : 0)
-        | (nativeBOType ? NATIVE : NONNATIVE)
+        | (nativeBOType ? NATIVE_BO : NONNATIVE_BO)
         | (byteBufferType ? BYTEBUF : 0);
 
     final WritableMemory wmem = selectMemory(slice, type, memReqSvr, byteBufferType, mapType, nativeBOType);
@@ -284,7 +284,7 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
         | (duplicateType ? DUPLICATE : 0)
         | (directType ? DIRECT : 0)
         | (mapType ? MAP : 0)
-        | (nativeBOType ? NATIVE : NONNATIVE)
+        | (nativeBOType ? NATIVE_BO : NONNATIVE_BO)
         | (byteBufferType ? BYTEBUF : 0);
 
     final WritableBuffer wbuf = selectBuffer(seg2, type, memReqSvr, byteBufferType, mapType, nativeBOType);
@@ -305,8 +305,7 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
   }
 
   @Override
-  public final void getByteArray(final long offsetBytes, final byte[] dstArray,
-      final int dstOffsetBytes, final int lengthBytes) {
+  public final void getByteArray(final long offsetBytes, final byte[] dstArray, final int dstOffsetBytes, final int lengthBytes) {
     checkBounds(dstOffsetBytes, lengthBytes, dstArray.length);
     final MemorySegment srcSlice = seg.asSlice(offsetBytes, lengthBytes);
     final MemorySegment dstSlice = MemorySegment.ofArray(dstArray).asSlice(dstOffsetBytes, lengthBytes);

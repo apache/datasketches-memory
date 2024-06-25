@@ -181,7 +181,7 @@ public class NativeWritableMemoryImplTest {
   public void checkNativeBaseBound() {
     int memCapacity = 64;
     try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity)) {
-      mem.toHexString("Force Assertion Error", memCapacity, 8);
+      mem.toString("Force Assertion Error", memCapacity, 8, true);
       fail("Should have thrown MemoryBoundsException");
     } catch (MemoryBoundsException e) { //bounds exception
       //ok

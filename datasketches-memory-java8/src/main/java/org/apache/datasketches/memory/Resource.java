@@ -334,11 +334,18 @@ public interface Resource extends AutoCloseable {
    * @param header a descriptive header
    * @param offsetBytes offset bytes relative to this object start
    * @param lengthBytes number of bytes to convert to a hex string
-// @param withData include output listing of byte data in the given range
+   * @param withData include output listing of byte data in the given range
    * @return a formatted hex string in a human readable array
    */
-  String toHexString(String header, long offsetBytes, int lengthBytes);
+  String toString(String header, long offsetBytes, int lengthBytes, boolean withData);
 
+  /**
+   * Returns a brief description of this object.
+   * @return a brief description of this object.
+   */
+  @Override
+  String toString();
+  
   /**
    * Returns the 64-bit hash of the sequence of bytes in this object specified by
    * <i>offsetBytes</i>, <i>lengthBytes</i> and a <i>seed</i>.  Note that the sequence of bytes is

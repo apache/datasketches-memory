@@ -53,7 +53,7 @@ public class AllocateDirectMemoryTest {
       origWmem.putLong(i << 3, i);
       assertEquals(origWmem.getLong(i << 3), i);
     }
-    println(origWmem.toHexString("Test", 0, 32 * 8));
+    println(origWmem.toString("Test", 0, 32 * 8, true));
 
     int longs2 = 64;
     int bytes2 = longs2 << 3;

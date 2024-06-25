@@ -223,7 +223,7 @@ public class MemoryTest {
     for (int i = 0; i < 64; i++) {
       assertEquals(mem.getByte(i), 64 + i);
     }
-    String s = mem.toHexString("slice", 0, slice.capacity());
+    String s = mem.toString("slice", 0, slice.capacity(), true);
     println(s);
   }
 

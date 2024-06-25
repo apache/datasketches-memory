@@ -37,9 +37,7 @@ public interface WritableBuffer extends Buffer {
    * The view is of the entire ByteBuffer independent of position and limit.
    * However, the returned <i>WritableBuffer</i> will have a position and end set to the
    * ByteBuffer's position and limit, respectively.
-   * The returned WritableBuffer will use the native <i>ByteOrder</i>,
-   * ignoring the ByteOrder of the given ByteBuffer.
-   * This does not affect the ByteOrder of data already in the ByteBuffer.
+   * The returned WritableBuffer will use the <i>ByteOrder</i> of the <i>ByteBuffer</i>.
    * @param byteBuffer the given ByteBuffer. It must be non-null and writable.
    * @return a new <i>WritableBuffer</i> for write operations on the given <i>ByteBuffer</i>.
    */
@@ -52,9 +50,8 @@ public interface WritableBuffer extends Buffer {
    * The view is of the entire ByteBuffer independent of position and limit.
    * However, the returned <i>WritableBuffer</i> will have a position and end set to the
    * ByteBuffer's position and limit, respectively.
-   * The returned WritableBuffer will use the native <i>ByteOrder</i>,
-   * ignoring the ByteOrder of the given ByteBuffer.
-   * This does not affect the ByteOrder of data already in the ByteBuffer.
+   * The returned WritableBuffer will use the given <i>ByteOrder</i>,
+   * independent of the ByteOrder of the given ByteBuffer.
    * @param byteBuffer the given ByteBuffer. It must be non-null and writable.
    * @param byteOrder the byte order to be used.  It must be non-null.
    * @param memReqSvr A user-specified <i>MemoryRequestServer</i>, which may be null.

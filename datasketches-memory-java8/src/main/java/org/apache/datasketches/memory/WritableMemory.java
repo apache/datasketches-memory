@@ -43,7 +43,6 @@ public interface WritableMemory extends Memory {
    * Provides a view of the given <i>ByteBuffer</i> for write operations.
    * The view is of the entire ByteBuffer independent of position and limit.
    * The returned <i>WritableMemory</i> will assume the <i>ByteOrder</i> of the given <i>ByteBuffer</i>.
-   * This does not affect the ByteOrder of data already in the ByteBuffer.
    * @param byteBuffer the given <i>ByteBuffer</i>. It must be non-null and writable.
    * @return a new <i>WritableMemory</i> for write operations on the given <i>ByteBuffer</i>.
    */
@@ -54,7 +53,7 @@ public interface WritableMemory extends Memory {
   /**
    * Provides a view of the given <i>ByteBuffer</i> for write operations.
    * The view is of the entire ByteBuffer independent of position and limit.
-   * The returned <i>WritableMemory</i> will assume the given <i>ByteOrder</i>,
+   * The returned <i>WritableMemory</i> will use the given <i>ByteOrder</i>,
    * independent of the ByteOrder of the given ByteBuffer.
    * This does not affect the ByteOrder of data already in the ByteBuffer.
    * @param byteBuffer the given <i>ByteBuffer</i>. It must be non-null and writable.

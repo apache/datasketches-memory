@@ -277,7 +277,7 @@ public abstract class ResourceImpl implements Resource {
     return typeBO == ByteOrder.nativeOrder() && typeBO == byteOrder;
   }
 
-  static final boolean isBufferApi(final int typeId) {
+  static final boolean isBuffer(final int typeId) {
     return (typeId & BUFFER) > 0;
   }
 
@@ -403,8 +403,8 @@ public abstract class ResourceImpl implements Resource {
    * @param lengthBytes number of bytes to convert to a hex string
    * @return a formatted hex string in a human readable array
    */
-  static final String toHex(final ResourceImpl state, final String preamble, final long offsetBytes,
-      final int lengthBytes) {
+  static final String toHex(final ResourceImpl state, final String preamble, final long offsetBytes, final int lengthBytes,
+      final boolean withData) {
     final long capacity = state.getCapacity();
     ResourceImpl.checkBounds(offsetBytes, lengthBytes, capacity);
     final StringBuilder sb = new StringBuilder();
@@ -431,32 +431,39 @@ public abstract class ResourceImpl implements Resource {
     sb.append("UnsafeObjHeader     : ").append(uObjHeader).append(LS);
     sb.append("ByteBuf, hashCode   : ").append(bbStr).append(LS);
     sb.append("RegionOffset        : ").append(state.getRelativeOffset()).append(LS);
+    if (ResourceImpl.isBuffer(state.typeId)) {
+      sb.append("Start               : ").append(((BaseBufferImpl)state).getStart()).append(LS);
+      sb.append("Position            : ").append(((BaseBufferImpl)state).getPosition()).append(LS);
+      sb.append("End                 : ").append(((BaseBufferImpl)state).getEnd()).append(LS);
+    }
     sb.append("Capacity            : ").append(capacity).append(LS);
     sb.append("CumBaseOffset       : ").append(cumBaseOffset).append(LS);
-    sb.append("MemReq, hashCode    : ").append(memReqStr).append(LS);
+    sb.append("MemReqSvr, hashCode : ").append(memReqStr).append(LS);
     sb.append("Valid               : ").append(state.isAlive()).append(LS);
     sb.append("Read Only           : ").append(state.isReadOnly()).append(LS);
     sb.append("Type Byte Order     : ").append(state.getTypeByteOrder().toString()).append(LS);
     sb.append("Native Byte Order   : ").append(ByteOrder.nativeOrder().toString()).append(LS);
     sb.append("JDK Runtime Version : ").append(UnsafeUtil.JDK).append(LS);
     //Data detail
-    sb.append("Data, littleEndian  :  0  1  2  3  4  5  6  7");
-
-    for (long i = 0; i < lengthBytes; i++) {
-      final int b = unsafe.getByte(uObj, cumBaseOffset + offsetBytes + i) & 0XFF;
-      if (i % 8 == 0) { //row header
-        sb.append(String.format("%n%20s: ", offsetBytes + i));
+    if (withData) {
+      sb.append("Data, bytes         :  0  1  2  3  4  5  6  7");
+  
+      for (long i = 0; i < lengthBytes; i++) {
+        final int b = unsafe.getByte(uObj, cumBaseOffset + offsetBytes + i) & 0XFF;
+        if (i % 8 == 0) { //row header
+          sb.append(String.format("%n%20s: ", offsetBytes + i));
+        }
+        sb.append(String.format("%02x ", b));
       }
-      sb.append(String.format("%02x ", b));
+      sb.append(LS);
     }
-    sb.append(LS);
-
+    sb.append("### END SUMMARY");
     return sb.toString();
   }
 
   @Override
-  public final String toHexString(final String header, final long offsetBytes,
-      final int lengthBytes) {
+  public final String toString(final String header, final long offsetBytes, final int lengthBytes, 
+      final boolean withData) {
     checkValid();
     final String klass = this.getClass().getSimpleName();
     final String s1 = String.format("(..., %d, %d)", offsetBytes, lengthBytes);
@@ -464,11 +471,17 @@ public abstract class ResourceImpl implements Resource {
     final String call = ".toHexString" + s1 + ", hashCode: " + hcode;
     final StringBuilder sb = new StringBuilder();
     sb.append("### ").append(klass).append(" SUMMARY ###").append(LS);
+    sb.append("Type Info           : ").append(typeDecode(typeId)).append(LS + LS);
     sb.append("Header Comment      : ").append(header).append(LS);
     sb.append("Call Parameters     : ").append(call);
-    return toHex(this, sb.toString(), offsetBytes, lengthBytes);
+    return toHex(this, sb.toString(), offsetBytes, lengthBytes, withData);
   }
 
+  @Override
+  public final String toString() {
+    return toString("", 0, (int)this.getCapacity(), false);
+  }
+  
   /**
    * Decodes the resource type. This is primarily for debugging.
    * @param typeId the given typeId

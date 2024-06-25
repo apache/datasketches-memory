@@ -42,8 +42,7 @@ public interface Memory extends Resource {
   /**
    * Provides a view of the given <i>ByteBuffer</i> for read-only operations.
    * The view is of the entire ByteBuffer independent of position and limit.
-   * The returned <i>WritableMemory</i> will use the <i>ByteOrder</i> of the <i>ByteBuffer</i>.
-   * This does not affect the ByteOrder of data already in the ByteBuffer.
+   * The returned <i>Memory</i> will use the <i>ByteOrder</i> of the <i>ByteBuffer</i>.
    * @param byteBuffer the given <i>ByteBuffer</i>. It must be non-null.
    * @return a new <i>Memory</i> for read-only operations on the given <i>ByteBuffer</i>.
    */
@@ -54,7 +53,7 @@ public interface Memory extends Resource {
   /**
    * Provides a view of the given <i>ByteBuffer</i> for read-only operations.
    * The view is of the entire ByteBuffer independent of position and limit.
-   * The returned <i>WritableMemory</i> will use the given <i>ByteOrder</i>,
+   * The returned <i>Memory</i> will use the given <i>ByteOrder</i>,
    * independent of the ByteOrder of the given ByteBuffer.
    * This does not affect the ByteOrder of data already in the ByteBuffer.
    * @param byteBuffer the given <i>ByteBuffer</i>. It must be non-null.

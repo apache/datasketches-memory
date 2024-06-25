@@ -35,11 +35,9 @@ public interface Buffer extends BaseBuffer {
   /**
    * Provides a view of the given <i>ByteBuffer</i> for read-only operations.
    * The view is of the entire ByteBuffer independent of position and limit.
-   * However, the returned <i>WritableBuffer</i> will have a position and end set to the
-   * ByteBuffer's position and limit, respectively.
-   * The returned WritableBuffer will use the native <i>ByteOrder</i>,
-   * ignoring the ByteOrder of the given ByteBuffer.
-   * This does not affect the ByteOrder of data already in the ByteBuffer.
+   * However, the returned <i>Buffer</i> will have a <i>position</i> and <i>end</i> set to the
+   * ByteBuffer's <i>position</i> and <i>limit</i>, respectively.
+   * The returned Buffer will use the <i>ByteOrder</i> of the <i>ByteBuffer</i>.
    * @param byteBuffer the given ByteBuffer, must not be null.
    * @return a new <i>Buffer</i> for read-only operations on the given ByteBuffer.
    */
@@ -50,10 +48,10 @@ public interface Buffer extends BaseBuffer {
   /**
    * Provides a view of the given <i>ByteBuffer</i> for read-only operations.
    * The view is of the entire ByteBuffer independent of position and limit.
-   * However, the returned <i>WritableBuffer</i> will have a position and end set to the
+   * However, the returned <i>Buffer</i> will have a position and end set to the
    * ByteBuffer's position and limit, respectively.
-   * The returned WritableBuffer will use the native <i>ByteOrder</i>,
-   * ignoring the ByteOrder of the given ByteBuffer.
+   * The returned Buffer will use the given <i>ByteOrder</i>,
+   * independent of the ByteOrder of the given ByteBuffer.
    * This does not affect the ByteOrder of data already in the ByteBuffer.
    * @param byteBuffer the given ByteBuffer. It must be non-null
    * @param byteOrder the ByteOrder to be used. It must be non-null.

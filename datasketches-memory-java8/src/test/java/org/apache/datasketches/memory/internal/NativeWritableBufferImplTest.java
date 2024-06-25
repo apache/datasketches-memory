@@ -184,7 +184,7 @@ public class NativeWritableBufferImplTest {
     int memCapacity = 64;
     try (WritableMemory wmem = WritableMemory.allocateDirect(memCapacity)) {
       WritableBuffer wbuf = wmem.asWritableBuffer();
-      wbuf.toHexString("Bounds Exception", memCapacity, 8); //Bounds Exception
+      wbuf.toString("Bounds Exception", memCapacity, 8, true); //Bounds Exception
       fail("Should have thrown MemoryBoundsException");
     } catch (MemoryBoundsException e) {
       //ok

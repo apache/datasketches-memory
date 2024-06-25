@@ -58,12 +58,6 @@ public abstract class BaseBufferImpl extends ResourceImpl implements BaseBuffer 
   }
 
   @Override
-  public final BaseBufferImpl incrementAndCheckPosition(final long increment) {
-    incrementAndCheckPositionForRead(pos, increment);
-    return this;
-  }
-
-  @Override
   public final long getEnd() {
     return end;
   }
@@ -91,22 +85,6 @@ public abstract class BaseBufferImpl extends ResourceImpl implements BaseBuffer 
   @Override
   public final BaseBufferImpl resetPosition() {
     pos = start;
-    return this;
-  }
-
-  @Override
-  public BaseBuffer setAndCheckPosition(final long position) {
-    checkInvariants(start, position, end, capacity);
-    pos = position;
-    return this;
-  }
-
-  @Override
-  public BaseBuffer setAndCheckStartPositionEnd(final long start, final long position, final long end) {
-    checkInvariants(start, position, end, capacity);
-    this.start = start;
-    this.end = end;
-    pos = position;
     return this;
   }
   

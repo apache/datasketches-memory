@@ -160,31 +160,31 @@ public class SpecificLeafTest {
     assertTrue(((ResourceImpl)reg1).isRegionView());
     Buffer buf1 = reg1.asBuffer();
     assertTrue(((ResourceImpl)buf1).isRegionView());
-    assertTrue(((ResourceImpl)buf1).isBufferApi(((ResourceImpl)buf1).getTypeId()));
+    assertTrue(((ResourceImpl)buf1).isBuffer(((ResourceImpl)buf1).getTypeId()));
     assertTrue(buf1.isReadOnly());
 
     Buffer buf2 = buf1.duplicate();
     assertTrue(((ResourceImpl)buf2).isRegionView());
-    assertTrue(((ResourceImpl)buf2).isBufferApi(((ResourceImpl)buf2).getTypeId()));
+    assertTrue(((ResourceImpl)buf2).isBuffer(((ResourceImpl)buf2).getTypeId()));
     assertTrue(((ResourceImpl)buf2).isDuplicate());
     assertTrue(buf2.isReadOnly());
 
     Memory mem2 = buf1.asMemory(); //
     assertTrue(((ResourceImpl)mem2).isRegionView());
-    assertFalse(((ResourceImpl)mem2).isBufferApi(((ResourceImpl)mem2).getTypeId()));
+    assertFalse(((ResourceImpl)mem2).isBuffer(((ResourceImpl)mem2).getTypeId()));
     assertFalse(((ResourceImpl)mem2).isDuplicate());
     assertTrue(mem2.isReadOnly());
 
     Buffer buf3 = buf1.duplicate(Util.NON_NATIVE_BYTE_ORDER);
     assertTrue(((ResourceImpl)buf3).isRegionView());
-    assertTrue(((ResourceImpl)buf3).isBufferApi(((ResourceImpl)buf3).getTypeId()));
+    assertTrue(((ResourceImpl)buf3).isBuffer(((ResourceImpl)buf3).getTypeId()));
     assertTrue(((ResourceImpl)buf3).isDuplicate());
     assertTrue(((ResourceImpl)buf3).isNonNativeOrder());
     assertTrue(buf3.isReadOnly());
 
     Memory mem3 = buf3.asMemory();
     assertTrue(((ResourceImpl)mem3).isRegionView());
-    assertFalse(((ResourceImpl)mem3).isBufferApi(((ResourceImpl)mem3).getTypeId()));
+    assertFalse(((ResourceImpl)mem3).isBuffer(((ResourceImpl)mem3).getTypeId()));
     assertTrue(((ResourceImpl)mem3).isDuplicate());
     assertTrue(((ResourceImpl)mem3).isNonNativeOrder());
     assertTrue(mem3.isReadOnly());

@@ -34,9 +34,9 @@ public interface WritableBuffer extends Buffer {
   //BYTE BUFFER
   /**
    * Provides a view of the given <i>ByteBuffer</i> for write operations.
-   * The view is of the entire ByteBuffer independent of position and limit.
-   * However, the returned <i>WritableBuffer</i> will have a position and end set to the
-   * ByteBuffer's position and limit, respectively.
+   * The view is of the entire ByteBuffer independent of <i>position</i> and <i>limit</i>.
+   * However, the returned <i>Buffer</i> will have <i>position</i> and <i>end</i> set to the
+   * ByteBuffer's <i>position</i> and <i>limit</i>, respectively.
    * The returned WritableBuffer will use the <i>ByteOrder</i> of the <i>ByteBuffer</i>.
    * @param byteBuffer the given ByteBuffer. It must be non-null and writable.
    * @return a new <i>WritableBuffer</i> for write operations on the given <i>ByteBuffer</i>.
@@ -47,9 +47,9 @@ public interface WritableBuffer extends Buffer {
 
   /**
    * Provides a view of the given <i>ByteBuffer</i> for write operations.
-   * The view is of the entire ByteBuffer independent of position and limit.
-   * However, the returned <i>WritableBuffer</i> will have a position and end set to the
-   * ByteBuffer's position and limit, respectively.
+   * The view is of the entire ByteBuffer independent of <i>position</i> and <i>limit</i>.
+   * However, the returned <i>Buffer</i> will have <i>position</i> and <i>end</i> set to the
+   * ByteBuffer's <i>position</i> and <i>limit</i>, respectively.
    * The returned WritableBuffer will use the given <i>ByteOrder</i>,
    * independent of the ByteOrder of the given ByteBuffer.
    * @param byteBuffer the given ByteBuffer. It must be non-null and writable.

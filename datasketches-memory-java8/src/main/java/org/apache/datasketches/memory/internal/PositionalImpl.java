@@ -19,7 +19,7 @@
 
 package org.apache.datasketches.memory.internal;
 
-import org.apache.datasketches.memory.BaseBuffer;
+import org.apache.datasketches.memory.Positional;
 import org.apache.datasketches.memory.BufferPositionInvariantsException;
 
 /**
@@ -39,20 +39,20 @@ import org.apache.datasketches.memory.BufferPositionInvariantsException;
  *
  * @author Lee Rhodes
  */
-public abstract class BaseBufferImpl extends ResourceImpl implements BaseBuffer {
+public abstract class PositionalImpl extends ResourceImpl implements Positional {
   private long capacity;
   private long start = 0;
   private long pos = 0;
   private long end;
 
   //Pass-through constructor
-  BaseBufferImpl(final long capacityBytes) {
+  PositionalImpl(final long capacityBytes) {
     super();
     capacity = end = capacityBytes;
   }
 
   @Override
-  public final BaseBufferImpl incrementPosition(final long increment) {
+  public final PositionalImpl incrementPosition(final long increment) {
     incrementAndCheckPositionForRead(pos, increment);
     return this;
   }
@@ -83,18 +83,18 @@ public abstract class BaseBufferImpl extends ResourceImpl implements BaseBuffer 
   }
 
   @Override
-  public final BaseBufferImpl resetPosition() {
+  public final PositionalImpl resetPosition() {
     pos = start;
     return this;
   }
   
   @Override
-  public final BaseBufferImpl setPosition(final long position) {
+  public final PositionalImpl setPosition(final long position) {
     return setStartPositionEnd(start, position, end);
   }
 
   @Override
-  public final BaseBufferImpl setStartPositionEnd(final long start, final long position, final long end) {
+  public final PositionalImpl setStartPositionEnd(final long start, final long position, final long end) {
     checkValid();
     checkInvariants(start, position, end, capacity);
     this.start = start;

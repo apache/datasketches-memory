@@ -432,9 +432,9 @@ public abstract class ResourceImpl implements Resource {
     sb.append("ByteBuf, hashCode   : ").append(bbStr).append(LS);
     sb.append("RegionOffset        : ").append(state.getRelativeOffset()).append(LS);
     if (ResourceImpl.isBuffer(state.typeId)) {
-      sb.append("Start               : ").append(((BaseBufferImpl)state).getStart()).append(LS);
-      sb.append("Position            : ").append(((BaseBufferImpl)state).getPosition()).append(LS);
-      sb.append("End                 : ").append(((BaseBufferImpl)state).getEnd()).append(LS);
+      sb.append("Start               : ").append(((PositionalImpl)state).getStart()).append(LS);
+      sb.append("Position            : ").append(((PositionalImpl)state).getPosition()).append(LS);
+      sb.append("End                 : ").append(((PositionalImpl)state).getEnd()).append(LS);
     }
     sb.append("Capacity            : ").append(capacity).append(LS);
     sb.append("CumBaseOffset       : ").append(cumBaseOffset).append(LS);

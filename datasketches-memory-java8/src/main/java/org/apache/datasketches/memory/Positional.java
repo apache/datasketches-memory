@@ -31,12 +31,12 @@ package org.apache.datasketches.memory;
  * <li>Position can be set directly or indirectly when using the positional get/put methods.
  * <li>Added incrementPosition(long), which is much easier when you know the increment.</li>
  * <li>This approach eliminated a number of methods and checks, and has no unseen side effects,
- * e.g., mark being invalidated.</li>
+ * e.g., <i>mark</i> being invalidated.</li>
  * <li>Clearer method naming (IMHO).</li>
  * </ul>
  * @author Lee Rhodes
  */
-public interface BaseBuffer extends Resource {
+public interface Positional extends Resource {
 
   /**
    * Increments the current position by the given increment.
@@ -45,7 +45,7 @@ public interface BaseBuffer extends Resource {
    * @return BaseBuffer
    * @throws BufferPositionInvariantsException if positional invariants have been violated.
    */
-  BaseBuffer incrementPosition(long increment);
+  Positional incrementPosition(long increment);
 
   /**
    * Gets the end position
@@ -82,7 +82,7 @@ public interface BaseBuffer extends Resource {
    * This does not modify any data.
    * @return BaseBuffer
    */
-  BaseBuffer resetPosition();
+  Positional resetPosition();
 
   /**
    * Sets the current position.
@@ -91,7 +91,7 @@ public interface BaseBuffer extends Resource {
    * @return BaseBuffer
    * @throws BufferPositionInvariantsException if positional invariants have been violated.
    */
-  BaseBuffer setPosition(long position);
+  Positional setPosition(long position);
 
   /**
    * Sets start position, current position, and end position.
@@ -102,6 +102,6 @@ public interface BaseBuffer extends Resource {
    * @return BaseBuffer
    * @throws BufferPositionInvariantsException if positional invariants have been violated.
    */
-  BaseBuffer setStartPositionEnd(long start, long position, long end);
+  Positional setStartPositionEnd(long start, long position, long end);
 
 }

@@ -44,7 +44,7 @@ import org.apache.datasketches.memory.WritableMemory;
  * Contains methods which are agnostic to the byte order.
  */
 @SuppressWarnings("restriction")
-public abstract class BaseWritableBufferImpl extends BaseBufferImpl implements WritableBuffer {
+public abstract class BaseWritableBufferImpl extends PositionalImpl implements WritableBuffer {
 
   //Pass-through constructor
   BaseWritableBufferImpl(final long capacityBytes) { super(capacityBytes); }

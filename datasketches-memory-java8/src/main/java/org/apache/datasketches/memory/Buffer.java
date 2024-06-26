@@ -29,13 +29,13 @@ import org.apache.datasketches.memory.internal.BaseWritableBufferImpl;
  *
  * @author Lee Rhodes
  */
-public interface Buffer extends BaseBuffer {
+public interface Buffer extends Positional {
 
   //BYTE BUFFER
   /**
    * Provides a view of the given <i>ByteBuffer</i> for read-only operations.
-   * The view is of the entire ByteBuffer independent of position and limit.
-   * However, the returned <i>Buffer</i> will have a <i>position</i> and <i>end</i> set to the
+   * The view is of the entire ByteBuffer independent of <i>position</i> and <i>limit</i>.
+   * However, the returned <i>Buffer</i> will have <i>position</i> and <i>end</i> set to the
    * ByteBuffer's <i>position</i> and <i>limit</i>, respectively.
    * The returned Buffer will use the <i>ByteOrder</i> of the <i>ByteBuffer</i>.
    * @param byteBuffer the given ByteBuffer, must not be null.
@@ -47,9 +47,9 @@ public interface Buffer extends BaseBuffer {
 
   /**
    * Provides a view of the given <i>ByteBuffer</i> for read-only operations.
-   * The view is of the entire ByteBuffer independent of position and limit.
-   * However, the returned <i>Buffer</i> will have a position and end set to the
-   * ByteBuffer's position and limit, respectively.
+   * The view is of the entire ByteBuffer independent of <i>position</i> and <i>limit</i>.
+   * However, the returned <i>Buffer</i> will have <i>position</i> and <i>end</i> set to the
+   * ByteBuffer's <i>position</i> and <i>limit</i>, respectively.
    * The returned Buffer will use the given <i>ByteOrder</i>,
    * independent of the ByteOrder of the given ByteBuffer.
    * This does not affect the ByteOrder of data already in the ByteBuffer.

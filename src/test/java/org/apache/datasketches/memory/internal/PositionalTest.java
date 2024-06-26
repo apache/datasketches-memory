@@ -22,9 +22,11 @@ package org.apache.datasketches.memory.internal;
 import static org.testng.Assert.fail;
 
 import org.apache.datasketches.memory.Buffer;
+import org.apache.datasketches.memory.BufferPositionInvariantsException;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.Resource;
+import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
@@ -33,7 +35,7 @@ import jdk.incubator.foreign.ResourceScope;
 /**
  * @author Lee Rhodes
  */
-public class BaseBufferTest {
+public class PositionalTest {
   private static final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
 
   @Test
@@ -44,7 +46,7 @@ public class BaseBufferTest {
     try {
       buf.setStartPositionEnd(0, 0, 101);
       fail();
-    } catch (AssertionError e) {
+    } catch (BufferPositionInvariantsException e) {
       //ok
     }
   }
@@ -52,40 +54,34 @@ public class BaseBufferTest {
   @Test
   public void checkLimitsAndCheck() {
     Buffer buf = Memory.wrap(new byte[100]).asBuffer();
-    buf.setAndCheckStartPositionEnd(40, 45, 50);
-    buf.setAndCheckStartPositionEnd(0, 0, 100);
+    buf.setStartPositionEnd(40, 45, 50);
+    buf.setStartPositionEnd(0, 0, 100);
     try {
-      buf.setAndCheckStartPositionEnd(0, 0, 101);
+      buf.setStartPositionEnd(0, 0, 101);
       fail();
-    } catch (IllegalArgumentException e) {
+    } catch (BufferPositionInvariantsException e) {
       //ok
     }
-    buf.setAndCheckPosition(100);
+    buf.setPosition(100);
     try {
-      buf.setAndCheckPosition(101);
+      buf.setPosition(101);
       fail();
-    } catch (IllegalArgumentException e) {
+    } catch (BufferPositionInvariantsException e) {
       //ok
     }
     buf.setPosition(99);
-    buf.incrementAndCheckPosition(1L);
+    buf.incrementPosition(1L);
     try {
-      buf.incrementAndCheckPosition(1L);
+      buf.incrementPosition(1L);
       fail();
-    } catch (IllegalArgumentException e) {
+    } catch (BufferPositionInvariantsException e) {
       //ok
     }
   }
 
-  @Test
-  public void checkCheckNotAliveAfterTWR() {
-    WritableMemory wmem;
-    Buffer buf;
-    try (ResourceScope scope = (wmem = WritableMemory.allocateDirect(100)).scope()) {
-      buf = wmem.asBuffer();
-    }
-    try {
-      buf.asMemory(); //not alive
-    } catch (IllegalStateException e) { }
+  @Test(expectedExceptions = BufferPositionInvariantsException.class)
+  public void checkPositionalInvariants() {
+    WritableBuffer wbuf = WritableMemory.allocate(64).asWritableBuffer();
+    wbuf.setStartPositionEnd(1, 0, 2); //out of order
   }
 }

@@ -27,6 +27,7 @@ import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.Buffer;
+import org.apache.datasketches.memory.BufferPositionInvariantsException;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
@@ -174,7 +175,7 @@ public class BufferInvariantsTest {
       try {
         buf.setStartPositionEnd(0, 0, 101);
         fail();
-      } catch (AssertionError e) {
+      } catch (BufferPositionInvariantsException e) {
         //
       }
     }

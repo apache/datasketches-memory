@@ -27,6 +27,7 @@ import java.nio.ByteOrder;
 import java.util.List;
 
 import org.apache.datasketches.memory.Buffer;
+import org.apache.datasketches.memory.BufferPositionInvariantsException;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.Resource;
@@ -306,12 +307,16 @@ public class BufferTest {
     region.getByte();
   }
 
-  @Test(expectedExceptions = AssertionError.class)
-  public void checkBaseBufferInvariants() {
-    WritableBuffer wbuf = WritableMemory.allocate(64).asWritableBuffer();
-    wbuf.setStartPositionEnd(1, 0, 2); //out of order
+  @Test
+  public void checkCheckNotAliveAfterTWR() {
+    Buffer buf;
+    try (WritableMemory wmem = WritableMemory.allocateDirect(100)) {
+      buf = wmem.asBuffer();
+    }
+    try {
+      buf.asMemory(); //not alive
+    } catch (IllegalStateException e) { }
   }
-
 
   @Test
   public void printlnTest() {

@@ -44,7 +44,7 @@ final class HeapWritableMemoryImpl extends NativeWritableMemoryImpl {
     this.unsafeObj = unsafeObj;
     this.offsetBytes = offsetBytes;
     this.capacityBytes = capacityBytes;
-    this.typeId = removeNnBuf(typeId) | HEAP | MEMORY | NATIVE;
+    this.typeId = removeNnBuf(typeId) | HEAP | MEMORY | NATIVE_BO;
     this.cumOffsetBytes = cumOffsetBytes;
     this.memReqSvr = memReqSvr; //in ResourceImpl
     if ((this.owner != null) && (this.owner != Thread.currentThread())) {
@@ -64,11 +64,11 @@ final class HeapWritableMemoryImpl extends NativeWritableMemoryImpl {
     int typeIdOut = removeNnBuf(typeId) | MEMORY | REGION | (readOnly ? READONLY : 0);
 
     if (Util.isNativeByteOrder(byteOrder)) {
-      typeIdOut |= NATIVE;
+      typeIdOut |= NATIVE_BO;
       return new HeapWritableMemoryImpl(
           unsafeObj, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, memReqSvr);
     } else {
-      typeIdOut |= NONNATIVE;
+      typeIdOut |= NONNATIVE_BO;
       return new HeapNonNativeWritableMemoryImpl(
           unsafeObj, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, memReqSvr);
     }
@@ -79,11 +79,11 @@ final class HeapWritableMemoryImpl extends NativeWritableMemoryImpl {
     int typeIdOut = removeNnBuf(typeId) | BUFFER | (readOnly ? READONLY : 0);
 
     if (byteOrder == ByteOrder.nativeOrder()) {
-      typeIdOut |= NATIVE;
+      typeIdOut |= NATIVE_BO;
       return new HeapWritableBufferImpl(
           unsafeObj, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr);
     } else {
-      typeIdOut |= NONNATIVE;
+      typeIdOut |= NONNATIVE_BO;
       return new HeapNonNativeWritableBufferImpl(
           unsafeObj, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr);
     }

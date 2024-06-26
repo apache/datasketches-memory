@@ -24,9 +24,9 @@ import sun.misc.Cleaner;
 /**
  * Extracts a version-dependent reference to the `sun.misc.Cleaner` into
  * a standalone class. The package name for Cleaner has changed in
- * later versions. The appropriate class will be loaded by the class loader
+ * later versions. If a JDK Toolchain and MR-JAR have been configured, 
+ * the appropriate class will be loaded by the class loader
  * depending on the Java version that is used.
- * For more information, see: https://openjdk.java.net/jeps/238
  */
 @SuppressWarnings("restriction")
 public class MemoryCleaner {

@@ -30,7 +30,7 @@ import org.testng.annotations.Test;
 /**
  * @author Lee Rhodes
  */
-public class BaseBufferTest {
+public class PositionalTest {
 
   @Test
   public void checkLimits() {
@@ -64,9 +64,9 @@ public class BaseBufferTest {
       //ok
     }
     buf.setPosition(99);
-    buf.incrementAndCheckPosition(1L);
+    buf.incrementPosition(1L);
     try {
-      buf.incrementAndCheckPosition(1L);
+      buf.incrementPosition(1L);
       fail();
     } catch (BufferPositionInvariantsException e) {
       //ok

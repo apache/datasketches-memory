@@ -23,7 +23,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import org.apache.datasketches.memory.DefaultMemoryRequestServer;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.WritableMemory;
@@ -49,30 +48,26 @@ public class AllocateDirectMemoryTest {
   public void checkDefaultMemoryRequestServer()  {
     int longs1 = 32;
     int bytes1 = longs1 << 3;
-    try (WritableMemory origWmem = WritableMemory.allocateDirect(bytes1)) {
-      for (int i = 0; i < longs1; i++) { //puts data in wMem1
-        origWmem.putLong(i << 3, i);
-        assertEquals(origWmem.getLong(i << 3), i);
-      }
-      println(origWmem.toHexString("Test", 0, 32 * 8));
+    WritableMemory origWmem = WritableMemory.allocateDirect(bytes1); 
+    for (int i = 0; i < longs1; i++) { //puts data in origWmem
+      origWmem.putLong(i << 3, i);
+      assertEquals(origWmem.getLong(i << 3), i);
+    }
+    println(origWmem.toString("Test", 0, 32 * 8, true));
 
-      int longs2 = 64;
-      int bytes2 = longs2 << 3;
-      MemoryRequestServer memReqSvr;
-      if (Resource.defaultMemReqSvr == null) {
-        memReqSvr = new DefaultMemoryRequestServer();
-      } else {
-        memReqSvr = origWmem.getMemoryRequestServer();
-      }
-      WritableMemory newWmem = memReqSvr.request(origWmem, bytes2);
-      assertFalse(newWmem.isDirectResource()); //on heap by default
-      for (int i = 0; i < longs2; i++) {
-          newWmem.putLong(i << 3, i);
-          assertEquals(newWmem.getLong(i << 3), i);
-      }
-      memReqSvr.requestClose(origWmem, newWmem);
-      //The default MRS doesn't actually release because it could be easily misused.
-      // So we let the TWR release it.
+    int longs2 = 64;
+    int bytes2 = longs2 << 3;
+    origWmem.setMemoryRequestServer(Resource.defaultMemReqSvr);
+    MemoryRequestServer myMemReqSvr = origWmem.getMemoryRequestServer();
+    
+    WritableMemory newWmem = myMemReqSvr.request(origWmem, bytes2);
+    assertTrue(newWmem.isHeap()); //on heap by default
+    for (int i = 0; i < longs2; i++) {
+        newWmem.putLong(i << 3, i);
+        assertEquals(newWmem.getLong(i << 3), i);
+    }
+    if (origWmem.isCloseable()) {
+      myMemReqSvr.requestClose(origWmem, newWmem);
     }
   }
 
@@ -88,9 +83,9 @@ public class AllocateDirectMemoryTest {
   public void checkExplicitClose() {
     final long cap = 128;
     WritableMemory wMem = WritableMemory.allocateDirect(cap);
-    assertTrue(wMem.isValid());
+    assertTrue(wMem.isAlive());
     wMem.close();
-    assertFalse(wMem.isValid());
+    assertFalse(wMem.isAlive());
   }
 
   @Test

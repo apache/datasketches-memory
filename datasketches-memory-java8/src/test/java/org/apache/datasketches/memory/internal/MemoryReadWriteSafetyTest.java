@@ -83,11 +83,6 @@ public class MemoryReadWriteSafetyTest {
   }
 
   @Test(expectedExceptions = ReadOnlyException.class)
-  public void testPutBooleanArray() {
-    mem.putBooleanArray(0, new boolean[] {true}, 0, 1);
-  }
-
-  @Test(expectedExceptions = ReadOnlyException.class)
   public void testPutShortArray() {
     mem.putShortArray(0, new short[] {1}, 0, 1);
   }
@@ -140,12 +135,6 @@ public class MemoryReadWriteSafetyTest {
   @Test(expectedExceptions = ReadOnlyException.class)
   public void testByteArrayWrapWithOffsetsAndBO() {
     WritableMemory mem1 = (WritableMemory) Memory.wrap(new byte[8], 0, 4, ByteOrder.nativeOrder());
-    mem1.putInt(0, 1);
-  }
-
-  @Test(expectedExceptions = ReadOnlyException.class)
-  public void testBooleanArrayWrap() {
-    WritableMemory mem1 = (WritableMemory) Memory.wrap(new boolean[8]);
     mem1.putInt(0, 1);
   }
 
@@ -206,7 +195,7 @@ public class MemoryReadWriteSafetyTest {
   }
 
   @Test(expectedExceptions = ReadOnlyException.class)
-  public void testWritableMapWithROFile() {
+  public void testWritableMapWithROFile() throws IOException {
     File tempFile;
     try {
       tempFile = File.createTempFile("test", ".tmp", null);
@@ -220,7 +209,7 @@ public class MemoryReadWriteSafetyTest {
   }
 
   @Test(expectedExceptions = ReadOnlyException.class)
-  public void testMapFileWithOffsetsAndBO() {
+  public void testMapFileWithOffsetsAndBO() throws IOException {
     File tempFile;
     try {
       tempFile = File.createTempFile("test", ".tmp", null);
@@ -234,7 +223,7 @@ public class MemoryReadWriteSafetyTest {
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)
-  public void testMapFileBeyondTheFileSize() {
+  public void testMapFileBeyondTheFileSize() throws IOException {
     File tempFile;
     try {
       tempFile = File.createTempFile("test", ".tmp", null);

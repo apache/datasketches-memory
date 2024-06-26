@@ -141,18 +141,6 @@ public class CommonBufferTest {
   public static void setGetArraysTests(WritableBuffer buf) {
     int words = 4;
 
-    boolean[] srcArray1 = {true, false, true, false};
-    boolean[] dstArray1 = new boolean[words];
-    buf.resetPosition();
-    buf.fill((byte)127);
-    buf.resetPosition();
-    buf.putBooleanArray(srcArray1, 0, words);
-    buf.resetPosition();
-    buf.getBooleanArray(dstArray1, 0, words);
-    for (int i = 0; i < words; i++) {
-      assertEquals(dstArray1[i], srcArray1[i]);
-    }
-
     byte[] srcArray2 = { 1, -2, 3, -4 };
     byte[] dstArray2 = new byte[4];
     buf.resetPosition();
@@ -236,15 +224,6 @@ public class CommonBufferTest {
 
   public static void setGetPartialArraysWithOffsetTests(WritableBuffer buf) {
     int items = 4;
-    boolean[] srcArray1 = {true, false, true, false};
-    boolean[] dstArray1 = new boolean[items];
-    buf.resetPosition();
-    buf.putBooleanArray(srcArray1, 2, items / 2);
-    buf.resetPosition();
-    buf.getBooleanArray(dstArray1, 2, items / 2);
-    for (int i = 2; i < items; i++) {
-      assertEquals(dstArray1[i], srcArray1[i]);
-    }
 
     byte[] srcArray2 = { 1, -2, 3, -4 };
     byte[] dstArray2 = new byte[items];

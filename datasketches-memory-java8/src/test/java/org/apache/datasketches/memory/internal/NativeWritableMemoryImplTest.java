@@ -46,29 +46,10 @@ public class NativeWritableMemoryImplTest {
     assertEquals(memCapacity, mem.getCapacity());
 
     mem.close(); //intentional
-    assertFalse(mem.isValid());
+    assertFalse(mem.isAlive());
   }
 
   //Simple Native arrays
-
-  @Test
-  public void checkBooleanArray() {
-    boolean[] srcArray = { true, false, true, false, false, true, true, false };
-    boolean[] dstArray = new boolean[8];
-
-    Memory mem = Memory.wrap(srcArray);
-    mem.getBooleanArray(0, dstArray, 0, 8);
-    for (int i = 0; i < 8; i++) {
-      assertEquals(dstArray[i], srcArray[i]);
-    }
-
-    WritableMemory wmem = WritableMemory.writableWrap(srcArray);
-    wmem.getBooleanArray(0, dstArray, 0, 8);
-    for (int i = 0; i < 8; i++) {
-      assertEquals(dstArray[i], srcArray[i]);
-    }
-    assertTrue(mem.isHeapResource());
-  }
 
   @Test
   public void checkByteArray() {
@@ -200,7 +181,7 @@ public class NativeWritableMemoryImplTest {
   public void checkNativeBaseBound() {
     int memCapacity = 64;
     try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity)) {
-      mem.toHexString("Force Assertion Error", memCapacity, 8);
+      mem.toString("Force Assertion Error", memCapacity, 8, true);
       fail("Should have thrown MemoryBoundsException");
     } catch (MemoryBoundsException e) { //bounds exception
       //ok
@@ -427,7 +408,7 @@ public class NativeWritableMemoryImplTest {
       assertEquals(wmem.getByte(i), byteBuf.get(i));
     }
 
-    assertTrue(wmem.isByteBufferResource());
+    assertTrue(wmem.hasByteBuffer());
     ByteBuffer byteBuf2 = ((ResourceImpl)wmem).getByteBuffer();
     assertEquals(byteBuf2, byteBuf);
     //println( mem.toHexString("HeapBB", 0, memCapacity));
@@ -516,9 +497,9 @@ public class NativeWritableMemoryImplTest {
   public void checkIsDirect() {
     int memCapacity = 64;
     WritableMemory mem = WritableMemory.allocate(memCapacity);
-    assertFalse(mem.isDirectResource());
+    assertFalse(mem.isDirect());
     try (WritableMemory mem1 = WritableMemory.allocateDirect(memCapacity)) {
-      assertTrue(mem1.isDirectResource());
+      assertTrue(mem1.isDirect());
     }
   }
 
@@ -626,7 +607,7 @@ public class NativeWritableMemoryImplTest {
   public void checkCumAndRegionOffset() {
     WritableMemory wmem = WritableMemory.allocate(64);
     WritableMemory reg = wmem.writableRegion(32, 32);
-    assertEquals(reg.getTotalOffset(), 32);
+    assertEquals(reg.getRelativeOffset(), 32);
     assertEquals(((ResourceImpl)reg).getCumulativeOffset(0), 32 + 16);
 
   }

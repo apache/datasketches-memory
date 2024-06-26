@@ -19,7 +19,6 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_BOOLEAN_BASE_OFFSET;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_CHAR_BASE_OFFSET;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_DOUBLE_BASE_OFFSET;
@@ -197,20 +196,6 @@ public class XxHash64 {
     hash *= P3;
     hash ^= hash >>> 32;
     return hash;
-  }
-
-  /**
-   * Hash the given arr starting at the given offset and continuing for the given length using the
-   * given seed.
-   * @param arr the given array
-   * @param offsetBooleans starting at this offset
-   * @param lengthBooleans continuing for this length
-   * @param seed the given seed
-   * @return the hash
-   */
-  public static long hashBooleans(final boolean[] arr, final long offsetBooleans,
-      final long lengthBooleans, final long seed) {
-    return hash(arr, ARRAY_BOOLEAN_BASE_OFFSET + offsetBooleans, lengthBooleans, seed);
   }
 
   /**

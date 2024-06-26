@@ -19,74 +19,68 @@
 
 package org.apache.datasketches.memory;
 
+import java.nio.ByteOrder;
+
 /**
- * This is a simple implementation of the MemoryRequestServer that creates space on the Java heap
- * for the requesting application. This capability is only available for direct, off-heap
- * allocated memory.
- *
- * <p>Using this default implementation could be something like the following:
- *
- * <blockquote><pre>
- * class OffHeap {
- *   WritableMemory mem;
- *   MemoryRequestServer memReqSvr = null;
- *
- *   void add(Object something) {
- *
- *     if (outOfSpace) { // determine if out-of-space
- *       long spaceNeeded = ...
- *
- *       //Acquire the MemoryRequestServer from the direct Memory the first time.
- *       //Once acquired, this can be reused if more memory is needed later.
- *       //This is required for the default implementation because it returns memory on heap
- *       // and on-heap memory does not carry a reference to the MemoryRequestServer.
- *       memReqSvr = (memReqSvr == null) ? mem.getMemoryRequestServer() : memReqSvr;
- *
- *       //Request bigger memory
- *       WritableMemory newMem = memReqSvr.request(mem, spaceNeeded);
- *
- *       //Copy your data from the current memory to the new one and resize
- *       moveAndResize(mem, newMem);
- *
- *       //You are done with the old memory, so request close.
- *       //Note that it is up to the owner of the WritableHandle whether or not to
- *       // actually close the resource.
- *       memReqSvr.requestClose(mem, newMem);
- *
- *       mem = newMem; //update your reference to memory
- *     }
- *
- *     //continue with the add process
- *   }
- * }
- * </pre></blockquote>
- *
+ * This example MemoryRequestServer is simple but demonstrates one of many ways to
+ * manage continuous requests for larger memory.
+ * This capability is only available for writable, non-file-memory-mapping resources.
  *
  * @author Lee Rhodes
  */
 public final class DefaultMemoryRequestServer implements MemoryRequestServer {
+  private final boolean offHeap; //create the new memory off-heap; otherwise, on-heap
+  private final boolean copyOldToNew; //copy data from old memory to new memory.
 
   /**
-   * {@inheritDoc}
-   *
-   * <p>By default this allocates new memory requests on the Java heap.
+   * Default constructor.
+   * Create new memory on-heap and do not copy old contents to new memory.
    */
-  @Override
-  public WritableMemory request(final WritableMemory currentWritableMemory, final long capacityBytes) {
-    final WritableMemory wmem = WritableMemory.allocate((int)capacityBytes, currentWritableMemory.getByteOrder());
-    return wmem;
+  public DefaultMemoryRequestServer() {
+    this(false, false);
   }
 
   /**
-   * {@inheritDoc}
-   *
-   * <p>This method does nothing in this default implementation because it is application specific.
-   * This method must be overridden to explicitly close if desired.
-   * Otherwise, the AutoCloseable will eventually close the resource.
+   * Constructor with parameters
+   * @param offHeap if true, the returned new memory will be off heap
+   * @param copyOldToNew if true, the data from the current memory will be copied to the new memory,
+   * starting at address 0, and through the currentMemory capacity.
    */
+  public DefaultMemoryRequestServer(final boolean offHeap, final boolean copyOldToNew) {
+    this.offHeap = offHeap;
+    this.copyOldToNew = copyOldToNew;
+  }
+
   @Override
-  public void requestClose(final WritableMemory memToRelease, final WritableMemory newMemory) {
-    //do nothing
+  public WritableMemory request(final WritableMemory currentWmem, final long newCapacityBytes) {
+    final ByteOrder order = currentWmem.getTypeByteOrder();
+    final long currentBytes = currentWmem.getCapacity();
+    final WritableMemory newWmem;
+
+    if (newCapacityBytes <= currentBytes) {
+      throw new IllegalArgumentException("newCapacityBytes must be &gt; currentBytes");
+    }
+
+    if (offHeap) {
+      newWmem = WritableMemory.allocateDirect(newCapacityBytes, order, this);
+    }
+    else { //On-heap
+      if (newCapacityBytes > Integer.MAX_VALUE) {
+        throw new IllegalArgumentException("Requested capacity exceeds Integer.MAX_VALUE.");
+      }
+      newWmem = WritableMemory.allocate((int)newCapacityBytes, order, this);
+    }
+
+    if (copyOldToNew) {
+      currentWmem.copyTo(0, newWmem, 0, currentBytes);
+    }
+
+    return newWmem;
+  }
+
+  @Override
+  public void requestClose(final WritableMemory memToClose, final WritableMemory newMemory) {
+    if (memToClose.isCloseable()) { memToClose.close(); }
   }
 
 }

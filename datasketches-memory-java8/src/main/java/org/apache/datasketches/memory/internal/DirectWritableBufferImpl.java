@@ -44,7 +44,7 @@ final class DirectWritableBufferImpl extends NativeWritableBufferImpl {
     this.direct = direct;
     this.offsetBytes = offsetBytes;
     this.capacityBytes = capacityBytes;
-    this.typeId = removeNnBuf(typeId) | DIRECT | BUFFER | NATIVE; //initially cannot be ReadOnly
+    this.typeId = removeNnBuf(typeId) | DIRECT | BUFFER | NATIVE_BO; //initially cannot be ReadOnly
     this.cumOffsetBytes = cumOffsetBytes;
     this.memReqSvr = memReqSvr; //in ResourceImpl
     if ((this.owner != null) && (this.owner != Thread.currentThread())) {
@@ -64,11 +64,11 @@ final class DirectWritableBufferImpl extends NativeWritableBufferImpl {
     int typeIdOut = removeNnBuf(typeId) | BUFFER | REGION | (readOnly ? READONLY : 0);
 
     if (Util.isNativeByteOrder(byteOrder)) {
-      typeIdOut |= NATIVE;
+      typeIdOut |= NATIVE_BO;
       return new DirectWritableBufferImpl(
           direct, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, memReqSvr);
     } else {
-      typeIdOut |= NONNATIVE;
+      typeIdOut |= NONNATIVE_BO;
       return new DirectNonNativeWritableBufferImpl(
           direct, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, memReqSvr);
     }
@@ -79,11 +79,11 @@ final class DirectWritableBufferImpl extends NativeWritableBufferImpl {
     int typeIdOut = removeNnBuf(typeId) | MEMORY | (readOnly ? READONLY : 0);
 
     if (byteOrder == ByteOrder.nativeOrder()) {
-      typeIdOut |= NATIVE;
+      typeIdOut |= NATIVE_BO;
       return new DirectWritableMemoryImpl(
           direct, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr);
     } else {
-      typeIdOut |= NONNATIVE;
+      typeIdOut |= NONNATIVE_BO;
       return new DirectNonNativeWritableMemoryImpl(
           direct, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr);
     }
@@ -94,11 +94,11 @@ final class DirectWritableBufferImpl extends NativeWritableBufferImpl {
     int typeIdOut = removeNnBuf(typeId) | BUFFER | DUPLICATE | (readOnly ? READONLY : 0);
 
     if (byteOrder == ByteOrder.nativeOrder()) {
-      typeIdOut |= NATIVE;
+      typeIdOut |= NATIVE_BO;
       return new DirectWritableBufferImpl(
           direct, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr);
     } else {
-      typeIdOut |= NONNATIVE;
+      typeIdOut |= NONNATIVE_BO;
       return new DirectNonNativeWritableBufferImpl(
           direct, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr);
     }
@@ -117,7 +117,7 @@ final class DirectWritableBufferImpl extends NativeWritableBufferImpl {
   }
 
   @Override
-  public boolean isValid() {
+  public boolean isAlive() {
     return direct.getValid().get();
   }
 

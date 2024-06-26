@@ -29,7 +29,7 @@ import sun.misc.Unsafe;
  *
  * @author Lee Rhodes
  */
-@SuppressWarnings({"restriction"})
+@SuppressWarnings({"restriction","javadoc"})
 public final class UnsafeUtil {
   public static final Unsafe unsafe;
   public static final String JDK; //must be at least "1.8"
@@ -137,7 +137,7 @@ public final class UnsafeUtil {
       p0 = Integer.parseInt(parts[0]); //the first number group
       p1 = (parts.length > 1) ? Integer.parseInt(parts[1]) : 0; //2nd number group, or 0
     } catch (final NumberFormatException | ArrayIndexOutOfBoundsException  e) {
-      throw new IllegalArgumentException("Improper Java -version string: " + jdkVer + "\n" + e);
+      throw new IllegalArgumentException("Improper Java -version string: " + jdkVer + LS + e);
     }
     checkJavaVersion(jdkVer, p0, p1);
     return new int[] {p0, p1};

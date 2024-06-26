@@ -93,7 +93,6 @@ public class BufferTest {
     buffersToCheck.add(WritableMemory.allocate(0).asBuffer());
     buffersToCheck.add(WritableBuffer.writableWrap(ByteBuffer.allocate(0)));
     buffersToCheck.add(Buffer.wrap(ByteBuffer.allocate(0)));
-    buffersToCheck.add(Memory.wrap(new boolean[0]).asBuffer());
     buffersToCheck.add(Memory.wrap(new byte[0]).asBuffer());
     buffersToCheck.add(Memory.wrap(new char[0]).asBuffer());
     buffersToCheck.add(Memory.wrap(new short[0]).asBuffer());
@@ -202,7 +201,7 @@ public class BufferTest {
     ByteBuffer bb = ByteBuffer.allocate(n * 8);
     bb.order(ByteOrder.BIG_ENDIAN);
     Buffer buf = Buffer.wrap(bb);
-    assertEquals(buf.getByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertEquals(buf.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test
@@ -219,7 +218,7 @@ public class BufferTest {
     for (int i = 0; i < 64; i++) {
       assertEquals(buf.getByte(), 64 + i);
     }
-    buf.toHexString("slice", 0, slice.capacity());
+    buf.toString("slice", 0, slice.capacity(), true);
     //println(s);
   }
 

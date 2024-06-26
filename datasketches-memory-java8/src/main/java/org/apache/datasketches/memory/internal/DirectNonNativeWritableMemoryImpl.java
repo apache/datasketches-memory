@@ -44,7 +44,7 @@ final class DirectNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImp
     this.direct = direct;
     this.offsetBytes = offsetBytes;
     this.capacityBytes = capacityBytes;
-    this.typeId = removeNnBuf(typeId) | DIRECT | MEMORY | NONNATIVE; //initially cannot be ReadOnly
+    this.typeId = removeNnBuf(typeId) | DIRECT | MEMORY | NONNATIVE_BO; //initially cannot be ReadOnly
     this.cumOffsetBytes = cumOffsetBytes;
     this.memReqSvr = memReqSvr; //in ResourceImpl
     if ((this.owner != null) && (this.owner != Thread.currentThread())) {
@@ -64,11 +64,11 @@ final class DirectNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImp
     int typeIdOut = removeNnBuf(typeId) | MEMORY | REGION | (readOnly ? READONLY : 0);
 
     if (Util.isNativeByteOrder(byteOrder)) {
-      typeIdOut |= NATIVE;
+      typeIdOut |= NATIVE_BO;
       return new DirectWritableMemoryImpl(
           direct, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, memReqSvr);
     } else {
-      typeIdOut |= NONNATIVE;
+      typeIdOut |= NONNATIVE_BO;
       return new DirectNonNativeWritableMemoryImpl(
           direct, newOffsetBytes, capacityBytes, typeIdOut, newCumOffsetBytes, memReqSvr);
     }
@@ -79,11 +79,11 @@ final class DirectNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImp
     int typeIdOut = removeNnBuf(typeId) | BUFFER | (readOnly ? READONLY : 0);
 
     if (byteOrder == ByteOrder.nativeOrder()) {
-      typeIdOut |= NATIVE;
+      typeIdOut |= NATIVE_BO;
       return new DirectWritableBufferImpl(
           direct, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr);
     } else {
-      typeIdOut |= NONNATIVE;
+      typeIdOut |= NONNATIVE_BO;
       return new DirectNonNativeWritableBufferImpl(
           direct, offsetBytes, capacityBytes, typeIdOut, cumOffsetBytes, memReqSvr);
     }
@@ -102,7 +102,7 @@ final class DirectNonNativeWritableMemoryImpl extends NonNativeWritableMemoryImp
   }
 
   @Override
-  public boolean isValid() {
+  public boolean isAlive() {
     return direct.getValid().get();
   }
 

@@ -19,7 +19,6 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.XxHash.hashBooleanArr;
 import static org.apache.datasketches.memory.XxHash.hashByteArr;
 import static org.apache.datasketches.memory.XxHash.hashCharArr;
 import static org.apache.datasketches.memory.XxHash.hashDoubleArr;
@@ -172,11 +171,6 @@ public class XxHash64Test {
     double[] darr = new double[2];
     wmem.getDoubleArray(0, darr, 0, 2);
     hash1 = hashDoubleArr(darr, 1, 1, 0);
-    assertEquals(hash1, hash0);
-
-    boolean[] blarr = new boolean[16];
-    wmem.getBooleanArray(0, blarr, 0, 16); //any byte != 0 is true
-    hash1 = hashBooleanArr(blarr, 8, 8, 0);
     assertEquals(hash1, hash0);
   }
 

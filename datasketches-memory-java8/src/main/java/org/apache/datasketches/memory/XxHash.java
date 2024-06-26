@@ -20,7 +20,6 @@
 package org.apache.datasketches.memory;
 
 import static org.apache.datasketches.memory.internal.XxHash64.hash;
-import static org.apache.datasketches.memory.internal.XxHash64.hashBooleans;
 import static org.apache.datasketches.memory.internal.XxHash64.hashBytes;
 import static org.apache.datasketches.memory.internal.XxHash64.hashChars;
 import static org.apache.datasketches.memory.internal.XxHash64.hashDoubles;
@@ -50,20 +49,6 @@ import static org.apache.datasketches.memory.internal.XxHash64.hashShorts;
 public final class XxHash {
 
   private XxHash() { /* singleton */ }
-
-  /**
-   * Hash the given arr starting at the given offset and continuing for the given length using the
-   * given seed.
-   * @param arr the given array
-   * @param offsetBooleans starting at this offset
-   * @param lengthBooleans continuing for this length
-   * @param seed the given seed
-   * @return the hash
-   */
-  public static long hashBooleanArr(final boolean[] arr, final long offsetBooleans,
-      final long lengthBooleans, final long seed) {
-    return hashBooleans(arr, offsetBooleans, lengthBooleans, seed);
-  }
 
   /**
    * Hash the given arr starting at the given offset and continuing for the given length using the

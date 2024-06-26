@@ -30,7 +30,7 @@ import org.testng.annotations.Test;
 /**
  * @author Lee Rhodes
  */
-public class BaseBufferTest {
+public class PositionalTest {
 
   @Test
   public void checkLimits() {

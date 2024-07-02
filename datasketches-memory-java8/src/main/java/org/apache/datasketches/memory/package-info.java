@@ -18,7 +18,7 @@
  */
 
 /**
- * <p>This package provides high performance primitive and primitive array access to direct (native),
+ * <p>This package provides high performance primitive and primitive array access to
  * off-heap memory and memory-mapped file resources, consistent views into
  * {@link java.nio.ByteBuffer}, and on-heap primitive arrays. It can be used as a more
  * comprehensive and flexible replacement for {@link java.nio.ByteBuffer}.
@@ -48,8 +48,7 @@
  *
  * <li>Immediate invalidation of all downstream references of an AutoCloseable
  * resource when that resource is closed, either manually or by the JVM.
- * This virtually eliminates the possibility of accidentally writing into the memory space
- * previously owned by a closed resource.</li>
+ * This virtually eliminates the possibility of use-after-close errors.</li>
  *
  * <li>Improved performance over the prior Memory implementation.</li>
  *
@@ -63,9 +62,9 @@
  * two different access APIs. These resources can be viewed as contiguous blobs of bytes that provide at least
  * byte-level read and write access. The four resources are:</p>
  *
- * <ul><li>Direct (a.k.a. Native) off-heap memory allocated by the user.</li>
+ * <ul><li>Off-heap memory allocated by the user.</li>
  * <li>Memory-mapped files, both writable and read-only.</li>
- * <li>{@code ByteBuffers}, both heap-based and direct, writable and read-only.</li>
+ * <li>{@code ByteBuffers}, both heap and off-heap, writable and read-only.</li>
  * <li>Heap-based primitive arrays, which can be accessed as writable or read-only.</li>
  * </ul>
  *
@@ -75,14 +74,14 @@
  * </ul>
  *
  * <p>In addition, all combinations of access APIs and backing resources can be accessed via
- * multibyte primitive methods (e.g.
+ * multibyte primitive methods (e.g.,
  * <i>getLong(...), getLongArray(...), putLong(...), putLongArray(...)</i>) as either
  * {@link java.nio.ByteOrder#BIG_ENDIAN} or {@link java.nio.ByteOrder#LITTLE_ENDIAN}.</p>
  *
  * <p>The resources don't know or care about the access APIs, and the access
  * APIs don't really know or care what resource they are accessing.</p>
  *
- * <p>A Direct or memory-mapped file resource can also be explicitly closed by the user</p>
+ * <p>An off-heap or memory-mapped file resource can also be explicitly closed by the user</p>
  * <blockquote><pre>
  *     //Using try-with-resources block:
  *     try (WritableMemory wmem = WritableMemory.map(File file)) {
@@ -95,8 +94,8 @@
  *     wmem.close();
  * </pre></blockquote>
  *
- * <p>Whatever thread of your process is responsible for allocating a direct or memory-mapped resource
- * must be responsible for closing it or making sure it gets closed. This is also true for the special
+ * <p>Whatever thread of your process is responsible for allocating an off-heap or memory-mapped resource
+ * is responsible for closing it or making sure it gets closed. This is also true for the special
  * memory-mapping methods load(), isLoaded() and force().</p>
  *
  *<p>Moving back and forth between <i>Memory</i> and <i>Buffer</i>:</p>

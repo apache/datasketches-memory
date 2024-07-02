@@ -439,7 +439,7 @@ public abstract class ResourceImpl implements Resource {
     sb.append("Capacity            : ").append(capacity).append(LS);
     sb.append("CumBaseOffset       : ").append(cumBaseOffset).append(LS);
     sb.append("MemReqSvr, hashCode : ").append(memReqStr).append(LS);
-    sb.append("Valid               : ").append(state.isAlive()).append(LS);
+    sb.append("is Alive            : ").append(state.isAlive()).append(LS);
     sb.append("Read Only           : ").append(state.isReadOnly()).append(LS);
     sb.append("Type Byte Order     : ").append(state.getTypeByteOrder().toString()).append(LS);
     sb.append("Native Byte Order   : ").append(ByteOrder.nativeOrder().toString()).append(LS);

@@ -29,8 +29,6 @@ import org.testng.annotations.Test;
 /**
  * Example of how to use the MemoryRequestServer with a memory hungry client.
  *
- * <p>Note: this example only works with Java 17.</p>
- *
  * @author Lee Rhodes
  */
 public class ExampleMemoryRequestServerTest {
@@ -57,8 +55,9 @@ public class ExampleMemoryRequestServerTest {
 
   /**
    * This little client is never happy with how much memory it has been allocated and keeps
-   * requesting for more. When it does ask for more, the DefaultMemoryRequestServer is configured to copy the old data into the new
-   * memory.  The client must request the MemoryRequestServer to release the prior memory.
+   * requesting for more. When it does ask for more, the DefaultMemoryRequestServer is 
+   * configured to copy the old data into the new memory. 
+   * The client must request the MemoryRequestServer to release the prior memory.
    * The client continues working and requesting more memory.
    *
    * <p>In reality, these memory requests should be quite rare.</p>
@@ -87,7 +86,7 @@ public class ExampleMemoryRequestServerTest {
         //Not big enough, expand
         oldWorkingCap = newWorkingCap;
         newWorkingCap = 2 * oldWorkingCap;
-        newMem = memReqSvr.request(workingMem, newWorkingCap); //defaults to new confined scope for each iteration
+        newMem = memReqSvr.request(workingMem, newWorkingCap); //creates a new memory for each iteration
 
         //done with old memory, close it, if applicable
         memReqSvr.requestClose(workingMem, newMem);

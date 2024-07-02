@@ -110,36 +110,36 @@ public interface WritableMemory extends Memory {
     return BaseWritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, false, byteOrder);
   }
 
-  //ALLOCATE DIRECT
+  //ALLOCATE OFF-HEAP
 
   /**
-   * Allocates and provides access to capacityBytes directly in native (off-heap) memory.
+   * Allocates and provides access to capacityBytes directly in off-heap memory.
    * Native byte order is assumed.
    * The allocated memory will be 8-byte aligned.
    *
-   * <p><b>NOTE:</b> Native/Direct memory acquired may have garbage in it.
+   * <p><b>NOTE:</b> Off-heap memory acquired may have garbage in it.
    * It is the responsibility of the using application to clear this memory, if required,
    * and to call <i>close()</i> when done.</p>
    *
    * @param capacityBytes the size of the desired memory in bytes.
-   * @return WritableMemory for this off-heap, native resource.
+   * @return WritableMemory for this off-heap resource.
    */
   static WritableMemory allocateDirect(long capacityBytes) {
     return allocateDirect(capacityBytes, ByteOrder.nativeOrder(), null);
   }
 
   /**
-   * Allocates and provides access to capacityBytes directly in native (off-heap) memory.
+   * Allocates and provides access to capacityBytes directly in off-heap memory.
    * The allocated memory will be 8-byte aligned.
    *
-   * <p><b>NOTE:</b> Native/Direct memory acquired may have garbage in it.
+   * <p><b>NOTE:</b> Off-heap memory acquired may have garbage in it.
    * It is the responsibility of the using application to clear this memory, if required,
    * and to call <i>close()</i> when done.</p>
    *
    * @param capacityBytes the size of the desired memory in bytes.
    * @param byteOrder the given <i>ByteOrder</i>.  It must be non-null.
    * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
-   * This is a callback mechanism for a user client of direct memory to request more memory.
+   * This is a callback mechanism for a user client of off-heap memory to request more memory.
    * @return a WritableMemory for this off-heap resource.
    */
   static WritableMemory allocateDirect(

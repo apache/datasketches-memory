@@ -66,8 +66,8 @@ public interface WritableBuffer extends Buffer {
     return BaseWritableBufferImpl.wrapByteBuffer(byteBuffer, false, byteOrder, memReqSvr);
   }
 
-  // NO MAP
-  // NO ALLOCATE DIRECT
+  // NO MAP use WritableMemory
+  // NO ALLOCATE OFF-HEAP use WritableMemory
 
   //DUPLICATES
   /**
@@ -104,9 +104,6 @@ public interface WritableBuffer extends Buffer {
    * <i>start</i>, <i>position</i> and <i>end</i>.
    */
   WritableBuffer writableDuplicate(ByteOrder byteOrder);
-
-  // NO MAP use WritableMemory
-  // NO ALLOCATE DIRECT use WritableMemory
 
   //REGIONS
   /**

@@ -39,10 +39,10 @@ public interface Resource extends AutoCloseable {
   /**
    * Gets the MemoryRequestServer object, if set, for the below resources to request additional memory.
    *
-   * <p>WritableMemory enables this for ByteBuffer, Heap and Direct Memory backed resources.</p>
+   * <p>WritableMemory enables this for ByteBuffer, Heap and Off-heap Memory backed resources.</p>
    *
    * <p>WritableBuffer enables this for ByteBuffer backed resources. However, the object returned is in the form of
-   * a WritableMemory. To convert to WritableBuffer use asWritableBuffer(). To enable for Heap and Direct Buffer
+   * a WritableMemory. To convert to WritableBuffer use asWritableBuffer(). To enable for Heap and Off-heap Buffer
    * resources, use the WritableMemory to configure and then call asWritableBuffer().</p>
    *
    * <p>Map backed resources will always return null.</p>
@@ -93,7 +93,7 @@ public interface Resource extends AutoCloseable {
    * should be manifest in the client code; a failure in any of these transitions reveals a bug in the underlying
    * application logic.
    *
-   * @throws IllegalStateException if this Resource is not <em>valid</em>.
+   * @throws IllegalStateException if this Resource is not <em>alive</em>.
    * @throws IllegalStateException if this method is not accessed from the owning thread.
    * @throws UnsupportedOperationException if this resource is not {@link AutoCloseable}.
    */
@@ -126,7 +126,7 @@ public interface Resource extends AutoCloseable {
    * @param thatOffsetBytes the starting offset in bytes for the given Resource object
    * @param lengthBytes the size of the range in bytes
    * @return true if the given Resource object has equal contents to this object in the given range of bytes.
-   * @throws IllegalStateException if either resource is not <em>valid</em>.
+   * @throws IllegalStateException if either resource is not <em>alive</em>.
    * @throws MemoryBoundsException if there is a bounds violation.
    */
   boolean equalTo(long thisOffsetBytes, Resource that, long thatOffsetBytes, long lengthBytes);
@@ -147,7 +147,7 @@ public interface Resource extends AutoCloseable {
    * In particular, this method has no effect for files mapped in read-only or private
    * mapping modes. This method may or may not have an effect for implementation-specific mapping modes.</p>
    *
-   * @throws IllegalStateException if this Resource is not <em>valid</em>.
+   * @throws IllegalStateException if this Resource is not <em>alive</em>.
    * @throws IllegalStateException if this method is not accessed from the owning thread.
    * @throws UnsupportedOperationException if this Resource is not memory-mapped, e.g. if {@code isMapped() == false}.
    * @throws ReadOnlyException if this Resource is read-only.
@@ -216,11 +216,11 @@ public interface Resource extends AutoCloseable {
   boolean isByteOrderCompatible(ByteOrder byteOrder);
 
   /**
-   * If true, the backing resource is direct (off-heap) memory.
-   * This is the case for allocated direct memory, memory-mapped files,
-   * or from a wrapped ByteBuffer that was allocated direct.
+   * If true, the backing resource is off-heap memory.
+   * This is the case for allocated off-heap memory, memory-mapped files,
+   * or from a wrapped ByteBuffer that was allocated off-heap.
    * If false, the backing resource is the Java heap.
-   * @return true if the backing resource is direct (off-heap) memory.
+   * @return true if the backing resource is off-heap memory.
    */
   boolean isDirect();
 
@@ -251,7 +251,7 @@ public interface Resource extends AutoCloseable {
    *
    * @return true if it is likely that all of the data in this memory-mapped Resource is resident in physical memory
    *
-   * @throws IllegalStateException if this Resource is not <em>valid</em>.
+   * @throws IllegalStateException if this Resource is not <em>alive</em>.
    * @throws IllegalStateException if this method is not accessed from the owning thread.
    * @throws UnsupportedOperationException if this Resource is not memory-mapped, e.g. if {@code isMapped() == false}.
    */
@@ -261,7 +261,7 @@ public interface Resource extends AutoCloseable {
    * If true, this is a <i>Memory</i> or <i>WritableMemory</i> instance, which provides the Memory API.
    * The Memory API is the principal API for this Memory Component.
    * It provides a rich variety of direct manipulations of four types of resources:
-   * On-heap memory, direct (off-heap) memory, memory-mapped files, and ByteBuffers.
+   * On-heap memory, off-heap memory, memory-mapped files, and ByteBuffers.
    * If false, this is a <i>Buffer</i> or <i>WritableBuffer</i> instance, which provides the Buffer API.
    *
    * <p>The Buffer API is largely parallel to the Memory API except that it adds a positional API
@@ -310,7 +310,7 @@ public interface Resource extends AutoCloseable {
 
   /**
    * Returns true if this object is alive and has not been closed.
-   * This is relevant only for direct (off-heap) memory and memory-mapped Files.
+   * This is relevant only for off-heap memory and memory-mapped Files.
    * @return true if this object is alive and has not been closed.
    */
   boolean isAlive();
@@ -322,7 +322,7 @@ public interface Resource extends AutoCloseable {
    * resident in physical memory. Invoking this method may cause some number of page faults and
    * I/O operations to occur.</p>
    *
-   * @throws IllegalStateException if this Resource is not <em>valid</em>.
+   * @throws IllegalStateException if this Resource is not <em>alive</em>.
    * @throws IllegalStateException if this method is not accessed from the owning thread.
    * @throws UnsupportedOperationException if this Resource is not memory-mapped, e.g. if {@code isMapped() == false}.
    */

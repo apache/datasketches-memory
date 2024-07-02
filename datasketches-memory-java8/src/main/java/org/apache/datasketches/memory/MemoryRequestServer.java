@@ -20,7 +20,7 @@
 package org.apache.datasketches.memory;
 
 /**
- * The MemoryRequestServer is a callback interface to provide a means for direct (off-heap), heap and ByteBuffer
+ * The MemoryRequestServer is a callback interface to provide a means for off-heap, heap and ByteBuffer
  * backed resources to request more memory.
  *
  * @author Lee Rhodes

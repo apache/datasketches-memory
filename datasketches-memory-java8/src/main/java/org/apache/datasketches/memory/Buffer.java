@@ -101,7 +101,7 @@ public interface Buffer extends Positional {
   Buffer duplicate(ByteOrder byteOrder);
 
   //NO MAP use Memory
-  //NO ALLOCATE DIRECT, makes no sense
+  //NO ALLOCATE OFF-HEAP, makes no sense
 
   //REGIONS
   /**

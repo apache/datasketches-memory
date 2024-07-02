@@ -119,11 +119,6 @@ public class BufferReadWriteSafetyTest {
   }
 
   @Test(expectedExceptions = ReadOnlyException.class)
-  public void testPutBooleanArray() {
-    buf.putBooleanArray(new boolean[] {true}, 0, 1);
-  }
-
-  @Test(expectedExceptions = ReadOnlyException.class)
   public void testPutShortArray() {
     buf.putShortArray(new short[] {1}, 0, 1);
   }

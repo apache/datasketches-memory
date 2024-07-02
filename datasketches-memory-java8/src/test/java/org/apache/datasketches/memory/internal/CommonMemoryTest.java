@@ -96,14 +96,6 @@ public class CommonMemoryTest {
     int accessCapacity = (int)mem.getCapacity();
 
     int words = 4;
-    boolean[] srcArray1 = {true, false, true, false};
-    boolean[] dstArray1 = new boolean[words];
-    mem.fill(0, accessCapacity, (byte)127);
-    mem.putBooleanArray(0, srcArray1, 0, words);
-    mem.getBooleanArray(0, dstArray1, 0, words);
-    for (int i = 0; i < words; i++) {
-      assertEquals(dstArray1[i], srcArray1[i]);
-    }
 
     byte[] srcArray2 = { 1, -2, 3, -4 };
     byte[] dstArray2 = new byte[4];
@@ -173,13 +165,6 @@ public class CommonMemoryTest {
 
   public static void setGetPartialArraysWithOffsetTests(WritableMemory mem) {
     int items = 4;
-    boolean[] srcArray1 = {true, false, true, false};
-    boolean[] dstArray1 = new boolean[items];
-    mem.putBooleanArray(0, srcArray1, 2, items / 2);
-    mem.getBooleanArray(0, dstArray1, 2, items / 2);
-    for (int i = 2; i < items; i++) {
-      assertEquals(dstArray1[i], srcArray1[i]);
-    }
 
     byte[] srcArray2 = { 1, -2, 3, -4 };
     byte[] dstArray2 = new byte[items];

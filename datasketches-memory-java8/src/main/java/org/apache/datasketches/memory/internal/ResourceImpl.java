@@ -31,7 +31,7 @@ import org.apache.datasketches.memory.ReadOnlyException;
 import org.apache.datasketches.memory.Resource;
 
 /**
- * Implements the root Resource methods.
+ * Implements the root Resource methods plus some common static variables and check methods.
  *
  * @author Lee Rhodes
  */
@@ -53,36 +53,31 @@ public abstract class ResourceImpl implements Resource {
   //class type IDs. Do not change the bit orders
   //The lowest 3 bits are set dynamically
   // 0000 0XXX Group 1
-  static final int WRITABLE = 0;
-  static final int READONLY = 1;
-  static final int REGION = 1 << 1;
-  static final int DUPLICATE = 1 << 2; //for Buffer only
+  static final int WRITABLE  = 0; //bit 0 = 0
+  static final int READONLY  = 1; //bit 0
+  static final int REGION    = 2; //bit 1
+  static final int DUPLICATE = 4; //bit 2, for Buffer only
 
   // 000X X000 Group 2
-  static final int HEAP = 0;
-  static final int DIRECT = 1 << 3;
-  static final int MAP = 1 << 4; //Map is always Direct also
+  static final int HEAP   = 0;    //bits 3,4 = 0
+  static final int DIRECT = 8;    //bit 3
+  static final int MAP    = 16;   //bit 4, Map is effectively Direct
 
-  // 00X0 0000 Group 3
-  static final int NATIVE = 0;
-  static final int NONNATIVE = 1 << 5;
+  // 00X0 0000 Group 3 ByteOrder
+  static final int NATIVE_BO    = 0; //bit 5 = 0
+  static final int NONNATIVE_BO = 32;//bit 5
 
   // 0X00 0000 Group 4
-  static final int MEMORY = 0;
-  static final int BUFFER = 1 << 6;
+  static final int MEMORY = 0;    //bit 6 = 0
+  static final int BUFFER = 64;   //bit 6
 
   // X000 0000 Group 5
-  static final int BYTEBUF = 1 << 7;
+  static final int BYTEBUF = 128; //bit 7
 
   /**
    * The java line separator character as a String.
    */
   public static final String LS = System.getProperty("line.separator");
-
-  public static final ByteOrder NATIVE_BYTE_ORDER = ByteOrder.nativeOrder();
-
-  public static final ByteOrder NON_NATIVE_BYTE_ORDER =
-      (NATIVE_BYTE_ORDER == ByteOrder.LITTLE_ENDIAN) ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
 
   static final String NOT_MAPPED_FILE_RESOURCE = "This is not a memory-mapped file resource";
   static final String THREAD_EXCEPTION_TEXT = "Attempted access outside owning thread";
@@ -99,13 +94,34 @@ public abstract class ResourceImpl implements Resource {
   long cumOffsetBytes;
   long offsetBytes;
   int typeId;
-  MemoryRequestServer memReqSvr = null; //set by the user via the leaf nodes
   Thread owner = null;
 
   /**
    * The root of the Memory inheritance hierarchy
    */
   ResourceImpl() { }
+
+  //MemoryRequestServer logic
+
+  /**
+   * User specified MemoryRequestServer. Set here and by leaf nodes.
+   */
+  MemoryRequestServer memReqSvr = null;
+
+  @Override
+  public MemoryRequestServer getMemoryRequestServer() {
+    return memReqSvr;
+  }
+
+  @Override
+  public boolean hasMemoryRequestServer() {
+    return memReqSvr != null;
+  }
+
+  @Override
+  public void setMemoryRequestServer(final MemoryRequestServer memReqSvr) { this.memReqSvr = memReqSvr; }
+
+  //***
 
   /**
    * Check the requested offset and length against the allocated size.
@@ -150,11 +166,11 @@ public abstract class ResourceImpl implements Resource {
   }
 
   /**
-   * @throws IllegalStateException if this Resource is AutoCloseable, and already closed, i.e., not <em>valid</em>.
+   * @throws IllegalStateException if this Resource is AutoCloseable, and already closed, i.e., not <em>alive</em>.
    */
   void checkValid() {
-    if (!isValid()) {
-      throw new IllegalStateException("this Resource is AutoCloseable, and already closed, i.e., not <em>valid</em>.");
+    if (!isAlive()) {
+      throw new IllegalStateException("this Resource is AutoCloseable, and already closed, i.e., not <em>alive</em>.");
     }
   }
 
@@ -219,8 +235,8 @@ public abstract class ResourceImpl implements Resource {
   }
 
   @Override
-  public final ByteOrder getByteOrder() {
-    return isNativeOrder(getTypeId()) ? NATIVE_BYTE_ORDER : NON_NATIVE_BYTE_ORDER;
+  public final ByteOrder getTypeByteOrder() {
+    return isNativeOrder(getTypeId()) ? Util.NATIVE_BYTE_ORDER : Util.NON_NATIVE_BYTE_ORDER;
   }
 
   @Override
@@ -229,24 +245,13 @@ public abstract class ResourceImpl implements Resource {
     return capacityBytes;
   }
 
-  /**
-   * Gets the cumulative offset in bytes of this object from the backing resource including the given
-   * localOffsetBytes. This offset may also include other offset components such as the native off-heap
-   * memory address, DirectByteBuffer split offsets, region offsets, and object arrayBaseOffsets.
-   *
-   * @param addOffsetBytes offset to be added to the cumulative offset.
-   * @return the cumulative offset in bytes of this object from the backing resource including the
-   * given offsetBytes.
-   */
-  long getCumulativeOffset(final long addOffsetBytes) {
+  @Override
+  public long getCumulativeOffset(final long addOffsetBytes) {
     return cumOffsetBytes + addOffsetBytes;
   }
 
   @Override
-  public MemoryRequestServer getMemoryRequestServer() { return memReqSvr; }
-
-  @Override
-  public long getTotalOffset() {
+  public long getRelativeOffset() {
     return offsetBytes;
   }
 
@@ -262,32 +267,37 @@ public abstract class ResourceImpl implements Resource {
   }
 
   @Override
-  public boolean isByteBufferResource() {
+  public boolean hasByteBuffer() {
     return (getTypeId() & BYTEBUF) > 0;
   }
 
   @Override
   public final boolean isByteOrderCompatible(final ByteOrder byteOrder) {
-    final ByteOrder typeBO = getByteOrder();
+    final ByteOrder typeBO = getTypeByteOrder();
     return typeBO == ByteOrder.nativeOrder() && typeBO == byteOrder;
   }
 
-  final boolean isBufferApi(final int typeId) {
+  static final boolean isBuffer(final int typeId) {
     return (typeId & BUFFER) > 0;
   }
 
   @Override
-  public final boolean isDirectResource() {
+  public boolean isCloseable() {
+    return (getTypeId() & (MAP | DIRECT)) > 0 && isAlive();
+  }
+  
+  @Override
+  public final boolean isDirect() {
     return getUnsafeObject() == null;
   }
 
   @Override
-  public boolean isDuplicateBufferView() {
+  public boolean isDuplicate() {
     return (getTypeId() & DUPLICATE) > 0;
   }
 
   @Override
-  public final boolean isHeapResource() {
+  public final boolean isHeap() {
     checkValid();
     return getUnsafeObject() != null;
   }
@@ -298,22 +308,22 @@ public abstract class ResourceImpl implements Resource {
   }
 
   @Override
-  public boolean isMemoryMappedResource() {
+  public boolean isMapped() {
     return (getTypeId() & MAP) > 0;
   }
 
   @Override
-  public boolean isMemoryApi() {
+  public boolean isMemory() {
     return (getTypeId() & BUFFER) == 0;
   }
 
-  final boolean isNativeOrder(final int typeId) { //not used
-    return (typeId & NONNATIVE) == 0;
+  static final boolean isNativeOrder(final int typeId) { //not used
+    return (typeId & NONNATIVE_BO) == 0;
   }
 
   @Override
   public boolean isNonNativeOrder() {
-    return (getTypeId() & NONNATIVE) > 0;
+    return (getTypeId() & NONNATIVE_BO) > 0;
   }
 
   @Override
@@ -342,7 +352,7 @@ public abstract class ResourceImpl implements Resource {
 
   //Overridden by Direct and Map leaves
   @Override
-  public boolean isValid() {
+  public boolean isAlive() {
     return true;
   }
 
@@ -369,7 +379,7 @@ public abstract class ResourceImpl implements Resource {
       p0 = Integer.parseInt(parts[0]); //the first number group
       p1 = (parts.length > 1) ? Integer.parseInt(parts[1]) : 0; //2nd number group, or 0
     } catch (final NumberFormatException | ArrayIndexOutOfBoundsException  e) {
-      throw new IllegalArgumentException("Improper Java -version string: " + jdkVer + "\n" + e);
+      throw new IllegalArgumentException("Improper Java -version string: " + jdkVer + LS + e);
     }
     checkJavaVersion(jdkVer, p0, p1);
     return new int[] {p0, p1};
@@ -378,14 +388,11 @@ public abstract class ResourceImpl implements Resource {
   //REACHABILITY FENCE
   static void reachabilityFence(final Object obj) { }
 
-  final static int removeNnBuf(final int typeId) { return typeId & ~NONNATIVE & ~BUFFER; }
+  final static int removeNnBuf(final int typeId) { return typeId & ~NONNATIVE_BO & ~BUFFER; }
 
   final static int setReadOnlyBit(final int typeId, final boolean readOnly) {
     return readOnly ? typeId | READONLY : typeId & ~READONLY;
   }
-
-  @Override
-  public void setMemoryRequestServer(final MemoryRequestServer memReqSvr) { this.memReqSvr = memReqSvr; }
 
   /**
    * Returns a formatted hex string of an area of this object.
@@ -396,8 +403,8 @@ public abstract class ResourceImpl implements Resource {
    * @param lengthBytes number of bytes to convert to a hex string
    * @return a formatted hex string in a human readable array
    */
-  static final String toHex(final ResourceImpl state, final String preamble, final long offsetBytes,
-      final int lengthBytes) {
+  static final String toHex(final ResourceImpl state, final String preamble, final long offsetBytes, final int lengthBytes,
+      final boolean withData) {
     final long capacity = state.getCapacity();
     ResourceImpl.checkBounds(offsetBytes, lengthBytes, capacity);
     final StringBuilder sb = new StringBuilder();
@@ -423,33 +430,40 @@ public abstract class ResourceImpl implements Resource {
     sb.append("UnsafeObj, hashCode : ").append(uObjStr).append(LS);
     sb.append("UnsafeObjHeader     : ").append(uObjHeader).append(LS);
     sb.append("ByteBuf, hashCode   : ").append(bbStr).append(LS);
-    sb.append("RegionOffset        : ").append(state.getTotalOffset()).append(LS);
+    sb.append("RegionOffset        : ").append(state.getRelativeOffset()).append(LS);
+    if (ResourceImpl.isBuffer(state.typeId)) {
+      sb.append("Start               : ").append(((PositionalImpl)state).getStart()).append(LS);
+      sb.append("Position            : ").append(((PositionalImpl)state).getPosition()).append(LS);
+      sb.append("End                 : ").append(((PositionalImpl)state).getEnd()).append(LS);
+    }
     sb.append("Capacity            : ").append(capacity).append(LS);
     sb.append("CumBaseOffset       : ").append(cumBaseOffset).append(LS);
-    sb.append("MemReq, hashCode    : ").append(memReqStr).append(LS);
-    sb.append("Valid               : ").append(state.isValid()).append(LS);
+    sb.append("MemReqSvr, hashCode : ").append(memReqStr).append(LS);
+    sb.append("is Alive            : ").append(state.isAlive()).append(LS);
     sb.append("Read Only           : ").append(state.isReadOnly()).append(LS);
-    sb.append("Type Byte Order     : ").append(state.getByteOrder().toString()).append(LS);
+    sb.append("Type Byte Order     : ").append(state.getTypeByteOrder().toString()).append(LS);
     sb.append("Native Byte Order   : ").append(ByteOrder.nativeOrder().toString()).append(LS);
     sb.append("JDK Runtime Version : ").append(UnsafeUtil.JDK).append(LS);
     //Data detail
-    sb.append("Data, littleEndian  :  0  1  2  3  4  5  6  7");
-
-    for (long i = 0; i < lengthBytes; i++) {
-      final int b = unsafe.getByte(uObj, cumBaseOffset + offsetBytes + i) & 0XFF;
-      if (i % 8 == 0) { //row header
-        sb.append(String.format("%n%20s: ", offsetBytes + i));
+    if (withData) {
+      sb.append("Data, bytes         :  0  1  2  3  4  5  6  7");
+  
+      for (long i = 0; i < lengthBytes; i++) {
+        final int b = unsafe.getByte(uObj, cumBaseOffset + offsetBytes + i) & 0XFF;
+        if (i % 8 == 0) { //row header
+          sb.append(String.format("%n%20s: ", offsetBytes + i));
+        }
+        sb.append(String.format("%02x ", b));
       }
-      sb.append(String.format("%02x ", b));
+      sb.append(LS);
     }
-    sb.append(LS);
-
+    sb.append("### END SUMMARY");
     return sb.toString();
   }
 
   @Override
-  public final String toHexString(final String header, final long offsetBytes,
-      final int lengthBytes) {
+  public final String toString(final String header, final long offsetBytes, final int lengthBytes, 
+      final boolean withData) {
     checkValid();
     final String klass = this.getClass().getSimpleName();
     final String s1 = String.format("(..., %d, %d)", offsetBytes, lengthBytes);
@@ -457,11 +471,17 @@ public abstract class ResourceImpl implements Resource {
     final String call = ".toHexString" + s1 + ", hashCode: " + hcode;
     final StringBuilder sb = new StringBuilder();
     sb.append("### ").append(klass).append(" SUMMARY ###").append(LS);
+    sb.append("Type Info           : ").append(typeDecode(typeId)).append(LS + LS);
     sb.append("Header Comment      : ").append(header).append(LS);
     sb.append("Call Parameters     : ").append(call);
-    return toHex(this, sb.toString(), offsetBytes, lengthBytes);
+    return toHex(this, sb.toString(), offsetBytes, lengthBytes, withData);
   }
 
+  @Override
+  public final String toString() {
+    return toString("", 0, (int)this.getCapacity(), false);
+  }
+  
   /**
    * Decodes the resource type. This is primarily for debugging.
    * @param typeId the given typeId

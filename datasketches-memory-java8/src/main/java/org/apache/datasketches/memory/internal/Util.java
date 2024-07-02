@@ -19,6 +19,8 @@
 
 package org.apache.datasketches.memory.internal;
 
+import static java.util.Arrays.fill;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -39,8 +41,31 @@ public final class Util {
 
   private Util() { }
 
+  /**
+   * Java line separator that is platform independent.
+   */
   public static final String LS = System.getProperty("line.separator");
 
+  /**
+   * The static final for <i>ByteOrder.nativeOrder()</i>.
+   */
+  public static final ByteOrder NATIVE_BYTE_ORDER = ByteOrder.nativeOrder();
+
+  /**
+   * The static final for NON <i>ByteOrder.nativeOrder()</i>.
+   */
+  public static final ByteOrder NON_NATIVE_BYTE_ORDER =
+      (NATIVE_BYTE_ORDER == ByteOrder.LITTLE_ENDIAN) ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
+  
+  /**
+   * Returns the opposite byte order from the given one.
+   * @param order the given byte order
+   * @return the opposite byte order from the given one
+   */
+  public static ByteOrder otherByteOrder(final ByteOrder order) {
+    return (order == NATIVE_BYTE_ORDER) ? NON_NATIVE_BYTE_ORDER : NATIVE_BYTE_ORDER;
+  }
+  
   /**
    * Don't use sun.misc.Unsafe#copyMemory to copy blocks of memory larger than this
    * threshold, because internally it doesn't have safepoint polls, that may cause long
@@ -52,16 +77,6 @@ public final class Util {
    * <p>A reference to this can be found in java.nio.Bits.</p>
    */
   public static final int UNSAFE_COPY_THRESHOLD_BYTES = 1024 * 1024;
-
-  //Byte Order related
-  public static final ByteOrder NATIVE_BYTE_ORDER = ByteOrder.nativeOrder();
-
-  public static final ByteOrder NON_NATIVE_BYTE_ORDER = NATIVE_BYTE_ORDER == ByteOrder.LITTLE_ENDIAN
-      ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
-
-  public static ByteOrder otherByteOrder(final ByteOrder order) {
-    return (order == NATIVE_BYTE_ORDER) ? NON_NATIVE_BYTE_ORDER : NATIVE_BYTE_ORDER;
-  }
 
   /**
    * Returns true if the given byteOrder is the same as the native byte order.
@@ -126,34 +141,15 @@ public final class Util {
    * @param fieldLength the desired field length
    * @param padChar the desired pad character
    * @param postpend if true append the pacCharacters to the end of the string.
-   * @return prepended or postpended given string with the given character to fill the given field
-   * length.
+   * @return prepended or postpended given string with the given character to fill the given field length.
    */
-  public static final String characterPad(final String s, final int fieldLength,
-      final char padChar, final boolean postpend) {
-    final char[] chArr = s.toCharArray();
-    final int sLen = chArr.length;
+  public static final String characterPad(final String s, final int fieldLength, final char padChar, final boolean postpend) {
+    final int sLen = s.length();
     if (sLen < fieldLength) {
-      final char[] out = new char[fieldLength];
-      final int blanks = fieldLength - sLen;
-
-      if (postpend) {
-        for (int i = 0; i < sLen; i++) {
-          out[i] = chArr[i];
-        }
-        for (int i = sLen; i < fieldLength; i++) {
-          out[i] = padChar;
-        }
-      } else { //prepend
-        for (int i = 0; i < blanks; i++) {
-          out[i] = padChar;
-        }
-        for (int i = blanks; i < fieldLength; i++) {
-          out[i] = chArr[i - blanks];
-        }
-      }
-
-      return String.valueOf(out);
+      final char[] cArr = new char[fieldLength - sLen];
+      fill(cArr, padChar);
+      final String addstr = String.valueOf(cArr);
+      return (postpend) ? s.concat(addstr) : addstr.concat(s);
     }
     return s;
   }
@@ -283,18 +279,36 @@ public final class Util {
     }
   } //End class RandomCodePoints
 
+  /**
+   * Checks if given value is &le; zero.
+   * @param value the given value
+   * @param arg a meaningful name of the actual argument.
+   * @throws IllegalArgumentException if value is &le; 0.
+   */
   public static final void zeroCheck(final long value, final String arg) {
     if (value <= 0) {
       throw new IllegalArgumentException("The argument '" + arg + "' may not be negative or zero.");
     }
   }
 
+  /**
+   * Checks if given value is &lt; zero.
+   * @param value the given value
+   * @param arg a meaningful name of the actual argument.
+   * @throws IllegalArgumentException if value is &lt; 0.
+   */
   public static final void negativeCheck(final long value, final String arg) {
     if (value < 0) {
       throw new IllegalArgumentException("The argument '" + arg + "' may not be negative.");
     }
   }
 
+  /**
+   * Checks if given value is null.
+   * @param obj the given object
+   * @param arg a meaningful name of the actual argument.
+   * @throws IllegalArgumentException if value is null.
+   */
   public static final void nullCheck(final Object obj, final String arg) {
     if (obj == null) {
       throw new IllegalArgumentException("The argument '" + arg + "' may not be null.");

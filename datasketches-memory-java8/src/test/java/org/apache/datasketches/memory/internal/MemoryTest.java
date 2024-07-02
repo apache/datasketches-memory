@@ -96,7 +96,6 @@ public class MemoryTest {
       assertEquals(v, i);
     }
     // check 0 length array wraps
-    Memory memZeroLengthArrayBoolean = WritableMemory.writableWrap(new boolean[0]);
     Memory memZeroLengthArrayByte = WritableMemory.writableWrap(new byte[0]);
     Memory memZeroLengthArrayChar = WritableMemory.writableWrap(new char[0]);
     Memory memZeroLengthArrayShort = WritableMemory.writableWrap(new short[0]);
@@ -104,7 +103,6 @@ public class MemoryTest {
     Memory memZeroLengthArrayLong = WritableMemory.writableWrap(new long[0]);
     Memory memZeroLengthArrayFloat = WritableMemory.writableWrap(new float[0]);
     Memory memZeroLengthArrayDouble = WritableMemory.writableWrap(new double[0]);
-    assertEquals(memZeroLengthArrayBoolean.getCapacity(), 0);
     assertEquals(memZeroLengthArrayByte.getCapacity(), 0);
     assertEquals(memZeroLengthArrayChar.getCapacity(), 0);
     assertEquals(memZeroLengthArrayShort.getCapacity(), 0);
@@ -117,7 +115,6 @@ public class MemoryTest {
     List<Memory> memoryToCheck = Lists.newArrayList();
     memoryToCheck.add(WritableMemory.allocate(0));
     memoryToCheck.add(WritableMemory.writableWrap(ByteBuffer.allocate(0)));
-    memoryToCheck.add(WritableMemory.writableWrap(new boolean[0]));
     memoryToCheck.add(WritableMemory.writableWrap(new byte[0]));
     memoryToCheck.add(WritableMemory.writableWrap(new char[0]));
     memoryToCheck.add(WritableMemory.writableWrap(new short[0]));
@@ -126,7 +123,6 @@ public class MemoryTest {
     memoryToCheck.add(WritableMemory.writableWrap(new float[0]));
     memoryToCheck.add(WritableMemory.writableWrap(new double[0]));
     memoryToCheck.add(Memory.wrap(ByteBuffer.allocate(0)));
-    memoryToCheck.add(Memory.wrap(new boolean[0]));
     memoryToCheck.add(Memory.wrap(new byte[0]));
     memoryToCheck.add(Memory.wrap(new char[0]));
     memoryToCheck.add(Memory.wrap(new short[0]));
@@ -207,8 +203,8 @@ public class MemoryTest {
     ByteBuffer bb = ByteBuffer.allocate(n * 8);
     bb.order(ByteOrder.BIG_ENDIAN);
     Memory mem = Memory.wrap(bb);
-    assertFalse(mem.getByteOrder() == ByteOrder.nativeOrder());
-    assertEquals(mem.getByteOrder(), ByteOrder.BIG_ENDIAN);
+    assertFalse(mem.getTypeByteOrder() == ByteOrder.nativeOrder());
+    assertEquals(mem.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
   }
 
   @Test
@@ -223,8 +219,8 @@ public class MemoryTest {
     for (int i = 0; i < 64; i++) {
       assertEquals(mem.getByte(i), 64 + i);
     }
-    mem.toHexString("slice", 0, slice.capacity());
-    //println(s);
+    String s = mem.toString("slice", 0, slice.capacity(), true);
+    println(s);
   }
 
   @Test

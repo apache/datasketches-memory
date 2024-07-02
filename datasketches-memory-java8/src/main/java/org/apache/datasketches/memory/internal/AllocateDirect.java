@@ -112,7 +112,7 @@ final class AllocateDirect {
       if (valid.change()) {
         if (calledFromCleaner) {
           // Warn about non-deterministic resource cleanup.
-          LOG.warning("A direct resource was not closed explicitly");
+          LOG.warning("A direct resource was not closed explicitly.");
         }
         unsafe.freeMemory(nativeAddress);
         return true;

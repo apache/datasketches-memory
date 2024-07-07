@@ -88,10 +88,10 @@ public interface Resource extends AutoCloseable {
    * If this operation completes without exceptions, this resource will be marked as <em>not alive</em>,
    * and subsequent operations on this resource will fail with {@link IllegalStateException}.
    *
-   * @apiNote This operation is not idempotent; that is, closing an already closed resource <em>always</em>
+   * <p>This operation is not idempotent; that is, closing an already closed resource <em>always</em>
    * results in an exception being thrown. This reflects a deliberate design choice: resource state transitions
    * should be manifest in the client code; a failure in any of these transitions reveals a bug in the underlying
-   * application logic.
+   * application logic.</p>
    *
    * @throws IllegalStateException if this Resource is not <em>alive</em>.
    * @throws IllegalStateException if this method is not accessed from the owning thread.

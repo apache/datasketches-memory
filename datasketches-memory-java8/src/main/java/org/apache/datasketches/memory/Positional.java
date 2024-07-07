@@ -102,6 +102,9 @@ public interface Positional extends Resource {
    * @return BaseBuffer
    * @throws BufferPositionInvariantsException if positional invariants have been violated.
    */
-  Positional setStartPositionEnd(long start, long position, long end);
+  Positional setStartPositionEnd(
+      long start, 
+      long position, 
+      long end);
 
 }

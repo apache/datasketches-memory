@@ -46,13 +46,17 @@ public final class DefaultMemoryRequestServer implements MemoryRequestServer {
    * @param copyOldToNew if true, the data from the current memory will be copied to the new memory,
    * starting at address 0, and through the currentMemory capacity.
    */
-  public DefaultMemoryRequestServer(final boolean offHeap, final boolean copyOldToNew) {
+  public DefaultMemoryRequestServer(
+      final boolean offHeap, 
+      final boolean copyOldToNew) {
     this.offHeap = offHeap;
     this.copyOldToNew = copyOldToNew;
   }
 
   @Override
-  public WritableMemory request(final WritableMemory currentWmem, final long newCapacityBytes) {
+  public WritableMemory request(
+      final WritableMemory currentWmem, 
+      final long newCapacityBytes) {
     final ByteOrder order = currentWmem.getTypeByteOrder();
     final long currentBytes = currentWmem.getCapacity();
     final WritableMemory newWmem;
@@ -79,7 +83,9 @@ public final class DefaultMemoryRequestServer implements MemoryRequestServer {
   }
 
   @Override
-  public void requestClose(final WritableMemory memToClose, final WritableMemory newMemory) {
+  public void requestClose(
+      final WritableMemory memToClose, 
+      final WritableMemory newMemory) {
     if (memToClose.isCloseable()) { memToClose.close(); }
   }
 

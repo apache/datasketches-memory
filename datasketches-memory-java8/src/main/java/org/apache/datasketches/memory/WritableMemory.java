@@ -29,7 +29,6 @@ import java.util.Objects;
 
 import org.apache.datasketches.memory.internal.BaseWritableMemoryImpl;
 import org.apache.datasketches.memory.internal.Prim;
-import org.apache.datasketches.memory.internal.ResourceImpl;
 
 /**
  * Defines the writable API for offset access to a resource.
@@ -331,8 +330,6 @@ public interface WritableMemory extends Memory {
       int lengthBytes, 
       ByteOrder byteOrder,
       MemoryRequestServer memReqSvr) {
-    Objects.requireNonNull(array, "array must be non-null");
-    ResourceImpl.checkBounds(offsetBytes, lengthBytes, array.length);
     return BaseWritableMemoryImpl.wrapHeapArray(array, offsetBytes, lengthBytes, false, byteOrder, memReqSvr);
   }
 

@@ -129,7 +129,11 @@ public interface Resource extends AutoCloseable {
    * @throws IllegalStateException if either resource is not <em>alive</em>.
    * @throws MemoryBoundsException if there is a bounds violation.
    */
-  boolean equalTo(long thisOffsetBytes, Resource that, long thatOffsetBytes, long lengthBytes);
+  boolean equalTo(
+      long thisOffsetBytes, 
+      Resource that, 
+      long thatOffsetBytes, 
+      long lengthBytes);
 
   /**
    * Forces any changes made to the contents of this memory-mapped Resource to be written to the storage
@@ -337,7 +341,11 @@ public interface Resource extends AutoCloseable {
    * @param withData include output listing of byte data in the given range
    * @return a formatted hex string in a human readable array
    */
-  String toString(String header, long offsetBytes, int lengthBytes, boolean withData);
+  String toString(
+      String header, 
+      long offsetBytes, 
+      int lengthBytes, 
+      boolean withData);
 
   /**
    * Returns a brief description of this object.
@@ -357,7 +365,10 @@ public interface Resource extends AutoCloseable {
    * @return the 64-bit hash of the sequence of bytes in this object specified by
    * <i>offsetBytes</i> and <i>lengthBytes</i>.
    */
-  long xxHash64(long offsetBytes, long lengthBytes, long seed);
+  long xxHash64(
+      long offsetBytes, 
+      long lengthBytes, 
+      long seed);
 
   /**
    * Returns a 64-bit hash from a single long. This method has been optimized for speed when only
@@ -366,6 +377,8 @@ public interface Resource extends AutoCloseable {
    * @param seed A long valued seed.
    * @return the hash.
    */
-  long xxHash64(long in, long seed);
+  long xxHash64(
+      long in, 
+      long seed);
 
 }

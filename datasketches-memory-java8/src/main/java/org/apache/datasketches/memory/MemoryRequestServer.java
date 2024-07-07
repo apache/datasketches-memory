@@ -35,7 +35,9 @@ public interface MemoryRequestServer {
    *
    * @return new WritableMemory with the requested capacity.
    */
-  WritableMemory request(WritableMemory currentWritableMemory, long newCapacityBytes);
+  WritableMemory request(
+      WritableMemory currentWritableMemory, 
+      long newCapacityBytes);
 
   /**
    * Request to close the resource, if applicable.
@@ -54,6 +56,8 @@ public interface MemoryRequestServer {
    * The newMemory reference is returned from the client for the convenience of the system that
    * owns the responsibility of memory allocation. It may be null.
    */
-  void requestClose(final WritableMemory memToClose, WritableMemory newMemory);
+  void requestClose(
+      final WritableMemory memToClose, 
+      WritableMemory newMemory);
 
 }

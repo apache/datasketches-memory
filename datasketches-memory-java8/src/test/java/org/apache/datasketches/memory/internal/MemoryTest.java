@@ -35,6 +35,7 @@ import java.util.List;
 
 import org.apache.datasketches.memory.DefaultMemoryRequestServer;
 import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.memory.MemoryBoundsException;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.WritableBuffer;
@@ -406,6 +407,30 @@ public class MemoryTest {
     }
   }
 
+  @Test
+  public void checkArrayBounds() {
+    byte[] arr = new byte[100];
+    int offset = 50;
+    int len = 51;
+    for (int i = 0; i < 100; i++) { arr[i] = (byte)(i + 1); }
+    try { //this worked
+      Memory.wrap(arr, offset, len, ByteOrder.LITTLE_ENDIAN);
+    } catch (MemoryBoundsException e) { }
+    try { //this was a bug
+      BaseWritableMemoryImpl.wrapHeapArray(arr, offset, len, false, ByteOrder.LITTLE_ENDIAN, null);
+    } catch (MemoryBoundsException e) { }
+  }
+  
+  @Test
+  public void checkByteOrder() {
+    byte[] arr = new byte[4];
+    int test = 1;
+    arr[0] = (byte)test;
+    Memory mem = Memory.wrap(arr, ByteOrder.BIG_ENDIAN);
+    int t = mem.getInt(0);
+    assertEquals(t, Integer.reverseBytes(test));
+  }
+  
   @Test
   public void printlnTest() {
     println("PRINTING: " + this.getClass().getName());

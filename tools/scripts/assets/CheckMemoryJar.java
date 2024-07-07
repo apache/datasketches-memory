@@ -23,9 +23,7 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.MapHandle;
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.WritableHandle;
 import org.apache.datasketches.memory.WritableMemory;
 
 public class CheckMemoryJar {
@@ -51,10 +49,9 @@ public class CheckMemoryJar {
     public void checkAllocateDirect() throws Exception {
         try {
             String str = "2 - Allocate Direct Successful";
-            WritableHandle wh = WritableMemory.allocateDirect(2 * str.length());
-            WritableMemory wmem = wh.getWritable();
+            WritableMemory wmem = WritableMemory.allocateDirect(2 * str.length());
             writeReadAndPrintString(wmem, str);
-            wh.close();
+            wmem.close();
         } catch (Exception ex) {
             exitOnError("Allocate Direct", ex);
         }
@@ -76,9 +73,8 @@ public class CheckMemoryJar {
         try {
             String str = "4 - Memory Map Successful";
             File file = new File(mappedFilePath);
-            MapHandle mh = Memory.map(file);
-            Memory mem = mh.get();
-            mh.close();
+            Memory mem = Memory.map(file);
+            mem.close();
             println(str);
         } catch (Exception ex) {
             exitOnError("Memory Map", ex);

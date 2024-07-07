@@ -260,8 +260,7 @@ public abstract class ResourceImpl implements Resource {
     return typeId;
   }
 
-  //Overridden by Heap and ByteBuffer leaves. Made public as getArray() in WritableMemoryImpl and
-  // WritableBufferImpl
+  //Overridden by Heap and ByteBuffer leaves. Made public as getArray() in BaseWritableMemoryImpl and BaseWritableBufferImpl
   Object getUnsafeObject() {
     return null;
   }

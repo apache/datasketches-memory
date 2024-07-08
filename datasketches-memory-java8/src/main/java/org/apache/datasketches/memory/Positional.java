@@ -42,7 +42,7 @@ public interface Positional extends Resource {
    * Increments the current position by the given increment.
    * Checks that the resource is alive and that the positional invariants are not violated
    * @param increment the given increment
-   * @return Positional
+   * @return this Positional
    * @throws BufferPositionInvariantsException if positional invariants have been violated.
    */
   Positional incrementPosition(long increment);
@@ -80,7 +80,7 @@ public interface Positional extends Resource {
   /**
    * Resets the current position to the start position,
    * This does not modify any data.
-   * @return BaseBuffer
+   * @return this Positional
    */
   Positional resetPosition();
 
@@ -88,7 +88,7 @@ public interface Positional extends Resource {
    * Sets the current position.
    * Checks that the positional invariants are not violated.
    * @param position the given current position.
-   * @return Positional
+   * @return this Positional
    * @throws BufferPositionInvariantsException if positional invariants have been violated.
    */
   Positional setPosition(long position);
@@ -99,7 +99,7 @@ public interface Positional extends Resource {
    * @param start the start position in the buffer
    * @param position the current position between the start and end
    * @param end the end position in the buffer
-   * @return Positional
+   * @return this Positional
    * @throws BufferPositionInvariantsException if positional invariants have been violated.
    */
   Positional setStartPositionEnd(

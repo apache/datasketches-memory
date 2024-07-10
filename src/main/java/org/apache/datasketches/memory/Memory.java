@@ -62,7 +62,9 @@ public interface Memory extends Resource {
    * @param byteOrder the byte order to be used.  It must be non-null.
    * @return a new <i>Memory</i> for read-only operations on the given <i>ByteBuffer</i>.
    */
-  static Memory wrap(ByteBuffer byteBuffer, ByteOrder byteOrder) {
+  static Memory wrap(
+      ByteBuffer byteBuffer,
+      ByteOrder byteOrder) {
     return WritableMemoryImpl.wrapByteBuffer(byteBuffer, true, byteOrder, null);
   }
 
@@ -99,8 +101,11 @@ public interface Memory extends Resource {
    * @throws SecurityException If a security manager is installed and it denies an unspecified permission
    * required by the implementation.
    */
-  static Memory map(File file, long fileOffsetBytes, long capacityBytes, ByteOrder byteOrder)
-      throws IOException {
+  static Memory map(
+      File file,
+      long fileOffsetBytes,
+      long capacityBytes,
+      ByteOrder byteOrder) throws IOException {
     final ResourceScope scope = ResourceScope.newConfinedScope();
     return WritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, true, byteOrder);
   }
@@ -120,8 +125,12 @@ public interface Memory extends Resource {
    * @throws SecurityException - If a security manager is installed and it denies an unspecified permission
    * required by the implementation.
    */
-  static Memory map(File file, long fileOffsetBytes, long capacityBytes, ResourceScope scope, ByteOrder byteOrder)
-      throws IOException {
+  static Memory map(
+      File file,
+      long fileOffsetBytes,
+      long capacityBytes,
+      ResourceScope scope,
+      ByteOrder byteOrder) throws IOException {
     return WritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, true, byteOrder);
   }
 
@@ -139,7 +148,9 @@ public interface Memory extends Resource {
    * @return a new <i>Memory</i> representing the defined region based on the given
    * offsetBytes and capacityBytes.
    */
-  default Memory region(long offsetBytes, long capacityBytes) {
+  default Memory region(
+      long offsetBytes,
+      long capacityBytes) {
     return region(offsetBytes, capacityBytes, getTypeByteOrder());
   }
 
@@ -156,7 +167,10 @@ public interface Memory extends Resource {
    * @return a new <i>Memory</i> representing the defined region based on the given
    * offsetBytes, capacityBytes and byteOrder.
    */
-  Memory region(long offsetBytes, long capacityBytes, ByteOrder byteOrder);
+  Memory region(
+      long offsetBytes,
+      long capacityBytes,
+      ByteOrder byteOrder);
 
   //AS BUFFER
   /**
@@ -209,7 +223,9 @@ public interface Memory extends Resource {
    * @param byteOrder the byte order to be used
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(byte[] array, ByteOrder byteOrder) {
+  static Memory wrap(
+      byte[] array,
+      ByteOrder byteOrder) {
     return wrap(array, 0, array.length, byteOrder);
   }
 
@@ -221,7 +237,11 @@ public interface Memory extends Resource {
    * @param byteOrder the byte order to be used.  It must be non-null.
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(byte[] array, int offsetBytes, int lengthBytes, ByteOrder byteOrder) {
+  static Memory wrap(
+      byte[] array,
+      int offsetBytes,
+      int lengthBytes,
+      ByteOrder byteOrder) {
     final MemorySegment slice = MemorySegment.ofArray(array).asSlice(offsetBytes, lengthBytes).asReadOnly();
     return WritableMemoryImpl.wrapSegmentAsArray(slice, byteOrder, null);
   }
@@ -314,7 +334,11 @@ public interface Memory extends Resource {
    * @param dstOffsetBytes offset in array units
    * @param lengthBytes number of array units to transfer
    */
-  void getByteArray(long offsetBytes, byte[] dstArray, int dstOffsetBytes, int lengthBytes);
+  void getByteArray(
+      long offsetBytes,
+      byte[] dstArray,
+      int dstOffsetBytes,
+      int lengthBytes);
 
   /**
    * Gets the char value at the given offset
@@ -330,7 +354,11 @@ public interface Memory extends Resource {
    * @param dstOffsetChars offset in array units
    * @param lengthChars number of array units to transfer
    */
-  void getCharArray(long offsetBytes, char[] dstArray, int dstOffsetChars, int lengthChars);
+  void getCharArray(
+      long offsetBytes,
+      char[] dstArray,
+      int dstOffsetChars,
+      int lengthChars);
 
   //Missing getCharsFromUtf8(long offsetBytes, int utf8LengthBytes, Appendable ds)
 
@@ -350,7 +378,11 @@ public interface Memory extends Resource {
    * @param dstOffsetDoubles offset in array units
    * @param lengthDoubles number of array units to transfer
    */
-  void getDoubleArray(long offsetBytes, double[] dstArray, int dstOffsetDoubles, int lengthDoubles);
+  void getDoubleArray(
+      long offsetBytes,
+      double[] dstArray,
+      int dstOffsetDoubles,
+      int lengthDoubles);
 
   /**
    * Gets the float value at the given offset
@@ -366,7 +398,11 @@ public interface Memory extends Resource {
    * @param dstOffsetFloats offset in array units
    * @param lengthFloats number of array units to transfer
    */
-  void getFloatArray(long offsetBytes, float[] dstArray, int dstOffsetFloats, int lengthFloats);
+  void getFloatArray(
+      long offsetBytes,
+      float[] dstArray,
+      int dstOffsetFloats,
+      int lengthFloats);
 
   /**
    * Gets the int value at the given offset
@@ -382,7 +418,11 @@ public interface Memory extends Resource {
    * @param dstOffsetInts offset in array units
    * @param lengthInts number of array units to transfer
    */
-  void getIntArray(long offsetBytes, int[] dstArray, int dstOffsetInts, int lengthInts);
+  void getIntArray(
+      long offsetBytes,
+      int[] dstArray,
+      int dstOffsetInts,
+      int lengthInts);
 
   /**
    * Gets the long value at the given offset
@@ -398,7 +438,11 @@ public interface Memory extends Resource {
    * @param dstOffsetLongs offset in array units
    * @param lengthLongs number of array units to transfer
    */
-  void getLongArray(long offsetBytes, long[] dstArray, int dstOffsetLongs, int lengthLongs);
+  void getLongArray(
+      long offsetBytes,
+      long[] dstArray,
+      int dstOffsetLongs,
+      int lengthLongs);
 
   /**
    * Gets the short value at the given offset
@@ -414,7 +458,11 @@ public interface Memory extends Resource {
    * @param dstOffsetShorts offset in array units
    * @param lengthShorts number of array units to transfer
    */
-  void getShortArray(long offsetBytes, short[] dstArray, int dstOffsetShorts, int lengthShorts);
+  void getShortArray(
+      long offsetBytes,
+      short[] dstArray,
+      int dstOffsetShorts,
+      int lengthShorts);
 
   //SPECIAL PRIMITIVE READ METHODS: compareTo, copyTo, writeTo
 
@@ -432,8 +480,12 @@ public interface Memory extends Resource {
    * @return <i>(this &lt; that) ? (some negative value) : (this &gt; that) ? (some positive value)
    * : 0;</i>
    */
-  int compareTo(long thisOffsetBytes, long thisLengthBytes, Memory that,
-      long thatOffsetBytes, long thatLengthBytes);
+  int compareTo(
+      long thisOffsetBytes,
+      long thisLengthBytes,
+      Memory that,
+      long thatOffsetBytes,
+      long thatLengthBytes);
 
   /**
    * Copies bytes from a source range of this Memory to a destination range of the given Memory
@@ -447,7 +499,11 @@ public interface Memory extends Resource {
    * @param dstOffsetBytes the destination offset
    * @param lengthBytes the number of bytes to copy
    */
-  void copyTo(long srcOffsetBytes, WritableMemory destination, long dstOffsetBytes, long lengthBytes);
+  void copyTo(
+      long srcOffsetBytes,
+      WritableMemory destination,
+      long dstOffsetBytes,
+      long lengthBytes);
 
   /**
    * Writes bytes from a source range of this Memory to the given {@code WritableByteChannel}.
@@ -456,7 +512,9 @@ public interface Memory extends Resource {
    * @param out the destination ByteArrayOutputStream
    * @throws IOException may occur while writing to the ByteArrayOutputStream.
    */
-  void writeToByteStream(long offsetBytes, int lengthBytes, ByteArrayOutputStream out)
-      throws IOException;
+  void writeToByteStream(
+      long offsetBytes,
+      int lengthBytes,
+      ByteArrayOutputStream out) throws IOException;
 
 }

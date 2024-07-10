@@ -454,6 +454,27 @@ public class MemoryTest {
   }
 
   @Test
+  public void checkArrayBounds() {
+    byte[] arr = new byte[100];
+    int offset = 50;
+    int len = 51;
+    for (int i = 0; i < 100; i++) { arr[i] = (byte)(i + 1); }
+    try { //this worked
+      Memory.wrap(arr, offset, len, ByteOrder.LITTLE_ENDIAN);
+    } catch (IndexOutOfBoundsException e) { }
+  }
+
+  @Test
+  public void checkByteOrder() {
+    byte[] arr = new byte[4];
+    int test = 1;
+    arr[0] = (byte)test;
+    Memory mem = Memory.wrap(arr, ByteOrder.BIG_ENDIAN);
+    int t = mem.getInt(0);
+    assertEquals(t, Integer.reverseBytes(test));
+  }
+
+  @Test
   public void printlnTest() {
     println("PRINTING: "+this.getClass().getName());
   }

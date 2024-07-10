@@ -62,7 +62,10 @@ public interface WritableBuffer extends Buffer {
    * @return a new <i>WritableBuffer</i> for write operations on the given <i>ByteBuffer</i>.
    * @throws IllegalArgumentException if ByteBuffer is not writable
    */
-  static WritableBuffer writableWrap(ByteBuffer byteBuffer, ByteOrder byteOrder, MemoryRequestServer memReqSvr) {
+  static WritableBuffer writableWrap(
+      ByteBuffer byteBuffer,
+      ByteOrder byteOrder,
+      MemoryRequestServer memReqSvr) {
     return WritableBufferImpl.wrapByteBuffer(byteBuffer, false, byteOrder, memReqSvr);
   }
 
@@ -147,7 +150,10 @@ public interface WritableBuffer extends Buffer {
    * @return a new <i>WritableBuffer</i> representing the defined writable region
    * with the given offsetBytes, capacityBytes and byte order.
    */
-  WritableBuffer writableRegion(long offsetBytes, long capacityBytes, ByteOrder byteOrder);
+  WritableBuffer writableRegion(
+      long offsetBytes,
+      long capacityBytes,
+      ByteOrder byteOrder);
 
   //AS WRITABLE MEMORY
   /**
@@ -189,7 +195,9 @@ public interface WritableBuffer extends Buffer {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start.
    * @param value the value to put
    */
-  void putBoolean(long offsetBytes, boolean value);
+  void putBoolean(
+      long offsetBytes,
+      boolean value);
 
   //intentionally removed putBooleanArray(...)
 
@@ -206,7 +214,9 @@ public interface WritableBuffer extends Buffer {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param value the value to put
    */
-  void putByte(long offsetBytes, byte value);
+  void putByte(
+      long offsetBytes,
+      byte value);
 
   /**
    * Puts the byte array at the current position.
@@ -215,7 +225,10 @@ public interface WritableBuffer extends Buffer {
    * @param srcOffsetBytes offset in array units
    * @param lengthBytes number of array units to transfer
    */
-  void putByteArray(byte[] srcArray, int srcOffsetBytes, int lengthBytes);
+  void putByteArray(
+      byte[] srcArray,
+      int srcOffsetBytes,
+      int lengthBytes);
 
   /**
    * Puts the char value at the current position.
@@ -230,7 +243,9 @@ public interface WritableBuffer extends Buffer {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param value the value to put
    */
-  void putChar(long offsetBytes, char value);
+  void putChar(
+      long offsetBytes,
+      char value);
 
   /**
    * Puts the char array at the current position.
@@ -239,7 +254,10 @@ public interface WritableBuffer extends Buffer {
    * @param srcOffsetChars offset in array units
    * @param lengthChars number of array units to transfer
    */
-  void putCharArray(char[] srcArray, int srcOffsetChars, int lengthChars);
+  void putCharArray(
+      char[] srcArray,
+      int srcOffsetChars,
+      int lengthChars);
 
   /**
    * Puts the double value at the current position.
@@ -254,7 +272,9 @@ public interface WritableBuffer extends Buffer {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param value the value to put
    */
-  void putDouble(long offsetBytes, double value);
+  void putDouble(
+      long offsetBytes,
+      double value);
 
   /**
    * Puts the double array at the current position.
@@ -263,7 +283,10 @@ public interface WritableBuffer extends Buffer {
    * @param srcOffsetDoubles offset in array units
    * @param lengthDoubles number of array units to transfer
    */
-  void putDoubleArray(double[] srcArray, int srcOffsetDoubles, int lengthDoubles);
+  void putDoubleArray(
+      double[] srcArray,
+      int srcOffsetDoubles,
+      int lengthDoubles);
 
   /**
    * Puts the float value at the current position.
@@ -278,7 +301,9 @@ public interface WritableBuffer extends Buffer {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param value the value to put
    */
-  void putFloat(long offsetBytes, float value);
+  void putFloat(
+      long offsetBytes,
+      float value);
 
   /**
    * Puts the float array at the current position.
@@ -287,7 +312,10 @@ public interface WritableBuffer extends Buffer {
    * @param srcOffsetFloats offset in array units
    * @param lengthFloats number of array units to transfer
    */
-  void putFloatArray(float[] srcArray, int srcOffsetFloats, int lengthFloats);
+  void putFloatArray(
+      float[] srcArray,
+      int srcOffsetFloats,
+      int lengthFloats);
 
   /**
    * Puts the int value at the current position.
@@ -302,7 +330,9 @@ public interface WritableBuffer extends Buffer {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param value the value to put
    */
-  void putInt(long offsetBytes, int value);
+  void putInt(
+      long offsetBytes,
+      int value);
 
   /**
    * Puts the int array at the current position.
@@ -311,7 +341,10 @@ public interface WritableBuffer extends Buffer {
    * @param srcOffsetInts offset in array units
    * @param lengthInts number of array units to transfer
    */
-  void putIntArray(int[] srcArray, int srcOffsetInts, int lengthInts);
+  void putIntArray(
+      int[] srcArray,
+      int srcOffsetInts,
+      int lengthInts);
 
   /**
    * Puts the long value at the current position.
@@ -326,7 +359,9 @@ public interface WritableBuffer extends Buffer {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param value the value to put
    */
-  void putLong(long offsetBytes, long value);
+  void putLong(
+      long offsetBytes,
+      long value);
 
   /**
    * Puts the long array at the current position.
@@ -335,7 +370,10 @@ public interface WritableBuffer extends Buffer {
    * @param srcOffsetLongs offset in array units
    * @param lengthLongs number of array units to transfer
    */
-  void putLongArray(long[] srcArray, int srcOffsetLongs, int lengthLongs);
+  void putLongArray(
+      long[] srcArray,
+      int srcOffsetLongs,
+      int lengthLongs);
 
   /**
    * Puts the short value at the current position.
@@ -350,7 +388,9 @@ public interface WritableBuffer extends Buffer {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param value the value to put
    */
-  void putShort(long offsetBytes, short value);
+  void putShort(
+      long offsetBytes,
+      short value);
 
   /**
    * Puts the short array at the current position.
@@ -359,7 +399,10 @@ public interface WritableBuffer extends Buffer {
    * @param srcOffsetShorts offset in array units
    * @param lengthShorts number of array units to transfer
    */
-  void putShortArray(short[] srcArray, int srcOffsetShorts, int lengthShorts);
+  void putShortArray(
+      short[] srcArray,
+      int srcOffsetShorts,
+      int lengthShorts);
 
   // NO ATOMIC METHODS
 

@@ -59,7 +59,9 @@ public interface Buffer extends Positional, Resource {
    * @param byteOrder the ByteOrder to be used. It must be non-null.
    * @return a new <i>Buffer</i> for read-only operations on the given ByteBuffer.
    */
-  static Buffer wrap(ByteBuffer byteBuffer, ByteOrder byteOrder) {
+  static Buffer wrap(
+      ByteBuffer byteBuffer,
+      ByteOrder byteOrder) {
     return WritableBufferImpl.wrapByteBuffer(byteBuffer, true, byteOrder, null);
   }
 
@@ -145,7 +147,10 @@ public interface Buffer extends Positional, Resource {
    * @return a new <i>Buffer</i> representing the defined writable region
    * based on the current <i>position</i>, <i>end</i> and byteOrder.
    */
-  Buffer region(long offsetBytes, long capacityBytes, ByteOrder byteOrder);
+  Buffer region(
+      long offsetBytes,
+      long capacityBytes,
+      ByteOrder byteOrder);
 
   //AS MEMORY
   /**
@@ -211,7 +216,10 @@ public interface Buffer extends Positional, Resource {
    * @param dstOffsetBytes offset in array units
    * @param lengthBytes number of array units to transfer
    */
-  void getByteArray(byte[] dstArray, int dstOffsetBytes, int lengthBytes);
+  void getByteArray(
+      byte[] dstArray,
+      int dstOffsetBytes,
+      int lengthBytes);
 
   /**
    * Gets the char value at the current position.
@@ -235,7 +243,10 @@ public interface Buffer extends Positional, Resource {
    * @param dstOffsetChars offset in array units
    * @param lengthChars number of array units to transfer
    */
-  void getCharArray(char[] dstArray, int dstOffsetChars, int lengthChars);
+  void getCharArray(
+      char[] dstArray,
+      int dstOffsetChars,
+      int lengthChars);
 
   /**
    * Gets the double value at the current position.
@@ -259,7 +270,10 @@ public interface Buffer extends Positional, Resource {
    * @param dstOffsetDoubles offset in array units
    * @param lengthDoubles number of array units to transfer
    */
-  void getDoubleArray(double[] dstArray, int dstOffsetDoubles, int lengthDoubles);
+  void getDoubleArray(
+      double[] dstArray,
+      int dstOffsetDoubles,
+      int lengthDoubles);
 
   /**
    * Gets the float value at the current position.
@@ -283,7 +297,10 @@ public interface Buffer extends Positional, Resource {
    * @param dstOffsetFloats offset in array units
    * @param lengthFloats number of array units to transfer
    */
-  void getFloatArray(float[] dstArray, int dstOffsetFloats, int lengthFloats);
+  void getFloatArray(
+      float[] dstArray,
+      int dstOffsetFloats,
+      int lengthFloats);
 
   /**
    * Gets the int value at the current position.
@@ -307,7 +324,10 @@ public interface Buffer extends Positional, Resource {
    * @param dstOffsetInts offset in array units
    * @param lengthInts number of array units to transfer
    */
-  void getIntArray(int[] dstArray, int dstOffsetInts, int lengthInts);
+  void getIntArray(
+      int[] dstArray,
+      int dstOffsetInts,
+      int lengthInts);
 
   /**
    * Gets the long value at the current position.
@@ -331,7 +351,10 @@ public interface Buffer extends Positional, Resource {
    * @param dstOffsetLongs offset in array units
    * @param lengthLongs number of array units to transfer
    */
-  void getLongArray(long[] dstArray, int dstOffsetLongs, int lengthLongs);
+  void getLongArray(
+      long[] dstArray,
+      int dstOffsetLongs,
+      int lengthLongs);
 
   /**
    * Gets the short value at the current position.
@@ -355,7 +378,10 @@ public interface Buffer extends Positional, Resource {
    * @param dstOffsetShorts offset in array units
    * @param lengthShorts number of array units to transfer
    */
-  void getShortArray(short[] dstArray, int dstOffsetShorts, int lengthShorts);
+  void getShortArray(
+      short[] dstArray,
+      int dstOffsetShorts,
+      int lengthShorts);
 
   //SPECIAL PRIMITIVE READ METHODS: compareTo.
   //   No copyTo, No writeTo. Use Memory for that.
@@ -375,7 +401,11 @@ public interface Buffer extends Positional, Resource {
    * @return <i>(this &lt; that) ? (some negative value) : (this &gt; that) ? (some positive value)
    * : 0;</i>
    */
-  int compareTo(long thisOffsetBytes, long thisLengthBytes, Buffer that,
-          long thatOffsetBytes, long thatLengthBytes);
+  int compareTo(
+      long thisOffsetBytes,
+      long thisLengthBytes,
+      Buffer that,
+      long thatOffsetBytes,
+      long thatLengthBytes);
 
 }

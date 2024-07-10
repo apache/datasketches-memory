@@ -39,7 +39,9 @@ public interface MemoryRequestServer {
    * @param newCapacityBytes The capacity being requested. It must be &gt; the capacity of the currentWritableMemory.
    * @return new WritableMemory with the requested capacity.
    */
-  default WritableMemory request(WritableMemory currentWritableMemory, long newCapacityBytes) {
+  default WritableMemory request(
+      WritableMemory currentWritableMemory,
+      long newCapacityBytes) {
     return request(currentWritableMemory, newCapacityBytes, ResourceScope.newConfinedScope());
   }
 
@@ -51,7 +53,10 @@ public interface MemoryRequestServer {
    * @param scope the ResourceScope to be used for the newly allocated memory.
    * @return new WritableMemory with the requested capacity.
    */
-  WritableMemory request(WritableMemory currentWritableMemory, long newCapacityBytes, ResourceScope scope);
+  WritableMemory request(
+      WritableMemory currentWritableMemory,
+      long newCapacityBytes,
+      ResourceScope scope);
 
   /**
    * Request to close the resource, if applicable.
@@ -70,6 +75,8 @@ public interface MemoryRequestServer {
    * The newMemory reference is returned from the client for the convenience of the system that
    * owns the responsibility of memory allocation. It may be null.
    */
-  void requestClose(WritableMemory memToClose, WritableMemory newMemory);
+  void requestClose(
+      WritableMemory memToClose,
+      WritableMemory newMemory);
 
 }

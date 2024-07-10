@@ -94,7 +94,8 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
   /**
    * The implementation of <i>wrapByteBuffer</i> for WritableMemory.
    * @param byteBuffer the given <i>ByteBuffer</i>. It must be non-null.
-   * @param localReadOnly true if read-only is being imposed locally, independent of the read-only state of the given ByteBuffer.
+   * @param localReadOnly true if read-only is being imposed locally,
+   * independent of the read-only state of the given ByteBuffer.
    * @param byteOrder the given <i>ByteOrder</i>. It must be non-null.
    * @param memReqSvr the given <i>MemoryRequestServer</i>. It may be null.
    * @return a <i>WritableMemory</i>.

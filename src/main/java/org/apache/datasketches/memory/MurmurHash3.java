@@ -56,7 +56,9 @@ public final class MurmurHash3 {
    * @param seed A long valued seed.
    * @return the hash
    */
-  public static long[] hash(final long[] in, final long seed) {
+  public static long[] hash(
+      final long[] in,
+      final long seed) {
     return MurmurHash3v3.hash(in, seed);
   }
 
@@ -68,7 +70,9 @@ public final class MurmurHash3 {
    * @param seed A long valued seed.
    * @return the hash
    */
-  public static long[] hash(final int[] in, final long seed) {
+  public static long[] hash(
+      final int[] in,
+      final long seed) {
     return MurmurHash3v3.hash(in, seed);
   }
 
@@ -80,7 +84,9 @@ public final class MurmurHash3 {
    * @param seed A long valued seed.
    * @return the hash
    */
-  public static long[] hash(final char[] in, final long seed) {
+  public static long[] hash(
+      final char[] in,
+      final long seed) {
     return MurmurHash3v3.hash(in, seed);
   }
 
@@ -92,7 +98,9 @@ public final class MurmurHash3 {
    * @param seed A long valued seed.
    * @return the hash
    */
-  public static long[] hash(final byte[] in, final long seed) {
+  public static long[] hash(
+      final byte[] in,
+      final long seed) {
     return MurmurHash3v3.hash(in, seed);
   }
 
@@ -106,7 +114,10 @@ public final class MurmurHash3 {
    * @param hashOut A long array of size 2
    * @return the hash
    */
-  public static long[] hash(final long in, final long seed, final long[] hashOut) {
+  public static long[] hash(
+      final long in,
+      final long seed,
+      final long[] hashOut) {
     return MurmurHash3v3.hash(in, seed, hashOut);
   }
 
@@ -118,7 +129,10 @@ public final class MurmurHash3 {
    * @param hashOut A long array of size 2
    * @return the hash
    */
-  public static long[] hash(final double in, final long seed, final long[] hashOut) {
+  public static long[] hash(
+      final double in,
+      final long seed,
+      final long[] hashOut) {
     return MurmurHash3v3.hash(in, seed, hashOut);
   }
 
@@ -130,7 +144,10 @@ public final class MurmurHash3 {
    * @param hashOut A long array of size 2
    * @return the hash
    */
-  public static long[] hash(final String in, final long seed, final long[] hashOut) {
+  public static long[] hash(
+      final String in,
+      final long seed,
+      final long[] hashOut) {
     return MurmurHash3v3.hash(in, seed, hashOut);
   }
 
@@ -146,8 +163,12 @@ public final class MurmurHash3 {
    * @param hashOut the size 2 long array for the resulting 128-bit hash
    * @return the hash.
    */
-  public static long[] hash(final Memory mem, final long offsetBytes, final long lengthBytes,
-      final long seed, final long[] hashOut) {
+  public static long[] hash(
+      final Memory mem,
+      final long offsetBytes,
+      final long lengthBytes,
+      final long seed,
+      final long[] hashOut) {
     return MurmurHash3v3.hash(mem, offsetBytes, lengthBytes, seed, hashOut);
   }
 
@@ -161,8 +182,12 @@ public final class MurmurHash3 {
    * @param hashOut the size 2 long array for the resulting 128-bit hash
    * @return the hash.
    */
-  public static long[] hash(final MemorySegment seg, final long offsetBytes, final long lengthBytes,
-      final long seed, final long[] hashOut) {
+  public static long[] hash(
+      final MemorySegment seg,
+      final long offsetBytes,
+      final long lengthBytes,
+      final long seed,
+      final long[] hashOut) {
     return MurmurHash3v3.hash(seg, offsetBytes, lengthBytes, seed, hashOut);
   }
 

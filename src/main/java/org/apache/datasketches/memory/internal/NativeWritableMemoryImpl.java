@@ -33,7 +33,7 @@ import jdk.incubator.foreign.MemorySegment;
  *
  * <p>The light weight methods, such as put/get primitives, use asserts (assertValid*()), which only
  * execute when asserts are enabled and JIT will remove them entirely from production runtime code.
- * The light weight methods will simplify to a single unsafe call, which is further simplified by
+ * The light weight methods will simplify to a single call, which is further simplified by
  * JIT to an intrinsic that is often a single CPU instruction.
  */
 

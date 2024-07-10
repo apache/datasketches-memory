@@ -665,8 +665,8 @@ public interface WritableMemory extends Memory {
 
   //OTHER WRITABLE API METHODS
   /**
-   * Returns a copy of the primitive backing byte array.
-   * @return a copy of the primitive backing byte array.
+   * Returns a copy of the primitive backing array as a byte array.
+   * @return a copy of the primitive backing array as a byte array.
    */
   byte[] getArray();
 

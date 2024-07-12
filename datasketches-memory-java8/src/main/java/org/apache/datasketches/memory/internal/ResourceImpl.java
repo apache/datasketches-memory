@@ -130,7 +130,7 @@ public abstract class ResourceImpl implements Resource {
    * @param reqOff the requested offset
    * @param reqLen the requested length
    * @param allocSize the allocated size.
-   * @Throws MemoryBoundsException if the given arguments constitute a violation
+   * @throws MemoryBoundsException if the given arguments constitute a violation
    * of the invariants equation expressed above.
    */
   public static void checkBounds(final long reqOff, final long reqLen, final long allocSize) {
@@ -181,9 +181,9 @@ public abstract class ResourceImpl implements Resource {
    * or offsetBytes + length &gt; {@link #getCapacity()}.
    * @param offsetBytes the given offset in bytes of this object
    * @param lengthBytes the given length in bytes of this object
-   * @Throws MemoryInvalidException if this resource is AutoCloseable and is no longer valid, i.e.,
+   * @throws IllegalStateException if this resource is AutoCloseable and is no longer valid, i.e.,
    * it has already been closed.
-   * @Throws MemoryBoundsException if this resource violates the memory bounds of this resource.
+   * @throws MemoryBoundsException if this resource violates the memory bounds of this resource.
    */
   public final void checkValidAndBounds(final long offsetBytes, final long lengthBytes) {
     checkValid();
@@ -260,8 +260,7 @@ public abstract class ResourceImpl implements Resource {
     return typeId;
   }
 
-  //Overridden by Heap and ByteBuffer leaves. Made public as getArray() in WritableMemoryImpl and
-  // WritableBufferImpl
+  //Overridden by Heap and ByteBuffer leaves. Made public as getArray() in BaseWritableMemoryImpl and BaseWritableBufferImpl
   Object getUnsafeObject() {
     return null;
   }

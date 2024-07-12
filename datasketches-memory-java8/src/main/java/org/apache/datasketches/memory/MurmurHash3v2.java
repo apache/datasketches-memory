@@ -54,7 +54,9 @@ public final class MurmurHash3v2 {
    * @param seed A long valued seed.
    * @return the hash
    */
-  public static long[] hash(final long[] in, final long seed) {
+  public static long[] hash(
+      final long[] in, 
+      final long seed) {
     if ((in == null) || (in.length == 0)) {
       throw new IllegalArgumentException("Input in is empty or null.");
     }
@@ -69,7 +71,9 @@ public final class MurmurHash3v2 {
    * @param seed A long valued seed.
    * @return the hash
    */
-  public static long[] hash(final int[] in, final long seed) {
+  public static long[] hash(
+      final int[] in, 
+      final long seed) {
     if ((in == null) || (in.length == 0)) {
       throw new IllegalArgumentException("Input in is empty or null.");
     }
@@ -84,7 +88,9 @@ public final class MurmurHash3v2 {
    * @param seed A long valued seed.
    * @return the hash
    */
-  public static long[] hash(final char[] in, final long seed) {
+  public static long[] hash(
+      final char[] in, 
+      final long seed) {
     if ((in == null) || (in.length == 0)) {
       throw new IllegalArgumentException("Input in is empty or null.");
     }
@@ -99,7 +105,9 @@ public final class MurmurHash3v2 {
    * @param seed A long valued seed.
    * @return the hash
    */
-  public static long[] hash(final byte[] in, final long seed) {
+  public static long[] hash(
+      final byte[] in, 
+      final long seed) {
     if ((in == null) || (in.length == 0)) {
       throw new IllegalArgumentException("Input in is empty or null.");
     }
@@ -116,7 +124,10 @@ public final class MurmurHash3v2 {
    * @param hashOut A long array of size 2
    * @return the hash
    */
-  public static long[] hash(final long in, final long seed, final long[] hashOut) {
+  public static long[] hash(
+      final long in, 
+      final long seed, 
+      final long[] hashOut) {
     final long h1 = seed ^ mixK1(in);
     final long h2 = seed;
     return finalMix128(h1, h2, 8, hashOut);
@@ -130,7 +141,10 @@ public final class MurmurHash3v2 {
    * @param hashOut A long array of size 2
    * @return the hash
    */
-  public static long[] hash(final double in, final long seed, final long[] hashOut) {
+  public static long[] hash(
+      final double in, 
+      final long seed, 
+      final long[] hashOut) {
     final double d = (in == 0.0) ? 0.0 : in;    // canonicalize -0.0, 0.0
     final long k1 = Double.doubleToLongBits(d); // canonicalize all NaN forms
     final long h1 = seed ^ mixK1(k1);
@@ -146,7 +160,10 @@ public final class MurmurHash3v2 {
    * @param hashOut A long array of size 2
    * @return the hash
    */
-  public static long[] hash(final String in, final long seed, final long[] hashOut) {
+  public static long[] hash(
+      final String in, 
+      final long seed, 
+      final long[] hashOut) {
     if ((in == null) || (in.length() == 0)) {
       throw new IllegalArgumentException("Input in is empty or null.");
     }
@@ -168,8 +185,12 @@ public final class MurmurHash3v2 {
    * @return the hash.
    */
   @SuppressWarnings("restriction")
-  public static long[] hash(final Memory mem, final long offsetBytes, final long lengthBytes,
-      final long seed, final long[] hashOut) {
+  public static long[] hash(
+      final Memory mem, 
+      final long offsetBytes, 
+      final long lengthBytes,
+      final long seed, 
+      final long[] hashOut) {
     if ((mem == null) || (mem.getCapacity() == 0L)) {
       throw new IllegalArgumentException("Input mem is empty or null.");
     }
@@ -338,7 +359,11 @@ public final class MurmurHash3v2 {
    * @param hashOut the output array of 2 longs
    * @return hashOut
    */
-  private static long[] finalMix128(long h1, long h2, final long lengthBytes, final long[] hashOut) {
+  private static long[] finalMix128(
+      long h1, 
+      long h2, 
+      final long lengthBytes, 
+      final long[] hashOut) {
     h1 ^= lengthBytes;
     h2 ^= lengthBytes;
 

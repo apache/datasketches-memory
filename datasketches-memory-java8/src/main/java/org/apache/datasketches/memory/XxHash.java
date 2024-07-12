@@ -59,8 +59,11 @@ public final class XxHash {
    * @param seed the given seed
    * @return the hash
    */
-  public static long hashByteArr(final byte[] arr, final long offsetBytes,
-      final long lengthBytes, final long seed) {
+  public static long hashByteArr(
+      final byte[] arr, 
+      final long offsetBytes,
+      final long lengthBytes, 
+      final long seed) {
     return hashBytes(arr, offsetBytes, lengthBytes, seed);
   }
 
@@ -73,8 +76,11 @@ public final class XxHash {
    * @param seed the given seed
    * @return the hash
    */
-  public static long hashShortArr(final short[] arr, final long offsetShorts,
-      final long lengthShorts, final long seed) {
+  public static long hashShortArr(
+      final short[] arr, 
+      final long offsetShorts,
+      final long lengthShorts, 
+      final long seed) {
     return hashShorts(arr, offsetShorts, lengthShorts, seed);
   }
 
@@ -87,8 +93,11 @@ public final class XxHash {
    * @param seed the given seed
    * @return the hash
    */
-  public static long hashCharArr(final char[] arr, final long offsetChars,
-      final long lengthChars, final long seed) {
+  public static long hashCharArr(
+      final char[] arr, 
+      final long offsetChars,
+      final long lengthChars, 
+      final long seed) {
     return hashChars(arr, offsetChars, lengthChars, seed);
   }
 
@@ -101,8 +110,11 @@ public final class XxHash {
    * @param seed the given seed
    * @return the hash
    */
-  public static long hashIntArr(final int[] arr, final long offsetInts,
-      final long lengthInts, final long seed) {
+  public static long hashIntArr(
+      final int[] arr, 
+      final long offsetInts,
+      final long lengthInts, 
+      final long seed) {
     return hashInts(arr, offsetInts, lengthInts, seed);
   }
 
@@ -115,8 +127,11 @@ public final class XxHash {
    * @param seed the given seed
    * @return the hash
    */
-  public static long hashLongArr(final long[] arr, final long offsetLongs,
-      final long lengthLongs, final long seed) {
+  public static long hashLongArr(
+      final long[] arr, 
+      final long offsetLongs,
+      final long lengthLongs, 
+      final long seed) {
     return hashLongs(arr, offsetLongs, lengthLongs, seed);
   }
 
@@ -127,7 +142,9 @@ public final class XxHash {
    * @param seed A long valued seed.
    * @return the hash.
    */
-  public static long hashLong(final long in, final long seed) {
+  public static long hashLong(
+      final long in, 
+      final long seed) {
     return hash(in, seed);
   }
 
@@ -140,8 +157,11 @@ public final class XxHash {
    * @param seed the given seed
    * @return the hash
    */
-  public static long hashFloatArr(final float[] arr, final long offsetFloats,
-      final long lengthFloats, final long seed) {
+  public static long hashFloatArr(
+      final float[] arr, 
+      final long offsetFloats,
+      final long lengthFloats, 
+      final long seed) {
     return hashFloats(arr, offsetFloats, lengthFloats, seed);
   }
 
@@ -154,8 +174,11 @@ public final class XxHash {
    * @param seed the given seed
    * @return the hash
    */
-  public static long hashDoubleArr(final double[] arr, final long offsetDoubles,
-      final long lengthDoubles, final long seed) {
+  public static long hashDoubleArr(
+      final double[] arr, 
+      final long offsetDoubles,
+      final long lengthDoubles, 
+      final long seed) {
     return hashDoubles(arr, offsetDoubles, lengthDoubles, seed);
   }
 
@@ -168,10 +191,12 @@ public final class XxHash {
    * @param seed the given seed
    * @return the hash
    */
-  public static long hashString(final String str, final long offsetChars,
-      final long lengthChars, final long seed) {
+  public static long hashString(
+      final String str, 
+      final long offsetChars,
+      final long lengthChars, 
+      final long seed) {
     return org.apache.datasketches.memory.internal.XxHash64.hashString(str, offsetChars, lengthChars, seed);
   }
 
 }
-

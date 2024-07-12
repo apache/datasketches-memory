@@ -76,6 +76,9 @@ public abstract class BaseWritableMemoryImpl extends ResourceImpl implements Wri
     Util.negativeCheck(offsetBytes, "offsetBytes");
     Util.negativeCheck(lengthBytes, "lengthBytes");
     Objects.requireNonNull(byteOrder, "byteOrder must be non-null");
+    if (array instanceof byte[]) {
+      ResourceImpl.checkBounds(offsetBytes, lengthBytes, ((byte[])array).length);
+    }
     final long cumOffsetBytes = UnsafeUtil.getArrayBaseOffset(array.getClass()) + offsetBytes;
     final int typeId = (localReadOnly ? READONLY : 0);
     return Util.isNativeByteOrder(byteOrder)

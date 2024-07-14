@@ -169,13 +169,6 @@ under the License.
         <scope>test</scope>
       </dependency>
       <dependency>
-        <!-- Used for UTF8 testing -->
-        <groupId>com.google.protobuf</groupId>
-        <artifactId>protobuf-java</artifactId>
-        <version>${protobuf-java.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
         <!-- Used for xxHash testing -->
         <groupId>net.openhft</groupId>
         <artifactId>zero-allocation-hashing</artifactId>

@@ -19,8 +19,6 @@
 
 [![Build Status](https://travis-ci.org/apache/datasketches-memory.svg?branch=master)](https://travis-ci.org/apache/datasketches-memory)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.datasketches/datasketches-memory/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.apache.datasketches/datasketches-memory)
-[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/apache/datasketches-memory.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/apache/datasketches-memory/context:java)
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/apache/datasketches-memory.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/apache/datasketches-memory/alerts/)
 [![Coverage Status](https://coveralls.io/repos/github/apache/datasketches-memory/badge.svg?branch=master)](https://coveralls.io/github/apache/datasketches-memory?branch=master)
 
 =================
@@ -29,23 +27,60 @@
 This Memory component is general purpose, has no external runtime dependencies and can be used in any
 application that needs to manage data structures inside or outside the Java heap.
 
-The goal of this component of the DataSketches library is to provide a high performance access API for accessing four different types of memory resources.  Each of the four resource types is accessed using different API methods in the Memory component.
-
-* **Heap:** Contiguous bytes on the Java Heap constructed by, e.g., *WritableMemory.writableWrap(byte[])* or using the *WritableMemory.allocate(int)* method. For purposes of this document this includes on-heap ByteBuffers constructed using *ByteBuffer.allocate(int)*.
-
-* **DirectByteBuffer:** Contiguous bytes of a ByteBuffer constructed by, e.g., *WritableMemory.writableWrap(ByteBuffer)* where the ByteBuffer was previously constructed using *ByteBuffer.allocateDirect(int)*; or, is a slice() thereof.
-
-* **Direct:** Contiguous bytes off the Java Heap constructed by, e.g., *WritableMemory.allocateDirect(long)* method.
-
-* **Memory-Mapped Files** Contiguous bytes of a file represented in off-heap memory and created using, e.g., the *WritableMemory.writableMap(File)* method.
-
 Please visit the main [DataSketches website](https://datasketches.apache.org) for more information.
 
 If you are interested in making contributions to this Memory component please see our
 [Community](https://datasketches.apache.org/docs/Community/) page.
 
-## Release 2.0.0+
-Starting with release *datasketches-memory-2.0.0*, this Memory component supports Java 8 through Java 13. Providing access to the four contiguous byte resources (mentioned above) in Java 8 only requires reflection. However, **Java 9 introduced the Java Platform Module System (JPMS) where access to these internal classes requires starting up the JVM with special JPMS arguments.**   The actual JVM arguments required will depend on how the user intends to use the Memory API, the Java version used to run the user's application and whether the user's application is a JPMS application or not.
+The goal of this component of the DataSketches library is to provide a high performance access API for accessing six different types of memory resources.  Each of the six resource types is accessed using different API methods. 
+
+Note: *primitive* = *{byte, short, int, long, float, double}*
+
+### Contiguous bytes on the Java Heap constructed by:
+
+* **Heap:**
+    * *Memory.wrap(primitive[])*
+    * *WritableMemory.allocate(int)*
+    * *WritableMemory.writableWrap(primitive[])*
+
+* **Heap via ByteBuffer**
+    * *Memory.wrap(ByteBuffer.allocate(int))*
+    * *WritableMemory.writableWrap(ByteBuffer.allocate(int))*
+
+### Contiguous bytes off the Java Heap constructed by:
+
+* **Direct:**
+    * *WritableMemory.allocateDirect(long)* method.
+
+* **Direct via ByteBuffer** 
+    *  *WritableMemory.writableWrap(ByteBuffer.allocateDirect(int))*
+
+* **Memory-Mapped Files**  
+    * *WritableMemory.writableMap(File)* method.
+
+# Release [3.0.0, 4.0.0)
+These are transitional releases that also supports Java 8 and 11. 
+However, the goal of this set of releases is to migrate the API to what it will be in release 4.0.0.
+The 4.0.0 release will require Java 17 and will utilize the Project Panama (FFM) capabilites introduced in Java 17.
+
+Some of the capabilites of releases [2.0.0, 3.0.0) have been removed because they cannot be supported in release 4.0.0 with Panama-17. 
+For example:
+
+* The ability to directly import and export UTF-8 encoded strings has been removed.
+    * The UTF-8 code in Memory 1.0.0 through 2.2.1 is out of date and needed to be removed anyway.
+    * Java already has built-in UTF-8 encoding.  
+* The ability to directly import and export boolean arrays has been removed.
+    * The Java Language Specification does not define the byte storage format for boolean arrays, thus Panama-17 doesn't support boolean arrays.
+* Other minor changes to the API is best understood by examining the Javadocs directly.
+
+Release 3.0.0 includes two bug fixes (Issues #194, #195).
+
+It is our expectation that this set of releases will be the last that support Java 8 and 11.
+
+The comments in the following section for releases [2.0.0, 3.0.0) still apply.
+
+# Releases [2.0.0, 3.0.0)
+Starting with release *datasketches-memory-2.0.0*, this Memory component supports Java 8 and 11. Providing access to the off-heap resources in Java 8 only requires reflection. However, **Java 9 introduced the Java Platform Module System (JPMS) where access to these internal classes requires starting up the JVM with special JPMS arguments.**  The actual JVM arguments required will depend on how the user intends to use the Memory API, the Java version used to run the user's application and whether the user's application is a JPMS application or not.
 
 Also see the [usage examples](docs/usage-examples.md) for more information.
 

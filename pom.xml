@@ -335,7 +335,7 @@ under the License.
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-failsafe-plugin</artifactId>
+          <artifactId>maven-surefire-plugin</artifactId>
           <version>${maven-surefire-failsafe-plugin.version}</version>
           <configuration>
             <trimStackTrace>false</trimStackTrace>
@@ -446,7 +446,7 @@ under the License.
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-failsafe-plugin</artifactId>
+        <artifactId>maven-surefire-plugin</artifactId>
       </plugin>
       <plugin>
         <groupId>org.jacoco</groupId>

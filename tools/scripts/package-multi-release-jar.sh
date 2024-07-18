@@ -144,6 +144,11 @@ cp ${MemoryJava11Classes}/module-info.class ${PackageMrJar}/META-INF/versions/11
 ${Jar_} cfm $OutputMrJar ${ArchiveDir}/MANIFEST.MF -C $PackageMrJar .
 echo "Created multi-release jar ${OutputMrJar}"
 
+#### Install to .m2
+mvn install:install-file -Dfile=$OutputMrJar -DgroupId=org.apache.datasketches -DartifactId=datasketches-memory -Dpackaging=jar
+echo "Installed multi-release jar ${OutputMrJar} to .m2"
+echo
+
 ###########################
 ####     TESTS JAR     ####
 ###########################
@@ -153,6 +158,11 @@ rsync -q -a -I --filter="- .*" ${MemoryJava8TestClasses}/org $PackageTests
 
 ${Jar_} cfm $OutputTests ${ArchiveDir}/MANIFEST.MF -C $PackageTests .
 echo "Created tests jar ${OutputTests}"
+
+#### Install to .m2
+mvn install:install-file -Dfile=$OutputTests -DgroupId=org.apache.datasketches -DartifactId=datasketches-memory -Dpackaging=jar -Dclassifier=tests
+echo "Installed tests jar ${OutputTests} to .m2"
+echo
 
 ###########################
 ####    SOURCES JAR    ####
@@ -167,6 +177,11 @@ cp ${MemoryJava11Sources}/module-info.java ${PackageSources}/META-INF/versions/1
 ${Jar_} cfm $OutputSources ${ArchiveDir}/MANIFEST.MF -C $PackageSources .
 echo "Created sources jar ${OutputSources}"
 
+#### Install to .m2
+mvn install:install-file -Dfile=$OutputSources -DgroupId=org.apache.datasketches -DartifactId=datasketches-memory -Dpackaging=jar -Dclassifier=sources
+echo "Installed sources jar ${OutputSources} to .m2"
+echo
+
 ###########################
 ####  TEST SOURCES JAR ####
 ###########################
@@ -177,6 +192,11 @@ rsync -q -a -I --filter="- .*" ${MemoryJava8TestSources}/org $PackageTestSources
 ${Jar_} cfm $OutputTestSources ${ArchiveDir}/MANIFEST.MF -C $PackageTestSources .
 echo "Created test sources jar ${OutputTestSources}"
 
+#### Install to .m2
+mvn install:install-file -Dfile=$OutputTestSources -DgroupId=org.apache.datasketches -DartifactId=datasketches-memory -Dpackaging=jar -Dclassifier=test-sources
+echo "Installed test-sources jar ${OutputTestSources} to .m2"
+echo
+
 ###########################
 ####    JAVADOC JAR    ####
 ###########################
@@ -186,4 +206,10 @@ rsync -q -a -I --filter="- .*" ${MemoryJava8Docs} $PackageJavaDoc
 ${Jar_} cfm $OutputJavaDoc ${ArchiveDir}/MANIFEST.MF -C $PackageJavaDoc .
 echo "Created javadoc jar ${OutputJavaDoc}"
 
+#### Install to .m2
+mvn install:install-file -Dfile=$OutputJavaDoc -DgroupId=org.apache.datasketches -DartifactId=datasketches-memory -Dpackaging=jar -Dclassifier=javadoc
+echo "Installed javadoc jar ${OutputJavaDoc} to .m2"
+echo
+
+#### Run Test of MR Jar
 echo "$($ScriptsDir/test-jar.sh $JDKHome $GitTag $OutputMrJar $ProjectBaseDir)"

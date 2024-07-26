@@ -32,6 +32,10 @@
 GitTag=$1
 ProjectBaseDir=$2
 
+#### Common Variables ####
+GroupId="org.apache.datasketches"
+ArtifactId="datasketches-memory"
+
 #### Setup absolute directory references ####
 OutputDir=${ProjectBaseDir}/target
 
@@ -63,6 +67,8 @@ fi;
 mvn org.apache.maven.plugins:maven-gpg-plugin:3.0.1:sign-and-deploy-file \
     -Durl=$DistributionsUrl\
     -DrepositoryId=$DistributionsId \
+    -DgroupId=${GroupId} \
+    -DartifactId=${ArtifactId} \
     -Dfile=$OutputMrJar \
     -Dsources=$OutputSources \
     -Dfiles=$OutputTests,$OutputTestSources \

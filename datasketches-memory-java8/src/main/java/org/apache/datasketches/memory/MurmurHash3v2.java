@@ -299,7 +299,7 @@ public final class MurmurHash3v2 {
           k1 ^= (unsafe.getByte(uObj, cumOff) & 0xFFL);
           break;
         }
-        //default: break; //can't happen
+        default: break; //can't happen
       }
 
       h1 ^= mixK1(k1);

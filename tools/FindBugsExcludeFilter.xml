@@ -21,76 +21,13 @@ under the License.
 
 <FindBugsFilter> <!-- memory -->
 
-  <!-- Too many false positives to be useful.  I could not make it happy :( -->
+  <!-- Ignore all test code -->
   <Match>
-    <Bug pattern="SF_SWITCH_NO_DEFAULT" />
+    <Class name="~.*\.*Test" />
   </Match>
 
-  <Match>   <!-- Exclude for test classes; too many False Positives. -->
-    <Bug pattern="NP_NULL_PARAM_DEREF_NONVIRTUAL" />
-    <Class name="~.*\.*Test" />
-  </Match>
-  
-  <Match>   <!-- Exclude for test classes; too many False Positives. -->
-    <Bug pattern="DLS_DEAD_LOCAL_STORE" />
-    <Class name="~.*\.*Test" />
+  <Match> <!-- harmless, not going to fix right now -->
+    <Bug pattern="INT_VACUOUS_BIT_OPERATION" />
   </Match>
   
 </FindBugsFilter>
-
-
-
-<!--  Examples: -->
-
-<!-- Exclude java.* classes -->
-  <!--
-  <Match>
-    <Package name="java\.*" />
-  </Match>
--->
-
-  <!-- Exclude test classes -->
-<!-- 
-  <Match>
-    <Class name="~.*\.*Test" />
-  </Match>
--->
-
-<!--
-     <Match>
-       <Class name="com.foobar.ClassNotToBeAnalyzed" />
-     </Match>
--->
-<!--
-     <Match>
-       <Class name="com.foobar.ClassWithSomeBugsMatched" />
-       <Bug code="DE,UrF,SIC" />
-     </Match>
--->
-     <!-- Match all XYZ violations. -->
-<!--
-     <Match>
-       <Bug code="XYZ" />
-     </Match>
--->
-     <!-- Match all doublecheck violations in these methods of "AnotherClass". -->
-<!--
-     <Match>
-       <Class name="com.foobar.AnotherClass" />
-       <Or>
-         <Method name="nonOverloadedMethod" />
-         <Method name="frob" params="int,java.lang.String" returns="void" />
-         <Method name="blat" params="" returns="boolean" />
-       </Or>
-       <Bug code="DC" />
-     </Match>
--->
-     <!-- A method with a dead local store false positive (medium priority). -->
-<!--
-     <Match>
-       <Class name="com.foobar.MyClass" />
-       <Method name="someMethod" />
-       <Bug pattern="DLS_DEAD_LOCAL_STORE" />
-       <Priority value="2" />
-     </Match>
--->

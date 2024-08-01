@@ -150,7 +150,7 @@ The Maven build requires the following JDKs to compile:
 Before building, first ensure that your local environment has been configured according to the [Maven Toolchains Configuration](docs/maven-toolchains.md).
 
 There are two types of tests: normal unit tests and continuous integration(CI) tests.
-The CI tests target the Multi-Release (MR) JAR and run the entire test suite using a specific versions of Java.  Running the CI test command also runs the default unit tests.
+The CI tests target the Multi-Release (MR) JAR and run the entire test suite using a specific version of Java.  Running the CI test command also runs the default unit tests.
 
 To run normal unit tests:
 

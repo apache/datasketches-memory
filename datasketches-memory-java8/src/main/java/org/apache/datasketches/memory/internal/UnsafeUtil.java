@@ -143,13 +143,28 @@ public final class UnsafeUtil {
     return new int[] {p0, p1};
   }
 
+  /**
+   * Checks the runtime Java Version string. Note that Java 17 is allowed only because some clients do not use the
+   * WritableMemory.allocateDirect(..) and related functions, which will not work with 17.  
+   * The on-heap functions work just fine with 17. Nonetheless, Java 17 is not officially supported. 
+   * @param jdkVer the <i>System.getProperty("java.version")</i> string of the form "p0.p1.X"
+   * @param p0 The first number group 
+   * @param p1 The second number group
+   */
   public static void checkJavaVersion(final String jdkVer, final int p0, final int p1) {
-    if ( (p0 < 1) || ((p0 == 1) && (p1 < 8)) || (p0 > 13)  ) {
+    final boolean ok = ( ((p0 == 1) && (p1 == 8)) || (p0 == 8) || (p0 == 11) || (p0 == 17) );
+    if (!ok) {
       throw new IllegalArgumentException(
-          "Unsupported JDK Major Version, must be one of 1.8, 8, 11, 17: " + jdkVer);
+          "Unsupported Runtime JDK Major Version, must be one of 1.8, 8, 11, 17: " + jdkVer);
     }
   }
 
+  /**
+   * Gets the <i>unsafe.objectFieldOffset(..)</i> for declared fields of a class.
+   * @param c the class
+   * @param fieldName the declared field name
+   * @return the field offset in bytes.
+   */
   public static long getFieldOffset(final Class<?> c, final String fieldName) {
     try {
       return unsafe.objectFieldOffset(c.getDeclaredField(fieldName));

@@ -38,7 +38,7 @@ public class UnsafeUtilTest {
   public void checkJdkString() {
     String jdkVer;
     int[] p = new int[2];
-    String[] good1_Strings = {"1.8.0_121", "8", "9", "10", "11", "12", "13"};
+    String[] good1_Strings = {"1.8.0_121", "8", "11", "17"};
     int len = good1_Strings.length;
     for (int i = 0; i < len; i++) {
       jdkVer = good1_Strings[i];

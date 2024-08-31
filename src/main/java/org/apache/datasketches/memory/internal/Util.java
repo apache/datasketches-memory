@@ -126,7 +126,7 @@ final class Util {
    * @return the absolute path of the given resource file's shortName.
    * @throws IllegalArgumentException if resource cannot be found
    */
-  static String getResourcePath(final String shortFileName) {
+  private static String getResourcePath(final String shortFileName) {
     Objects.requireNonNull(shortFileName, "input parameter " + shortFileName + " cannot be null.");
     try {
       final URL url = Util.class.getClassLoader().getResource(shortFileName);

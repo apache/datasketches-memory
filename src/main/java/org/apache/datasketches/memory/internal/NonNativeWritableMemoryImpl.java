@@ -25,18 +25,6 @@ import org.apache.datasketches.memory.WritableMemory;
 import jdk.incubator.foreign.MemoryAccess;
 import jdk.incubator.foreign.MemorySegment;
 
-/*
- * Developer notes: The heavier methods, such as put/get arrays, duplicate, region, clear, fill,
- * compareTo, etc., use hard checks (checkValid*() and checkBounds()), which execute at runtime and
- * throw exceptions if violated. The cost of the runtime checks are minor compared to the rest of
- * the work these methods are doing.
- *
- * <p>The light weight methods, such as put/get primitives, use asserts (assertValid*()), which only
- * execute when asserts are enabled and JIT will remove them entirely from production runtime code.
- * The light weight methods will simplify to a single unsafe call, which is further simplified by
- * JIT to an intrinsic that is often a single CPU instruction.
- */
-
 /**
  * Implementation of {@link WritableMemory} for non-native endian byte order.
  * @author Roman Leventov

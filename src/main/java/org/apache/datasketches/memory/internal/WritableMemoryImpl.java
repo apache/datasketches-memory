@@ -40,18 +40,6 @@ import jdk.incubator.foreign.MemoryAccess;
 import jdk.incubator.foreign.MemorySegment;
 import jdk.incubator.foreign.ResourceScope;
 
-/*
- * Developer notes: The heavier methods, such as put/get arrays, duplicate, region, clear, fill,
- * compareTo, etc., use hard checks (checkValid*() and checkBounds()), which execute at runtime and
- * throw exceptions if violated. The cost of the runtime checks are minor compared to the rest of
- * the work these methods are doing.
- *
- * <p>The light weight methods, such as put/get primitives, use asserts (assertValid*()), which only
- * execute when asserts are enabled and JIT will remove them entirely from production runtime code.
- * The light weight methods will simplify to a single unsafe call, which is further simplified by
- * JIT to an intrinsic that is often a single CPU instruction.
- */
-
 /**
  * Common base of native-ordered and non-native-ordered {@link WritableMemory} implementations.
  * Contains methods which are agnostic to the byte order.
@@ -93,9 +81,12 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
 
   /**
    * The implementation of <i>wrapByteBuffer</i> for WritableMemory.
+   * This creates a MemorySegment view of the entire ByteBuffer and
+   * ignores, but does not change, the current position and limit of the ByteBuffer.
+   * This method is also used for read-only operations when localReadOnly is false.
+   * If the given ByteBuffer is Direct, the resulting MemorySegment will be Native (Direct).
    * @param byteBuffer the given <i>ByteBuffer</i>. It must be non-null.
-   * @param localReadOnly true if read-only is being imposed locally,
-   * independent of the read-only state of the given ByteBuffer.
+   * @param localReadOnly true if read-only is being imposed locally, even if the given ByteBuffer is writable.
    * @param byteOrder the given <i>ByteOrder</i>. It must be non-null.
    * @param memReqSvr the given <i>MemoryRequestServer</i>. It may be null.
    * @return a <i>WritableMemory</i>.
@@ -107,21 +98,21 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
       final MemoryRequestServer memReqSvr) {
     Objects.requireNonNull(byteBuffer, "ByteBuffer must not be null");
     Objects.requireNonNull(byteOrder, "ByteOrder must not be null");
-    final ByteBuffer byteBuf;
+    final ByteBuffer byteBufView;
     if (localReadOnly) {
       if (byteBuffer.isReadOnly()) {
-        byteBuf = byteBuffer.duplicate();
-      } else { //bb writable
-        byteBuf = byteBuffer.asReadOnlyBuffer();
+        byteBufView = byteBuffer.duplicate();
+      } else { //bb is writable
+        byteBufView = byteBuffer.asReadOnlyBuffer();
       }
     } else { //want writable
       if (byteBuffer.isReadOnly()) {
         throw new IllegalArgumentException("ByteBuffer must be writable.");
       }
-      byteBuf = byteBuffer.duplicate(); //crease another view of the same backing data
+      byteBufView = byteBuffer.duplicate();
     }
-    byteBuf.clear(); //resets position to zero and limit to capacity. Does not clear data.
-    final MemorySegment seg = MemorySegment.ofByteBuffer(byteBuf); //from 0 to capacity
+    byteBufView.clear(); //resets position to zero and limit to capacity. Does not impact data.
+    final MemorySegment seg = MemorySegment.ofByteBuffer(byteBufView); //from 0 to capacity
     int type = MEMORY | BYTEBUF
         | (localReadOnly ? READONLY : 0)
         | (seg.isNative() ? DIRECT : 0)
@@ -140,11 +131,12 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
 
   /**
    * The implementation of <i>wrapMap</i> for <i>WritableMemory</i>.
+   * This method is also used for read-only operations when localReadOnly is false.
    * @param file the given file to map. It must be non-null.
    * @param fileOffsetBytes the file starting offset in bytes. It must be &ge; 0.
    * @param capacityBytes the capacity of the mapped memory. It must be &ge; 0.
    * @param scope the given scope. It must be non-null.
-   * @param localReadOnly true if read-only is being imposed locally, independent of the read-only state of the given ByteBuffer.
+   * @param localReadOnly true if read-only is being imposed locally, even if the given file is writable..
    * @param byteOrder the given <i>ByteOrder</i>. It must be non-null.
    * @return a <i>WritableMemory</i>
    * @throws IllegalArgumentException if file is not readable.
@@ -161,10 +153,17 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
     Objects.requireNonNull(file, "File must be non-null.");
     Objects.requireNonNull(byteOrder, "ByteOrder must be non-null.");
     Objects.requireNonNull(scope, "ResourceScope must be non-null.");
-    if (!file.canRead()) { throw new IllegalArgumentException("File must be readable."); }
-    if (!localReadOnly && !file.canWrite()) { throw new IllegalArgumentException("File must be writable."); }
-    final FileChannel.MapMode mapMode = (localReadOnly) ? READ_ONLY : READ_WRITE;
-
+    final FileChannel.MapMode mapMode;
+    final boolean fileCanRead = file.canRead();
+    if (localReadOnly) {
+      if (fileCanRead) { mapMode = READ_ONLY; }
+      else { throw new IllegalArgumentException("File must be readable."); }
+    } else { //!localReadOnly
+      if (fileCanRead && file.canWrite()) { mapMode = READ_WRITE; }
+      else {
+        throw new IllegalArgumentException("File must be readable and writable.");
+      }
+    }
     final MemorySegment seg = MemorySegment.mapFile(file.toPath(), fileOffsetBytes, capacityBytes, mapMode, scope);
     final boolean nativeBOType = byteOrder == ByteOrder.nativeOrder();
     final int type = MEMORY | MAP | DIRECT
@@ -188,7 +187,6 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
    * This is a callback mechanism for a user client of direct memory to request more memory.
    * @return WritableMemory
    */
-  //@SuppressWarnings("resource")
   public static WritableMemory wrapDirect(
       final long capacityBytes,
       final long alignmentBytes,

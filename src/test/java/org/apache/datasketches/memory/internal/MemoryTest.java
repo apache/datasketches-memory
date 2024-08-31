@@ -359,9 +359,7 @@ public class MemoryTest {
     ResourceScope scope = ResourceScope.newConfinedScope();
     WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, scope, ByteOrder.nativeOrder(), myMemReqSvr);
     wmem.close();
-    //with -ea assert: Memory not valid.
-    //with -da sometimes segfaults, sometimes passes!
-    wmem.getLong(0);
+    wmem.getLong(0); //Already closed
   }
 
   @SuppressWarnings("resource")
@@ -372,9 +370,7 @@ public class MemoryTest {
     WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, scope, ByteOrder.nativeOrder(), myMemReqSvr);
     Memory region = wmem.region(0L, bytes);
     wmem.close();
-    //with -ea assert: Memory not valid.
-    //with -da sometimes segfaults, sometimes passes!
-    region.getByte(0);
+    region.getByte(0); //Already closed.
   }
 
   @Test

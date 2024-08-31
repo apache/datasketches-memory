@@ -146,7 +146,7 @@ public class AllocateDirectWritableMapMemoryTest {
     assertTrue(file.canRead());
     assertFalse(file.canWrite());
     WritableMemory wmem = null;
-    try (ResourceScope scope = (wmem = WritableMemory.writableMap(file)).scope()) { //throws ReadOnlyException
+    try (ResourceScope scope = (wmem = WritableMemory.writableMap(file)).scope()) { //assumes file is writable!
       wmem.getCapacity();
     }
   }
@@ -159,7 +159,6 @@ public class AllocateDirectWritableMapMemoryTest {
     WritableMemory wmem = null;
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
       wmem = WritableMemory.writableMap(file, 0, 1 << 20, scope, ByteOrder.nativeOrder());
-      //throws ReadOnlyException
       wmem.getCapacity();
     }
   }

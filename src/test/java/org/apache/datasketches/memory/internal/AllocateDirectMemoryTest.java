@@ -46,7 +46,7 @@ public class AllocateDirectMemoryTest {
       //inside the TWR block the memory scope will be alive
       assertTrue(wMem.isAlive());
     }
-    //The TWR block has exited, so the memory should be invalid
+    //The TWR block has exited, so the memory should be not alive
     assertFalse(wMem2.isAlive());
   }
 

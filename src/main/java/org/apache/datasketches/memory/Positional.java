@@ -40,7 +40,7 @@ public interface Positional {
 
   /**
    * Increments the current position by the given increment.
-   * Checks that the resource is valid and that the positional invariants are not violated.
+   * Checks that the resource is alive and that the positional invariants are not violated.
    * @param increment the given increment
    * @return this Positional
    * @throws BufferPositionInvariantsException if positional invariants have been violated.

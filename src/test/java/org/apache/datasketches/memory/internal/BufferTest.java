@@ -290,7 +290,7 @@ public class BufferTest {
     WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, ResourceScope.newConfinedScope(), ByteOrder.nativeOrder(), memReqSvr);
     WritableBuffer wbuf = wmem.asWritableBuffer();
     wbuf.close();
-    //with -ea assert: Memory not valid.
+    //with -ea assert: Memory not alive.
     //with -da sometimes segfaults, sometimes passes!
     wbuf.getLong();
   }
@@ -302,7 +302,7 @@ public class BufferTest {
     WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, ResourceScope.newConfinedScope(), ByteOrder.nativeOrder(), memReqSvr);
     Buffer region = wmem.asBuffer().region();
     region.close();
-    //with -ea assert: Memory not valid.
+    //with -ea assert: Memory not alive.
     //with -da sometimes segfaults, sometimes passes!
     region.getByte();
   }

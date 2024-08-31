@@ -97,10 +97,10 @@ public interface Resource extends AutoCloseable {
    * as <em>not alive</em>, and subsequent operations on resources associated with this scope will fail with {@link IllegalStateException}.
    * Additionally, upon successful closure, all direct (native) resources associated with this resource scope will be released.</p>
    *
-   * @apiNote This operation is not idempotent; that is, closing an already closed resource scope <em>always</em> results in an
+   * <p>API Note This operation is not idempotent; that is, closing an already closed resource scope <em>always</em> results in an
    * exception being thrown. This reflects a deliberate design choice: resource scope state transitions should be
    * manifest in the client code; a failure in any of these transitions reveals a bug in the underlying application
-   * logic.
+   * logic. </p>
    *
    * @throws IllegalStateException if one of the following condition is met:
    * <ul>

@@ -26,7 +26,7 @@ jobs:
 
     steps:
       - name: Download math result from job_1
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: homework
 
@@ -48,7 +48,7 @@ jobs:
 
     steps:
       - name: Download math result from job_2
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: homework
 
@@ -71,7 +71,7 @@ jobs:
 
     steps:
       - name: Download math result from job-3
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: homework
 

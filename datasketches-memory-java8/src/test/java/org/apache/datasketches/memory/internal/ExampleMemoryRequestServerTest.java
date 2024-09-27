@@ -113,6 +113,6 @@ public class ExampleMemoryRequestServerTest {
    * @param o value to print
    */
   static void println(Object o) {
-    System.out.println(o); //disable here
+    //System.out.println(o); //disable here
   }
 }

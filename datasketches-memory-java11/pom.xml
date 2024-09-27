@@ -24,8 +24,8 @@ under the License.
 
   <parent>
     <groupId>org.apache.datasketches</groupId>
-    <artifactId>datasketches-memory-root</artifactId>
-    <version>3.0.1</version>
+    <artifactId>datasketches-memory</artifactId>
+    <version>3.0.2</version>
   </parent>
 
   <artifactId>datasketches-memory-java11</artifactId>

@@ -144,18 +144,19 @@ public final class UnsafeUtil {
   }
 
   /**
-   * Checks the runtime Java Version string. Note that Java 17 is allowed only because some clients do not use the
-   * WritableMemory.allocateDirect(..) and related functions, which will not work with 17.  
-   * The on-heap functions work just fine with 17. Nonetheless, Java 17 is not officially supported. 
+   * Checks the runtime Java Version string. Note that Java 17 and 21 is allowed only because some clients do not use the
+   * WritableMemory.allocateDirect(..) and related functions, which will not work with Java versions >= 14.  
+   * The on-heap functions may work with 17 and 21, nonetheless, versions > Java 11 are not officially supported. 
+   * Caveat emptor.
    * @param jdkVer the <i>System.getProperty("java.version")</i> string of the form "p0.p1.X"
    * @param p0 The first number group 
    * @param p1 The second number group
    */
   public static void checkJavaVersion(final String jdkVer, final int p0, final int p1) {
-    final boolean ok = ( ((p0 == 1) && (p1 == 8)) || (p0 == 8) || (p0 == 11) || (p0 == 17) );
+    final boolean ok = ( ((p0 == 1) && (p1 == 8)) || (p0 == 8) || (p0 == 11) || (p0 == 17) || (p0 == 21));
     if (!ok) {
       throw new IllegalArgumentException(
-          "Unsupported Runtime JDK Major Version, must be one of 1.8, 8, 11, 17: " + jdkVer);
+          "Unsupported Runtime JDK Major Version, must be one of 1.8, 8, 11, 17, 21: " + jdkVer);
     }
   }
 

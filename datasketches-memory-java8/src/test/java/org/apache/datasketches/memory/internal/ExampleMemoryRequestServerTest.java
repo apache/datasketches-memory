@@ -81,7 +81,7 @@ public class ExampleMemoryRequestServerTest {
         //use all the given memory
         workingMem.fill(oldWorkingCap, newWorkingCap - oldWorkingCap, itr);
 
-        //println(workingMem.toHexString("Size: " + newWorkingCap + " Bytes", 0, newWorkingCap, true));
+        println(workingMem.toString("Size: " + newWorkingCap + " Bytes", 0, newWorkingCap, true));
 
         //Not big enough, expand
         oldWorkingCap = newWorkingCap;
@@ -90,11 +90,17 @@ public class ExampleMemoryRequestServerTest {
 
         //done with old memory, close it, if applicable
         memReqSvr.requestClose(workingMem, newMem);
+        println("");
+        println("### New Memory: " + newWorkingCap + " Bytes, is allocated.");
+        println("### Old Memory: " + oldWorkingCap + " Bytes, is closed: " + (!workingMem.isAlive()));
         workingMem = newMem;
         itr++;
+        println("");
+        println("");
       }
-
+      
       workingMem.close();
+      println("### Last Memory: " + newWorkingCap + " Bytes, is Closed: " + (!workingMem.isAlive()));
     }
   }
 
@@ -107,6 +113,6 @@ public class ExampleMemoryRequestServerTest {
    * @param o value to print
    */
   static void println(Object o) {
-    //System.out.println(o); //disable here
+    System.out.println(o); //disable here
   }
 }

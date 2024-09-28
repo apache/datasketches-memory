@@ -213,8 +213,7 @@ public abstract class ResourceImpl implements Resource {
 
   @Override
   public void close() {
-    /* Overridden by the actual AutoCloseable leaf sub-classes. */
-    throw new UnsupportedOperationException("This resource is not AutoCloseable.");
+    /* Overridden by the leaf sub-classes that need AutoCloseable. */
   }
 
   @Override

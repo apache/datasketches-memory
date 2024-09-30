@@ -37,7 +37,7 @@ import org.apache.datasketches.memory.Resource;
  */
 @SuppressWarnings("restriction")
 public abstract class ResourceImpl implements Resource {
-  static final String JDK; //must be at least "1.8"
+  static final String JDK; 
   static final int JDK_MAJOR; //8, 11, 17, etc
 
   //Used to convert "type" to bytes:  bytes = longs << LONG_SHIFT
@@ -141,10 +141,19 @@ public abstract class ResourceImpl implements Resource {
     }
   }
 
+  /**
+   * Checks the runtime Java Version string. Note that Java 17 and 21 is allowed only because some clients do not use the
+   * WritableMemory.allocateDirect(..) and related functions, which will not work with Java versions >= 14.  
+   * The on-heap functions may work with 17 and 21, nonetheless, versions > Java 11 are not officially supported. 
+   * Caveat emptor.
+   * @param jdkVer the <i>System.getProperty("java.version")</i> string of the form "p0.p1.X"
+   * @param p0 The first number group 
+   * @param p1 The second number group
+   */
   static void checkJavaVersion(final String jdkVer, final int p0, final int p1 ) {
-    final boolean ok = ((p0 == 1) && (p1 == 8)) || (p0 == 8) || (p0 == 11) || (p0 == 17);
+    final boolean ok = ((p0 == 1) && (p1 == 8)) || (p0 == 8) || (p0 == 11) || (p0 == 17 || (p0 == 21));
     if (!ok) { throw new IllegalArgumentException(
-        "Unsupported JDK Major Version. It must be one of 1.8, 8, 11, 17: " + jdkVer);
+        "Unsupported JDK Major Version. It must be one of 1.8, 8, 11, 17, 21: " + jdkVer);
     }
   }
 
@@ -441,7 +450,7 @@ public abstract class ResourceImpl implements Resource {
     sb.append("Read Only           : ").append(state.isReadOnly()).append(LS);
     sb.append("Type Byte Order     : ").append(state.getTypeByteOrder().toString()).append(LS);
     sb.append("Native Byte Order   : ").append(ByteOrder.nativeOrder().toString()).append(LS);
-    sb.append("JDK Runtime Version : ").append(UnsafeUtil.JDK).append(LS);
+    sb.append("JDK Runtime Version : ").append(JDK).append(LS);
     //Data detail
     if (withData) {
       sb.append("Data, bytes         :  0  1  2  3  4  5  6  7");

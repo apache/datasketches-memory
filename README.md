@@ -58,7 +58,7 @@ Note: *primitive* = *{byte, short, int, long, float, double}*
 * **Memory-Mapped Files**  
     * *WritableMemory.writableMap(File)* method.
 
-# Release [3.0.0, 4.0.0)
+# Releases 3.0.0 (inclusive) to 4.0.0 (exclusive)
 These are transitional releases that also supports Java 8 and 11. 
 However, the goal of this set of releases is to migrate the API to what it will be in release 4.0.0.
 The 4.0.0 release will require Java 17 and will utilize the Project Panama (FFM) capabilites introduced in Java 17.
@@ -79,7 +79,7 @@ It is our expectation that this set of releases will be the last that support Ja
 
 The comments in the following section for releases [2.0.0, 3.0.0) still apply.
 
-# Releases [2.0.0, 3.0.0)
+# Releases 2.0.0 (inclusive) to 3.0.0 (exclusive)
 Starting with release *datasketches-memory-2.0.0*, this Memory component supports Java 8 and 11. Providing access to the off-heap resources in Java 8 only requires reflection. However, **Java 9 introduced the Java Platform Module System (JPMS) where access to these internal classes requires starting up the JVM with special JPMS arguments.**  The actual JVM arguments required will depend on how the user intends to use the Memory API, the Java version used to run the user's application and whether the user's application is a JPMS application or not.
 
 Also see the [usage examples](docs/usage-examples.md) for more information.

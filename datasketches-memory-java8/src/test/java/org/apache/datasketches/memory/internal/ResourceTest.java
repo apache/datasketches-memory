@@ -121,6 +121,64 @@ public class ResourceTest {
     }
   }
 
+  @Test
+  public void checkJdkString() {
+    String jdkVer;
+    int[] p = new int[2];
+    String[] good1_Strings = {"1.8.0_121", "8", "11", "17", "21"};
+    int len = good1_Strings.length;
+    for (int i = 0; i < len; i++) {
+      jdkVer = good1_Strings[i];
+      p = ResourceImpl.parseJavaVersion(jdkVer);
+      ResourceImpl.checkJavaVersion(jdkVer, p[0], p[1]);
+      int jdkMajor = (p[0] == 1) ? p[1] : p[0]; //model the actual JDK_MAJOR
+      if (p[0] == 1) { assertTrue(jdkMajor == p[1]); }
+      if (p[0] > 1 ) { assertTrue(jdkMajor == p[0]); }
+    }
+    try {
+      jdkVer = "14.0.4";
+      p = ResourceImpl.parseJavaVersion(jdkVer);
+      ResourceImpl.checkJavaVersion(jdkVer, p[0], p[1]);
+      fail();
+    } catch (IllegalArgumentException e) {
+      println("" + e);
+    }
+
+    try {
+      jdkVer = "1.7.0_80";
+      p = ResourceImpl.parseJavaVersion(jdkVer);
+      ResourceImpl.checkJavaVersion(jdkVer, p[0], p[1]);
+      fail();
+    } catch (IllegalArgumentException e) {
+      println("" + e);
+    }
+    try {
+      jdkVer = "1.6.0_65";
+      p = ResourceImpl.parseJavaVersion(jdkVer);
+      ResourceImpl.checkJavaVersion(jdkVer, p[0], p[1]); //throws
+      fail();
+    } catch (IllegalArgumentException e) {
+      println("" + e);
+    }
+    try {
+      jdkVer = "b"; //invalid string
+      p = ResourceImpl.parseJavaVersion(jdkVer);
+      ResourceImpl.checkJavaVersion(jdkVer, p[0], p[1]); //throws
+      fail();
+    } catch (IllegalArgumentException e) {
+      println("" + e);
+    }
+    try {
+      jdkVer = ""; //invalid string
+      p = ResourceImpl.parseJavaVersion(jdkVer);
+      ResourceImpl.checkJavaVersion(jdkVer, p[0], p[1]); //throws
+      fail();
+    } catch (IllegalArgumentException e) {
+      println("" + e);
+    }
+  }
+
+  
   /********************/
   @Test
   public void printlnTest() {

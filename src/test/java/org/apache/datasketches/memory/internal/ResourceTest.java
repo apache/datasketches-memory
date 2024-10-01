@@ -109,10 +109,10 @@ public class ResourceTest {
   @Test
   public void checkToHexString() {
     WritableMemory mem = WritableMemory.writableWrap(new byte[16]);
-    println(mem.toHexString("baseMem", 0, 16, true));
+    println(mem.toString("baseMem", 0, 16, true));
     for (int i = 0; i < 16; i++) { mem.putByte(i, (byte)i); }
     Buffer buf = mem.asBuffer();
-    println(buf.toHexString("buffer", 0, 16, true));
+    println(buf.toString("buffer", 0, 16, true));
   }
 
   @Test

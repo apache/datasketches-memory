@@ -189,7 +189,7 @@ public class NativeWritableMemoryImplTest {
     int memCapacity = 64;
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
       WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
-      wmem.toHexString("Force Assertion Error", memCapacity, 8, false);
+      wmem.toString("Force Assertion Error", memCapacity, 8, false);
     } catch (IllegalArgumentException e) {
       //ok
     }

@@ -192,7 +192,7 @@ public class NativeWritableBufferImplTest {
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
       WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
       WritableBuffer wbuf = wmem.asWritableBuffer();
-      wbuf.toHexString("Force Assertion Error", memCapacity, 8, false);
+      wbuf.toString("Force Assertion Error", memCapacity, 8, false);
     } catch (IllegalArgumentException e) {
       //ok
     }

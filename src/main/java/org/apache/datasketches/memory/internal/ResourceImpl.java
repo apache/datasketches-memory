@@ -61,10 +61,10 @@ abstract class ResourceImpl implements Resource {
   static final int REGION    = 2; //bit 1
   static final int DUPLICATE = 4; //bit 2, for Buffer only
 
-  // 000X X000 Group 2
-  static final int HEAP   = 0;    //bits 3,4 = 0
-  static final int DIRECT = 8;    //bit 3
-  static final int MAP    = 16;   //bit 4, Map is effectively Direct
+  // 000X X000 Group 2                         43
+  static final int HEAP   = 0;    //bits 3,4 = 00
+  static final int DIRECT = 8;    //bit 3    = 01
+  static final int MAP    = 16;   //bit 4,   = 10 Map is effectively Direct
 
   // 00X0 0000 Group 3 ByteOrder
   static final int NATIVE_BO    = 0; //bit 5 = 0
@@ -198,36 +198,34 @@ abstract class ResourceImpl implements Resource {
     final StringBuilder sb = new StringBuilder();
     final int group1 = typeId & 0x7;
     switch (group1) { // 0000 0XXX
-      case 0 : sb.append("Writable:\t"); break;
-      case 1 : sb.append("ReadOnly:\t"); break;
-      case 2 : sb.append("Writable:\tRegion:\t"); break;
-      case 3 : sb.append("ReadOnly:\tRegion:\t"); break;
-      case 4 : sb.append("Writable:\tDuplicate:\t"); break;
-      case 5 : sb.append("ReadOnly:\tDuplicate:\t"); break;
-      case 6 : sb.append("Writable:\tRegion:\tDuplicate:\t"); break;
-      case 7 : sb.append("ReadOnly:\tRegion:\tDuplicate:\t"); break;
+      case 0 : sb.append(pad("Writable + ",32)); break;
+      case 1 : sb.append(pad("ReadOnly + ",32)); break;
+      case 2 : sb.append(pad("Writable + Region + ",32)); break;
+      case 3 : sb.append(pad("ReadOnly + Region + ",32)); break;
+      case 4 : sb.append(pad("Writable + Duplicate + ",32)); break;
+      case 5 : sb.append(pad("ReadOnly + Duplicate + ",32)); break;
+      case 6 : sb.append(pad("Writable + Region + Duplicate + ",32)); break;
+      case 7 : sb.append(pad("ReadOnly + Region + Duplicate + ",32)); break;
       default: break;
     }
     final int group2 = (typeId >>> 3) & 0x3;
-    switch (group2) { // 000X X000
-      case 0 : sb.append("Heap:\t"); break;
-      case 1 : sb.append("Direct:\t"); break;
-      case 2 : sb.append("Map:\t"); break;
-      case 3 : sb.append("Direct:\tMap:\t"); break;
+    switch (group2) { // 000X X000                            43
+      case 0 : sb.append(pad("Heap + ",15)); break;   //      00
+      case 1 : sb.append(pad("Direct + ",15)); break; //      01
+      case 2 : sb.append(pad("Map + Direct + ",15)); break; //10
+      case 3 : sb.append(pad("Map + Direct + ",15)); break; //11
       default: break;
     }
-    if ((typeId & BYTEBUF) > 0) { sb.append("ByteBuffer:\t"); }
-
     final int group3 = (typeId >>> 5) & 0x1;
     switch (group3) { // 00X0 0000
-      case 0 : sb.append("NativeOrder:\t"); break;
-      case 1 : sb.append("NonNativeOrder:\t"); break;
+      case 0 : sb.append(pad("NativeOrder + ",17)); break;
+      case 1 : sb.append(pad("NonNativeOrder + ",17)); break;
       default: break;
     }
     final int group4 = (typeId >>> 6) & 0x1;
     switch (group4) { // 0X00 0000
-      case 0 : sb.append("Memory"); break;
-      case 1 : sb.append("Buffer"); break;
+      case 0 : sb.append(pad("Memory + ",9)); break;
+      case 1 : sb.append(pad("Buffer + ",9)); break;
       default: break;
     }
     final int group5 = (typeId >>> 7) & 0x1;
@@ -364,7 +362,7 @@ abstract class ResourceImpl implements Resource {
 
   @Override
   public final ByteOrder getTypeByteOrder() {
-    return (typeId & NONNATIVE_BO) > 0 ? NON_NATIVE_BYTE_ORDER : ByteOrder.nativeOrder();
+    return (typeId & NONNATIVE_BO) > 0 ? NON_NATIVE_BYTE_ORDER : NATIVE_BYTE_ORDER;
   }
 
   @Override
@@ -508,7 +506,12 @@ abstract class ResourceImpl implements Resource {
   }
 
   @Override
-  public final String toHexString(final String comment, final long offsetBytes, final int lengthBytes,
+  public String toString() {
+    return toString("", 0, (int)this.getCapacity(), false);
+  }
+
+  @Override
+  public final String toString(final String comment, final long offsetBytes, final int lengthBytes,
       final boolean withData) {
     return toHex(this, comment, offsetBytes, lengthBytes, withData);
   }

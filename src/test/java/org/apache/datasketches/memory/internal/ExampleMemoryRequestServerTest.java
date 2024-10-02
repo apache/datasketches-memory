@@ -87,7 +87,7 @@ public class ExampleMemoryRequestServerTest {
         //use all the given memory
         workingMem.fill(oldWorkingCap, newWorkingCap - oldWorkingCap, itr);
 
-        println(workingMem.toHexString("Size: " + newWorkingCap + " Bytes", 0, newWorkingCap, true));
+        println(workingMem.toString("Size: " + newWorkingCap + " Bytes", 0, newWorkingCap, true));
 
         //Not big enough, expand
         oldWorkingCap = newWorkingCap;

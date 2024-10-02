@@ -309,6 +309,13 @@ public interface Resource extends AutoCloseable {
   ByteBuffer toByteBuffer(ByteOrder order);
 
   /**
+   * Returns a brief description of this object.
+   * @return a brief description of this object.
+   */
+  @Override
+  String toString();
+
+  /**
    * Returns a description of this object with an optional formatted hex string of the data
    * for the specified a range. Used primarily for testing.
    * @param comment a description
@@ -317,7 +324,7 @@ public interface Resource extends AutoCloseable {
    * @param withData include output listing of byte data in the given range
    * @return a description and hex output in a human readable format.
    */
-  String toHexString(
+  String toString(
       String comment,
       long offsetBytes,
       int lengthBytes,

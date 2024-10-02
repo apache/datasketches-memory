@@ -224,7 +224,7 @@ public class BufferTest {
     for (int i = 0; i < 64; i++) {
       assertEquals(buf.getByte(), 64 + i);
     }
-    buf.toHexString("slice", 0, slice.capacity(), true);
+    buf.toString("slice", 0, slice.capacity(), true);
     //println(s);
   }
 

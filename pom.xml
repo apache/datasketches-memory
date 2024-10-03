@@ -25,7 +25,7 @@ under the License.
 
   <groupId>org.apache.datasketches</groupId>
   <artifactId>datasketches-memory</artifactId>
-  <version>4.0.0-SNAPSHOT</version>
+  <version>4.1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>${project.artifactId}</name>
@@ -93,15 +93,15 @@ under the License.
     <!--  Maven Plugins -->
     <maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>
     <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
-    <maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
-    <maven-enforcer-plugin.version>3.4.1</maven-enforcer-plugin.version>
-    <maven-gpg-plugin.version>3.2.3</maven-gpg-plugin.version>
-    <maven-jar-plugin.version>3.4.0</maven-jar-plugin.version>
-    <maven-javadoc-plugin.version>3.7.0</maven-javadoc-plugin.version>
-    <maven-release-plugin.version>3.0.1</maven-release-plugin.version>
+    <maven-deploy-plugin.version>3.1.3</maven-deploy-plugin.version>
+    <maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
+    <maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
+    <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
+    <maven-javadoc-plugin.version>3.10.1</maven-javadoc-plugin.version>
+    <maven-release-plugin.version>3.1.1</maven-release-plugin.version>
     <maven-remote-resources-plugin.version>3.2.0</maven-remote-resources-plugin.version>
     <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
-    <maven-surefire-failsafe-plugins.version>3.2.5</maven-surefire-failsafe-plugins.version><!-- for surefire, failsafe and surefire-report -->
+    <maven-surefire-failsafe-plugins.version>3.5.0</maven-surefire-failsafe-plugins.version><!-- for surefire, failsafe and surefire-report -->
     <maven-install-plugin.version>3.1.2</maven-install-plugin.version>
     <!-- Apache Plugins -->
     <apache-rat-plugin.version>0.16.1</apache-rat-plugin.version>
@@ -111,7 +111,7 @@ under the License.
     <coveralls-repo-token></coveralls-repo-token>
     <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
     <!-- mojohaus.org plugins -->
-    <versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
+    <versions-maven-plugin.version>2.17.1</versions-maven-plugin.version>
 
     <!-- other -->
     <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version> <!-- no actual plugin, referenced by m2e -->
@@ -557,7 +557,7 @@ under the License.
     </profile>
 
     <!-- Disable source release assembly for 'apache-release' profile.
-             This is performed from a script outside Maven
+             This is performed from a script outside Maven -->
     <profile>
       <id>apache-release</id>
       <build>
@@ -574,7 +574,7 @@ under the License.
           </plugin>
         </plugins>
       </build>
-    </profile> -->
+    </profile>
 
   </profiles>
 

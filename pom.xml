@@ -189,9 +189,10 @@ under the License.
                   <requireJavaVersion>
                     <version>${require-java.version}</version>
                   </requireJavaVersion>
+                  <!--
                   <requireMavenVersion>
-                    <version>${maven.version}</version>
-                  </requireMavenVersion>
+                    <version>3.6.3</version>
+                  </requireMavenVersion> -->
                   <bannedDependencies>
                     <excludes>
                       <!--LGPL licensed library-->

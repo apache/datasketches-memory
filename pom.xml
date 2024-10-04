@@ -25,11 +25,12 @@ under the License.
 
   <modelVersion>4.0.0</modelVersion>
 
+<!--
   <parent>
     <groupId>org.apache</groupId>
     <artifactId>apache</artifactId>
     <version>32</version>
-  </parent>
+  </parent> -->
 
   <groupId>org.apache.datasketches</groupId>
   <artifactId>datasketches-memory</artifactId>

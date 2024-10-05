@@ -17,20 +17,32 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# This is a general bash script to sign and deploy a datasketches-memory-X.jar.
-# This is intended to be used for releasing the Memory component to Maven central.
+# This is a general bash script to sign and deploy datasketches-memory-X.Y.Z.jars to Nexus.
+# This assumes that the jar files exist with X.Y.Z suffix in /target/ 
+#   and were created by "mvn clean install".
+# Also the project.basedir must be set to the X.Y.X candidate at the correct git hash
+# and there must be an X.Y.Z tag at that git hash.
+
+# Even for release candidates, e.g. "-RCn", it is recommended to deploy the candidates
+#   without the "-RCn". If the candidate succeeds, it is trivial just "release" them in Nexus.
+# If the candidate does not succeed, you can just "drop" them in Nexus for the next round.
 
 #  Required Input Parameters:
 #  \$1 = Git Version Tag for this deployment
-#       Example tag for SNAPSHOT         : 1.0.0-SNAPSHOT
-#       Example tag for Release Candidate: 1.0.0-RC1
-#       Example tag for Release          : 1.0.0
+#       Example tag for SNAPSHOT         : 1.0.0-SNAPSHOT  //not recommended
+#       Example tag for Release Candidate: 1.0.0-RC1       //not recommended
+#       Example tag for Release          : 1.0.0           //always use this form
 #  \$2 = absolute path of project.basedir
-#  For example:  $ <this script>.sh 2.1.0 .
+
+#  For example, from the scripts directory:  $ ./sign-deploy-jar.sh 2.1.0 ${project.basedir}
 
 #### Extract GitTag, TestJar and ProjectBaseDir from input parameters ####
 GitTag=$1
 ProjectBaseDir=$2
+
+#### Common Variables ####
+GroupId="org.apache.datasketches"
+ArtifactId="datasketches-memory"
 
 #### Setup absolute directory references ####
 OutputDir=${ProjectBaseDir}/target
@@ -63,6 +75,8 @@ fi;
 mvn org.apache.maven.plugins:maven-gpg-plugin:3.0.1:sign-and-deploy-file \
     -Durl=$DistributionsUrl\
     -DrepositoryId=$DistributionsId \
+    -DgroupId=${GroupId} \
+    -DartifactId=${ArtifactId} \
     -Dfile=$OutputMrJar \
     -Dsources=$OutputSources \
     -Dfiles=$OutputTests,$OutputTestSources \

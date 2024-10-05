@@ -116,8 +116,9 @@ public class ResourceTest {
 
   @Test
   public void checkTypeDecode() {
-    for (int i = 0; i < 128; i++) {
-      ResourceImpl.typeDecode(i);
+    for (int i = 0; i < 256; i++) {
+      String str = ResourceImpl.typeDecode(i);
+      println(i + "\t" + str);
     }
   }
 

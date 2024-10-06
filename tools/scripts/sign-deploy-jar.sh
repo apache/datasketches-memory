@@ -28,13 +28,11 @@
 # If the candidate does not succeed, you can just "drop" them in Nexus for the next round.
 
 #  Required Input Parameters:
-#  \$1 = Git Version Tag for this deployment
-#       Example tag for SNAPSHOT         : 1.0.0-SNAPSHOT  //not recommended
-#       Example tag for Release Candidate: 1.0.0-RC1       //not recommended
-#       Example tag for Release          : 1.0.0           //always use this form
+#  \$1 = Git Version Tag for this deployment (with -SNAPSHOT is OK, but rarely needed)
+#       Example tag for Release          : 1.0.0  //always use this form
 #  \$2 = absolute path of project.basedir
 
-#  For example, from the scripts directory:  $ ./sign-deploy-jar.sh 2.1.0 ${project.basedir}
+#  For example, from the scripts directory:  $ ./sign-deploy-jar.sh 3.0.0 ${project.basedir}
 
 #### Extract GitTag, TestJar and ProjectBaseDir from input parameters ####
 GitTag=$1

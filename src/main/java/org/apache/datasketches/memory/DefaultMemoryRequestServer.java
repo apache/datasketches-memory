@@ -89,7 +89,8 @@ public final class DefaultMemoryRequestServer implements MemoryRequestServer {
   public void requestClose(
       final WritableMemory memToClose,
       final WritableMemory newMemory) {
-    memToClose.close();
+    //make this operation idempotent.
+    if (memToClose.isCloseable()) { memToClose.scope().close(); }
   }
 
 }

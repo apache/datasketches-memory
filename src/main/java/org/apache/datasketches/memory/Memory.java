@@ -112,10 +112,13 @@ public interface Memory extends Resource {
 
   /**
    * Maps the specified portion of the given file into <i>Memory</i> for read operations with a ResourceScope.
-   * @param file the given file to map. It must be non-null,readable and length &ge; 0.
+   * @param file the given file to map. It must be non-null, readable and length &ge; 0.
    * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
    * @param capacityBytes the size of the mapped memory. It must not be negative.
    * @param scope the given ResourceScope.
+   * It must be non-null.
+   * Typically use <i>ResourceScope.newConfinedScope()</i>.
+   * Warning: specifying a <i>newSharedScope()</i> is not supported.
    * @param byteOrder the byte order to be used.  It must be non-null.
    * @return <i>Memory</i> for managing the mapped memory.
    * @throws IllegalArgumentException  if path is not associated with the default file system.

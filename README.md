@@ -68,9 +68,6 @@ Note: *primitive* := *{byte, short, int, long, float, double}*
 
 ### *NOTE: The DataSketches Java Memory Component is not thread-safe.*
 
-## Release 4.0.0 (inclusive) to 5.0.0 (exclusive)
-Starting with release *datasketches-memory-4.0.0*, this Memory component supports Java 17 when compiling from source and should work with later Java versions at runtime. This component is not designed as a Java Module, so the Jar file should be part of the application classpath.
-
 ## Build Instructions
 __NOTES:__
 

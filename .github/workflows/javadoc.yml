@@ -9,9 +9,16 @@ on:
 jobs:
   javadoc:
     runs-on: ubuntu-latest
+    
+    env:
+      JDK_VERSION: 17
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Echo Java Version
+        run: >
+            java -version
       - name: Generate JavaDoc
         run: mvn javadoc:javadoc
       - name: Deploy JavaDoc

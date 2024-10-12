@@ -113,6 +113,9 @@ public interface WritableMemory extends Memory {
    * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
    * @param capacityBytes the size of the mapped Memory. It must be &ge; 0.
    * @param scope the given ResourceScope.
+   * It must be non-null.
+   * Typically use <i>ResourceScope.newConfinedScope()</i>.
+   * Warning: specifying a <i>newSharedScope()</i> is not supported.
    * @param byteOrder the byte order to be used.  It must be non-null.
    * @return mapped WritableMemory.
    * @throws IllegalArgumentException -- if file is not readable or writable.
@@ -182,6 +185,9 @@ public interface WritableMemory extends Memory {
    * @param capacityBytes the size of the desired memory in bytes.
    * @param alignmentBytes requested segment alignment. Typically 1, 2, 4 or 8.
    * @param scope the given ResourceScope.
+   * It must be non-null.
+   * Typically use <i>ResourceScope.newConfinedScope()</i>.
+   * Warning: specifying a <i>newSharedScope()</i> is not supported.
    * @param byteOrder the byte order to be used.  It must be non-null.
    * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
    * This is a callback mechanism for a user client of direct memory to request more memory.

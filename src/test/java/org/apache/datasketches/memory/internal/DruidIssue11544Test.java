@@ -73,10 +73,8 @@ public class DruidIssue11544Test {
     //Move data to new memory
     mem1.copyTo(0, mem2, 0, size1);
 
-    //Request deallocation
-    try {
-      myMemReqSvr.requestClose(mem1, mem2); //throws, because mem1 is implicit
-    } catch (UnsupportedOperationException e) { }
+    //Request Close
+    myMemReqSvr.requestClose(mem1, mem2); //ignored, because mem1 is implicit
     assertTrue(mem1.isAlive());
     assertTrue(mem2.isAlive());
 
@@ -92,9 +90,7 @@ public class DruidIssue11544Test {
     mem2.copyTo(0, mem3, 0, size2);
 
     //Request deallocation
-    try {
-      myMemReqSvr.requestClose(mem2, mem3); //throws, mem2, mem3 are on-heap
-    } catch (UnsupportedOperationException e) { }
+    myMemReqSvr.requestClose(mem2, mem3); //ignored, mem2 is on-heap (implicit)
     assertTrue(mem2.isAlive());
     assertTrue(mem3.isAlive());
   }

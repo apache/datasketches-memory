@@ -51,6 +51,9 @@ public interface MemoryRequestServer {
    * @param currentWritableMemory the current writableMemory of the client. It must be non-null.
    * @param newCapacityBytes The capacity being requested. It must be &gt; the capacity of the currentWritableMemory.
    * @param scope the ResourceScope to be used for the newly allocated memory.
+   * It must be non-null.
+   * Typically use <i>ResourceScope.newConfinedScope()</i>.
+   * Warning: specifying a <i>newSharedScope()</i> is not supported.
    * @return new WritableMemory with the requested capacity.
    */
   WritableMemory request(

@@ -2,9 +2,7 @@ name: JavaDoc
 
 on:
   push:
-    branches:
-      - 4.0.X
-      - main
+    branches: [ 4.0.X, main ]
   workflow_dispatch:
 
 jobs:

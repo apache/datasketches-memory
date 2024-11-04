@@ -13,12 +13,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Checkout Java
-        uses: actions/checkout@v4
-        with:
-          repository: apache/datasketches-memory
-          path: java
-
       - name: Setup Java
         uses: actions/setup-java@v2
         with:

@@ -57,7 +57,7 @@ jobs:
               java -version
 
         - name: Test, Package, Verify, Coverage Report
-          if: ${{ matrix.jdk == 8 && success() }}
+          if: ${{ matrix.jdk == 17 && success() }}
           run: 
               mvn verify coveralls:report -B
               -DrepoToken=${{secrets.coveralls_token}}

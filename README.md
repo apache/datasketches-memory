@@ -36,7 +36,7 @@ The goal of this component of the DataSketches library is to provide a high perf
 
 * On-heap Memory via primitive arrays
 * On-heap Memory via ByteBuffers
-* Off-heap (Direct) Memory via direct allocation
+* Off-heap (Direct or Native) Memory via direct allocation
 * Off-Heap Memory-Mapped files
 
 Each of the four resource types is accessed using different API methods in the Memory component.
@@ -67,7 +67,7 @@ Note: *primitive* := *{byte, short, int, long, float, double}*
     * *WritableMemory.writableMap(File)*
 
 ## Release 4.0.0 (inclusive) to 5.0.0 (exclusive)
-Starting with release *datasketches-memory-4.0.0*, this Memory component supports Java 17 when compiling from source and should work with later Java versions at runtime. This component is not designed as a Java Module, so the Jar file should be part of the application classpath.
+Starting with release *datasketches-memory-4.0.0*, this Memory component supports only Java 17 when compiling from source and should work with later Java versions at runtime.
 
 ### *NOTE: The DataSketches Java Memory Component is not thread-safe.*
 

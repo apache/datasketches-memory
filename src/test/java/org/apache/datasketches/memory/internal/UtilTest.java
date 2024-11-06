@@ -54,6 +54,7 @@ public class UtilTest {
   static final File setGettysburgAddressFileToReadOnly() {
     File file = getResourceFile("GettysburgAddress.txt");
     if (!file.setWritable(false)) { throw new IllegalStateException("File could not set Read-Only"); }
+    System.out.println("FILE SET READ ONLY");
     return file;
   }
 

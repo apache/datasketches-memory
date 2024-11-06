@@ -39,7 +39,6 @@ import java.nio.file.attribute.PosixFilePermissions;
 
 import org.testng.annotations.Test;
 
-
 public class UtilTest {
 
   static final String getFileAttributes(File file) throws IOException {
@@ -82,6 +81,9 @@ public class UtilTest {
     final int windows = 1548;
     boolean pass = (bytes.length == macos_unix) || (bytes.length == windows);
     if (!pass) { fail("ACTUAL LENGTH=" + bytes.length); }
+    for (int i = 0; i < bytes.length; i++) {
+      if (bytes[i] == '\r') { System.err.println("R"); }
+    }
   }
 
   @Test(expectedExceptions = NullPointerException.class)

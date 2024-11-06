@@ -92,6 +92,7 @@ public class AllocateDirectMapMemoryTest {
     try (Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
       mem.load();
       //assertTrue(mem.isLoaded()); //incompatible with Windows
+      assertTrue(mem.isAlive());
     }
   }
 

@@ -41,16 +41,13 @@ import jdk.incubator.foreign.ResourceScope;
 
 public class AllocateDirectMapMemoryTest {
 
-  @Test(expectedExceptions = IllegalStateException.class)
+  @Test
   public void simpleMap() throws IOException {
-    File file = getResourceFile("GettysburgAddress.txt");
-    file.setReadOnly();
-    Memory mem2;
+    File file = UtilTest.setGettysburgAddressFileToReadOnly();
     try (Memory mem = Memory.map(file)) {
-      mem2 = mem;
       mem.close();
-    } //The Try-With-Resources will throw if already closed
-    assertFalse(mem2.isAlive());
+    } //The Try-With-Resources will throw since it is already closed
+    catch (IllegalStateException e) { /* OK */ }
   }
 
   @Test

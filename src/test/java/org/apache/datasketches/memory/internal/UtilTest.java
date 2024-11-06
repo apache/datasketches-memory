@@ -51,9 +51,10 @@ public class UtilTest {
     return s;
   }
 
-  static final void setGettysburgAddressFileToReadOnly() throws IOException {
+  static final File setGettysburgAddressFileToReadOnly() {
     File file = getResourceFile("GettysburgAddress.txt");
-    if (!file.setReadOnly()) { throw new IllegalStateException("File could not set Read-Only"); }
+    if (!file.setWritable(false)) { throw new IllegalStateException("File could not set Read-Only"); }
+    return file;
   }
 
   //Resources

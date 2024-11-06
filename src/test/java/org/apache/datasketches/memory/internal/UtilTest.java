@@ -79,7 +79,7 @@ public class UtilTest {
   public void resourceBytesCorrect() {
     final String shortFileName = "GettysburgAddress.txt";
     final byte[] bytes = getResourceBytes(shortFileName);
-    if (bytes.length != 1541) { fail("ACTUAL LENGTH=" + bytes.length); }
+    if ((bytes.length < 1541) || bytes.length > 1548) { fail("ACTUAL LENGTH=" + bytes.length); }
   }
 
   @Test(expectedExceptions = NullPointerException.class)

@@ -228,7 +228,7 @@ public class AllocateDirectWritableMapMemoryTest {
    */
   static void print(final Object o) {
     if (o != null) {
-      System.out.print(o.toString()); //disable here
+      //System.out.print(o.toString()); //disable here
     }
   }
 

@@ -44,7 +44,6 @@ public class NativeWritableBufferImplTest {
 
   //Simple Native direct
 
-  @SuppressWarnings("resource")
   @Test
   public void checkNativeCapacityAndClose() throws Exception {
     int memCapacity = 64;
@@ -324,7 +323,6 @@ public class NativeWritableBufferImplTest {
     //println( mem.toHexString("HeapBB", 0, memCapacity));
   }
 
-  @SuppressWarnings("resource")
   @Test
   public void checkIsDirect() throws Exception {
     int memCapacity = 64;

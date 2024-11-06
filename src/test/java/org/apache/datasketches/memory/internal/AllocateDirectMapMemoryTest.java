@@ -91,11 +91,10 @@ public class AllocateDirectMapMemoryTest {
     long memCapacity = file.length();
     try (Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
       mem.load();
-      assertTrue(mem.isLoaded());
+      //assertTrue(mem.isLoaded()); //incompatible with Windows
     }
   }
 
-  @SuppressWarnings("resource")
   @Test
   public void testScopeHandle() throws IOException {
     File file = getResourceFile("GettysburgAddress.txt");
@@ -104,7 +103,7 @@ public class AllocateDirectMapMemoryTest {
     ResourceScope scope = mem.scope();
     ResourceScope.Handle handle = scope.acquire();
     mem.load();
-    assertTrue(mem.isLoaded());
+    //assertTrue(mem.isLoaded()); //incompatible with Windows
     mem.scope().release(handle);
     assertTrue(mem.isAlive());
     mem.close();

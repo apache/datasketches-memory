@@ -39,7 +39,6 @@ import jdk.incubator.foreign.ResourceScope;
 public class ZeroCapacityTest {
   private static final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
 
-  @SuppressWarnings("resource")
   @Test
   public void checkZeroCapacity() throws Exception {
     WritableMemory wmem = WritableMemory.allocate(0);

@@ -82,8 +82,10 @@ public class UtilTest {
     boolean pass = (bytes.length == macos_unix) || (bytes.length == windows);
     if (!pass) { fail("ACTUAL LENGTH=" + bytes.length); }
     for (int i = 0; i < bytes.length; i++) {
-      if (bytes[i] == '\r') { System.err.println("R"); }
+      if (bytes[i] == 13) { System.err.println("CR"); } //\r
+      if (bytes[i] == 10) { System.err.print("LF "); }   //\n
     }
+    System.err.println("");
   }
 
   @Test(expectedExceptions = NullPointerException.class)

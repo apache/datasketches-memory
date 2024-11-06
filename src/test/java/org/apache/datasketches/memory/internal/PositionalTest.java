@@ -24,19 +24,14 @@ import static org.testng.Assert.fail;
 import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.BufferPositionInvariantsException;
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.MemoryRequestServer;
-import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
-
-import jdk.incubator.foreign.ResourceScope;
 
 /**
  * @author Lee Rhodes
  */
 public class PositionalTest {
-  private static final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
 
   @Test
   public void checkLimits() {

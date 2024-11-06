@@ -42,7 +42,6 @@ public class ExampleMemoryRequestServerTest {
    * and each is closed by the MemoryClient when it is done with them.
    * @throws Exception
    */
-  @SuppressWarnings("resource")
   @Test
   public void checkExampleMemoryRequestServer1() {
 

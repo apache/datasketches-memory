@@ -36,7 +36,6 @@ public class IgnoredArrayOverflowTest {
   private WritableMemory memory;
   private static final long MAX_SIZE = (1L << 10); // use 1L << 31 to test int overrange
 
-  @SuppressWarnings("resource")
   @BeforeClass
   public void allocate() {
     ResourceScope scope = ResourceScope.newConfinedScope();

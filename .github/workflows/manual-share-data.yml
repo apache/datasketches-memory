@@ -14,9 +14,9 @@ jobs:
           expr 3 + 7 > math-homework.txt
 
       - name: Upload math result for job_2
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: homework
+          name: homework1
           path: math-homework.txt
 
   job_2:
@@ -26,9 +26,9 @@ jobs:
 
     steps:
       - name: Download math result from job_1
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: homework
+          name: homework1
 
       - shell: bash
         run: |
@@ -36,9 +36,9 @@ jobs:
           expr $value \* 9 > math-homework.txt
 
       - name: Upload math result from job_2 to job_3
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: homework
+          name: homework2
           path: math-homework.txt
 
   job_3:
@@ -48,9 +48,9 @@ jobs:
 
     steps:
       - name: Download math result from job_2
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: homework
+          name: homework2
 
       - name: Print the final result
         shell: bash
@@ -59,9 +59,9 @@ jobs:
           echo The result is $value
 
       - name: Upload result from job_3 to job_4
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: homework
+          name: homework3
           path: math-homework.txt
 
   job_4:
@@ -71,12 +71,12 @@ jobs:
 
     steps:
       - name: Download math result from job-3
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: homework
+          name: homework3
 
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: update brew, install tree, output
         run: |

@@ -352,7 +352,6 @@ public class MemoryTest {
     }
   }
 
-  @SuppressWarnings("resource")
   @Test(expectedExceptions = IllegalStateException.class)
   public void checkParentUseAfterFree() throws Exception {
     int bytes = 64 * 8;
@@ -362,7 +361,6 @@ public class MemoryTest {
     wmem.getLong(0); //Already closed
   }
 
-  @SuppressWarnings("resource")
   @Test(expectedExceptions = IllegalStateException.class)
   public void checkRegionUseAfterFree() throws Exception {
     int bytes = 64;

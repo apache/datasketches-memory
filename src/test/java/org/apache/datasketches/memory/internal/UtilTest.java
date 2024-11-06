@@ -27,6 +27,7 @@ import static org.apache.datasketches.memory.internal.ResourceImpl.LS;
 import static org.apache.datasketches.memory.internal.Util.getResourceBytes;
 import static org.apache.datasketches.memory.internal.Util.getResourceFile;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +38,7 @@ import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermissions;
 
 import org.testng.annotations.Test;
+
 
 public class UtilTest {
 
@@ -51,9 +53,10 @@ public class UtilTest {
     return s;
   }
 
-  static final void setGettysburgAddressFileToReadOnly() throws IOException {
+  static final File setGettysburgAddressFileToReadOnly() {
     File file = getResourceFile("GettysburgAddress.txt");
-    Files.setPosixFilePermissions(file.toPath(), PosixFilePermissions.fromString("r--r--r--"));
+    if (!file.setWritable(false)) { throw new IllegalStateException("File could not set Read-Only"); }
+    return file;
   }
 
   //Resources
@@ -75,7 +78,10 @@ public class UtilTest {
   public void resourceBytesCorrect() {
     final String shortFileName = "GettysburgAddress.txt";
     final byte[] bytes = getResourceBytes(shortFileName);
-    assertTrue(bytes.length == 1541);
+    final int macos_unix = 1541;
+    final int windows = 1548;
+    boolean pass = (bytes.length == macos_unix) || (bytes.length == windows);
+    if (!pass) { fail("ACTUAL LENGTH=" + bytes.length); }
   }
 
   @Test(expectedExceptions = NullPointerException.class)

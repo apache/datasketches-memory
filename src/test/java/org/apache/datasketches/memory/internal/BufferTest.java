@@ -27,7 +27,6 @@ import java.nio.ByteOrder;
 import java.util.List;
 
 import org.apache.datasketches.memory.Buffer;
-import org.apache.datasketches.memory.BufferPositionInvariantsException;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.Resource;
@@ -283,7 +282,6 @@ public class BufferTest {
     }
   }
 
-  @SuppressWarnings("resource")
   @Test(expectedExceptions = IllegalStateException.class)
   public void checkParentUseAfterFree() throws Exception {
     int bytes = 64 * 8;
@@ -295,7 +293,6 @@ public class BufferTest {
     wbuf.getLong();
   }
 
-  @SuppressWarnings("resource")
   @Test(expectedExceptions = IllegalStateException.class)
   public void checkRegionUseAfterFree() throws Exception {
     int bytes = 64;

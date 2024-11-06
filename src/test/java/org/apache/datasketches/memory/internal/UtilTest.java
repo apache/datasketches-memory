@@ -53,7 +53,7 @@ public class UtilTest {
 
   static final void setGettysburgAddressFileToReadOnly() throws IOException {
     File file = getResourceFile("GettysburgAddress.txt");
-    Files.setPosixFilePermissions(file.toPath(), PosixFilePermissions.fromString("r--r--r--"));
+    if (!file.setReadOnly()) { throw new IllegalStateException("File could not set Read-Only"); }
   }
 
   //Resources

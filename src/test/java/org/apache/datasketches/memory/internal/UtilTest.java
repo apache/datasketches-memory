@@ -56,7 +56,6 @@ public class UtilTest {
   static final File setGettysburgAddressFileToReadOnly() {
     File file = getResourceFile("GettysburgAddress.txt");
     if (!file.setWritable(false)) { throw new IllegalStateException("File could not set Read-Only"); }
-    System.out.println("FILE SET READ ONLY");
     return file;
   }
 
@@ -79,7 +78,10 @@ public class UtilTest {
   public void resourceBytesCorrect() {
     final String shortFileName = "GettysburgAddress.txt";
     final byte[] bytes = getResourceBytes(shortFileName);
-    if ((bytes.length < 1541) || bytes.length > 1548) { fail("ACTUAL LENGTH=" + bytes.length); }
+    final int macos_unix = 1541;
+    final int windows = 1548;
+    boolean pass = (bytes.length == macos_unix) || (bytes.length == windows);
+    if (!pass) { fail("ACTUAL LENGTH=" + bytes.length); }
   }
 
   @Test(expectedExceptions = NullPointerException.class)

@@ -78,7 +78,7 @@ public class UtilTest {
     final String shortFileName = "GettysburgAddress.bin";
     final byte[] bytes = getResourceBytes(shortFileName);
     final int macos_unix = 1541;
-    final int windows = 1548;
+    //final int windows = 1548;
     boolean pass = (bytes.length == macos_unix);// || (bytes.length == windows);
     if (!pass) { fail("ACTUAL LENGTH=" + bytes.length); }
   }

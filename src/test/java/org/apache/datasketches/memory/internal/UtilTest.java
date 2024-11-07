@@ -77,6 +77,11 @@ public class UtilTest {
   @Test
   public void resourceBytesCorrect() {
     final String shortFileName = "GettysburgAddress.bin";
+    final File file = getResourceFile(shortFileName);
+    final int flen = (int)file.length();
+    if (flen != 1541) {
+      fail("ACTUAL FILE LENGTH = " + flen);
+    }
     final byte[] bytes = getResourceBytes(shortFileName);
     final int macos_unix = 1541;
     //final int windows = 1548;

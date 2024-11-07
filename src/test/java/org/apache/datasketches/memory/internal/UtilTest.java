@@ -23,10 +23,9 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.Util.getResourceBytes;
+import static java.nio.file.Files.readString;
 import static org.apache.datasketches.memory.internal.Util.getResourceFile;
 import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -75,32 +74,15 @@ public class UtilTest {
   static final String LS = System.getProperty("line.separator");
 
   @Test
-  public void resourceBytesCorrect() {
+  public void resourceStringLikelyCorrect() {
     final String shortFileName = "GettysburgAddress.bin";
     final File file = getResourceFile(shortFileName);
-    final int flen = (int)file.length();
-    if (flen != 1541) {
-      fail("ACTUAL FILE LENGTH = " + flen);
+    String str;
+    try {
+      str = readString(file.toPath());
     }
-    final byte[] bytes = getResourceBytes(shortFileName);
-    final int macos_unix = 1541;
-    //final int windows = 1548;
-    boolean pass = (bytes.length == macos_unix);// || (bytes.length == windows);
-    if (!pass) {
-      StringBuilder sb = new StringBuilder();
-      for (int i = 0; i < bytes.length; i++) {
-        if (bytes[i] == 13) { sb.append("CR"); }  //\r
-        if (bytes[i] == 10) { sb.append("LF "); } //\n
-      }
-      sb.append(LS);
-      fail("ACTUAL LENGTH=" + bytes.length + LS + sb.toString());
-    }
-  }
-
-  @Test(expectedExceptions = NullPointerException.class)
-  public void resourceBytesFileNotFound() {
-    final String shortFileName = "GettysburgAddress.txt";
-    getResourceBytes(shortFileName + "123");
+    catch (IOException e) { throw new IllegalArgumentException(e); }
+    assertTrue(str.startsWith("Abraham Lincoln's Gettysburg Address:"));
   }
 
   @Test

@@ -23,8 +23,6 @@ import static java.util.Arrays.fill;
 import static org.apache.datasketches.memory.internal.ResourceImpl.LS;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -34,7 +32,6 @@ import java.util.Objects;
 /**
  * @author Lee Rhodes
  */
-//@SuppressWarnings("javadoc")
 final class Util {
 
   private Util() { }
@@ -147,23 +144,6 @@ final class Util {
    */
   static File getResourceFile(final String shortFileName) {
     return new File(getResourcePath(shortFileName));
-  }
-
-  /**
-   * Returns a byte array of the contents of the file defined by the given resource file's shortFileName.
-   * @param shortFileName the last name in the pathname's name sequence.
-   * @return a byte array of the contents of the file defined by the given resource file's shortFileName.
-   * @throws IllegalArgumentException if resource cannot be read.
-   */
-  static byte[] getResourceBytes(final String shortFileName) {
-    File file = getResourceFile(shortFileName);
-    byte[] bytes = new byte[(int) file.length()];
-    try (FileInputStream fis = new FileInputStream(file)) {
-      fis.read(bytes);
-    } catch (final IOException e) {
-      throw new IllegalArgumentException("Cannot read resource: " + shortFileName + LS + e);
-    }
-    return bytes;
   }
 
 }

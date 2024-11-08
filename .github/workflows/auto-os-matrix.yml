@@ -1,10 +1,13 @@
-name: DataSketches-Memory Manual OS Matrix Test & Install
+name: DataSketches-Memory Auto OS Matrix Test & Install
 
 on:
+    pull_request:
+    push:
+        branches: [ main ]
     workflow_dispatch:
 
 env:
-    MAVEN_OPTS: -Xmx4g -Xms1g
+    MAVEN_OPTS: -Xmx1g -Xms1g
 
 jobs:
     build:

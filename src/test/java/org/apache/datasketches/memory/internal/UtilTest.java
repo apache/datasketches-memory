@@ -23,8 +23,7 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.ResourceImpl.LS;
-import static org.apache.datasketches.memory.internal.Util.getResourceBytes;
+import static java.nio.file.Files.readString;
 import static org.apache.datasketches.memory.internal.Util.getResourceFile;
 import static org.testng.Assert.assertTrue;
 
@@ -51,9 +50,10 @@ public class UtilTest {
     return s;
   }
 
-  static final void setGettysburgAddressFileToReadOnly() throws IOException {
+  static final File setGettysburgAddressFileToReadOnly() {
     File file = getResourceFile("GettysburgAddress.txt");
-    Files.setPosixFilePermissions(file.toPath(), PosixFilePermissions.fromString("r--r--r--"));
+    if (!file.setWritable(false)) { throw new IllegalStateException("File could not set Read-Only"); }
+    return file;
   }
 
   //Resources
@@ -71,17 +71,18 @@ public class UtilTest {
     getResourceFile(shortFileName + "123");
   }
 
-  @Test
-  public void resourceBytesCorrect() {
-    final String shortFileName = "GettysburgAddress.txt";
-    final byte[] bytes = getResourceBytes(shortFileName);
-    assertTrue(bytes.length == 1541);
-  }
+  static final String LS = System.getProperty("line.separator");
 
-  @Test(expectedExceptions = NullPointerException.class)
-  public void resourceBytesFileNotFound() {
+  @Test
+  public void resourceStringLikelyCorrect() {
     final String shortFileName = "GettysburgAddress.txt";
-    getResourceBytes(shortFileName + "123");
+    final File file = getResourceFile(shortFileName);
+    String str;
+    try {
+      str = readString(file.toPath());
+    }
+    catch (IOException e) { throw new IllegalArgumentException(e); }
+    assertTrue(str.startsWith("Abraham Lincoln's Gettysburg Address:"));
   }
 
   @Test

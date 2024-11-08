@@ -57,8 +57,7 @@ public class AllocateDirectWritableMapMemoryTest {
   }
 
   @Test
-  public void simpleMap()
-      throws IllegalArgumentException, InvalidPathException, IllegalStateException,
+  public void simpleMap() throws IllegalArgumentException, InvalidPathException, IllegalStateException,
       UnsupportedOperationException, IOException, SecurityException {
     File file = getResourceFile("GettysburgAddress.txt");
     Memory mem = null;
@@ -127,7 +126,6 @@ public class AllocateDirectWritableMapMemoryTest {
     }
   }
 
-  @SuppressWarnings("resource")
   @Test
   public void testMapExceptionNoTWR()
       throws IllegalArgumentException, InvalidPathException, IllegalStateException, UnsupportedOperationException,
@@ -180,7 +178,7 @@ public class AllocateDirectWritableMapMemoryTest {
     try (ResourceScope scope = ResourceScope.newConfinedScope()) {
       mem = Memory.map(origFile, 0, origBytes, scope, ByteOrder.nativeOrder());
       mem.load();
-      assertTrue(mem.isLoaded());
+      //assertTrue(mem.isLoaded()); //incompatible with Windows
       //confirm orig string
       byte[] buf = new byte[(int)origBytes];
       mem.getByteArray(0, buf, 0, (int)origBytes);
@@ -189,7 +187,7 @@ public class AllocateDirectWritableMapMemoryTest {
 
       wmem = WritableMemory.writableMap(origFile, 0, correctBytesLen, scope, ByteOrder.nativeOrder());
       wmem.load();
-      assertTrue(wmem.isLoaded());
+      //assertTrue(wmem.isLoaded()); //incompatible with Windows
       // over write content
       wmem.putByteArray(0, correctByteArr, 0, (int)correctBytesLen);
       wmem.force();

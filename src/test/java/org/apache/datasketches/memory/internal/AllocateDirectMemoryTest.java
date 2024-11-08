@@ -76,7 +76,6 @@ public class AllocateDirectMemoryTest {
     }
   }
 
-  @SuppressWarnings("resource")
   @Test
   public void checkNonNativeDirect() {
     MemoryRequestServer myMemReqSvr = Resource.defaultMemReqSvr;
@@ -86,7 +85,6 @@ public class AllocateDirectMemoryTest {
     }
   }
 
-  @SuppressWarnings("resource")
   @Test
   public void checkExplicitCloseNoTWR() {
     final long cap = 128;

@@ -150,7 +150,6 @@ public class CopyMemoryTest {
     }
   }
 
-  @SuppressWarnings("resource")
   private static WritableMemory genWmem(int longs, boolean empty) {
     WritableMemory wmem = WritableMemory.allocateDirect(longs << 3, 1, ResourceScope.newConfinedScope(), ByteOrder.nativeOrder(), memReqSvr);
     if (empty) {

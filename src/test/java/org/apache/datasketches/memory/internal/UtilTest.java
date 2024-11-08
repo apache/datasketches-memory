@@ -75,7 +75,7 @@ public class UtilTest {
 
   @Test
   public void resourceStringLikelyCorrect() {
-    final String shortFileName = "GettysburgAddress.bin";
+    final String shortFileName = "GettysburgAddress.txt";
     final File file = getResourceFile(shortFileName);
     String str;
     try {

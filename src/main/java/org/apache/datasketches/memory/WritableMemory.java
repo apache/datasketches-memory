@@ -21,13 +21,13 @@ package org.apache.datasketches.memory;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.MemorySegment.Scope;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.internal.WritableMemoryImpl;
-
-import jdk.incubator.foreign.MemorySegment;
-import jdk.incubator.foreign.ResourceScope;
 
 /**
  * Defines the writable API for offset access to a resource.
@@ -83,28 +83,7 @@ public interface WritableMemory extends Memory {
    * required by the implementation.
    */
   static WritableMemory writableMap(File file) throws IOException {
-    return writableMap(file, 0, file.length(), ByteOrder.nativeOrder());
-  }
-
-  /**
-   * Maps the specified portion of the given file into Memory for write operations.
-   * @param file the given file to map. It must be non-null and writable.
-   * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
-   * @param capacityBytes the size of the mapped Memory.
-   * @param byteOrder the given <i>ByteOrder</i>. It must be non-null.
-   * @return a file-mapped WritableMemory.
-   * @throws IllegalArgumentException if file is not readable or not writable.
-   * @throws IOException if the specified path does not point to an existing file, or if some other I/O error occurs.
-   * @throws SecurityException If a security manager is installed and it denies an unspecified permission
-   * required by the implementation.
-   */
-  static WritableMemory writableMap(
-      File file,
-      long fileOffsetBytes,
-      long capacityBytes,
-      ByteOrder byteOrder) throws IOException {
-    final ResourceScope scope = ResourceScope.newConfinedScope();
-    return WritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, false, byteOrder);
+    return writableMap(Arena.ofConfined(), file, 0, file.length(), ByteOrder.nativeOrder());
   }
 
   /**
@@ -112,10 +91,6 @@ public interface WritableMemory extends Memory {
    * @param file the given file to map. It must be non-null with a non-negative length and writable.
    * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
    * @param capacityBytes the size of the mapped Memory. It must be &ge; 0.
-   * @param scope the given ResourceScope.
-   * It must be non-null.
-   * Typically use <i>ResourceScope.newConfinedScope()</i>.
-   * Warning: specifying a <i>newSharedScope()</i> is not supported.
    * @param byteOrder the byte order to be used.  It must be non-null.
    * @return mapped WritableMemory.
    * @throws IllegalArgumentException -- if file is not readable or writable.
@@ -128,9 +103,30 @@ public interface WritableMemory extends Memory {
       File file,
       long fileOffsetBytes,
       long capacityBytes,
-      ResourceScope scope,
       ByteOrder byteOrder) throws IOException {
-    return WritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, false, byteOrder);
+    return WritableMemoryImpl.wrapMap(Arena.ofConfined(), file, fileOffsetBytes, capacityBytes, false, byteOrder);
+  }
+
+  /**
+   * Maps the specified portion of the given file into Memory for write operations.
+   * @param arena the given arena to map. It must be non-null.
+   * @param file the given file to map. It must be non-null and writable.
+   * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
+   * @param capacityBytes the size of the mapped Memory.
+   * @param byteOrder the given <i>ByteOrder</i>. It must be non-null.
+   * @return a file-mapped WritableMemory.
+   * @throws IllegalArgumentException if file is not readable or not writable.
+   * @throws IOException if the specified path does not point to an existing file, or if some other I/O error occurs.
+   * @throws SecurityException If a security manager is installed and it denies an unspecified permission
+   * required by the implementation.
+   */
+  static WritableMemory writableMap(
+      Arena arena,
+      File file,
+      long fileOffsetBytes,
+      long capacityBytes,
+      ByteOrder byteOrder) throws IOException {
+    return WritableMemoryImpl.wrapMap(arena, file, fileOffsetBytes, capacityBytes, false, byteOrder);
   }
 
   //ALLOCATE DIRECT
@@ -144,11 +140,12 @@ public interface WritableMemory extends Memory {
    * It is the responsibility of the using application to clear this memory, if required,
    * and to call <i>close()</i> when done.</p>
    *
+   * @param arena the given arena to map. It must be non-null.
    * @param capacityBytes the size of the desired memory in bytes.
    * @return WritableMemory for this off-heap, native resource.
    */
-  static WritableMemory allocateDirect(long capacityBytes) {
-    return allocateDirect(capacityBytes, 8, ByteOrder.nativeOrder(), new DefaultMemoryRequestServer());
+  static WritableMemory allocateDirect(Arena arena, long capacityBytes) {
+    return allocateDirect(arena, capacityBytes, 8, ByteOrder.nativeOrder(), new DefaultMemoryRequestServer());
   }
 
   /**
@@ -159,6 +156,7 @@ public interface WritableMemory extends Memory {
    * It is the responsibility of the using application to clear this memory, if required,
    * and to call <i>close()</i> when done.</p>
    *
+   * @param arena the given arena to map. It must be non-null.
    * @param capacityBytes the size of the desired memory in bytes.
    * @param alignmentBytes requested segment alignment. Typically 1, 2, 4 or 8.
    * @param byteOrder the given <i>ByteOrder</i>.  It must be non-null.
@@ -167,12 +165,12 @@ public interface WritableMemory extends Memory {
    * @return a WritableMemory for this off-heap resource.
    */
   static WritableMemory allocateDirect(
+      Arena arena,
       long capacityBytes,
       long alignmentBytes,
       ByteOrder byteOrder,
       MemoryRequestServer memReqSvr) {
-    final ResourceScope scope = ResourceScope.newConfinedScope();
-    return WritableMemoryImpl.wrapDirect(capacityBytes, alignmentBytes, scope, byteOrder, memReqSvr);
+    return WritableMemoryImpl.wrapDirect(arena, capacityBytes, alignmentBytes, byteOrder, memReqSvr);
   }
 
   /**
@@ -182,6 +180,7 @@ public interface WritableMemory extends Memory {
    * <p><b>NOTICE:</b> It is the responsibility of the using application to
    * call <i>close()</i> when done.</p>
    *
+   * @param arena the given arena to map. It must be non-null.
    * @param capacityBytes the size of the desired memory in bytes.
    * @param alignmentBytes requested segment alignment. Typically 1, 2, 4 or 8.
    * @param scope the given ResourceScope.
@@ -194,12 +193,13 @@ public interface WritableMemory extends Memory {
    * @return WritableMemory
    */
   static WritableMemory allocateDirect(
+      Arena arena,
       long capacityBytes,
       long alignmentBytes,
-      ResourceScope scope,
+      Scope scope,
       ByteOrder byteOrder,
       MemoryRequestServer memReqSvr) {
-    return WritableMemoryImpl.wrapDirect(capacityBytes, alignmentBytes, scope, byteOrder, memReqSvr);
+    return WritableMemoryImpl.wrapDirect(arena, capacityBytes, alignmentBytes, byteOrder, memReqSvr);
   }
 
   //REGIONS

@@ -25,6 +25,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
+import java.lang.foreign.Arena;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -36,8 +37,6 @@ import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
-import jdk.incubator.foreign.ResourceScope;
-
 public class NativeWritableMemoryImplTest {
   private static final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
 
@@ -46,8 +45,12 @@ public class NativeWritableMemoryImplTest {
   @Test
   public void checkNativeCapacityAndClose() throws Exception {
     int memCapacity = 64;
-    ResourceScope scope = ResourceScope.newConfinedScope();
-    WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    WritableMemory wmem = WritableMemory.allocateDirect(
+      Arena.ofConfined(),
+      memCapacity,
+      1,
+      ByteOrder.nativeOrder(),
+      memReqSvr);
     assertEquals(memCapacity, wmem.getCapacity());
 
     wmem.close();
@@ -186,8 +189,8 @@ public class NativeWritableMemoryImplTest {
   @Test
   public void checkNativeBaseBound() throws Exception {
     int memCapacity = 64;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
       wmem.toString("Force Assertion Error", memCapacity, 8, false);
     } catch (IllegalArgumentException e) {
       //ok
@@ -197,8 +200,8 @@ public class NativeWritableMemoryImplTest {
   @Test
   public void checkNativeSrcArrayBound() throws Exception {
     long memCapacity = 64;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
       byte[] srcArray = { 1, -2, 3, -4 };
       wmem.putByteArray(0L, srcArray, 0, 5);
     } catch (IndexOutOfBoundsException e) {
@@ -218,8 +221,8 @@ public class NativeWritableMemoryImplTest {
   public void checkCopyWithinNativeSmall() throws Exception {
     int memCapacity = 64;
     int half = memCapacity/2;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
       wmem.clear();
 
       for (int i=0; i<half; i++) { //fill first half
@@ -240,8 +243,8 @@ public class NativeWritableMemoryImplTest {
     int memCapLongs = memCapacity / 8;
     int halfBytes = memCapacity / 2;
     int halfLongs = memCapLongs / 2;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
       wmem.clear();
 
       for (int i=0; i < halfLongs; i++) {
@@ -259,8 +262,8 @@ public class NativeWritableMemoryImplTest {
   @Test
   public void checkCopyWithinNativeSrcBound() throws Exception {
     int memCapacity = 64;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
       wmem.copyTo(32, wmem, 32, 33);  //hit source bound check
       fail("Did Not Catch Assertion Error: source bound");
     }
@@ -272,8 +275,8 @@ public class NativeWritableMemoryImplTest {
   @Test
   public void checkCopyWithinNativeDstBound() throws Exception {
     int memCapacity = 64;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
       wmem.copyTo(0, wmem, 32, 33);  //hit dst bound check
       fail("Did Not Catch Assertion Error: dst bound");
     }
@@ -286,9 +289,9 @@ public class NativeWritableMemoryImplTest {
   public void checkCopyCrossNativeSmall() throws Exception {
     int memCapacity = 64;
 
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory wmem1 = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
-      WritableMemory wmem2 = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem1 = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory wmem2 = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
 
       for (int i=0; i < memCapacity; i++) {
         wmem1.putByte(i, (byte) i);
@@ -307,9 +310,9 @@ public class NativeWritableMemoryImplTest {
     int memCapacity = (2<<20) + 64;
     int memCapLongs = memCapacity / 8;
 
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory wmem1 = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
-      WritableMemory wmem2 = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem1 = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory wmem2 = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
 
       for (int i=0; i < memCapLongs; i++) {
         wmem1.putLong(i*8, i);
@@ -327,8 +330,8 @@ public class NativeWritableMemoryImplTest {
   @Test
   public void checkCopyCrossNativeAndByteArray() throws Exception {
     int memCapacity = 64;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
 
       for (int i= 0; i < wmem.getCapacity(); i++) {
         wmem.putByte(i, (byte) i);
@@ -348,8 +351,8 @@ public class NativeWritableMemoryImplTest {
   public void checkCopyCrossRegionsSameNative() throws Exception {
     int memCapacity = 128;
 
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory wmem1 = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem1 = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
 
       for (int i= 0; i < wmem1.getCapacity(); i++) {
         wmem1.putByte(i, (byte) i);
@@ -374,8 +377,8 @@ public class NativeWritableMemoryImplTest {
   @Test
   public void checkCopyCrossNativeArrayAndHierarchicalRegions() throws Exception {
     int memCapacity = 64;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory wmem1 = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem1 = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
 
       for (int i= 0; i < wmem1.getCapacity(); i++) { //fill with numbers
         wmem1.putByte(i, (byte) i);
@@ -404,8 +407,8 @@ public class NativeWritableMemoryImplTest {
   @Test(expectedExceptions = IndexOutOfBoundsException.class)
   public void checkRegionBounds() throws Exception {
     int memCapacity = 64;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
       wmem.writableRegion(1, 64);
     }
   }
@@ -514,10 +517,10 @@ public class NativeWritableMemoryImplTest {
   @Test
   public void checkIsDirect() throws Exception {
     int memCapacity = 64;
-    WritableMemory mem = WritableMemory.allocate(memCapacity);
-    assertFalse(mem.isDirect());
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory mem = WritableMemory.allocate(memCapacity);
+      assertFalse(mem.isDirect());
+      WritableMemory wmem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
       assertTrue(wmem.isDirect());
     }
   }
@@ -577,10 +580,10 @@ public class NativeWritableMemoryImplTest {
     byte[] arr2 = new byte[] {0, 1, 2, 4};
     byte[] arr3 = new byte[] {0, 1, 2, 3, 4};
 
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory mem1 = WritableMemory.allocateDirect(4, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
-      WritableMemory mem2 = WritableMemory.allocateDirect(4, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
-      WritableMemory mem3 = WritableMemory.allocateDirect(5, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory mem1 = WritableMemory.allocateDirect(arena, 4, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory mem2 = WritableMemory.allocateDirect(arena, 4, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory mem3 = WritableMemory.allocateDirect(arena, 5, 1, ByteOrder.nativeOrder(), memReqSvr);
 
       mem1.putByteArray(0, arr1, 0, 4);
       mem2.putByteArray(0, arr2, 0, 4);

@@ -24,6 +24,8 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.lang.foreign.Arena;
+
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.WritableMemory;
@@ -37,7 +39,7 @@ public class AllocateDirectMemoryTest {
   public void simpleAllocateDirect() {
     int longs = 32;
     WritableMemory wMem2 = null;
-    try (WritableMemory wMem = WritableMemory.allocateDirect(longs << 3)) {
+    try (WritableMemory wMem = WritableMemory.allocateDirect(Arena.ofConfined(), longs << 3)) {
       wMem2 = wMem;
       for (int i = 0; i<longs; i++) {
         wMem.putLong(i << 3, i);
@@ -54,7 +56,7 @@ public class AllocateDirectMemoryTest {
   public void checkDefaultMemoryRequestServer() {
     int longs1 = 32;
     int bytes1 = longs1 << 3;
-    try (WritableMemory origWmem = WritableMemory.allocateDirect(bytes1)) {
+    try (WritableMemory origWmem = WritableMemory.allocateDirect(Arena.ofConfined(), bytes1)) {
       for (int i = 0; i < longs1; i++) { //puts data in origWmem
         origWmem.putLong(i << 3, i);
         assertEquals(origWmem.getLong(i << 3), i);
@@ -66,20 +68,20 @@ public class AllocateDirectMemoryTest {
       origWmem.setMemoryRequestServer(Resource.defaultMemReqSvr);
       MemoryRequestServer myMemReqSvr = origWmem.getMemoryRequestServer();
 
-      WritableMemory newWmem = myMemReqSvr.request(origWmem, bytes2);
-      assertTrue(newWmem.isHeap()); //on heap by default
-      for (int i = 0; i < longs2; i++) {
-          newWmem.putLong(i << 3, i);
-          assertEquals(newWmem.getLong(i << 3), i);
-      }
-      //allow the TWR to close the direct origWmem
-    }
+      try (WritableMemory newWmem = myMemReqSvr.request(origWmem, bytes2)) {
+        assertTrue(newWmem.isHeap()); //on heap by default
+        for (int i = 0; i < longs2; i++) {
+            newWmem.putLong(i << 3, i);
+            assertEquals(newWmem.getLong(i << 3), i);
+        }
+      } //allow the TWR to close the newWmem
+    } //allow the TWR to close the direct origWmem
   }
 
   @Test
   public void checkNonNativeDirect() {
     MemoryRequestServer myMemReqSvr = Resource.defaultMemReqSvr;
-    try (WritableMemory wmem = WritableMemory.allocateDirect(128, 8, NON_NATIVE_BYTE_ORDER, myMemReqSvr)) {
+    try (WritableMemory wmem = WritableMemory.allocateDirect(Arena.ofConfined(), 128, 8, NON_NATIVE_BYTE_ORDER, myMemReqSvr)) {
       wmem.putChar(0, (char) 1);
       assertEquals(wmem.getByte(1), (byte) 1);
     }
@@ -88,8 +90,7 @@ public class AllocateDirectMemoryTest {
   @Test
   public void checkExplicitCloseNoTWR() {
     final long cap = 128;
-    WritableMemory wmem = null;
-    wmem = WritableMemory.allocateDirect(cap);
+    WritableMemory wmem = WritableMemory.allocateDirect(Arena.ofConfined(), cap);
     wmem.close(); //explicit close
   }
 

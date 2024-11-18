@@ -19,11 +19,13 @@
 
 package org.apache.datasketches.memory.internal;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+
 import org.apache.datasketches.memory.BufferPositionInvariantsException;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.Positional;
 
-import jdk.incubator.foreign.MemorySegment;
 
 /**
  * This implements the positional API.
@@ -51,10 +53,11 @@ abstract class PositionalImpl extends ResourceImpl implements Positional {
 
   //Pass-through constructor
   PositionalImpl(
+      final Arena arena,
       final MemorySegment seg,
       final int typeId,
       final MemoryRequestServer memReqSvr) {
-    super(seg, typeId, memReqSvr);
+    super(arena, seg, typeId, memReqSvr);
     capacity = end = seg.byteSize();
   }
 

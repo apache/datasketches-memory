@@ -26,6 +26,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.foreign.Arena;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -34,8 +35,6 @@ import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
-
-import jdk.incubator.foreign.ResourceScope;
 
 /**
  * @author Lee Rhodes
@@ -54,15 +53,15 @@ public class LeafImplTest {
     long off = 0;
     long cap = 128;
     // Off Heap, Native order, No ByteBuffer, has MemReqSvr
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory memNO = WritableMemory.allocateDirect(cap, 8, scope, NBO, myMemReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory memNO = WritableMemory.allocateDirect(arena, cap, 8, NBO, myMemReqSvr);
       memNO.putShort(0, (short) 1);
       assertTrue(memNO.isDirect());
       checkCombinations(memNO, off, cap, memNO.isDirect(), NBO, false, true);
     }
     // Off Heap, Non Native order, No ByteBuffer, has MemReqSvr
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory memNNO = WritableMemory.allocateDirect(cap, 8, scope, NNBO, myMemReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory memNNO = WritableMemory.allocateDirect(arena, cap, 8, NNBO, myMemReqSvr);
       memNNO.putShort(0, (short) 1);
       assertTrue(memNNO.isDirect());
       checkCombinations(memNNO, off, cap, memNNO.isDirect(), NNBO, false, true);
@@ -123,15 +122,15 @@ public class LeafImplTest {
     assertTrue(file.isFile());
     file.deleteOnExit();  //comment out if you want to examine the file.
     // Off Heap, Native order, No ByteBuffer, No MemReqSvr
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory memNO = WritableMemory.writableMap(file, off, cap, scope, NBO);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory memNO = WritableMemory.writableMap(arena, file, off, cap, NBO);
       memNO.putShort(0, (short) 1);
       assertTrue(memNO.isDirect());
       checkCombinations(memNO, off, cap, memNO.isDirect(), NBO, false, false);
     }
     // Off heap, Non Native order, No ByteBuffer, no MemReqSvr
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory memNNO = WritableMemory.writableMap(file, off, cap, scope, NNBO);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory memNNO = WritableMemory.writableMap(arena, file, off, cap, NNBO);
       memNNO.putShort(0, (short) 1);
       assertTrue(memNNO.isDirect());
       checkCombinations(memNNO, off, cap, memNNO.isDirect(), NNBO, false, false);

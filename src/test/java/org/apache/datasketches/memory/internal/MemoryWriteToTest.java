@@ -24,6 +24,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.foreign.Arena;
 import java.nio.ByteOrder;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -32,8 +33,6 @@ import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
-
-import jdk.incubator.foreign.ResourceScope;
 
 public class MemoryWriteToTest {
   private static final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
@@ -60,8 +59,8 @@ public class MemoryWriteToTest {
 
   @Test
   public void testOffHeap() throws Exception {
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory mem = WritableMemory.allocateDirect(((1 << 20) * 5) + 10, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory mem = WritableMemory.allocateDirect(arena, ((1 << 20) * 5) + 10, 1, ByteOrder.nativeOrder(), memReqSvr);
       testWriteTo(mem.region(0, 0));
       testOffHeap(mem, 7);
       testOffHeap(mem, 1023);

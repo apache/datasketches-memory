@@ -19,9 +19,12 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static jdk.incubator.foreign.MemoryAccess.getByteAtOffset;
 import static org.apache.datasketches.memory.internal.Util.characterPad;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.MemorySegment.Scope;
+import java.lang.foreign.ValueLayout;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Objects;
@@ -30,9 +33,6 @@ import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
-
-import jdk.incubator.foreign.MemorySegment;
-import jdk.incubator.foreign.ResourceScope;
 
 /**
  * Implements the root Resource methods plus some common static variables and check methods.
@@ -100,16 +100,19 @@ abstract class ResourceImpl implements Resource {
     JDK_MAJOR = (p[0] == 1) ? p[1] : p[0];
   }
 
+  final Arena arena;
   final MemorySegment seg;
   final int typeId;
 
   /**
    * Root constructor.
+   * @param arena the given Arena, or null if an on-heap MemorySegment.
    * @param seg the given, one and only one MemorySegment
    * @param typeId the given typeId
    * @param memReqSvr the given MemoryRequestServer, or null.
    */
-  ResourceImpl(final MemorySegment seg, final int typeId, final MemoryRequestServer memReqSvr) {
+  ResourceImpl(final Arena arena, final MemorySegment seg, final int typeId, final MemoryRequestServer memReqSvr) {
+    this.arena = arena;
     this.seg = seg;
     this.typeId = typeId;
     this.memReqSvr = memReqSvr;
@@ -159,9 +162,9 @@ abstract class ResourceImpl implements Resource {
   }
 
   static void checkJavaVersion(final String jdkVer, final int p0) {
-    if ( p0 != 17 ) {
+    if ( p0 != 21 ) {
       throw new IllegalArgumentException(
-          "Unsupported JDK Major Version, must be 17; " + jdkVer);
+          "Unsupported JDK Major Version, must be 21; " + jdkVer);
     }
   }
 
@@ -248,9 +251,9 @@ abstract class ResourceImpl implements Resource {
     final MemoryRequestServer memReqSvr2 = (byteBufferType || mapType) ? null : memReqSvr;
     final WritableBuffer wbuf;
     if (nativeBOType) {
-      wbuf = new NativeWritableBufferImpl(segment, type, memReqSvr2);
+      wbuf = new NativeWritableBufferImpl(null, segment, type, memReqSvr2);
     } else { //non-native BO
-      wbuf = new NonNativeWritableBufferImpl(segment, type, memReqSvr2);
+      wbuf = new NonNativeWritableBufferImpl(null, segment, type, memReqSvr2);
     }
     return wbuf;
   }
@@ -265,9 +268,9 @@ abstract class ResourceImpl implements Resource {
     final MemoryRequestServer memReqSvr2 = (byteBufferType || mapType) ? null : memReqSvr;
     final WritableMemory wmem;
     if (nativeBOType) {
-      wmem = new NativeWritableMemoryImpl(segment, type, memReqSvr2);
+      wmem = new NativeWritableMemoryImpl(null, segment, type, memReqSvr2);
     } else { //non-native BO
-      wmem = new NonNativeWritableMemoryImpl(segment, type, memReqSvr2);
+      wmem = new NonNativeWritableMemoryImpl(null, segment, type, memReqSvr2);
     }
     return wmem;
   }
@@ -288,7 +291,7 @@ abstract class ResourceImpl implements Resource {
     checkBounds(offsetBytes, lengthBytes, capacity);
     final StringBuilder sb = new StringBuilder();
     final String theComment = (comment != null) ? comment : "";
-    final String addHCStr = "" + Integer.toHexString(seg.address().hashCode());
+    final String addHCStr = Integer.toHexString(Long.hashCode(seg.address()));
     final MemoryRequestServer memReqSvr = resourceImpl.getMemoryRequestServer();
     final String memReqStr = memReqSvr != null
         ? memReqSvr.getClass().getSimpleName() + ", " + Integer.toHexString(memReqSvr.hashCode())
@@ -306,11 +309,12 @@ abstract class ResourceImpl implements Resource {
     sb.append("Type Byte Order        : ").append(resourceImpl.getTypeByteOrder().toString()).append(LS);
     sb.append("Native Byte Order      : ").append(ByteOrder.nativeOrder().toString()).append(LS);
     sb.append("JDK Runtime Version    : ").append(JDK).append(LS);
+
     //Data detail
     if (withData) {
       sb.append("Data, LittleEndian     :  0  1  2  3  4  5  6  7");
       for (long i = 0; i < lengthBytes; i++) {
-        final int b = getByteAtOffset(seg, offsetBytes + i) & 0XFF;
+        final int b = seg.get(ValueLayout.JAVA_BYTE, offsetBytes + i) & 0XFF;
         if (i % 8 == 0) { //row header
           sb.append(String.format("%n%23s: ", offsetBytes + i));
         }
@@ -331,7 +335,14 @@ abstract class ResourceImpl implements Resource {
 
   @Override
   public void close() {
-    seg.scope().close(); //not idempotent
+    if (arena != null) {
+      try {
+        arena.close();
+      }
+      catch (UnsupportedOperationException uoe) {
+        // ignored as it seems there's no way to determine if the Arena is closeable or not
+      }
+    } //not idempotent
   }
 
   @Override
@@ -350,14 +361,9 @@ abstract class ResourceImpl implements Resource {
   }
 
   @Override
-  public Thread getOwnerThread() {
-    return seg.scope().ownerThread();
-  }
-
-  @Override
   public final long getRelativeOffset(final Resource that) {
     final ResourceImpl that2 = (ResourceImpl) that;
-    return this.seg.address().segmentOffset(that2.seg);
+    return this.seg.segmentOffset(that2.seg);
   }
 
   @Override
@@ -387,7 +393,7 @@ abstract class ResourceImpl implements Resource {
 
   @Override
   public boolean isCloseable() {
-    return ((seg.isNative() || seg.isMapped()) && seg.scope().isAlive() && !seg.scope().isImplicit());
+    return ((seg.isNative() || seg.isMapped()) && seg.scope().isAlive());
   }
 
   @Override
@@ -434,7 +440,7 @@ abstract class ResourceImpl implements Resource {
   @Override
   public final boolean isSameResource(final Resource that) {
     final ResourceImpl that2 = (ResourceImpl) that;
-    return this.seg.address().equals(that2.seg.address());
+    return this.seg.address() == that2.seg.address();
   }
 
   @Override
@@ -463,8 +469,8 @@ abstract class ResourceImpl implements Resource {
     //Identify the left and right edges of two regions, A and B in memory.
     final long bytesA = segA.byteSize();
     final long bytesB = segB.byteSize();
-    final long lA = segA.address().toRawLongValue(); //left A
-    final long lB = segB.address().toRawLongValue(); //left B
+    final long lA = segA.address(); //left A
+    final long lB = segB.address(); //left B
     final long rA = lA + bytesA; //right A
     final long rB = lB + bytesB; //right B
     if ((rA <= lB) || (rB <= lA)) { return 0; } //Eliminate the totally disjoint case:
@@ -497,12 +503,12 @@ abstract class ResourceImpl implements Resource {
   }
 
   @Override
-  public ResourceScope scope() { return seg.scope(); }
+  public Scope scope() { return seg.scope(); }
 
   @Override
   public ByteBuffer toByteBuffer(final ByteOrder order) {
     Objects.requireNonNull(order, "The input ByteOrder must not be null");
-    return ByteBuffer.wrap(seg.toByteArray());
+    return ByteBuffer.wrap(seg.toArray(ValueLayout.JAVA_BYTE));
   }
 
   @Override

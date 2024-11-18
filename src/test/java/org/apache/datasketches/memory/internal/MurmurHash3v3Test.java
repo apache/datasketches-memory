@@ -23,6 +23,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.datasketches.memory.MurmurHash3.*;
 import static org.testng.Assert.fail;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.Resource;
@@ -31,9 +33,6 @@ import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import jdk.incubator.foreign.MemorySegment;
-import jdk.incubator.foreign.ResourceScope;
 
 /**
  * Tests the MurmurHash3 against specific, known hash results given known
@@ -205,7 +204,7 @@ public class MurmurHash3v3Test {
       0x72, 0x20, 0x74, 0x68, 0x65, 0x20, 0x6c, 0x61, 0x7a, 0x79, 0x20, 0x64, 0x6f, 0x67,
       (byte) 0xff, 0x64, 0x6f, 0x67, 0x00
     };
-    long[] result = MurmurHash3v3.hash(key, 0);
+    long[] result = MurmurHash3v4.hash(key, 0);
 
     //Should be:
     long h1 = 0xe88abda785929c9eL;
@@ -276,8 +275,8 @@ public class MurmurHash3v3Test {
       Memory mem = Memory.wrap(new byte[0]);
       out = hash(mem, 0L, 4L, 1L, out);
     } catch (final IllegalArgumentException e) { }
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      Memory mem = WritableMemory.allocateDirect(8, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      Memory mem = WritableMemory.allocateDirect(arena, 8, 1, ByteOrder.nativeOrder(), memReqSvr);
       long[] out = new long[2];
       out = hash(mem, 0L, 4L, 1L, out);
     } catch (Exception ee) {}

@@ -19,6 +19,9 @@
 
 package org.apache.datasketches.memory.internal;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Objects;
@@ -28,9 +31,6 @@ import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
-
-import jdk.incubator.foreign.MemoryAccess;
-import jdk.incubator.foreign.MemorySegment;
 
 /*
  * Developer notes: The heavier methods, such as put/get arrays, duplicate, region, clear, fill,
@@ -53,10 +53,11 @@ public abstract class WritableBufferImpl extends PositionalImpl implements Writa
 
   //Pass-through constructor
   WritableBufferImpl(
+      final Arena arena,
       final MemorySegment seg,
       final int typeId,
       final MemoryRequestServer memReqSvr) {
-    super(seg, typeId, memReqSvr);
+    super(arena, seg, typeId, memReqSvr);
   }
 
   //NO WRAP HEAP ARRAY RESOURCE
@@ -92,7 +93,7 @@ public abstract class WritableBufferImpl extends PositionalImpl implements Writa
       byteBuf = byteBuffer.duplicate();
     }
     byteBuf.clear(); //resets position to zero and limit to capacity. Does not clear data.
-    final MemorySegment seg = MemorySegment.ofByteBuffer(byteBuf); //from 0 to capacity
+    final MemorySegment seg = MemorySegment.ofBuffer(byteBuf); //from 0 to capacity
     int type = BUFFER | BYTEBUF
         | (localReadOnly ? READONLY : 0)
         | (seg.isNative() ? DIRECT : 0)
@@ -100,9 +101,9 @@ public abstract class WritableBufferImpl extends PositionalImpl implements Writa
     final WritableBuffer wbuf;
     if (byteOrder == NON_NATIVE_BYTE_ORDER) {
       type |= NONNATIVE_BO;
-      wbuf = new NonNativeWritableBufferImpl(seg, type, memReqSvr);
+      wbuf = new NonNativeWritableBufferImpl(null, seg, type, memReqSvr);
     } else {
-      wbuf = new NativeWritableBufferImpl(seg, type, memReqSvr);
+      wbuf = new NativeWritableBufferImpl(null, seg, type, memReqSvr);
     }
     wbuf.setStartPositionEnd(0, byteBuffer.position(), byteBuffer.limit());
     return wbuf;
@@ -259,14 +260,14 @@ public abstract class WritableBufferImpl extends PositionalImpl implements Writa
   @Override
   public final byte getByte() {
     final long pos = getPosition();
-    final byte aByte = MemoryAccess.getByteAtOffset(seg, pos);
+    final byte aByte = seg.get(ValueLayout.JAVA_BYTE, pos);
     setPosition(pos + Byte.BYTES);
     return aByte;
   }
 
   @Override
   public final byte getByte(final long offsetBytes) {
-    return MemoryAccess.getByteAtOffset(seg, offsetBytes);
+    return seg.get(ValueLayout.JAVA_BYTE, offsetBytes);
   }
 
   @Override
@@ -307,13 +308,13 @@ public abstract class WritableBufferImpl extends PositionalImpl implements Writa
   @Override
   public final void putByte(final byte value) {
     final long pos = getPosition();
-    MemoryAccess.setByteAtOffset(seg, pos, value);
+    seg.set(ValueLayout.JAVA_BYTE, pos, value);
     setPosition(pos + Byte.BYTES);
   }
 
   @Override
   public final void putByte(final long offsetBytes, final byte value) {
-    MemoryAccess.setByteAtOffset(seg, offsetBytes, value);
+    seg.set(ValueLayout.JAVA_BYTE, offsetBytes, value);
   }
 
   @Override
@@ -339,6 +340,6 @@ public abstract class WritableBufferImpl extends PositionalImpl implements Writa
 
   @Override
   public final byte[] getArray() {
-    return seg.toByteArray();
+    return seg.toArray(ValueLayout.JAVA_BYTE);
   }
 }

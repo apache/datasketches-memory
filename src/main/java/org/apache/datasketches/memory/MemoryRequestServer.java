@@ -19,13 +19,13 @@
 
 package org.apache.datasketches.memory;
 
-import jdk.incubator.foreign.ResourceScope;
+import java.lang.foreign.Arena;
 
 /**
  * The MemoryRequestServer is a callback interface to provide a means to request more memory
  * for heap and off-heap WritableMemory resources that are not file-memory-mapped backed resources.
  *
- * <p>Note: this only works with Java 17.
+ * <p>Note: this only works with Java 21.
  *
  * @author Lee Rhodes
  */
@@ -42,7 +42,8 @@ public interface MemoryRequestServer {
   default WritableMemory request(
       WritableMemory currentWritableMemory,
       long newCapacityBytes) {
-    return request(currentWritableMemory, newCapacityBytes, ResourceScope.newConfinedScope());
+
+    return request(currentWritableMemory, newCapacityBytes, Arena.ofConfined());
   }
 
   /**
@@ -50,8 +51,7 @@ public interface MemoryRequestServer {
    * determine the byte order of the returned WritableMemory and other properties.
    * @param currentWritableMemory the current writableMemory of the client. It must be non-null.
    * @param newCapacityBytes The capacity being requested. It must be &gt; the capacity of the currentWritableMemory.
-   * @param scope the ResourceScope to be used for the newly allocated memory.
-   * It must be non-null.
+   * @param arena the Arena to be used for the newly allocated memory. It must be non-null.
    * Typically use <i>ResourceScope.newConfinedScope()</i>.
    * Warning: specifying a <i>newSharedScope()</i> is not supported.
    * @return new WritableMemory with the requested capacity.
@@ -59,7 +59,7 @@ public interface MemoryRequestServer {
   WritableMemory request(
       WritableMemory currentWritableMemory,
       long newCapacityBytes,
-      ResourceScope scope);
+      Arena arena);
 
   /**
    * Request to close the resource, if applicable.

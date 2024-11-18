@@ -22,6 +22,7 @@ package org.apache.datasketches.memory.internal;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.lang.foreign.Arena;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -29,13 +30,24 @@ import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
-import jdk.incubator.foreign.ResourceScope;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 
 public class MemoryReadWriteSafetyTest {
 
   // Test various operations with read-only Memory
 
-  final WritableMemory mem = (WritableMemory) Memory.wrap(new byte[8]);
+  WritableMemory mem;
+
+  @BeforeClass
+  public void allocate() {
+    mem = (WritableMemory) Memory.wrap(new byte[8]);
+  }
+
+  @AfterClass
+  public void close() throws Exception {
+    mem.close();
+  }
 
   @Test(expectedExceptions = UnsupportedOperationException.class)
   public void testPutByte() {
@@ -182,10 +194,11 @@ public class MemoryReadWriteSafetyTest {
     tempFile.deleteOnExit();
     try (RandomAccessFile raf = new RandomAccessFile(tempFile, "rw")) {
       raf.setLength(8);
-      Memory mem = null;
       //System.out.println(UtilTest.getFileAttributes(tempFile));
-      try (ResourceScope scope = (mem = Memory.map(tempFile)).scope()) {
-        ((WritableMemory) mem).putInt(0, 1);
+      try (Arena arena = Arena.ofConfined();
+           Memory memory = Memory.map(arena, tempFile)) {
+
+          ((WritableMemory) memory).putInt(0, 1);
       }
     }
   }
@@ -196,9 +209,9 @@ public class MemoryReadWriteSafetyTest {
     File tempFile = File.createTempFile("test", "test");
     tempFile.deleteOnExit();
     new RandomAccessFile(tempFile, "rw").setLength(8);
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      Memory mem = Memory.map(tempFile, 0, 4, scope, ByteOrder.nativeOrder());
-      ((WritableMemory) mem).putInt(0, 1);
+    try (Arena arena = Arena.ofConfined()) {
+      Memory memory = Memory.map(arena, tempFile, 0, 4, ByteOrder.nativeOrder());
+      ((WritableMemory) memory).putInt(0, 1);
     }
   }
 
@@ -208,8 +221,8 @@ public class MemoryReadWriteSafetyTest {
     tempFile.deleteOnExit();
     try (RandomAccessFile raf = new RandomAccessFile(tempFile, "rw")) {
       raf.setLength(8);
-      try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-        Memory.map(tempFile, 0, 16, scope, ByteOrder.nativeOrder());
+      try (Arena arena = Arena.ofConfined()) {
+        Memory.map(arena, tempFile, 0, 16, ByteOrder.nativeOrder());
       }
     }
   }

@@ -33,7 +33,7 @@ public interface MemoryRequestServer {
 
   /**
    * Request new WritableMemory with the given newCapacityBytes. The current WritableMemory can be used to
-   * determine the byte order of the returned WritableMemory and other properties. A new confined ResourceScope is
+   * determine the byte order of the returned WritableMemory and other properties. A new confined Arena is
    * assigned.
    * @param currentWritableMemory the current writableMemory of the client. It must be non-null.
    * @param newCapacityBytes The capacity being requested. It must be &gt; the capacity of the currentWritableMemory.
@@ -52,8 +52,8 @@ public interface MemoryRequestServer {
    * @param currentWritableMemory the current writableMemory of the client. It must be non-null.
    * @param newCapacityBytes The capacity being requested. It must be &gt; the capacity of the currentWritableMemory.
    * @param arena the Arena to be used for the newly allocated memory. It must be non-null.
-   * Typically use <i>ResourceScope.newConfinedScope()</i>.
-   * Warning: specifying a <i>newSharedScope()</i> is not supported.
+   * Typically use <i>Arena.ofConfined()</i>.
+   * Warning: specifying a <i>Arena.ofShared()</i> is not supported.
    * @return new WritableMemory with the requested capacity.
    */
   WritableMemory request(

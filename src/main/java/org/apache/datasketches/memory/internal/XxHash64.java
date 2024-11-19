@@ -306,4 +306,5 @@ public class XxHash64 {
     return hash(seg, offsetChars << CHAR_SHIFT, lengthChars << CHAR_SHIFT, seed);
   }
 
+  private XxHash64() { }
 }

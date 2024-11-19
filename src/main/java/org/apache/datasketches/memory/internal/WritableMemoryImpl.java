@@ -140,8 +140,8 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
    * @param fileOffsetBytes the file starting offset in bytes. It must be &ge; 0.
    * @param capacityBytes the capacity of the mapped memory. It must be &ge; 0.
    * It must be non-null.
-   * Typically use <i>ResourceScope.newConfinedScope()</i>.
-   * Warning: specifying a <i>newSharedScope()</i> is not supported.
+   * Typically use <i>Arena.ofConfined()</i>.
+   * Warning: specifying a <i>Arena.ofShared()</i> is not supported.
    * @param localReadOnly true if read-only is being imposed locally, even if the given file is writable..
    * @param byteOrder the given <i>ByteOrder</i>. It must be non-null.
    * @return a <i>WritableMemory</i>
@@ -196,7 +196,7 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
    * @param arena the given arena. It must be non-null.
    * @param capacityBytes the requested capacity for the Direct (off-heap) memory.  It must be &ge; 0.
    * @param alignmentBytes requested segment alignment. Typically 1, 2, 4 or 8.
-   * Warning: specifying a <i>newSharedScope()</i> is not supported.
+   * Warning: specifying a <i>Arena.ofShared()</i> is not supported.
    * @param byteOrder the byte order to be used.  It must be non-null.
    * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
    * This is a callback mechanism for a user client of direct memory to request more memory.

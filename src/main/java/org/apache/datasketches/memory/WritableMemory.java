@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.MemorySegment.Scope;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -74,7 +73,7 @@ public interface WritableMemory extends Memory {
   /**
    * Maps the entire given file into native-ordered WritableMemory for write operations
    * Calling this method is equivalent to calling
-   * {@link #writableMap(File, long, long, ByteOrder) writableMap(file, 0, file.length(), scope, ByteOrder.nativeOrder())}.
+   * {@link #writableMap(File, long, long, ByteOrder) writableMap(file, 0, file.length(), ByteOrder.nativeOrder())}.
    * @param file the given file to map. It must be non-null and writable.
    * @return a file-mapped WritableMemory
    * @throws IllegalArgumentException if file is not readable or not writable.
@@ -87,7 +86,7 @@ public interface WritableMemory extends Memory {
   }
 
   /**
-   * Maps the specified portion of the given file into Memory for write operations with a ResourceScope.
+   * Maps the specified portion of the given file into Memory for write operations with Arena.ofConfined().
    * @param file the given file to map. It must be non-null with a non-negative length and writable.
    * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
    * @param capacityBytes the size of the mapped Memory. It must be &ge; 0.
@@ -168,35 +167,6 @@ public interface WritableMemory extends Memory {
       Arena arena,
       long capacityBytes,
       long alignmentBytes,
-      ByteOrder byteOrder,
-      MemoryRequestServer memReqSvr) {
-    return WritableMemoryImpl.wrapDirect(arena, capacityBytes, alignmentBytes, byteOrder, memReqSvr);
-  }
-
-  /**
-   * Allocates and provides access to capacityBytes directly in native (off-heap) memory with a ResourceScope.
-   * The allocated memory will be aligned to the given <i>alignmentBytes</i>.
-   *
-   * <p><b>NOTICE:</b> It is the responsibility of the using application to
-   * call <i>close()</i> when done.</p>
-   *
-   * @param arena the given arena to map. It must be non-null.
-   * @param capacityBytes the size of the desired memory in bytes.
-   * @param alignmentBytes requested segment alignment. Typically 1, 2, 4 or 8.
-   * @param scope the given ResourceScope.
-   * It must be non-null.
-   * Typically use <i>ResourceScope.newConfinedScope()</i>.
-   * Warning: specifying a <i>newSharedScope()</i> is not supported.
-   * @param byteOrder the byte order to be used.  It must be non-null.
-   * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
-   * This is a callback mechanism for a user client of direct memory to request more memory.
-   * @return WritableMemory
-   */
-  static WritableMemory allocateDirect(
-      Arena arena,
-      long capacityBytes,
-      long alignmentBytes,
-      Scope scope,
       ByteOrder byteOrder,
       MemoryRequestServer memReqSvr) {
     return WritableMemoryImpl.wrapDirect(arena, capacityBytes, alignmentBytes, byteOrder, memReqSvr);

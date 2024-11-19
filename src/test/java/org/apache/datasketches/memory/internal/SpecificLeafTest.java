@@ -103,11 +103,9 @@ public class SpecificLeafTest {
 
   @Test
   public void checkMapLeafs() throws IOException {
-    File file = new File("TestFile2.bin");
-    if (file.exists()) {
-      java.nio.file.Files.delete(file.toPath());
-    }
-    assertTrue(file.createNewFile());
+    File file = File.createTempFile("TestFile2", "bin");
+    file.deleteOnExit();
+
     assertTrue(file.setWritable(true, false)); //writable=true, ownerOnly=false
     assertTrue(file.isFile());
     file.deleteOnExit();  //comment out if you want to examine the file.

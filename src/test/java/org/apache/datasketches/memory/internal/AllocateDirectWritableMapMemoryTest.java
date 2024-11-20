@@ -127,7 +127,7 @@ public class AllocateDirectWritableMapMemoryTest {
   public void testMapExceptionNoTWR()
       throws IllegalArgumentException, InvalidPathException, IllegalStateException, UnsupportedOperationException,
       IOException, SecurityException {
-    File dummy = createFile("dummy.txt", ""); //zero length
+    File dummy = createTempFile("dummy", ".txt" , ""); //zero length
     try (Arena arena = Arena.ofConfined()) {
       Memory.map(arena, dummy, 0, dummy.length(), ByteOrder.nativeOrder());
     }
@@ -161,7 +161,7 @@ public class AllocateDirectWritableMapMemoryTest {
       throws IllegalArgumentException, InvalidPathException, IllegalStateException, UnsupportedOperationException,
       IOException, SecurityException {
     String origStr = "Corectng spellng mistks";
-    File origFile = createFile("force_original.txt", origStr); //23
+    File origFile = createTempFile("force_original", ".txt", origStr); //23
     assertTrue(origFile.setWritable(true, false));
     long origBytes = origFile.length();
     String correctStr = "Correcting spelling mistakes"; //28
@@ -194,8 +194,9 @@ public class AllocateDirectWritableMapMemoryTest {
     }
   }
 
-  private static File createFile(String fileName, String text) throws FileNotFoundException {
-    File file = new File(fileName);
+  private static File createTempFile(String fileNamePrefix, String fileNameSuffix, String text)
+          throws FileNotFoundException, IOException {
+    File file = File.createTempFile(fileNamePrefix, fileNameSuffix);
     file.deleteOnExit();
     PrintWriter writer;
     try {

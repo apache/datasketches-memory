@@ -19,14 +19,13 @@
 
 package org.apache.datasketches.memory.internal;
 
+import java.lang.foreign.Arena;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.DefaultMemoryRequestServer;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
-
-import jdk.incubator.foreign.ResourceScope;
 
 /**
  * Example of how to use the MemoryRequestServer with a memory hungry client.
@@ -45,15 +44,20 @@ public class ExampleMemoryRequestServerTest {
   @Test
   public void checkExampleMemoryRequestServer1() {
 
+    long workingMemBytes = 8;
+    long alignmentBytes = 8;
+
+    Arena arena = Arena.ofConfined();
     //Configure the default memReqSvr to create new memory off-heap and copy data from old to new
     MemoryRequestServer memReqSvr = new DefaultMemoryRequestServer(true, true);
 
-    long workingMemBytes = 8;
-    long alignmentBytes = 8;
-    ResourceScope scope = ResourceScope.newConfinedScope();
-
     //Create the initial working memory for the client
-    WritableMemory workingMem = WritableMemory.allocateDirect(workingMemBytes, alignmentBytes, scope, ByteOrder.nativeOrder(), memReqSvr);
+    WritableMemory workingMem = WritableMemory.allocateDirect(
+      arena,
+      workingMemBytes,
+      alignmentBytes,
+      ByteOrder.nativeOrder(),
+      memReqSvr);
 
     MemoryHungryClient client = new MemoryHungryClient(workingMem);
     client.process();

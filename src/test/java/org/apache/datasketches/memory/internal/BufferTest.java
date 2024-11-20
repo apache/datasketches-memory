@@ -22,6 +22,7 @@ package org.apache.datasketches.memory.internal;
 import static org.apache.datasketches.memory.internal.ResourceImpl.NON_NATIVE_BYTE_ORDER;
 import static org.testng.Assert.assertEquals;
 
+import java.lang.foreign.Arena;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
@@ -35,15 +36,13 @@ import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 import org.testng.collections.Lists;
 
-import jdk.incubator.foreign.ResourceScope;
-
 public class BufferTest {
   private final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
   @Test
   public void checkDirectRoundTrip() throws Exception {
     int n = 1024; //longs
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-    WritableMemory wmem = WritableMemory.allocateDirect(n * 8, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(arena, n * 8, 1, ByteOrder.nativeOrder(), memReqSvr);
       WritableBuffer wbuf = wmem.asWritableBuffer();
       for (int i = 0; i < n; i++) {
         wbuf.putLong(i);
@@ -60,44 +59,44 @@ public class BufferTest {
   public void checkAutoHeapRoundTrip() {
     int n = 1024; //longs
     WritableBuffer wbuf = WritableMemory.allocate(n * 8).asWritableBuffer();
-    for (int i = 0; i < n; i++) {
-      wbuf.putLong(i);
+      for (int i = 0; i < n; i++) {
+        wbuf.putLong(i);
+      }
+      wbuf.resetPosition();
+      for (int i = 0; i < n; i++) {
+        long v = wbuf.getLong();
+        assertEquals(v, i);
+      }
     }
-    wbuf.resetPosition();
-    for (int i = 0; i < n; i++) {
-      long v = wbuf.getLong();
-      assertEquals(v, i);
-    }
-  }
 
   @Test
   public void checkArrayWrap() {
     int n = 1024; //longs
     byte[] arr = new byte[n * 8];
     WritableBuffer wbuf = WritableMemory.writableWrap(arr).asWritableBuffer();
-    for (int i = 0; i < n; i++) {
-      wbuf.putLong(i);
-    }
-    wbuf.resetPosition();
-    for (int i = 0; i < n; i++) {
-      long v = wbuf.getLong();
-      assertEquals(v, i);
-    }
+      for (int i = 0; i < n; i++) {
+        wbuf.putLong(i);
+      }
+      wbuf.resetPosition();
+      for (int i = 0; i < n; i++) {
+        long v = wbuf.getLong();
+        assertEquals(v, i);
+      }
     Buffer buf = Memory.wrap(arr).asBuffer();
-    buf.resetPosition();
-    for (int i = 0; i < n; i++) {
-      long v = buf.getLong();
-      assertEquals(v, i);
-    }
-    // Check Zero length array wraps
+      buf.resetPosition();
+      for (int i = 0; i < n; i++) {
+        long v = buf.getLong();
+        assertEquals(v, i);
+      }
+      // Check Zero length array wraps
     Memory mem = Memory.wrap(new byte[0]);
-    Buffer buffZeroLengthArrayWrap = mem.asBuffer();
-    assertEquals(buffZeroLengthArrayWrap.getCapacity(), 0);
-    // check 0 length array wraps
-    List<Buffer> buffersToCheck = Lists.newArrayList();
+      Buffer buffZeroLengthArrayWrap = mem.asBuffer();
+      assertEquals(buffZeroLengthArrayWrap.getCapacity(), 0);
+      // check 0 length array wraps
+      List<Buffer> buffersToCheck = Lists.newArrayList();
     buffersToCheck.add(WritableMemory.allocate(0).asBuffer());
     buffersToCheck.add(WritableBuffer.writableWrap(ByteBuffer.allocate(0)));
-    buffersToCheck.add(Buffer.wrap(ByteBuffer.allocate(0)));
+      buffersToCheck.add(Buffer.wrap(ByteBuffer.allocate(0)));
     buffersToCheck.add(Memory.wrap(new byte[0]).asBuffer());
     buffersToCheck.add(Memory.wrap(new char[0]).asBuffer());
     buffersToCheck.add(Memory.wrap(new short[0]).asBuffer());
@@ -105,11 +104,11 @@ public class BufferTest {
     buffersToCheck.add(Memory.wrap(new long[0]).asBuffer());
     buffersToCheck.add(Memory.wrap(new float[0]).asBuffer());
     buffersToCheck.add(Memory.wrap(new double[0]).asBuffer());
-    //Check the buffer lengths
-    for (Buffer buffer : buffersToCheck) {
-      assertEquals(buffer.getCapacity(), 0);
+      //Check the buffer lengths
+      for (Buffer buffer : buffersToCheck) {
+        assertEquals(buffer.getCapacity(), 0);
+      }
     }
-  }
 
   @Test
   public void simpleBBTest() {
@@ -119,19 +118,19 @@ public class BufferTest {
     bb.order(ByteOrder.nativeOrder());
 
     WritableBuffer wbuf = WritableBuffer.writableWrap(bb);
-    for (int i = 0; i < n; i++) { //write to wbuf
-      wbuf.putLong(i);
+      for (int i = 0; i < n; i++) { //write to wbuf
+        wbuf.putLong(i);
+      }
+      wbuf.resetPosition();
+      for (int i = 0; i < n; i++) { //read from wbuf
+        long v = wbuf.getLong();
+        assertEquals(v, i);
+      }
+      for (int i = 0; i < n; i++) { //read from BB
+        long v = bb.getLong();
+        assertEquals(v, i);
+      }
     }
-    wbuf.resetPosition();
-    for (int i = 0; i < n; i++) { //read from wbuf
-      long v = wbuf.getLong();
-      assertEquals(v, i);
-    }
-    for (int i = 0; i < n; i++) { //read from BB
-      long v = bb.getLong();
-      assertEquals(v, i);
-    }
-  }
 
   @Test
   public void checkByteBufHeap() {
@@ -234,14 +233,14 @@ public class BufferTest {
     for (int i = 0; i < n; i++) { arr[i] = i; }
 
     WritableBuffer wbuf = WritableMemory.allocate(n * 8).asWritableBuffer();
-    wbuf.putLongArray(arr, 0, n);
-    long[] arr2 = new long[n];
-    wbuf.resetPosition();
-    wbuf.getLongArray(arr2, 0, n);
-    for (int i = 0; i < n; i++) {
-      assertEquals(arr2[i], i);
+      wbuf.putLongArray(arr, 0, n);
+      long[] arr2 = new long[n];
+      wbuf.resetPosition();
+      wbuf.getLongArray(arr2, 0, n);
+      for (int i = 0; i < n; i++) {
+        assertEquals(arr2[i], i);
+      }
     }
-  }
 
   @Test
   public void checkRORegions() {
@@ -251,14 +250,14 @@ public class BufferTest {
     for (int i = 0; i < n; i++) { arr[i] = i; }
 
     Buffer buf = Memory.wrap(arr).asBuffer();
-    buf.setPosition(n2 * 8);
-    Buffer reg = buf.region();
-    for (int i = 0; i < n2; i++) {
-      long v = reg.getLong();
-      assertEquals(v, i + n2);
-      //println("" + v);
+      buf.setPosition(n2 * 8);
+      Buffer reg = buf.region();
+      for (int i = 0; i < n2; i++) {
+        long v = reg.getLong();
+        assertEquals(v, i + n2);
+        //println("" + v);
+      }
     }
-  }
 
   @Test
   public void checkWRegions() {
@@ -285,29 +284,33 @@ public class BufferTest {
   @Test(expectedExceptions = IllegalStateException.class)
   public void checkParentUseAfterFree() throws Exception {
     int bytes = 64 * 8;
-    WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, ResourceScope.newConfinedScope(), ByteOrder.nativeOrder(), memReqSvr);
-    WritableBuffer wbuf = wmem.asWritableBuffer();
-    wbuf.close();
-    //with -ea assert: Memory not alive.
-    //with -da sometimes segfaults, sometimes passes!
-    wbuf.getLong();
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(arena, bytes, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableBuffer wbuf = wmem.asWritableBuffer();
+      wmem.close();
+      //with -ea assert: Memory not alive.
+      //with -da sometimes segfaults, sometimes passes!
+      wbuf.getLong();
+    }
   }
 
   @Test(expectedExceptions = IllegalStateException.class)
   public void checkRegionUseAfterFree() throws Exception {
     int bytes = 64;
-    WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, ResourceScope.newConfinedScope(), ByteOrder.nativeOrder(), memReqSvr);
-    Buffer region = wmem.asBuffer().region();
-    region.close();
-    //with -ea assert: Memory not alive.
-    //with -da sometimes segfaults, sometimes passes!
-    region.getByte();
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(arena, bytes, 1, ByteOrder.nativeOrder(), memReqSvr);
+      Buffer region = wmem.asBuffer().region();
+      wmem.close();
+      //with -ea assert: Memory not alive.
+      //with -da sometimes segfaults, sometimes passes!
+      region.getByte();
+    }
   }
 
   @Test
   public void checkCheckNotAliveAfterTWR() {
     Buffer buf;
-    try (WritableMemory wmem = WritableMemory.allocateDirect(100)) {
+    try (WritableMemory wmem = WritableMemory.allocateDirect(Arena.ofConfined(), 100)) {
       buf = wmem.asBuffer();
     }
     try {

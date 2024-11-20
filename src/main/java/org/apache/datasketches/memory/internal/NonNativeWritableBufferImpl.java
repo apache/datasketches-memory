@@ -19,11 +19,18 @@
 
 package org.apache.datasketches.memory.internal;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
+
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableBuffer;
-
-import jdk.incubator.foreign.MemoryAccess;
-import jdk.incubator.foreign.MemorySegment;
+import static org.apache.datasketches.memory.internal.NonNativeValueLayouts.JAVA_CHAR_UNALIGNED_NON_NATIVE;
+import static org.apache.datasketches.memory.internal.NonNativeValueLayouts.JAVA_DOUBLE_UNALIGNED_NON_NATIVE;
+import static org.apache.datasketches.memory.internal.NonNativeValueLayouts.JAVA_FLOAT_UNALIGNED_NON_NATIVE;
+import static org.apache.datasketches.memory.internal.NonNativeValueLayouts.JAVA_INT_UNALIGNED_NON_NATIVE;
+import static org.apache.datasketches.memory.internal.NonNativeValueLayouts.JAVA_LONG_UNALIGNED_NON_NATIVE;
+import static org.apache.datasketches.memory.internal.NonNativeValueLayouts.JAVA_SHORT_UNALIGNED_NON_NATIVE;
 
 /*
  * Developer notes: The heavier methods, such as put/get arrays, duplicate, region, clear, fill,
@@ -47,10 +54,11 @@ final class NonNativeWritableBufferImpl extends WritableBufferImpl {
 
   //Pass-through ctor
   NonNativeWritableBufferImpl(
+      final Arena arena,
       final MemorySegment seg,
       final int typeId,
       final MemoryRequestServer memReqSvr) {
-    super(seg, typeId, memReqSvr);
+    super(arena, seg, typeId, memReqSvr);
   }
 
   //PRIMITIVE getX() and getXArray()
@@ -58,12 +66,12 @@ final class NonNativeWritableBufferImpl extends WritableBufferImpl {
   public char getChar() {
     final long pos = getPosition();
     setPosition(pos + Character.BYTES);
-    return MemoryAccess.getCharAtOffset(seg, pos, NON_NATIVE_BYTE_ORDER);
+    return seg.get(JAVA_CHAR_UNALIGNED_NON_NATIVE, pos);
   }
 
   @Override
   public char getChar(final long offsetBytes) {
-    return MemoryAccess.getCharAtOffset(seg, offsetBytes, NON_NATIVE_BYTE_ORDER);
+    return seg.get(JAVA_CHAR_UNALIGNED_NON_NATIVE, offsetBytes);
   }
 
   @Override
@@ -73,8 +81,8 @@ final class NonNativeWritableBufferImpl extends WritableBufferImpl {
     final MemorySegment srcSlice = seg.asSlice(pos, copyBytes);
     final MemorySegment dstSlice = MemorySegment.ofArray(dstArray).asSlice(dstOffsetChars << CHAR_SHIFT, copyBytes);
     for (int index = 0; index < lengthChars; index++) {
-      final char aChar = MemoryAccess.getCharAtIndex(srcSlice, index,  NON_NATIVE_BYTE_ORDER);
-      MemoryAccess.setCharAtIndex(dstSlice, index, NATIVE_BYTE_ORDER, aChar);
+      final char aChar = srcSlice.getAtIndex(JAVA_CHAR_UNALIGNED_NON_NATIVE, index);
+      dstSlice.setAtIndex(ValueLayout.JAVA_CHAR_UNALIGNED, index, aChar);
     }
     setPosition(pos + copyBytes);
   }
@@ -83,12 +91,12 @@ final class NonNativeWritableBufferImpl extends WritableBufferImpl {
   public double getDouble() {
     final long pos = getPosition();
     setPosition(pos + Double.BYTES);
-    return MemoryAccess.getDoubleAtOffset(seg, pos, NON_NATIVE_BYTE_ORDER);
+    return seg.get(JAVA_DOUBLE_UNALIGNED_NON_NATIVE, pos);
   }
 
   @Override
   public double getDouble(final long offsetBytes) {
-    return MemoryAccess.getDoubleAtOffset(seg, offsetBytes, NON_NATIVE_BYTE_ORDER);
+    return seg.get(JAVA_DOUBLE_UNALIGNED_NON_NATIVE, offsetBytes);
   }
 
   @Override
@@ -98,8 +106,8 @@ final class NonNativeWritableBufferImpl extends WritableBufferImpl {
     final MemorySegment srcSlice = seg.asSlice(pos, copyBytes);
     final MemorySegment dstSlice = MemorySegment.ofArray(dstArray).asSlice(dstOffsetDoubles << DOUBLE_SHIFT, copyBytes);
     for (int index = 0; index < lengthDoubles; index++) {
-      final double dbl = MemoryAccess.getDoubleAtIndex(srcSlice, index,  NON_NATIVE_BYTE_ORDER);
-      MemoryAccess.setDoubleAtIndex(dstSlice, index, NATIVE_BYTE_ORDER, dbl);
+      final double dbl = srcSlice.getAtIndex(JAVA_DOUBLE_UNALIGNED_NON_NATIVE, index);
+      dstSlice.setAtIndex(ValueLayout.JAVA_DOUBLE_UNALIGNED, index, dbl);
     }
     setPosition(pos + copyBytes);
   }
@@ -108,12 +116,12 @@ final class NonNativeWritableBufferImpl extends WritableBufferImpl {
   public float getFloat() {
     final long pos = getPosition();
     setPosition(pos + Float.BYTES);
-    return MemoryAccess.getFloatAtOffset(seg, pos, NON_NATIVE_BYTE_ORDER);
+    return seg.get(JAVA_FLOAT_UNALIGNED_NON_NATIVE, pos);
   }
 
   @Override
   public float getFloat(final long offsetBytes) {
-    return MemoryAccess.getFloatAtOffset(seg, offsetBytes, NON_NATIVE_BYTE_ORDER);
+    return seg.get(JAVA_FLOAT_UNALIGNED_NON_NATIVE, offsetBytes);
   }
 
   @Override
@@ -123,8 +131,8 @@ final class NonNativeWritableBufferImpl extends WritableBufferImpl {
     final MemorySegment srcSlice = seg.asSlice(pos, copyBytes);
     final MemorySegment dstSlice = MemorySegment.ofArray(dstArray).asSlice(dstOffsetFloats << FLOAT_SHIFT, copyBytes);
     for (int index = 0; index < lengthFloats; index++) {
-      final float flt = MemoryAccess.getFloatAtIndex(srcSlice, index,  NON_NATIVE_BYTE_ORDER);
-      MemoryAccess.setFloatAtIndex(dstSlice, index, NATIVE_BYTE_ORDER, flt);
+      final float flt = srcSlice.getAtIndex(JAVA_FLOAT_UNALIGNED_NON_NATIVE, index);
+      dstSlice.setAtIndex(ValueLayout.JAVA_FLOAT_UNALIGNED, index, flt);
     }
     setPosition(pos + copyBytes);
   }
@@ -133,12 +141,12 @@ final class NonNativeWritableBufferImpl extends WritableBufferImpl {
   public int getInt() {
     final long pos = getPosition();
     setPosition(pos + Integer.BYTES);
-    return MemoryAccess.getIntAtOffset(seg, pos, NON_NATIVE_BYTE_ORDER);
+    return seg.get(JAVA_INT_UNALIGNED_NON_NATIVE, pos);
   }
 
   @Override
   public int getInt(final long offsetBytes) {
-    return MemoryAccess.getIntAtOffset(seg, offsetBytes, NON_NATIVE_BYTE_ORDER);
+    return seg.get(JAVA_INT_UNALIGNED_NON_NATIVE, offsetBytes);
   }
 
   @Override
@@ -148,8 +156,8 @@ final class NonNativeWritableBufferImpl extends WritableBufferImpl {
     final MemorySegment srcSlice = seg.asSlice(pos, copyBytes);
     final MemorySegment dstSlice = MemorySegment.ofArray(dstArray).asSlice(dstOffsetInts << INT_SHIFT, copyBytes);
     for (int index = 0; index < lengthInts; index++) {
-      final int anInt = MemoryAccess.getIntAtIndex(srcSlice, index,  NON_NATIVE_BYTE_ORDER);
-      MemoryAccess.setIntAtIndex(dstSlice, index, NATIVE_BYTE_ORDER, anInt);
+      final int anInt = srcSlice.getAtIndex(JAVA_INT_UNALIGNED_NON_NATIVE, index);
+      dstSlice.setAtIndex(ValueLayout.JAVA_INT_UNALIGNED, index, anInt);
     }
     setPosition(pos + copyBytes);
   }
@@ -158,12 +166,12 @@ final class NonNativeWritableBufferImpl extends WritableBufferImpl {
   public long getLong() {
     final long pos = getPosition();
     setPosition(pos + Long.BYTES);
-    return MemoryAccess.getLongAtOffset(seg, pos, NON_NATIVE_BYTE_ORDER);
+    return seg.get(JAVA_LONG_UNALIGNED_NON_NATIVE, pos);
   }
 
   @Override
   public long getLong(final long offsetBytes) {
-    return MemoryAccess.getLongAtOffset(seg, offsetBytes, NON_NATIVE_BYTE_ORDER);
+    return seg.get(JAVA_LONG_UNALIGNED_NON_NATIVE, offsetBytes);
   }
 
   @Override
@@ -173,8 +181,8 @@ final class NonNativeWritableBufferImpl extends WritableBufferImpl {
     final MemorySegment srcSlice = seg.asSlice(pos, copyBytes);
     final MemorySegment dstSlice = MemorySegment.ofArray(dstArray).asSlice(dstOffsetLongs << LONG_SHIFT, copyBytes);
     for (int index = 0; index < lengthLongs; index++) {
-      final long aLong = MemoryAccess.getLongAtIndex(srcSlice, index,  NON_NATIVE_BYTE_ORDER);
-      MemoryAccess.setLongAtIndex(dstSlice, index, NATIVE_BYTE_ORDER, aLong);
+      final long aLong = srcSlice.getAtIndex(JAVA_LONG_UNALIGNED_NON_NATIVE, index);
+      dstSlice.setAtIndex(ValueLayout.JAVA_LONG_UNALIGNED, index, aLong);
     }
     setPosition(pos + copyBytes);
   }
@@ -183,12 +191,12 @@ final class NonNativeWritableBufferImpl extends WritableBufferImpl {
   public short getShort() {
     final long pos = getPosition();
     setPosition(pos + Short.BYTES);
-    return MemoryAccess.getShortAtOffset(seg, pos, NON_NATIVE_BYTE_ORDER);
+    return seg.get(JAVA_SHORT_UNALIGNED_NON_NATIVE, pos);
   }
 
   @Override
   public short getShort(final long offsetBytes) {
-    return MemoryAccess.getShortAtOffset(seg, offsetBytes, NON_NATIVE_BYTE_ORDER);
+    return seg.get(JAVA_SHORT_UNALIGNED_NON_NATIVE, offsetBytes);
   }
 
   @Override
@@ -198,8 +206,8 @@ final class NonNativeWritableBufferImpl extends WritableBufferImpl {
     final MemorySegment srcSlice = seg.asSlice(pos, copyBytes);
     final MemorySegment dstSlice = MemorySegment.ofArray(dstArray).asSlice(dstOffsetShorts << SHORT_SHIFT, copyBytes);
     for (int index = 0; index < lengthShorts; index++) {
-      final short aShort = MemoryAccess.getShortAtIndex(srcSlice, index,  NON_NATIVE_BYTE_ORDER);
-      MemoryAccess.setShortAtIndex(dstSlice, index, NATIVE_BYTE_ORDER, aShort);
+      final short aShort = srcSlice.getAtIndex(JAVA_SHORT_UNALIGNED_NON_NATIVE, index);
+      dstSlice.setAtIndex(ValueLayout.JAVA_SHORT_UNALIGNED, index, aShort);
     }
     setPosition(pos + copyBytes);
   }
@@ -208,13 +216,13 @@ final class NonNativeWritableBufferImpl extends WritableBufferImpl {
   @Override
   public void putChar(final char value) {
     final long pos = getPosition();
-    MemoryAccess.setCharAtOffset(seg, pos, NON_NATIVE_BYTE_ORDER, value);
+    seg.set(JAVA_CHAR_UNALIGNED_NON_NATIVE, pos, value);
     setPosition(pos + Character.BYTES);
   }
 
   @Override
   public void putChar(final long offsetBytes, final char value) {
-    MemoryAccess.setCharAtOffset(seg, offsetBytes, NON_NATIVE_BYTE_ORDER, value);
+    seg.set(JAVA_CHAR_UNALIGNED_NON_NATIVE, offsetBytes, value);
   }
 
   @Override
@@ -224,8 +232,8 @@ final class NonNativeWritableBufferImpl extends WritableBufferImpl {
     final MemorySegment srcSlice = MemorySegment.ofArray(srcArray).asSlice(srcOffsetChars << CHAR_SHIFT, copyBytes);
     final MemorySegment dstSlice = seg.asSlice(pos, copyBytes);
     for (int index = 0; index < lengthChars; index++) {
-      final char aChar = MemoryAccess.getCharAtIndex(srcSlice, index,  NATIVE_BYTE_ORDER);
-      MemoryAccess.setCharAtIndex(dstSlice, index, NON_NATIVE_BYTE_ORDER, aChar);
+      final char aChar = srcSlice.getAtIndex(ValueLayout.JAVA_CHAR_UNALIGNED, index);
+      dstSlice.setAtIndex(JAVA_CHAR_UNALIGNED_NON_NATIVE, index, aChar);
     }
     setPosition(pos + copyBytes);
   }
@@ -233,13 +241,13 @@ final class NonNativeWritableBufferImpl extends WritableBufferImpl {
   @Override
   public void putDouble(final double value) {
     final long pos = getPosition();
-    MemoryAccess.setDoubleAtOffset(seg, pos, NON_NATIVE_BYTE_ORDER, value);
+    seg.set(JAVA_DOUBLE_UNALIGNED_NON_NATIVE, pos, value);
     setPosition(pos + Double.BYTES);
   }
 
   @Override
   public void putDouble(final long offsetBytes, final double value) {
-    MemoryAccess.setDoubleAtOffset(seg, offsetBytes, NON_NATIVE_BYTE_ORDER, value);
+    seg.set(JAVA_DOUBLE_UNALIGNED_NON_NATIVE, offsetBytes, value);
   }
 
   @Override
@@ -249,8 +257,8 @@ final class NonNativeWritableBufferImpl extends WritableBufferImpl {
     final MemorySegment srcSlice = MemorySegment.ofArray(srcArray).asSlice(srcOffsetDoubles << DOUBLE_SHIFT, copyBytes);
     final MemorySegment dstSlice = seg.asSlice(pos, copyBytes);
     for (int index = 0; index < lengthDoubles; index++) {
-      final double dbl = MemoryAccess.getDoubleAtIndex(srcSlice, index,  NATIVE_BYTE_ORDER);
-      MemoryAccess.setDoubleAtIndex(dstSlice, index, NON_NATIVE_BYTE_ORDER, dbl);
+      final double dbl = srcSlice.getAtIndex(ValueLayout.JAVA_DOUBLE_UNALIGNED, index);
+      dstSlice.setAtIndex(JAVA_DOUBLE_UNALIGNED_NON_NATIVE, index, dbl);
     }
     setPosition(pos + copyBytes);
   }
@@ -258,13 +266,13 @@ final class NonNativeWritableBufferImpl extends WritableBufferImpl {
   @Override
   public void putFloat(final float value) {
     final long pos = getPosition();
-    MemoryAccess.setFloatAtOffset(seg, pos, NON_NATIVE_BYTE_ORDER, value);
+    seg.set(JAVA_FLOAT_UNALIGNED_NON_NATIVE, pos, value);
     setPosition(pos + Float.BYTES);
   }
 
   @Override
   public void putFloat(final long offsetBytes, final float value) {
-    MemoryAccess.setFloatAtOffset(seg, offsetBytes, NON_NATIVE_BYTE_ORDER, value);
+    seg.set(JAVA_FLOAT_UNALIGNED_NON_NATIVE, offsetBytes, value);
   }
 
   @Override
@@ -274,8 +282,8 @@ final class NonNativeWritableBufferImpl extends WritableBufferImpl {
     final MemorySegment srcSlice = MemorySegment.ofArray(srcArray).asSlice(srcOffsetFloats << FLOAT_SHIFT, copyBytes);
     final MemorySegment dstSlice = seg.asSlice(pos, copyBytes);
     for (int index = 0; index < lengthFloats; index++) {
-      final float flt = MemoryAccess.getFloatAtIndex(srcSlice, index,  NATIVE_BYTE_ORDER);
-      MemoryAccess.setFloatAtIndex(dstSlice, index, NON_NATIVE_BYTE_ORDER, flt);
+      final float flt = srcSlice.getAtIndex(ValueLayout.JAVA_FLOAT_UNALIGNED, index);
+      dstSlice.setAtIndex(JAVA_FLOAT_UNALIGNED_NON_NATIVE, index, flt);
     }
     setPosition(pos + copyBytes);
   }
@@ -283,13 +291,13 @@ final class NonNativeWritableBufferImpl extends WritableBufferImpl {
   @Override
   public void putInt(final int value) {
     final long pos = getPosition();
-    MemoryAccess.setIntAtOffset(seg, pos, NON_NATIVE_BYTE_ORDER, value);
+    seg.set(JAVA_INT_UNALIGNED_NON_NATIVE, pos, value);
     setPosition(pos + Integer.BYTES);
   }
 
   @Override
   public void putInt(final long offsetBytes, final int value) {
-    MemoryAccess.setIntAtOffset(seg, offsetBytes, NON_NATIVE_BYTE_ORDER, value);
+    seg.set(JAVA_INT_UNALIGNED_NON_NATIVE, offsetBytes, value);
   }
 
   @Override
@@ -299,8 +307,8 @@ final class NonNativeWritableBufferImpl extends WritableBufferImpl {
     final  MemorySegment srcSlice = MemorySegment.ofArray(srcArray).asSlice(srcOffsetInts << INT_SHIFT, copyBytes);
     final MemorySegment dstSlice = seg.asSlice(pos, copyBytes);
     for (int index = 0; index < lengthInts; index++) {
-      final int anInt = MemoryAccess.getIntAtIndex(srcSlice, index,  NATIVE_BYTE_ORDER);
-      MemoryAccess.setIntAtIndex(dstSlice, index, NON_NATIVE_BYTE_ORDER, anInt);
+      final int anInt = srcSlice.getAtIndex(ValueLayout.JAVA_INT_UNALIGNED, index);
+      dstSlice.setAtIndex(JAVA_INT_UNALIGNED_NON_NATIVE, index, anInt);
     }
     setPosition(pos + copyBytes);
   }
@@ -308,13 +316,13 @@ final class NonNativeWritableBufferImpl extends WritableBufferImpl {
   @Override
   public void putLong(final long value) {
     final long pos = getPosition();
-    MemoryAccess.setLongAtOffset(seg, pos, NON_NATIVE_BYTE_ORDER, value);
+    seg.set(JAVA_LONG_UNALIGNED_NON_NATIVE, pos, value);
     setPosition(pos + Long.BYTES);
   }
 
   @Override
   public void putLong(final long offsetBytes, final long value) {
-    MemoryAccess.setLongAtOffset(seg, offsetBytes, NON_NATIVE_BYTE_ORDER, value);
+    seg.set(JAVA_LONG_UNALIGNED_NON_NATIVE, offsetBytes, value);
   }
 
   @Override
@@ -324,8 +332,8 @@ final class NonNativeWritableBufferImpl extends WritableBufferImpl {
     final MemorySegment srcSlice = MemorySegment.ofArray(srcArray).asSlice(srcOffsetLongs << LONG_SHIFT, copyBytes);
     final MemorySegment dstSlice = seg.asSlice(pos, copyBytes);
     for (int index = 0; index < lengthLongs; index++) {
-      final long aLong = MemoryAccess.getLongAtIndex(srcSlice, index,  NATIVE_BYTE_ORDER);
-      MemoryAccess.setLongAtIndex(dstSlice, index, NON_NATIVE_BYTE_ORDER, aLong);
+      final long aLong = srcSlice.getAtIndex(ValueLayout.JAVA_LONG_UNALIGNED, index);
+      dstSlice.setAtIndex(JAVA_LONG_UNALIGNED_NON_NATIVE, index, aLong);
     }
     setPosition(pos + copyBytes);
   }
@@ -333,13 +341,13 @@ final class NonNativeWritableBufferImpl extends WritableBufferImpl {
   @Override
   public void putShort(final short value) {
     final long pos = getPosition();
-    MemoryAccess.setShortAtOffset(seg, pos, NON_NATIVE_BYTE_ORDER, value);
+    seg.set(JAVA_SHORT_UNALIGNED_NON_NATIVE, pos, value);
     setPosition(pos + Short.BYTES);
   }
 
   @Override
   public void putShort(final long offsetBytes, final short value) {
-    MemoryAccess.setShortAtOffset(seg, offsetBytes, NON_NATIVE_BYTE_ORDER, value);
+    seg.set(JAVA_SHORT_UNALIGNED_NON_NATIVE, offsetBytes, value);
   }
 
   @Override
@@ -349,8 +357,8 @@ final class NonNativeWritableBufferImpl extends WritableBufferImpl {
     final MemorySegment srcSlice = MemorySegment.ofArray(srcArray).asSlice(srcOffsetShorts << SHORT_SHIFT, copyBytes);
     final MemorySegment dstSlice = seg.asSlice(pos, copyBytes);
     for (int index = 0; index < lengthShorts; index++) {
-      final short aShort = MemoryAccess.getShortAtIndex(srcSlice, index,  NATIVE_BYTE_ORDER);
-      MemoryAccess.setShortAtIndex(dstSlice, index, NON_NATIVE_BYTE_ORDER, aShort);
+      final short aShort = srcSlice.getAtIndex(ValueLayout.JAVA_SHORT_UNALIGNED, index);
+      dstSlice.setAtIndex(JAVA_SHORT_UNALIGNED_NON_NATIVE, index, aShort);
     }
     setPosition(pos + copyBytes);
   }

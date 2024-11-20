@@ -21,6 +21,7 @@ package org.apache.datasketches.memory.internal;
 
 import static org.testng.Assert.assertEquals;
 
+import java.lang.foreign.Arena;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.Resource;
@@ -29,15 +30,13 @@ import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
-import jdk.incubator.foreign.ResourceScope;
-
 public class CommonBufferTest {
   private final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
   @Test
   public void checkSetGet() throws Exception {
     int memCapacity = 60; //must be at least 60
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, 1, scope,ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory mem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
       setGetTests(buf);
@@ -138,8 +137,8 @@ public class CommonBufferTest {
   @Test
   public void checkSetGetArrays() throws Exception {
     int memCapacity = 32;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory mem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
       setGetArraysTests(buf);
@@ -223,8 +222,8 @@ public class CommonBufferTest {
   @Test
   public void checkSetGetPartialArraysWithOffset() throws Exception {
     int memCapacity = 32;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory mem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
       setGetPartialArraysWithOffsetTests(buf);
@@ -308,8 +307,8 @@ public class CommonBufferTest {
   @Test
   public void checkSetClearMemoryRegions() throws Exception {
     int memCapacity = 64; //must be 64
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory mem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
 
@@ -397,8 +396,8 @@ public class CommonBufferTest {
   @Test
   public void checkToHexStringAllMem() throws Exception {
     int memCapacity = 48; //must be 48
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory mem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
       toHexStringAllMemTests(buf); //requires println enabled to visually check

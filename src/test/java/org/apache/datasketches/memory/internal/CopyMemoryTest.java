@@ -19,6 +19,7 @@
 
 package org.apache.datasketches.memory.internal;
 
+import java.lang.foreign.Arena;
 import static org.testng.Assert.assertEquals;
 
 import java.nio.ByteOrder;
@@ -30,8 +31,6 @@ import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import jdk.incubator.foreign.ResourceScope;
 
 public class CopyMemoryTest {
   private static final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
@@ -78,7 +77,7 @@ public class CopyMemoryTest {
     srcMem.copyTo(0, dstMem, k1 << 3, k1 << 3);
     check(dstMem, k1, k1, 1);
     srcMem.close();
-  }
+    }
 
   @Test
   public void heapWSrcRegion() {
@@ -112,7 +111,6 @@ public class CopyMemoryTest {
     Memory baseMem = genWmem(k1, false);
     //gen src region of k1/2 longs, off= k1/2
     Memory srcReg = baseMem.region((k1/2) << 3, (k1/2) << 3);
-
     WritableMemory dstMem = genMem(2 * k1, true); //empty
     srcReg.copyTo(0, dstMem, k1 << 3, (k1/2) << 3);
     check(dstMem, k1, k1/2, (k1/2) + 1);
@@ -138,10 +136,10 @@ public class CopyMemoryTest {
     byte[] referenceBytes = bytes.clone();
     Memory referenceMem = Memory.wrap(referenceBytes);
     WritableMemory mem = WritableMemory.writableWrap(bytes);
-    long copyLen = (1 << 20) * 2;
-    mem.copyTo((1 << 20) / 2, mem, 0, copyLen);
-    Assert.assertEquals(0, mem.compareTo(0, copyLen, referenceMem, (1 << 20) / 2, copyLen));
-  }
+      long copyLen = (1 << 20) * 2;
+      mem.copyTo((1 << 20) / 2, mem, 0, copyLen);
+      Assert.assertEquals(0, mem.compareTo(0, copyLen, referenceMem, (1 << 20) / 2, copyLen));
+    }
 
   private static void check(Memory mem, int offsetLongs, int lengthLongs, int startValue) {
     int offBytes = offsetLongs << 3;
@@ -151,7 +149,7 @@ public class CopyMemoryTest {
   }
 
   private static WritableMemory genWmem(int longs, boolean empty) {
-    WritableMemory wmem = WritableMemory.allocateDirect(longs << 3, 1, ResourceScope.newConfinedScope(), ByteOrder.nativeOrder(), memReqSvr);
+    WritableMemory wmem = WritableMemory.allocateDirect(Arena.ofConfined(), longs << 3, 1, ByteOrder.nativeOrder(), memReqSvr);
     if (empty) {
       wmem.clear();
     } else {

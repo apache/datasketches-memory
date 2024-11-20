@@ -26,25 +26,23 @@ package org.apache.datasketches.memory.internal;
 import static org.apache.datasketches.memory.internal.ResourceImpl.LS;
 import static org.apache.datasketches.memory.internal.Util.getResourceFile;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.foreign.Arena;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.Memory;
 import org.testng.annotations.Test;
-
-import jdk.incubator.foreign.ResourceScope;
 
 public class AllocateDirectMapMemoryTest {
 
   @Test
   public void simpleMap() throws IOException {
     File file = UtilTest.setGettysburgAddressFileToReadOnly();
-    try (Memory mem = Memory.map(file)) {
+    try (Memory mem = Memory.map(Arena.ofConfined(), file)) {
       mem.close();
     } //The Try-With-Resources will throw since it is already closed
     catch (IllegalStateException e) { /* OK */ }
@@ -53,14 +51,15 @@ public class AllocateDirectMapMemoryTest {
   @Test
   public void testIllegalArguments() throws IOException {
     File file = getResourceFile("GettysburgAddress.txt");
-    try (Memory mem = Memory.map(file, -1, Integer.MAX_VALUE, ByteOrder.nativeOrder())) {
+    try (Memory mem = Memory.map(Arena.ofConfined(), file, -1, Integer.MAX_VALUE, ByteOrder.nativeOrder())) {
       fail("Failed: test IllegalArgumentException: Position was negative.");
       mem.getCapacity();
     }
     catch (IllegalArgumentException e) {
       //ok
     }
-    try (Memory mem = Memory.map(file, 0, -1, ByteOrder.nativeOrder())) {
+    try (Arena arena = Arena.ofConfined();
+         Memory mem = Memory.map(arena, file, 0, -1, ByteOrder.nativeOrder())) {
       fail("Failed: testIllegalArgumentException: Size was negative.");
     } catch (IllegalArgumentException e) {
       //ok
@@ -73,7 +72,7 @@ public class AllocateDirectMapMemoryTest {
     long memCapacity = file.length();
     Memory mem2 = null;
     try {
-      try (Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
+      try (Memory mem = Memory.map(Arena.ofConfined(), file, 0, memCapacity, ByteOrder.nativeOrder())) {
         mem2 = mem;
         assertEquals(memCapacity, mem.getCapacity());
         mem.close(); //a close inside the TWR block will throw
@@ -89,26 +88,11 @@ public class AllocateDirectMapMemoryTest {
   public void testLoad() throws IOException {
     File file = getResourceFile("GettysburgAddress.txt");
     long memCapacity = file.length();
-    try (Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
+    try (Memory mem = Memory.map(Arena.ofConfined(), file, 0, memCapacity, ByteOrder.nativeOrder())) {
       mem.load();
       //assertTrue(mem.isLoaded()); //incompatible with Windows
       assertTrue(mem.isAlive());
     }
-  }
-
-  @Test
-  public void testScopeHandle() throws IOException {
-    File file = getResourceFile("GettysburgAddress.txt");
-    long memCapacity = file.length();
-    Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder());
-    ResourceScope scope = mem.scope();
-    ResourceScope.Handle handle = scope.acquire();
-    mem.load();
-    //assertTrue(mem.isLoaded()); //incompatible with Windows
-    mem.scope().release(handle);
-    assertTrue(mem.isAlive());
-    mem.close();
-    assertFalse(mem.isAlive());
   }
 
   @Test

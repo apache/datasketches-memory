@@ -27,6 +27,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.foreign.Arena;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -36,8 +37,6 @@ import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
-
-import jdk.incubator.foreign.ResourceScope;
 
 /**
  * @author Lee Rhodes
@@ -76,8 +75,8 @@ public class SpecificLeafTest {
   @Test
   public void checkDirectLeafs() throws Exception {
     int bytes = 128;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(arena, bytes, 1, ByteOrder.nativeOrder(), memReqSvr);
       assertFalse(((ResourceImpl)wmem).isReadOnly());
       assertTrue(wmem.isDirect());
       assertFalse(wmem.isHeap());
@@ -104,18 +103,16 @@ public class SpecificLeafTest {
 
   @Test
   public void checkMapLeafs() throws IOException {
-    File file = new File("TestFile2.bin");
-    if (file.exists()) {
-      java.nio.file.Files.delete(file.toPath());
-    }
-    assertTrue(file.createNewFile());
+    File file = File.createTempFile("TestFile2", "bin");
+    file.deleteOnExit();
+
     assertTrue(file.setWritable(true, false)); //writable=true, ownerOnly=false
     assertTrue(file.isFile());
     file.deleteOnExit();  //comment out if you want to examine the file.
 
     final long bytes = 128;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory mem = WritableMemory.writableMap(file, 0L, bytes, scope, ByteOrder.nativeOrder());
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory mem = WritableMemory.writableMap(arena, file, 0L, bytes, ByteOrder.nativeOrder());
       assertTrue(mem.isMapped());
       assertFalse(mem.isReadOnly());
       checkCrossLeafTypeIds(mem);

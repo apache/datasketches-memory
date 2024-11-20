@@ -22,13 +22,15 @@ package org.apache.datasketches.memory;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.MemorySegment.Scope;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Objects;
 
 import org.apache.datasketches.memory.internal.WritableMemoryImpl;
 
-import jdk.incubator.foreign.MemorySegment;
-import jdk.incubator.foreign.ResourceScope;
 
 /**
  * Defines the read-only API for offset access to a resource.
@@ -74,8 +76,9 @@ public interface Memory extends Resource {
   /**
    * Maps the given file into <i>Memory</i> for read operations
    * Calling this method is equivalent to calling
-   * {@link #map(File, long, long, ByteOrder)
+   * {@link #map(Arena, File, long, long, ByteOrder)
    * map(file, 0, file.length(), scope, ByteOrder.nativeOrder())}.
+   * @param arena the given arena. It must be non-null.
    * @param file the given file to map. It must be non-null with a non-negative length and readable.
    * @return <i>Memory</i> for managing the mapped memory.
    * @throws IllegalArgumentException if path is not associated with the default file system.
@@ -84,12 +87,13 @@ public interface Memory extends Resource {
    * @throws SecurityException If a security manager is installed and it denies an unspecified permission
    * required by the implementation.
    */
-  static Memory map(File file) throws IOException {
-    return map(file, 0, file.length(), ByteOrder.nativeOrder());
+  static Memory map(Arena arena, File file) throws IOException {
+    return map(arena, file, 0, file.length(), ByteOrder.nativeOrder());
   }
 
   /**
    * Maps the specified portion of the given file into <i>Memory</i> for read operations.
+   * @param arena the given arena. It must be non-null.
    * @param file the given file to map. It must be non-null,readable and length &ge; 0.
    * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
    * @param capacityBytes the size of the mapped memory. It must not be negative..
@@ -102,39 +106,12 @@ public interface Memory extends Resource {
    * required by the implementation.
    */
   static Memory map(
+      Arena arena,
       File file,
       long fileOffsetBytes,
       long capacityBytes,
       ByteOrder byteOrder) throws IOException {
-    final ResourceScope scope = ResourceScope.newConfinedScope();
-    return WritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, true, byteOrder);
-  }
-
-  /**
-   * Maps the specified portion of the given file into <i>Memory</i> for read operations with a ResourceScope.
-   * @param file the given file to map. It must be non-null, readable and length &ge; 0.
-   * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
-   * @param capacityBytes the size of the mapped memory. It must not be negative.
-   * @param scope the given ResourceScope.
-   * It must be non-null.
-   * Typically use <i>ResourceScope.newConfinedScope()</i>.
-   * Warning: specifying a <i>newSharedScope()</i> is not supported.
-   * @param byteOrder the byte order to be used.  It must be non-null.
-   * @return <i>Memory</i> for managing the mapped memory.
-   * @throws IllegalArgumentException  if path is not associated with the default file system.
-   * @throws IllegalStateException - if scope has been already closed, or if access occurs from a thread other
-   * than the thread owning scope.
-   * @throws IOException - if the specified path does not point to an existing file, or if some other I/O error occurs.
-   * @throws SecurityException - If a security manager is installed and it denies an unspecified permission
-   * required by the implementation.
-   */
-  static Memory map(
-      File file,
-      long fileOffsetBytes,
-      long capacityBytes,
-      ResourceScope scope,
-      ByteOrder byteOrder) throws IOException {
-    return WritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, true, byteOrder);
+    return WritableMemoryImpl.wrapMap(arena, file, fileOffsetBytes, capacityBytes, true, byteOrder);
   }
 
   //NO ALLOCATE DIRECT, makes no sense

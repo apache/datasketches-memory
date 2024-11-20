@@ -19,11 +19,12 @@
 
 package org.apache.datasketches.memory.internal;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
+
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableBuffer;
-
-import jdk.incubator.foreign.MemoryAccess;
-import jdk.incubator.foreign.MemorySegment;
 
 /*
  * Developer notes: The heavier methods, such as put/get arrays, duplicate, region, clear, fill,
@@ -46,10 +47,11 @@ import jdk.incubator.foreign.MemorySegment;
 final class NativeWritableBufferImpl extends WritableBufferImpl {
 
   NativeWritableBufferImpl(
+      final Arena arena,
       final MemorySegment seg,
       final int typeId,
       final MemoryRequestServer memReqSvr) {
-    super(seg, typeId, memReqSvr);
+    super(arena, seg, typeId, memReqSvr);
   }
 
   //PRIMITIVE getX() and getXArray()
@@ -57,12 +59,12 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   public char getChar() {
     final long pos = getPosition();
     setPosition(pos + Character.BYTES);
-    return MemoryAccess.getCharAtOffset(seg, pos);
+    return seg.get(ValueLayout.JAVA_CHAR_UNALIGNED, pos);
   }
 
   @Override
   public char getChar(final long offsetBytes) {
-    return MemoryAccess.getCharAtOffset(seg, offsetBytes);
+    return seg.get(ValueLayout.JAVA_CHAR_UNALIGNED, offsetBytes);
   }
 
   @Override
@@ -79,12 +81,12 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   public double getDouble() {
     final long pos = getPosition();
     setPosition(pos + Double.BYTES);
-    return MemoryAccess.getDoubleAtOffset(seg, pos);
+    return seg.get(ValueLayout.JAVA_DOUBLE_UNALIGNED, pos);
   }
 
   @Override
   public double getDouble(final long offsetBytes) {
-    return MemoryAccess.getDoubleAtOffset(seg, offsetBytes);
+    return seg.get(ValueLayout.JAVA_DOUBLE_UNALIGNED, offsetBytes);
   }
 
   @Override
@@ -101,12 +103,12 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   public float getFloat() {
     final long pos = getPosition();
     setPosition(pos + Float.BYTES);
-    return MemoryAccess.getFloatAtOffset(seg, pos);
+    return seg.get(ValueLayout.JAVA_FLOAT_UNALIGNED, pos);
   }
 
   @Override
   public float getFloat(final long offsetBytes) {
-    return MemoryAccess.getFloatAtOffset(seg, offsetBytes);
+    return seg.get(ValueLayout.JAVA_FLOAT_UNALIGNED, offsetBytes);
   }
 
   @Override
@@ -123,12 +125,12 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   public int getInt() {
     final long pos = getPosition();
     setPosition(pos + Integer.BYTES);
-    return MemoryAccess.getIntAtOffset(seg, pos);
+    return seg.get(ValueLayout.JAVA_INT_UNALIGNED, pos);
   }
 
   @Override
   public int getInt(final long offsetBytes) {
-    return MemoryAccess.getIntAtOffset(seg, offsetBytes);
+    return seg.get(ValueLayout.JAVA_INT_UNALIGNED, offsetBytes);
   }
 
   @Override
@@ -145,12 +147,12 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   public long getLong() {
     final long pos = getPosition();
     setPosition(pos + Long.BYTES);
-    return MemoryAccess.getLongAtOffset(seg, pos);
+    return seg.get(ValueLayout.JAVA_LONG_UNALIGNED, pos);
   }
 
   @Override
   public long getLong(final long offsetBytes) {
-    return MemoryAccess.getLongAtOffset(seg, offsetBytes);
+    return seg.get(ValueLayout.JAVA_LONG_UNALIGNED, offsetBytes);
   }
 
   @Override
@@ -167,12 +169,12 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   public short getShort() {
     final long pos = getPosition();
     setPosition(pos + Short.BYTES);
-    return MemoryAccess.getShortAtOffset(seg, pos);
+    return seg.get(ValueLayout.JAVA_SHORT_UNALIGNED, pos);
   }
 
   @Override
   public short getShort(final long offsetBytes) {
-    return MemoryAccess.getShortAtOffset(seg, offsetBytes);
+    return seg.get(ValueLayout.JAVA_SHORT_UNALIGNED, offsetBytes);
   }
 
   @Override
@@ -190,12 +192,12 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   public void putChar(final char value) {
     final long pos = getPosition();
     setPosition(pos + Character.BYTES);
-    MemoryAccess.setCharAtOffset(seg, pos, value);
+    seg.set(ValueLayout.JAVA_CHAR_UNALIGNED, pos, value);
   }
 
   @Override
   public void putChar(final long offsetBytes, final char value) {
-    MemoryAccess.setCharAtOffset(seg, offsetBytes, value);
+    seg.set(ValueLayout.JAVA_CHAR_UNALIGNED, offsetBytes, value);
   }
 
   @Override
@@ -212,12 +214,12 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   public void putDouble(final double value) {
     final long pos = getPosition();
     setPosition(pos + Double.BYTES);
-    MemoryAccess.setDoubleAtOffset(seg, pos, value);
+    seg.set(ValueLayout.JAVA_DOUBLE_UNALIGNED, pos, value);
   }
 
   @Override
   public void putDouble(final long offsetBytes, final double value) {
-    MemoryAccess.setDoubleAtOffset(seg, offsetBytes, value);
+    seg.set(ValueLayout.JAVA_DOUBLE_UNALIGNED, offsetBytes, value);
   }
 
   @Override
@@ -234,12 +236,12 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   public void putFloat(final float value) {
     final long pos = getPosition();
     setPosition(pos + Float.BYTES);
-    MemoryAccess.setFloatAtOffset(seg, pos, value);
+    seg.set(ValueLayout.JAVA_FLOAT_UNALIGNED, pos, value);
   }
 
   @Override
   public void putFloat(final long offsetBytes, final float value) {
-    MemoryAccess.setFloatAtOffset(seg, offsetBytes, value);
+    seg.set(ValueLayout.JAVA_FLOAT_UNALIGNED, offsetBytes, value);
   }
 
   @Override
@@ -256,12 +258,12 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   public void putInt(final int value) {
     final long pos = getPosition();
     setPosition(pos + Integer.BYTES);
-    MemoryAccess.setIntAtOffset(seg, pos, value);
+    seg.set(ValueLayout.JAVA_INT_UNALIGNED, pos, value);
   }
 
   @Override
   public void putInt(final long offsetBytes, final int value) {
-    MemoryAccess.setIntAtOffset(seg, offsetBytes, value);
+    seg.set(ValueLayout.JAVA_INT_UNALIGNED, offsetBytes, value);
   }
 
   @Override
@@ -278,12 +280,12 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   public void putLong(final long value) {
     final long pos = getPosition();
     setPosition(pos + Long.BYTES);
-    MemoryAccess.setLongAtOffset(seg, pos, value);
+    seg.set(ValueLayout.JAVA_LONG_UNALIGNED, pos, value);
   }
 
   @Override
   public void putLong(final long offsetBytes, final long value) {
-    MemoryAccess.setLongAtOffset(seg, offsetBytes, value);
+    seg.set(ValueLayout.JAVA_LONG_UNALIGNED, offsetBytes, value);
   }
 
   @Override
@@ -300,12 +302,12 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   public void putShort(final short value) {
     final long pos = getPosition();
     setPosition(pos + Short.BYTES);
-    MemoryAccess.setShortAtOffset(seg, pos, value);
+    seg.set(ValueLayout.JAVA_SHORT_UNALIGNED, pos, value);
   }
 
   @Override
   public void putShort(final long offsetBytes, final short value) {
-    MemoryAccess.setShortAtOffset(seg, offsetBytes, value);
+    seg.set(ValueLayout.JAVA_SHORT_UNALIGNED, offsetBytes, value);
   }
 
   @Override

@@ -19,6 +19,7 @@
 
 package org.apache.datasketches.memory;
 
+import java.lang.foreign.Arena;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 

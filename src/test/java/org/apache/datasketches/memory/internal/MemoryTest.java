@@ -33,6 +33,7 @@ import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
+import java.lang.foreign.Arena;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
@@ -46,8 +47,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.testng.collections.Lists;
 
-import jdk.incubator.foreign.ResourceScope;
-
 public class MemoryTest {
   final MemoryRequestServer myMemReqSvr = Resource.defaultMemReqSvr;
 
@@ -59,8 +58,8 @@ public class MemoryTest {
   @Test
   public void checkDirectRoundTrip() throws Exception {
     int n = 1024; //longs
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory mem = WritableMemory.allocateDirect(n * 8, 1, scope, ByteOrder.nativeOrder(), myMemReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory mem = WritableMemory.allocateDirect(arena, n * 8, 1,  ByteOrder.nativeOrder(), myMemReqSvr);
       for (int i = 0; i < n; i++) {
         mem.putLong(i * 8, i);
       }
@@ -355,20 +354,22 @@ public class MemoryTest {
   @Test(expectedExceptions = IllegalStateException.class)
   public void checkParentUseAfterFree() throws Exception {
     int bytes = 64 * 8;
-    ResourceScope scope = ResourceScope.newConfinedScope();
-    WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, scope, ByteOrder.nativeOrder(), myMemReqSvr);
-    wmem.close();
-    wmem.getLong(0); //Already closed
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(arena, bytes, 1, ByteOrder.nativeOrder(), myMemReqSvr);
+      wmem.close();
+      wmem.getLong(0); //Already closed
+    }
   }
 
   @Test(expectedExceptions = IllegalStateException.class)
   public void checkRegionUseAfterFree() throws Exception {
     int bytes = 64;
-    ResourceScope scope = ResourceScope.newConfinedScope();
-    WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, scope, ByteOrder.nativeOrder(), myMemReqSvr);
-    Memory region = wmem.region(0L, bytes);
-    wmem.close();
-    region.getByte(0); //Already closed.
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(arena, bytes, 1, ByteOrder.nativeOrder(), myMemReqSvr);
+      Memory region = wmem.region(0L, bytes);
+      wmem.close();
+      region.getByte(0); //Already closed.
+    }
   }
 
   @Test
@@ -376,44 +377,44 @@ public class MemoryTest {
     WritableMemory wmem;
     WritableBuffer wbuf;
 
-    //ON HEAP
-    wmem = WritableMemory.writableWrap(new byte[16]);
-    assertNull(wmem.getMemoryRequestServer());
-    wbuf = wmem.asWritableBuffer();
-    assertNull(wbuf.getMemoryRequestServer());
-    //OFF HEAP
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-       wmem = WritableMemory.allocateDirect(16, 1, scope, ByteOrder.nativeOrder(), myMemReqSvr);  //OFF HEAP
+    try (Arena arena = Arena.ofConfined()) {
+      //ON HEAP
+      wmem = WritableMemory.writableWrap(new byte[16]);
+      assertNull(wmem.getMemoryRequestServer());
+      wbuf = wmem.asWritableBuffer();
+      assertNull(wbuf.getMemoryRequestServer());
+      //OFF HEAP
+      wmem = WritableMemory.allocateDirect(arena, 16, 1, ByteOrder.nativeOrder(), myMemReqSvr);  //OFF HEAP
       assertNotNull(wmem.getMemoryRequestServer());
       wbuf = wmem.asWritableBuffer();
       assertNotNull(wbuf.getMemoryRequestServer());
+      //ByteBuffer
+      ByteBuffer bb = ByteBuffer.allocate(16);
+      wmem = WritableMemory.writableWrap(bb);
+      wmem.setMemoryRequestServer(myMemReqSvr);
+      assertNotNull(wmem.getMemoryRequestServer());
+      wbuf = wmem.asWritableBuffer();
+      assertNull(wbuf.getMemoryRequestServer());
     }
-    //ByteBuffer
-    ByteBuffer bb = ByteBuffer.allocate(16);
-    wmem = WritableMemory.writableWrap(bb);
-    wmem.setMemoryRequestServer(myMemReqSvr);
-    assertNotNull(wmem.getMemoryRequestServer());
-    wbuf = wmem.asWritableBuffer();
-    assertNull(wbuf.getMemoryRequestServer());
 
-    //ON HEAP
-    wmem = WritableMemory.writableWrap(new byte[16], 0, 16, NATIVE_BYTE_ORDER, myMemReqSvr);
-    assertNotNull(wmem.getMemoryRequestServer());
-    wbuf = wmem.asWritableBuffer();
-    assertNotNull(wbuf.getMemoryRequestServer());
-    //OFF HEAP
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory wmem2 = WritableMemory.allocateDirect(16, 1, scope, ByteOrder.nativeOrder(), myMemReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      //ON HEAP
+      wmem = WritableMemory.writableWrap(new byte[16], 0, 16, NATIVE_BYTE_ORDER, myMemReqSvr);
+      assertNotNull(wmem.getMemoryRequestServer());
+      wbuf = wmem.asWritableBuffer();
+      assertNotNull(wbuf.getMemoryRequestServer());
+      //OFF HEAP
+      WritableMemory wmem2 = WritableMemory.allocateDirect(arena, 16, 1, ByteOrder.nativeOrder(), myMemReqSvr);
       assertNotNull(wmem2.getMemoryRequestServer());
       wbuf = wmem.asWritableBuffer();
       assertNotNull(wbuf.getMemoryRequestServer());
+      //ByteBuffer
+      ByteBuffer bb = ByteBuffer.allocate(16);
+      wmem = WritableMemory.writableWrap(bb);
+      assertNull(wmem.getMemoryRequestServer());
+      wbuf = wmem.asWritableBuffer();
+      assertNull(wbuf.getMemoryRequestServer());
     }
-    //ByteBuffer
-    bb = ByteBuffer.allocate(16);
-    wmem = WritableMemory.writableWrap(bb);
-    assertNull(wmem.getMemoryRequestServer());
-    wbuf = wmem.asWritableBuffer();
-    assertNull(wbuf.getMemoryRequestServer());
   }
 
   @Test

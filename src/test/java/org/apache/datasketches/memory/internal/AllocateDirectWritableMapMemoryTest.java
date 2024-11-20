@@ -36,6 +36,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.foreign.Arena;
 import java.nio.ByteOrder;
 import java.nio.file.InvalidPathException;
 
@@ -45,8 +46,6 @@ import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import jdk.incubator.foreign.ResourceScope;
 
 public class AllocateDirectWritableMapMemoryTest {
   private final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
@@ -60,8 +59,8 @@ public class AllocateDirectWritableMapMemoryTest {
   public void simpleMap() throws IllegalArgumentException, InvalidPathException, IllegalStateException,
       UnsupportedOperationException, IOException, SecurityException {
     File file = getResourceFile("GettysburgAddress.txt");
-    Memory mem = null;
-    try (ResourceScope scope = (mem = Memory.map(file)).scope()) {
+
+    try (Memory mem = Memory.map(Arena.ofConfined(), file)) {
       byte[] byteArr = new byte[(int)mem.getCapacity()];
       mem.getByteArray(0, byteArr, 0, byteArr.length);
       String text = new String(byteArr, UTF_8);
@@ -88,9 +87,9 @@ public class AllocateDirectWritableMapMemoryTest {
 
     WritableMemory dstMem = null;
     WritableMemory srcMem = null;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) { //this scope manages two Memory objects
-      dstMem = WritableMemory.writableMap(file, 0, numBytes, scope, ByteOrder.nativeOrder());
-      srcMem = WritableMemory.allocateDirect(numBytes, 8, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) { //this scope manages two Memory objects
+      dstMem = WritableMemory.writableMap(arena, file, 0, numBytes, ByteOrder.nativeOrder());
+      srcMem = WritableMemory.allocateDirect(arena, numBytes, 8, ByteOrder.nativeOrder(), memReqSvr);
 
       //load source with consecutive longs
       for (long i = 0; i < numLongs; i++) {
@@ -119,21 +118,19 @@ public class AllocateDirectWritableMapMemoryTest {
 
     final long bytes = 8;
     WritableMemory wmem = null;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      wmem = WritableMemory.writableMap(file, 0L, bytes, scope, NON_NATIVE_BYTE_ORDER);
-      wmem.putChar(0, (char) 1);
-      assertEquals(wmem.getByte(1), (byte) 1);
-    }
+    wmem = WritableMemory.writableMap(file, 0L, bytes, NON_NATIVE_BYTE_ORDER);
+    wmem.putChar(0, (char) 1);
+    assertEquals(wmem.getByte(1), (byte) 1);
   }
 
   @Test
   public void testMapExceptionNoTWR()
       throws IllegalArgumentException, InvalidPathException, IllegalStateException, UnsupportedOperationException,
       IOException, SecurityException {
-    File dummy = createFile("dummy.txt", ""); //zero length
-    ResourceScope scope = ResourceScope.newConfinedScope();
-    Memory.map(dummy, 0, dummy.length(), scope, ByteOrder.nativeOrder());
-    scope.close();
+    File dummy = createTempFile("dummy", ".txt" , ""); //zero length
+    try (Arena arena = Arena.ofConfined()) {
+      Memory.map(arena, dummy, 0, dummy.length(), ByteOrder.nativeOrder());
+    }
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)
@@ -143,8 +140,8 @@ public class AllocateDirectWritableMapMemoryTest {
     File file = getResourceFile("GettysburgAddress.txt");
     assertTrue(file.canRead());
     assertFalse(file.canWrite());
-    WritableMemory wmem = null;
-    try (ResourceScope scope = (wmem = WritableMemory.writableMap(file)).scope()) { //assumes file is writable!
+    try (Arena arena = Arena.ofConfined();
+         WritableMemory wmem = WritableMemory.writableMap(file)) { //assumes file is writable!
       wmem.getCapacity();
     }
   }
@@ -155,10 +152,8 @@ public class AllocateDirectWritableMapMemoryTest {
       IOException, SecurityException {
     File file = getResourceFile("GettysburgAddress.txt");
     WritableMemory wmem = null;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      wmem = WritableMemory.writableMap(file, 0, 1 << 20, scope, ByteOrder.nativeOrder());
-      wmem.getCapacity();
-    }
+    wmem = WritableMemory.writableMap(file, 0, 1 << 20, ByteOrder.nativeOrder());
+    wmem.getCapacity();
   }
 
   @Test
@@ -166,7 +161,7 @@ public class AllocateDirectWritableMapMemoryTest {
       throws IllegalArgumentException, InvalidPathException, IllegalStateException, UnsupportedOperationException,
       IOException, SecurityException {
     String origStr = "Corectng spellng mistks";
-    File origFile = createFile("force_original.txt", origStr); //23
+    File origFile = createTempFile("force_original", ".txt", origStr); //23
     assertTrue(origFile.setWritable(true, false));
     long origBytes = origFile.length();
     String correctStr = "Correcting spelling mistakes"; //28
@@ -175,8 +170,8 @@ public class AllocateDirectWritableMapMemoryTest {
 
     Memory mem = null;
     WritableMemory wmem = null;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      mem = Memory.map(origFile, 0, origBytes, scope, ByteOrder.nativeOrder());
+    try (Arena arena = Arena.ofConfined()) {
+      mem = Memory.map(arena, origFile, 0, origBytes, ByteOrder.nativeOrder());
       mem.load();
       //assertTrue(mem.isLoaded()); //incompatible with Windows
       //confirm orig string
@@ -185,7 +180,7 @@ public class AllocateDirectWritableMapMemoryTest {
       String bufStr = new String(buf, UTF_8);
       assertEquals(bufStr, origStr);
 
-      wmem = WritableMemory.writableMap(origFile, 0, correctBytesLen, scope, ByteOrder.nativeOrder());
+      wmem = WritableMemory.writableMap(origFile, 0, correctBytesLen, ByteOrder.nativeOrder());
       wmem.load();
       //assertTrue(wmem.isLoaded()); //incompatible with Windows
       // over write content
@@ -199,8 +194,9 @@ public class AllocateDirectWritableMapMemoryTest {
     }
   }
 
-  private static File createFile(String fileName, String text) throws FileNotFoundException {
-    File file = new File(fileName);
+  private static File createTempFile(String fileNamePrefix, String fileNameSuffix, String text)
+          throws FileNotFoundException, IOException {
+    File file = File.createTempFile(fileNamePrefix, fileNameSuffix);
     file.deleteOnExit();
     PrintWriter writer;
     try {

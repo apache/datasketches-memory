@@ -19,9 +19,8 @@
 
 package org.apache.datasketches.memory;
 
+import java.lang.foreign.Arena;
 import java.nio.ByteOrder;
-
-import jdk.incubator.foreign.ResourceScope;
 
 /**
  * This example MemoryRequestServer is simple but demonstrates one of many ways to
@@ -59,7 +58,7 @@ public final class DefaultMemoryRequestServer implements MemoryRequestServer {
   public WritableMemory request(
       final WritableMemory currentWmem,
       final long newCapacityBytes,
-      final ResourceScope scope) {
+      final Arena arena) {
     final ByteOrder order = currentWmem.getTypeByteOrder();
     final long currentBytes = currentWmem.getCapacity();
     final WritableMemory newWmem;
@@ -69,7 +68,7 @@ public final class DefaultMemoryRequestServer implements MemoryRequestServer {
     }
 
     if (offHeap) {
-      newWmem = WritableMemory.allocateDirect(newCapacityBytes, 8, scope, order, this);
+      newWmem = WritableMemory.allocateDirect(arena, newCapacityBytes, 8, order, this);
     }
     else { //On-heap
       if (newCapacityBytes > Integer.MAX_VALUE) {
@@ -90,7 +89,7 @@ public final class DefaultMemoryRequestServer implements MemoryRequestServer {
       final WritableMemory memToClose,
       final WritableMemory newMemory) {
     //make this operation idempotent.
-    if (memToClose.isCloseable()) { memToClose.scope().close(); }
+    if (memToClose.isCloseable()) { memToClose.close(); }
   }
 
 }

@@ -19,9 +19,8 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static jdk.incubator.foreign.MemoryAccess.getByteAtOffset;
-
-import jdk.incubator.foreign.MemorySegment;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
 
 /**
  * @author Lee Rhodes
@@ -39,7 +38,9 @@ final class CompareAndCopy {
     if (mm == -1) { return 0; }
     if ((lengthBytes1 > mm) && (lengthBytes2 > mm)) {
       return Integer.compare(
-          getByteAtOffset(slice1, mm) & 0XFF, getByteAtOffset(slice2, mm) & 0XFF);
+          slice1.get(ValueLayout.JAVA_BYTE, mm) & 0XFF,
+          slice2.get(ValueLayout.JAVA_BYTE, mm) & 0XFF
+      );
     }
     if (lengthBytes1 == mm) { return -1; }
     return +1;

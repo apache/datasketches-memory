@@ -19,11 +19,12 @@
 
 package org.apache.datasketches.memory.internal;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
+
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableMemory;
-
-import jdk.incubator.foreign.MemoryAccess;
-import jdk.incubator.foreign.MemorySegment;
 
 /**
  * Implementation of {@link WritableMemory} for native endian byte order.
@@ -34,16 +35,17 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
 
   //Pass-through constructor
   NativeWritableMemoryImpl(
+      final Arena arena,
       final MemorySegment seg,
       final int typeId,
       final MemoryRequestServer memReqSvr) {
-    super(seg, typeId, memReqSvr);
+    super(arena, seg, typeId, memReqSvr);
   }
 
   ///PRIMITIVE getX() and getXArray()
   @Override
   public char getChar(final long offsetBytes) {
-    return MemoryAccess.getCharAtOffset(seg, offsetBytes);
+    return seg.get(ValueLayout.JAVA_CHAR_UNALIGNED, offsetBytes);
   }
 
   @Override
@@ -56,7 +58,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
 
   @Override
   public double getDouble(final long offsetBytes) {
-    return MemoryAccess.getDoubleAtOffset(seg, offsetBytes);
+    return seg.get(ValueLayout.JAVA_DOUBLE_UNALIGNED, offsetBytes);
   }
 
   @Override
@@ -69,7 +71,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
 
   @Override
   public float getFloat(final long offsetBytes) {
-    return MemoryAccess.getFloatAtOffset(seg, offsetBytes);
+    return seg.get(ValueLayout.JAVA_FLOAT_UNALIGNED, offsetBytes);
   }
 
   @Override
@@ -82,7 +84,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
 
   @Override
   public int getInt(final long offsetBytes) {
-    return MemoryAccess.getIntAtOffset(seg, offsetBytes);
+    return seg.get(ValueLayout.JAVA_INT_UNALIGNED, offsetBytes);
   }
 
   @Override
@@ -95,7 +97,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
 
   @Override
   public long getLong(final long offsetBytes) {
-    return MemoryAccess.getLongAtOffset(seg, offsetBytes);
+    return seg.get(ValueLayout.JAVA_LONG_UNALIGNED, offsetBytes);
   }
 
   @Override
@@ -108,7 +110,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
 
   @Override
   public short getShort(final long offsetBytes) {
-    return MemoryAccess.getShortAtOffset(seg, offsetBytes);
+    return seg.get(ValueLayout.JAVA_SHORT_UNALIGNED, offsetBytes);
   }
 
   @Override
@@ -122,7 +124,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
   //PRIMITIVE putX() and putXArray() implementations
   @Override
   public void putChar(final long offsetBytes, final char value) {
-    MemoryAccess.setCharAtOffset(seg, offsetBytes, value);
+    seg.set(ValueLayout.JAVA_CHAR_UNALIGNED, offsetBytes, value);
   }
 
   @Override
@@ -135,7 +137,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
 
   @Override
   public void putDouble(final long offsetBytes, final double value) {
-    MemoryAccess.setDoubleAtOffset(seg, offsetBytes, value);
+    seg.set(ValueLayout.JAVA_DOUBLE_UNALIGNED, offsetBytes, value);
   }
 
   @Override
@@ -148,7 +150,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
 
   @Override
   public void putFloat(final long offsetBytes, final float value) {
-    MemoryAccess.setFloatAtOffset(seg, offsetBytes, value);
+    seg.set(ValueLayout.JAVA_FLOAT_UNALIGNED, offsetBytes, value);
   }
 
   @Override
@@ -161,7 +163,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
 
   @Override
   public void putInt(final long offsetBytes, final int value) {
-    MemoryAccess.setIntAtOffset(seg, offsetBytes, value);
+    seg.set(ValueLayout.JAVA_INT_UNALIGNED, offsetBytes, value);
   }
 
   @Override
@@ -174,7 +176,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
 
   @Override
   public void putLong(final long offsetBytes, final long value) {
-    MemoryAccess.setLongAtOffset(seg, offsetBytes, value);
+    seg.set(ValueLayout.JAVA_LONG_UNALIGNED, offsetBytes, value);
   }
 
   @Override
@@ -187,7 +189,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
 
   @Override
   public void putShort(final long offsetBytes, final short value) {
-    MemoryAccess.setShortAtOffset(seg, offsetBytes, value);
+    seg.set(ValueLayout.JAVA_SHORT_UNALIGNED, offsetBytes, value);
   }
 
   @Override

@@ -339,7 +339,7 @@ abstract class ResourceImpl implements Resource {
       try {
         arena.close();
       }
-      catch (UnsupportedOperationException uoe) {
+      catch (final UnsupportedOperationException uoe) {
         // ignored as it seems there's no way to determine if the Arena is closeable or not
       }
     } //not idempotent

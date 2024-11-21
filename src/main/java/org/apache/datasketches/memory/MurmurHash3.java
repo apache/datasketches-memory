@@ -20,8 +20,8 @@
 package org.apache.datasketches.memory;
 
 import java.lang.foreign.MemorySegment;
-import org.apache.datasketches.memory.internal.MurmurHash3v4;
 
+import org.apache.datasketches.memory.internal.MurmurHash3v4;
 
 /**
  * <p>The MurmurHash3 is a fast, non-cryptographic, 128-bit hash function that has

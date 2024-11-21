@@ -24,13 +24,10 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.MemorySegment.Scope;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Objects;
 
 import org.apache.datasketches.memory.internal.WritableMemoryImpl;
-
 
 /**
  * Defines the read-only API for offset access to a resource.

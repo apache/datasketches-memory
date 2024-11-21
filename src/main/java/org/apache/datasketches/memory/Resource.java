@@ -95,13 +95,13 @@ public interface Resource extends AutoCloseable {
    * and all the memory segments associated with it can no longer be accessed. Furthermore, any off-heap region of memory backing the
    * segments obtained from this arena are also released.
    *
-   * This operation is not idempotent; that is, closing an already closed arena <em>always</em> results in an
+   * <p>This operation is not idempotent; that is, closing an already closed arena <em>always</em> results in an
    * exception being thrown. This reflects a deliberate design choice: failure to close an arena might reveal a bug
-   * in the underlying application logic.
+   * in the underlying application logic.</p>
    *
-   * If this method completes normally, then {@code java.lang.foreign.Arena.scope().isAlive() == false}.
+   * <p>If this method completes normally, then {@code java.lang.foreign.Arena.scope().isAlive() == false}.
    * Implementations are allowed to throw {@link UnsupportedOperationException} if an explicit close operation is
-   * not supported.
+   * not supported.</p>
    *
    * @see java.lang.foreign.MemorySegment.Scope#isAlive()
    *

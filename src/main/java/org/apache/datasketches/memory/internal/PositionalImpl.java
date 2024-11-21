@@ -26,7 +26,6 @@ import org.apache.datasketches.memory.BufferPositionInvariantsException;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.Positional;
 
-
 /**
  * This implements the positional API.
  * This is different from and simpler than Java BufferImpl positional approach.

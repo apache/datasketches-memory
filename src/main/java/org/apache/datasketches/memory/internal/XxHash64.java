@@ -47,7 +47,7 @@ import java.lang.foreign.ValueLayout;
  *
  * @author Lee Rhodes
  */
-public class XxHash64 {
+public final class XxHash64 {
   // Unsigned, 64-bit primes
   private static final long P1 = -7046029288634856825L;
   private static final long P2 = -4417276706812531889L;
@@ -79,7 +79,7 @@ public class XxHash64 {
         v1 = Long.rotateLeft(v1, 31);
         v1 *= P1;
 
-        v2 += seg.get(ValueLayout.JAVA_LONG_UNALIGNED, offsetBytes+ 8L) * P2;
+        v2 += seg.get(ValueLayout.JAVA_LONG_UNALIGNED, offsetBytes + 8L) * P2;
         v2 = Long.rotateLeft(v2, 31);
         v2 *= P1;
 

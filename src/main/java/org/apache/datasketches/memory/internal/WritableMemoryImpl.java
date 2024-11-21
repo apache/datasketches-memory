@@ -46,6 +46,7 @@ import org.apache.datasketches.memory.WritableMemory;
  * Common base of native-ordered and non-native-ordered {@link WritableMemory} implementations.
  * Contains methods which are agnostic to the byte order.
  */
+@SuppressWarnings("preview")
 public abstract class WritableMemoryImpl extends ResourceImpl implements WritableMemory {
 
   //Pass-through constructor
@@ -171,9 +172,9 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
       }
     }
 
-    final Set<OpenOption> openOptions = READ_WRITE.equals(mapMode) ?
-      Set.of(StandardOpenOption.READ, StandardOpenOption.WRITE) :
-      Set.of(StandardOpenOption.READ);
+    final Set<OpenOption> openOptions = READ_WRITE.equals(mapMode)
+      ? Set.of(StandardOpenOption.READ, StandardOpenOption.WRITE)
+      : Set.of(StandardOpenOption.READ);
 
     final boolean nativeBOType = byteOrder == ByteOrder.nativeOrder();
     final int type = MEMORY | MAP | DIRECT

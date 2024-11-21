@@ -19,10 +19,11 @@
 
 package org.apache.datasketches.memory.internal;
 
-import java.lang.foreign.ValueLayout;
 import static org.apache.datasketches.memory.internal.ResourceImpl.NON_NATIVE_BYTE_ORDER;
 
-public class NonNativeValueLayouts {
+import java.lang.foreign.ValueLayout;
+
+public final class NonNativeValueLayouts {
 
   private NonNativeValueLayouts() { }
 
@@ -38,5 +39,5 @@ public class NonNativeValueLayouts {
     .withOrder(NON_NATIVE_BYTE_ORDER);
   static final ValueLayout.OfShort JAVA_SHORT_UNALIGNED_NON_NATIVE = ValueLayout.JAVA_SHORT_UNALIGNED
     .withOrder(NON_NATIVE_BYTE_ORDER);
-  
+
 }

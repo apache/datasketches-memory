@@ -308,7 +308,6 @@ under the License.
             <useDefaultExcludes>true</useDefaultExcludes>
             <excludes>
               <!-- rat uses .gitignore for excludes by default -->
-<!--              <exclude>**/nb-configuration.xml</exclude>-->
               <exclude>**/*.yaml</exclude>
               <exclude>**/*.yml</exclude>
               <exclude>**/.*</exclude>

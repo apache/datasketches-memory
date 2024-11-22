@@ -120,14 +120,14 @@ public class LeafImplTest {
     file.deleteOnExit();  //comment out if you want to examine the file.
     // Off Heap, Native order, No ByteBuffer, No MemReqSvr
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory memNO = WritableMemory.writableMap(arena, file, off, cap, NBO);
+      WritableMemory memNO = WritableMemory.writableMap(file, off, cap, NBO, arena);
       memNO.putShort(0, (short) 1);
       assertTrue(memNO.isDirect());
       checkCombinations(memNO, off, cap, memNO.isDirect(), NBO, false, false);
     }
     // Off heap, Non Native order, No ByteBuffer, no MemReqSvr
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory memNNO = WritableMemory.writableMap(arena, file, off, cap, NNBO);
+      WritableMemory memNNO = WritableMemory.writableMap(file, off, cap, NNBO, arena);
       memNNO.putShort(0, (short) 1);
       assertTrue(memNNO.isDirect());
       checkCombinations(memNNO, off, cap, memNNO.isDirect(), NNBO, false, false);

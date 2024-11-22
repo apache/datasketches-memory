@@ -112,7 +112,7 @@ public class SpecificLeafTest {
 
     final long bytes = 128;
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory mem = WritableMemory.writableMap(arena, file, 0L, bytes, ByteOrder.nativeOrder());
+      WritableMemory mem = WritableMemory.writableMap(file, 0L, bytes, ByteOrder.nativeOrder(), arena);
       assertTrue(mem.isMapped());
       assertFalse(mem.isReadOnly());
       checkCrossLeafTypeIds(mem);

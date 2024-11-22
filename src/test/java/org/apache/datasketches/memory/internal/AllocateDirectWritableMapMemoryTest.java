@@ -88,7 +88,7 @@ public class AllocateDirectWritableMapMemoryTest {
     WritableMemory dstMem = null;
     WritableMemory srcMem = null;
     try (Arena arena = Arena.ofConfined()) { //this scope manages two Memory objects
-      dstMem = WritableMemory.writableMap(arena, file, 0, numBytes, ByteOrder.nativeOrder());
+      dstMem = WritableMemory.writableMap(file, 0, numBytes, ByteOrder.nativeOrder(), arena);
       srcMem = WritableMemory.allocateDirect(arena, numBytes, 8, ByteOrder.nativeOrder(), memReqSvr);
 
       //load source with consecutive longs

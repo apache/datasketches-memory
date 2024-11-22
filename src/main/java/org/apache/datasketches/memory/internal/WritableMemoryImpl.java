@@ -136,26 +136,26 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
   /**
    * The implementation of <i>wrapMap</i> for <i>WritableMemory</i>.
    * This method is also used for read-only operations when localReadOnly is false.
-   * @param arena the given arena. It must be non-null.
    * @param file the given file to map. It must be non-null.
    * @param fileOffsetBytes the file starting offset in bytes. It must be &ge; 0.
    * @param capacityBytes the capacity of the mapped memory. It must be &ge; 0.
    * It must be non-null.
    * Typically use <i>Arena.ofConfined()</i>.
    * Warning: specifying a <i>Arena.ofShared()</i> is not supported.
-   * @param localReadOnly true if read-only is being imposed locally, even if the given file is writable..
    * @param byteOrder the given <i>ByteOrder</i>. It must be non-null.
+   * @param localReadOnly true if read-only is being imposed locally, even if the given file is writable..
+   * @param arena the given arena. It must be non-null.
    * @return a <i>WritableMemory</i>
    * @throws IllegalArgumentException if file is not readable.
    * @throws IOException if mapping is not successful.
    */
   public static WritableMemory wrapMap(
-      final Arena arena,
       final File file,
       final long fileOffsetBytes,
       final long capacityBytes,
+      final ByteOrder byteOrder,
       final boolean localReadOnly,
-      final ByteOrder byteOrder)
+      final Arena arena)
           throws IllegalArgumentException, IOException {
     Objects.requireNonNull(arena, "Arena must be non-null.");
     Objects.requireNonNull(file, "File must be non-null.");

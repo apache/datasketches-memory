@@ -108,7 +108,7 @@ public interface Memory extends Resource {
       long fileOffsetBytes,
       long capacityBytes,
       ByteOrder byteOrder) throws IOException {
-    return WritableMemoryImpl.wrapMap(arena, file, fileOffsetBytes, capacityBytes, true, byteOrder);
+    return WritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, byteOrder, true, arena);
   }
 
   //NO ALLOCATE DIRECT, makes no sense

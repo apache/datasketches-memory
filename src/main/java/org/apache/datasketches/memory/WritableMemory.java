@@ -82,7 +82,7 @@ public interface WritableMemory extends Memory {
    * required by the implementation.
    */
   static WritableMemory writableMap(File file) throws IOException {
-    return writableMap(Arena.ofConfined(), file, 0, file.length(), ByteOrder.nativeOrder());
+    return writableMap(file, 0, file.length(), ByteOrder.nativeOrder(), Arena.ofConfined());
   }
 
   /**
@@ -103,16 +103,16 @@ public interface WritableMemory extends Memory {
       long fileOffsetBytes,
       long capacityBytes,
       ByteOrder byteOrder) throws IOException {
-    return WritableMemoryImpl.wrapMap(Arena.ofConfined(), file, fileOffsetBytes, capacityBytes, false, byteOrder);
+    return WritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, byteOrder, false, Arena.ofConfined());
   }
 
   /**
    * Maps the specified portion of the given file into Memory for write operations.
-   * @param arena the given arena to map. It must be non-null.
    * @param file the given file to map. It must be non-null and writable.
    * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
    * @param capacityBytes the size of the mapped Memory.
    * @param byteOrder the given <i>ByteOrder</i>. It must be non-null.
+   * @param arena the given arena to map. It must be non-null.
    * @return a file-mapped WritableMemory.
    * @throws IllegalArgumentException if file is not readable or not writable.
    * @throws IOException if the specified path does not point to an existing file, or if some other I/O error occurs.
@@ -120,12 +120,12 @@ public interface WritableMemory extends Memory {
    * required by the implementation.
    */
   static WritableMemory writableMap(
-      Arena arena,
       File file,
       long fileOffsetBytes,
       long capacityBytes,
-      ByteOrder byteOrder) throws IOException {
-    return WritableMemoryImpl.wrapMap(arena, file, fileOffsetBytes, capacityBytes, false, byteOrder);
+      ByteOrder byteOrder,
+      Arena arena) throws IOException {
+    return WritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, byteOrder, false, arena);
   }
 
   //ALLOCATE DIRECT

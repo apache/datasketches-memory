@@ -42,7 +42,7 @@ public class AllocateDirectMapMemoryTest {
   @Test
   public void simpleMap() throws IOException {
     File file = UtilTest.setGettysburgAddressFileToReadOnly();
-    try (Memory mem = Memory.map(Arena.ofConfined(), file)) {
+    try (Memory mem = Memory.map(file, Arena.ofConfined())) {
       mem.close();
     } //The Try-With-Resources will throw since it is already closed
     catch (IllegalStateException e) { /* OK */ }
@@ -51,7 +51,7 @@ public class AllocateDirectMapMemoryTest {
   @Test
   public void testIllegalArguments() throws IOException {
     File file = getResourceFile("GettysburgAddress.txt");
-    try (Memory mem = Memory.map(Arena.ofConfined(), file, -1, Integer.MAX_VALUE, ByteOrder.nativeOrder())) {
+    try (Memory mem = Memory.map(file, -1, Integer.MAX_VALUE, ByteOrder.nativeOrder(), Arena.ofConfined())) {
       fail("Failed: test IllegalArgumentException: Position was negative.");
       mem.getCapacity();
     }
@@ -59,7 +59,7 @@ public class AllocateDirectMapMemoryTest {
       //ok
     }
     try (Arena arena = Arena.ofConfined();
-         Memory mem = Memory.map(arena, file, 0, -1, ByteOrder.nativeOrder())) {
+         Memory mem = Memory.map(file, 0, -1, ByteOrder.nativeOrder(), arena)) {
       fail("Failed: testIllegalArgumentException: Size was negative.");
     } catch (IllegalArgumentException e) {
       //ok
@@ -72,7 +72,7 @@ public class AllocateDirectMapMemoryTest {
     long memCapacity = file.length();
     Memory mem2 = null;
     try {
-      try (Memory mem = Memory.map(Arena.ofConfined(), file, 0, memCapacity, ByteOrder.nativeOrder())) {
+      try (Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder(), Arena.ofConfined())) {
         mem2 = mem;
         assertEquals(memCapacity, mem.getCapacity());
         mem.close(); //a close inside the TWR block will throw
@@ -88,7 +88,7 @@ public class AllocateDirectMapMemoryTest {
   public void testLoad() throws IOException {
     File file = getResourceFile("GettysburgAddress.txt");
     long memCapacity = file.length();
-    try (Memory mem = Memory.map(Arena.ofConfined(), file, 0, memCapacity, ByteOrder.nativeOrder())) {
+    try (Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder(), Arena.ofConfined())) {
       mem.load();
       //assertTrue(mem.isLoaded()); //incompatible with Windows
       assertTrue(mem.isAlive());

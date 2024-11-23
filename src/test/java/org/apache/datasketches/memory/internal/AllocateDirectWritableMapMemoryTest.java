@@ -60,7 +60,7 @@ public class AllocateDirectWritableMapMemoryTest {
       UnsupportedOperationException, IOException, SecurityException {
     File file = getResourceFile("GettysburgAddress.txt");
 
-    try (Memory mem = Memory.map(Arena.ofConfined(), file)) {
+    try (Memory mem = Memory.map(file, Arena.ofConfined())) {
       byte[] byteArr = new byte[(int)mem.getCapacity()];
       mem.getByteArray(0, byteArr, 0, byteArr.length);
       String text = new String(byteArr, UTF_8);
@@ -89,7 +89,7 @@ public class AllocateDirectWritableMapMemoryTest {
     WritableMemory srcMem = null;
     try (Arena arena = Arena.ofConfined()) { //this scope manages two Memory objects
       dstMem = WritableMemory.writableMap(file, 0, numBytes, ByteOrder.nativeOrder(), arena);
-      srcMem = WritableMemory.allocateDirect(arena, numBytes, 8, ByteOrder.nativeOrder(), memReqSvr);
+      srcMem = WritableMemory.allocateDirect(numBytes, 8, ByteOrder.nativeOrder(), memReqSvr, arena);
 
       //load source with consecutive longs
       for (long i = 0; i < numLongs; i++) {
@@ -129,7 +129,7 @@ public class AllocateDirectWritableMapMemoryTest {
       IOException, SecurityException {
     File dummy = createTempFile("dummy", ".txt" , ""); //zero length
     try (Arena arena = Arena.ofConfined()) {
-      Memory.map(arena, dummy, 0, dummy.length(), ByteOrder.nativeOrder());
+      Memory.map(dummy, 0, dummy.length(), ByteOrder.nativeOrder(), arena);
     }
   }
 
@@ -171,7 +171,7 @@ public class AllocateDirectWritableMapMemoryTest {
     Memory mem = null;
     WritableMemory wmem = null;
     try (Arena arena = Arena.ofConfined()) {
-      mem = Memory.map(arena, origFile, 0, origBytes, ByteOrder.nativeOrder());
+      mem = Memory.map(origFile, 0, origBytes, ByteOrder.nativeOrder(), arena);
       mem.load();
       //assertTrue(mem.isLoaded()); //incompatible with Windows
       //confirm orig string

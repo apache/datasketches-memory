@@ -276,7 +276,7 @@ public class MurmurHash3v3Test {
       out = hash(mem, 0L, 4L, 1L, out);
     } catch (final IllegalArgumentException e) { }
     try (Arena arena = Arena.ofConfined()) {
-      Memory mem = WritableMemory.allocateDirect(arena, 8, 1, ByteOrder.nativeOrder(), memReqSvr);
+      Memory mem = WritableMemory.allocateDirect(8, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       long[] out = new long[2];
       out = hash(mem, 0L, 4L, 1L, out);
     } catch (Exception ee) {}

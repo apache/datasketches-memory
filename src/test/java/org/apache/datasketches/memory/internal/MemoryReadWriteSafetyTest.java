@@ -196,7 +196,7 @@ public class MemoryReadWriteSafetyTest {
       raf.setLength(8);
       //System.out.println(UtilTest.getFileAttributes(tempFile));
       try (Arena arena = Arena.ofConfined();
-           Memory memory = Memory.map(arena, tempFile)) {
+           Memory memory = Memory.map(tempFile, arena)) {
 
           ((WritableMemory) memory).putInt(0, 1);
       }
@@ -210,7 +210,7 @@ public class MemoryReadWriteSafetyTest {
     tempFile.deleteOnExit();
     new RandomAccessFile(tempFile, "rw").setLength(8);
     try (Arena arena = Arena.ofConfined()) {
-      Memory memory = Memory.map(arena, tempFile, 0, 4, ByteOrder.nativeOrder());
+      Memory memory = Memory.map(tempFile, 0, 4, ByteOrder.nativeOrder(), arena);
       ((WritableMemory) memory).putInt(0, 1);
     }
   }
@@ -222,7 +222,7 @@ public class MemoryReadWriteSafetyTest {
     try (RandomAccessFile raf = new RandomAccessFile(tempFile, "rw")) {
       raf.setLength(8);
       try (Arena arena = Arena.ofConfined()) {
-        Memory.map(arena, tempFile, 0, 16, ByteOrder.nativeOrder());
+        Memory.map(tempFile, 0, 16, ByteOrder.nativeOrder(), arena);
       }
     }
   }

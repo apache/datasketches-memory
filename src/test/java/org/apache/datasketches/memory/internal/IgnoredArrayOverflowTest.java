@@ -33,11 +33,11 @@ public class IgnoredArrayOverflowTest {
   private static final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
 
   private WritableMemory memory;
-  private static final long MAX_SIZE = (1L << 10); // use 1L << 31 to test int overrange
+  private static final long MAX_SIZE = (1L << 10); // use 1L << 31 to test int over range
 
   @BeforeClass
   public void allocate() {
-     memory = WritableMemory.allocateDirect(Arena.ofConfined(), MAX_SIZE, 8L, ByteOrder.nativeOrder(), memReqSvr);
+     memory = WritableMemory.allocateDirect(MAX_SIZE, 8L, ByteOrder.nativeOrder(), memReqSvr, Arena.ofConfined());
   }
 
   @AfterClass

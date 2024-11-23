@@ -113,6 +113,7 @@ public interface WritableMemory extends Memory {
    * @param capacityBytes the size of the mapped Memory.
    * @param byteOrder the given <i>ByteOrder</i>. It must be non-null.
    * @param arena the given arena to map. It must be non-null.
+   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not supported.
    * @return a file-mapped WritableMemory.
    * @throws IllegalArgumentException if file is not readable or not writable.
    * @throws IOException if the specified path does not point to an existing file, or if some other I/O error occurs.
@@ -138,13 +139,14 @@ public interface WritableMemory extends Memory {
    * <p><b>NOTE:</b> Native/Direct memory acquired may have garbage in it.
    * It is the responsibility of the using application to clear this memory, if required,
    * and to call <i>close()</i> when done.</p>
-   *
-   * @param arena the given arena to map. It must be non-null.
    * @param capacityBytes the size of the desired memory in bytes.
+   * @param arena the given arena to map. It must be non-null.
+   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not supported.
+   *
    * @return WritableMemory for this off-heap, native resource.
    */
-  static WritableMemory allocateDirect(Arena arena, long capacityBytes) {
-    return allocateDirect(arena, capacityBytes, 8, ByteOrder.nativeOrder(), new DefaultMemoryRequestServer());
+  static WritableMemory allocateDirect(long capacityBytes, Arena arena) {
+    return allocateDirect(capacityBytes, 8, ByteOrder.nativeOrder(), new DefaultMemoryRequestServer(), arena);
   }
 
   /**
@@ -154,22 +156,23 @@ public interface WritableMemory extends Memory {
    * <p><b>NOTE:</b> Native/Direct memory acquired may have garbage in it.
    * It is the responsibility of the using application to clear this memory, if required,
    * and to call <i>close()</i> when done.</p>
-   *
-   * @param arena the given arena to map. It must be non-null.
    * @param capacityBytes the size of the desired memory in bytes.
    * @param alignmentBytes requested segment alignment. Typically 1, 2, 4 or 8.
    * @param byteOrder the given <i>ByteOrder</i>.  It must be non-null.
    * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
    * This is a callback mechanism for a user client of direct memory to request more memory.
+   * @param arena the given arena to map. It must be non-null.
+   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not supported.
+   *
    * @return a WritableMemory for this off-heap resource.
    */
   static WritableMemory allocateDirect(
-      Arena arena,
       long capacityBytes,
       long alignmentBytes,
       ByteOrder byteOrder,
-      MemoryRequestServer memReqSvr) {
-    return WritableMemoryImpl.wrapDirect(arena, capacityBytes, alignmentBytes, byteOrder, memReqSvr);
+      MemoryRequestServer memReqSvr,
+      Arena arena) {
+    return WritableMemoryImpl.wrapDirect(capacityBytes, alignmentBytes, byteOrder, memReqSvr, arena);
   }
 
   //REGIONS

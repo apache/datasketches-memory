@@ -46,7 +46,7 @@ public interface Resource extends AutoCloseable {
    * <p>The user can customize the actions of the MemoryRequestServer by
    * implementing the MemoryRequestServer interface and set it using the
    * {@link #setMemoryRequestServer(MemoryRequestServer)} method or optionally with the
-   * {@link WritableMemory#allocateDirect(arena, long, long, ByteOrder, MemoryRequestServer)} method.</p>
+   * {@link WritableMemory#allocateDirect(long, long, ByteOrder, MemoryRequestServer, arena)} method.</p>
    *
    * <p>If the MemoryRequestServer is not set by the user and additional memory is needed by the sketch,
    * null will be returned and the sketch will abort.
@@ -116,8 +116,9 @@ public interface Resource extends AutoCloseable {
   void close();
 
   /**
-   * Return true if this resource is closeable.
-   * @return true if this resource is closeable.
+   * Return true if this resource likely to be closeable, but not guaranteed.
+   * There is no way to determine if the specific type of Arena is explicitly closeable.
+   * @return true if this resource likely to be closeable.
    */
   boolean isCloseable();
 

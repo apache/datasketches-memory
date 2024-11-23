@@ -149,7 +149,7 @@ public class CopyMemoryTest {
   }
 
   private static WritableMemory genWmem(int longs, boolean empty) {
-    WritableMemory wmem = WritableMemory.allocateDirect(Arena.ofConfined(), longs << 3, 1, ByteOrder.nativeOrder(), memReqSvr);
+    WritableMemory wmem = WritableMemory.allocateDirect(longs << 3, 1, ByteOrder.nativeOrder(), memReqSvr, Arena.ofConfined());
     if (empty) {
       wmem.clear();
     } else {

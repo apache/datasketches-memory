@@ -42,7 +42,7 @@ public class BufferTest {
   public void checkDirectRoundTrip() throws Exception {
     int n = 1024; //longs
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(arena, n * 8, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory wmem = WritableMemory.allocateDirect(n * 8, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       WritableBuffer wbuf = wmem.asWritableBuffer();
       for (int i = 0; i < n; i++) {
         wbuf.putLong(i);
@@ -285,7 +285,7 @@ public class BufferTest {
   public void checkParentUseAfterFree() throws Exception {
     int bytes = 64 * 8;
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(arena, bytes, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       WritableBuffer wbuf = wmem.asWritableBuffer();
       wmem.close();
       //with -ea assert: Memory not alive.
@@ -298,7 +298,7 @@ public class BufferTest {
   public void checkRegionUseAfterFree() throws Exception {
     int bytes = 64;
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(arena, bytes, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       Buffer region = wmem.asBuffer().region();
       wmem.close();
       //with -ea assert: Memory not alive.
@@ -310,7 +310,7 @@ public class BufferTest {
   @Test
   public void checkCheckNotAliveAfterTWR() {
     Buffer buf;
-    try (WritableMemory wmem = WritableMemory.allocateDirect(Arena.ofConfined(), 100)) {
+    try (WritableMemory wmem = WritableMemory.allocateDirect(100, Arena.ofConfined())) {
       buf = wmem.asBuffer();
     }
     try {

@@ -68,7 +68,7 @@ public final class DefaultMemoryRequestServer implements MemoryRequestServer {
     }
 
     if (offHeap) {
-      newWmem = WritableMemory.allocateDirect(arena, newCapacityBytes, 8, order, this);
+      newWmem = WritableMemory.allocateDirect(newCapacityBytes, 8, order, this, arena);
     }
     else { //On-heap
       if (newCapacityBytes > Integer.MAX_VALUE) {
@@ -88,7 +88,7 @@ public final class DefaultMemoryRequestServer implements MemoryRequestServer {
   public void requestClose(
       final WritableMemory memToClose,
       final WritableMemory newMemory) {
-    //make this operation idempotent.
+    //try to make this operation idempotent.
     if (memToClose.isCloseable()) { memToClose.close(); }
   }
 

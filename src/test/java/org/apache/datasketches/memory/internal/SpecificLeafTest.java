@@ -76,7 +76,7 @@ public class SpecificLeafTest {
   public void checkDirectLeafs() throws Exception {
     int bytes = 128;
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(arena, bytes, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       assertFalse(((ResourceImpl)wmem).isReadOnly());
       assertTrue(wmem.isDirect());
       assertFalse(wmem.isHeap());

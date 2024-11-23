@@ -60,7 +60,7 @@ public class MemoryWriteToTest {
   @Test
   public void testOffHeap() throws Exception {
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory mem = WritableMemory.allocateDirect(arena, ((1 << 20) * 5) + 10, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory mem = WritableMemory.allocateDirect(((1 << 20) * 5) + 10, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       testWriteTo(mem.region(0, 0));
       testOffHeap(mem, 7);
       testOffHeap(mem, 1023);

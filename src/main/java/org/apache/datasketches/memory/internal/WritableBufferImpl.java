@@ -53,11 +53,11 @@ public abstract class WritableBufferImpl extends PositionalImpl implements Writa
 
   //Pass-through constructor
   WritableBufferImpl(
-      final Arena arena,
       final MemorySegment seg,
       final int typeId,
-      final MemoryRequestServer memReqSvr) {
-    super(arena, seg, typeId, memReqSvr);
+      final MemoryRequestServer memReqSvr,
+      final Arena arena) {
+    super(seg, typeId, memReqSvr, arena);
   }
 
   //NO WRAP HEAP ARRAY RESOURCE
@@ -101,7 +101,7 @@ public abstract class WritableBufferImpl extends PositionalImpl implements Writa
     final WritableBuffer wbuf;
     if (byteOrder == NON_NATIVE_BYTE_ORDER) {
       type |= NONNATIVE_BO;
-      wbuf = new NonNativeWritableBufferImpl(null, seg, type, memReqSvr);
+      wbuf = new NonNativeWritableBufferImpl(seg, type, memReqSvr, null);
     } else {
       wbuf = new NativeWritableBufferImpl(null, seg, type, memReqSvr);
     }

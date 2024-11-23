@@ -54,14 +54,14 @@ public class LeafImplTest {
     long cap = 128;
     // Off Heap, Native order, No ByteBuffer, has MemReqSvr
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory memNO = WritableMemory.allocateDirect(arena, cap, 8, NBO, myMemReqSvr);
+      WritableMemory memNO = WritableMemory.allocateDirect(cap, 8, NBO, myMemReqSvr, arena);
       memNO.putShort(0, (short) 1);
       assertTrue(memNO.isDirect());
       checkCombinations(memNO, off, cap, memNO.isDirect(), NBO, false, true);
     }
     // Off Heap, Non Native order, No ByteBuffer, has MemReqSvr
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory memNNO = WritableMemory.allocateDirect(arena, cap, 8, NNBO, myMemReqSvr);
+      WritableMemory memNNO = WritableMemory.allocateDirect(cap, 8, NNBO, myMemReqSvr, arena);
       memNNO.putShort(0, (short) 1);
       assertTrue(memNNO.isDirect());
       checkCombinations(memNNO, off, cap, memNNO.isDirect(), NNBO, false, true);

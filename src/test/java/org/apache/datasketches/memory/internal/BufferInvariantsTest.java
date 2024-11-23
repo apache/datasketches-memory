@@ -167,7 +167,7 @@ public class BufferInvariantsTest {
   @Test
   public void checkLimitsDirect() throws Exception {
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(arena, 100, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory wmem = WritableMemory.allocateDirect(100, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       Buffer buf = wmem.asBuffer();
       buf.setStartPositionEnd(40, 45, 50);
       buf.setStartPositionEnd(0, 0, 100);
@@ -238,7 +238,7 @@ public class BufferInvariantsTest {
   public void testBufDirect() throws Exception {
     int n = 25;
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(arena, n, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory wmem = WritableMemory.allocateDirect(n, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       WritableBuffer buf = wmem.asWritableBuffer();
       for (byte i = 0; i < n; i++) { buf.putByte(i); }
       buf.setPosition(0);

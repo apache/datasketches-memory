@@ -400,7 +400,7 @@ public class Buffer2Test {
   public void checkIndependence() {
     int cap = 64;
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(arena, cap, 8, ByteOrder.nativeOrder(), null);
+      WritableMemory wmem = WritableMemory.allocateDirect(cap, 8, ByteOrder.nativeOrder(), null, arena);
       WritableBuffer wbuf1 = wmem.asWritableBuffer();
       WritableBuffer wbuf2 = wmem.asWritableBuffer();
       assertFalse(wbuf1 == wbuf2);

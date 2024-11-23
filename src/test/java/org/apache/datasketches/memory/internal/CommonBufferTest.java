@@ -36,7 +36,7 @@ public class CommonBufferTest {
   public void checkSetGet() throws Exception {
     int memCapacity = 60; //must be at least 60
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory mem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
       setGetTests(buf);
@@ -138,7 +138,7 @@ public class CommonBufferTest {
   public void checkSetGetArrays() throws Exception {
     int memCapacity = 32;
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory mem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
       setGetArraysTests(buf);
@@ -223,7 +223,7 @@ public class CommonBufferTest {
   public void checkSetGetPartialArraysWithOffset() throws Exception {
     int memCapacity = 32;
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory mem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
       setGetPartialArraysWithOffsetTests(buf);
@@ -308,7 +308,7 @@ public class CommonBufferTest {
   public void checkSetClearMemoryRegions() throws Exception {
     int memCapacity = 64; //must be 64
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory mem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
 
@@ -397,7 +397,7 @@ public class CommonBufferTest {
   public void checkToHexStringAllMem() throws Exception {
     int memCapacity = 48; //must be 48
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory mem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       WritableBuffer buf = mem.asWritableBuffer();
       assertEquals(buf.getCapacity(), memCapacity);
       toHexStringAllMemTests(buf); //requires println enabled to visually check

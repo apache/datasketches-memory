@@ -49,7 +49,7 @@ public class InvalidAllocationTest {
     mem3.region(0, 0);
     WritableMemory nullMem = null;
     try (Arena arena = Arena.ofConfined()) { //Invalid allocation size : -1
-      nullMem = WritableMemory.allocateDirect(arena, -1, 1, ByteOrder.nativeOrder(), memReqSvr);
+      nullMem = WritableMemory.allocateDirect(-1, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       Assert.fail();
     } catch (IllegalArgumentException ignore) {
       if (nullMem != null) {
@@ -70,7 +70,7 @@ public class InvalidAllocationTest {
     mem3.region(0, 0);
     WritableMemory nullMem = null;
     try (Arena arena = Arena.ofConfined()) { //Invalid alignment : 3 
-      nullMem = WritableMemory.allocateDirect(arena, 0, 3, ByteOrder.nativeOrder(), memReqSvr);
+      nullMem = WritableMemory.allocateDirect(0, 3, ByteOrder.nativeOrder(), memReqSvr, arena);
       Assert.fail();
     } catch (IllegalArgumentException ignore) {
       if (nullMem != null) {

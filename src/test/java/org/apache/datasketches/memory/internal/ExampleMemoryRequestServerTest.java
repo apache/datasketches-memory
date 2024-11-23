@@ -53,11 +53,11 @@ public class ExampleMemoryRequestServerTest {
 
     //Create the initial working memory for the client
     WritableMemory workingMem = WritableMemory.allocateDirect(
-      arena,
       workingMemBytes,
       alignmentBytes,
       ByteOrder.nativeOrder(),
-      memReqSvr);
+      memReqSvr,
+      arena);
 
     MemoryHungryClient client = new MemoryHungryClient(workingMem);
     client.process();

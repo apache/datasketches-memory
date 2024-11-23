@@ -42,11 +42,11 @@ final class NonNativeWritableMemoryImpl extends WritableMemoryImpl {
 
   //Pass-through ctor
   NonNativeWritableMemoryImpl(
-      final Arena arena,
       final MemorySegment seg,
       final int typeId,
-      final MemoryRequestServer memReqSvr) {
-    super(arena, seg, typeId, memReqSvr);
+      final MemoryRequestServer memReqSvr,
+      final Arena arena) {
+    super(seg, typeId, memReqSvr, arena);
   }
 
   ///PRIMITIVE getX() and getXArray()

@@ -59,7 +59,7 @@ public class MemoryTest {
   public void checkDirectRoundTrip() throws Exception {
     int n = 1024; //longs
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory mem = WritableMemory.allocateDirect(arena, n * 8, 1,  ByteOrder.nativeOrder(), myMemReqSvr);
+      WritableMemory mem = WritableMemory.allocateDirect(n * 8, 1, ByteOrder.nativeOrder(),  myMemReqSvr, arena);
       for (int i = 0; i < n; i++) {
         mem.putLong(i * 8, i);
       }
@@ -355,7 +355,7 @@ public class MemoryTest {
   public void checkParentUseAfterFree() throws Exception {
     int bytes = 64 * 8;
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(arena, bytes, 1, ByteOrder.nativeOrder(), myMemReqSvr);
+      WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, ByteOrder.nativeOrder(), myMemReqSvr, arena);
       wmem.close();
       wmem.getLong(0); //Already closed
     }
@@ -365,7 +365,7 @@ public class MemoryTest {
   public void checkRegionUseAfterFree() throws Exception {
     int bytes = 64;
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(arena, bytes, 1, ByteOrder.nativeOrder(), myMemReqSvr);
+      WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, ByteOrder.nativeOrder(), myMemReqSvr, arena);
       Memory region = wmem.region(0L, bytes);
       wmem.close();
       region.getByte(0); //Already closed.
@@ -384,7 +384,7 @@ public class MemoryTest {
       wbuf = wmem.asWritableBuffer();
       assertNull(wbuf.getMemoryRequestServer());
       //OFF HEAP
-      wmem = WritableMemory.allocateDirect(arena, 16, 1, ByteOrder.nativeOrder(), myMemReqSvr);  //OFF HEAP
+      wmem = WritableMemory.allocateDirect(16, 1, ByteOrder.nativeOrder(), myMemReqSvr, arena);  //OFF HEAP
       assertNotNull(wmem.getMemoryRequestServer());
       wbuf = wmem.asWritableBuffer();
       assertNotNull(wbuf.getMemoryRequestServer());
@@ -404,7 +404,7 @@ public class MemoryTest {
       wbuf = wmem.asWritableBuffer();
       assertNotNull(wbuf.getMemoryRequestServer());
       //OFF HEAP
-      WritableMemory wmem2 = WritableMemory.allocateDirect(arena, 16, 1, ByteOrder.nativeOrder(), myMemReqSvr);
+      WritableMemory wmem2 = WritableMemory.allocateDirect(16, 1, ByteOrder.nativeOrder(), myMemReqSvr, arena);
       assertNotNull(wmem2.getMemoryRequestServer());
       wbuf = wmem.asWritableBuffer();
       assertNotNull(wbuf.getMemoryRequestServer());

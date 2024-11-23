@@ -44,7 +44,7 @@ public class WritableDirectCopyTest {
     int memCapacity = 64;
     int half = memCapacity / 2;
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory mem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       mem.clear();
 
       for (int i = 0; i < half; i++) { //fill first half
@@ -66,7 +66,7 @@ public class WritableDirectCopyTest {
     int halfBytes = memCapacity / 2;
     int halfLongs = memCapLongs / 2;
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory mem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       mem.clear();
 
       for (int i = 0; i < halfLongs; i++) {
@@ -85,7 +85,7 @@ public class WritableDirectCopyTest {
   public void checkCopyWithinNativeOverlap() throws Exception {
     int memCapacity = 64;
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory mem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       mem.clear();
       //println(mem.toHexString("Clear 64", 0, memCapacity));
 
@@ -101,7 +101,7 @@ public class WritableDirectCopyTest {
   public void checkCopyWithinNativeSrcBound() throws Exception {
     int memCapacity = 64;
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory mem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       mem.copyTo(32, mem, 32, 33);  //hit source bound check
       fail("Did Not Catch Assertion Error: source bound");
     } catch (IndexOutOfBoundsException e) {
@@ -113,7 +113,7 @@ public class WritableDirectCopyTest {
   public void checkCopyWithinNativeDstBound() throws Exception {
     int memCapacity = 64;
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory mem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory mem = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       mem.copyTo(0, mem, 32, 33);  //hit dst bound check
       fail("Did Not Catch Assertion Error: dst bound");
     } catch (IndexOutOfBoundsException e) {
@@ -126,8 +126,8 @@ public class WritableDirectCopyTest {
     int memCapacity = 64;
 
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory mem1 = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
-      WritableMemory mem2 = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory mem1 = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
+      WritableMemory mem2 = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
 
       for (int i = 0; i < memCapacity; i++) {
         mem1.putByte(i, (byte) i);
@@ -147,8 +147,8 @@ public class WritableDirectCopyTest {
     int memCapLongs = memCapacity / 8;
 
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory mem1 = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
-      WritableMemory mem2 = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory mem1 = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
+      WritableMemory mem2 = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
 
       for (int i = 0; i < memCapLongs; i++) {
         mem1.putLong(i * 8, i);
@@ -167,7 +167,7 @@ public class WritableDirectCopyTest {
   public void checkCopyCrossNativeAndByteArray() throws Exception {
     int memCapacity = 64;
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory mem1 = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory mem1 = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
 
       for (int i = 0; i < mem1.getCapacity(); i++) {
         mem1.putByte(i, (byte) i);
@@ -188,7 +188,7 @@ public class WritableDirectCopyTest {
     int memCapacity = 128;
 
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory mem1 = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory mem1 = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
 
       for (int i = 0; i < mem1.getCapacity(); i++) {
         mem1.putByte(i, (byte) i);
@@ -214,7 +214,7 @@ public class WritableDirectCopyTest {
   public void checkCopyCrossNativeArrayAndHierarchicalRegions() throws Exception {
     int memCapacity = 64;
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory mem1 = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory mem1 = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
 
       for (int i = 0; i < mem1.getCapacity(); i++) { //fill with numbers
         mem1.putByte(i, (byte) i);

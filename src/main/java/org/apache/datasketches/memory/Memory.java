@@ -73,10 +73,11 @@ public interface Memory extends Resource {
   /**
    * Maps the given file into <i>Memory</i> for read operations
    * Calling this method is equivalent to calling
-   * {@link #map(Arena, File, long, long, ByteOrder)
+   * {@link #map(File, long, long, ByteOrder, Arena)
    * map(file, 0, file.length(), scope, ByteOrder.nativeOrder())}.
-   * @param arena the given arena. It must be non-null.
    * @param file the given file to map. It must be non-null with a non-negative length and readable.
+   * @param arena the given arena. It must be non-null.
+   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not supported.
    * @return <i>Memory</i> for managing the mapped memory.
    * @throws IllegalArgumentException if path is not associated with the default file system.
    * @throws IllegalStateException if scope has been already closed, or if access occurs from a thread other than the thread owning scope.
@@ -84,17 +85,18 @@ public interface Memory extends Resource {
    * @throws SecurityException If a security manager is installed and it denies an unspecified permission
    * required by the implementation.
    */
-  static Memory map(Arena arena, File file) throws IOException {
-    return map(arena, file, 0, file.length(), ByteOrder.nativeOrder());
+  static Memory map(File file, Arena arena) throws IOException {
+    return map(file, 0, file.length(), ByteOrder.nativeOrder(), arena);
   }
 
   /**
    * Maps the specified portion of the given file into <i>Memory</i> for read operations.
-   * @param arena the given arena. It must be non-null.
    * @param file the given file to map. It must be non-null,readable and length &ge; 0.
    * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
    * @param capacityBytes the size of the mapped memory. It must not be negative..
    * @param byteOrder the byte order to be used.  It must be non-null.
+   * @param arena the given arena. It must be non-null.
+   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not supported.
    * @return <i>Memory</i> for managing the mapped memory.
    * @throws IllegalArgumentException if path is not associated with the default file system.
    * @throws IllegalStateException if scope has been already closed, or if access occurs from a thread other than the thread owning scope.
@@ -103,11 +105,11 @@ public interface Memory extends Resource {
    * required by the implementation.
    */
   static Memory map(
-      Arena arena,
       File file,
       long fileOffsetBytes,
       long capacityBytes,
-      ByteOrder byteOrder) throws IOException {
+      ByteOrder byteOrder,
+      Arena arena) throws IOException {
     return WritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, byteOrder, true, arena);
   }
 

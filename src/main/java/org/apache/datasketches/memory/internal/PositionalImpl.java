@@ -52,11 +52,11 @@ abstract class PositionalImpl extends ResourceImpl implements Positional {
 
   //Pass-through constructor
   PositionalImpl(
-      final Arena arena,
       final MemorySegment seg,
       final int typeId,
-      final MemoryRequestServer memReqSvr) {
-    super(arena, seg, typeId, memReqSvr);
+      final MemoryRequestServer memReqSvr,
+      final Arena arena) {
+    super(seg, typeId, memReqSvr, arena);
     capacity = end = seg.byteSize();
   }
 

@@ -46,7 +46,7 @@ public class NativeWritableBufferImplTest {
   @Test
   public void checkNativeCapacityAndClose() throws Exception {
     int memCapacity = 64;
-    WritableMemory wmem = WritableMemory.allocateDirect(Arena.ofConfined(), memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
+    WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, Arena.ofConfined());
     WritableBuffer wbuf = wmem.asWritableBuffer();
     assertEquals(wbuf.getCapacity(), memCapacity);
 
@@ -187,7 +187,7 @@ public class NativeWritableBufferImplTest {
   public void checkNativeBaseBound() throws Exception {
     int memCapacity = 64;
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       WritableBuffer wbuf = wmem.asWritableBuffer();
       wbuf.toString("Force Assertion Error", memCapacity, 8, false);
     } catch (IllegalArgumentException e) {
@@ -199,7 +199,7 @@ public class NativeWritableBufferImplTest {
   public void checkNativeSrcArrayBound() throws Exception {
     long memCapacity = 64;
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       WritableBuffer wbuf = wmem.asWritableBuffer();
       byte[] srcArray = { 1, -2, 3, -4 };
       wbuf.putByteArray(srcArray, 0, 5); //wrong!
@@ -212,7 +212,7 @@ public class NativeWritableBufferImplTest {
   public void checkRegionBounds() throws Exception {
     int memCapacity = 64;
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       WritableBuffer wbuf = wmem.asWritableBuffer();
       wbuf.writableRegion(1, 64, wbuf.getTypeByteOrder()); //wrong!
     }
@@ -327,7 +327,7 @@ public class NativeWritableBufferImplTest {
     WritableBuffer mem = WritableMemory.allocate(memCapacity).asWritableBuffer();
     assertFalse(mem.isDirect());
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(arena, memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       WritableBuffer wbuf = wmem.asWritableBuffer();
       assertTrue(wbuf.isDirect());
     }
@@ -382,9 +382,9 @@ public class NativeWritableBufferImplTest {
     byte[] arr2 = new byte[] {0, 1, 2, 4};
     byte[] arr3 = new byte[] {0, 1, 2, 3, 4};
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory mem1 = WritableMemory.allocateDirect(arena, 4, 1, ByteOrder.nativeOrder(), memReqSvr);
-      WritableMemory mem2 = WritableMemory.allocateDirect(arena, 4, 1, ByteOrder.nativeOrder(), memReqSvr);
-      WritableMemory mem3 = WritableMemory.allocateDirect(arena, 5, 1, ByteOrder.nativeOrder(), memReqSvr);
+      WritableMemory mem1 = WritableMemory.allocateDirect(4, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
+      WritableMemory mem2 = WritableMemory.allocateDirect(4, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
+      WritableMemory mem3 = WritableMemory.allocateDirect(5, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
 
       mem1.putByteArray(0, arr1, 0, 4);
       mem2.putByteArray(0, arr2, 0, 4);

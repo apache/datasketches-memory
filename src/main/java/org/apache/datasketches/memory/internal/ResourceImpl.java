@@ -106,16 +106,17 @@ abstract class ResourceImpl implements Resource {
 
   /**
    * Root constructor.
-   * @param arena the given Arena, or null if an on-heap MemorySegment.
    * @param seg the given, one and only one MemorySegment
    * @param typeId the given typeId
    * @param memReqSvr the given MemoryRequestServer, or null.
+   * @param arena the given Arena, or null if an on-heap MemorySegment.
+   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not supported.
    */
-  ResourceImpl(final Arena arena, final MemorySegment seg, final int typeId, final MemoryRequestServer memReqSvr) {
-    this.arena = arena;
+  ResourceImpl(final MemorySegment seg, final int typeId, final MemoryRequestServer memReqSvr, final Arena arena) {
     this.seg = seg;
     this.typeId = typeId;
     this.memReqSvr = memReqSvr;
+    this.arena = arena;
   }
 
   //MemoryReqestServer logic
@@ -253,7 +254,7 @@ abstract class ResourceImpl implements Resource {
     if (nativeBOType) {
       wbuf = new NativeWritableBufferImpl(null, segment, type, memReqSvr2);
     } else { //non-native BO
-      wbuf = new NonNativeWritableBufferImpl(null, segment, type, memReqSvr2);
+      wbuf = new NonNativeWritableBufferImpl(segment, type, memReqSvr2, null);
     }
     return wbuf;
   }
@@ -268,9 +269,9 @@ abstract class ResourceImpl implements Resource {
     final MemoryRequestServer memReqSvr2 = (byteBufferType || mapType) ? null : memReqSvr;
     final WritableMemory wmem;
     if (nativeBOType) {
-      wmem = new NativeWritableMemoryImpl(null, segment, type, memReqSvr2);
+      wmem = new NativeWritableMemoryImpl(segment, type, memReqSvr2, null);
     } else { //non-native BO
-      wmem = new NonNativeWritableMemoryImpl(null, segment, type, memReqSvr2);
+      wmem = new NonNativeWritableMemoryImpl(segment, type, memReqSvr2, null);
     }
     return wmem;
   }

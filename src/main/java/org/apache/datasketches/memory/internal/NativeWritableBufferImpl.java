@@ -51,7 +51,7 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
       final MemorySegment seg,
       final int typeId,
       final MemoryRequestServer memReqSvr) {
-    super(arena, seg, typeId, memReqSvr);
+    super(seg, typeId, memReqSvr, arena);
   }
 
   //PRIMITIVE getX() and getXArray()

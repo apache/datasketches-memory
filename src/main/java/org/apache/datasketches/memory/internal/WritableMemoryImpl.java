@@ -51,11 +51,11 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
 
   //Pass-through constructor
   WritableMemoryImpl(
-      final Arena arena,
       final MemorySegment seg,
       final int typeId,
-      final MemoryRequestServer memReqSvr) {
-    super(arena, seg, typeId, memReqSvr);
+      final MemoryRequestServer memReqSvr,
+      final Arena arena) {
+    super(seg, typeId, memReqSvr, arena);
   }
 
   //WRAP HEAP ARRAY RESOURCE
@@ -76,9 +76,9 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
         | (seg.isReadOnly() ? READONLY : 0);
     if (byteOrder == NON_NATIVE_BYTE_ORDER) {
       type |= NONNATIVE_BO;
-      return new NonNativeWritableMemoryImpl(null, seg, type, memReqSvr);
+      return new NonNativeWritableMemoryImpl(seg, type, memReqSvr, null);
     }
-    return new NativeWritableMemoryImpl(null, seg, type, memReqSvr);
+    return new NativeWritableMemoryImpl(seg, type, memReqSvr, null);
   }
 
   //BYTE BUFFER RESOURCE
@@ -124,9 +124,9 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
     final WritableMemory wmem;
     if (byteOrder == NON_NATIVE_BYTE_ORDER) {
       type |= NONNATIVE_BO;
-      wmem = new NonNativeWritableMemoryImpl(null, seg, type, memReqSvr);
+      wmem = new NonNativeWritableMemoryImpl(seg, type, memReqSvr, null);
     } else {
-      wmem = new NativeWritableMemoryImpl(null, seg, type, memReqSvr);
+      wmem = new NativeWritableMemoryImpl(seg, type, memReqSvr, null);
     }
     return wmem;
   }
@@ -145,6 +145,7 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
    * @param byteOrder the given <i>ByteOrder</i>. It must be non-null.
    * @param localReadOnly true if read-only is being imposed locally, even if the given file is writable..
    * @param arena the given arena. It must be non-null.
+   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not supported.
    * @return a <i>WritableMemory</i>
    * @throws IllegalArgumentException if file is not readable.
    * @throws IOException if mapping is not successful.
@@ -185,8 +186,8 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
       final MemorySegment seg = fileChannel.map(mapMode, fileOffsetBytes, capacityBytes, arena);
 
       return nativeBOType
-          ? new NativeWritableMemoryImpl(arena, seg, type, null)
-          : new NonNativeWritableMemoryImpl(arena, seg, type, null);
+          ? new NativeWritableMemoryImpl(seg, type, null, arena)
+          : new NonNativeWritableMemoryImpl(seg, type, null, arena);
     }
   }
 
@@ -194,21 +195,22 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
 
   /**
    * The static constructor that chooses the correct Direct leaf node based on the byte order.
-   * @param arena the given arena. It must be non-null.
    * @param capacityBytes the requested capacity for the Direct (off-heap) memory.  It must be &ge; 0.
    * @param alignmentBytes requested segment alignment. Typically 1, 2, 4 or 8.
    * Warning: specifying a <i>Arena.ofShared()</i> is not supported.
    * @param byteOrder the byte order to be used.  It must be non-null.
    * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
    * This is a callback mechanism for a user client of direct memory to request more memory.
+   * @param arena the given arena. It must be non-null.
+   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not supported.
    * @return WritableMemory
    */
   public static WritableMemory wrapDirect(
-      final Arena arena,
       final long capacityBytes,
       final long alignmentBytes,
       final ByteOrder byteOrder,
-      final MemoryRequestServer memReqSvr) {
+      final MemoryRequestServer memReqSvr,
+      final Arena arena) {
     Objects.requireNonNull(arena, "Arena must be non-null");
     Objects.requireNonNull(byteOrder, "ByteOrder must be non-null");
     final MemorySegment seg = arena.allocate(capacityBytes, alignmentBytes);
@@ -216,8 +218,8 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
     final int type = MEMORY | DIRECT
         | (nativeBOType ? NATIVE_BO : NONNATIVE_BO);
     return nativeBOType
-        ? new NativeWritableMemoryImpl(arena, seg, type, memReqSvr)
-        : new NonNativeWritableMemoryImpl(arena, seg, type, memReqSvr);
+        ? new NativeWritableMemoryImpl(seg, type, memReqSvr, arena)
+        : new NonNativeWritableMemoryImpl(seg, type, memReqSvr, arena);
   }
 
   //REGION DERIVED

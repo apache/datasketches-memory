@@ -52,7 +52,7 @@ public interface MemoryRequestServer {
    * @param currentWritableMemory the current writableMemory of the client. It must be non-null.
    * @param newCapacityBytes The capacity being requested. It must be &gt; the capacity of the currentWritableMemory.
    * @param arena the Arena to be used for the newly allocated memory. It must be non-null.
-   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not supported.
+   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not recommended.
    * @return new WritableMemory with the requested capacity.
    */
   WritableMemory request(

@@ -77,7 +77,7 @@ public interface Memory extends Resource {
    * map(file, 0, file.length(), scope, ByteOrder.nativeOrder())}.
    * @param file the given file to map. It must be non-null with a non-negative length and readable.
    * @param arena the given arena. It must be non-null.
-   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not supported.
+   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not recommended.
    * @return <i>Memory</i> for managing the mapped memory.
    * @throws IllegalArgumentException if path is not associated with the default file system.
    * @throws IllegalStateException if scope has been already closed, or if access occurs from a thread other than the thread owning scope.
@@ -96,7 +96,7 @@ public interface Memory extends Resource {
    * @param capacityBytes the size of the mapped memory. It must not be negative..
    * @param byteOrder the byte order to be used.  It must be non-null.
    * @param arena the given arena. It must be non-null.
-   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not supported.
+   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not recommended.
    * @return <i>Memory</i> for managing the mapped memory.
    * @throws IllegalArgumentException if path is not associated with the default file system.
    * @throws IllegalStateException if scope has been already closed, or if access occurs from a thread other than the thread owning scope.

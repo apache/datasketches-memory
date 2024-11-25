@@ -110,7 +110,7 @@ abstract class ResourceImpl implements Resource {
    * @param typeId the given typeId
    * @param memReqSvr the given MemoryRequestServer, or null.
    * @param arena the given Arena, or null if an on-heap MemorySegment.
-   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not supported.
+   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not recommended.
    */
   ResourceImpl(final MemorySegment seg, final int typeId, final MemoryRequestServer memReqSvr, final Arena arena) {
     this.seg = seg;

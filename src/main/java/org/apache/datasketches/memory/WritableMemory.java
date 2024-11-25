@@ -113,7 +113,7 @@ public interface WritableMemory extends Memory {
    * @param capacityBytes the size of the mapped Memory.
    * @param byteOrder the given <i>ByteOrder</i>. It must be non-null.
    * @param arena the given arena to map. It must be non-null.
-   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not supported.
+   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not recommended.
    * @return a file-mapped WritableMemory.
    * @throws IllegalArgumentException if file is not readable or not writable.
    * @throws IOException if the specified path does not point to an existing file, or if some other I/O error occurs.
@@ -141,7 +141,7 @@ public interface WritableMemory extends Memory {
    * and to call <i>close()</i> when done.</p>
    * @param capacityBytes the size of the desired memory in bytes.
    * @param arena the given arena to map. It must be non-null.
-   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not supported.
+   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not recommended.
    *
    * @return WritableMemory for this off-heap, native resource.
    */
@@ -162,7 +162,7 @@ public interface WritableMemory extends Memory {
    * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
    * This is a callback mechanism for a user client of direct memory to request more memory.
    * @param arena the given arena to map. It must be non-null.
-   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not supported.
+   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not recommended.
    *
    * @return a WritableMemory for this off-heap resource.
    */

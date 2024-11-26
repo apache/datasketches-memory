@@ -90,9 +90,10 @@ under the License.
     <!-- System-wide properties -->
     <maven.version>3.6.3</maven.version>
     <java.version>21</java.version>
+    <enable.preview>--enable-preview</enable.preview>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
-    <argLine>-Xmx4g -Duser.language=en -Duser.country=US -Dfile.encoding=UTF-8 --enable-preview</argLine>
+    <argLine>-Xmx4g -Duser.language=en -Duser.country=US -Dfile.encoding=UTF-8 ${enable.preview}</argLine>
     <charset.encoding>UTF-8</charset.encoding>
     <project.build.sourceEncoding>${charset.encoding}</project.build.sourceEncoding>
     <project.build.resourceEncoding>${charset.encoding}</project.build.resourceEncoding>
@@ -161,8 +162,8 @@ under the License.
           <version>${maven-compiler-plugin.version}</version>
           <configuration>
             <release>21</release>
-            <compilerArgs>
-              <arg>--enable-preview</arg>
+             <compilerArgs>
+              <arg>${enable.preview}</arg>
             </compilerArgs>
           </configuration>
         </plugin>
@@ -236,7 +237,7 @@ under the License.
             <excludePackageNames>org.apache.datasketches.memory/internal</excludePackageNames>
             <show>public</show>
             <additionalOptions>
-              <additionalOption>--enable-preview</additionalOption>
+              <additionalOption>${enable.preview}</additionalOption>
             </additionalOptions>
           </configuration>
           <executions>
@@ -282,7 +283,7 @@ under the License.
           <artifactId>maven-surefire-plugin</artifactId>
           <version>${maven-surefire-failsafe-plugins.version}</version>
           <configuration>
-            <argLine>--enable-preview</argLine>
+            <argLine>${enable.preview}</argLine>
             <trimStackTrace>false</trimStackTrace>
             <useManifestOnlyJar>false</useManifestOnlyJar>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>

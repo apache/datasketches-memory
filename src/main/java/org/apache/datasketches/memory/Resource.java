@@ -19,6 +19,9 @@
 
 package org.apache.datasketches.memory;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.Linker.Option;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.MemorySegment.Scope;
 import java.nio.ByteBuffer;
@@ -46,7 +49,7 @@ public interface Resource extends AutoCloseable {
    * <p>The user can customize the actions of the MemoryRequestServer by
    * implementing the MemoryRequestServer interface and set it using the
    * {@link #setMemoryRequestServer(MemoryRequestServer)} method or optionally with the
-   * {@link WritableMemory#allocateDirect(long, long, ByteOrder, MemoryRequestServer, arena)} method.</p>
+   * {@link WritableMemory#allocateDirect(long, long, ByteOrder, MemoryRequestServer, Arena)} method.</p>
    *
    * <p>If the MemoryRequestServer is not set by the user and additional memory is needed by the sketch,
    * null will be returned and the sketch will abort.
@@ -107,7 +110,7 @@ public interface Resource extends AutoCloseable {
    *
    * @throws IllegalStateException if the arena has already been closed.
    * @throws IllegalStateException if a segment associated with this arena is being accessed concurrently, e.g.
-   * by a {@linkplain java.lang.foreign.Linker#downcallHandle(FunctionDescriptor, Linker.Option...) downcall method handle}.
+   * by a {@linkplain java.lang.foreign.Linker#downcallHandle(FunctionDescriptor, Option...) downcall method handle}.
    * @throws WrongThreadException if this arena is confined, and this method is called from a thread
    * other than the arena's owner thread.
    * @throws UnsupportedOperationException if this arena cannot be closed explicitly.

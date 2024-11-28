@@ -2,7 +2,7 @@ name: JavaDoc
 
 on:
   push:
-    branches: [ 4.0.X, main ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -31,7 +31,6 @@ jobs:
 
       - name: Deploy JavaDoc
         uses: JamesIves/github-pages-deploy-action@v4.6.8
-        # uses: JamesIves/github-pages-deploy-action@5dc1d5a192aeb5ab5b7d5a77b7d36aea4a7f5c92
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           folder: target/reports/apidocs

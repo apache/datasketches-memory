@@ -33,8 +33,7 @@ import org.apache.datasketches.memory.Positional;
  * <li>Eliminated "mark". Rarely used and confusing with its silent side effects.</li>
  * <li>The invariants are {@code 0 <= start <= position <= end <= capacity}.</li>
  * <li>It always starts up as (0, 0, capacity, capacity).</li>
- * <li>You set (start, position, end) in one call with
- * {@link #setStartPositionEnd(long, long, long)}</li>
+ * <li>You set (start, position, end) in one call with <i>setStartPositionEnd(long, long, long)</i></li>
  * <li>Position can be set directly or indirectly when using the positional get/put methods.
  * <li>Added incrementPosition(long), which is much easier when you know the increment.</li>
  * <li>This approach eliminated a number of methods and checks, and has no unseen side effects,
@@ -107,8 +106,7 @@ abstract class PositionalImpl extends ResourceImpl implements Positional {
   }
 
   @Override
-  public final PositionalImpl setStartPositionEnd(final long start, final long position,
-      final long end) {
+  public final PositionalImpl setStartPositionEnd(final long start, final long position, final long end) {
     checkInvariants(start, position, end, capacity);
     this.start = start;
     this.end = end;

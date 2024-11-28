@@ -23,6 +23,9 @@ import static org.apache.datasketches.memory.internal.ResourceImpl.NON_NATIVE_BY
 
 import java.lang.foreign.ValueLayout;
 
+/**
+ * Value Layouts for Non-native Endianness
+ */
 public final class NonNativeValueLayouts {
 
   private NonNativeValueLayouts() { }

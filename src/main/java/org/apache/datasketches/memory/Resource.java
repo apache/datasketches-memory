@@ -270,7 +270,8 @@ public interface Resource extends AutoCloseable {
 
   /**
    * Loads the contents of this mapped segment into physical memory. Please refer to
-   * <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#load()">load()</a>
+   * <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html
+#load()">load()</a>
    */
   void load();
 
@@ -286,12 +287,27 @@ public interface Resource extends AutoCloseable {
   long nativeOverlap(Resource that);
 
   /**
-   * See <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#mismatch(jdk.incubator.foreign.MemorySegment)">mismatch(...)</a>
+   * See <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/foreign/MemorySegment.html
+#mismatch(java.lang.foreign.MemorySegment)">mismatch(MemorySegment)</a>
    * @param that the other Resource
    * @return the relative offset, in bytes, of the first mismatch between this and the given other Resource object,
    * otherwise -1 if no mismatch
    */
   long mismatch(Resource that);
+
+  /**
+   * See <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/foreign/MemorySegment.html
+#mismatch(java.lang.foreign.MemorySegment,long,long,java.lang.foreign.MemorySegment,long,long)">
+mismatch(MemorySegment, long, long, MemorySegment, long, long)</a>
+   * @param src the given source Resource
+   * @param srcFromOffset the given start offset of the source region, inclusive.
+   * @param srcToOffset the given end offset of the source region, exclusive.
+   * @param dst the given destination Resource
+   * @param dstFromOffset the given start of the destination destination region, inclusive.
+   * @param dstToOffset the given end offset of the destination destination region, exclusive.
+   * @return the byte offset of the first mismatch relative to the start of each of the above two regions.
+   */
+  long mismatch(Resource src, long srcFromOffset, long srcToOffset, Resource dst, long dstFromOffset, long dstToOffset);
 
   /**
    * Returns the resource scope associated with this memory segment.
@@ -332,8 +348,7 @@ public interface Resource extends AutoCloseable {
 
   /**
    * Returns a copy of the underlying MemorySegment.
-   * The size is limited to <i>Integer.MAX_VALUE</i>.
-   * @return a copy of the underlying MemorySegment
+   * @return a copy of the underlying MemorySegment.
    */
   MemorySegment toMemorySegment();
 

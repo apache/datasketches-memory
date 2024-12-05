@@ -23,12 +23,17 @@ import java.lang.foreign.Arena;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+import static java.lang.foreign.ValueLayout.JAVA_BYTE;
 
 import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
+import java.lang.foreign.ValueLayout.OfByte;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
@@ -118,9 +123,65 @@ public class ResourceTest {
 
   @Test
   public void checkToMemorySegment() {
-    WritableMemory mem = WritableMemory.allocate(8);
-    mem.toMemorySegment();
-    mem.asByteBufferView(ByteOrder.nativeOrder());
+    {
+      int len = 0;
+      WritableMemory mem = WritableMemory.allocate(len);
+      MemorySegment seg = mem.toMemorySegment();
+      assertEquals(seg.byteSize(), len);
+    }
+    {
+      int len = 13 * 8;
+      WritableMemory mem = WritableMemory.allocate(len);
+      MemorySegment seg = mem.toMemorySegment();
+      assertEquals(seg.byteSize(), len);
+    }
+    {
+      int len = 13 * 4;
+      WritableMemory mem = WritableMemory.allocate(len);
+      MemorySegment seg = mem.toMemorySegment();
+      assertEquals(seg.byteSize(), len);
+    }
+    {
+      int len = 13 * 2;
+      WritableMemory mem = WritableMemory.allocate(len);
+      MemorySegment seg = mem.toMemorySegment();
+      assertEquals(seg.byteSize(), len);
+    }
+    {
+      int len = 13;
+      WritableMemory mem = WritableMemory.allocate(len);
+      MemorySegment seg = mem.toMemorySegment();
+      assertEquals(seg.byteSize(), len);
+    }
+  }
+
+  @Test
+  public void checkParseJavaVersion() {
+    try {
+      ResourceImpl.parseJavaVersion("15_1");
+      fail();
+    } catch (IllegalArgumentException e) { }
+    try {
+      ResourceImpl.parseJavaVersion("20");
+      fail();
+    } catch (IllegalArgumentException e) { }
+    ResourceImpl.parseJavaVersion("21");
+    ResourceImpl.parseJavaVersion("22");
+  }
+
+  @Test
+  public void checkGetRelativeOffset() {
+    WritableMemory wmem = WritableMemory.allocateDirect(1024);
+    WritableMemory reg = wmem.writableRegion(512, 256);
+    long off = wmem.getRelativeOffset(reg);
+    assertEquals(off, 512);
+  }
+
+  @Test
+  public void checkIsSameResource() {
+    WritableMemory wmem = WritableMemory.allocateDirect(1024);
+    WritableMemory reg = wmem.writableRegion(0, 1024);
+    assertTrue(wmem.isSameResource(reg));
   }
 
   /********************/
@@ -132,8 +193,8 @@ public class ResourceTest {
   /**
    * @param s value to print
    */
-  static void println(String s) {
-    //System.out.println(s); //disable here
+  static void println(Object o) {
+    //System.out.println(o); //disable here
   }
 
 }

@@ -319,10 +319,8 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
 
   @Override
   public final void getByteArray(final long offsetBytes, final byte[] dstArray, final int dstOffsetBytes, final int lengthBytes) {
-    checkBounds(dstOffsetBytes, lengthBytes, dstArray.length);
-    final MemorySegment srcSlice = seg.asSlice(offsetBytes, lengthBytes);
-    final MemorySegment dstSlice = MemorySegment.ofArray(dstArray).asSlice(dstOffsetBytes, lengthBytes);
-    dstSlice.copyFrom(srcSlice);
+    final MemorySegment dstSeg = MemorySegment.ofArray(dstArray);
+    MemorySegment.copy(seg, offsetBytes, dstSeg, dstOffsetBytes, lengthBytes);
   }
 
   //OTHER PRIMITIVE READ METHODS: compareTo, copyTo, writeTo
@@ -342,8 +340,8 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
   }
 
   @Override
-  public final void writeToByteStream(final long offsetBytes, final int lengthBytes,
-      final ByteArrayOutputStream out) throws IOException {
+  public final void writeToByteStream(final long offsetBytes, final int lengthBytes, final ByteArrayOutputStream out)
+      throws IOException {
     checkBounds(offsetBytes, lengthBytes, seg.byteSize());
     final byte[] bArr = new byte[lengthBytes];
     getByteArray(offsetBytes,bArr, 0, lengthBytes); //fundamental limitation of MemorySegment
@@ -363,11 +361,9 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
   }
 
   @Override
-  public final void putByteArray(final long offsetBytes, final byte[] srcArray,
-      final int srcOffsetBytes, final int lengthBytes) {
-    final MemorySegment srcSlice = MemorySegment.ofArray(srcArray).asSlice(srcOffsetBytes, lengthBytes);
-    final MemorySegment dstSlice = seg.asSlice(offsetBytes, lengthBytes);
-    dstSlice.copyFrom(srcSlice);
+  public final void putByteArray(final long offsetBytes, final byte[] srcArray, final int srcOffsetBytes, final int lengthBytes) {
+    final MemorySegment srcSeg = MemorySegment.ofArray(srcArray);
+    MemorySegment.copy(srcSeg, srcOffsetBytes, seg, offsetBytes, lengthBytes);
   }
 
   // OTHER WRITE METHODS

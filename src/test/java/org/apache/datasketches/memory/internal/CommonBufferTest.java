@@ -32,6 +32,7 @@ import org.testng.annotations.Test;
 
 public class CommonBufferTest {
   private final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
+
   @Test
   public void checkSetGet() throws Exception {
     int memCapacity = 60; //must be at least 60

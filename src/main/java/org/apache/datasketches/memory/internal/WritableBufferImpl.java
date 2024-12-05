@@ -272,10 +272,9 @@ public abstract class WritableBufferImpl extends PositionalImpl implements Writa
 
   @Override
   public final void getByteArray(final byte[] dstArray, final int dstOffsetBytes, final int lengthBytes) {
-    final MemorySegment dstSlice = MemorySegment.ofArray(dstArray).asSlice(dstOffsetBytes, lengthBytes);
     final long pos = getPosition();
-    final MemorySegment srcSlice = seg.asSlice(pos, lengthBytes);
-    dstSlice.copyFrom(srcSlice);
+    final MemorySegment dstSeg = MemorySegment.ofArray(dstArray);
+    MemorySegment.copy(seg, pos, dstSeg, dstOffsetBytes, lengthBytes);
     setPosition(pos + lengthBytes);
   }
 
@@ -319,10 +318,9 @@ public abstract class WritableBufferImpl extends PositionalImpl implements Writa
 
   @Override
   public final void putByteArray(final byte[] srcArray, final int srcOffsetBytes, final int lengthBytes) {
-    final MemorySegment srcSlice = MemorySegment.ofArray(srcArray).asSlice(srcOffsetBytes, lengthBytes);
     final long pos = getPosition();
-    final MemorySegment dstSlice = seg.asSlice(pos, lengthBytes);
-    dstSlice.copyFrom(srcSlice);
+    final MemorySegment srcSeg = MemorySegment.ofArray(srcArray);
+    MemorySegment.copy(srcSeg, srcOffsetBytes, seg, pos, lengthBytes);
     setPosition(pos + lengthBytes);
   }
 

@@ -25,7 +25,7 @@ under the License.
 
   <modelVersion>4.0.0</modelVersion>
 
-<!--
+  <!--
   <parent>
     <groupId>org.apache</groupId>
     <artifactId>apache</artifactId>
@@ -108,11 +108,12 @@ under the License.
     <maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
     <maven-install-plugin.version>3.1.2</maven-install-plugin.version>
     <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
-    <maven-javadoc-plugin.version>3.10.1</maven-javadoc-plugin.version>
+    <maven-javadoc-plugin.version>3.11.1</maven-javadoc-plugin.version>
     <maven-release-plugin.version>3.1.1</maven-release-plugin.version>
     <maven-remote-resources-plugin.version>3.2.0</maven-remote-resources-plugin.version>
     <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
-    <maven-surefire-failsafe-plugins.version>3.5.0</maven-surefire-failsafe-plugins.version> <!-- for surefire, failsafe and surefire-report -->
+    <maven-surefire-failsafe-plugins.version>3.5.2</maven-surefire-failsafe-plugins.version> <!-- for surefire, failsafe and surefire-report -->
+    <maven-toolchains-plugin.version>3.2.0</maven-toolchains-plugin.version>
     <!-- com.github plugins -->
     <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
     <!-- org.apache.creadur plugins -->
@@ -161,8 +162,7 @@ under the License.
           <artifactId>maven-compiler-plugin</artifactId>
           <version>${maven-compiler-plugin.version}</version>
           <configuration>
-            <release>21</release>
-             <compilerArgs>
+            <compilerArgs>
               <arg>${enable.preview}</arg>
             </compilerArgs>
           </configuration>
@@ -189,7 +189,7 @@ under the License.
               <configuration>
                 <rules>
                   <requireJavaVersion>
-                    <version>21</version>
+                    <version>${java.version}</version>
                   </requireJavaVersion>
                   <requireMavenVersion>
                     <version>[${maven.version},4.0.0)</version>
@@ -288,6 +288,26 @@ under the License.
             <useManifestOnlyJar>false</useManifestOnlyJar>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
             <reportsDirectory>${project.build.directory}/test-output/${maven.build.timestamp}</reportsDirectory>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-toolchains-plugin</artifactId>
+          <version>${maven-toolchains-plugin.version}</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>toolchain</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <toolchains>
+              <jdk>
+                <version>${java.version}</version>
+              </jdk>
+            </toolchains>
           </configuration>
         </plugin>
 
@@ -393,6 +413,10 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-toolchains-plugin</artifactId>
       </plugin>
       <plugin>
         <groupId>org.apache.rat</groupId>

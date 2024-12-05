@@ -40,8 +40,8 @@ import org.apache.datasketches.memory.WritableMemory;
  * @author Lee Rhodes
  */
 abstract class ResourceImpl implements Resource {
-  static final String JDK; //must be at least "17"
-  static final int JDK_MAJOR; //8, 11, 17, etc
+  static final String JDK; //the first two numbers of the java version string: 1.8, 11.0, 17.0, 21.0, etc
+  static final int JDK_MAJOR; //either 1.8 or just the first number of the java version string: 11, 17, 21, etc
 
   //Used to convert "type" to bytes:  bytes = longs << LONG_SHIFT
   static final int BOOLEAN_SHIFT    = 0;
@@ -93,6 +93,11 @@ abstract class ResourceImpl implements Resource {
   static final ByteOrder NON_NATIVE_BYTE_ORDER =
       (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
 
+  /**
+   * The alignment of the starting address of new MemorySegments
+   */
+  static final long SEGMENT_ALIGHMENT = 8;
+
   static {
     final String jdkVer = System.getProperty("java.version");
     final int[] p = parseJavaVersion(jdkVer);
@@ -100,9 +105,9 @@ abstract class ResourceImpl implements Resource {
     JDK_MAJOR = (p[0] == 1) ? p[1] : p[0];
   }
 
-  final Arena arena;
   final MemorySegment seg;
   final int typeId;
+  final Arena arena;
 
   /**
    * Root constructor.
@@ -163,9 +168,9 @@ abstract class ResourceImpl implements Resource {
   }
 
   static void checkJavaVersion(final String jdkVer, final int p0) {
-    if ( p0 != 21 ) {
+    if ( p0 < 21 ) {
       throw new IllegalArgumentException(
-          "Unsupported JDK Major Version, must be 21; " + jdkVer);
+          "Unsupported JDK Major Version, must be >= 21; " + jdkVer);
     }
   }
 
@@ -341,7 +346,7 @@ abstract class ResourceImpl implements Resource {
         arena.close();
       }
       catch (final UnsupportedOperationException uoe) {
-        // ignored as it seems there's no way to determine if the Arena is closeable or not
+        // ignored as it seems there's no reliable way to determine if the Arena is closeable or not
       }
     } //not idempotent
   }
@@ -440,8 +445,10 @@ abstract class ResourceImpl implements Resource {
 
   @Override
   public final boolean isSameResource(final Resource that) {
+    Objects.requireNonNull(that);
     final ResourceImpl that2 = (ResourceImpl) that;
-    return this.seg.address() == that2.seg.address();
+    return this.seg.address() == that2.seg.address()
+        && this.seg.byteSize() == that2.seg.byteSize();
   }
 
   @Override
@@ -451,17 +458,33 @@ abstract class ResourceImpl implements Resource {
   public long mismatch(final Resource that) {
     Objects.requireNonNull(that);
     if (!that.isAlive()) { throw new IllegalArgumentException("Given argument is not alive."); }
-    final ResourceImpl thatBSI = (ResourceImpl) that;
-    return seg.mismatch(thatBSI.seg);
+    final ResourceImpl that2 = (ResourceImpl) that;
+    return seg.mismatch(that2.seg);
+  }
+
+  @Override
+  public long mismatch(final Resource src,
+      final long srcFromOffset,
+      final long srcToOffset,
+      final Resource dst,
+      final long dstFromOffset,
+      final long dstToOffset ) {
+    return MemorySegment.mismatch(
+        ((ResourceImpl)src).seg,
+        srcFromOffset,
+        srcToOffset,
+        ((ResourceImpl)dst).seg,
+        dstFromOffset,
+        dstToOffset);
   }
 
   @Override
   public final long nativeOverlap(final Resource that) {
     if (that == null) { return 0; }
     if (!that.isAlive()) { return 0; }
-    final ResourceImpl thatBSI = (ResourceImpl) that;
-    if (this == thatBSI) { return seg.byteSize(); }
-    return nativeOverlap(seg, thatBSI.seg);
+    final ResourceImpl that2 = (ResourceImpl) that;
+    if (this == that2) { return seg.byteSize(); }
+    return nativeOverlap(seg, that2.seg);
   }
 
   static final long nativeOverlap(final MemorySegment segA, final MemorySegment segB) { //used in test
@@ -525,9 +548,32 @@ abstract class ResourceImpl implements Resource {
 
   @Override
   public MemorySegment toMemorySegment() {
-    final MemorySegment arrSeg = MemorySegment.ofArray(new byte[(int)seg.byteSize()]);
-    arrSeg.copyFrom(seg);
-    return arrSeg;
+    final long len = seg.byteSize();
+    final MemorySegment out;
+    if (seg.isNative()) { //off-heap
+      if (len == 0) {
+        out = MemorySegment.NULL;
+        return out;
+      }
+      out = arena.allocate(seg.byteSize(), SEGMENT_ALIGHMENT);
+    }
+    else { //on-heap
+      if (len == 0) {
+        out = MemorySegment.ofArray(new byte[0]);
+        return out;
+      }
+      if (len % Long.BYTES == 0) {
+        out = MemorySegment.ofArray(new long[(int)(len >>> LONG_SHIFT)]);
+      } else if (len % Integer.BYTES == 0) {
+        out = MemorySegment.ofArray(new int[(int)(len >>> INT_SHIFT)]);
+      } else if (len % Short.BYTES == 0) {
+        out = MemorySegment.ofArray(new short[(int)(len >>> SHORT_SHIFT)]);
+      } else {
+        out = MemorySegment.ofArray(new byte[(int)len]);
+      }
+    }
+    out.copyFrom(seg);
+    return out;
   }
 
   @Override

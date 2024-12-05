@@ -30,7 +30,7 @@ import org.testng.annotations.Test;
 /**
  * Example of how to use the MemoryRequestServer with a memory hungry client.
  *
- * <p>Note: this example only works with Java 17.</p>
+ * <p>Note: this example only works with Java 21 and above.</p>
  *
  * @author Lee Rhodes
  */

@@ -24,8 +24,8 @@ import java.lang.foreign.MemorySegment;
 import org.apache.datasketches.memory.internal.MurmurHash3v4;
 
 /**
- * <p>The MurmurHash3 is a fast, non-cryptographic, 128-bit hash function that has
- * excellent avalanche and 2-way bit independence properties.</p>
+ * The MurmurHash3 is a fast, non-cryptographic, 128-bit hash function that has
+ * excellent avalanche and 2-way bit independence properties.
  *
  * <p>Austin Appleby's C++
  * <a href="https://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp">

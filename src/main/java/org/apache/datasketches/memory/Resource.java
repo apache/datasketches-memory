@@ -155,7 +155,7 @@ public interface Resource extends AutoCloseable {
   /**
    * Forces any changes made to the contents of this mapped segment to be written to the storage device described
    * by the mapped segment's file descriptor.
-   * @see <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#force()">force()</a>
+   * @see <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/foreign/MemorySegment.html#force()">force()</a>
    */
   void force();
 
@@ -231,9 +231,10 @@ public interface Resource extends AutoCloseable {
   boolean isHeap();
 
   /**
-   * Tells whether or not the contents of this mapped segment is resident in physical memory. Please refer to
-   * <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#isLoaded()">isLoaded()</a>.
+   * Returns true if it is likely that the contents of this segment is resident in physical memory.
    * @return true if it is likely that the contents of this segment is resident in physical memory.
+   * @see
+<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/foreign/MemorySegment.html#isLoaded()">isLoaded()</a>
    */
   boolean isLoaded();
 
@@ -269,9 +270,8 @@ public interface Resource extends AutoCloseable {
   boolean isSameResource(Resource that);
 
   /**
-   * Loads the contents of this mapped segment into physical memory. Please refer to
-   * <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html
-#load()">load()</a>
+   * Loads the contents of this mapped segment into physical memory.
+   * @see <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/foreign/MemorySegment.html#load()">load()</a>
    */
   void load();
 
@@ -287,18 +287,18 @@ public interface Resource extends AutoCloseable {
   long nativeOverlap(Resource that);
 
   /**
-   * See <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/foreign/MemorySegment.html
-#mismatch(java.lang.foreign.MemorySegment)">mismatch(MemorySegment)</a>
+   * Finds the first byte mismatch with <i>that</i>.
    * @param that the other Resource
    * @return the relative offset, in bytes, of the first mismatch between this and the given other Resource object,
-   * otherwise -1 if no mismatch
+   * otherwise -1 if no mismatch.
+   * @see
+<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/foreign/MemorySegment.html#mismatch(java.lang.foreign.MemorySegment)">
+mismatch(MemorySegment)</a>
    */
   long mismatch(Resource that);
 
   /**
-   * See <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/foreign/MemorySegment.html
-#mismatch(java.lang.foreign.MemorySegment,long,long,java.lang.foreign.MemorySegment,long,long)">
-mismatch(MemorySegment, long, long, MemorySegment, long, long)</a>
+   * Finds the first byte mismatch based on the given offsets
    * @param src the given source Resource
    * @param srcFromOffset the given start offset of the source region, inclusive.
    * @param srcToOffset the given end offset of the source region, exclusive.
@@ -306,6 +306,9 @@ mismatch(MemorySegment, long, long, MemorySegment, long, long)</a>
    * @param dstFromOffset the given start of the destination destination region, inclusive.
    * @param dstToOffset the given end offset of the destination destination region, exclusive.
    * @return the byte offset of the first mismatch relative to the start of each of the above two regions.
+   * @see
+<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/foreign/MemorySegment.html#mismatch(java.lang.foreign.MemorySegment,long,long,java.lang.foreign.MemorySegment,long,long)">
+mismatch(MemorySegment, long, long, MemorySegment, long, long)</a>
    */
   long mismatch(Resource src, long srcFromOffset, long srcToOffset, Resource dst, long dstFromOffset, long dstToOffset);
 
@@ -353,8 +356,8 @@ mismatch(MemorySegment, long, long, MemorySegment, long, long)</a>
   MemorySegment toMemorySegment();
 
   /**
-   * Unloads the contents of this mapped segment from physical memory. Please refer to
-   * <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#unload()">unload()</a>
+   * Unloads the contents of this mapped segment from physical memory.
+   * @see <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/foreign/MemorySegment.html#unload()">unload()</a>
    */
   void unload();
 

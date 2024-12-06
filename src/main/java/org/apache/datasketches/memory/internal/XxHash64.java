@@ -19,9 +19,6 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static jdk.incubator.foreign.MemoryAccess.getByteAtOffset;
-import static jdk.incubator.foreign.MemoryAccess.getIntAtOffset;
-import static jdk.incubator.foreign.MemoryAccess.getLongAtOffset;
 import static org.apache.datasketches.memory.internal.ResourceImpl.CHAR_SHIFT;
 import static org.apache.datasketches.memory.internal.ResourceImpl.DOUBLE_SHIFT;
 import static org.apache.datasketches.memory.internal.ResourceImpl.FLOAT_SHIFT;
@@ -29,7 +26,8 @@ import static org.apache.datasketches.memory.internal.ResourceImpl.INT_SHIFT;
 import static org.apache.datasketches.memory.internal.ResourceImpl.LONG_SHIFT;
 import static org.apache.datasketches.memory.internal.ResourceImpl.SHORT_SHIFT;
 
-import jdk.incubator.foreign.MemorySegment;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
 
 /**
  * The XxHash is a fast, non-cryptographic, 64-bit hash function that has
@@ -49,7 +47,7 @@ import jdk.incubator.foreign.MemorySegment;
  *
  * @author Lee Rhodes
  */
-public class XxHash64 {
+public final class XxHash64 {
   // Unsigned, 64-bit primes
   private static final long P1 = -7046029288634856825L;
   private static final long P2 = -4417276706812531889L;
@@ -77,19 +75,19 @@ public class XxHash64 {
       long v4 = seed - P1;
 
       do {
-        v1 += getLongAtOffset(seg, offsetBytes) * P2;
+        v1 += seg.get(ValueLayout.JAVA_LONG_UNALIGNED, offsetBytes) * P2;
         v1 = Long.rotateLeft(v1, 31);
         v1 *= P1;
 
-        v2 += getLongAtOffset(seg, offsetBytes + 8L) * P2;
+        v2 += seg.get(ValueLayout.JAVA_LONG_UNALIGNED, offsetBytes + 8L) * P2;
         v2 = Long.rotateLeft(v2, 31);
         v2 *= P1;
 
-        v3 += getLongAtOffset(seg, offsetBytes + 16L) * P2;
+        v3 += seg.get(ValueLayout.JAVA_LONG_UNALIGNED, offsetBytes + 16L) * P2;
         v3 = Long.rotateLeft(v3, 31);
         v3 *= P1;
 
-        v4 += getLongAtOffset(seg, offsetBytes + 24L) * P2;
+        v4 += seg.get(ValueLayout.JAVA_LONG_UNALIGNED, offsetBytes + 24L) * P2;
         v4 = Long.rotateLeft(v4, 31);
         v4 *= P1;
 
@@ -133,7 +131,7 @@ public class XxHash64 {
     hash += lengthBytes;
 
     while (remaining >= 8) {
-      long k1 = getLongAtOffset(seg, offsetBytes);
+      long k1 = seg.get(ValueLayout.JAVA_LONG_UNALIGNED, offsetBytes);
       k1 *= P2;
       k1 = Long.rotateLeft(k1, 31);
       k1 *= P1;
@@ -144,14 +142,14 @@ public class XxHash64 {
     }
 
     if (remaining >= 4) { //treat as unsigned ints
-      hash ^= (getIntAtOffset(seg, offsetBytes) & 0XFFFF_FFFFL) * P1;
+      hash ^= (seg.get(ValueLayout.JAVA_INT_UNALIGNED, offsetBytes) & 0XFFFF_FFFFL) * P1;
       hash = (Long.rotateLeft(hash, 23) * P2) + P3;
       offsetBytes += 4;
       remaining -= 4;
     }
 
     while (remaining != 0) { //treat as unsigned bytes
-      hash ^= (getByteAtOffset(seg, offsetBytes) & 0XFFL) * P5;
+      hash ^= (seg.get(ValueLayout.JAVA_BYTE, offsetBytes) & 0XFFL) * P5;
       hash = Long.rotateLeft(hash, 11) * P1;
       --remaining;
       ++offsetBytes;
@@ -308,4 +306,5 @@ public class XxHash64 {
     return hash(seg, offsetChars << CHAR_SHIFT, lengthChars << CHAR_SHIFT, seed);
   }
 
+  private XxHash64() { }
 }

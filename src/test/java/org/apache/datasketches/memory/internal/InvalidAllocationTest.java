@@ -21,6 +21,7 @@ package org.apache.datasketches.memory.internal;
 
 import static org.testng.Assert.assertEquals;
 
+import java.lang.foreign.Arena;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -31,16 +32,14 @@ import org.apache.datasketches.memory.WritableMemory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import jdk.incubator.foreign.ResourceScope;
-
 /**
  * @author Lee Rhodes
  */
-public class ZeroCapacityTest {
+public class InvalidAllocationTest {
   private static final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
 
   @Test
-  public void checkZeroCapacity() throws Exception {
+  public void checkInvalidCapacity() throws Exception {
     WritableMemory wmem = WritableMemory.allocate(0);
     assertEquals(wmem.getCapacity(), 0);
 
@@ -49,9 +48,29 @@ public class ZeroCapacityTest {
     Memory mem3 = Memory.wrap(ByteBuffer.allocateDirect(0));
     mem3.region(0, 0);
     WritableMemory nullMem = null;
-    ResourceScope scope = ResourceScope.newConfinedScope();
-    try { //Invalid allocation size : 0
-      nullMem = WritableMemory.allocateDirect(0, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) { //Invalid allocation size : -1
+      nullMem = WritableMemory.allocateDirect(-1, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
+      Assert.fail();
+    } catch (IllegalArgumentException ignore) {
+      if (nullMem != null) {
+        nullMem.close();
+      }
+      // expected
+    }
+  }
+
+  @Test
+  public void checkInvalidAlignment() throws Exception {
+    WritableMemory wmem = WritableMemory.allocate(0);
+    assertEquals(wmem.getCapacity(), 0);
+
+    Memory.wrap(new byte[0]);
+    Memory.wrap(ByteBuffer.allocate(0));
+    Memory mem3 = Memory.wrap(ByteBuffer.allocateDirect(0));
+    mem3.region(0, 0);
+    WritableMemory nullMem = null;
+    try (Arena arena = Arena.ofConfined()) { //Invalid alignment : 3 
+      nullMem = WritableMemory.allocateDirect(0, 3, ByteOrder.nativeOrder(), memReqSvr, arena);
       Assert.fail();
     } catch (IllegalArgumentException ignore) {
       if (nullMem != null) {

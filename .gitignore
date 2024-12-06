@@ -13,6 +13,9 @@ datasketches-memory*/.gitignore
 *.ipr
 *.iws
 
+# Netbeans project files
+nb-configuration.xml
+
 # Additional tools
 .clover/
 

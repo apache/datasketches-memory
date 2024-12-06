@@ -21,16 +21,15 @@ package org.apache.datasketches.memory.internal;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
 import java.util.Objects;
 
 import org.apache.datasketches.memory.Memory;
 
-import jdk.incubator.foreign.MemoryAccess;
-import jdk.incubator.foreign.MemorySegment;
-
 /**
- * <p>The MurmurHash3 is a fast, non-cryptographic, 128-bit hash function that has
- * excellent avalanche and 2-way bit independence properties.</p>
+ * The MurmurHash3 is a fast, non-cryptographic, 128-bit hash function that has
+ * excellent avalanche and 2-way bit independence properties.
  *
  * <p>Austin Appleby's C++
  * <a href="https://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp">
@@ -44,12 +43,12 @@ import jdk.incubator.foreign.MemorySegment;
  * <p>This implementation produces exactly the same hash result as the
  * MurmurHash3 function in datasketches-java given compatible inputs.</p>
  *
- * <p>This version 3 of the implementation leverages the jdk.incubator.foreign package of JDK-17 in place of
+ * <p>This version 4 of the implementation leverages the java.lang.foreign package of JDK-21 in place of
  * the Unsafe class.
  *
  * @author Lee Rhodes
  */
-public final class MurmurHash3v3 {
+public final class MurmurHash3v4 {
   private static final long C1 = 0x87c37b91114253d5L;
   private static final long C2 = 0x4cf5ad432745937fL;
 
@@ -211,8 +210,8 @@ public final class MurmurHash3v3 {
 
     // Process the 128-bit blocks (the body) into the hash
     while (rem >= 16L) {
-      final long k1 = MemoryAccess.getLongAtOffset(seg, cumOff);     //0, 16, 32, ...
-      final long k2 = MemoryAccess.getLongAtOffset(seg, cumOff + 8); //8, 24, 40, ...
+      final long k1 = seg.get(ValueLayout.JAVA_LONG_UNALIGNED, cumOff);     //0, 16, 32, ...
+      final long k2 = seg.get(ValueLayout.JAVA_LONG_UNALIGNED, cumOff + 8); //8, 24, 40, ...
       cumOff += 16L;
       rem -= 16L;
 
@@ -233,75 +232,75 @@ public final class MurmurHash3v3 {
       long k2 = 0;
       switch ((int) rem) {
         case 15: {
-          k2 ^= (MemoryAccess.getByteAtOffset(seg, cumOff + 14) & 0xFFL) << 48;
+          k2 ^= (seg.get(ValueLayout.JAVA_BYTE, cumOff + 14) & 0xFFL) << 48;
         }
         //$FALL-THROUGH$
         case 14: {
-          k2 ^= (MemoryAccess.getShortAtOffset(seg, cumOff + 12) & 0xFFFFL) << 32;
-          k2 ^= (MemoryAccess.getIntAtOffset(seg, cumOff + 8) & 0xFFFFFFFFL);
-          k1 = MemoryAccess.getLongAtOffset(seg, cumOff);
+          k2 ^= (seg.get(ValueLayout.JAVA_SHORT_UNALIGNED, cumOff + 12) & 0xFFFFL) << 32;
+          k2 ^= seg.get(ValueLayout.JAVA_INT_UNALIGNED, cumOff + 8) & 0xFFFFFFFFL;
+          k1 = seg.get(ValueLayout.JAVA_LONG_UNALIGNED, cumOff);
           break;
         }
 
         case 13: {
-          k2 ^= (MemoryAccess.getByteAtOffset(seg, cumOff + 12) & 0xFFL) << 32;
+          k2 ^= (seg.get(ValueLayout.JAVA_BYTE, cumOff + 12) & 0xFFFFL) << 32;
         }
         //$FALL-THROUGH$
         case 12: {
-          k2 ^= (MemoryAccess.getIntAtOffset(seg, cumOff + 8) & 0xFFFFFFFFL);
-          k1 = MemoryAccess.getLongAtOffset(seg, cumOff);
+          k2 ^= seg.get(ValueLayout.JAVA_INT_UNALIGNED, cumOff + 8) & 0xFFFFFFFFL;
+          k1 = seg.get(ValueLayout.JAVA_LONG_UNALIGNED, cumOff);
           break;
         }
 
         case 11: {
-          k2 ^= (MemoryAccess.getByteAtOffset(seg, cumOff + 10) & 0xFFL) << 16;
+          k2 ^= (seg.get(ValueLayout.JAVA_BYTE, cumOff + 10) & 0xFFL) << 16;
         }
         //$FALL-THROUGH$
         case 10: {
-          k2 ^= (MemoryAccess.getShortAtOffset(seg, cumOff +  8) & 0xFFFFL);
-          k1 = MemoryAccess.getLongAtOffset(seg, cumOff);
+          k2 ^= seg.get(ValueLayout.JAVA_SHORT_UNALIGNED, cumOff + 8) & 0xFFFFL;
+          k1 = seg.get(ValueLayout.JAVA_LONG_UNALIGNED, cumOff);
           break;
         }
 
         case  9: {
-          k2 ^= (MemoryAccess.getByteAtOffset(seg, cumOff +  8) & 0xFFL);
+          k2 ^= seg.get(ValueLayout.JAVA_BYTE, cumOff + 8) & 0xFFL;
         }
         //$FALL-THROUGH$
         case  8: {
-          k1 = MemoryAccess.getLongAtOffset(seg, cumOff);
+          k1 = seg.get(ValueLayout.JAVA_LONG_UNALIGNED, cumOff);
           break;
         }
 
         case  7: {
-          k1 ^= (MemoryAccess.getByteAtOffset(seg, cumOff +  6) & 0xFFL) << 48;
+          k1 ^= (seg.get(ValueLayout.JAVA_BYTE, cumOff + 6) & 0xFFL) << 48;
         }
         //$FALL-THROUGH$
         case  6: {
-          k1 ^= (MemoryAccess.getShortAtOffset(seg, cumOff +  4) & 0xFFFFL) << 32;
-          k1 ^= (MemoryAccess.getIntAtOffset(seg, cumOff) & 0xFFFFFFFFL);
+          k1 ^= (seg.get(ValueLayout.JAVA_SHORT_UNALIGNED, cumOff + 4) & 0xFFFFL) << 32;
+          k1 ^= seg.get(ValueLayout.JAVA_INT_UNALIGNED, cumOff) & 0xFFFFFFFFL;
           break;
         }
 
         case  5: {
-          k1 ^= (MemoryAccess.getByteAtOffset(seg, cumOff +  4) & 0xFFL) << 32;
+          k1 ^= (seg.get(ValueLayout.JAVA_BYTE, cumOff + 4) & 0xFFL) << 32;
         }
         //$FALL-THROUGH$
         case  4: {
-          k1 ^= (MemoryAccess.getIntAtOffset(seg, cumOff) & 0xFFFFFFFFL);
+          k1 ^= seg.get(ValueLayout.JAVA_INT_UNALIGNED, cumOff) & 0xFFFFFFFFL;
           break;
         }
 
         case  3: {
-          k1 ^= (MemoryAccess.getByteAtOffset(seg, cumOff +  2) & 0xFFL) << 16;
+          k1 ^= (seg.get(ValueLayout.JAVA_BYTE, cumOff + 2) & 0xFFL) << 16;
         }
         //$FALL-THROUGH$
         case  2: {
-          k1 ^= (MemoryAccess.getShortAtOffset(seg, cumOff) & 0xFFFFL);
+          k1 ^= seg.get(ValueLayout.JAVA_SHORT_UNALIGNED, cumOff) & 0xFFFFL;
           break;
         }
 
         case  1: {
-          k1 ^= (MemoryAccess.getByteAtOffset(seg, cumOff) & 0xFFL);
+          k1 ^= seg.get(ValueLayout.JAVA_BYTE, cumOff) & 0xFFL;
           break;
         }
         default: break; //can't happen
@@ -381,5 +380,7 @@ public final class MurmurHash3v3 {
     hashOut[1] = h2;
     return hashOut;
   }
+
+  private MurmurHash3v4() { }
 
 }

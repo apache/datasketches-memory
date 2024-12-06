@@ -19,11 +19,13 @@
 
 package org.apache.datasketches.memory;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.Linker.Option;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.MemorySegment.Scope;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-
-import jdk.incubator.foreign.MemorySegment;
-import jdk.incubator.foreign.ResourceScope;
 
 /**
  * The base class for Memory and Buffer plus some common static variables and check methods.
@@ -47,7 +49,7 @@ public interface Resource extends AutoCloseable {
    * <p>The user can customize the actions of the MemoryRequestServer by
    * implementing the MemoryRequestServer interface and set it using the
    * {@link #setMemoryRequestServer(MemoryRequestServer)} method or optionally with the
-   * {@link WritableMemory#allocateDirect(long, long, ByteOrder, MemoryRequestServer)} method.</p>
+   * {@link WritableMemory#allocateDirect(long, long, ByteOrder, MemoryRequestServer, Arena)} method.</p>
    *
    * <p>If the MemoryRequestServer is not set by the user and additional memory is needed by the sketch,
    * null will be returned and the sketch will abort.
@@ -72,7 +74,7 @@ public interface Resource extends AutoCloseable {
    */
   void setMemoryRequestServer(MemoryRequestServer memReqSvr);
 
-  //***
+  //*** Other
 
   /**
    * Returns a ByteBuffer view of this Memory object with the given ByteOrder.
@@ -91,33 +93,48 @@ public interface Resource extends AutoCloseable {
   ByteBuffer asByteBufferView(ByteOrder order);
 
   /**
-   * <i>From Java 17 ResourceScope::close():</i>
+   * <i>From Java 21 java.lang.foreign.Arena::close():</i>
+   * Closes this arena. If this method completes normally, the arena scope is no longer {@linkplain Scope#isAlive() alive},
+   * and all the memory segments associated with it can no longer be accessed. Furthermore, any off-heap region of memory backing the
+   * segments obtained from this arena are also released.
    *
-   * <p>Closes this resource scope. As a side-effect, if this operation completes without exceptions, this scope will be marked
-   * as <em>not alive</em>, and subsequent operations on resources associated with this scope will fail with {@link IllegalStateException}.
-   * Additionally, upon successful closure, all direct (native) resources associated with this resource scope will be released.</p>
+   * <p>This operation is not idempotent; that is, closing an already closed arena <em>always</em> results in an
+   * exception being thrown. This reflects a deliberate design choice: failure to close an arena might reveal a bug
+   * in the underlying application logic.</p>
    *
-   * <p>API Note This operation is not idempotent; that is, closing an already closed resource scope <em>always</em> results in an
-   * exception being thrown. This reflects a deliberate design choice: resource scope state transitions should be
-   * manifest in the client code; a failure in any of these transitions reveals a bug in the underlying application
-   * logic. </p>
+   * <p>If this method completes normally, then {@code java.lang.foreign.Arena.scope().isAlive() == false}.
+   * Implementations are allowed to throw {@link UnsupportedOperationException} if an explicit close operation is
+   * not supported.</p>
    *
-   * @throws IllegalStateException if one of the following condition is met:
-   * <ul>
-   *     <li>this resource scope is not <em>alive</em>
-   *     <li>this resource scope is confined, and this method is called from a thread other than the thread owning this resource scope</li>
-   *     <li>this resource scope is shared and a resource associated with this scope is accessed while this method is called</li>
-   * </ul>
-   * @throws UnsupportedOperationException if this resource scope is <em>implicit</em>}.
+   * @see java.lang.foreign.MemorySegment.Scope#isAlive()
+   *
+   * @throws IllegalStateException if the arena has already been closed.
+   * @throws IllegalStateException if a segment associated with this arena is being accessed concurrently, e.g.
+   * by a {@linkplain java.lang.foreign.Linker#downcallHandle(FunctionDescriptor, Option...) downcall method handle}.
+   * @throws WrongThreadException if this arena is confined, and this method is called from a thread
+   * other than the arena's owner thread.
+   * @throws UnsupportedOperationException if this arena cannot be closed explicitly.
    */
   @Override
   void close();
 
   /**
-   * Return true if this resource is closeable.
-   * @return true if this resource is closeable.
+   * Compares the bytes of this Resource to <i>that</i> Resource.
+   * Returns <i>(this &lt; that) ? (some negative value) : (this &gt; that) ? (some positive value) : 0;</i>.
+   * If all bytes are equal up to the shorter of the two lengths, the shorter length is considered
+   * to be less than the other.
+   * @param thisOffsetBytes the starting offset for <i>this Resource</i>
+   * @param thisLengthBytes the length of the region to compare from <i>this Resource</i>
+   * @param that the other Memory to compare with
+   * @param thatOffsetBytes the starting offset for <i>that Resource</i>
+   * @param thatLengthBytes the length of the region to compare from <i>that Resource</i>
+   * @return <i>(this &lt; that) ? (some negative value) : (this &gt; that) ? (some positive value) : 0;</i>
    */
-  boolean isCloseable();
+  int compareTo(long thisOffsetBytes,
+      long thisLengthBytes,
+      Resource that,
+      long thatOffsetBytes,
+      long thatLengthBytes);
 
   /**
    * Returns true if the given object is an instance of this class and has equal contents to
@@ -149,7 +166,7 @@ public interface Resource extends AutoCloseable {
   /**
    * Forces any changes made to the contents of this mapped segment to be written to the storage device described
    * by the mapped segment's file descriptor.
-   * @see <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#force()">force()</a>
+   * @see <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/foreign/MemorySegment.html#force()">force()</a>
    */
   void force();
 
@@ -158,12 +175,6 @@ public interface Resource extends AutoCloseable {
    * @return the capacity of this object in bytes
    */
   long getCapacity();
-
-  /**
-   * Return the owner thread of the underlying ResourceScope, or null.
-   * @return the owner thread of the underlying ResourceScope, or null.
-   */
-  Thread getOwnerThread();
 
   /**
    * Gets the relative base offset of <i>this</i> with respect to <i>that</i>, defined as: <i>this</i> - <i>that</i>.
@@ -186,6 +197,13 @@ public interface Resource extends AutoCloseable {
    * @return true if this Memory is backed by a ByteBuffer.
    */
   boolean hasByteBuffer();
+
+  /**
+   * Return true if this resource is likely to be closeable, but not guaranteed.
+   * There is no way to determine if the specific type of Arena is explicitly closeable.
+   * @return true if this resource is likely to be closeable.
+   */
+  boolean isCloseable();
 
   /**
    * Is the underlying resource scope alive?
@@ -231,9 +249,10 @@ public interface Resource extends AutoCloseable {
   boolean isHeap();
 
   /**
-   * Tells whether or not the contents of this mapped segment is resident in physical memory. Please refer to
-   * <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#isLoaded()">isLoaded()</a>.
+   * Returns true if it is likely that the contents of this segment is resident in physical memory.
    * @return true if it is likely that the contents of this segment is resident in physical memory.
+   * @see
+<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/foreign/MemorySegment.html#isLoaded()">isLoaded()</a>
    */
   boolean isLoaded();
 
@@ -269,8 +288,8 @@ public interface Resource extends AutoCloseable {
   boolean isSameResource(Resource that);
 
   /**
-   * Loads the contents of this mapped segment into physical memory. Please refer to
-   * <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#load()">load()</a>
+   * Loads the contents of this mapped segment into physical memory.
+   * @see <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/foreign/MemorySegment.html#load()">load()</a>
    */
   void load();
 
@@ -286,18 +305,36 @@ public interface Resource extends AutoCloseable {
   long nativeOverlap(Resource that);
 
   /**
-   * See <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#mismatch(jdk.incubator.foreign.MemorySegment)">mismatch(...)</a>
+   * Finds the first byte mismatch with <i>that</i>.
    * @param that the other Resource
    * @return the relative offset, in bytes, of the first mismatch between this and the given other Resource object,
-   * otherwise -1 if no mismatch
+   * otherwise -1 if no mismatch.
+   * @see
+<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/foreign/MemorySegment.html#mismatch(java.lang.foreign.MemorySegment)">
+mismatch(MemorySegment)</a>
    */
   long mismatch(Resource that);
+
+  /**
+   * Finds the first byte mismatch based on the given offsets
+   * @param src the given source Resource
+   * @param srcFromOffset the given start offset of the source region, inclusive.
+   * @param srcToOffset the given end offset of the source region, exclusive.
+   * @param dst the given destination Resource
+   * @param dstFromOffset the given start of the destination destination region, inclusive.
+   * @param dstToOffset the given end offset of the destination destination region, exclusive.
+   * @return the byte offset of the first mismatch relative to the start of each of the above two regions.
+   * @see
+<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/foreign/MemorySegment.html#mismatch(java.lang.foreign.MemorySegment,long,long,java.lang.foreign.MemorySegment,long,long)">
+mismatch(MemorySegment, long, long, MemorySegment, long, long)</a>
+   */
+  long mismatch(Resource src, long srcFromOffset, long srcToOffset, Resource dst, long dstFromOffset, long dstToOffset);
 
   /**
    * Returns the resource scope associated with this memory segment.
    * @return the resource scope associated with this memory segment.
    */
-  ResourceScope scope();
+  Scope scope();
 
   /**
    * Returns a new ByteBuffer with a copy of the data from this Memory object.
@@ -307,6 +344,12 @@ public interface Resource extends AutoCloseable {
    * @return a new ByteBuffer with a copy of the data from this Memory object.
    */
   ByteBuffer toByteBuffer(ByteOrder order);
+
+  /**
+   * Returns a copy of the underlying MemorySegment.
+   * @return a copy of the underlying MemorySegment.
+   */
+  MemorySegment toMemorySegment();
 
   /**
    * Returns a brief description of this object.
@@ -331,15 +374,8 @@ public interface Resource extends AutoCloseable {
       boolean withData);
 
   /**
-   * Returns a copy of the underlying MemorySegment.
-   * The size is limited to <i>Integer.MAX_VALUE</i>.
-   * @return a copy of the underlying MemorySegment
-   */
-  MemorySegment toMemorySegment();
-
-  /**
-   * Unloads the contents of this mapped segment from physical memory. Please refer to
-   * <a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.incubator.foreign/jdk/incubator/foreign/MemorySegment.html#unload()">unload()</a>
+   * Unloads the contents of this mapped segment from physical memory.
+   * @see <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/foreign/MemorySegment.html#unload()">unload()</a>
    */
   void unload();
 

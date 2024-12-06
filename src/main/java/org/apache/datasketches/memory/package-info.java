@@ -18,11 +18,10 @@
  */
 
 /**
- * <p>This package provides high performance primitive and primitive array access to direct (native),
+ * This package provides high performance primitive and primitive array access to direct (native),
  * off-heap memory and memory-mapped file resources, and consistent views into
  * {@link java.nio.ByteBuffer}, and on-heap primitive arrays. It can be used as a more
  * comprehensive and flexible replacement for {@link java.nio.ByteBuffer}.
- * </p>
  *
  * <p>In addition, this package provides:</p>
  *

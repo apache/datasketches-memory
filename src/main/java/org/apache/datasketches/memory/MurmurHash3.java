@@ -19,13 +19,13 @@
 
 package org.apache.datasketches.memory;
 
-import org.apache.datasketches.memory.internal.MurmurHash3v3;
+import java.lang.foreign.MemorySegment;
 
-import jdk.incubator.foreign.MemorySegment;
+import org.apache.datasketches.memory.internal.MurmurHash3v4;
 
 /**
- * <p>The MurmurHash3 is a fast, non-cryptographic, 128-bit hash function that has
- * excellent avalanche and 2-way bit independence properties.</p>
+ * The MurmurHash3 is a fast, non-cryptographic, 128-bit hash function that has
+ * excellent avalanche and 2-way bit independence properties.
  *
  * <p>Austin Appleby's C++
  * <a href="https://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp">
@@ -39,12 +39,14 @@ import jdk.incubator.foreign.MemorySegment;
  * <p>This implementation produces exactly the same hash result as the
  * MurmurHash3 function in datasketches-java given compatible inputs.</p>
  *
- * <p>This version 3 of the implementation leverages the jdk.incubator.foreign package of JDK-17 in place of
+ * <p>This version 4 of the implementation leverages the java.lang.foreign package of JDK-21 in place of
  * the Unsafe class.
  *
  * @author Lee Rhodes
  */
 public final class MurmurHash3 {
+
+  private MurmurHash3() { }
 
   //Provided for backward compatibility
 
@@ -59,7 +61,7 @@ public final class MurmurHash3 {
   public static long[] hash(
       final long[] in,
       final long seed) {
-    return MurmurHash3v3.hash(in, seed);
+    return MurmurHash3v4.hash(in, seed);
   }
 
   /**
@@ -73,7 +75,7 @@ public final class MurmurHash3 {
   public static long[] hash(
       final int[] in,
       final long seed) {
-    return MurmurHash3v3.hash(in, seed);
+    return MurmurHash3v4.hash(in, seed);
   }
 
   /**
@@ -87,7 +89,7 @@ public final class MurmurHash3 {
   public static long[] hash(
       final char[] in,
       final long seed) {
-    return MurmurHash3v3.hash(in, seed);
+    return MurmurHash3v4.hash(in, seed);
   }
 
   /**
@@ -101,7 +103,7 @@ public final class MurmurHash3 {
   public static long[] hash(
       final byte[] in,
       final long seed) {
-    return MurmurHash3v3.hash(in, seed);
+    return MurmurHash3v4.hash(in, seed);
   }
 
   //Single primitive inputs
@@ -118,7 +120,7 @@ public final class MurmurHash3 {
       final long in,
       final long seed,
       final long[] hashOut) {
-    return MurmurHash3v3.hash(in, seed, hashOut);
+    return MurmurHash3v4.hash(in, seed, hashOut);
   }
 
   /**
@@ -133,7 +135,7 @@ public final class MurmurHash3 {
       final double in,
       final long seed,
       final long[] hashOut) {
-    return MurmurHash3v3.hash(in, seed, hashOut);
+    return MurmurHash3v4.hash(in, seed, hashOut);
   }
 
   /**
@@ -148,7 +150,7 @@ public final class MurmurHash3 {
       final String in,
       final long seed,
       final long[] hashOut) {
-    return MurmurHash3v3.hash(in, seed, hashOut);
+    return MurmurHash3v4.hash(in, seed, hashOut);
   }
 
   //The main API calls
@@ -169,7 +171,7 @@ public final class MurmurHash3 {
       final long lengthBytes,
       final long seed,
       final long[] hashOut) {
-    return MurmurHash3v3.hash(mem, offsetBytes, lengthBytes, seed, hashOut);
+    return MurmurHash3v4.hash(mem, offsetBytes, lengthBytes, seed, hashOut);
   }
 
   /**
@@ -188,7 +190,7 @@ public final class MurmurHash3 {
       final long lengthBytes,
       final long seed,
       final long[] hashOut) {
-    return MurmurHash3v3.hash(seg, offsetBytes, lengthBytes, seed, hashOut);
+    return MurmurHash3v4.hash(seg, offsetBytes, lengthBytes, seed, hashOut);
   }
 
 }

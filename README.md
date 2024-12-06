@@ -69,7 +69,9 @@ Note: *primitive* := *{byte, short, int, long, float, double}*
 ## Release 5.0.0 (inclusive) to 6.0.0 (exclusive)
 Starting with release *datasketches-memory-5.0.0*, this Memory component supports only Java 21 when compiling from source and should work with later Java versions at runtime.
 
-### *NOTE: The DataSketches Java Memory Component is not thread-safe.*
+### *NOTES:* 
+* The DataSketches Java Memory Component is not thread-safe.
+* I recommend Eclipse Adoptium/Temurin 21.0.5+11 or later as earlier releases of 21 have bugs that affect this product.
 
 ## Build Instructions
 __NOTES:__

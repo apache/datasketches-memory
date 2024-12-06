@@ -74,7 +74,7 @@ public interface Resource extends AutoCloseable {
    */
   void setMemoryRequestServer(MemoryRequestServer memReqSvr);
 
-  //***
+  //*** Other
 
   /**
    * Returns a ByteBuffer view of this Memory object with the given ByteOrder.
@@ -119,11 +119,22 @@ public interface Resource extends AutoCloseable {
   void close();
 
   /**
-   * Return true if this resource likely to be closeable, but not guaranteed.
-   * There is no way to determine if the specific type of Arena is explicitly closeable.
-   * @return true if this resource likely to be closeable.
+   * Compares the bytes of this Resource to <i>that</i> Resource.
+   * Returns <i>(this &lt; that) ? (some negative value) : (this &gt; that) ? (some positive value) : 0;</i>.
+   * If all bytes are equal up to the shorter of the two lengths, the shorter length is considered
+   * to be less than the other.
+   * @param thisOffsetBytes the starting offset for <i>this Resource</i>
+   * @param thisLengthBytes the length of the region to compare from <i>this Resource</i>
+   * @param that the other Memory to compare with
+   * @param thatOffsetBytes the starting offset for <i>that Resource</i>
+   * @param thatLengthBytes the length of the region to compare from <i>that Resource</i>
+   * @return <i>(this &lt; that) ? (some negative value) : (this &gt; that) ? (some positive value) : 0;</i>
    */
-  boolean isCloseable();
+  int compareTo(long thisOffsetBytes,
+      long thisLengthBytes,
+      Resource that,
+      long thatOffsetBytes,
+      long thatLengthBytes);
 
   /**
    * Returns true if the given object is an instance of this class and has equal contents to
@@ -186,6 +197,13 @@ public interface Resource extends AutoCloseable {
    * @return true if this Memory is backed by a ByteBuffer.
    */
   boolean hasByteBuffer();
+
+  /**
+   * Return true if this resource is likely to be closeable, but not guaranteed.
+   * There is no way to determine if the specific type of Arena is explicitly closeable.
+   * @return true if this resource is likely to be closeable.
+   */
+  boolean isCloseable();
 
   /**
    * Is the underlying resource scope alive?
@@ -328,6 +346,12 @@ mismatch(MemorySegment, long, long, MemorySegment, long, long)</a>
   ByteBuffer toByteBuffer(ByteOrder order);
 
   /**
+   * Returns a copy of the underlying MemorySegment.
+   * @return a copy of the underlying MemorySegment.
+   */
+  MemorySegment toMemorySegment();
+
+  /**
    * Returns a brief description of this object.
    * @return a brief description of this object.
    */
@@ -348,12 +372,6 @@ mismatch(MemorySegment, long, long, MemorySegment, long, long)</a>
       long offsetBytes,
       int lengthBytes,
       boolean withData);
-
-  /**
-   * Returns a copy of the underlying MemorySegment.
-   * @return a copy of the underlying MemorySegment.
-   */
-  MemorySegment toMemorySegment();
 
   /**
    * Unloads the contents of this mapped segment from physical memory.

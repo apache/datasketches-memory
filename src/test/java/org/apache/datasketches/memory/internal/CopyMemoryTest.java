@@ -20,6 +20,8 @@
 package org.apache.datasketches.memory.internal;
 
 import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+
 import static org.testng.Assert.assertEquals;
 
 import java.nio.ByteOrder;
@@ -174,7 +176,7 @@ public class CopyMemoryTest {
   /**
    * @param s value to print
    */
-  static void println(String s) {
-    //System.out.println(s); //disable here
+  static void println(Object o) {
+    //System.out.println(o); //disable here
   }
 }

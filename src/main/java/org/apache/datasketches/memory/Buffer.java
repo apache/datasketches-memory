@@ -383,29 +383,6 @@ public interface Buffer extends Positional, Resource {
       int dstOffsetShorts,
       int lengthShorts);
 
-  //SPECIAL PRIMITIVE READ METHODS: compareTo.
-  //   No copyTo, No writeTo. Use Memory for that.
-
-  /**
-   * Compares the bytes of this Buffer to <i>that</i> Buffer.
-   * This uses absolute offsets not the start, position and end.
-   * Returns <i>(this &lt; that) ? (some negative value) : (this &gt; that) ? (some positive value)
-   * : 0;</i>.
-   * If all bytes are equal up to the shorter of the two lengths, the shorter length is
-   * considered to be less than the other.
-   * @param thisOffsetBytes the starting offset for <i>this Buffer</i>
-   * @param thisLengthBytes the length of the region to compare from <i>this Buffer</i>
-   * @param that the other Buffer to compare with
-   * @param thatOffsetBytes the starting offset for <i>that Buffer</i>
-   * @param thatLengthBytes the length of the region to compare from <i>that Buffer</i>
-   * @return <i>(this &lt; that) ? (some negative value) : (this &gt; that) ? (some positive value)
-   * : 0;</i>
-   */
-  int compareTo(
-      long thisOffsetBytes,
-      long thisLengthBytes,
-      Buffer that,
-      long thatOffsetBytes,
-      long thatLengthBytes);
+  //SPECIAL PRIMITIVE READ METHODS:none.
 
 }

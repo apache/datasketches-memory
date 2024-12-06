@@ -422,6 +422,7 @@ public class MemoryTest {
     int len = 64;
     WritableMemory wmem = WritableMemory.allocate(len);
     for (int i = 0; i < len; i++) { wmem.putByte(i, (byte) i); }
+    println(wmem.toString("",0,64, true));
     assertTrue(wmem.equalTo(0, wmem, 0, len));
     assertFalse(wmem.equalTo(0, wmem, len/2, len/2));
     assertEquals(wmem.compareTo(0, len, wmem, 0, len), 0);

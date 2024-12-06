@@ -148,7 +148,7 @@ abstract class ResourceImpl implements Resource {
     this.memReqSvr = memReqSvr;
   }
 
-  //***
+  //*** Other Statics
 
   /**
    * Check the requested offset and length against the allocated size.
@@ -174,6 +174,23 @@ abstract class ResourceImpl implements Resource {
     }
   }
 
+  static int compare(
+      final MemorySegment seg1, final long offsetBytes1, final long lengthBytes1,
+      final MemorySegment seg2, final long offsetBytes2, final long lengthBytes2) {
+    final long seg1EndOff = offsetBytes1 + lengthBytes1;
+    final long seg2EndOff = offsetBytes2 + lengthBytes2;
+    final long mm = MemorySegment.mismatch(seg1, offsetBytes1, seg1EndOff, seg2, offsetBytes2, seg2EndOff);
+    if (mm == -1) {
+      return (lengthBytes2 > lengthBytes1) ? -1 : (lengthBytes2 == lengthBytes1) ? 0 : 1;
+    }
+    if (mm < Math.min(lengthBytes1, lengthBytes2)) {
+      final int c1 = seg1.get(ValueLayout.JAVA_BYTE, offsetBytes1 + mm) & 0XFF;
+      final int c2 = seg2.get(ValueLayout.JAVA_BYTE, offsetBytes2 + mm) & 0XFF;
+      return Integer.compare(c1, c2);
+    }
+    return (lengthBytes1 == mm) ? -1 : 1;
+  }
+
   private static String pad(final String s, final int fieldLen) {
     return characterPad(s, fieldLen, ' ' , true);
   }
@@ -196,55 +213,6 @@ abstract class ResourceImpl implements Resource {
     }
     checkJavaVersion(jdkVer, p0);
     return new int[] {p0, p1};
-  }
-
-  /**
-   * Decodes the resource type. This is primarily for debugging.
-   * @param typeId the given typeId
-   * @return a human readable string.
-   */
-  static final String typeDecode(final int typeId) {
-    final StringBuilder sb = new StringBuilder();
-    final int group1 = typeId & 0x7;
-    switch (group1) { // 0000 0XXX
-      case 0 : sb.append(pad("Writable + ",32)); break;
-      case 1 : sb.append(pad("ReadOnly + ",32)); break;
-      case 2 : sb.append(pad("Writable + Region + ",32)); break;
-      case 3 : sb.append(pad("ReadOnly + Region + ",32)); break;
-      case 4 : sb.append(pad("Writable + Duplicate + ",32)); break;
-      case 5 : sb.append(pad("ReadOnly + Duplicate + ",32)); break;
-      case 6 : sb.append(pad("Writable + Region + Duplicate + ",32)); break;
-      case 7 : sb.append(pad("ReadOnly + Region + Duplicate + ",32)); break;
-      default: break;
-    }
-    final int group2 = (typeId >>> 3) & 0x3;
-    switch (group2) { // 000X X000                            43
-      case 0 : sb.append(pad("Heap + ",15)); break;   //      00
-      case 1 : sb.append(pad("Direct + ",15)); break; //      01
-      case 2 : sb.append(pad("Map + Direct + ",15)); break; //10
-      case 3 : sb.append(pad("Map + Direct + ",15)); break; //11
-      default: break;
-    }
-    final int group3 = (typeId >>> 5) & 0x1;
-    switch (group3) { // 00X0 0000
-      case 0 : sb.append(pad("NativeOrder + ",17)); break;
-      case 1 : sb.append(pad("NonNativeOrder + ",17)); break;
-      default: break;
-    }
-    final int group4 = (typeId >>> 6) & 0x1;
-    switch (group4) { // 0X00 0000
-      case 0 : sb.append(pad("Memory + ",9)); break;
-      case 1 : sb.append(pad("Buffer + ",9)); break;
-      default: break;
-    }
-    final int group5 = (typeId >>> 7) & 0x1;
-    switch (group5) { // X000 0000
-      case 0 : sb.append(pad("",10)); break;
-      case 1 : sb.append(pad("ByteBuffer",10)); break;
-      default: break;
-    }
-
-    return sb.toString();
   }
 
   static final WritableBuffer selectBuffer(
@@ -333,6 +301,57 @@ abstract class ResourceImpl implements Resource {
     return sb.toString();
   }
 
+  /**
+   * Decodes the resource type. This is primarily for debugging.
+   * @param typeId the given typeId
+   * @return a human readable string.
+   */
+  static final String typeDecode(final int typeId) {
+    final StringBuilder sb = new StringBuilder();
+    final int group1 = typeId & 0x7;
+    switch (group1) { // 0000 0XXX
+      case 0 : sb.append(pad("Writable + ",32)); break;
+      case 1 : sb.append(pad("ReadOnly + ",32)); break;
+      case 2 : sb.append(pad("Writable + Region + ",32)); break;
+      case 3 : sb.append(pad("ReadOnly + Region + ",32)); break;
+      case 4 : sb.append(pad("Writable + Duplicate + ",32)); break;
+      case 5 : sb.append(pad("ReadOnly + Duplicate + ",32)); break;
+      case 6 : sb.append(pad("Writable + Region + Duplicate + ",32)); break;
+      case 7 : sb.append(pad("ReadOnly + Region + Duplicate + ",32)); break;
+      default: break;
+    }
+    final int group2 = (typeId >>> 3) & 0x3;
+    switch (group2) { // 000X X000                            43
+      case 0 : sb.append(pad("Heap + ",15)); break;   //      00
+      case 1 : sb.append(pad("Direct + ",15)); break; //      01
+      case 2 : sb.append(pad("Map + Direct + ",15)); break; //10
+      case 3 : sb.append(pad("Map + Direct + ",15)); break; //11
+      default: break;
+    }
+    final int group3 = (typeId >>> 5) & 0x1;
+    switch (group3) { // 00X0 0000
+      case 0 : sb.append(pad("NativeOrder + ",17)); break;
+      case 1 : sb.append(pad("NonNativeOrder + ",17)); break;
+      default: break;
+    }
+    final int group4 = (typeId >>> 6) & 0x1;
+    switch (group4) { // 0X00 0000
+      case 0 : sb.append(pad("Memory + ",9)); break;
+      case 1 : sb.append(pad("Buffer + ",9)); break;
+      default: break;
+    }
+    final int group5 = (typeId >>> 7) & 0x1;
+    switch (group5) { // X000 0000
+      case 0 : sb.append(pad("",10)); break;
+      case 1 : sb.append(pad("ByteBuffer",10)); break;
+      default: break;
+    }
+
+    return sb.toString();
+  }
+
+  //Other members
+
   @Override
   public final ByteBuffer asByteBufferView(final ByteOrder order) {
     final ByteBuffer byteBuffer = seg.asByteBuffer().order(order);
@@ -352,10 +371,18 @@ abstract class ResourceImpl implements Resource {
   }
 
   @Override
-  public final boolean equalTo(final long thisOffsetBytes, final Resource that,
-      final long thatOffsetBytes, final long lengthBytes) {
+  public final int compareTo(final long thisOffsetBytes, final long thisLengthBytes,
+      final Resource that, final long thatOffsetBytes, final long thatLengthBytes) {
+    return ResourceImpl.compare(seg, thisOffsetBytes, thisLengthBytes,
+        ((ResourceImpl)that).seg, thatOffsetBytes, thatLengthBytes);
+  }
+
+  @Override
+  public final boolean equalTo(final long thisOffsetBytes, final Resource that, final long thatOffsetBytes, final long lengthBytes) {
     if (that == null) { return false; }
-    return CompareAndCopy.equals(seg, thisOffsetBytes, ((ResourceImpl) that).seg, thatOffsetBytes, lengthBytes);
+    final long thisEndOff = thisOffsetBytes + lengthBytes;
+    final long thatEndOff = thatOffsetBytes + lengthBytes;
+    return MemorySegment.mismatch(seg, thisOffsetBytes, thisEndOff, ((ResourceImpl)that).seg, thatOffsetBytes, thatEndOff) == -1;
   }
 
   @Override
@@ -387,14 +414,14 @@ abstract class ResourceImpl implements Resource {
   public boolean isAlive() { return seg.scope().isAlive(); }
 
   @Override
-  public final boolean isByteOrderCompatible(final ByteOrder byteOrder) {
-    final ByteOrder typeBO = getTypeByteOrder();
-    return typeBO == ByteOrder.nativeOrder() && typeBO == byteOrder;
+  public final boolean isBuffer() {
+    return (typeId & BUFFER) > 0;
   }
 
   @Override
-  public final boolean isBuffer() {
-    return (typeId & BUFFER) > 0;
+  public final boolean isByteOrderCompatible(final ByteOrder byteOrder) {
+    final ByteOrder typeBO = getTypeByteOrder();
+    return typeBO == ByteOrder.nativeOrder() && typeBO == byteOrder;
   }
 
   @Override

@@ -278,14 +278,7 @@ public abstract class WritableBufferImpl extends PositionalImpl implements Writa
     setPosition(pos + lengthBytes);
   }
 
-  //OTHER PRIMITIVE READ METHODS: e.g., copyTo, compareTo. No writeTo
-
-  @Override
-  public final int compareTo(final long thisOffsetBytes, final long thisLengthBytes,
-      final Buffer that, final long thatOffsetBytes, final long thatLengthBytes) {
-    return CompareAndCopy.compare(seg, thisOffsetBytes, thisLengthBytes,
-        ((ResourceImpl)that).seg, thatOffsetBytes, thatLengthBytes);
-  }
+  //OTHER PRIMITIVE READ METHODS:
 
   /*
    * Developer notes: There is no copyTo for Buffers because of the ambiguity of what to do with

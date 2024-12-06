@@ -446,27 +446,6 @@ public interface Memory extends Resource {
   //SPECIAL PRIMITIVE READ METHODS: compareTo, copyTo, writeTo
 
   /**
-   * Compares the bytes of this Memory to <i>that</i> Memory.
-   * Returns <i>(this &lt; that) ? (some negative value) : (this &gt; that) ? (some positive value)
-   * : 0;</i>.
-   * If all bytes are equal up to the shorter of the two lengths, the shorter length is considered
-   * to be less than the other.
-   * @param thisOffsetBytes the starting offset for <i>this Memory</i>
-   * @param thisLengthBytes the length of the region to compare from <i>this Memory</i>
-   * @param that the other Memory to compare with
-   * @param thatOffsetBytes the starting offset for <i>that Memory</i>
-   * @param thatLengthBytes the length of the region to compare from <i>that Memory</i>
-   * @return <i>(this &lt; that) ? (some negative value) : (this &gt; that) ? (some positive value)
-   * : 0;</i>
-   */
-  int compareTo(
-      long thisOffsetBytes,
-      long thisLengthBytes,
-      Memory that,
-      long thatOffsetBytes,
-      long thatLengthBytes);
-
-  /**
    * Copies bytes from a source range of this Memory to a destination range of the given Memory
    * with the same semantics when copying between overlapping ranges of bytes as method
    * {@link java.lang.System#arraycopy(Object, int, Object, int, int)} has. However, if the source

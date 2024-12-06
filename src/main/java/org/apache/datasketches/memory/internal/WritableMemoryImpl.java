@@ -323,20 +323,12 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
     MemorySegment.copy(seg, offsetBytes, dstSeg, dstOffsetBytes, lengthBytes);
   }
 
-  //OTHER PRIMITIVE READ METHODS: compareTo, copyTo, writeTo
-
-  @Override
-  public final int compareTo(final long thisOffsetBytes, final long thisLengthBytes,
-      final Memory that, final long thatOffsetBytes, final long thatLengthBytes) {
-    return CompareAndCopy.compare(seg, thisOffsetBytes, thisLengthBytes,
-        ((ResourceImpl)that).seg, thatOffsetBytes, thatLengthBytes);
-  }
+  //OTHER PRIMITIVE READ METHODS:
 
   @Override
   public final void copyTo(final long srcOffsetBytes,
       final WritableMemory destination, final long dstOffsetBytes, final long lengthBytes) {
-    CompareAndCopy.copy(seg, srcOffsetBytes,
-        ((ResourceImpl)destination).seg, dstOffsetBytes, lengthBytes);
+    MemorySegment.copy(seg, srcOffsetBytes, ((ResourceImpl)destination).seg, dstOffsetBytes, lengthBytes);
   }
 
   @Override

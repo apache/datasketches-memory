@@ -382,10 +382,10 @@ public class CommonMemoryTest {
    * @param s value to print
    */
   static void println(Object o) {
-    System.out.println(o); //disable here
+    //System.out.println(o); //disable here
   }
 
   static void print(Object o) {
-    System.out.print(o); //disable here
+    //System.out.print(o); //disable here
   }
 }

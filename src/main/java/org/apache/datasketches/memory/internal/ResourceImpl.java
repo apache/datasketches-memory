@@ -72,7 +72,7 @@ abstract class ResourceImpl implements Resource {
 
   // 0X00 0000 Group 4
   static final int MEMORY  = 0;   //bit 6 = 0
-   static final int BUFFER = 64;  //bit 6
+  static final int BUFFER = 64;   //bit 6
 
   // X000 0000 Group 5
   static final int BYTEBUF = 128; //bit 7,

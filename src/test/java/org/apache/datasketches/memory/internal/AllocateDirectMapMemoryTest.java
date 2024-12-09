@@ -81,7 +81,6 @@ public class AllocateDirectMapMemoryTest {
     try {
       mem2.close(); //closes outside the TWR block will throw
     } catch (IllegalStateException e) { }
-
   }
 
   @Test

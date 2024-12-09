@@ -138,10 +138,10 @@ public class CopyMemoryTest {
     byte[] referenceBytes = bytes.clone();
     Memory referenceMem = Memory.wrap(referenceBytes);
     WritableMemory mem = WritableMemory.writableWrap(bytes);
-      long copyLen = (1 << 20) * 2;
-      mem.copyTo((1 << 20) / 2, mem, 0, copyLen);
-      Assert.assertEquals(0, mem.compareTo(0, copyLen, referenceMem, (1 << 20) / 2, copyLen));
-    }
+    long copyLen = (1 << 20) * 2;
+    mem.copyTo((1 << 20) / 2, mem, 0, copyLen);
+    Assert.assertEquals(0, mem.compareTo(0, copyLen, referenceMem, (1 << 20) / 2, copyLen));
+  }
 
   private static void check(Memory mem, int offsetLongs, int lengthLongs, int startValue) {
     int offBytes = offsetLongs << 3;

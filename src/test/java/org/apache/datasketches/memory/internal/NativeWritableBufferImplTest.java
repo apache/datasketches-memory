@@ -371,25 +371,25 @@ public class NativeWritableBufferImplTest {
   @Test
   public void checkDuplicate() {
     WritableMemory wmem = WritableMemory.allocate(64);
-      for (int i = 0; i < 64; i++) { wmem.putByte(i, (byte)i); }
+    for (int i = 0; i < 64; i++) { wmem.putByte(i, (byte)i); }
 
-      WritableBuffer wbuf = wmem.asWritableBuffer().writableDuplicate();
+    WritableBuffer wbuf = wmem.asWritableBuffer().writableDuplicate();
 
-      for (int i = 0; i < 64; i++) {
-        assertEquals(wbuf.getByte(), i);
-      }
-      Buffer buf = wmem.asBuffer().duplicate();
-      for (int i = 0; i < 64; i++) {
-        assertEquals(buf.getByte(), i);
-      }
-
-      WritableMemory wmem2 = wbuf.asWritableMemory();
-      for (int i = 0; i < 64; i++) {
-        assertEquals(wmem2.getByte(i), i);
-      }
-      wbuf.asWritableMemory();
-
+    for (int i = 0; i < 64; i++) {
+      assertEquals(wbuf.getByte(), i);
     }
+    Buffer buf = wmem.asBuffer().duplicate();
+    for (int i = 0; i < 64; i++) {
+      assertEquals(buf.getByte(), i);
+    }
+
+    WritableMemory wmem2 = wbuf.asWritableMemory();
+    for (int i = 0; i < 64; i++) {
+      assertEquals(wmem2.getByte(i), i);
+    }
+    wbuf.asWritableMemory();
+
+  }
 
   @Test
   public void checkDegenerateRegionReturn() {

@@ -103,7 +103,6 @@ public class MurmurHash3v3Test {
     long h2 = 0xbdbf05f8da0f0392L;
     Assert.assertEquals(result[0], h1);
     Assert.assertEquals(result[1], h2);
-
   }
 
   /**
@@ -119,7 +118,6 @@ public class MurmurHash3v3Test {
     long h2 = 0xbdbf05f8da0f0392L;
     Assert.assertEquals(result[0], h1);
     Assert.assertEquals(result[1], h2);
-
   }
 
   /**
@@ -149,7 +147,6 @@ public class MurmurHash3v3Test {
     Assert.assertEquals(result[1], h2);
   }
 
-
   /**
    * Tests an odd remainder of int[].
    */
@@ -164,7 +161,6 @@ public class MurmurHash3v3Test {
     Assert.assertEquals(result[0], h1);
     Assert.assertEquals(result[1], h2);
   }
-
 
   /**
    * Tests an odd remainder of int[].
@@ -205,7 +201,6 @@ public class MurmurHash3v3Test {
       (byte) 0xff, 0x64, 0x6f, 0x67, 0x00
     };
     long[] result = MurmurHash3v4.hash(key, 0);
-
     //Should be:
     long h1 = 0xe88abda785929c9eL;
     long h2 = 0x96b98587cacc83d6L;

@@ -71,8 +71,8 @@ public class AllocateDirectMemoryTest {
       try (WritableMemory newWmem = myMemReqSvr.request(origWmem, bytes2)) {
         assertTrue(newWmem.isHeap()); //on heap by default
         for (int i = 0; i < longs2; i++) {
-            newWmem.putLong(i << 3, i);
-            assertEquals(newWmem.getLong(i << 3), i);
+          newWmem.putLong(i << 3, i);
+          assertEquals(newWmem.getLong(i << 3), i);
         }
       } //allow the TWR to close the newWmem
     } //allow the TWR to close the direct origWmem

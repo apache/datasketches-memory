@@ -82,19 +82,19 @@ public class Buffer2Test {
       byteArray[i] = i;
     }
 
-      Buffer buffer = Memory.wrap(byteArray).asBuffer();
-      int i = 0;
-      while (buffer.hasRemaining()) {
-        assertEquals(byteArray[i++], buffer.getByte());
-      }
-
-      buffer.setPosition(0);
-      byte[] copyByteArray = new byte[64];
-      buffer.getByteArray(copyByteArray, 0, 64);
-      assertEquals(byteArray, copyByteArray);
-
-      assertEquals(false, buffer.hasByteBuffer());
+    Buffer buffer = Memory.wrap(byteArray).asBuffer();
+    int i = 0;
+    while (buffer.hasRemaining()) {
+      assertEquals(byteArray[i++], buffer.getByte());
     }
+
+    buffer.setPosition(0);
+    byte[] copyByteArray = new byte[64];
+    buffer.getByteArray(copyByteArray, 0, 64);
+    assertEquals(byteArray, copyByteArray);
+
+    assertEquals(false, buffer.hasByteBuffer());
+  }
 
   @Test
   public void testWrapCharArray() {
@@ -105,16 +105,16 @@ public class Buffer2Test {
     }
 
     Buffer buffer = Memory.wrap(charArray).asBuffer();
-      int i = 0;
-      while (buffer.hasRemaining()) {
-        assertEquals(charArray[i++], buffer.getChar());
-      }
-
-      buffer.setPosition(0);
-      char[] copyCharArray = new char[64];
-      buffer.getCharArray(copyCharArray, 0, 64);
-      assertEquals(charArray, copyCharArray);
+    int i = 0;
+    while (buffer.hasRemaining()) {
+      assertEquals(charArray[i++], buffer.getChar());
     }
+
+    buffer.setPosition(0);
+    char[] copyCharArray = new char[64];
+    buffer.getCharArray(copyCharArray, 0, 64);
+    assertEquals(charArray, copyCharArray);
+  }
 
   @Test
   public void testWrapShortArray() {
@@ -125,16 +125,16 @@ public class Buffer2Test {
     }
 
     Buffer buffer = Memory.wrap(shortArray).asBuffer();
-      int i = 0;
-      while (buffer.hasRemaining()) {
-        assertEquals(shortArray[i++], buffer.getShort());
-      }
-
-      buffer.setPosition(0);
-      short[] copyShortArray = new short[64];
-      buffer.getShortArray(copyShortArray, 0, 64);
-      assertEquals(shortArray, copyShortArray);
+    int i = 0;
+    while (buffer.hasRemaining()) {
+      assertEquals(shortArray[i++], buffer.getShort());
     }
+
+    buffer.setPosition(0);
+    short[] copyShortArray = new short[64];
+    buffer.getShortArray(copyShortArray, 0, 64);
+    assertEquals(shortArray, copyShortArray);
+  }
 
   @Test
   public void testWrapIntArray() {
@@ -145,16 +145,16 @@ public class Buffer2Test {
     }
 
     Buffer buffer = Memory.wrap(intArray).asBuffer();
-      int i = 0;
-      while (buffer.hasRemaining()) {
-        assertEquals(intArray[i++], buffer.getInt());
-      }
-
-      buffer.setPosition(0);
-      int[] copyIntArray = new int[64];
-      buffer.getIntArray(copyIntArray, 0, 64);
-      assertEquals(intArray, copyIntArray);
+    int i = 0;
+    while (buffer.hasRemaining()) {
+      assertEquals(intArray[i++], buffer.getInt());
     }
+
+    buffer.setPosition(0);
+    int[] copyIntArray = new int[64];
+    buffer.getIntArray(copyIntArray, 0, 64);
+    assertEquals(intArray, copyIntArray);
+  }
 
   @Test
   public void testWrapLongArray() {
@@ -165,16 +165,16 @@ public class Buffer2Test {
     }
 
     Buffer buffer = Memory.wrap(longArray).asBuffer();
-      int i = 0;
-      while (buffer.hasRemaining()) {
-        assertEquals(longArray[i++], buffer.getLong());
-      }
-
-      buffer.setPosition(0);
-      long[] copyLongArray = new long[64];
-      buffer.getLongArray(copyLongArray, 0, 64);
-      assertEquals(longArray, copyLongArray);
+    int i = 0;
+    while (buffer.hasRemaining()) {
+      assertEquals(longArray[i++], buffer.getLong());
     }
+
+    buffer.setPosition(0);
+    long[] copyLongArray = new long[64];
+    buffer.getLongArray(copyLongArray, 0, 64);
+    assertEquals(longArray, copyLongArray);
+  }
 
   @Test
   public void testWrapFloatArray() {
@@ -185,16 +185,16 @@ public class Buffer2Test {
     }
 
     Buffer buffer = Memory.wrap(floatArray).asBuffer();
-      int i = 0;
-      while (buffer.hasRemaining()) {
-        assertEquals(floatArray[i++], buffer.getFloat());
-      }
-
-      buffer.setPosition(0);
-      float[] copyFloatArray = new float[64];
-      buffer.getFloatArray(copyFloatArray, 0, 64);
-      assertEquals(floatArray, copyFloatArray);
+    int i = 0;
+    while (buffer.hasRemaining()) {
+      assertEquals(floatArray[i++], buffer.getFloat());
     }
+
+    buffer.setPosition(0);
+    float[] copyFloatArray = new float[64];
+    buffer.getFloatArray(copyFloatArray, 0, 64);
+    assertEquals(floatArray, copyFloatArray);
+  }
 
   @Test
   public void testWrapDoubleArray() {
@@ -205,16 +205,16 @@ public class Buffer2Test {
     }
 
     Buffer buffer = Memory.wrap(doubleArray).asBuffer();
-      int i = 0;
-      while (buffer.hasRemaining()) {
-        assertEquals(doubleArray[i++], buffer.getDouble());
-      }
-
-      buffer.setPosition(0);
-      double[] copyDoubleArray = new double[64];
-      buffer.getDoubleArray(copyDoubleArray, 0, 64);
-      assertEquals(doubleArray, copyDoubleArray);
+    int i = 0;
+    while (buffer.hasRemaining()) {
+      assertEquals(doubleArray[i++], buffer.getDouble());
     }
+
+    buffer.setPosition(0);
+    double[] copyDoubleArray = new double[64];
+    buffer.getDoubleArray(copyDoubleArray, 0, 64);
+    assertEquals(doubleArray, copyDoubleArray);
+  }
 
   @Test
   public void testByteBufferPositionPreservation() {

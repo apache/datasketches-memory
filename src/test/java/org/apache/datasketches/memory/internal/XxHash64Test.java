@@ -164,7 +164,6 @@ public class XxHash64Test {
     wmem.getDoubleArray(0, darr, 0, 2);
     hash1 = hashDoubleArr(darr, 1, 1, 0);
     assertEquals(hash1, hash0);
-
   }
 
   @Test

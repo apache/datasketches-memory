@@ -19,11 +19,24 @@
 
 package org.apache.datasketches.memory.internal;
 
+import static java.lang.foreign.ValueLayout.JAVA_CHAR;
+import static java.lang.foreign.ValueLayout.JAVA_DOUBLE;
+import static java.lang.foreign.ValueLayout.JAVA_FLOAT;
+import static java.lang.foreign.ValueLayout.JAVA_INT;
+import static java.lang.foreign.ValueLayout.JAVA_LONG;
+import static java.lang.foreign.ValueLayout.JAVA_SHORT;
+import static org.apache.datasketches.memory.internal.NonNativeValueLayouts.JAVA_CHAR_UNALIGNED_NON_NATIVE;
+import static org.apache.datasketches.memory.internal.NonNativeValueLayouts.JAVA_DOUBLE_UNALIGNED_NON_NATIVE;
+import static org.apache.datasketches.memory.internal.NonNativeValueLayouts.JAVA_FLOAT_UNALIGNED_NON_NATIVE;
+import static org.apache.datasketches.memory.internal.NonNativeValueLayouts.JAVA_INT_UNALIGNED_NON_NATIVE;
+import static org.apache.datasketches.memory.internal.NonNativeValueLayouts.JAVA_LONG_UNALIGNED_NON_NATIVE;
+import static org.apache.datasketches.memory.internal.NonNativeValueLayouts.JAVA_SHORT_UNALIGNED_NON_NATIVE;
+
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableMemory;
-
-import jdk.incubator.foreign.MemoryAccess;
-import jdk.incubator.foreign.MemorySegment;
 
 /**
  * Implementation of {@link WritableMemory} for non-native endian byte order.
@@ -36,202 +49,215 @@ final class NonNativeWritableMemoryImpl extends WritableMemoryImpl {
   NonNativeWritableMemoryImpl(
       final MemorySegment seg,
       final int typeId,
-      final MemoryRequestServer memReqSvr) {
-    super(seg, typeId, memReqSvr);
+      final MemoryRequestServer memReqSvr,
+      final Arena arena) {
+    super(seg, typeId, memReqSvr, arena);
   }
 
   ///PRIMITIVE getX() and getXArray()
   @Override
   public char getChar(final long offsetBytes) {
-    return MemoryAccess.getCharAtOffset(seg, offsetBytes, NON_NATIVE_BYTE_ORDER);
+    return seg.get(JAVA_CHAR_UNALIGNED_NON_NATIVE, offsetBytes);
   }
 
   @Override
   public void getCharArray(final long offsetBytes, final char[] dstArray, final int dstOffsetChars, final int lengthChars) {
-    final long copyBytes = ((long) lengthChars) << CHAR_SHIFT;
-    final MemorySegment srcSlice = seg.asSlice(offsetBytes, copyBytes);
-    final MemorySegment dstSlice = MemorySegment.ofArray(dstArray).asSlice(dstOffsetChars << CHAR_SHIFT, copyBytes);
-    for (int index = 0; index < lengthChars; index++) {
-      final char aChar = MemoryAccess.getCharAtIndex(srcSlice, index,  NON_NATIVE_BYTE_ORDER);
-      MemoryAccess.setCharAtIndex(dstSlice, index, NATIVE_BYTE_ORDER, aChar);
-    }
+    getCharArr(seg, offsetBytes, dstArray, dstOffsetChars, lengthChars);
+  }
+
+  static void getCharArr(
+      final MemorySegment seg, final long offsetBytes, final char[] dstArray, final int dstOffsetChars, final int lengthChars) {
+    final MemorySegment dstSeg = MemorySegment.ofArray(dstArray);
+    final long dstOffsetBytes = ((long) dstOffsetChars) << CHAR_SHIFT;
+    MemorySegment.copy(seg, JAVA_CHAR_UNALIGNED_NON_NATIVE, offsetBytes, dstSeg, JAVA_CHAR, dstOffsetBytes, lengthChars);
   }
 
   @Override
   public double getDouble(final long offsetBytes) {
-    return MemoryAccess.getDoubleAtOffset(seg, offsetBytes, NON_NATIVE_BYTE_ORDER);
+    return seg.get(JAVA_DOUBLE_UNALIGNED_NON_NATIVE, offsetBytes);
   }
 
   @Override
   public void getDoubleArray(final long offsetBytes, final double[] dstArray, final int dstOffsetDoubles, final int lengthDoubles) {
-    final long copyBytes = ((long) lengthDoubles) << DOUBLE_SHIFT;
-    final MemorySegment srcSlice = seg.asSlice(offsetBytes, copyBytes);
-    final MemorySegment dstSlice = MemorySegment.ofArray(dstArray).asSlice(dstOffsetDoubles << DOUBLE_SHIFT, copyBytes);
-    for (int index = 0; index < lengthDoubles; index++) {
-      final double dbl = MemoryAccess.getDoubleAtIndex(srcSlice, index,  NON_NATIVE_BYTE_ORDER);
-      MemoryAccess.setDoubleAtIndex(dstSlice, index, NATIVE_BYTE_ORDER, dbl);
-    }
+    getDoubleArr(seg, offsetBytes, dstArray, dstOffsetDoubles, lengthDoubles);
+  }
+
+  static void getDoubleArr(
+      final MemorySegment seg, final long offsetBytes, final double[] dstArray, final int dstOffsetDoubles, final int lengthDoubles) {
+    final MemorySegment dstSeg = MemorySegment.ofArray(dstArray);
+    final long dstOffsetBytes = ((long) dstOffsetDoubles) << DOUBLE_SHIFT;
+    MemorySegment.copy(seg, JAVA_DOUBLE_UNALIGNED_NON_NATIVE, offsetBytes, dstSeg, JAVA_DOUBLE, dstOffsetBytes, lengthDoubles);
   }
 
   @Override
   public float getFloat(final long offsetBytes) {
-    return MemoryAccess.getFloatAtOffset(seg, offsetBytes, NON_NATIVE_BYTE_ORDER);
+    return seg.get(JAVA_FLOAT_UNALIGNED_NON_NATIVE, offsetBytes);
   }
 
   @Override
   public void getFloatArray(final long offsetBytes, final float[] dstArray, final int dstOffsetFloats, final int lengthFloats) {
-    final long copyBytes = ((long) lengthFloats) << FLOAT_SHIFT;
-    final MemorySegment srcSlice = seg.asSlice(offsetBytes, copyBytes);
-    final MemorySegment dstSlice = MemorySegment.ofArray(dstArray).asSlice(dstOffsetFloats << FLOAT_SHIFT, copyBytes);
-    for (int index = 0; index < lengthFloats; index++) {
-      final float flt = MemoryAccess.getFloatAtIndex(srcSlice, index,  NON_NATIVE_BYTE_ORDER);
-      MemoryAccess.setFloatAtIndex(dstSlice, index, NATIVE_BYTE_ORDER, flt);
-    }
+    getFloatArr(seg, offsetBytes, dstArray, dstOffsetFloats, lengthFloats);
+  }
+
+  static void getFloatArr(
+      final MemorySegment seg, final long offsetBytes, final float[] dstArray, final int dstOffsetFloats, final int lengthFloats) {
+    final MemorySegment dstSeg = MemorySegment.ofArray(dstArray);
+    final long dstOffsetBytes = ((long) dstOffsetFloats) << FLOAT_SHIFT;
+    MemorySegment.copy(seg, JAVA_FLOAT_UNALIGNED_NON_NATIVE, offsetBytes, dstSeg, JAVA_FLOAT, dstOffsetBytes, lengthFloats);
   }
 
   @Override
   public int getInt(final long offsetBytes) {
-    return MemoryAccess.getIntAtOffset(seg, offsetBytes, NON_NATIVE_BYTE_ORDER);
+    return seg.get(JAVA_INT_UNALIGNED_NON_NATIVE, offsetBytes);
   }
 
   @Override
   public void getIntArray(final long offsetBytes, final int[] dstArray, final int dstOffsetInts, final int lengthInts) {
-    final long copyBytes = ((long) lengthInts) << INT_SHIFT;
-    final MemorySegment srcSlice = seg.asSlice(offsetBytes, copyBytes);
-    final MemorySegment dstSlice = MemorySegment.ofArray(dstArray).asSlice(dstOffsetInts << INT_SHIFT, copyBytes);
-    for (int index = 0; index < lengthInts; index++) {
-      final int anInt = MemoryAccess.getIntAtIndex(srcSlice, index,  NON_NATIVE_BYTE_ORDER);
-      MemoryAccess.setIntAtIndex(dstSlice, index, NATIVE_BYTE_ORDER, anInt);
-    }
+    getIntArr(seg, offsetBytes, dstArray, dstOffsetInts, lengthInts);
+  }
+
+  static void getIntArr(
+      final MemorySegment seg, final long offsetBytes, final int[] dstArray, final int dstOffsetInts, final int lengthInts) {
+    final MemorySegment dstSeg = MemorySegment.ofArray(dstArray);
+    final long dstOffsetBytes = ((long) dstOffsetInts) << INT_SHIFT;
+    MemorySegment.copy(seg, JAVA_INT_UNALIGNED_NON_NATIVE, offsetBytes, dstSeg, JAVA_INT, dstOffsetBytes, lengthInts);
   }
 
   @Override
   public long getLong(final long offsetBytes) {
-    return MemoryAccess.getLongAtOffset(seg, offsetBytes, NON_NATIVE_BYTE_ORDER);
+    return seg.get(JAVA_LONG_UNALIGNED_NON_NATIVE, offsetBytes);
   }
 
   @Override
   public void getLongArray(final long offsetBytes, final long[] dstArray, final int dstOffsetLongs, final int lengthLongs) {
-    final long copyBytes = ((long) lengthLongs) << LONG_SHIFT;
-    final MemorySegment srcSlice = seg.asSlice(offsetBytes, copyBytes);
-    final MemorySegment dstSlice = MemorySegment.ofArray(dstArray).asSlice(dstOffsetLongs << LONG_SHIFT, copyBytes);
-    for (int index = 0; index < lengthLongs; index++) {
-      final long aLong = MemoryAccess.getLongAtIndex(srcSlice, index,  NON_NATIVE_BYTE_ORDER);
-      MemoryAccess.setLongAtIndex(dstSlice, index, NATIVE_BYTE_ORDER, aLong);
-    }
+    getLongArr(seg, offsetBytes, dstArray, dstOffsetLongs, lengthLongs);
+  }
+
+  static void getLongArr(
+      final MemorySegment seg, final long offsetBytes, final long[] dstArray, final int dstOffsetLongs, final int lengthLongs) {
+    final MemorySegment dstSeg = MemorySegment.ofArray(dstArray);
+    final long dstOffsetBytes = ((long) dstOffsetLongs) << LONG_SHIFT;
+    MemorySegment.copy(seg, JAVA_LONG_UNALIGNED_NON_NATIVE, offsetBytes, dstSeg, JAVA_LONG, dstOffsetBytes, lengthLongs);
   }
 
   @Override
   public short getShort(final long offsetBytes) {
-    return MemoryAccess.getShortAtOffset(seg, offsetBytes, NON_NATIVE_BYTE_ORDER);
+    return seg.get(JAVA_SHORT_UNALIGNED_NON_NATIVE, offsetBytes);
   }
 
   @Override
   public void getShortArray(final long offsetBytes, final short[] dstArray, final int dstOffsetShorts, final int lengthShorts) {
-    final long copyBytes = ((long) lengthShorts) << SHORT_SHIFT;
-    final MemorySegment srcSlice = seg.asSlice(offsetBytes, copyBytes);
-    final MemorySegment dstSlice = MemorySegment.ofArray(dstArray).asSlice(dstOffsetShorts << SHORT_SHIFT, copyBytes);
-    for (int index = 0; index < lengthShorts; index++) {
-      final short aShort = MemoryAccess.getShortAtIndex(srcSlice, index,  NON_NATIVE_BYTE_ORDER);
-      MemoryAccess.setShortAtIndex(dstSlice, index, NATIVE_BYTE_ORDER, aShort);
-    }
+    getShortArr(seg, offsetBytes, dstArray, dstOffsetShorts, lengthShorts);
+  }
+
+  static void getShortArr(
+      final MemorySegment seg, final long offsetBytes, final short[] dstArray, final int dstOffsetShorts, final int lengthShorts) {
+    final MemorySegment dstSeg = MemorySegment.ofArray(dstArray);
+    final long dstOffsetBytes = ((long) dstOffsetShorts) << SHORT_SHIFT;
+    MemorySegment.copy(seg, JAVA_SHORT_UNALIGNED_NON_NATIVE, offsetBytes, dstSeg, JAVA_SHORT, dstOffsetBytes, lengthShorts);
   }
 
   //PRIMITIVE putX() and putXArray() implementations
   @Override
   public void putChar(final long offsetBytes, final char value) {
-    MemoryAccess.setCharAtOffset(seg, offsetBytes, NON_NATIVE_BYTE_ORDER, value);
+    seg.set(JAVA_CHAR_UNALIGNED_NON_NATIVE, offsetBytes, value);
   }
 
   @Override
   public void putCharArray(final long offsetBytes, final char[] srcArray, final int srcOffsetChars, final int lengthChars) {
-    final long copyBytes = ((long) lengthChars) << CHAR_SHIFT;
-    final MemorySegment srcSlice = MemorySegment.ofArray(srcArray).asSlice(srcOffsetChars << CHAR_SHIFT, copyBytes);
-    final MemorySegment dstSlice = seg.asSlice(offsetBytes, copyBytes);
-    for (int index = 0; index < lengthChars; index++) {
-      final char aChar = MemoryAccess.getCharAtIndex(srcSlice, index,  NATIVE_BYTE_ORDER);
-      MemoryAccess.setCharAtIndex(dstSlice, index, NON_NATIVE_BYTE_ORDER, aChar);
-    }
+    putCharArr(seg, offsetBytes, srcArray, srcOffsetChars, lengthChars);
+  }
+
+  static void putCharArr(
+      final MemorySegment seg, final long offsetBytes, final char[] srcArray, final int srcOffsetChars, final int lengthChars) {
+    final MemorySegment srcSeg = MemorySegment.ofArray(srcArray);
+    final long srcOffsetBytes = ((long) srcOffsetChars) << CHAR_SHIFT;
+    MemorySegment.copy(srcSeg, JAVA_CHAR, srcOffsetBytes, seg, JAVA_CHAR_UNALIGNED_NON_NATIVE, offsetBytes, lengthChars);
   }
 
   @Override
   public void putDouble(final long offsetBytes, final double value) {
-    MemoryAccess.setDoubleAtOffset(seg, offsetBytes, NON_NATIVE_BYTE_ORDER, value);
+    seg.set(JAVA_DOUBLE_UNALIGNED_NON_NATIVE, offsetBytes, value);
   }
 
   @Override
   public void putDoubleArray(final long offsetBytes, final double[] srcArray, final int srcOffsetDoubles, final int lengthDoubles) {
-    final long copyBytes = ((long) lengthDoubles) << DOUBLE_SHIFT;
-    final MemorySegment srcSlice = MemorySegment.ofArray(srcArray).asSlice(srcOffsetDoubles << DOUBLE_SHIFT, copyBytes);
-    final MemorySegment dstSlice = seg.asSlice(offsetBytes, copyBytes);
-    for (int index = 0; index < lengthDoubles; index++) {
-      final double dbl = MemoryAccess.getDoubleAtIndex(srcSlice, index,  NATIVE_BYTE_ORDER);
-      MemoryAccess.setDoubleAtIndex(dstSlice, index, NON_NATIVE_BYTE_ORDER, dbl);
-    }
+    putDoubleArr(seg, offsetBytes, srcArray, srcOffsetDoubles, lengthDoubles);
+  }
+
+  static void putDoubleArr(
+      final MemorySegment seg, final long offsetBytes, final double[] srcArray, final int srcOffsetDoubles, final int lengthDoubles) {
+    final MemorySegment srcSeg = MemorySegment.ofArray(srcArray);
+    final long srcOffsetBytes = ((long) srcOffsetDoubles) << DOUBLE_SHIFT;
+    MemorySegment.copy(srcSeg, JAVA_DOUBLE, srcOffsetBytes, seg, JAVA_DOUBLE_UNALIGNED_NON_NATIVE, offsetBytes, lengthDoubles);
   }
 
   @Override
   public void putFloat(final long offsetBytes, final float value) {
-    MemoryAccess.setFloatAtOffset(seg, offsetBytes, NON_NATIVE_BYTE_ORDER, value);
+    seg.set(JAVA_FLOAT_UNALIGNED_NON_NATIVE, offsetBytes, value);
   }
 
   @Override
   public void putFloatArray(final long offsetBytes, final float[] srcArray, final int srcOffsetFloats, final int lengthFloats) {
-    final long copyBytes = ((long) lengthFloats) << FLOAT_SHIFT;
-    final MemorySegment srcSlice = MemorySegment.ofArray(srcArray).asSlice(srcOffsetFloats << FLOAT_SHIFT, copyBytes);
-    final MemorySegment dstSlice = seg.asSlice(offsetBytes, copyBytes);
-    for (int index = 0; index < lengthFloats; index++) {
-      final float flt = MemoryAccess.getFloatAtIndex(srcSlice, index,  NATIVE_BYTE_ORDER);
-      MemoryAccess.setFloatAtIndex(dstSlice, index, NON_NATIVE_BYTE_ORDER, flt);
-    }
+    putFloatArr(seg, offsetBytes, srcArray, srcOffsetFloats, lengthFloats);
+  }
+
+  static void putFloatArr(
+      final MemorySegment seg, final long offsetBytes, final float[] srcArray, final int srcOffsetFloats, final int lengthFloats) {
+    final MemorySegment srcSeg = MemorySegment.ofArray(srcArray);
+    final long srcOffsetBytes = ((long) srcOffsetFloats) << FLOAT_SHIFT;
+    MemorySegment.copy(srcSeg, JAVA_FLOAT, srcOffsetBytes, seg, JAVA_FLOAT_UNALIGNED_NON_NATIVE, offsetBytes, lengthFloats);
   }
 
   @Override
   public void putInt(final long offsetBytes, final int value) {
-    MemoryAccess.setIntAtOffset(seg, offsetBytes, NON_NATIVE_BYTE_ORDER, value);
+    seg.set(JAVA_INT_UNALIGNED_NON_NATIVE, offsetBytes, value);
   }
 
   @Override
   public void putIntArray(final long offsetBytes, final int[] srcArray, final int srcOffsetInts, final int lengthInts) {
-    final long copyBytes = ((long) lengthInts) << INT_SHIFT;
-    final MemorySegment srcSlice = MemorySegment.ofArray(srcArray).asSlice(srcOffsetInts << INT_SHIFT, copyBytes);
-    final MemorySegment dstSlice = seg.asSlice(offsetBytes, copyBytes);
-    for (int index = 0; index < lengthInts; index++) {
-      final int anInt = MemoryAccess.getIntAtIndex(srcSlice, index,  NATIVE_BYTE_ORDER);
-      MemoryAccess.setIntAtIndex(dstSlice, index, NON_NATIVE_BYTE_ORDER, anInt);
-    }
+    putIntArr(seg, offsetBytes, srcArray, srcOffsetInts, lengthInts);
+  }
+
+  static void putIntArr(
+      final MemorySegment seg, final long offsetBytes, final int[] srcArray, final int srcOffsetInts, final int lengthInts) {
+    final MemorySegment srcSeg = MemorySegment.ofArray(srcArray);
+    final long srcOffsetBytes = ((long) srcOffsetInts) << INT_SHIFT;
+    MemorySegment.copy(srcSeg, JAVA_INT, srcOffsetBytes, seg, JAVA_INT_UNALIGNED_NON_NATIVE, offsetBytes, lengthInts);
   }
 
   @Override
   public void putLong(final long offsetBytes, final long value) {
-    MemoryAccess.setLongAtOffset(seg, offsetBytes, NON_NATIVE_BYTE_ORDER, value);
+    seg.set(JAVA_LONG_UNALIGNED_NON_NATIVE, offsetBytes, value);
   }
 
   @Override
   public void putLongArray(final long offsetBytes, final long[] srcArray, final int srcOffsetLongs, final int lengthLongs) {
-    final long copyBytes = ((long) lengthLongs) << LONG_SHIFT;
-    final MemorySegment srcSlice = MemorySegment.ofArray(srcArray).asSlice(srcOffsetLongs << LONG_SHIFT, copyBytes);
-    final MemorySegment dstSlice = seg.asSlice(offsetBytes, copyBytes);
-    for (int index = 0; index < lengthLongs; index++) {
-      final long aLong = MemoryAccess.getLongAtIndex(srcSlice, index,  NATIVE_BYTE_ORDER);
-      MemoryAccess.setLongAtIndex(dstSlice, index, NON_NATIVE_BYTE_ORDER, aLong);
-    }
+    putLongArr(seg, offsetBytes, srcArray, srcOffsetLongs, lengthLongs);
+  }
+
+  static void putLongArr(
+      final MemorySegment seg, final long offsetBytes, final long[] srcArray, final int srcOffsetLongs, final int lengthLongs) {
+    final MemorySegment srcSeg = MemorySegment.ofArray(srcArray);
+    final long srcOffsetBytes = ((long) srcOffsetLongs) << LONG_SHIFT;
+    MemorySegment.copy(srcSeg, JAVA_LONG, srcOffsetBytes, seg, JAVA_LONG_UNALIGNED_NON_NATIVE, offsetBytes, lengthLongs);
   }
 
   @Override
   public void putShort(final long offsetBytes, final short value) {
-    MemoryAccess.setShortAtOffset(seg, offsetBytes, NON_NATIVE_BYTE_ORDER, value);
+    seg.set(JAVA_SHORT_UNALIGNED_NON_NATIVE, offsetBytes, value);
   }
 
   @Override
   public void putShortArray(final long offsetBytes, final short[] srcArray, final int srcOffsetShorts, final int lengthShorts) {
-    final long copyBytes = ((long) lengthShorts) << SHORT_SHIFT;
-    final MemorySegment srcSlice = MemorySegment.ofArray(srcArray).asSlice(srcOffsetShorts << SHORT_SHIFT, copyBytes);
-    final MemorySegment dstSlice = seg.asSlice(offsetBytes, copyBytes);
-    for (int index = 0; index < lengthShorts; index++) {
-      final short aShort = MemoryAccess.getShortAtIndex(srcSlice, index,  NATIVE_BYTE_ORDER);
-      MemoryAccess.setShortAtIndex(dstSlice, index, NON_NATIVE_BYTE_ORDER, aShort);
-    }
+    putShortArr(seg, offsetBytes, srcArray, srcOffsetShorts, lengthShorts);
+  }
+
+  static void putShortArr(
+      final MemorySegment seg, final long offsetBytes, final short[] srcArray, final int srcOffsetShorts, final int lengthShorts) {
+    final MemorySegment srcSeg = MemorySegment.ofArray(srcArray);
+    final long srcOffsetBytes = ((long) srcOffsetShorts) << SHORT_SHIFT;
+    MemorySegment.copy(srcSeg, JAVA_SHORT, srcOffsetBytes, seg, JAVA_SHORT_UNALIGNED_NON_NATIVE, offsetBytes, lengthShorts);
   }
 
 }

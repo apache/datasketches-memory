@@ -71,10 +71,6 @@ public class WritableMemoryTest {
   public void checkEquals() {
     int len = 7;
     WritableMemory wmem1 = WritableMemory.allocate(len);
-    //@SuppressWarnings({"EqualsWithItself", "SelfEquals"}) //unsupported
-    //SelfEquals for Plexus, EqualsWithItself for IntelliJ
-    //boolean eq1 = wmem1.equals(wmem1); //strict profile complains
-    //assertTrue(eq1);
 
     WritableMemory wmem2 = WritableMemory.allocate(len + 1);
     assertFalse(wmem1.equals(wmem2));

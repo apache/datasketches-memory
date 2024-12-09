@@ -22,6 +22,7 @@ package org.apache.datasketches.memory.internal;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
+import java.lang.foreign.Arena;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -32,8 +33,6 @@ import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
-
-import jdk.incubator.foreign.ResourceScope;
 
 /**
  * @author Lee Rhodes
@@ -167,8 +166,8 @@ public class BufferInvariantsTest {
 
   @Test
   public void checkLimitsDirect() throws Exception {
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(100, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(100, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       Buffer buf = wmem.asBuffer();
       buf.setStartPositionEnd(40, 45, 50);
       buf.setStartPositionEnd(0, 0, 100);
@@ -238,43 +237,43 @@ public class BufferInvariantsTest {
   @Test
   public void testBufDirect() throws Exception {
     int n = 25;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-    WritableMemory wmem = WritableMemory.allocateDirect(n, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
-    WritableBuffer buf = wmem.asWritableBuffer();
-    for (byte i = 0; i < n; i++) { buf.putByte(i); }
-    buf.setPosition(0);
-    assertEquals(buf.getPosition(), 0);
-    assertEquals(buf.getEnd(), 25);
-    assertEquals(buf.getCapacity(), 25);
-//    print("Orig  : ");
-//    printbuf(buf);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(n, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
+      WritableBuffer buf = wmem.asWritableBuffer();
+      for (byte i = 0; i < n; i++) { buf.putByte(i); }
+      buf.setPosition(0);
+      assertEquals(buf.getPosition(), 0);
+      assertEquals(buf.getEnd(), 25);
+      assertEquals(buf.getCapacity(), 25);
+  //    print("Orig  : ");
+  //    printbuf(buf);
 
-    buf.setStartPositionEnd(0, 5, 20);
-    assertEquals(buf.getRemaining(), 15);
-    assertEquals(buf.getCapacity(), 25);
-    assertEquals(buf.getByte(), 5);
-    buf.setPosition(5);
-//    print("Set   : ");
-//    printbuf(buf);
+      buf.setStartPositionEnd(0, 5, 20);
+      assertEquals(buf.getRemaining(), 15);
+      assertEquals(buf.getCapacity(), 25);
+      assertEquals(buf.getByte(), 5);
+      buf.setPosition(5);
+  //    print("Set   : ");
+  //    printbuf(buf);
 
-    Buffer dup = buf.duplicate();
-    assertEquals(dup.getRemaining(), 15);
-    assertEquals(dup.getCapacity(), 25);
-    assertEquals(dup.getByte(), 5);
-    dup.setPosition(5);
-//    print("Dup   : ");
-//    printbuf(dup);
+      Buffer dup = buf.duplicate();
+      assertEquals(dup.getRemaining(), 15);
+      assertEquals(dup.getCapacity(), 25);
+      assertEquals(dup.getByte(), 5);
+      dup.setPosition(5);
+  //    print("Dup   : ");
+  //    printbuf(dup);
 
 
-    Buffer reg = buf.region();
-    assertEquals(reg.getPosition(), 0);
-    assertEquals(reg.getEnd(), 15);
-    assertEquals(reg.getRemaining(), 15);
-    assertEquals(reg.getCapacity(), 15);
-    assertEquals(reg.getByte(), 5);
-    reg.setPosition(0);
-//    print("Region: ");
-//    printbuf(reg);
+      Buffer reg = buf.region();
+      assertEquals(reg.getPosition(), 0);
+      assertEquals(reg.getEnd(), 15);
+      assertEquals(reg.getRemaining(), 15);
+      assertEquals(reg.getCapacity(), 15);
+      assertEquals(reg.getByte(), 5);
+      reg.setPosition(0);
+  //    print("Region: ");
+  //    printbuf(reg);
     }
   }
 

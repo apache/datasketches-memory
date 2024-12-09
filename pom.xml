@@ -25,7 +25,7 @@ under the License.
 
   <modelVersion>4.0.0</modelVersion>
 
-<!--
+  <!--
   <parent>
     <groupId>org.apache</groupId>
     <artifactId>apache</artifactId>
@@ -34,7 +34,7 @@ under the License.
 
   <groupId>org.apache.datasketches</groupId>
   <artifactId>datasketches-memory</artifactId>
-  <version>4.2.0-SNAPSHOT</version>
+  <version>5.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>${project.artifactId}</name>
@@ -89,10 +89,11 @@ under the License.
 
     <!-- System-wide properties -->
     <maven.version>3.6.3</maven.version>
-    <java.version>17</java.version>
+    <java.version>21</java.version>
+    <enable.preview>--enable-preview</enable.preview>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
-    <argLine>-Xmx4g -Duser.language=en -Duser.country=US -Dfile.encoding=UTF-8 --add-modules=jdk.incubator.foreign</argLine>
+    <argLine>-Xmx4g -Duser.language=en -Duser.country=US -Dfile.encoding=UTF-8 ${enable.preview}</argLine>
     <charset.encoding>UTF-8</charset.encoding>
     <project.build.sourceEncoding>${charset.encoding}</project.build.sourceEncoding>
     <project.build.resourceEncoding>${charset.encoding}</project.build.resourceEncoding>
@@ -107,11 +108,12 @@ under the License.
     <maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
     <maven-install-plugin.version>3.1.2</maven-install-plugin.version>
     <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
-    <maven-javadoc-plugin.version>3.10.1</maven-javadoc-plugin.version>
+    <maven-javadoc-plugin.version>3.11.1</maven-javadoc-plugin.version>
     <maven-release-plugin.version>3.1.1</maven-release-plugin.version>
     <maven-remote-resources-plugin.version>3.2.0</maven-remote-resources-plugin.version>
     <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
-    <maven-surefire-failsafe-plugins.version>3.5.0</maven-surefire-failsafe-plugins.version> <!-- for surefire, failsafe and surefire-report -->
+    <maven-surefire-failsafe-plugins.version>3.5.2</maven-surefire-failsafe-plugins.version> <!-- for surefire, failsafe and surefire-report -->
+    <maven-toolchains-plugin.version>3.2.0</maven-toolchains-plugin.version>
     <!-- com.github plugins -->
     <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
     <!-- org.apache.creadur plugins -->
@@ -161,7 +163,7 @@ under the License.
           <version>${maven-compiler-plugin.version}</version>
           <configuration>
             <compilerArgs>
-              <arg>--add-modules=jdk.incubator.foreign</arg>
+              <arg>${enable.preview}</arg>
             </compilerArgs>
           </configuration>
         </plugin>
@@ -187,7 +189,7 @@ under the License.
               <configuration>
                 <rules>
                   <requireJavaVersion>
-                    <version>[17,18)</version>
+                    <version>${java.version}</version>
                   </requireJavaVersion>
                   <requireMavenVersion>
                     <version>[${maven.version},4.0.0)</version>
@@ -235,7 +237,7 @@ under the License.
             <excludePackageNames>org.apache.datasketches.memory/internal</excludePackageNames>
             <show>public</show>
             <additionalOptions>
-              <additionalOption>--add-modules=jdk.incubator.foreign</additionalOption>
+              <additionalOption>${enable.preview}</additionalOption>
             </additionalOptions>
           </configuration>
           <executions>
@@ -281,11 +283,31 @@ under the License.
           <artifactId>maven-surefire-plugin</artifactId>
           <version>${maven-surefire-failsafe-plugins.version}</version>
           <configuration>
-            <argLine>--add-modules=jdk.incubator.foreign</argLine>
+            <argLine>${enable.preview}</argLine>
             <trimStackTrace>false</trimStackTrace>
             <useManifestOnlyJar>false</useManifestOnlyJar>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
             <reportsDirectory>${project.build.directory}/test-output/${maven.build.timestamp}</reportsDirectory>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-toolchains-plugin</artifactId>
+          <version>${maven-toolchains-plugin.version}</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>toolchain</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <toolchains>
+              <jdk>
+                <version>${java.version}</version>
+              </jdk>
+            </toolchains>
           </configuration>
         </plugin>
 
@@ -391,6 +413,10 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-toolchains-plugin</artifactId>
       </plugin>
       <plugin>
         <groupId>org.apache.rat</groupId>

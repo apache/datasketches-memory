@@ -66,10 +66,12 @@ Note: *primitive* := *{byte, short, int, long, float, double}*
     * *Memory.map(File)*  (read only)
     * *WritableMemory.writableMap(File)*
 
-## Release 4.0.0 (inclusive) to 5.0.0 (exclusive)
-Starting with release *datasketches-memory-4.0.0*, this Memory component supports only Java 17 when compiling from source and should work with later Java versions at runtime.
+## Release 5.0.0 (inclusive) to 6.0.0 (exclusive)
+Starting with release *datasketches-memory-5.0.0*, this Memory component supports only Java 21 when compiling from source and should work with later Java versions at runtime.
 
-### *NOTE: The DataSketches Java Memory Component is not thread-safe.*
+### *NOTES:* 
+* The DataSketches Java Memory Component is not thread-safe.
+* We recommend Eclipse Adoptium/Temurin 21.0.5+11 or later as earlier releases of 21 have bugs that affect this product.
 
 ## Build Instructions
 __NOTES:__
@@ -78,14 +80,14 @@ __NOTES:__
 As a result, the directory elements of the full absolute path of the target installation directory must qualify as Java identifiers.
 In other words, the directory elements must not have any space characters (or non-Java identifier characters) in any of the path elements. This is required by the Oracle Java Specification in order to ensure location-independent access to resources:
 [See Oracle Location-Independent Access to Resources](https://docs.oracle.com/javase/8/docs/technotes/guides/lang/resources.html)
-* The compile command line must contain the JVM flag *--add-modules=jdk.incubator.foreign*.
+* The compile command line must contain the JVM flag *--enable-preview*.
 * This component is not designed as a Java Module, so the Jar file should be part of the application classpath.
 
 #### Dependencies
 There are no run-time dependencies. See the pom.xml file for test dependencies.
 
 #### Maven build instructions
-The Maven build requires JDK-17 to compile:
+The Maven build requires JDK-21 to compile:
 
 To run normal unit tests:
 

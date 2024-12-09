@@ -41,12 +41,12 @@ public class UtilTest {
 
   static final String getFileAttributes(File file) throws IOException {
     PosixFileAttributes attrs = Files.getFileAttributeView(
-        file.toPath(), PosixFileAttributeView.class, new LinkOption[0]).readAttributes();
+       file.toPath(), PosixFileAttributeView.class, new LinkOption[0]).readAttributes();
     String s = String.format("%s: %s %s %s%n",
-        file.getPath(),
-        attrs.owner().getName(),
-        attrs.group().getName(),
-        PosixFilePermissions.toString(attrs.permissions()));
+       file.getPath(),
+       attrs.owner().getName(),
+       attrs.group().getName(),
+       PosixFilePermissions.toString(attrs.permissions()));
     return s;
   }
 

@@ -25,10 +25,16 @@ import static java.nio.channels.FileChannel.MapMode.READ_WRITE;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
+import java.nio.file.OpenOption;
+import java.nio.file.StandardOpenOption;
 import java.util.Objects;
+import java.util.Set;
 
 import org.apache.datasketches.memory.Buffer;
 import org.apache.datasketches.memory.Memory;
@@ -36,22 +42,20 @@ import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 
-import jdk.incubator.foreign.MemoryAccess;
-import jdk.incubator.foreign.MemorySegment;
-import jdk.incubator.foreign.ResourceScope;
-
 /**
  * Common base of native-ordered and non-native-ordered {@link WritableMemory} implementations.
  * Contains methods which are agnostic to the byte order.
  */
+@SuppressWarnings("preview")
 public abstract class WritableMemoryImpl extends ResourceImpl implements WritableMemory {
 
   //Pass-through constructor
   WritableMemoryImpl(
       final MemorySegment seg,
       final int typeId,
-      final MemoryRequestServer memReqSvr) {
-    super(seg, typeId, memReqSvr);
+      final MemoryRequestServer memReqSvr,
+      final Arena arena) {
+    super(seg, typeId, memReqSvr, arena);
   }
 
   //WRAP HEAP ARRAY RESOURCE
@@ -72,9 +76,9 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
         | (seg.isReadOnly() ? READONLY : 0);
     if (byteOrder == NON_NATIVE_BYTE_ORDER) {
       type |= NONNATIVE_BO;
-      return new NonNativeWritableMemoryImpl(seg, type, memReqSvr);
+      return new NonNativeWritableMemoryImpl(seg, type, memReqSvr, null);
     }
-    return new NativeWritableMemoryImpl(seg, type, memReqSvr);
+    return new NativeWritableMemoryImpl(seg, type, memReqSvr, null);
   }
 
   //BYTE BUFFER RESOURCE
@@ -112,7 +116,7 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
       byteBufView = byteBuffer.duplicate();
     }
     byteBufView.clear(); //resets position to zero and limit to capacity. Does not impact data.
-    final MemorySegment seg = MemorySegment.ofByteBuffer(byteBufView); //from 0 to capacity
+    final MemorySegment seg = MemorySegment.ofBuffer(byteBufView); //from 0 to capacity
     int type = MEMORY | BYTEBUF
         | (localReadOnly ? READONLY : 0)
         | (seg.isNative() ? DIRECT : 0)
@@ -120,9 +124,9 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
     final WritableMemory wmem;
     if (byteOrder == NON_NATIVE_BYTE_ORDER) {
       type |= NONNATIVE_BO;
-      wmem = new NonNativeWritableMemoryImpl(seg, type, memReqSvr);
+      wmem = new NonNativeWritableMemoryImpl(seg, type, memReqSvr, null);
     } else {
-      wmem = new NativeWritableMemoryImpl(seg, type, memReqSvr);
+      wmem = new NativeWritableMemoryImpl(seg, type, memReqSvr, null);
     }
     return wmem;
   }
@@ -135,12 +139,13 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
    * @param file the given file to map. It must be non-null.
    * @param fileOffsetBytes the file starting offset in bytes. It must be &ge; 0.
    * @param capacityBytes the capacity of the mapped memory. It must be &ge; 0.
-   * @param scope the given scope.
    * It must be non-null.
-   * Typically use <i>ResourceScope.newConfinedScope()</i>.
-   * Warning: specifying a <i>newSharedScope()</i> is not supported.
-   * @param localReadOnly true if read-only is being imposed locally, even if the given file is writable..
+   * Typically use <i>Arena.ofConfined()</i>.
+   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not recommended.
    * @param byteOrder the given <i>ByteOrder</i>. It must be non-null.
+   * @param localReadOnly true if read-only is being imposed locally, even if the given file is writable..
+   * @param arena the given arena. It must be non-null.
+   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not recommended.
    * @return a <i>WritableMemory</i>
    * @throws IllegalArgumentException if file is not readable.
    * @throws IOException if mapping is not successful.
@@ -149,13 +154,13 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
       final File file,
       final long fileOffsetBytes,
       final long capacityBytes,
-      final ResourceScope scope,
+      final ByteOrder byteOrder,
       final boolean localReadOnly,
-      final ByteOrder byteOrder)
+      final Arena arena)
           throws IllegalArgumentException, IOException {
+    Objects.requireNonNull(arena, "Arena must be non-null.");
     Objects.requireNonNull(file, "File must be non-null.");
     Objects.requireNonNull(byteOrder, "ByteOrder must be non-null.");
-    Objects.requireNonNull(scope, "ResourceScope must be non-null.");
     final FileChannel.MapMode mapMode;
     final boolean fileCanRead = file.canRead();
     if (localReadOnly) {
@@ -167,14 +172,23 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
         throw new IllegalArgumentException("File must be readable and writable.");
       }
     }
-    final MemorySegment seg = MemorySegment.mapFile(file.toPath(), fileOffsetBytes, capacityBytes, mapMode, scope);
+
+    final Set<OpenOption> openOptions = READ_WRITE.equals(mapMode)
+      ? Set.of(StandardOpenOption.READ, StandardOpenOption.WRITE)
+      : Set.of(StandardOpenOption.READ);
+
     final boolean nativeBOType = byteOrder == ByteOrder.nativeOrder();
     final int type = MEMORY | MAP | DIRECT
-        | (localReadOnly ? READONLY : 0)
-        | (nativeBOType ? NATIVE_BO : NONNATIVE_BO);
-    return nativeBOType
-        ? new NativeWritableMemoryImpl(seg, type, null)
-        : new NonNativeWritableMemoryImpl(seg, type, null);
+          | (localReadOnly ? READONLY : 0)
+          | (nativeBOType ? NATIVE_BO : NONNATIVE_BO);
+
+    try (final FileChannel fileChannel = FileChannel.open(file.toPath(), openOptions)) {
+      final MemorySegment seg = fileChannel.map(mapMode, fileOffsetBytes, capacityBytes, arena);
+
+      return nativeBOType
+          ? new NativeWritableMemoryImpl(seg, type, null, arena)
+          : new NonNativeWritableMemoryImpl(seg, type, null, arena);
+    }
   }
 
   //DIRECT RESOURCE
@@ -183,33 +197,28 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
    * The static constructor that chooses the correct Direct leaf node based on the byte order.
    * @param capacityBytes the requested capacity for the Direct (off-heap) memory.  It must be &ge; 0.
    * @param alignmentBytes requested segment alignment. Typically 1, 2, 4 or 8.
-   * @param scope ResourceScope for the backing MemorySegment.
-   * It must be non-null.
-   * Typically use <i>ResourceScope.newConfinedScope()</i>.
-   * Warning: specifying a <i>newSharedScope()</i> is not supported.
    * @param byteOrder the byte order to be used.  It must be non-null.
    * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
    * This is a callback mechanism for a user client of direct memory to request more memory.
+   * @param arena the given arena. It must be non-null.
+   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not recommended.
    * @return WritableMemory
    */
   public static WritableMemory wrapDirect(
       final long capacityBytes,
       final long alignmentBytes,
-      final ResourceScope scope,
       final ByteOrder byteOrder,
-      final MemoryRequestServer memReqSvr) {
-    Objects.requireNonNull(scope, "ResourceScope must be non-null");
+      final MemoryRequestServer memReqSvr,
+      final Arena arena) {
+    Objects.requireNonNull(arena, "Arena must be non-null");
     Objects.requireNonNull(byteOrder, "ByteOrder must be non-null");
-    final MemorySegment seg = MemorySegment.allocateNative(
-        capacityBytes,
-        alignmentBytes,
-        scope);
+    final MemorySegment seg = arena.allocate(capacityBytes, alignmentBytes);
     final boolean nativeBOType = byteOrder == ByteOrder.nativeOrder();
     final int type = MEMORY | DIRECT
         | (nativeBOType ? NATIVE_BO : NONNATIVE_BO);
     return nativeBOType
-        ? new NativeWritableMemoryImpl(seg, type, memReqSvr)
-        : new NonNativeWritableMemoryImpl(seg, type, memReqSvr);
+        ? new NativeWritableMemoryImpl(seg, type, memReqSvr, arena)
+        : new NonNativeWritableMemoryImpl(seg, type, memReqSvr, arena);
   }
 
   //REGION DERIVED
@@ -305,36 +314,26 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
 
   @Override
   public final byte getByte(final long offsetBytes) {
-    return MemoryAccess.getByteAtOffset(seg, offsetBytes);
+    return seg.get(ValueLayout.JAVA_BYTE, offsetBytes);
   }
 
   @Override
   public final void getByteArray(final long offsetBytes, final byte[] dstArray, final int dstOffsetBytes, final int lengthBytes) {
-    checkBounds(dstOffsetBytes, lengthBytes, dstArray.length);
-    final MemorySegment srcSlice = seg.asSlice(offsetBytes, lengthBytes);
-    final MemorySegment dstSlice = MemorySegment.ofArray(dstArray).asSlice(dstOffsetBytes, lengthBytes);
-    dstSlice.copyFrom(srcSlice);
+    final MemorySegment dstSeg = MemorySegment.ofArray(dstArray);
+    MemorySegment.copy(seg, offsetBytes, dstSeg, dstOffsetBytes, lengthBytes);
   }
 
-  //OTHER PRIMITIVE READ METHODS: compareTo, copyTo, writeTo
-
-  @Override
-  public final int compareTo(final long thisOffsetBytes, final long thisLengthBytes,
-      final Memory that, final long thatOffsetBytes, final long thatLengthBytes) {
-    return CompareAndCopy.compare(seg, thisOffsetBytes, thisLengthBytes,
-        ((ResourceImpl)that).seg, thatOffsetBytes, thatLengthBytes);
-  }
+  //OTHER PRIMITIVE READ METHODS:
 
   @Override
   public final void copyTo(final long srcOffsetBytes,
       final WritableMemory destination, final long dstOffsetBytes, final long lengthBytes) {
-    CompareAndCopy.copy(seg, srcOffsetBytes,
-        ((ResourceImpl)destination).seg, dstOffsetBytes, lengthBytes);
+    MemorySegment.copy(seg, srcOffsetBytes, ((ResourceImpl)destination).seg, dstOffsetBytes, lengthBytes);
   }
 
   @Override
-  public final void writeToByteStream(final long offsetBytes, final int lengthBytes,
-      final ByteArrayOutputStream out) throws IOException {
+  public final void writeToByteStream(final long offsetBytes, final int lengthBytes, final ByteArrayOutputStream out)
+      throws IOException {
     checkBounds(offsetBytes, lengthBytes, seg.byteSize());
     final byte[] bArr = new byte[lengthBytes];
     getByteArray(offsetBytes,bArr, 0, lengthBytes); //fundamental limitation of MemorySegment
@@ -350,15 +349,13 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
 
   @Override
   public final void putByte(final long offsetBytes, final byte value) {
-    MemoryAccess.setByteAtOffset(seg, offsetBytes, value);
+    seg.set(ValueLayout.JAVA_BYTE, offsetBytes, value);
   }
 
   @Override
-  public final void putByteArray(final long offsetBytes, final byte[] srcArray,
-      final int srcOffsetBytes, final int lengthBytes) {
-    final MemorySegment srcSlice = MemorySegment.ofArray(srcArray).asSlice(srcOffsetBytes, lengthBytes);
-    final MemorySegment dstSlice = seg.asSlice(offsetBytes, lengthBytes);
-    dstSlice.copyFrom(srcSlice);
+  public final void putByteArray(final long offsetBytes, final byte[] srcArray, final int srcOffsetBytes, final int lengthBytes) {
+    final MemorySegment srcSeg = MemorySegment.ofArray(srcArray);
+    MemorySegment.copy(srcSeg, srcOffsetBytes, seg, offsetBytes, lengthBytes);
   }
 
   // OTHER WRITE METHODS
@@ -376,8 +373,8 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
 
   @Override
   public final void clearBits(final long offsetBytes, final byte bitMask) {
-    final byte b = MemoryAccess.getByteAtOffset(seg, offsetBytes);
-    MemoryAccess.setByteAtOffset(seg, offsetBytes, (byte)(b & ~bitMask));
+    final byte b = seg.get(ValueLayout.JAVA_BYTE, offsetBytes);
+    seg.set(ValueLayout.JAVA_BYTE, offsetBytes, (byte)(b & ~bitMask));
   }
 
   @Override
@@ -393,13 +390,13 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
 
   @Override
   public final byte[] getArray() {
-    return seg.toByteArray();
+    return seg.toArray(ValueLayout.JAVA_BYTE);
   }
 
   @Override
   public final void setBits(final long offsetBytes, final byte bitMask) {
-    final byte b = MemoryAccess.getByteAtOffset(seg, offsetBytes);
-    MemoryAccess.setByteAtOffset(seg, offsetBytes, (byte)(b | bitMask));
+    final byte b = seg.get(ValueLayout.JAVA_BYTE, offsetBytes);
+    seg.set(ValueLayout.JAVA_BYTE, offsetBytes, (byte)(b | bitMask));
   }
 
 }

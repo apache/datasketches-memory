@@ -22,6 +22,7 @@ package org.apache.datasketches.memory.internal;
 import static org.apache.datasketches.memory.internal.ResourceImpl.NON_NATIVE_BYTE_ORDER;
 import static org.testng.Assert.assertEquals;
 
+import java.lang.foreign.Arena;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
@@ -35,15 +36,13 @@ import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 import org.testng.collections.Lists;
 
-import jdk.incubator.foreign.ResourceScope;
-
 public class BufferTest {
   private final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
   @Test
   public void checkDirectRoundTrip() throws Exception {
     int n = 1024; //longs
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-    WritableMemory wmem = WritableMemory.allocateDirect(n * 8, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(n * 8, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       WritableBuffer wbuf = wmem.asWritableBuffer();
       for (int i = 0; i < n; i++) {
         wbuf.putLong(i);
@@ -285,29 +284,33 @@ public class BufferTest {
   @Test(expectedExceptions = IllegalStateException.class)
   public void checkParentUseAfterFree() throws Exception {
     int bytes = 64 * 8;
-    WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, ResourceScope.newConfinedScope(), ByteOrder.nativeOrder(), memReqSvr);
-    WritableBuffer wbuf = wmem.asWritableBuffer();
-    wbuf.close();
-    //with -ea assert: Memory not alive.
-    //with -da sometimes segfaults, sometimes passes!
-    wbuf.getLong();
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
+      WritableBuffer wbuf = wmem.asWritableBuffer();
+      wmem.close();
+      //with -ea assert: Memory not alive.
+      //with -da sometimes segfaults, sometimes passes!
+      wbuf.getLong();
+    }
   }
 
   @Test(expectedExceptions = IllegalStateException.class)
   public void checkRegionUseAfterFree() throws Exception {
     int bytes = 64;
-    WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, ResourceScope.newConfinedScope(), ByteOrder.nativeOrder(), memReqSvr);
-    Buffer region = wmem.asBuffer().region();
-    region.close();
-    //with -ea assert: Memory not alive.
-    //with -da sometimes segfaults, sometimes passes!
-    region.getByte();
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
+      Buffer region = wmem.asBuffer().region();
+      wmem.close();
+      //with -ea assert: Memory not alive.
+      //with -da sometimes segfaults, sometimes passes!
+      region.getByte();
+    }
   }
 
   @Test
   public void checkCheckNotAliveAfterTWR() {
     Buffer buf;
-    try (WritableMemory wmem = WritableMemory.allocateDirect(100)) {
+    try (WritableMemory wmem = WritableMemory.allocateDirect(100, Arena.ofConfined())) {
       buf = wmem.asBuffer();
     }
     try {

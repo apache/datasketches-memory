@@ -22,13 +22,12 @@ package org.apache.datasketches.memory;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.internal.WritableMemoryImpl;
-
-import jdk.incubator.foreign.MemorySegment;
-import jdk.incubator.foreign.ResourceScope;
 
 /**
  * Defines the read-only API for offset access to a resource.
@@ -74,9 +73,11 @@ public interface Memory extends Resource {
   /**
    * Maps the given file into <i>Memory</i> for read operations
    * Calling this method is equivalent to calling
-   * {@link #map(File, long, long, ByteOrder)
+   * {@link #map(File, long, long, ByteOrder, Arena)
    * map(file, 0, file.length(), scope, ByteOrder.nativeOrder())}.
    * @param file the given file to map. It must be non-null with a non-negative length and readable.
+   * @param arena the given arena. It must be non-null.
+   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not recommended.
    * @return <i>Memory</i> for managing the mapped memory.
    * @throws IllegalArgumentException if path is not associated with the default file system.
    * @throws IllegalStateException if scope has been already closed, or if access occurs from a thread other than the thread owning scope.
@@ -84,8 +85,8 @@ public interface Memory extends Resource {
    * @throws SecurityException If a security manager is installed and it denies an unspecified permission
    * required by the implementation.
    */
-  static Memory map(File file) throws IOException {
-    return map(file, 0, file.length(), ByteOrder.nativeOrder());
+  static Memory map(File file, Arena arena) throws IOException {
+    return map(file, 0, file.length(), ByteOrder.nativeOrder(), arena);
   }
 
   /**
@@ -94,6 +95,8 @@ public interface Memory extends Resource {
    * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
    * @param capacityBytes the size of the mapped memory. It must not be negative..
    * @param byteOrder the byte order to be used.  It must be non-null.
+   * @param arena the given arena. It must be non-null.
+   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not recommended.
    * @return <i>Memory</i> for managing the mapped memory.
    * @throws IllegalArgumentException if path is not associated with the default file system.
    * @throws IllegalStateException if scope has been already closed, or if access occurs from a thread other than the thread owning scope.
@@ -105,36 +108,9 @@ public interface Memory extends Resource {
       File file,
       long fileOffsetBytes,
       long capacityBytes,
-      ByteOrder byteOrder) throws IOException {
-    final ResourceScope scope = ResourceScope.newConfinedScope();
-    return WritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, true, byteOrder);
-  }
-
-  /**
-   * Maps the specified portion of the given file into <i>Memory</i> for read operations with a ResourceScope.
-   * @param file the given file to map. It must be non-null, readable and length &ge; 0.
-   * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
-   * @param capacityBytes the size of the mapped memory. It must not be negative.
-   * @param scope the given ResourceScope.
-   * It must be non-null.
-   * Typically use <i>ResourceScope.newConfinedScope()</i>.
-   * Warning: specifying a <i>newSharedScope()</i> is not supported.
-   * @param byteOrder the byte order to be used.  It must be non-null.
-   * @return <i>Memory</i> for managing the mapped memory.
-   * @throws IllegalArgumentException  if path is not associated with the default file system.
-   * @throws IllegalStateException - if scope has been already closed, or if access occurs from a thread other
-   * than the thread owning scope.
-   * @throws IOException - if the specified path does not point to an existing file, or if some other I/O error occurs.
-   * @throws SecurityException - If a security manager is installed and it denies an unspecified permission
-   * required by the implementation.
-   */
-  static Memory map(
-      File file,
-      long fileOffsetBytes,
-      long capacityBytes,
-      ResourceScope scope,
-      ByteOrder byteOrder) throws IOException {
-    return WritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, scope, true, byteOrder);
+      ByteOrder byteOrder,
+      Arena arena) throws IOException {
+    return WritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, byteOrder, true, arena);
   }
 
   //NO ALLOCATE DIRECT, makes no sense
@@ -468,27 +444,6 @@ public interface Memory extends Resource {
       int lengthShorts);
 
   //SPECIAL PRIMITIVE READ METHODS: compareTo, copyTo, writeTo
-
-  /**
-   * Compares the bytes of this Memory to <i>that</i> Memory.
-   * Returns <i>(this &lt; that) ? (some negative value) : (this &gt; that) ? (some positive value)
-   * : 0;</i>.
-   * If all bytes are equal up to the shorter of the two lengths, the shorter length is considered
-   * to be less than the other.
-   * @param thisOffsetBytes the starting offset for <i>this Memory</i>
-   * @param thisLengthBytes the length of the region to compare from <i>this Memory</i>
-   * @param that the other Memory to compare with
-   * @param thatOffsetBytes the starting offset for <i>that Memory</i>
-   * @param thatLengthBytes the length of the region to compare from <i>that Memory</i>
-   * @return <i>(this &lt; that) ? (some negative value) : (this &gt; that) ? (some positive value)
-   * : 0;</i>
-   */
-  int compareTo(
-      long thisOffsetBytes,
-      long thisLengthBytes,
-      Memory that,
-      long thatOffsetBytes,
-      long thatLengthBytes);
 
   /**
    * Copies bytes from a source range of this Memory to a destination range of the given Memory

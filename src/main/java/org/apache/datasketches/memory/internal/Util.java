@@ -29,6 +29,8 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Objects;
 
+import org.apache.datasketches.memory.Memory;
+
 /**
  * @author Lee Rhodes
  */
@@ -66,6 +68,17 @@ final class Util {
       return (postpend) ? s.concat(addstr) : addstr.concat(s);
     }
     return s;
+  }
+
+  public static String toHexSeparated(final Memory mem, final int offset, final int lengthBytes) {
+    final int len = (int)Math.min(mem.getCapacity(), lengthBytes);
+    final StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < len; i++) {
+      final int b = mem.getByte(offset + i);
+      sb.append(zeroPad(Integer.toString(b), 2));
+      sb.append(" ");
+    }
+    return sb.toString();
   }
 
   /**
@@ -108,7 +121,7 @@ final class Util {
     return (value & bitMask) != 0;
   }
 
-  //Resources mention: these 3 methods are duplicated in Java/ datasketches/Util
+  //Resources mention: these 2 methods are duplicated in Java/ datasketches/Util
 
   /**
    * Gets the absolute path of the given resource file's shortName.

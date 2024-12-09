@@ -19,6 +19,7 @@
 
 package org.apache.datasketches.memory.internal;
 
+import java.lang.foreign.Arena;
 import static org.apache.datasketches.memory.internal.ResourceImpl.NON_NATIVE_BYTE_ORDER;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -37,8 +38,6 @@ import org.apache.datasketches.memory.WritableMemory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import jdk.incubator.foreign.ResourceScope;
-
 public class NativeWritableBufferImplTest {
   private static final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
 
@@ -47,8 +46,7 @@ public class NativeWritableBufferImplTest {
   @Test
   public void checkNativeCapacityAndClose() throws Exception {
     int memCapacity = 64;
-    ResourceScope scope = ResourceScope.newConfinedScope();
-    WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, Arena.ofConfined());
     WritableBuffer wbuf = wmem.asWritableBuffer();
     assertEquals(wbuf.getCapacity(), memCapacity);
 
@@ -188,8 +186,8 @@ public class NativeWritableBufferImplTest {
   @Test
   public void checkNativeBaseBound() throws Exception {
     int memCapacity = 64;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       WritableBuffer wbuf = wmem.asWritableBuffer();
       wbuf.toString("Force Assertion Error", memCapacity, 8, false);
     } catch (IllegalArgumentException e) {
@@ -200,8 +198,8 @@ public class NativeWritableBufferImplTest {
   @Test
   public void checkNativeSrcArrayBound() throws Exception {
     long memCapacity = 64;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       WritableBuffer wbuf = wmem.asWritableBuffer();
       byte[] srcArray = { 1, -2, 3, -4 };
       wbuf.putByteArray(srcArray, 0, 5); //wrong!
@@ -213,8 +211,8 @@ public class NativeWritableBufferImplTest {
   @Test(expectedExceptions = IndexOutOfBoundsException.class)
   public void checkRegionBounds() throws Exception {
     int memCapacity = 64;
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       WritableBuffer wbuf = wmem.asWritableBuffer();
       wbuf.writableRegion(1, 64, wbuf.getTypeByteOrder()); //wrong!
     }
@@ -328,11 +326,11 @@ public class NativeWritableBufferImplTest {
     int memCapacity = 64;
     WritableBuffer mem = WritableMemory.allocate(memCapacity).asWritableBuffer();
     assertFalse(mem.isDirect());
-    ResourceScope scope = ResourceScope.newConfinedScope();
-    WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
-    WritableBuffer wbuf = wmem.asWritableBuffer();
-    assertTrue(wbuf.isDirect());
-    wmem.close(); //immediate close
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(memCapacity, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
+      WritableBuffer wbuf = wmem.asWritableBuffer();
+      assertTrue(wbuf.isDirect());
+    }
   }
 
   @Test
@@ -353,61 +351,6 @@ public class NativeWritableBufferImplTest {
   @Test
   public void checkGoodBounds() {
    ResourceImpl.checkBounds(50, 50, 100);
-  }
-
-  @Test
-  public void checkCompareToHeap() {
-    byte[] arr1 = new byte[] {0, 1, 2, 3};
-    byte[] arr2 = new byte[] {0, 1, 2, 4};
-    byte[] arr3 = new byte[] {0, 1, 2, 3, 4};
-
-    Buffer buf1 = Memory.wrap(arr1).asBuffer();
-    Buffer buf2 = Memory.wrap(arr2).asBuffer();
-    Buffer buf3 = Memory.wrap(arr3).asBuffer();
-
-    int comp = buf1.compareTo(0, 3, buf2, 0, 3);
-    assertEquals(comp, 0);
-    comp = buf1.compareTo(0, 4, buf2, 0, 4);
-    assertEquals(comp, -1);
-    comp = buf2.compareTo(0, 4, buf1, 0, 4);
-    assertEquals(comp, 1);
-    //different lengths
-    comp = buf1.compareTo(0, 4, buf3, 0, 5);
-    assertEquals(comp, -1);
-    comp = buf3.compareTo(0, 5, buf1, 0, 4);
-    assertEquals(comp, 1);
-  }
-
-  @Test
-  public void checkCompareToDirect() throws Exception {
-    byte[] arr1 = new byte[] {0, 1, 2, 3};
-    byte[] arr2 = new byte[] {0, 1, 2, 4};
-    byte[] arr3 = new byte[] {0, 1, 2, 3, 4};
-    try (ResourceScope scope = ResourceScope.newConfinedScope()) {
-      WritableMemory mem1 = WritableMemory.allocateDirect(4, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
-      WritableMemory mem2 = WritableMemory.allocateDirect(4, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
-      WritableMemory mem3 = WritableMemory.allocateDirect(5, 1, scope, ByteOrder.nativeOrder(), memReqSvr);
-
-      mem1.putByteArray(0, arr1, 0, 4);
-      mem2.putByteArray(0, arr2, 0, 4);
-      mem3.putByteArray(0, arr3, 0, 5);
-
-      Buffer buf1 = mem1.asBuffer();
-      Buffer buf2 = mem2.asBuffer();
-      Buffer buf3 = mem3.asBuffer();
-
-      int comp = buf1.compareTo(0, 3, buf2, 0, 3);
-      assertEquals(comp, 0);
-      comp = buf1.compareTo(0, 4, buf2, 0, 4);
-      assertEquals(comp, -1);
-      comp = buf2.compareTo(0, 4, buf1, 0, 4);
-      assertEquals(comp, 1);
-      //different lengths
-      comp = buf1.compareTo(0, 4, buf3, 0, 5);
-      assertEquals(comp, -1);
-      comp = buf3.compareTo(0, 5, buf1, 0, 4);
-      assertEquals(comp, 1);
-    }
   }
 
   @Test

@@ -24,6 +24,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
+import java.lang.foreign.Arena;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -33,8 +34,6 @@ import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
-
-import jdk.incubator.foreign.ResourceScope;
 
 public class Buffer2Test {
 
@@ -400,23 +399,24 @@ public class Buffer2Test {
   @Test
   public void checkIndependence() {
     int cap = 64;
-    ResourceScope scope = ResourceScope.newImplicitScope();
-    WritableMemory wmem = WritableMemory.allocateDirect(cap, 8, scope, ByteOrder.nativeOrder(), null);
-    WritableBuffer wbuf1 = wmem.asWritableBuffer();
-    WritableBuffer wbuf2 = wmem.asWritableBuffer();
-    assertFalse(wbuf1 == wbuf2);
-    assertTrue(wbuf1.nativeOverlap(wbuf2) == cap);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(cap, 8, ByteOrder.nativeOrder(), null, arena);
+      WritableBuffer wbuf1 = wmem.asWritableBuffer();
+      WritableBuffer wbuf2 = wmem.asWritableBuffer();
+      assertFalse(wbuf1 == wbuf2);
+      assertTrue(wbuf1.nativeOverlap(wbuf2) == cap);
 
-    WritableMemory reg1 = wmem.writableRegion(0, cap);
-    WritableMemory reg2 = wmem.writableRegion(0, cap);
-    assertFalse(reg1 == reg2);
-    assertTrue(reg1.nativeOverlap(reg2) == cap);
+      WritableMemory reg1 = wmem.writableRegion(0, cap);
+      WritableMemory reg2 = wmem.writableRegion(0, cap);
+      assertFalse(reg1 == reg2);
+      assertTrue(reg1.nativeOverlap(reg2) == cap);
 
 
-    WritableBuffer wbuf3 = wbuf1.writableRegion();
-    WritableBuffer wbuf4 = wbuf1.writableRegion();
-    assertFalse(wbuf3 == wbuf4);
-    assertTrue(wbuf3.nativeOverlap(wbuf4) == cap);
+      WritableBuffer wbuf3 = wbuf1.writableRegion();
+      WritableBuffer wbuf4 = wbuf1.writableRegion();
+      assertFalse(wbuf3 == wbuf4);
+      assertTrue(wbuf3.nativeOverlap(wbuf4) == cap);
+    }
   }
 
   @Test

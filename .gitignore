@@ -16,6 +16,9 @@ datasketches-memory*/.gitignore
 # Netbeans project files
 nb-configuration.xml
 
+# VSCode project files
+**/.vscode/
+
 # Additional tools
 .clover/
 

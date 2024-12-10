@@ -21,6 +21,7 @@ package org.apache.datasketches.memory.internal;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.datasketches.memory.MurmurHash3.*;
+import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 import java.lang.foreign.Arena;
@@ -251,7 +252,8 @@ public class MurmurHash3v3Test {
       long[] arr = null;
       hash(arr, 1L);
       fail();
-    } catch (final IllegalArgumentException e) { }
+    }
+    catch (final IllegalArgumentException e) { }
     try {
       int[] arr = null; hash(arr, 1L); fail();
     } catch (final IllegalArgumentException e) { }
@@ -261,20 +263,20 @@ public class MurmurHash3v3Test {
     try {
       byte[] arr = null; hash(arr, 1L); fail();
     } catch (final IllegalArgumentException e) { }
+
+    long[] out = new long[2];
     try {
-      long[] out = new long[2];
       String in = null; hash(in, 1L, out); fail();
     } catch (final IllegalArgumentException e) { }
     try {
-      long[] out = new long[2];
       Memory mem = Memory.wrap(new byte[0]);
-      out = hash(mem, 0L, 4L, 1L, out);
+      hash(mem, 0L, 4L, 1L, out);
     } catch (final IllegalArgumentException e) { }
     try (Arena arena = Arena.ofConfined()) {
       Memory mem = WritableMemory.allocateDirect(8, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
-      long[] out = new long[2];
       out = hash(mem, 0L, 4L, 1L, out);
-    } catch (Exception ee) {}
+    }
+    assertTrue((out[0] != 0) && (out[1] != 0));
   }
 
   @Test

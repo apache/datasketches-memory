@@ -154,14 +154,19 @@ public class WritableMemoryTest {
   }
 
   @Test
-  @SuppressWarnings("unused")
   public void checkOwnerClientCase() {
     WritableMemory owner = WritableMemory.allocate(64);
-    Memory client1 = owner; //Client1 cannot write (no API)
-    owner.putInt(0, 1); //But owner can write
-    ((WritableMemory)client1).putInt(0, 2); //Client1 can write, but with explicit effort.
-    Memory client2 = owner.region(0, owner.getCapacity()); //client2 cannot write (no API)
-    owner.putInt(0, 3); //But Owner should be able to write
+    owner.putInt(0, 1);     //owner contains 1
+    Memory client1 = owner; //owner can cast to a read-only alias, but underneath it is a writable MemorySegment
+    assertEquals(client1.getInt(0), 1); //client contains 1
+    //client1.putInt(0, 2) //no API to do this
+    ((WritableMemory)client1).putInt(0, 2); //can write to client1, but with explicit cast.
+    assertEquals(client1.getInt(0), 2); //client1 now contains 2
+    assertEquals(owner.getInt(0), 2);   //so now owner contains 2 also
+    Memory client2 = owner.region(0, owner.getCapacity()); //create a readOnly region (MemorySegment) from owner
+    try {
+      ((WritableMemory) client2).putInt(0, 3); //now you cannot make client2 writable
+    } catch (UnsupportedOperationException e) { }
   }
 
   @Test

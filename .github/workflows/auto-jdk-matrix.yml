@@ -16,11 +16,9 @@ jobs:
 
         strategy:
           fail-fast: false
-          matrix:
-              jdk: [ 21 ]
 
         env:
-          JDK_VERSION: {{ matrix.jdk }}
+          JDK_VERSION: 21
 
         steps:
         - name: "Checkout ${{ github.ref }} ( ${{ github.sha }} )"
@@ -32,10 +30,10 @@ jobs:
           run: >
              cat .github/workflows/auto-jdk-matrix.yml
 
-        - name: Install Matrix Java
+        - name: Setup Java
           uses: actions/setup-java@v4
           with:
-              java-version: {{ matrix.jdk }}
+              java-version: 21
               distribution: 'temurin'
               java-package: jdk
               architecture: x64

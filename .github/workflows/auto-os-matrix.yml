@@ -1,4 +1,4 @@
-name: DataSketches-Memory Auto JDK, OS Matrix Test & Install
+name: DS-Memory Auto OS Matrix Test & Install
 
 on:
     pull_request:
@@ -7,7 +7,7 @@ on:
     workflow_dispatch:
 
 env:
-    MAVEN_OPTS: -Xmx1g -Xms1g
+    MAVEN_OPTS: -Xmx4g -Xms1g
 
 jobs:
     build:

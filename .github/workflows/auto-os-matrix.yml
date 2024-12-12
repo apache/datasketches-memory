@@ -60,6 +60,10 @@ jobs:
           run: >
               java -version
 
+        - name: Print Current workflow
+          run: >
+           cat .github/workflows/auto-os-matrix.yml
+
         - name: Test
           run: >
               mvn clean test

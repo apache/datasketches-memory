@@ -1,4 +1,4 @@
-name: DataSketches-Memory Auto JDK 21 Test & Install
+name: DataSketches-Memory Auto JDK Matrix Test & Install
 
 on:
     pull_request:

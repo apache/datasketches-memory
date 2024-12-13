@@ -17,18 +17,18 @@ jobs:
           fail-fast: false
 
           matrix:
-            jdk: [ 21, 22 ]
-            os: [ macos-latest ]
+            jdk: [ 21 ]
+            os: [ ubuntu-latest ]
             include:
 #              - os: windows-latest
 #                skip_javadoc: "`-Dmaven`.javadoc`.skip=true"
 #                skip_gpg: "`-Dgpg`.skip=true"
-#              - os: ubuntu-latest
-#                skip_javadoc: -Dmaven.javadoc.skip=true
-#                skip_gpg: -Dgpg.skip=true
-              - os: macos-latest
+              - os: ubuntu-latest
                 skip_javadoc: -Dmaven.javadoc.skip=true
                 skip_gpg: -Dgpg.skip=true
+#              - os: macos-latest
+#                skip_javadoc: -Dmaven.javadoc.skip=true
+#                skip_gpg: -Dgpg.skip=true
 
         runs-on: ${{matrix.os}}
 

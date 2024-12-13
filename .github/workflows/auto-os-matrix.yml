@@ -1,4 +1,4 @@
-name: DataSketches-Memory Auto OS Matrix Test & Install
+name: DS-Memory Auto OS Matrix Test & Install
 
 on:
     pull_request:
@@ -7,7 +7,7 @@ on:
     workflow_dispatch:
 
 env:
-    MAVEN_OPTS: -Xmx1g -Xms1g
+    MAVEN_OPTS: -Xmx4g -Xms1g
 
 jobs:
     build:
@@ -17,7 +17,7 @@ jobs:
           fail-fast: false
 
           matrix:
-            jdk: [ 21 ]
+            jdk: [ 21 ] # LTS versions only
             os: [ windows-latest, ubuntu-latest, macos-latest ]
             include:
               - os: windows-latest
@@ -59,6 +59,10 @@ jobs:
         - name: Echo Java Version
           run: >
               java -version
+
+        - name: Print Current workflow
+          run: >
+           cat .github/workflows/auto-os-matrix.yml
 
         - name: Test
           run: >

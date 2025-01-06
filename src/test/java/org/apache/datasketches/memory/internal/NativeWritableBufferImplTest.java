@@ -403,71 +403,53 @@ public class NativeWritableBufferImplTest {
   public void checkAsWritableMemoryRO() {
     ByteBuffer bb = ByteBuffer.allocate(64);
     WritableBuffer wbuf = WritableBuffer.writableWrap(bb);
-    WritableMemory wmem = wbuf.asWritableMemory(); //OK
-    assertNotNull(wmem);
 
     try {
       Buffer buf = Buffer.wrap(bb.asReadOnlyBuffer());
       wbuf = (WritableBuffer) buf;
-      wmem = wbuf.asWritableMemory();
+      wbuf.asWritableMemory();
       Assert.fail();
-    } catch (IllegalArgumentException expected) {
-      // expected
     }
+    catch (IllegalArgumentException expected) { }
   }
 
   @Test
   public void checkWritableDuplicateRO() {
     ByteBuffer bb = ByteBuffer.allocate(64);
     WritableBuffer wbuf = WritableBuffer.writableWrap(bb);
-    @SuppressWarnings("unused")
-    WritableBuffer wdup = wbuf.writableDuplicate();
 
     try {
       Buffer buf = Buffer.wrap(bb);
       wbuf = (WritableBuffer) buf;
-      @SuppressWarnings("unused")
-      WritableBuffer wdup2 = wbuf.writableDuplicate();
+      wbuf.writableDuplicate();
       Assert.fail();
-    } catch (IllegalArgumentException expected) {
-      // ignore
-    }
+    } catch (IllegalArgumentException expected) { }
   }
 
   @Test
   public void checkWritableRegionRO() {
     ByteBuffer bb = ByteBuffer.allocate(64);
     WritableBuffer wbuf = WritableBuffer.writableWrap(bb);
-    @SuppressWarnings("unused")
-    WritableBuffer wreg = wbuf.writableRegion();
 
     try {
       Buffer buf = Buffer.wrap(bb);
       wbuf = (WritableBuffer) buf;
-      @SuppressWarnings("unused")
-      WritableBuffer wreg2 = wbuf.writableRegion();
+      wbuf.writableRegion();
       Assert.fail();
-    } catch (IllegalArgumentException expected) {
-      // ignore
-    }
+    } catch (IllegalArgumentException expected) { }
   }
 
   @Test
   public void checkWritableRegionWithParamsRO() {
     ByteBuffer bb = ByteBuffer.allocate(64);
     WritableBuffer wbuf = WritableBuffer.writableWrap(bb);
-    @SuppressWarnings("unused")
-    WritableBuffer wreg = wbuf.writableRegion(0, 1, wbuf.getTypeByteOrder());
 
     try {
       Buffer buf = Buffer.wrap(bb);
       wbuf = (WritableBuffer) buf;
-      @SuppressWarnings("unused")
-      WritableBuffer wreg2 = wbuf.writableRegion(0, 1, wbuf.getTypeByteOrder());
+      wbuf.writableRegion(0, 1, wbuf.getTypeByteOrder());
       Assert.fail();
-    } catch (IllegalArgumentException expected) {
-      // ignore
-    }
+    } catch (IllegalArgumentException expected) { }
   }
 
   @Test

@@ -63,15 +63,18 @@ Note: *primitive* := *{byte, short, int, long, float, double}*
     *  *WritableMemory.writableWrap(ByteBuffer.allocateDirect(int))*
 
 * **Off-Heap, Memory-Mapped Files**
-    * *Memory.map(File)*  (read only)
+    * *Memory.map(File, Arena)*  (read only)
     * *WritableMemory.writableMap(File)*
 
 ## Release 5.0.0 (inclusive) to 6.0.0 (exclusive)
-Starting with release *datasketches-memory-5.0.0*, this Memory component supports only Java 21 when compiling from source and should work with later Java versions at runtime.
+Starting with release *datasketches-memory-5.0.0*, this Memory component supports only Java 21 when compiling from source and may work with later Java versions at runtime.
 
-### *NOTES:* 
+### Runtime Notes:
+* There are no run-time dependencies. 
 * The DataSketches Java Memory Component is not thread-safe.
+* This Release, based on Java 21, leverages the new Java Foreign Function & Memory (FFM) API [JEP 442](https://openjdk.org/jeps/442), which is in its third Preview and will require the JVM flag *--enable-preview* at run-time.
 * We recommend Eclipse Adoptium/Temurin 21.0.5+11 or later as earlier releases of 21 have bugs that affect this product.
+* This component is not designed as a Java Module, so the Jar file should be part of the application classpath.
 
 ## Build Instructions
 __NOTES:__
@@ -80,14 +83,20 @@ __NOTES:__
 As a result, the directory elements of the full absolute path of the target installation directory must qualify as Java identifiers.
 In other words, the directory elements must not have any space characters (or non-Java identifier characters) in any of the path elements. This is required by the Oracle Java Specification in order to ensure location-independent access to resources:
 [See Oracle Location-Independent Access to Resources](https://docs.oracle.com/javase/8/docs/technotes/guides/lang/resources.html)
-* The compile command line must contain the JVM flag *--enable-preview*.
-* This component is not designed as a Java Module, so the Jar file should be part of the application classpath.
+* The compile command line must contain the JVM flag *--enable-preview* (see [JEP 442](https://openjdk.org/jeps/442)).
 
-#### Dependencies
-There are no run-time dependencies. See the pom.xml file for test dependencies.
+
+#### Build & Test Dependencies
+* There are two direct build dependencies, both of which are only used in *test scope*:
+    * org.testng/testng
+    * net.openhft/zero-allocation-hashing  
+* See the pom.xml file for maven plug-in dependencies.
+
 
 #### Maven build instructions
 The Maven build requires JDK-21 to compile:
+
+* We recommend Eclipse Adoptium/Temurin 21.0.5+11 or later as earlier releases of 21 have bugs that affect this product.
 
 To run normal unit tests:
 

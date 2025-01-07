@@ -108,7 +108,7 @@ under the License.
     <maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
     <maven-install-plugin.version>3.1.2</maven-install-plugin.version>
     <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
-    <maven-javadoc-plugin.version>3.11.1</maven-javadoc-plugin.version>
+    <maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
     <maven-release-plugin.version>3.1.1</maven-release-plugin.version>
     <maven-remote-resources-plugin.version>3.2.0</maven-remote-resources-plugin.version>
     <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
@@ -124,7 +124,7 @@ under the License.
     <!-- org.jacoco.maven plugins -->
     <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
     <!-- org.mojohaus plugins -->
-    <versions-maven-plugin.version>2.17.1</versions-maven-plugin.version>
+    <versions-maven-plugin.version>2.18.0</versions-maven-plugin.version>
     <!-- other -->
     <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
     <zero-allocation-hashing.version>0.16</zero-allocation-hashing.version>

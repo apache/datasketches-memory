@@ -77,10 +77,10 @@ public class AllocateDirectMapMemoryTest {
         assertEquals(memCapacity, mem.getCapacity());
         mem.close(); //a close inside the TWR block will throw
       }
-    } catch (IllegalStateException e) { }
+    } catch (IllegalStateException e) { /* expected */ }
     try {
-      mem2.close(); //closes outside the TWR block will throw
-    } catch (IllegalStateException e) { }
+      if (mem2 != null) { mem2.close(); } //a close outside the TWR block will throw
+    } catch (IllegalStateException e) { /* expected */ }
   }
 
   @Test

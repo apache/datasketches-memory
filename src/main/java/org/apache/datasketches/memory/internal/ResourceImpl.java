@@ -359,18 +359,6 @@ abstract class ResourceImpl implements Resource {
   }
 
   @Override
-  public void close() {
-    if (arena != null) {
-      try {
-        arena.close();
-      }
-      catch (final UnsupportedOperationException uoe) {
-        // ignored as it seems there's no reliable way to determine if the Arena is closeable or not
-      }
-    } //not idempotent
-  }
-
-  @Override
   public final int compareTo(final long thisOffsetBytes, final long thisLengthBytes,
       final Resource that, final long thatOffsetBytes, final long thatLengthBytes) {
     return ResourceImpl.compare(seg, thisOffsetBytes, thisLengthBytes,
@@ -422,11 +410,6 @@ abstract class ResourceImpl implements Resource {
   public final boolean isByteOrderCompatible(final ByteOrder byteOrder) {
     final ByteOrder typeBO = getTypeByteOrder();
     return typeBO == ByteOrder.nativeOrder() && typeBO == byteOrder;
-  }
-
-  @Override
-  public boolean isCloseable() {
-    return ((seg.isNative() || seg.isMapped()) && seg.scope().isAlive());
   }
 
   @Override

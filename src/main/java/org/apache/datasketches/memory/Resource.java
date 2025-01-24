@@ -20,8 +20,6 @@
 package org.apache.datasketches.memory;
 
 import java.lang.foreign.Arena;
-import java.lang.foreign.FunctionDescriptor;
-import java.lang.foreign.Linker.Option;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.MemorySegment.Scope;
 import java.nio.ByteBuffer;
@@ -32,7 +30,7 @@ import java.nio.ByteOrder;
  *
  * @author Lee Rhodes
  */
-public interface Resource extends AutoCloseable {
+public interface Resource {
 
   //MemoryRequestServer logic
 
@@ -91,32 +89,6 @@ public interface Resource extends AutoCloseable {
    * or if its size is greater than Integer.MAX_VALUE.
    */
   ByteBuffer asByteBufferView(ByteOrder order);
-
-  /**
-   * <i>From Java 21 java.lang.foreign.Arena::close():</i>
-   * Closes this arena. If this method completes normally, the arena scope is no longer {@linkplain Scope#isAlive() alive},
-   * and all the memory segments associated with it can no longer be accessed. Furthermore, any off-heap region of memory backing the
-   * segments obtained from this arena are also released.
-   *
-   * <p>This operation is not idempotent; that is, closing an already closed arena <em>always</em> results in an
-   * exception being thrown. This reflects a deliberate design choice: failure to close an arena might reveal a bug
-   * in the underlying application logic.</p>
-   *
-   * <p>If this method completes normally, then {@code java.lang.foreign.Arena.scope().isAlive() == false}.
-   * Implementations are allowed to throw {@link UnsupportedOperationException} if an explicit close operation is
-   * not supported.</p>
-   *
-   * @see java.lang.foreign.MemorySegment.Scope#isAlive()
-   *
-   * @throws IllegalStateException if the arena has already been closed.
-   * @throws IllegalStateException if a segment associated with this arena is being accessed concurrently, e.g.
-   * by a {@linkplain java.lang.foreign.Linker#downcallHandle(FunctionDescriptor, Option...) downcall method handle}.
-   * @throws WrongThreadException if this arena is confined, and this method is called from a thread
-   * other than the arena's owner thread.
-   * @throws UnsupportedOperationException if this arena cannot be closed explicitly.
-   */
-  @Override
-  void close();
 
   /**
    * Compares the bytes of this Resource to <i>that</i> Resource.
@@ -197,13 +169,6 @@ public interface Resource extends AutoCloseable {
    * @return true if this Memory is backed by a ByteBuffer.
    */
   boolean hasByteBuffer();
-
-  /**
-   * Return true if this resource is likely to be closeable, but not guaranteed.
-   * There is no way to determine if the specific type of Arena is explicitly closeable.
-   * @return true if this resource is likely to be closeable.
-   */
-  boolean isCloseable();
 
   /**
    * Is the underlying resource scope alive?

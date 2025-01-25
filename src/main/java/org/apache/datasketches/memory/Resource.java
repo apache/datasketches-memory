@@ -143,6 +143,13 @@ public interface Resource {
   void force();
 
   /**
+   * Returns the arena used to create this resource and possibly other resources.
+   * Be careful when you close the returned Arena, you may be closing other resources as well.
+   * @return the arena used to create this resource and possibly other resources.
+   */
+  Arena getArena();
+
+  /**
    * Gets the capacity of this object in bytes
    * @return the capacity of this object in bytes
    */
@@ -311,10 +318,14 @@ mismatch(MemorySegment, long, long, MemorySegment, long, long)</a>
   ByteBuffer toByteBuffer(ByteOrder order);
 
   /**
-   * Returns a copy of the underlying MemorySegment.
-   * @return a copy of the underlying MemorySegment.
+   * Returns a copy of the underlying MemorySegment in the given arena.
+   * @param arena the given arena.
+   * If the desired result is to be off-heap, the arena must not be null.
+   * Otherwise, the result will be on-heap.
+   * @param alignment requested segment alignment. Typically 1, 2, 4 or 8.
+   * @return a copy of the underlying MemorySegment in the given arena.
    */
-  MemorySegment toMemorySegment();
+  MemorySegment toMemorySegment(Arena arena, long alignment);
 
   /**
    * Returns a brief description of this object.

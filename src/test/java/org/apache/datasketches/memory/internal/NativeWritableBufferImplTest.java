@@ -50,9 +50,9 @@ public class NativeWritableBufferImplTest {
     WritableBuffer wbuf = wmem.asWritableBuffer();
     assertEquals(wbuf.getCapacity(), memCapacity);
 
-    wmem.close();
+    wmem.getArena().close();
     assertFalse(wbuf.isAlive());
-    try { wmem.close(); } catch (IllegalStateException e) { }
+    try { wmem.getArena().close(); } catch (IllegalStateException e) { }
   }
 
   //Simple Heap arrays

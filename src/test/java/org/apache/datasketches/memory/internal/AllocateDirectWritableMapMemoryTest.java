@@ -59,8 +59,8 @@ public class AllocateDirectWritableMapMemoryTest {
   public void simpleMap() throws IllegalArgumentException, InvalidPathException, IllegalStateException,
       UnsupportedOperationException, IOException, SecurityException {
     File file = getResourceFile("GettysburgAddress.txt");
-
-    try (Memory mem = Memory.map(file, Arena.ofConfined())) {
+    try (Arena arena = Arena.ofConfined()) {
+      Memory mem = Memory.map(file, arena);
       byte[] byteArr = new byte[(int)mem.getCapacity()];
       mem.getByteArray(0, byteArr, 0, byteArr.length);
       String text = new String(byteArr, UTF_8);
@@ -118,9 +118,11 @@ public class AllocateDirectWritableMapMemoryTest {
 
     final long bytes = 8;
     WritableMemory wmem = null;
-    wmem = WritableMemory.writableMap(file, 0L, bytes, NON_NATIVE_BYTE_ORDER);
+    Arena arena = Arena.ofConfined();
+    wmem = WritableMemory.writableMap(file, 0L, bytes, NON_NATIVE_BYTE_ORDER, arena);
     wmem.putChar(0, (char) 1);
     assertEquals(wmem.getByte(1), (byte) 1);
+    arena.close();
   }
 
   @Test
@@ -140,8 +142,8 @@ public class AllocateDirectWritableMapMemoryTest {
     File file = getResourceFile("GettysburgAddress.txt");
     assertTrue(file.canRead());
     assertFalse(file.canWrite());
-    try (Arena arena = Arena.ofConfined();
-         WritableMemory wmem = WritableMemory.writableMap(file)) { //assumes file is writable!
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.writableMap(file, arena); //assumes file is writable! It is not.
       wmem.getCapacity();
     }
   }
@@ -151,9 +153,11 @@ public class AllocateDirectWritableMapMemoryTest {
       throws IllegalArgumentException, InvalidPathException, IllegalStateException, UnsupportedOperationException,
       IOException, SecurityException {
     File file = getResourceFile("GettysburgAddress.txt");
+    Arena arena = Arena.ofConfined();
     WritableMemory wmem = null;
-    wmem = WritableMemory.writableMap(file, 0, 1 << 20, ByteOrder.nativeOrder());
+    wmem = WritableMemory.writableMap(file, 0, 1 << 20, ByteOrder.nativeOrder(), arena); //cannot create writableMap from RO file
     wmem.getCapacity();
+    arena.close();
   }
 
   @Test
@@ -180,7 +184,7 @@ public class AllocateDirectWritableMapMemoryTest {
       String bufStr = new String(buf, UTF_8);
       assertEquals(bufStr, origStr);
 
-      wmem = WritableMemory.writableMap(origFile, 0, correctBytesLen, ByteOrder.nativeOrder());
+      wmem = WritableMemory.writableMap(origFile, 0, correctBytesLen, ByteOrder.nativeOrder(), arena);
       wmem.load();
       //assertTrue(wmem.isLoaded()); //incompatible with Windows
       // over write content

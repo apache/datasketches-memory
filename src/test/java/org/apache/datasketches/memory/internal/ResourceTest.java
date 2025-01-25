@@ -123,10 +123,12 @@ public class ResourceTest {
 
   @Test
   public void checkGetRelativeOffset() {
-    WritableMemory wmem = WritableMemory.allocateDirect(1024);
-    WritableMemory reg = wmem.writableRegion(512, 256);
-    long off = wmem.getRelativeOffset(reg);
-    assertEquals(off, 512);
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(1024, arena);
+      WritableMemory reg = wmem.writableRegion(512, 256);
+      long off = wmem.getRelativeOffset(reg);
+      assertEquals(off, 512);
+    }
   }
 
   @Test
@@ -137,9 +139,11 @@ public class ResourceTest {
 
   @Test
   public void checkIsSameResource() {
-    WritableMemory wmem = WritableMemory.allocateDirect(1024);
-    WritableMemory reg = wmem.writableRegion(0, 1024);
-    assertTrue(wmem.isSameResource(reg));
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(1024, arena);
+      WritableMemory reg = wmem.writableRegion(0, 1024);
+      assertTrue(wmem.isSameResource(reg));
+    }
   }
 
   @Test
@@ -222,31 +226,31 @@ public class ResourceTest {
     {
       int len = 0;
       WritableMemory mem = WritableMemory.allocate(len);
-      MemorySegment seg = mem.toMemorySegment();
+      MemorySegment seg = mem.toMemorySegment(null, 8);
       assertEquals(seg.byteSize(), len);
     }
     {
       int len = 13 * 8;
       WritableMemory mem = WritableMemory.allocate(len);
-      MemorySegment seg = mem.toMemorySegment();
+      MemorySegment seg = mem.toMemorySegment(null, 8);
       assertEquals(seg.byteSize(), len);
     }
     {
       int len = 13 * 4;
       WritableMemory mem = WritableMemory.allocate(len);
-      MemorySegment seg = mem.toMemorySegment();
+      MemorySegment seg = mem.toMemorySegment(null, 8);
       assertEquals(seg.byteSize(), len);
     }
     {
       int len = 13 * 2;
       WritableMemory mem = WritableMemory.allocate(len);
-      MemorySegment seg = mem.toMemorySegment();
+      MemorySegment seg = mem.toMemorySegment(null, 8);
       assertEquals(seg.byteSize(), len);
     }
     {
       int len = 13;
       WritableMemory mem = WritableMemory.allocate(len);
-      MemorySegment seg = mem.toMemorySegment();
+      MemorySegment seg = mem.toMemorySegment(null, 8);
       assertEquals(seg.byteSize(), len);
     }
   }

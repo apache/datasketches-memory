@@ -34,8 +34,7 @@ public final class DefaultMemoryRequestServer implements MemoryRequestServer {
   /**
    * Default constructor.
    */
-  public DefaultMemoryRequestServer() {
-  }
+  public DefaultMemoryRequestServer() { }
 
   @Override
   public WritableMemory request(

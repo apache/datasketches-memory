@@ -53,7 +53,7 @@ public class InvalidAllocationTest {
       Assert.fail();
     } catch (IllegalArgumentException ignore) {
       if (nullMem != null) {
-        nullMem.close();
+        nullMem.getArena().close();
       }
       // expected
     }
@@ -69,12 +69,12 @@ public class InvalidAllocationTest {
     Memory mem3 = Memory.wrap(ByteBuffer.allocateDirect(0));
     mem3.region(0, 0);
     WritableMemory nullMem = null;
-    try (Arena arena = Arena.ofConfined()) { //Invalid alignment : 3 
+    try (Arena arena = Arena.ofConfined()) { //Invalid alignment : 3
       nullMem = WritableMemory.allocateDirect(0, 3, ByteOrder.nativeOrder(), memReqSvr, arena);
       Assert.fail();
     } catch (IllegalArgumentException ignore) {
       if (nullMem != null) {
-        nullMem.close();
+        nullMem.getArena().close();
       }
       // expected
     }

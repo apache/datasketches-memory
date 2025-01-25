@@ -41,13 +41,13 @@ public class MemoryReadWriteSafetyTest {
 
   @BeforeClass
   public void allocate() {
-    mem = (WritableMemory) Memory.wrap(new byte[8]);
+    mem = (WritableMemory) Memory.wrap(new byte[8]); //on heap
   }
 
-  @AfterClass
-  public void close() throws Exception {
-    mem.close();
-  }
+//  @AfterClass
+//  public void close() throws Exception {
+//    mem.close();
+//  }
 
   @Test(expectedExceptions = UnsupportedOperationException.class)
   public void testPutByte() {
@@ -187,7 +187,6 @@ public class MemoryReadWriteSafetyTest {
     mem1.putInt(0, 1);
   }
 
-  //@SuppressWarnings("resource")
   @Test(expectedExceptions = UnsupportedOperationException.class)
   public void testMapFile() throws Exception {
     File tempFile = File.createTempFile("test", null);
@@ -195,10 +194,9 @@ public class MemoryReadWriteSafetyTest {
     try (RandomAccessFile raf = new RandomAccessFile(tempFile, "rw")) {
       raf.setLength(8);
       //System.out.println(UtilTest.getFileAttributes(tempFile));
-      try (Arena arena = Arena.ofConfined();
-           Memory memory = Memory.map(tempFile, arena)) {
-
-          ((WritableMemory) memory).putInt(0, 1);
+      try (Arena arena = Arena.ofConfined()) {
+        Memory memory = Memory.map(tempFile, arena);
+        ((WritableMemory) memory).putInt(0, 1); //cannot write into read only resource
       }
     }
   }

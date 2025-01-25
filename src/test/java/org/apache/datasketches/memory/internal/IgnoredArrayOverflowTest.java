@@ -42,7 +42,7 @@ public class IgnoredArrayOverflowTest {
 
   @AfterClass
   public void close() throws Exception {
-    memory.close();
+    memory.getArena().close();
   }
 
   @Test

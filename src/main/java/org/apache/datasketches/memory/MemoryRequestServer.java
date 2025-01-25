@@ -50,6 +50,7 @@ public interface MemoryRequestServer {
 
   /**
    * Request to close the area managing all the related resources, if applicable.
+   * Be careful when you request to close the given Arena, you may be closing other resources as well.
    * @param arena the given arena to use to close all its managed resources.
    */
   void requestClose( Arena arena);

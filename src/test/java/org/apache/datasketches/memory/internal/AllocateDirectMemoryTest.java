@@ -96,6 +96,7 @@ public class AllocateDirectMemoryTest {
     Arena arena = Arena.ofConfined();
     WritableMemory wmem = WritableMemory.allocateDirect(cap, arena);
     arena.close(); //explicit close
+    assertFalse(wmem.isAlive());
   }
 
   @Test

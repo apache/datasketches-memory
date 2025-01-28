@@ -66,7 +66,7 @@ Note: *primitive* := *{byte, short, int, long, float, double}*
     * *Memory.map(File, Arena)*  (read only)
     * *WritableMemory.writableMap(File)*
 
-## Release 5.0.0 (inclusive) to 6.0.0 (exclusive)
+## Release 5.0.0 (inclusive) to 7.0.0 (exclusive)
 Starting with release *datasketches-memory-5.0.0*, this Memory component supports only Java 21 when compiling from source and may work with later Java versions at runtime.
 
 ### Runtime Notes:
@@ -106,7 +106,7 @@ To run javadoc:
 
     mvn clean javadoc:javadoc -DskipTests=true
 
-To run the eclipse plugin on this multi-module project, use:
+To run the eclipse plugin on this project, use:
 
     mvn clean eclipse:eclipse -DskipTests=true
 

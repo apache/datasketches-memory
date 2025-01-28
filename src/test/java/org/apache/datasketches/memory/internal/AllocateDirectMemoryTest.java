@@ -51,7 +51,7 @@ public class AllocateDirectMemoryTest {
       assertTrue(wMem.isAlive());
     }
     //The TWR block has exited, so the memory should be not alive
-    assertFalse(wMem2.isAlive());
+    if (wMem2 != null) { assertFalse(wMem2.isAlive()); }
   }
 
   @Test
@@ -96,6 +96,7 @@ public class AllocateDirectMemoryTest {
     Arena arena = Arena.ofConfined();
     WritableMemory wmem = WritableMemory.allocateDirect(cap, arena);
     arena.close(); //explicit close
+    assertFalse(wmem.isAlive());
   }
 
   @Test

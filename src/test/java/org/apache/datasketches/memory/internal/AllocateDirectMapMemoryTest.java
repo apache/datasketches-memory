@@ -49,7 +49,7 @@ public class AllocateDirectMapMemoryTest {
       arena.close();
     } //The Try-With-Resources will throw since it is already closed
     catch (IllegalStateException e) { /* OK */ }
-    assertFalse(mem.isAlive());
+    if (mem != null) { assertFalse(mem.isAlive()); }
   }
 
   @Test
@@ -87,7 +87,7 @@ public class AllocateDirectMapMemoryTest {
       } //a close inside the TWR block will throw here
     }
     catch (IllegalStateException e) { /* expected */ }
-    assertFalse(mem.isAlive());
+    if (mem != null) { assertFalse(mem.isAlive()); }
     if (mem2 != null) { assertFalse(mem2.isAlive()); }
   }
 

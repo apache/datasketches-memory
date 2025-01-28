@@ -41,9 +41,9 @@ public class CopyMemoryTest {
   public void heapWSource() {
     int k1 = 1 << 20; //longs
     int k2 = 2 * k1;
-    WritableMemory srcMem = genMem(k1, false); //!empty
+    WritableMemory srcMem = genHeapMem(k1, false); //!empty
     //println(srcMem.toHexString("src: ", 0, k1 << 3));
-    WritableMemory dstMem = genMem(k2, true);
+    WritableMemory dstMem = genHeapMem(k2, true);
     srcMem.copyTo(0, dstMem, k1 << 3, k1 << 3);
     //println(dstMem.toHexString("dst: ", 0, k2 << 3));
     check(dstMem, k1, k1, 1);
@@ -53,8 +53,8 @@ public class CopyMemoryTest {
   public void heapROSource() {
     int k1 = 1 << 20; //longs
     int k2 = 2 * k1;
-    Memory srcMem = genMem(k1, false); //!empty
-    WritableMemory dstMem = genMem(k2, true);
+    Memory srcMem = genHeapMem(k1, false); //!empty
+    WritableMemory dstMem = genHeapMem(k2, true);
     srcMem.copyTo(0, dstMem, k1 << 3, k1 << 3);
     check(dstMem, k1, k1, 1);
   }
@@ -63,32 +63,32 @@ public class CopyMemoryTest {
   public void directWSource() throws Exception {
     int k1 = 1 << 20; //longs
     int k2 = 2 * k1;
-    WritableMemory srcMem = genWmem(k1, false);
-    WritableMemory dstMem = genMem(k2, true);
+    WritableMemory srcMem = genOffHeapMem(k1, false);
+    WritableMemory dstMem = genHeapMem(k2, true);
     srcMem.copyTo(0, dstMem, k1 << 3, k1 << 3);
     check(dstMem, k1, k1, 1);
-    srcMem.close();
+    srcMem.getArena().close();
   }
 
   @Test
   public void directROSource() throws Exception {
     int k1 = 1 << 20; //longs
     int k2 = 2 * k1;
-    Memory srcMem = genWmem(k1, false);
-    WritableMemory dstMem = genMem(k2, true);
+    Memory srcMem = genOffHeapMem(k1, false);
+    WritableMemory dstMem = genHeapMem(k2, true);
     srcMem.copyTo(0, dstMem, k1 << 3, k1 << 3);
     check(dstMem, k1, k1, 1);
-    srcMem.close();
+    srcMem.getArena().close();
     }
 
   @Test
   public void heapWSrcRegion() {
     int k1 = 1 << 20; //longs
     //gen baseMem of k1 longs w data
-    WritableMemory baseMem = genMem(k1, false); //!empty
+    WritableMemory baseMem = genHeapMem(k1, false); //!empty
     //gen src region of k1/2 longs, off= k1/2
     WritableMemory srcReg = baseMem.writableRegion((k1/2) << 3, (k1/2) << 3);
-    WritableMemory dstMem = genMem(2 * k1, true); //empty
+    WritableMemory dstMem = genHeapMem(2 * k1, true); //empty
     srcReg.copyTo(0, dstMem, k1 << 3, (k1/2) << 3);
     //println(dstMem.toHexString("dstMem: ", k1 << 3, (k1/2) << 3));
     check(dstMem, k1, k1/2, (k1/2) + 1);
@@ -98,10 +98,10 @@ public class CopyMemoryTest {
   public void heapROSrcRegion() {
     int k1 = 1 << 20; //longs
     //gen baseMem of k1 longs w data
-    WritableMemory baseMem = genMem(k1, false); //!empty
+    WritableMemory baseMem = genHeapMem(k1, false); //!empty
     //gen src region of k1/2 longs, off= k1/2
     Memory srcReg = baseMem.region((k1/2) << 3, (k1/2) << 3);
-    WritableMemory dstMem = genMem(2 * k1, true); //empty
+    WritableMemory dstMem = genHeapMem(2 * k1, true); //empty
     srcReg.copyTo(0, dstMem, k1 << 3, (k1/2) << 3);
     check(dstMem, k1, k1/2, (k1/2) + 1);
   }
@@ -110,13 +110,13 @@ public class CopyMemoryTest {
   public void directROSrcRegion() throws Exception {
     int k1 = 1 << 20; //longs
     //gen baseMem of k1 longs w data, direct
-    Memory baseMem = genWmem(k1, false);
+    Memory baseMem = genOffHeapMem(k1, false);
     //gen src region of k1/2 longs, off= k1/2
     Memory srcReg = baseMem.region((k1/2) << 3, (k1/2) << 3);
-    WritableMemory dstMem = genMem(2 * k1, true); //empty
+    WritableMemory dstMem = genHeapMem(2 * k1, true); //empty
     srcReg.copyTo(0, dstMem, k1 << 3, (k1/2) << 3);
     check(dstMem, k1, k1/2, (k1/2) + 1);
-    baseMem.close();
+    baseMem.getArena().close();
   }
 
   @Test
@@ -150,7 +150,7 @@ public class CopyMemoryTest {
     }
   }
 
-  private static WritableMemory genWmem(int longs, boolean empty) {
+  private static WritableMemory genOffHeapMem(int longs, boolean empty) {
     WritableMemory wmem = WritableMemory.allocateDirect(longs << 3, 1, ByteOrder.nativeOrder(), memReqSvr, Arena.ofConfined());
     if (empty) {
       wmem.clear();
@@ -160,7 +160,7 @@ public class CopyMemoryTest {
     return wmem;
   }
 
-  private static WritableMemory genMem(int longs, boolean empty) {
+  private static WritableMemory genHeapMem(int longs, boolean empty) {
     WritableMemory mem = WritableMemory.allocate(longs << 3);
     if (!empty) {
       for (int i = 0; i < longs; i++) { mem.putLong(i << 3, i + 1); }

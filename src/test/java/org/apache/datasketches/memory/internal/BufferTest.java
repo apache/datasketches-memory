@@ -287,7 +287,7 @@ public class BufferTest {
     try (Arena arena = Arena.ofConfined()) {
       WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       WritableBuffer wbuf = wmem.asWritableBuffer();
-      wmem.close();
+      arena.close();
       //with -ea assert: Memory not alive.
       //with -da sometimes segfaults, sometimes passes!
       wbuf.getLong();
@@ -300,7 +300,7 @@ public class BufferTest {
     try (Arena arena = Arena.ofConfined()) {
       WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, ByteOrder.nativeOrder(), memReqSvr, arena);
       Buffer region = wmem.asBuffer().region();
-      wmem.close();
+      arena.close();
       //with -ea assert: Memory not alive.
       //with -da sometimes segfaults, sometimes passes!
       region.getByte();
@@ -310,7 +310,8 @@ public class BufferTest {
   @Test
   public void checkCheckNotAliveAfterTWR() {
     Buffer buf;
-    try (WritableMemory wmem = WritableMemory.allocateDirect(100, Arena.ofConfined())) {
+    try (Arena arena = Arena.ofConfined()) {
+      WritableMemory wmem = WritableMemory.allocateDirect(100, Arena.ofConfined());
       buf = wmem.asBuffer();
     }
     try {

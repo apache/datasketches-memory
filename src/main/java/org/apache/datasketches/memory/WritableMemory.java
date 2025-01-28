@@ -73,40 +73,18 @@ public interface WritableMemory extends Memory {
   /**
    * Maps the entire given file into native-ordered WritableMemory for write operations with Arena.ofConfined().
    * Calling this method is equivalent to calling
-   * {@link #writableMap(File, long, long, ByteOrder) writableMap(file, 0, file.length(), ByteOrder.nativeOrder())}.
+   * {@link #writableMap(File, long, long, ByteOrder, Arena) writableMap(file, 0, file.length(), ByteOrder.nativeOrder(), arena)}.
    * @param file the given file to map. It must be non-null and writable.
+   * @param arena the given arena to manage the new off-heap WritableMemory. It must be non-null.
+   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not recommended.
    * @return a file-mapped WritableMemory
    * @throws IllegalArgumentException if file is not readable or not writable.
    * @throws IOException if the specified path does not point to an existing file, or if some other I/O error occurs.
    * @throws SecurityException If a security manager is installed and it denies an unspecified permission
    * required by the implementation.
    */
-  static WritableMemory writableMap(File file) throws IOException {
-    return WritableMemoryImpl.wrapMap(file, 0, file.length(), ByteOrder.nativeOrder(), false, Arena.ofConfined());
-  }
-
-  /**
-   * Maps the specified portion of the given file into Memory for write operations with Arena.ofConfined().
-   * Calling this method is equivalent to calling
-   * {@link #writableMap(File, long, long, ByteOrder, Arena)
-   * writableMap(file, fileOffsetBytes, capacityBytes, ByteOrder, Arena.ofConfined())}.
-   * @param file the given file to map. It must be non-null with a non-negative length and writable.
-   * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
-   * @param capacityBytes the size of the mapped Memory. It must be &ge; 0.
-   * @param byteOrder the byte order to be used. It must be non-null.
-   * @return mapped WritableMemory.
-   * @throws IllegalArgumentException -- if file is not readable or writable.
-   * @throws IllegalArgumentException -- if file is not writable.
-   * @throws IOException - if the specified path does not point to an existing file, or if some other I/O error occurs.
-   * @throws SecurityException - If a security manager is installed and it denies an unspecified permission
-   * required by the implementation.
-   */
-  static WritableMemory writableMap(
-      File file,
-      long fileOffsetBytes,
-      long capacityBytes,
-      ByteOrder byteOrder) throws IOException {
-    return WritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, byteOrder, false, Arena.ofConfined());
+  static WritableMemory writableMap(File file, Arena arena) throws IOException {
+    return WritableMemoryImpl.wrapMap(file, 0, file.length(), ByteOrder.nativeOrder(), false, arena);
   }
 
   /**
@@ -115,8 +93,9 @@ public interface WritableMemory extends Memory {
    * @param fileOffsetBytes the position in the given file in bytes. It must not be negative.
    * @param capacityBytes the size of the mapped Memory.
    * @param byteOrder the given <i>ByteOrder</i>. It must be non-null.
-   * @param arena the given arena to map. It must be non-null.
+   * @param arena the given arena to manage the new off-heap WritableMemory. It must be non-null.
    * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not recommended.
+   *
    * @return a file-mapped WritableMemory.
    * @throws IllegalArgumentException if file is not readable or not writable.
    * @throws IOException if the specified path does not point to an existing file, or if some other I/O error occurs.
@@ -139,34 +118,15 @@ public interface WritableMemory extends Memory {
    * The allocated memory will be 8-byte aligned.
    * Native byte order is assumed.
    * A new DefaultMemoryRequestServer() is created.
-   * A new Arena.ofConfined() is created.
    *
    * <p><b>NOTE:</b> Native/Direct memory acquired may have garbage in it.
    * It is the responsibility of the using application to clear this memory, if required,
    * and to call <i>close()</i> when done.</p>
    * @param capacityBytes the size of the desired memory in bytes.
-   * Warning: This class is not thread-safe.
-   *
-   * @return WritableMemory for this off-heap, native resource.
-   */
-  static WritableMemory allocateDirect(long capacityBytes) {
-    return allocateDirect(capacityBytes, 8, ByteOrder.nativeOrder(), new DefaultMemoryRequestServer(), Arena.ofConfined());
-  }
-
-  /**
-   * Allocates and provides access to capacityBytes directly in native (off-heap) memory.
-   * The allocated memory will be 8-byte aligned.
-   * Native byte order is assumed.
-   * A new DefaultMemoryRequestServer() is created.
-   *
-   * <p><b>NOTE:</b> Native/Direct memory acquired may have garbage in it.
-   * It is the responsibility of the using application to clear this memory, if required,
-   * and to call <i>close()</i> when done.</p>
-   * @param capacityBytes the size of the desired memory in bytes.
-   * @param arena the given arena to use. It must be non-null.
+   * @param arena the given arena to manage the new off-heap WritableMemory. It must be non-null.
    * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not recommended.
    *
-   * @return WritableMemory for this off-heap, native resource.
+   * @return a WritableMemory for this off-heap resource.
    */
   static WritableMemory allocateDirect(long capacityBytes, Arena arena) {
     return allocateDirect(capacityBytes, 8, ByteOrder.nativeOrder(), new DefaultMemoryRequestServer(), arena);
@@ -184,7 +144,7 @@ public interface WritableMemory extends Memory {
    * @param byteOrder the given <i>ByteOrder</i>.  It must be non-null.
    * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
    * This is a callback mechanism for a user client of direct memory to request more memory.
-   * @param arena the given arena to use. It must be non-null.
+   * @param arena the given arena to manage the new off-heap WritableMemory. It must be non-null.
    * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not recommended.
    *
    * @return a WritableMemory for this off-heap resource.

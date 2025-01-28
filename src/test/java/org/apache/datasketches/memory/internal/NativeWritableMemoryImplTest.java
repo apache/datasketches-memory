@@ -53,9 +53,9 @@ public class NativeWritableMemoryImplTest {
       Arena.ofConfined());
     assertEquals(memCapacity, wmem.getCapacity());
 
-    wmem.close();
+    wmem.getArena().close();
     assertFalse(wmem.isAlive());
-    try { wmem.close(); } catch (IllegalStateException e) { }
+    try { wmem.getArena().close(); } catch (IllegalStateException e) { }
   }
 
   //Simple Native arrays

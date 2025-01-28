@@ -26,6 +26,7 @@ package org.apache.datasketches.memory.internal;
 import static org.apache.datasketches.memory.internal.ResourceImpl.LS;
 import static org.apache.datasketches.memory.internal.Util.getResourceFile;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
@@ -42,8 +43,9 @@ public class AllocateDirectMapMemoryTest {
   @Test
   public void simpleMap() throws IOException {
     File file = UtilTest.setGettysburgAddressFileToReadOnly();
-    try (Memory mem = Memory.map(file, Arena.ofConfined())) {
-      mem.close();
+    try (Arena arena = Arena.ofConfined()) {
+      Memory mem = Memory.map(file, arena);
+      arena.close();
     } //The Try-With-Resources will throw since it is already closed
     catch (IllegalStateException e) { /* OK */ }
   }
@@ -51,15 +53,16 @@ public class AllocateDirectMapMemoryTest {
   @Test
   public void testIllegalArguments() throws IOException {
     File file = getResourceFile("GettysburgAddress.txt");
-    try (Memory mem = Memory.map(file, -1, Integer.MAX_VALUE, ByteOrder.nativeOrder(), Arena.ofConfined())) {
+    try (Arena arena = Arena.ofConfined()) {
+      Memory mem = Memory.map(file, -1, Integer.MAX_VALUE, ByteOrder.nativeOrder(), arena);
       fail("Failed: test IllegalArgumentException: Position was negative.");
       mem.getCapacity();
     }
     catch (IllegalArgumentException e) {
       //ok
     }
-    try (Arena arena = Arena.ofConfined();
-         Memory mem = Memory.map(file, 0, -1, ByteOrder.nativeOrder(), arena)) {
+    try (Arena arena = Arena.ofConfined()) {
+      Memory mem = Memory.map(file, 0, -1, ByteOrder.nativeOrder(), arena);
       fail("Failed: testIllegalArgumentException: Size was negative.");
     } catch (IllegalArgumentException e) {
       //ok
@@ -72,22 +75,24 @@ public class AllocateDirectMapMemoryTest {
     long memCapacity = file.length();
     Memory mem2 = null;
     try {
-      try (Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder(), Arena.ofConfined())) {
+      try (Arena arena = Arena.ofConfined()) {
+        Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder(), arena);
         mem2 = mem;
         assertEquals(memCapacity, mem.getCapacity());
-        mem.close(); //a close inside the TWR block will throw
-      }
-    } catch (IllegalStateException e) { /* expected */ }
-    try {
-      if (mem2 != null) { mem2.close(); } //a close outside the TWR block will throw
-    } catch (IllegalStateException e) { /* expected */ }
+        arena.close();
+        assertFalse(mem.isAlive());
+      } //a close inside the TWR block will throw here
+    }
+    catch (IllegalStateException e) { /* expected */ }
+    assertFalse(mem2.isAlive());
   }
 
   @Test
   public void testLoad() throws IOException {
     File file = getResourceFile("GettysburgAddress.txt");
     long memCapacity = file.length();
-    try (Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder(), Arena.ofConfined())) {
+    try (Arena arena = Arena.ofConfined()) {
+      Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder(), arena);
       mem.load();
       //assertTrue(mem.isLoaded()); //incompatible with Windows
       assertTrue(mem.isAlive());

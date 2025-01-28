@@ -93,11 +93,6 @@ abstract class ResourceImpl implements Resource {
   static final ByteOrder NON_NATIVE_BYTE_ORDER =
       (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
 
-  /**
-   * The alignment of the starting address of new MemorySegments
-   */
-  static final long SEGMENT_ALIGHMENT = 8;
-
   static {
     final String jdkVer = System.getProperty("java.version");
     final int[] p = parseJavaVersion(jdkVer);
@@ -359,18 +354,6 @@ abstract class ResourceImpl implements Resource {
   }
 
   @Override
-  public void close() {
-    if (arena != null) {
-      try {
-        arena.close();
-      }
-      catch (final UnsupportedOperationException uoe) {
-        // ignored as it seems there's no reliable way to determine if the Arena is closeable or not
-      }
-    } //not idempotent
-  }
-
-  @Override
   public final int compareTo(final long thisOffsetBytes, final long thisLengthBytes,
       final Resource that, final long thatOffsetBytes, final long thatLengthBytes) {
     return ResourceImpl.compare(seg, thisOffsetBytes, thisLengthBytes,
@@ -387,6 +370,9 @@ abstract class ResourceImpl implements Resource {
 
   @Override
   public void force() { seg.force(); }
+
+  @Override
+  public Arena getArena() { return arena; }
 
   @Override
   public final long getCapacity() {
@@ -422,11 +408,6 @@ abstract class ResourceImpl implements Resource {
   public final boolean isByteOrderCompatible(final ByteOrder byteOrder) {
     final ByteOrder typeBO = getTypeByteOrder();
     return typeBO == ByteOrder.nativeOrder() && typeBO == byteOrder;
-  }
-
-  @Override
-  public boolean isCloseable() {
-    return ((seg.isNative() || seg.isMapped()) && seg.scope().isAlive());
   }
 
   @Override
@@ -563,26 +544,16 @@ abstract class ResourceImpl implements Resource {
   }
 
   @Override
-  public String toString() {
-    return toString("", 0, (int)this.getCapacity(), false);
-  }
-
-  @Override
-  public final String toString(final String comment, final long offsetBytes, final int lengthBytes,
-      final boolean withData) {
-    return toHex(this, comment, offsetBytes, lengthBytes, withData);
-  }
-
-  @Override
-  public MemorySegment toMemorySegment() {
+  public MemorySegment toMemorySegment(final Arena arena, final long alignment) {
     final long len = seg.byteSize();
+    final boolean arenaValid = arena != null;
     final MemorySegment out;
-    if (seg.isNative()) { //off-heap
+    if (arenaValid) { //off-heap
       if (len == 0) {
         out = MemorySegment.NULL;
         return out;
       }
-      out = arena.allocate(seg.byteSize(), SEGMENT_ALIGHMENT);
+      out = arena.allocate(seg.byteSize(), alignment);
     }
     else { //on-heap
       if (len == 0) {
@@ -601,6 +572,17 @@ abstract class ResourceImpl implements Resource {
     }
     out.copyFrom(seg);
     return out;
+  }
+
+  @Override
+  public String toString() {
+    return toString("", 0, (int)this.getCapacity(), false);
+  }
+
+  @Override
+  public final String toString(final String comment, final long offsetBytes, final int lengthBytes,
+      final boolean withData) {
+    return toHex(this, comment, offsetBytes, lengthBytes, withData);
   }
 
   @Override

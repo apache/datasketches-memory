@@ -34,12 +34,7 @@ public class MemoryBoundaryCheckTest {
 
   @BeforeClass
   public void allocate() {
-     writableBuffer = WritableMemory.allocate(8).asWritableBuffer();
-  }
-
-  @AfterClass
-  public void close() throws Exception {
-    writableBuffer.close();
+     writableBuffer = WritableMemory.allocate(8).asWritableBuffer(); //on heap
   }
 
   @Test

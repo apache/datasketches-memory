@@ -47,7 +47,7 @@ import org.testng.annotations.Test;
  *
  */
 public class DruidIssue11544Test {
-  private static final MemoryRequestServer myMemReqSvr = Resource.defaultMemReqSvr; //on heap, no copy
+  private static final MemoryRequestServer myMemReqSvr = Resource.defaultMemReqSvr;
 
   @Test
   public void withByteBuffer() {
@@ -64,7 +64,7 @@ public class DruidIssue11544Test {
 
     //Request Bigger Memory on heap
     int size2 = size1 * 2;
-    WritableMemory mem2 = myMemReqSvr.request(mem1, size2);
+    WritableMemory mem2 = myMemReqSvr.request(size2, 8, ByteOrder.LITTLE_ENDIAN, null);
 
     //Confirm that mem2 is on the heap (the default) and 2X size1
     assertFalse(mem2.isDirect());
@@ -73,14 +73,12 @@ public class DruidIssue11544Test {
     //Move data to new memory
     mem1.copyTo(0, mem2, 0, size1);
 
-    //Request Close
-    myMemReqSvr.requestClose(mem1, mem2); //ignored, because mem1 is implicit
     assertTrue(mem1.isAlive());
     assertTrue(mem2.isAlive());
 
     //Now we are on the heap and need to grow again:
     int size3 = size2 * 2;
-    WritableMemory mem3 = myMemReqSvr.request(mem2, size3);
+    WritableMemory mem3 = myMemReqSvr.request(size3, 8, ByteOrder.LITTLE_ENDIAN, null);
 
     //Confirm that mem3 is still on the heap and 2X of size2
     assertFalse(mem3.isDirect());
@@ -89,8 +87,7 @@ public class DruidIssue11544Test {
     //Move data to new memory
     mem2.copyTo(0, mem3, 0, size2);
 
-    //Request deallocation
-    myMemReqSvr.requestClose(mem2, mem3); //ignored, mem2 is on-heap (implicit)
+    //deallocation via close not relevant, GC does the work.
     assertTrue(mem2.isAlive());
     assertTrue(mem3.isAlive());
   }

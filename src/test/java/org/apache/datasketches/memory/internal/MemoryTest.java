@@ -356,7 +356,7 @@ public class MemoryTest {
     int bytes = 64 * 8;
     try (Arena arena = Arena.ofConfined()) {
       WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, ByteOrder.nativeOrder(), myMemReqSvr, arena);
-      wmem.close();
+      wmem.getArena().close();
       wmem.getLong(0); //Already closed
     }
   }
@@ -367,7 +367,7 @@ public class MemoryTest {
     try (Arena arena = Arena.ofConfined()) {
       WritableMemory wmem = WritableMemory.allocateDirect(bytes, 1, ByteOrder.nativeOrder(), myMemReqSvr, arena);
       Memory region = wmem.region(0L, bytes);
-      wmem.close();
+      wmem.getArena().close();
       region.getByte(0); //Already closed.
     }
   }

@@ -42,7 +42,7 @@ import org.testng.annotations.Test;
 public class LeafImplTest {
   private static final ByteOrder NBO = ByteOrder.nativeOrder();
   private static final ByteOrder NNBO = NON_NATIVE_BYTE_ORDER;
-  private static final MemoryRequestServer myMemReqSvr = new DefaultMemoryRequestServer(true, true);
+  private static final MemoryRequestServer myMemReqSvr = new DefaultMemoryRequestServer();
 
   public static ByteOrder otherByteOrder(final ByteOrder order) {
     return (order == ByteOrder.nativeOrder()) ? NNBO : ByteOrder.nativeOrder();

@@ -35,6 +35,7 @@ import org.testng.annotations.Test;
  * @author Lee Rhodes
  */
 public class ExampleMemoryRequestServerTest {
+  private static long alignmentBytes = 8;
 
   /**
    * This version is without a TWR block. All of the memory allocations are done through the MemoryRequestServer
@@ -45,11 +46,10 @@ public class ExampleMemoryRequestServerTest {
   public void checkExampleMemoryRequestServer1() {
 
     long workingMemBytes = 8;
-    long alignmentBytes = 8;
 
     Arena arena = Arena.ofConfined();
     //Configure the default memReqSvr to create new memory off-heap and copy data from old to new
-    MemoryRequestServer memReqSvr = new DefaultMemoryRequestServer(true, true);
+    MemoryRequestServer memReqSvr = new DefaultMemoryRequestServer();
 
     //Create the initial working memory for the client
     WritableMemory workingMem = WritableMemory.allocateDirect(
@@ -65,8 +65,7 @@ public class ExampleMemoryRequestServerTest {
 
   /**
    * This little client is never happy with how much memory it has been allocated and keeps
-   * requesting for more. When it does ask for more, the DefaultMemoryRequestServer is configured to copy the old data into the new
-   * memory.  The client must request the MemoryRequestServer to release the prior memory.
+   * requesting for more. The client must request the MemoryRequestServer to release all the memory at the end.
    * The client continues working and requesting more memory.
    *
    * <p>In reality, these memory requests should be quite rare.</p>
@@ -95,15 +94,16 @@ public class ExampleMemoryRequestServerTest {
         //Not big enough, expand
         oldWorkingCap = newWorkingCap;
         newWorkingCap = 2 * oldWorkingCap;
-        newMem = memReqSvr.request(workingMem, newWorkingCap); //defaults to new confined scope for each iteration
+        Arena arena = Arena.ofConfined(); // new confined scope for each iteration
+        newMem = memReqSvr.request(newWorkingCap, alignmentBytes, ByteOrder.LITTLE_ENDIAN, arena);
 
-        //done with old memory, close it, if applicable
-        memReqSvr.requestClose(workingMem, newMem);
+        //done with old memory, close it
+        memReqSvr.requestClose(workingMem.getArena());
         workingMem = newMem;
         itr++;
       }
 
-      workingMem.close();
+      workingMem.getArena().close();
     }
   }
 

@@ -20,8 +20,6 @@
 package org.apache.datasketches.memory;
 
 import java.lang.foreign.Arena;
-import java.lang.foreign.FunctionDescriptor;
-import java.lang.foreign.Linker.Option;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.MemorySegment.Scope;
 import java.nio.ByteBuffer;
@@ -32,7 +30,7 @@ import java.nio.ByteOrder;
  *
  * @author Lee Rhodes
  */
-public interface Resource extends AutoCloseable {
+public interface Resource {
 
   //MemoryRequestServer logic
 
@@ -93,32 +91,6 @@ public interface Resource extends AutoCloseable {
   ByteBuffer asByteBufferView(ByteOrder order);
 
   /**
-   * <i>From Java 21 java.lang.foreign.Arena::close():</i>
-   * Closes this arena. If this method completes normally, the arena scope is no longer {@linkplain Scope#isAlive() alive},
-   * and all the memory segments associated with it can no longer be accessed. Furthermore, any off-heap region of memory backing the
-   * segments obtained from this arena are also released.
-   *
-   * <p>This operation is not idempotent; that is, closing an already closed arena <em>always</em> results in an
-   * exception being thrown. This reflects a deliberate design choice: failure to close an arena might reveal a bug
-   * in the underlying application logic.</p>
-   *
-   * <p>If this method completes normally, then {@code java.lang.foreign.Arena.scope().isAlive() == false}.
-   * Implementations are allowed to throw {@link UnsupportedOperationException} if an explicit close operation is
-   * not supported.</p>
-   *
-   * @see java.lang.foreign.MemorySegment.Scope#isAlive()
-   *
-   * @throws IllegalStateException if the arena has already been closed.
-   * @throws IllegalStateException if a segment associated with this arena is being accessed concurrently, e.g.
-   * by a {@linkplain java.lang.foreign.Linker#downcallHandle(FunctionDescriptor, Option...) downcall method handle}.
-   * @throws WrongThreadException if this arena is confined, and this method is called from a thread
-   * other than the arena's owner thread.
-   * @throws UnsupportedOperationException if this arena cannot be closed explicitly.
-   */
-  @Override
-  void close();
-
-  /**
    * Compares the bytes of this Resource to <i>that</i> Resource.
    * Returns <i>(this &lt; that) ? (some negative value) : (this &gt; that) ? (some positive value) : 0;</i>.
    * If all bytes are equal up to the shorter of the two lengths, the shorter length is considered
@@ -171,6 +143,13 @@ public interface Resource extends AutoCloseable {
   void force();
 
   /**
+   * Returns the arena used to create this resource and possibly other resources.
+   * Be careful when you close the returned Arena, you may be closing other resources as well.
+   * @return the arena used to create this resource and possibly other resources.
+   */
+  Arena getArena();
+
+  /**
    * Gets the capacity of this object in bytes
    * @return the capacity of this object in bytes
    */
@@ -197,13 +176,6 @@ public interface Resource extends AutoCloseable {
    * @return true if this Memory is backed by a ByteBuffer.
    */
   boolean hasByteBuffer();
-
-  /**
-   * Return true if this resource is likely to be closeable, but not guaranteed.
-   * There is no way to determine if the specific type of Arena is explicitly closeable.
-   * @return true if this resource is likely to be closeable.
-   */
-  boolean isCloseable();
 
   /**
    * Is the underlying resource scope alive?
@@ -346,10 +318,14 @@ mismatch(MemorySegment, long, long, MemorySegment, long, long)</a>
   ByteBuffer toByteBuffer(ByteOrder order);
 
   /**
-   * Returns a copy of the underlying MemorySegment.
-   * @return a copy of the underlying MemorySegment.
+   * Returns a copy of the underlying MemorySegment in the given arena.
+   * @param arena the given arena.
+   * If the desired result is to be off-heap, the arena must not be null.
+   * Otherwise, the result will be on-heap.
+   * @param alignment requested segment alignment. Typically 1, 2, 4 or 8.
+   * @return a copy of the underlying MemorySegment in the given arena.
    */
-  MemorySegment toMemorySegment();
+  MemorySegment toMemorySegment(Arena arena, long alignment);
 
   /**
    * Returns a brief description of this object.

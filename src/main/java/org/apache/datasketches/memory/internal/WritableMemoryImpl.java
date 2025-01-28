@@ -138,18 +138,16 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
    * This method is also used for read-only operations when localReadOnly is false.
    * @param file the given file to map. It must be non-null.
    * @param fileOffsetBytes the file starting offset in bytes. It must be &ge; 0.
-   * @param capacityBytes the capacity of the mapped memory. It must be &ge; 0.
-   * It must be non-null.
-   * Typically use <i>Arena.ofConfined()</i>.
-   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not recommended.
+   * @param capacityBytes the capacity of the mapped memory. It must be &ge; 0. It must be non-null.
    * @param byteOrder the given <i>ByteOrder</i>. It must be non-null.
    * @param localReadOnly true if read-only is being imposed locally, even if the given file is writable..
-   * @param arena the given arena. It must be non-null.
+   * @param arena the given arena. It must be non-null. Typically use <i>Arena.ofConfined()</i>.
    * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not recommended.
    * @return a <i>WritableMemory</i>
    * @throws IllegalArgumentException if file is not readable.
    * @throws IOException if mapping is not successful.
    */
+  @SuppressWarnings("resource")
   public static WritableMemory wrapMap(
       final File file,
       final long fileOffsetBytes,
@@ -204,6 +202,7 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
    * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not recommended.
    * @return WritableMemory
    */
+  @SuppressWarnings("resource")
   public static WritableMemory wrapDirect(
       final long capacityBytes,
       final long alignmentBytes,

@@ -273,7 +273,22 @@ public class NonNativeWritableBufferImplTest {
     Memory mreg = mem.region(0, 8);
     assertEquals(mreg.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
     assertEquals(mreg.getChar(0), 1);
+  }
 
+  @Test
+  public void checkPutIntArray() {
+    WritableMemory wmem = WritableMemory.allocate(12, ByteOrder.BIG_ENDIAN);
+    WritableBuffer wbuf = wmem.asWritableBuffer(ByteOrder.BIG_ENDIAN);
+
+    wbuf.putInt(1);
+    int[] array = new int[] { 2 };
+    wbuf.putIntArray(array, 0, 1);
+    wbuf.putInt(3);
+
+    Buffer buf = wmem.asWritableBuffer();
+    assertEquals(buf.getInt(), 1);
+    assertEquals(buf.getInt(), 2);
+    assertEquals(buf.getInt(), 3);
   }
 
 }

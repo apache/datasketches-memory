@@ -469,6 +469,22 @@ public class NativeWritableBufferImplTest {
   }
 
   @Test
+  public void checkPutIntArray() {
+    WritableMemory wmem = WritableMemory.allocate(12);
+    WritableBuffer wbuf = wmem.asWritableBuffer();
+
+    wbuf.putInt(1);
+    int[] array = new int[] { 2 };
+    wbuf.putIntArray(array, 0, 1);
+    wbuf.putInt(3);
+
+    Buffer buf = wmem.asWritableBuffer();
+    assertEquals(buf.getInt(), 1);
+    assertEquals(buf.getInt(), 2);
+    assertEquals(buf.getInt(), 3);
+  }
+
+  @Test
   public void printlnTest() {
     println("PRINTING: "+this.getClass().getName());
   }

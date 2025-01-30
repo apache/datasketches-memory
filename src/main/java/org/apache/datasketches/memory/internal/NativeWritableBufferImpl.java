@@ -89,7 +89,7 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   public void getCharArray(final char[] dstArray, final int dstOffsetChars, final int lengthChars) {
     final long pos = getPosition();
     getCharArr(seg, pos, dstArray, dstOffsetChars, lengthChars);
-    setPosition(pos + (lengthChars) << CHAR_SHIFT);
+    setPosition(pos + (lengthChars << CHAR_SHIFT));
   }
 
   @Override
@@ -108,7 +108,7 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   public void getDoubleArray(final double[] dstArray, final int dstOffsetDoubles, final int lengthDoubles) {
     final long pos = getPosition();
     getDoubleArr(seg, pos, dstArray, dstOffsetDoubles, lengthDoubles);
-    setPosition(pos + (lengthDoubles) << DOUBLE_SHIFT);
+    setPosition(pos + (lengthDoubles << DOUBLE_SHIFT));
   }
 
   @Override
@@ -127,7 +127,7 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   public void getFloatArray(final float[] dstArray, final int dstOffsetFloats, final int lengthFloats) {
     final long pos = getPosition();
     getFloatArr(seg, pos, dstArray, dstOffsetFloats, lengthFloats);
-    setPosition(pos + (lengthFloats) << FLOAT_SHIFT);
+    setPosition(pos + (lengthFloats << FLOAT_SHIFT));
   }
 
   @Override
@@ -146,7 +146,7 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   public void getIntArray(final int[] dstArray, final int dstOffsetInts, final int lengthInts) {
     final long pos = getPosition();
     getIntArr(seg, pos, dstArray, dstOffsetInts, lengthInts);
-    setPosition(pos + (lengthInts) << INT_SHIFT);
+    setPosition(pos + (lengthInts << INT_SHIFT));
   }
 
   @Override
@@ -165,7 +165,7 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   public void getLongArray(final long[] dstArray, final int dstOffsetLongs, final int lengthLongs) {
     final long pos = getPosition();
     getLongArr(seg, pos, dstArray, dstOffsetLongs, lengthLongs);
-    setPosition(pos + (lengthLongs) << LONG_SHIFT);
+    setPosition(pos + (lengthLongs << LONG_SHIFT));
   }
 
   @Override
@@ -184,7 +184,7 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   public void getShortArray(final short[] dstArray, final int dstOffsetShorts, final int lengthShorts) {
     final long pos = getPosition();
     getShortArr(seg, pos, dstArray, dstOffsetShorts, lengthShorts);
-    setPosition(pos + (lengthShorts) << SHORT_SHIFT);
+    setPosition(pos + (lengthShorts << SHORT_SHIFT));
   }
 
   //PRIMITIVE putX() and putXArray()
@@ -204,7 +204,7 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   public void putCharArray(final char[] srcArray, final int srcOffsetChars, final int lengthChars) {
     final long pos = getPosition();
     putCharArr(seg, pos, srcArray, srcOffsetChars, lengthChars);
-    setPosition(pos + (lengthChars) << CHAR_SHIFT);
+    setPosition(pos + (lengthChars << CHAR_SHIFT));
   }
 
   @Override
@@ -223,7 +223,7 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   public void putDoubleArray(final double[] srcArray, final int srcOffsetDoubles, final int lengthDoubles) {
     final long pos = getPosition();
     putDoubleArr(seg, pos, srcArray, srcOffsetDoubles, lengthDoubles);
-    setPosition(pos + (lengthDoubles) << DOUBLE_SHIFT);
+    setPosition(pos + (lengthDoubles << DOUBLE_SHIFT));
   }
 
   @Override
@@ -242,7 +242,7 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   public void putFloatArray(final float[] srcArray, final int srcOffsetFloats, final int lengthFloats) {
     final long pos = getPosition();
     putFloatArr(seg, pos, srcArray, srcOffsetFloats, lengthFloats);
-    setPosition(pos + (lengthFloats) << FLOAT_SHIFT);
+    setPosition(pos + (lengthFloats << FLOAT_SHIFT));
   }
 
   @Override
@@ -261,7 +261,7 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   public void putIntArray(final int[] srcArray, final int srcOffsetInts, final int lengthInts) {
     final long pos = getPosition();
     putIntArr(seg, pos, srcArray, srcOffsetInts, lengthInts);
-    setPosition(pos + (lengthInts) << INT_SHIFT);
+    setPosition(pos + (lengthInts << INT_SHIFT));
   }
 
   @Override
@@ -280,7 +280,7 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   public void putLongArray(final long[] srcArray, final int srcOffsetLongs, final int lengthLongs) {
     final long pos = getPosition();
     putLongArr(seg, pos, srcArray, srcOffsetLongs, lengthLongs);
-    setPosition(pos + (lengthLongs) << LONG_SHIFT);
+    setPosition(pos + (lengthLongs << LONG_SHIFT));
   }
 
   @Override
@@ -299,6 +299,6 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   public void putShortArray(final short[] srcArray, final int srcOffsetShorts, final int lengthShorts) {
     final long pos = getPosition();
     putShortArr(seg, pos, srcArray, srcOffsetShorts, lengthShorts);
-    setPosition(pos + (lengthShorts) << SHORT_SHIFT);
+    setPosition(pos + (lengthShorts << SHORT_SHIFT));
   }
 }

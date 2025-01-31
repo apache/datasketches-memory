@@ -58,132 +58,231 @@ public class NativeWritableMemoryImplTest {
     try { wmem.getArena().close(); } catch (IllegalStateException e) { }
   }
 
-  //Simple Native arrays
+  //Simple Heap arrays
 
   @Test
-  public void checkByteArray() {
+  public void checkGetByteArray() {
     byte[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
-    byte[] dstArray = new byte[8];
+    final int len = srcArray.length;
+    final int half = len / 2;
+    byte[] dstArray = new byte[len];
 
     Memory mem = Memory.wrap(srcArray);
-    mem.getByteArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
-      assertEquals(dstArray[i], srcArray[i]);
-    }
+    mem.getByteArray(0, dstArray, 0, half);
+    mem.getByteArray(half, dstArray, half, half);
+    assertEquals(dstArray, srcArray);
 
     WritableMemory wmem = WritableMemory.writableWrap(srcArray);
-    wmem.getByteArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
-      assertEquals(dstArray[i], srcArray[i]);
-    }
+    wmem.getByteArray(0, dstArray, 0, half);
+    wmem.getByteArray(half, dstArray, half, half);
+    assertEquals(dstArray, srcArray);
   }
 
   @Test
-  public void checkCharArray() {
+  public void checkPutByteArray() {
+    byte[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
+    final int len = srcArray.length;
+    final int half = len / 2;
+    byte[] dstArray = new byte[len];
+
+    WritableMemory wmem = WritableMemory.allocate(len * Byte.BYTES);
+    wmem.putByteArray(0, srcArray, 0, half);
+    wmem.putByteArray(half * Byte.BYTES, srcArray, half, half);
+    wmem.getByteArray(0, dstArray, 0, len);
+    assertEquals(dstArray, srcArray);
+  }
+
+  @Test
+  public void checkGetCharArray() {
     char[] srcArray = { 1, 2, 3, 4, 5, 6, 7, 8 };
-    char[] dstArray = new char[8];
+    final int len = srcArray.length;
+    final int half = len / 2;
+    char[] dstArray = new char[len];
 
     Memory mem = Memory.wrap(srcArray);
-    mem.getCharArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
-      assertEquals(dstArray[i], srcArray[i]);
-    }
+    mem.getCharArray(0, dstArray, 0, half);
+    mem.getCharArray(half * Character.BYTES, dstArray, half, half);
+    assertEquals(dstArray, srcArray);
 
     WritableMemory wmem = WritableMemory.writableWrap(srcArray);
-    wmem.getCharArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
-      assertEquals(dstArray[i], srcArray[i]);
-    }
+    wmem.getCharArray(0, dstArray, 0, half);
+    wmem.getCharArray(half * Character.BYTES, dstArray, half, half);
+    assertEquals(dstArray, srcArray);
   }
 
   @Test
-  public void checkShortArray() {
+  public void checkPutCharArray() {
+    char[] srcArray = { 1, 2, 3, 4, 5, 6, 7, 8 };
+    final int len = srcArray.length;
+    final int half = len / 2;
+    char[] dstArray = new char[len];
+
+    WritableMemory wmem = WritableMemory.allocate(len * Character.BYTES);
+    wmem.putCharArray(0, srcArray, 0, half);
+    wmem.putCharArray(half * Character.BYTES, srcArray, half, half);
+    wmem.getCharArray(0, dstArray, 0, len);
+    assertEquals(dstArray, srcArray);
+  }
+
+  @Test
+  public void checkGetShortArray() {
     short[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
-    short[] dstArray = new short[8];
+    final int len = srcArray.length;
+    final int half = len / 2;
+    short[] dstArray = new short[len];
 
     Memory mem = Memory.wrap(srcArray);
-    mem.getShortArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
-      assertEquals(dstArray[i], srcArray[i]);
-    }
+    mem.getShortArray(0, dstArray, 0, half);
+    mem.getShortArray(half * Short.BYTES, dstArray, half, half);
+    assertEquals(dstArray, srcArray);
 
     WritableMemory wmem = WritableMemory.writableWrap(srcArray);
-    wmem.getShortArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
-      assertEquals(dstArray[i], srcArray[i]);
-    }
+    wmem.getShortArray(0, dstArray, 0, half);
+    wmem.getShortArray(half * Short.BYTES, dstArray, half, half);
+    assertEquals(dstArray, srcArray);
   }
 
   @Test
-  public void checkIntArray() {
+  public void checkPutShortArray() {
+    short[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
+    final int len = srcArray.length;
+    final int half = len / 2;
+    short[] dstArray = new short[len];
+
+    WritableMemory wmem = WritableMemory.allocate(len * Short.BYTES);
+    wmem.putShortArray(0, srcArray, 0, half);
+    wmem.putShortArray(half * Short.BYTES, srcArray, half, half);
+    wmem.getShortArray(0, dstArray, 0, len);
+    assertEquals(dstArray, srcArray);
+  }
+
+  @Test
+  public void checkGetIntArray() {
     int[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
-    int[] dstArray = new int[8];
+    final int len = srcArray.length;
+    final int half = len / 2;
+    int[] dstArray = new int[len];
 
     Memory mem = Memory.wrap(srcArray);
-    mem.getIntArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
-      assertEquals(dstArray[i], srcArray[i]);
-    }
+    mem.getIntArray(0, dstArray, 0, half);
+    mem.getIntArray(half * Integer.BYTES, dstArray, half, half);
+    assertEquals(dstArray, srcArray);
 
     WritableMemory wmem = WritableMemory.writableWrap(srcArray);
-    wmem.getIntArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
-      assertEquals(dstArray[i], srcArray[i]);
-    }
+    wmem.getIntArray(0, dstArray, 0, half);
+    wmem.getIntArray(half * Integer.BYTES, dstArray, half, half);
+    assertEquals(dstArray, srcArray);
   }
 
   @Test
-  public void checkLongArray() {
+  public void checkPutIntArray() {
+    int[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
+    final int len = srcArray.length;
+    final int half = len / 2;
+    int[] dstArray = new int[len];
+
+    WritableMemory wmem = WritableMemory.allocate(len * Integer.BYTES);
+    wmem.putIntArray(0, srcArray, 0, half);
+    wmem.putIntArray(half * Integer.BYTES, srcArray, half, half);
+    wmem.getIntArray(0, dstArray, 0, len);
+    assertEquals(dstArray, srcArray);
+  }
+
+  @Test
+  public void checkGetLongArray() {
     long[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
-    long[] dstArray = new long[8];
+    final int len = srcArray.length;
+    final int half = len / 2;
+    long[] dstArray = new long[len];
 
     Memory mem = Memory.wrap(srcArray);
-    mem.getLongArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
-      assertEquals(dstArray[i], srcArray[i]);
-    }
+    mem.getLongArray(0, dstArray, 0, half);
+    mem.getLongArray(half * Long.BYTES, dstArray, half, half);
+    assertEquals(dstArray, srcArray);
 
     WritableMemory wmem = WritableMemory.writableWrap(srcArray);
-    wmem.getLongArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
-      assertEquals(dstArray[i], srcArray[i]);
-    }
+    wmem.getLongArray(0, dstArray, 0, half);
+    wmem.getLongArray(half * Long.BYTES, dstArray, half, half);
+    assertEquals(dstArray, srcArray);
   }
 
   @Test
-  public void checkFloatArray() {
+  public void checkPutLongArray() {
+    long[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
+    final int len = srcArray.length;
+    final int half = len / 2;
+    long[] dstArray = new long[len];
+
+    WritableMemory wmem = WritableMemory.allocate(len * Long.BYTES);
+    wmem.putLongArray(0, srcArray, 0, half);
+    wmem.putLongArray(half * Long.BYTES, srcArray, half, half);
+    wmem.getLongArray(0, dstArray, 0, len);
+    assertEquals(dstArray, srcArray);
+  }
+
+
+  @Test
+  public void checkGetFloatArray() {
     float[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
-    float[] dstArray = new float[8];
+    final int len = srcArray.length;
+    final int half = len / 2;
+    float[] dstArray = new float[len];
 
     Memory mem = Memory.wrap(srcArray);
-    mem.getFloatArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
-      assertEquals(dstArray[i], srcArray[i]);
-    }
+    mem.getFloatArray(0, dstArray, 0, half);
+    mem.getFloatArray(half * Float.BYTES, dstArray, half, half);
+    assertEquals(dstArray, srcArray);
 
     WritableMemory wmem = WritableMemory.writableWrap(srcArray);
-    wmem.getFloatArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
-      assertEquals(dstArray[i], srcArray[i]);
-    }
+    wmem.getFloatArray(0, dstArray, 0, half);
+    wmem.getFloatArray(half * Float.BYTES, dstArray, half, half);
+    assertEquals(dstArray, srcArray);
   }
 
   @Test
-  public void checkDoubleArray() {
+  public void checkPutFloatArray() {
+    float[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
+    final int len = srcArray.length;
+    final int half = len / 2;
+    float[] dstArray = new float[len];
+
+    WritableMemory wmem = WritableMemory.allocate(len * Float.BYTES);
+    wmem.putFloatArray(0, srcArray, 0, half);
+    wmem.putFloatArray(half * Float.BYTES, srcArray, half, half);
+    wmem.getFloatArray(0, dstArray, 0, len);
+    assertEquals(dstArray, srcArray);
+  }
+
+  @Test
+  public void checkGetDoubleArray() {
     double[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
+    final int len = srcArray.length;
+    final int half = len / 2;
     double[] dstArray = new double[8];
 
     Memory mem = Memory.wrap(srcArray);
-    mem.getDoubleArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
-      assertEquals(dstArray[i], srcArray[i]);
-    }
+    mem.getDoubleArray(0, dstArray, 0, half);
+    mem.getDoubleArray(half * Double.BYTES, dstArray, half, half);
+    assertEquals(dstArray, srcArray);
 
     WritableMemory wmem = WritableMemory.writableWrap(srcArray);
-    wmem.getDoubleArray(0, dstArray, 0, 8);
-    for (int i=0; i<8; i++) {
-      assertEquals(dstArray[i], srcArray[i]);
-    }
+    wmem.getDoubleArray(0, dstArray, 0, half);
+    wmem.getDoubleArray(half * Double.BYTES, dstArray, half, half);
+    assertEquals(dstArray, srcArray);
+  }
+
+  @Test
+  public void checkPutDoubleArray() {
+    double[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
+    final int len = srcArray.length;
+    final int half = len / 2;
+    double[] dstArray = new double[len];
+
+    WritableMemory wmem = WritableMemory.allocate(len * Double.BYTES);
+    wmem.putDoubleArray(0, srcArray, 0, half);
+    wmem.putDoubleArray(half * Double.BYTES, srcArray, half, half);
+    wmem.getDoubleArray(0, dstArray, 0, len);
+    assertEquals(dstArray, srcArray);
   }
 
   @Test

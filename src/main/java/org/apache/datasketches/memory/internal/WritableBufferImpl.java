@@ -32,19 +32,6 @@ import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
 
-/*
- * Developer notes: The heavier methods, such as put/get arrays, duplicate, region, clear, fill,
- * compareTo, etc., use hard checks (check*() and incrementAndCheck*() methods), which execute at
- * runtime and throw exceptions if violated. The cost of the runtime checks are minor compared to
- * the rest of the work these methods are doing.
- *
- * <p>The light weight methods, such as put/get primitives, use asserts (assert*() and
- * incrementAndAssert*() methods), which only execute when asserts are enabled and JIT will remove
- * them entirely from production runtime code. The offset versions of the light weight methods will
- * simplify to a single unsafe call, which is further simplified by JIT to an intrinsic that is
- * often a single CPU instruction.
- */
-
 /**
  * Common base of native-ordered and non-native-ordered {@link WritableBuffer} implementations.
  * Contains methods which are agnostic to the byte order.

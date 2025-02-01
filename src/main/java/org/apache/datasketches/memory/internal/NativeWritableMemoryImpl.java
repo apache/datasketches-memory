@@ -19,17 +19,11 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static java.lang.foreign.ValueLayout.JAVA_CHAR;
 import static java.lang.foreign.ValueLayout.JAVA_CHAR_UNALIGNED;
-import static java.lang.foreign.ValueLayout.JAVA_DOUBLE;
 import static java.lang.foreign.ValueLayout.JAVA_DOUBLE_UNALIGNED;
-import static java.lang.foreign.ValueLayout.JAVA_FLOAT;
 import static java.lang.foreign.ValueLayout.JAVA_FLOAT_UNALIGNED;
-import static java.lang.foreign.ValueLayout.JAVA_INT;
 import static java.lang.foreign.ValueLayout.JAVA_INT_UNALIGNED;
-import static java.lang.foreign.ValueLayout.JAVA_LONG;
 import static java.lang.foreign.ValueLayout.JAVA_LONG_UNALIGNED;
-import static java.lang.foreign.ValueLayout.JAVA_SHORT;
 import static java.lang.foreign.ValueLayout.JAVA_SHORT_UNALIGNED;
 
 import java.lang.foreign.Arena;
@@ -55,7 +49,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
     super(seg, typeId, memReqSvr, arena);
   }
 
-  ///PRIMITIVE getX() and getXArray()
+  //PRIMITIVE getX() and getXArray()
   @Override
   public char getChar(final long offsetBytes) {
     return seg.get(ValueLayout.JAVA_CHAR_UNALIGNED, offsetBytes);
@@ -63,14 +57,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
 
   @Override
   public void getCharArray(final long offsetBytes, final char[] dstArray, final int dstOffsetChars, final int lengthChars) {
-    getCharArr(seg, offsetBytes, dstArray, dstOffsetChars, lengthChars);
-  }
-
-  static void getCharArr(
-      final MemorySegment seg, final long offsetBytes, final char[] dstArray, final int dstOffsetChars, final int lengthChars) {
-    final MemorySegment dstSeg = MemorySegment.ofArray(dstArray);
-    final long dstOffsetBytes = ((long) dstOffsetChars) << CHAR_SHIFT;
-    MemorySegment.copy(seg, JAVA_CHAR_UNALIGNED, offsetBytes, dstSeg, JAVA_CHAR, dstOffsetBytes, lengthChars);
+    MemorySegment.copy(seg, JAVA_CHAR_UNALIGNED, offsetBytes, dstArray, dstOffsetChars, lengthChars);
   }
 
   @Override
@@ -80,14 +67,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
 
   @Override
   public void getDoubleArray(final long offsetBytes, final double[] dstArray, final int dstOffsetDoubles, final int lengthDoubles) {
-    getDoubleArr(seg, offsetBytes, dstArray, dstOffsetDoubles, lengthDoubles);
-  }
-
-  static void getDoubleArr(
-      final MemorySegment seg, final long offsetBytes, final double[] dstArray, final int dstOffsetDoubles, final int lengthDoubles) {
-    final MemorySegment dstSeg = MemorySegment.ofArray(dstArray);
-    final long dstOffsetBytes = ((long) dstOffsetDoubles) << DOUBLE_SHIFT;
-    MemorySegment.copy(seg, JAVA_DOUBLE_UNALIGNED, offsetBytes, dstSeg, JAVA_DOUBLE, dstOffsetBytes, lengthDoubles);
+    MemorySegment.copy(seg, JAVA_DOUBLE_UNALIGNED, offsetBytes, dstArray, dstOffsetDoubles, lengthDoubles);
   }
 
   @Override
@@ -97,14 +77,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
 
   @Override
   public void getFloatArray(final long offsetBytes, final float[] dstArray, final int dstOffsetFloats, final int lengthFloats) {
-    getFloatArr(seg, offsetBytes, dstArray, dstOffsetFloats, lengthFloats);
-  }
-
-  static void getFloatArr(
-      final MemorySegment seg, final long offsetBytes, final float[] dstArray, final int dstOffsetFloats, final int lengthFloats) {
-    final MemorySegment dstSeg = MemorySegment.ofArray(dstArray);
-    final long dstOffsetBytes = ((long) dstOffsetFloats) << FLOAT_SHIFT;
-    MemorySegment.copy(seg, JAVA_FLOAT_UNALIGNED, offsetBytes, dstSeg, JAVA_FLOAT, dstOffsetBytes, lengthFloats);
+    MemorySegment.copy(seg, JAVA_FLOAT_UNALIGNED, offsetBytes, dstArray, dstOffsetFloats, lengthFloats);
   }
 
   @Override
@@ -114,14 +87,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
 
   @Override
   public void getIntArray(final long offsetBytes, final int[] dstArray, final int dstOffsetInts, final int lengthInts) {
-    getIntArr(seg, offsetBytes, dstArray, dstOffsetInts, lengthInts);
-  }
-
-  static void getIntArr(
-      final MemorySegment seg, final long offsetBytes, final int[] dstArray, final int dstOffsetInts, final int lengthInts) {
-    final MemorySegment dstSeg = MemorySegment.ofArray(dstArray);
-    final long dstOffsetBytes = ((long) dstOffsetInts) << INT_SHIFT;
-    MemorySegment.copy(seg, JAVA_INT_UNALIGNED, offsetBytes, dstSeg, JAVA_INT, dstOffsetBytes, lengthInts);
+    MemorySegment.copy(seg, JAVA_INT_UNALIGNED, offsetBytes, dstArray, dstOffsetInts, lengthInts);
   }
 
   @Override
@@ -131,14 +97,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
 
   @Override
   public void getLongArray(final long offsetBytes, final long[] dstArray, final int dstOffsetLongs, final int lengthLongs) {
-    getLongArr(seg, offsetBytes, dstArray, dstOffsetLongs, lengthLongs);
-  }
-
-  static void getLongArr(
-      final MemorySegment seg, final long offsetBytes, final long[] dstArray, final int dstOffsetLongs, final int lengthLongs) {
-    final MemorySegment dstSeg = MemorySegment.ofArray(dstArray);
-    final long dstOffsetBytes = ((long) dstOffsetLongs) << LONG_SHIFT;
-    MemorySegment.copy(seg, JAVA_LONG_UNALIGNED, offsetBytes, dstSeg, JAVA_LONG, dstOffsetBytes, lengthLongs);
+    MemorySegment.copy(seg, JAVA_LONG_UNALIGNED, offsetBytes, dstArray, dstOffsetLongs, lengthLongs);
   }
 
   @Override
@@ -148,14 +107,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
 
   @Override
   public void getShortArray(final long offsetBytes, final short[] dstArray, final int dstOffsetShorts, final int lengthShorts) {
-    getShortArr(seg, offsetBytes, dstArray, dstOffsetShorts, lengthShorts);
-  }
-
-  static void getShortArr(
-      final MemorySegment seg, final long offsetBytes, final short[] dstArray, final int dstOffsetShorts, final int lengthShorts) {
-    final MemorySegment dstSeg = MemorySegment.ofArray(dstArray);
-    final long dstOffsetBytes = ((long) dstOffsetShorts) << SHORT_SHIFT;
-    MemorySegment.copy(seg, JAVA_SHORT_UNALIGNED, offsetBytes, dstSeg, JAVA_SHORT, dstOffsetBytes, lengthShorts);
+    MemorySegment.copy(seg, JAVA_SHORT_UNALIGNED, offsetBytes, dstArray, dstOffsetShorts, lengthShorts);
   }
 
   //PRIMITIVE putX() and putXArray() implementations
@@ -166,14 +118,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
 
   @Override
   public void putCharArray(final long offsetBytes, final char[] srcArray, final int srcOffsetChars, final int lengthChars) {
-    putCharArr(seg, offsetBytes, srcArray, srcOffsetChars, lengthChars);
-  }
-
-  static void putCharArr(
-      final MemorySegment seg, final long offsetBytes, final char[] srcArray, final int srcOffsetChars, final int lengthChars) {
-    final MemorySegment srcSeg = MemorySegment.ofArray(srcArray);
-    final long srcOffsetBytes = ((long) srcOffsetChars) << CHAR_SHIFT;
-    MemorySegment.copy(srcSeg, JAVA_CHAR, srcOffsetBytes, seg, JAVA_CHAR_UNALIGNED, offsetBytes, lengthChars);
+    MemorySegment.copy(srcArray, srcOffsetChars, seg, JAVA_CHAR_UNALIGNED, offsetBytes, lengthChars);
   }
 
   @Override
@@ -183,14 +128,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
 
   @Override
   public void putDoubleArray(final long offsetBytes, final double[] srcArray, final int srcOffsetDoubles, final int lengthDoubles) {
-    putDoubleArr(seg, offsetBytes, srcArray, srcOffsetDoubles, lengthDoubles);
-  }
-
-  static void putDoubleArr(
-      final MemorySegment seg, final long offsetBytes, final double[] srcArray, final int srcOffsetDoubles, final int lengthDoubles) {
-    final MemorySegment srcSeg = MemorySegment.ofArray(srcArray);
-    final long srcOffsetBytes = ((long) srcOffsetDoubles) << DOUBLE_SHIFT;
-    MemorySegment.copy(srcSeg, JAVA_DOUBLE, srcOffsetBytes, seg, JAVA_DOUBLE_UNALIGNED, offsetBytes, lengthDoubles);
+    MemorySegment.copy(srcArray, srcOffsetDoubles, seg, JAVA_DOUBLE_UNALIGNED, offsetBytes, lengthDoubles);
   }
 
   @Override
@@ -200,14 +138,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
 
   @Override
   public void putFloatArray(final long offsetBytes, final float[] srcArray, final int srcOffsetFloats, final int lengthFloats) {
-    putFloatArr(seg, offsetBytes, srcArray, srcOffsetFloats, lengthFloats);
-  }
-
-  static void putFloatArr(
-      final MemorySegment seg, final long offsetBytes, final float[] srcArray, final int srcOffsetFloats, final int lengthFloats) {
-    final MemorySegment srcSeg = MemorySegment.ofArray(srcArray);
-    final long srcOffsetBytes = ((long) srcOffsetFloats) << FLOAT_SHIFT;
-    MemorySegment.copy(srcSeg, JAVA_FLOAT, srcOffsetBytes, seg, JAVA_FLOAT_UNALIGNED, offsetBytes, lengthFloats);
+    MemorySegment.copy(srcArray, srcOffsetFloats, seg, JAVA_FLOAT_UNALIGNED, offsetBytes, lengthFloats);
   }
 
   @Override
@@ -217,14 +148,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
 
   @Override
   public void putIntArray(final long offsetBytes, final int[] srcArray, final int srcOffsetInts, final int lengthInts) {
-    putIntArr(seg, offsetBytes, srcArray, srcOffsetInts, lengthInts);
-  }
-
-  static void putIntArr(
-      final MemorySegment seg, final long offsetBytes, final int[] srcArray, final int srcOffsetInts, final int lengthInts) {
-    final MemorySegment srcSeg = MemorySegment.ofArray(srcArray);
-    final long srcOffsetBytes = ((long) srcOffsetInts) << INT_SHIFT;
-    MemorySegment.copy(srcSeg, JAVA_INT, srcOffsetBytes, seg, JAVA_INT_UNALIGNED, offsetBytes, lengthInts);
+    MemorySegment.copy(srcArray, srcOffsetInts, seg, JAVA_INT_UNALIGNED, offsetBytes, lengthInts);
   }
 
   @Override
@@ -234,14 +158,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
 
   @Override
   public void putLongArray(final long offsetBytes, final long[] srcArray, final int srcOffsetLongs, final int lengthLongs) {
-    putLongArr(seg, offsetBytes, srcArray, srcOffsetLongs, lengthLongs);
-  }
-
-  static void putLongArr(
-      final MemorySegment seg, final long offsetBytes, final long[] srcArray, final int srcOffsetLongs, final int lengthLongs) {
-    final MemorySegment srcSeg = MemorySegment.ofArray(srcArray);
-    final long srcOffsetBytes = ((long) srcOffsetLongs) << LONG_SHIFT;
-    MemorySegment.copy(srcSeg, JAVA_LONG, srcOffsetBytes, seg, JAVA_LONG_UNALIGNED, offsetBytes, lengthLongs);
+    MemorySegment.copy(srcArray, srcOffsetLongs, seg, JAVA_LONG_UNALIGNED, offsetBytes, lengthLongs);
   }
 
   @Override
@@ -251,13 +168,7 @@ final class NativeWritableMemoryImpl extends WritableMemoryImpl {
 
   @Override
   public void putShortArray(final long offsetBytes, final short[] srcArray, final int srcOffsetShorts, final int lengthShorts) {
-    putShortArr(seg, offsetBytes, srcArray, srcOffsetShorts, lengthShorts);
+    MemorySegment.copy(srcArray, srcOffsetShorts, seg, JAVA_SHORT_UNALIGNED, offsetBytes, lengthShorts);
   }
 
-  static void putShortArr(
-      final MemorySegment seg, final long offsetBytes, final short[] srcArray, final int srcOffsetShorts, final int lengthShorts) {
-    final MemorySegment srcSeg = MemorySegment.ofArray(srcArray);
-    final long srcOffsetBytes = ((long) srcOffsetShorts) << SHORT_SHIFT;
-    MemorySegment.copy(srcSeg, JAVA_SHORT, srcOffsetBytes, seg, JAVA_SHORT_UNALIGNED, offsetBytes, lengthShorts);
-  }
 }

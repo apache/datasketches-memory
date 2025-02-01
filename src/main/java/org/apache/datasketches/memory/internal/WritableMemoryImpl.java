@@ -46,7 +46,6 @@ import org.apache.datasketches.memory.WritableMemory;
  * Common base of native-ordered and non-native-ordered {@link WritableMemory} implementations.
  * Contains methods which are agnostic to the byte order.
  */
-@SuppressWarnings("preview")
 public abstract class WritableMemoryImpl extends ResourceImpl implements WritableMemory {
 
   //Pass-through constructor
@@ -147,7 +146,7 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
    * @throws IllegalArgumentException if file is not readable.
    * @throws IOException if mapping is not successful.
    */
-  @SuppressWarnings("resource")
+  @SuppressWarnings({"resource","preview"})
   public static WritableMemory wrapMap(
       final File file,
       final long fileOffsetBytes,
@@ -339,7 +338,7 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
     out.writeBytes(bArr);
   }
 
-  //  //PRIMITIVE putX() and putXArray() implementations
+  //PRIMITIVE putX() and putXArray() implementations
 
   @Override
   public final void putBoolean(final long offsetBytes, final boolean value) {

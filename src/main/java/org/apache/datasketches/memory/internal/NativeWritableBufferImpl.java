@@ -25,37 +25,12 @@ import static java.lang.foreign.ValueLayout.JAVA_FLOAT_UNALIGNED;
 import static java.lang.foreign.ValueLayout.JAVA_INT_UNALIGNED;
 import static java.lang.foreign.ValueLayout.JAVA_LONG_UNALIGNED;
 import static java.lang.foreign.ValueLayout.JAVA_SHORT_UNALIGNED;
-import static org.apache.datasketches.memory.internal.NativeWritableMemoryImpl.getCharArr;
-import static org.apache.datasketches.memory.internal.NativeWritableMemoryImpl.getDoubleArr;
-import static org.apache.datasketches.memory.internal.NativeWritableMemoryImpl.getFloatArr;
-import static org.apache.datasketches.memory.internal.NativeWritableMemoryImpl.getIntArr;
-import static org.apache.datasketches.memory.internal.NativeWritableMemoryImpl.getLongArr;
-import static org.apache.datasketches.memory.internal.NativeWritableMemoryImpl.getShortArr;
-import static org.apache.datasketches.memory.internal.NativeWritableMemoryImpl.putCharArr;
-import static org.apache.datasketches.memory.internal.NativeWritableMemoryImpl.putDoubleArr;
-import static org.apache.datasketches.memory.internal.NativeWritableMemoryImpl.putFloatArr;
-import static org.apache.datasketches.memory.internal.NativeWritableMemoryImpl.putIntArr;
-import static org.apache.datasketches.memory.internal.NativeWritableMemoryImpl.putLongArr;
-import static org.apache.datasketches.memory.internal.NativeWritableMemoryImpl.putShortArr;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.WritableBuffer;
-
-/*
- * Developer notes: The heavier methods, such as put/get arrays, duplicate, region, clear, fill,
- * compareTo, etc., use hard checks (check*() and incrementAndCheck*() methods), which execute at
- * runtime and throw exceptions if violated. The cost of the runtime checks are minor compared to
- * the rest of the work these methods are doing.
- *
- * <p>The light weight methods, such as put/get primitives, use asserts (assert*() and
- * incrementAndAssert*() methods), which only execute when asserts are enabled and JIT will remove
- * them entirely from production runtime code. The offset versions of the light weight methods will
- * simplify to a single unsafe call, which is further simplified by JIT to an intrinsic that is
- * often a single CPU instruction.
- */
 
 /**
  * Implementation of {@link WritableBuffer} for native endian byte order.
@@ -64,6 +39,7 @@ import org.apache.datasketches.memory.WritableBuffer;
  */
 final class NativeWritableBufferImpl extends WritableBufferImpl {
 
+  //Pass-through ctor
   NativeWritableBufferImpl(
       final Arena arena,
       final MemorySegment seg,
@@ -88,8 +64,8 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   @Override
   public void getCharArray(final char[] dstArray, final int dstOffsetChars, final int lengthChars) {
     final long pos = getPosition();
-    getCharArr(seg, pos, dstArray, dstOffsetChars, lengthChars);
-    setPosition(pos + (lengthChars) << CHAR_SHIFT);
+    MemorySegment.copy(seg, JAVA_CHAR_UNALIGNED, pos, dstArray, dstOffsetChars, lengthChars);
+    setPosition(pos + (lengthChars << CHAR_SHIFT));
   }
 
   @Override
@@ -107,8 +83,8 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   @Override
   public void getDoubleArray(final double[] dstArray, final int dstOffsetDoubles, final int lengthDoubles) {
     final long pos = getPosition();
-    getDoubleArr(seg, pos, dstArray, dstOffsetDoubles, lengthDoubles);
-    setPosition(pos + (lengthDoubles) << DOUBLE_SHIFT);
+    MemorySegment.copy(seg, JAVA_DOUBLE_UNALIGNED, pos, dstArray, dstOffsetDoubles, lengthDoubles);
+    setPosition(pos + (lengthDoubles << DOUBLE_SHIFT));
   }
 
   @Override
@@ -126,8 +102,8 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   @Override
   public void getFloatArray(final float[] dstArray, final int dstOffsetFloats, final int lengthFloats) {
     final long pos = getPosition();
-    getFloatArr(seg, pos, dstArray, dstOffsetFloats, lengthFloats);
-    setPosition(pos + (lengthFloats) << FLOAT_SHIFT);
+    MemorySegment.copy(seg, JAVA_FLOAT_UNALIGNED, pos, dstArray, dstOffsetFloats, lengthFloats);
+    setPosition(pos + (lengthFloats << FLOAT_SHIFT));
   }
 
   @Override
@@ -145,8 +121,8 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   @Override
   public void getIntArray(final int[] dstArray, final int dstOffsetInts, final int lengthInts) {
     final long pos = getPosition();
-    getIntArr(seg, pos, dstArray, dstOffsetInts, lengthInts);
-    setPosition(pos + (lengthInts) << INT_SHIFT);
+    MemorySegment.copy(seg, JAVA_INT_UNALIGNED, pos, dstArray, dstOffsetInts, lengthInts);
+    setPosition(pos + (lengthInts << INT_SHIFT));
   }
 
   @Override
@@ -164,8 +140,8 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   @Override
   public void getLongArray(final long[] dstArray, final int dstOffsetLongs, final int lengthLongs) {
     final long pos = getPosition();
-    getLongArr(seg, pos, dstArray, dstOffsetLongs, lengthLongs);
-    setPosition(pos + (lengthLongs) << LONG_SHIFT);
+    MemorySegment.copy(seg, JAVA_LONG_UNALIGNED, pos, dstArray, dstOffsetLongs, lengthLongs);
+    setPosition(pos + (lengthLongs << LONG_SHIFT));
   }
 
   @Override
@@ -183,8 +159,8 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   @Override
   public void getShortArray(final short[] dstArray, final int dstOffsetShorts, final int lengthShorts) {
     final long pos = getPosition();
-    getShortArr(seg, pos, dstArray, dstOffsetShorts, lengthShorts);
-    setPosition(pos + (lengthShorts) << SHORT_SHIFT);
+    MemorySegment.copy(seg, JAVA_SHORT_UNALIGNED, pos, dstArray, dstOffsetShorts, lengthShorts);
+    setPosition(pos + (lengthShorts << SHORT_SHIFT));
   }
 
   //PRIMITIVE putX() and putXArray()
@@ -203,8 +179,8 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   @Override
   public void putCharArray(final char[] srcArray, final int srcOffsetChars, final int lengthChars) {
     final long pos = getPosition();
-    putCharArr(seg, pos, srcArray, srcOffsetChars, lengthChars);
-    setPosition(pos + (lengthChars) << CHAR_SHIFT);
+    MemorySegment.copy(srcArray, srcOffsetChars, seg, JAVA_CHAR_UNALIGNED, pos, lengthChars);
+    setPosition(pos + (lengthChars << CHAR_SHIFT));
   }
 
   @Override
@@ -222,8 +198,8 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   @Override
   public void putDoubleArray(final double[] srcArray, final int srcOffsetDoubles, final int lengthDoubles) {
     final long pos = getPosition();
-    putDoubleArr(seg, pos, srcArray, srcOffsetDoubles, lengthDoubles);
-    setPosition(pos + (lengthDoubles) << DOUBLE_SHIFT);
+    MemorySegment.copy(srcArray, srcOffsetDoubles, seg, JAVA_DOUBLE_UNALIGNED, pos, lengthDoubles);
+    setPosition(pos + (lengthDoubles << DOUBLE_SHIFT));
   }
 
   @Override
@@ -241,8 +217,8 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   @Override
   public void putFloatArray(final float[] srcArray, final int srcOffsetFloats, final int lengthFloats) {
     final long pos = getPosition();
-    putFloatArr(seg, pos, srcArray, srcOffsetFloats, lengthFloats);
-    setPosition(pos + (lengthFloats) << FLOAT_SHIFT);
+    MemorySegment.copy(srcArray, srcOffsetFloats, seg, JAVA_FLOAT_UNALIGNED, pos, lengthFloats);
+    setPosition(pos + (lengthFloats << FLOAT_SHIFT));
   }
 
   @Override
@@ -260,8 +236,8 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   @Override
   public void putIntArray(final int[] srcArray, final int srcOffsetInts, final int lengthInts) {
     final long pos = getPosition();
-    putIntArr(seg, pos, srcArray, srcOffsetInts, lengthInts);
-    setPosition(pos + (lengthInts) << INT_SHIFT);
+    MemorySegment.copy(srcArray, srcOffsetInts, seg, JAVA_INT_UNALIGNED, pos, lengthInts);
+    setPosition(pos + (lengthInts << INT_SHIFT));
   }
 
   @Override
@@ -279,8 +255,8 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   @Override
   public void putLongArray(final long[] srcArray, final int srcOffsetLongs, final int lengthLongs) {
     final long pos = getPosition();
-    putLongArr(seg, pos, srcArray, srcOffsetLongs, lengthLongs);
-    setPosition(pos + (lengthLongs) << LONG_SHIFT);
+    MemorySegment.copy(srcArray, srcOffsetLongs, seg, JAVA_LONG_UNALIGNED, pos, lengthLongs);
+    setPosition(pos + (lengthLongs << LONG_SHIFT));
   }
 
   @Override
@@ -298,7 +274,8 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
   @Override
   public void putShortArray(final short[] srcArray, final int srcOffsetShorts, final int lengthShorts) {
     final long pos = getPosition();
-    putShortArr(seg, pos, srcArray, srcOffsetShorts, lengthShorts);
-    setPosition(pos + (lengthShorts) << SHORT_SHIFT);
+    MemorySegment.copy(srcArray, srcOffsetShorts, seg, JAVA_SHORT_UNALIGNED, pos, lengthShorts);
+    setPosition(pos + (lengthShorts << SHORT_SHIFT));
   }
+
 }

@@ -38,7 +38,7 @@ public interface MemoryRequestServer {
    * @param alignmentBytes requested segment alignment. Typically 1, 2, 4 or 8.
    * @param byteOrder the given <i>ByteOrder</i>.  It must be non-null.
    * @param arena the given arena to manage the new off-heap WritableMemory.
-   * If arena is null, the requested WritableMemory will be off-heap.
+   * If arena is null, the requested WritableMemory will be on-heap.
    * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not recommended.
    * @return new WritableMemory with the requested capacity.
    */

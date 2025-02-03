@@ -41,10 +41,10 @@ final class NativeWritableBufferImpl extends WritableBufferImpl {
 
   //Pass-through ctor
   NativeWritableBufferImpl(
-      final Arena arena,
       final MemorySegment seg,
       final int typeId,
-      final MemoryRequestServer memReqSvr) {
+      final MemoryRequestServer memReqSvr,
+      final Arena arena) {
     super(seg, typeId, memReqSvr, arena);
   }
 

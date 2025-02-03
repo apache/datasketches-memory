@@ -19,8 +19,14 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.ResourceImpl.NATIVE_BYTE_ORDER;
-import static org.apache.datasketches.memory.internal.ResourceImpl.NON_NATIVE_BYTE_ORDER;
+import static org.apache.datasketches.memory.internal.UtilForTest.CB;
+import static org.apache.datasketches.memory.internal.UtilForTest.DB;
+import static org.apache.datasketches.memory.internal.UtilForTest.FB;
+import static org.apache.datasketches.memory.internal.UtilForTest.IB;
+import static org.apache.datasketches.memory.internal.UtilForTest.LB;
+import static org.apache.datasketches.memory.internal.UtilForTest.NBO;
+import static org.apache.datasketches.memory.internal.UtilForTest.NNBO;
+import static org.apache.datasketches.memory.internal.UtilForTest.SB;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -35,28 +41,33 @@ import org.testng.annotations.Test;
  */
 public class NonNativeWritableMemoryImplTest {
   private byte[] bArr = new byte[8];
-  private final WritableMemory wmem = WritableMemory.writableWrap(bArr, ByteOrder.BIG_ENDIAN);
+  private final WritableMemory wmem = WritableMemory.writableWrap(bArr, NNBO);
 
   //Check primitives
 
   @Test
   public void checkPutGetNonNativeCharacters() {
-    char[] srcArray = { 1, 2, 3, 4, 5, 6, 7, 8 };
+    char[] srcArray = { 'a','b','c','d','e','f','g','h' };
     final int len = srcArray.length;
     final int half = len / 2;
-    WritableMemory wmem = WritableMemory.allocate(len * Character.BYTES, NON_NATIVE_BYTE_ORDER);
-    wmem.putCharArray(0, srcArray, 0, half);
-    wmem.putCharArray(half * Character.BYTES, srcArray, half, half);
+    WritableMemory wmem = WritableMemory.allocate(len * CB, NNBO);
+    //put
+    wmem.putCharArray(0, srcArray, 0, half);             //put*Array(add, src[], srcOff, len)
+    for (int i = 0; i < half; i++) {
+      wmem.putChar((half + i) * CB, srcArray[half + i]); //put*(add, value)
+    }
     //confirm
-    WritableMemory wmem2 = WritableMemory.allocate(len * Character.BYTES, NATIVE_BYTE_ORDER);
-    wmem.copyTo(0, wmem2, 0, len * Character.BYTES);
+    WritableMemory wmem2 = WritableMemory.allocate(len * CB, NBO);
+    wmem.copyTo(0, wmem2, 0, len * CB);
     for (int i = 0; i < len; i++) {
-      assertTrue(srcArray[i] == Character.reverseBytes(wmem2.getChar(i * Character.BYTES)));
+      assertTrue(srcArray[i] == Character.reverseBytes(wmem2.getChar(i * CB)));
     }
     //get
     char[] dstArray = new char[len];
-    wmem.getCharArray(0, dstArray, 0, half);
-    wmem.getCharArray(half * Character.BYTES, dstArray, half, half);
+    wmem.getCharArray(0, dstArray, 0, half);             //get*Array(add, dst[], dstOff, len)
+    for (int i = half; i < len; i++) {
+      dstArray[i] = wmem.getChar(i * CB);                //get*(add)
+    }
     assertEquals(srcArray, dstArray);
   }
 
@@ -65,19 +76,23 @@ public class NonNativeWritableMemoryImplTest {
     double[] srcArray = { 1, 2, 3, 4, 5, 6, 7, 8 };
     final int len = srcArray.length;
     final int half = len / 2;
-    WritableMemory wmem = WritableMemory.allocate(len * Double.BYTES, NON_NATIVE_BYTE_ORDER);
-    wmem.putDoubleArray(0, srcArray, 0, half);
-    wmem.putDoubleArray(half * Double.BYTES, srcArray, half, half);
+    WritableMemory wmem = WritableMemory.allocate(len * DB, NNBO);
+    wmem.putDoubleArray(0, srcArray, 0, half);             //put*Array(add, src[], srcOff, len)
+    for (int i = 0; i < half; i++) {
+      wmem.putDouble((half + i) * DB, srcArray[half + i]); //put*(add, value)
+    }
     //confirm
-    WritableMemory wmem2 = WritableMemory.allocate(len * Double.BYTES, NATIVE_BYTE_ORDER);
-    wmem.copyTo(0, wmem2, 0, len * Double.BYTES);
+    WritableMemory wmem2 = WritableMemory.allocate(len * DB, NBO);
+    wmem.copyTo(0, wmem2, 0, len * DB);
     for (int i = 0; i < len; i++) {
-      assertTrue(srcArray[i] == doubleReverseBytes(wmem2.getDouble(i * Double.BYTES)));
+      assertTrue(srcArray[i] == UtilForTest.doubleReverseBytes(wmem2.getDouble(i * DB)));
     }
     //get
     double[] dstArray = new double[len];
-    wmem.getDoubleArray(0, dstArray, 0, half);
-    wmem.getDoubleArray(half * Double.BYTES, dstArray, half, half);
+    wmem.getDoubleArray(0, dstArray, 0, half);             //get*Array(add, dst[], dstOff, len)
+    for (int i = half; i < len; i++) {
+      dstArray[i] = wmem.getDouble(i * DB);                //get*(add)
+    }
     assertEquals(srcArray, dstArray);
   }
 
@@ -86,19 +101,23 @@ public class NonNativeWritableMemoryImplTest {
     float[] srcArray = { 1, 2, 3, 4, 5, 6, 7, 8 };
     final int len = srcArray.length;
     final int half = len / 2;
-    WritableMemory wmem = WritableMemory.allocate(len * Float.BYTES, NON_NATIVE_BYTE_ORDER);
-    wmem.putFloatArray(0, srcArray, 0, half);
-    wmem.putFloatArray(half * Float.BYTES, srcArray, half, half);
+    WritableMemory wmem = WritableMemory.allocate(len * FB, NNBO);
+    wmem.putFloatArray(0, srcArray, 0, half);             //put*Array(add, src[], srcOff, len)
+    for (int i = 0; i < half; i++) {
+      wmem.putFloat((half + i) * FB, srcArray[half + i]); //put*(add, value)
+    }
     //confirm
-    WritableMemory wmem2 = WritableMemory.allocate(len * Float.BYTES, NATIVE_BYTE_ORDER);
-    wmem.copyTo(0, wmem2, 0, len * Float.BYTES);
+    WritableMemory wmem2 = WritableMemory.allocate(len * FB, NBO);
+    wmem.copyTo(0, wmem2, 0, len * FB);
     for (int i = 0; i < len; i++) {
-      assertTrue(srcArray[i] == floatReverseBytes(wmem2.getFloat(i * Float.BYTES)));
+      assertTrue(srcArray[i] == UtilForTest.floatReverseBytes(wmem2.getFloat(i * FB)));
     }
     //get
     float[] dstArray = new float[len];
-    wmem.getFloatArray(0, dstArray, 0, half);
-    wmem.getFloatArray(half * Float.BYTES, dstArray, half, half);
+    wmem.getFloatArray(0, dstArray, 0, half);             //get*Array(add, dst[], dstOff, len)
+    for (int i = half; i < len; i++) {
+      dstArray[i] = wmem.getFloat(i * FB);                //get*(add)
+    }
     assertEquals(srcArray, dstArray);
   }
 
@@ -107,19 +126,23 @@ public class NonNativeWritableMemoryImplTest {
     int[] srcArray = { 1, 2, 3, 4, 5, 6, 7, 8 };
     final int len = srcArray.length;
     final int half = len / 2;
-    WritableMemory wmem = WritableMemory.allocate(len * Integer.BYTES, NON_NATIVE_BYTE_ORDER);
-    wmem.putIntArray(0, srcArray, 0, half);
-    wmem.putIntArray(half * Integer.BYTES, srcArray, half, half);
+    WritableMemory wmem = WritableMemory.allocate(len * IB, NNBO);
+    wmem.putIntArray(0, srcArray, 0, half);             //put*Array(add, src[], srcOff, len)
+    for (int i = 0; i < half; i++) {
+      wmem.putInt((half + i) * IB, srcArray[half + i]); //put*(add, value)
+    }
     //confirm
-    WritableMemory wmem2 = WritableMemory.allocate(len * Integer.BYTES, NATIVE_BYTE_ORDER);
-    wmem.copyTo(0, wmem2, 0, len * Integer.BYTES);
+    WritableMemory wmem2 = WritableMemory.allocate(len * IB, NBO);
+    wmem.copyTo(0, wmem2, 0, len * IB);
     for (int i = 0; i < len; i++) {
-      assertTrue(srcArray[i] == Integer.reverseBytes(wmem2.getInt(i * Integer.BYTES)));
+      assertTrue(srcArray[i] == Integer.reverseBytes(wmem2.getInt(i * IB)));
     }
     //get
     int[] dstArray = new int[len];
-    wmem.getIntArray(0, dstArray, 0, half);
-    wmem.getIntArray(half * Integer.BYTES, dstArray, half, half);
+    wmem.getIntArray(0, dstArray, 0, half);             //get*Array(add, dst[], dstOff, len)
+    for (int i = half; i < len; i++) {
+      dstArray[i] = wmem.getInt(i * IB);                //get*(add)
+    }
     assertEquals(srcArray, dstArray);
   }
 
@@ -128,19 +151,23 @@ public class NonNativeWritableMemoryImplTest {
     long[] srcArray = { 1, 2, 3, 4, 5, 6, 7, 8 };
     final int len = srcArray.length;
     final int half = len / 2;
-    WritableMemory wmem = WritableMemory.allocate(len * Long.BYTES, NON_NATIVE_BYTE_ORDER);
-    wmem.putLongArray(0, srcArray, 0, half);
-    wmem.putLongArray(half * Long.BYTES, srcArray, half, half);
+    WritableMemory wmem = WritableMemory.allocate(len * LB, NNBO);
+    wmem.putLongArray(0, srcArray, 0, half);             //put*Array(add, src[], srcOff, len)
+    for (int i = 0; i < half; i++) {
+      wmem.putLong((half + i) * LB, srcArray[half + i]); //put*(add, value)
+    }
     //confirm
-    WritableMemory wmem2 = WritableMemory.allocate(len * Long.BYTES, NATIVE_BYTE_ORDER);
-    wmem.copyTo(0, wmem2, 0, len * Long.BYTES);
+    WritableMemory wmem2 = WritableMemory.allocate(len * LB, NBO);
+    wmem.copyTo(0, wmem2, 0, len * LB);
     for (int i = 0; i < len; i++) {
-      assertTrue(srcArray[i] == Long.reverseBytes(wmem2.getLong(i * Long.BYTES)));
+      assertTrue(srcArray[i] == Long.reverseBytes(wmem2.getLong(i * LB)));
     }
     //get
     long[] dstArray = new long[len];
-    wmem.getLongArray(0, dstArray, 0, half);
-    wmem.getLongArray(half * Long.BYTES, dstArray, half, half);
+    wmem.getLongArray(0, dstArray, 0, half);             //get*Array(add, dst[], dstOff, len)
+    for (int i = half; i < len; i++) {
+      dstArray[i] = wmem.getLong(i *LB);                 //get*(add)
+    }
     assertEquals(srcArray, dstArray);
   }
 
@@ -149,19 +176,23 @@ public class NonNativeWritableMemoryImplTest {
     short[] srcArray = { 1, 2, 3, 4, 5, 6, 7, 8 };
     final int len = srcArray.length;
     final int half = len / 2;
-    WritableMemory wmem = WritableMemory.allocate(len * Short.BYTES, NON_NATIVE_BYTE_ORDER);
-    wmem.putShortArray(0, srcArray, 0, half);
-    wmem.putShortArray(half * Short.BYTES, srcArray, half, half);
+    WritableMemory wmem = WritableMemory.allocate(len * SB, NNBO);
+    wmem.putShortArray(0, srcArray, 0, half);             //put*Array(add, src[], srcOff, len)
+    for (int i = 0; i < half; i++) {
+      wmem.putShort((half + i) * SB, srcArray[half + i]); //put*(add, value)
+    }
     //confirm
-    WritableMemory wmem2 = WritableMemory.allocate(len * Short.BYTES, NATIVE_BYTE_ORDER);
-    wmem.copyTo(0, wmem2, 0, len * Short.BYTES);
+    WritableMemory wmem2 = WritableMemory.allocate(len * SB, NBO);
+    wmem.copyTo(0, wmem2, 0, len * SB);
     for (int i = 0; i < len; i++) {
-      assertTrue(srcArray[i] == Short.reverseBytes(wmem2.getShort(i * Short.BYTES)));
+      assertTrue(srcArray[i] == Short.reverseBytes(wmem2.getShort(i * SB)));
     }
     //get
     short[] dstArray = new short[len];
-    wmem.getShortArray(0, dstArray, 0, half);
-    wmem.getShortArray(half * Short.BYTES, dstArray, half, half);
+    wmem.getShortArray(0, dstArray, 0, half);             //get*Array(add, dst[], dstOff, len)
+    for (int i = half; i < len; i++) {
+      dstArray[i] = wmem.getShort(i *SB);                 //get*(add)
+    }
     assertEquals(srcArray, dstArray);
   }
 
@@ -171,21 +202,7 @@ public class NonNativeWritableMemoryImplTest {
   @Test
   public void checkRegion() {
     WritableMemory wreg = wmem.writableRegion(0, wmem.getCapacity());
-    assertEquals(wreg.getTypeByteOrder(), ByteOrder.BIG_ENDIAN);
-  }
-
-  //Java does not provide reverse bytes on doubles or floats
-
-  static double doubleReverseBytes(double value) {
-    long longIn = Double.doubleToRawLongBits(value);
-    long longOut = Long.reverseBytes(longIn);
-    return Double.longBitsToDouble(longOut);
-  }
-
-  static float floatReverseBytes(float value) {
-    int intIn = Float.floatToRawIntBits(value);
-    int intOut = Integer.reverseBytes(intIn);
-    return Float.intBitsToFloat(intOut);
+    assertEquals(wreg.getTypeByteOrder(), NNBO);
   }
 
 }

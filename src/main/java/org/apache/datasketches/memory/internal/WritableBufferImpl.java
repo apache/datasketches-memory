@@ -90,7 +90,7 @@ public abstract class WritableBufferImpl extends PositionalImpl implements Writa
       type |= NONNATIVE_BO;
       wbuf = new NonNativeWritableBufferImpl(seg, type, memReqSvr, null);
     } else {
-      wbuf = new NativeWritableBufferImpl(null, seg, type, memReqSvr);
+      wbuf = new NativeWritableBufferImpl(seg, type, memReqSvr, null);
     }
     wbuf.setStartPositionEnd(0, byteBuffer.position(), byteBuffer.limit());
     return wbuf;

@@ -270,6 +270,27 @@ public class ResourceTest {
     assertTrue(out != 0);
   }
 
+  @Test
+  public void checkMismatch() {
+    byte[] arr1 = {1,2,3,4};
+    byte[] arr2 = {1,2,3,4};
+    byte[] arr3 = {1,2,3,4,5};
+    Memory mem1 = Memory.wrap(arr1);
+    Memory mem2 = Memory.wrap(arr2);
+    Memory mem3 = Memory.wrap(arr3);
+    assertEquals(mem1.mismatch(mem2), -1);
+    assertEquals(mem1.mismatch(mem3), 4);
+
+    byte[] arr4 = {9,9,1,2,3,4,9,9};
+    byte[] arr5 = {8,8,8,1,2,3,4,8};
+    byte[] arr6 = {8,8,8,1,2,3,4,5};
+    Memory mem4 = Memory.wrap(arr4);
+    Memory mem5 = Memory.wrap(arr5);
+    Memory mem6 = Memory.wrap(arr6);
+    assertEquals(mem4.mismatch(mem4, 2, 6, mem5, 3, 7), -1);
+    assertEquals(mem4.mismatch(mem4, 2, 7, mem6, 3, 8), 4);
+  }
+
   /********************/
   @Test
   public void printlnTest() {

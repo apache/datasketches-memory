@@ -220,7 +220,7 @@ abstract class ResourceImpl implements Resource {
     final MemoryRequestServer memReqSvr2 = (byteBufferType || mapType) ? null : memReqSvr;
     final WritableBuffer wbuf;
     if (nativeBOType) {
-      wbuf = new NativeWritableBufferImpl(null, segment, type, memReqSvr2);
+      wbuf = new NativeWritableBufferImpl(segment, type, memReqSvr2, null);
     } else { //non-native BO
       wbuf = new NonNativeWritableBufferImpl(segment, type, memReqSvr2, null);
     }

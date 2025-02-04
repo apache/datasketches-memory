@@ -19,13 +19,13 @@
 
 package org.apache.datasketches.memory.internal;
 
-import java.lang.foreign.Arena;
+import static org.apache.datasketches.memory.internal.ResourceImpl.NATIVE_BYTE_ORDER;
 import static org.apache.datasketches.memory.internal.ResourceImpl.NON_NATIVE_BYTE_ORDER;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
+import java.lang.foreign.Arena;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -38,6 +38,9 @@ import org.apache.datasketches.memory.WritableMemory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+/**
+ * @author Lee Rhodes
+ */
 public class NativeWritableBufferImplTest {
   private static final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
 
@@ -55,239 +58,170 @@ public class NativeWritableBufferImplTest {
     try { wmem.getArena().close(); } catch (IllegalStateException e) { }
   }
 
-  //Simple Heap arrays
+  //Check primitives
 
   @Test
-  public void checkGetByteArray() {
+  public void checkPutGetBooleans() {
+    boolean[] srcArray = {true, false, true, false, false, true, false, true};
+    final int len = srcArray.length;
+    final int half = len / 2;
+    WritableBuffer wbuf = WritableMemory.allocate(len, NATIVE_BYTE_ORDER).asWritableBuffer();
+    //put
+    for (int i = 0; i < half; i++) { wbuf.putBoolean(srcArray[i]); }       //put*(value)
+    for (int i = half; i < len; i++) { wbuf.putBoolean(i, srcArray[i]); }  //put*(add, value)
+    wbuf.resetPosition();
+    //get
+    boolean[] dstArray = new boolean[len];
+    for (int i = 0; i < half; i++) { dstArray[i] = wbuf.getBoolean(); }    //get*()
+    for (int i = half; i < len; i++) { dstArray[i] = wbuf.getBoolean(i); } //get*(add)
+    assertEquals(srcArray, dstArray);
+  }
+
+  @Test
+  public void checkPutGetBytes() {
     byte[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
     final int len = srcArray.length;
     final int half = len / 2;
+    WritableBuffer wbuf = WritableMemory.allocate(len, NATIVE_BYTE_ORDER).asWritableBuffer();
+    //put
+    wbuf.putByte(srcArray[0]);                        //put*(value)
+    wbuf.putByteArray(srcArray, 1, 2);                //put*Array(src[], srcOff, len)
+    wbuf.putByte(srcArray[3]);                        //put*(value)
+    for (int i = half; i < len; i++) { wbuf.putByte(i, srcArray[i]); } //put*(add, value)
+    wbuf.resetPosition();
+    //get
     byte[] dstArray = new byte[len];
-
-    Buffer buf = Memory.wrap(srcArray).asBuffer();
-    buf.getByteArray(dstArray, 0, half);
-    buf.getByteArray(dstArray, half, half);
-    assertEquals(dstArray, srcArray);
-
-    WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
-    wbuf.getByteArray(dstArray, 0, half);
-    wbuf.getByteArray(dstArray, half, half);
-    assertEquals(dstArray, srcArray);
+    dstArray[0] = wbuf.getByte();                     //get*()
+    wbuf.getByteArray(dstArray, 1, 2);                //get*Array(dst[], dstOff, len)
+    dstArray[3] = wbuf.getByte();                     //get*()
+    for (int i = half; i < len; i++) { dstArray[i] = wbuf.getByte(i); } //get*(add)
+    assertEquals(srcArray, dstArray);
   }
 
   @Test
-  public void checkPutByteArray() {
-    byte[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
+  public void checkPutGetNativeCharacters() {
+    char[] srcArray = { 'a','b','c','d','e','f','g','h' };
     final int len = srcArray.length;
     final int half = len / 2;
-    byte[] dstArray = new byte[len];
-
-    WritableBuffer wbuf = WritableMemory.allocate(len * Byte.BYTES).asWritableBuffer();
-    wbuf.putByteArray(srcArray, 0, half);
-    wbuf.putByteArray(srcArray, half, half);
+    WritableBuffer wbuf = WritableMemory.allocate(len * Character.BYTES, NATIVE_BYTE_ORDER).asWritableBuffer();
+    //put
+    wbuf.putChar(srcArray[0]);                        //put*(value)
+    wbuf.putCharArray(srcArray, 1, 2);                //put*Array(src[], srcOff, len)
+    wbuf.putChar(srcArray[3]);                        //put*(value)
+    for (int i = half; i < len; i++) { wbuf.putChar(i * Character.BYTES, srcArray[i]); } //put*(add, value)
     wbuf.resetPosition();
-    wbuf.getByteArray(dstArray, 0, len);
-    assertEquals(dstArray, srcArray);
-  }
-
-  @Test
-  public void checkGetCharArray() {
-    char[] srcArray = { 1, 2, 3, 4, 5, 6, 7, 8 };
-    final int len = srcArray.length;
-    final int half = len / 2;
+    //get
     char[] dstArray = new char[len];
-
-    Buffer buf = Memory.wrap(srcArray).asBuffer();
-    buf.getCharArray(dstArray, 0, half);
-    buf.getCharArray(dstArray, half, half);
-    assertEquals(dstArray, srcArray);
-
-    WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
-    wbuf.getCharArray(dstArray, 0, half);
-    wbuf.getCharArray(dstArray, half, half);
-    assertEquals(dstArray, srcArray);
+    dstArray[0] = wbuf.getChar();                     //get*()
+    wbuf.getCharArray(dstArray, 1, 2);                //get*Array(dst[], dstOff, len)
+    dstArray[3] = wbuf.getChar();                     //get*()
+    for (int i = half; i < len; i++) { dstArray[i] = wbuf.getChar(i * Character.BYTES); } //get*(add)
+    assertEquals(srcArray, dstArray);
   }
 
   @Test
-  public void checkPutCharArray() {
-    char[] srcArray = { 1, 2, 3, 4, 5, 6, 7, 8 };
+  public void checkPutGetNativeDoubles() {
+    double[] srcArray = { 1, 2, 3, 4, 5, 6, 7, 8 };
     final int len = srcArray.length;
     final int half = len / 2;
-    char[] dstArray = new char[len];
-
-    WritableBuffer wbuf = WritableMemory.allocate(len * Character.BYTES).asWritableBuffer();
-    wbuf.putCharArray(srcArray, 0, half);
-    wbuf.putCharArray(srcArray, half, half);
+    WritableBuffer wbuf = WritableMemory.allocate(len * Double.BYTES, NATIVE_BYTE_ORDER).asWritableBuffer();
+    //put
+    wbuf.putDouble(srcArray[0]);                        //put*(value)
+    wbuf.putDoubleArray(srcArray, 1, 2);                //put*Array(src[], srcOff, len)
+    wbuf.putDouble(srcArray[3]);                        //put*(value)
+    for (int i = half; i < len; i++) { wbuf.putDouble(i * Double.BYTES, srcArray[i]); } //put*(add, value)
     wbuf.resetPosition();
-    wbuf.getCharArray(dstArray, 0, len);
-    assertEquals(dstArray, srcArray);
-  }
-
-  @Test
-  public void checkGetShortArray() {
-    short[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
-    final int len = srcArray.length;
-    final int half = len / 2;
-    short[] dstArray = new short[len];
-
-    Buffer buf = Memory.wrap(srcArray).asBuffer();
-    buf.getShortArray(dstArray, 0, half);
-    buf.getShortArray(dstArray, half, half);
-    assertEquals(dstArray, srcArray);
-
-    WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
-    wbuf.getShortArray(dstArray, 0, half);
-    wbuf.getShortArray(dstArray, half, half);
-    assertEquals(dstArray, srcArray);
-  }
-
-  @Test
-  public void checkPutShortArray() {
-    short[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
-    final int len = srcArray.length;
-    final int half = len / 2;
-    short[] dstArray = new short[len];
-
-    WritableBuffer wbuf = WritableMemory.allocate(len * Short.BYTES).asWritableBuffer();
-    wbuf.putShortArray(srcArray, 0, half);
-    wbuf.putShortArray(srcArray, half, half);
-    wbuf.resetPosition();
-    wbuf.getShortArray(dstArray, 0, len);
-    assertEquals(dstArray, srcArray);
-  }
-
-  @Test
-  public void checkGetIntArray() {
-    int[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
-    final int len = srcArray.length;
-    final int half = len / 2;
-    int[] dstArray = new int[len];
-
-    Buffer buf = Memory.wrap(srcArray).asBuffer();
-    buf.getIntArray(dstArray, 0, half);
-    buf.getIntArray(dstArray, half, half);
-    assertEquals(dstArray, srcArray);
-
-    WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
-    wbuf.getIntArray(dstArray, 0, half);
-    wbuf.getIntArray(dstArray, half, half);
-    assertEquals(dstArray, srcArray);
-  }
-
-  @Test
-  public void checkPutIntArray() {
-    int[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
-    final int len = srcArray.length;
-    final int half = len / 2;
-    int[] dstArray = new int[len];
-
-    WritableBuffer wbuf = WritableMemory.allocate(len * Integer.BYTES).asWritableBuffer();
-    wbuf.putIntArray(srcArray, 0, half);
-    wbuf.putIntArray(srcArray, half, half);
-    wbuf.resetPosition();
-    wbuf.getIntArray(dstArray, 0, len);
-    assertEquals(dstArray, srcArray);
-  }
-
-  @Test
-  public void checkGetLongArray() {
-    long[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
-    final int len = srcArray.length;
-    final int half = len / 2;
-    long[] dstArray = new long[len];
-
-    Buffer buf = Memory.wrap(srcArray).asBuffer();
-    buf.getLongArray(dstArray, 0, half);
-    buf.getLongArray(dstArray, half, half);
-    assertEquals(dstArray, srcArray);
-
-    WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
-    wbuf.getLongArray(dstArray, 0, half);
-    wbuf.getLongArray(dstArray, half, half);
-    assertEquals(dstArray, srcArray);
-  }
-
-  @Test
-  public void checkPutLongArray() {
-    long[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
-    final int len = srcArray.length;
-    final int half = len / 2;
-    long[] dstArray = new long[len];
-
-    WritableBuffer wbuf = WritableMemory.allocate(len * Long.BYTES).asWritableBuffer();
-    wbuf.putLongArray(srcArray, 0, half);
-    wbuf.putLongArray(srcArray, half, half);
-    wbuf.resetPosition();
-    wbuf.getLongArray(dstArray, 0, len);
-    assertEquals(dstArray, srcArray);
-  }
-
-  @Test
-  public void checkGetFloatArray() {
-    float[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
-    final int len = srcArray.length;
-    final int half = len / 2;
-    float[] dstArray = new float[len];
-
-    Buffer buf = Memory.wrap(srcArray).asBuffer();
-    buf.getFloatArray(dstArray, 0, half);
-    buf.getFloatArray(dstArray, half, half);
-    assertEquals(dstArray, srcArray);
-
-
-    WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
-    wbuf.getFloatArray(dstArray, 0, half);
-    wbuf.getFloatArray(dstArray, half, half);
-    assertEquals(dstArray, srcArray);
-  }
-
-  @Test
-  public void checkPutFloatArray() {
-    float[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
-    final int len = srcArray.length;
-    final int half = len / 2;
-    float[] dstArray = new float[len];
-
-    WritableBuffer wbuf = WritableMemory.allocate(len * Float.BYTES).asWritableBuffer();
-    wbuf.putFloatArray(srcArray, 0, half);
-    wbuf.putFloatArray(srcArray, half, half);
-    wbuf.resetPosition();
-    wbuf.getFloatArray(dstArray, 0, len);
-    assertEquals(dstArray, srcArray);
-  }
-
-  @Test
-  public void checkGetDoubleArray() {
-    double[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
-    final int len = srcArray.length;
-    final int half = len / 2;
+    //get
     double[] dstArray = new double[len];
-
-    Buffer buf = Memory.wrap(srcArray).asBuffer();
-    buf.getDoubleArray(dstArray, 0, half);
-    buf.getDoubleArray(dstArray, half, half);
-    assertEquals(dstArray, srcArray);
-
-
-    WritableBuffer wbuf = WritableMemory.writableWrap(srcArray).asWritableBuffer();
-    wbuf.getDoubleArray(dstArray, 0, half);
-    wbuf.getDoubleArray(dstArray, half, half);
-    assertEquals(dstArray, srcArray);
+    dstArray[0] = wbuf.getDouble();                     //get*()
+    wbuf.getDoubleArray(dstArray, 1, 2);                //get*Array(dst[], dstOff, len)
+    dstArray[3] = wbuf.getDouble();                     //get*()
+    for (int i = half; i < len; i++) { dstArray[i] = wbuf.getDouble(i * Double.BYTES); } //get*(add)
+    assertEquals(srcArray, dstArray);
   }
 
   @Test
-  public void checkPutDoubleArray() {
-    double[] srcArray = { 1, -2, 3, -4, 5, -6, 7, -8 };
+  public void checkPutGetNativeFloats() {
+    float[] srcArray = { 1, 2, 3, 4, 5, 6, 7, 8 };
     final int len = srcArray.length;
     final int half = len / 2;
-    double[] dstArray = new double[len];
-
-    WritableBuffer wbuf = WritableMemory.allocate(len * Double.BYTES).asWritableBuffer();
-    wbuf.putDoubleArray(srcArray, 0, half);
-    wbuf.putDoubleArray(srcArray, half, half);
+    WritableBuffer wbuf = WritableMemory.allocate(len * Float.BYTES, NATIVE_BYTE_ORDER).asWritableBuffer();
+    //put
+    wbuf.putFloat(srcArray[0]);                        //put*(value)
+    wbuf.putFloatArray(srcArray, 1, 2);                //put*Array(src[], srcOff, len)
+    wbuf.putFloat(srcArray[3]);                        //put*(value)
+    for (int i = half; i < len; i++) { wbuf.putFloat(i * Float.BYTES, srcArray[i]); } //put*(add, value)
     wbuf.resetPosition();
-    wbuf.getDoubleArray(dstArray, 0, len);
-    assertEquals(dstArray, srcArray);
+    //get
+    float[] dstArray = new float[len];
+    dstArray[0] = wbuf.getFloat();                     //get*()
+    wbuf.getFloatArray(dstArray, 1, 2);                //get*Array(dst[], dstOff, len)
+    dstArray[3] = wbuf.getFloat();                     //get*()
+    for (int i = half; i < len; i++) { dstArray[i] = wbuf.getFloat(i * Float.BYTES); } //get*(add)
+    assertEquals(srcArray, dstArray);
+  }
+
+  @Test
+  public void checkPutGetNativeInts() {
+    int[] srcArray = { 1, 2, 3, 4, 5, 6, 7, 8 };
+    final int len = srcArray.length;
+    final int half = len / 2;
+    WritableBuffer wbuf = WritableMemory.allocate(len * Integer.BYTES, NATIVE_BYTE_ORDER).asWritableBuffer();
+    //put
+    wbuf.putInt(srcArray[0]);                        //put*(value)
+    wbuf.putIntArray(srcArray, 1, 2);                //put*Array(src[], srcOff, len)
+    wbuf.putInt(srcArray[3]);                        //put*(value)
+    for (int i = half; i < len; i++) { wbuf.putInt(i * Integer.BYTES, srcArray[i]); } //put*(add, value)
+    wbuf.resetPosition();
+    //get
+    int[] dstArray = new int[len];
+    dstArray[0] = wbuf.getInt();                     //get*()
+    wbuf.getIntArray(dstArray, 1, 2);                //get*Array(dst[], dstOff, len)
+    dstArray[3] = wbuf.getInt();                     //get*()
+    for (int i = half; i < len; i++) { dstArray[i] = wbuf.getInt(i * Integer.BYTES); } //get*(add)
+    assertEquals(srcArray, dstArray);
+  }
+
+  @Test
+  public void checkPutGetNativeLongs() {
+    long[] srcArray = { 1, 2, 3, 4, 5, 6, 7, 8 };
+    final int len = srcArray.length;
+    final int half = len / 2;
+    WritableBuffer wbuf = WritableMemory.allocate(len * Long.BYTES, NATIVE_BYTE_ORDER).asWritableBuffer();
+    //put
+    wbuf.putLong(srcArray[0]);                        //put*(value)
+    wbuf.putLongArray(srcArray, 1, 2);                //put*Array(src[], srcOff, len)
+    wbuf.putLong(srcArray[3]);                        //put*(value)
+    for (int i = half; i < len; i++) { wbuf.putLong(i * Long.BYTES, srcArray[i]); } //put*(add, value)
+    wbuf.resetPosition();
+    //get
+    long[] dstArray = new long[len];
+    dstArray[0] = wbuf.getLong();                     //get*()
+    wbuf.getLongArray(dstArray, 1, 2);                //get*Array(dst[], dstOff, len)
+    dstArray[3] = wbuf.getLong();                     //get*()
+    for (int i = half; i < len; i++) { dstArray[i] = wbuf.getLong(i * Long.BYTES); } //get*(add)
+    assertEquals(srcArray, dstArray);
+  }
+
+  @Test
+  public void checkPutGetNativeShorts() {
+    short[] srcArray = { 1, 2, 3, 4, 5, 6, 7, 8 };
+    final int len = srcArray.length;
+    final int half = len / 2;
+    WritableBuffer wbuf = WritableMemory.allocate(len * Short.BYTES, NATIVE_BYTE_ORDER).asWritableBuffer();
+    //put
+    wbuf.putShort(srcArray[0]);                        //put*(value)
+    wbuf.putShortArray(srcArray, 1, 2);                //put*Array(src[], srcOff, len)
+    wbuf.putShort(srcArray[3]);                        //put*(value)
+    for (int i = half; i < len; i++) { wbuf.putShort(i * Short.BYTES, srcArray[i]); } //put*(add, value)
+    wbuf.resetPosition();
+    //get
+    short[] dstArray = new short[len];
+    dstArray[0] = wbuf.getShort();                     //get*()
+    wbuf.getShortArray(dstArray, 1, 2);                //get*Array(dst[], dstOff, len)
+    dstArray[3] = wbuf.getShort();                     //get*()
+    for (int i = half; i < len; i++) { dstArray[i] = wbuf.getShort(i * Short.BYTES); } //get*(add)
+    assertEquals(srcArray, dstArray);
   }
 
   @Test

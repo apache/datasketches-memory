@@ -247,7 +247,7 @@ public final class MurmurHash3v4 {
         }
         //$FALL-THROUGH$
         case 12: {
-          k2 ^= seg.get(ValueLayout.JAVA_INT_UNALIGNED, cumOff + 8) & 0xFFFFFFFFL;
+          k2 ^= (seg.get(ValueLayout.JAVA_INT_UNALIGNED, cumOff + 8) & 0xFFFFFFFFL);
           k1 = seg.get(ValueLayout.JAVA_LONG_UNALIGNED, cumOff);
           break;
         }

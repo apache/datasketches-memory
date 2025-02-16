@@ -453,10 +453,13 @@ abstract class ResourceImpl implements Resource {
 
   @Override
   public final boolean isSameResource(final Resource that) {
-    Objects.requireNonNull(that);
+    if (that == null) { return false; }
     final ResourceImpl that2 = (ResourceImpl) that;
-    return this.seg.address() == that2.seg.address()
-        && this.seg.byteSize() == that2.seg.byteSize();
+    if (this.arena == null && that2.arena == null) { //both on heap
+      if (this.seg.isReadOnly() || that2.seg.isReadOnly()) { return false; }
+      return this.seg.heapBase().get() == that2.seg.heapBase().get();
+    }
+    return this.seg.address() == that2.seg.address();
   }
 
   @Override

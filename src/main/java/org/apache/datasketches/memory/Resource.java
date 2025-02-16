@@ -36,8 +36,9 @@ public interface Resource {
 
   /**
    * The default MemoryRequestServer used primarily by test.
+   * Do not allocate requested memory off-heap.
    */
-  static final MemoryRequestServer defaultMemReqSvr = new DefaultMemoryRequestServer();
+  static final MemoryRequestServer defaultMemReqSvr = new DefaultMemoryRequestServer(8, ByteOrder.nativeOrder(), false, false);
 
   /**
    * Gets the {@link MemoryRequestServer} to request additional memory
@@ -253,9 +254,10 @@ public interface Resource {
   boolean isRegion();
 
   /**
-   * Returns true if the underlying resource is the same underlying resource as <i>that</i>.
+   * Returns true if the backing resource of <i>this</i> is the same as the backing resource of <i>that</i>.
+   * This returns false if <i>this</i> and <i>that</i> are both on-heap and one of them is read-only.
    * @param that the other Resource object
-   * @return a long value representing the ordering and size of overlap between <i>this</i> and <i>that</i>
+   * @return true if the backing resource of <i>this</i> is the same as the backing resource of <i>that</i>.
    */
   boolean isSameResource(Resource that);
 
@@ -322,6 +324,7 @@ mismatch(MemorySegment, long, long, MemorySegment, long, long)</a>
    * @param arena the given arena.
    * If the desired result is to be off-heap, the arena must not be null.
    * Otherwise, the result will be on-heap.
+   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not recommended.
    * @param alignment requested segment alignment. Typically 1, 2, 4 or 8.
    * @return a copy of the underlying MemorySegment in the given arena.
    */

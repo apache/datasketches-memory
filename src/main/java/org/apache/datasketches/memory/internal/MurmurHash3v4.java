@@ -243,7 +243,7 @@ public final class MurmurHash3v4 {
         }
 
         case 13: {
-          k2 ^= (seg.get(ValueLayout.JAVA_BYTE, cumOff + 12) & 0xFFFFL) << 32;
+          k2 ^= (seg.get(ValueLayout.JAVA_BYTE, cumOff + 12) & 0xFFL) << 32;
         }
         //$FALL-THROUGH$
         case 12: {

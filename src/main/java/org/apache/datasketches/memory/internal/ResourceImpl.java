@@ -380,6 +380,11 @@ abstract class ResourceImpl implements Resource {
   }
 
   @Override
+  public MemorySegment getMemorySegment() {
+    return seg.asReadOnly();
+  }
+
+  @Override
   public final long getRelativeOffset(final Resource that) {
     final ResourceImpl that2 = (ResourceImpl) that;
     return this.seg.segmentOffset(that2.seg);

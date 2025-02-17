@@ -157,11 +157,18 @@ public interface Resource {
   long getCapacity();
 
   /**
-   * Gets the relative base offset of <i>this</i> with respect to <i>that</i>, defined as: <i>this</i> - <i>that</i>.
-   * This method is only valid for <i>native</i> (off-heap) allocated resources.
+   * Gets the MemorySegment that backs this resource as a read-only MemorySegment.
+   * @return the MemorySegment that back this resource as a read-only MemorySegment.
+   */
+  MemorySegment getMemorySegment();
+
+  /**
+   * Gets the relative base offset of <i>this</i> resource with respect to <i>that</i> resource,
+   * defined as: <i>this</i> - <i>that</i>.
    * @param that the given resource.
    * @return <i>this</i> - <i>that</i> offset
-   * @throws IllegalArgumentException if one of the resources is on-heap.
+   * @throws UnsupportedOperationException if the two resources cannot be compared, e.g. because they are of
+     * different kinds, or because they are backed by different Java arrays.
    */
   long getRelativeOffset(Resource that);
 
@@ -275,17 +282,6 @@ public interface Resource {
   void load();
 
   /**
-   * Returns a positive number if <i>this</i> overlaps <i>that</i> and <i>this</i> base address is &le; <i>that</i>
-   * base address.
-   * Returns a negative number if <i>this</i> overlaps <i>that</i> and <i>this</i> base address is &gt; <i>that</i>
-   * base address.
-   * Returns a zero if there is no overlap or if one or both objects are null, not active or on heap.
-   * @param that the other Resource object
-   * @return a long value representing the ordering and size of overlap between <i>this</i> and <i>that</i>.
-   */
-  long nativeOverlap(Resource that);
-
-  /**
    * Finds the first byte mismatch with <i>that</i>.
    * @param that the other Resource
    * @return the relative offset, in bytes, of the first mismatch between this and the given other Resource object,
@@ -310,6 +306,17 @@ mismatch(MemorySegment)</a>
 mismatch(MemorySegment, long, long, MemorySegment, long, long)</a>
    */
   long mismatch(Resource src, long srcFromOffset, long srcToOffset, Resource dst, long dstFromOffset, long dstToOffset);
+
+  /**
+   * Returns a positive number if <i>this</i> overlaps <i>that</i> and <i>this</i> base address is &le; <i>that</i>
+   * base address.
+   * Returns a negative number if <i>this</i> overlaps <i>that</i> and <i>this</i> base address is &gt; <i>that</i>
+   * base address.
+   * Returns a zero if there is no overlap or if one or both objects are null, not active or on heap.
+   * @param that the other Resource object
+   * @return a long value representing the ordering and size of overlap between <i>this</i> and <i>that</i>.
+   */
+  long nativeOverlap(Resource that);
 
   /**
    * Returns the resource scope associated with this memory segment.

@@ -254,14 +254,16 @@ public interface Resource {
   boolean isRegion();
 
   /**
-   * Returns true if the underlying resource is the same underlying resource as <i>that</i>.
+   * Returns true if the underlying resource is the same resource as <i>that</i>.
+   *
+   * <p>Two resources are considered the same if one were to write a value at offset A in one resource
+   * and that same value appears in the other resource at the same offset A. In other words,
+   * if two regions (or slices) are derived from the same underlying resource they both must have the same
+   * starting offset with respect to the resource and the same size in order to be considered to be the same resource.</p>
    *
    * <p>Note: for on-heap resources neither <i>this</i> nor <i>that</i> can be read-only.</p>
    *
-   * <p>if two sub-regions (or slices) are derived from the same resource they both must have the same
-   * starting offset with respect to the resource and the same size.</p>
-   *
-   * @param that the other Resource object
+   * @param that the other Resource.
    * @return true if the underlying resource is the same underlying resource as <i>that</i>.
    */
   boolean isSameResource(Resource that);

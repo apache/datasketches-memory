@@ -464,7 +464,7 @@ abstract class ResourceImpl implements Resource {
           && thisSeg.byteSize() == thatSeg.byteSize();
     } else { //on heap
       if (thisSeg.isReadOnly() || thatSeg.isReadOnly()) {
-        throw new IllegalArgumentException("Cannot determine 'is same resource' on heap if one resource is Read-only.");
+        throw new IllegalArgumentException("Cannot determine 'isSameResource(..)' on heap if either resource is Read-only.");
       }
       return (thisSeg.heapBase().get() == thatSeg.heapBase().get())
           && (thisSeg.address() == thatSeg.address())

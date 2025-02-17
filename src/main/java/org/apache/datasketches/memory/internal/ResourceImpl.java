@@ -453,13 +453,23 @@ abstract class ResourceImpl implements Resource {
 
   @Override
   public final boolean isSameResource(final Resource that) {
-    if (that == null) { return false; }
-    final ResourceImpl that2 = (ResourceImpl) that;
-    if (this.arena == null && that2.arena == null) { //both on heap
-      if (this.seg.isReadOnly() || that2.seg.isReadOnly()) { return false; }
-      return this.seg.heapBase().get() == that2.seg.heapBase().get();
+    Objects.requireNonNull(that);
+    final MemorySegment thisSeg = this.seg;
+    final MemorySegment thatSeg = ((ResourceImpl)that).seg;
+    final boolean thisNative = thisSeg.isNative();
+    final boolean thatNative = thatSeg.isNative();
+    if (thisNative != thatNative) { return false; }
+    if (thisNative && thatNative) { //off-heap
+      return thisSeg.address() == thatSeg.address()
+          && thisSeg.byteSize() == thatSeg.byteSize();
+    } else { //on heap
+      if (thisSeg.isReadOnly() || thatSeg.isReadOnly()) {
+        throw new IllegalArgumentException("Cannot determine 'is same resource' on heap if one resource is Read-only.");
+      }
+      return (thisSeg.heapBase().get() == thatSeg.heapBase().get())
+          && (thisSeg.address() == thatSeg.address())
+          && thisSeg.byteSize() == thatSeg.byteSize();
     }
-    return this.seg.address() == that2.seg.address();
   }
 
   @Override

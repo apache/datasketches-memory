@@ -24,6 +24,7 @@ import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.DefaultMemoryRequestServer;
 import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
@@ -35,7 +36,6 @@ import org.testng.annotations.Test;
  * @author Lee Rhodes
  */
 public class ExampleMemoryRequestServerTest {
-  private static long alignmentBytes = 8;
 
   /**
    * This version is without a TWR block. All of the memory allocations are done through the MemoryRequestServer
@@ -48,15 +48,13 @@ public class ExampleMemoryRequestServerTest {
     long workingMemBytes = 8;
 
     Arena arena = Arena.ofConfined();
-    //Configure the default memReqSvr to create new memory off-heap and copy data from old to new
-    MemoryRequestServer memReqSvr = new DefaultMemoryRequestServer();
+    //Configure the memReqSvr to create new subsequent allocations off-heap, each with a new Arena.
+    MemoryRequestServer myMemReqSvr = new DefaultMemoryRequestServer(8, ByteOrder.nativeOrder(), false, true);
 
     //Create the initial working memory for the client
     WritableMemory workingMem = WritableMemory.allocateDirect(
       workingMemBytes,
-      alignmentBytes,
-      ByteOrder.nativeOrder(),
-      memReqSvr,
+      myMemReqSvr,
       arena);
 
     MemoryHungryClient client = new MemoryHungryClient(workingMem);
@@ -95,14 +93,14 @@ public class ExampleMemoryRequestServerTest {
         oldWorkingCap = newWorkingCap;
         newWorkingCap = 2 * oldWorkingCap;
         Arena arena = Arena.ofConfined(); // new confined scope for each iteration
-        newMem = memReqSvr.request(newWorkingCap, alignmentBytes, ByteOrder.LITTLE_ENDIAN, arena);
+        newMem = memReqSvr.request(workingMem, newWorkingCap);
 
         //done with old memory, close it
-        memReqSvr.requestClose(workingMem.getArena());
+        memReqSvr.requestClose(workingMem);
         workingMem = newMem;
         itr++;
       }
-
+      //close the last allocation
       workingMem.getArena().close();
     }
   }

@@ -117,11 +117,10 @@ public interface WritableMemory extends Memory {
    * Allocates and provides access to capacityBytes directly in native (off-heap) memory.
    * The allocated memory will be 8-byte aligned.
    * Native byte order is assumed.
-   * A new DefaultMemoryRequestServer() is created.
+   * A new DefaultMemoryRequestServer() is created, which allocates on-heap.
    *
-   * <p><b>NOTE:</b> Native/Direct memory acquired may have garbage in it.
-   * It is the responsibility of the using application to clear this memory, if required,
-   * and to call <i>close()</i> when done.</p>
+   * <p><b>NOTE:</b>It is the responsibility of the using application to call
+   * <i>WritableMemory::getArena().close()</i> when done.</p>
    * @param capacityBytes the size of the desired memory in bytes.
    * @param arena the given arena to manage the new off-heap WritableMemory. It must be non-null.
    * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not recommended.
@@ -130,6 +129,25 @@ public interface WritableMemory extends Memory {
    */
   static WritableMemory allocateDirect(long capacityBytes, Arena arena) {
     return allocateDirect(capacityBytes, 8, ByteOrder.nativeOrder(), new DefaultMemoryRequestServer(), arena);
+  }
+
+  /**
+   * Allocates and provides access to capacityBytes directly in native (off-heap) memory.
+   * The allocated memory will be 8-byte aligned.
+   * Native byte order is assumed.
+   *
+   * <p><b>NOTE:</b>It is the responsibility of the using application to call
+   * <i>WritableMemory::getArena().close()</i> when done.</p>
+   * @param capacityBytes the size of the desired memory in bytes.
+   * @param memReqSvr A user-specified MemoryRequestServer, which may be null.
+   * This is a callback mechanism for a user client of direct memory to request more memory.
+   * @param arena the given arena to manage the new off-heap WritableMemory. It must be non-null.
+   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not recommended.
+   *
+   * @return a WritableMemory for this off-heap resource.
+   */
+  static WritableMemory allocateDirect(long capacityBytes, MemoryRequestServer memReqSvr, Arena arena) {
+    return allocateDirect(capacityBytes, 8, ByteOrder.nativeOrder(), memReqSvr, arena);
   }
 
   /**
@@ -340,7 +358,7 @@ public interface WritableMemory extends Memory {
       ByteOrder byteOrder,
       MemoryRequestServer memReqSvr) {
     final MemorySegment slice = MemorySegment.ofArray(array).asSlice(offsetBytes, lengthBytes);
-    return WritableMemoryImpl.wrapSegmentAsArray(slice, byteOrder, memReqSvr);
+    return WritableMemoryImpl.wrapSegment(slice, byteOrder, memReqSvr);
   }
 
   //intentionally removed writableWrap(boolean[])
@@ -352,7 +370,7 @@ public interface WritableMemory extends Memory {
    */
   static WritableMemory writableWrap(char[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array);
-    return WritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
+    return WritableMemoryImpl.wrapSegment(seg, ByteOrder.nativeOrder());
   }
 
   /**
@@ -362,7 +380,7 @@ public interface WritableMemory extends Memory {
    */
   static WritableMemory writableWrap(short[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array);
-    return WritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
+    return WritableMemoryImpl.wrapSegment(seg, ByteOrder.nativeOrder());
   }
 
   /**
@@ -372,7 +390,7 @@ public interface WritableMemory extends Memory {
    */
   static WritableMemory writableWrap(int[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array);
-    return WritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
+    return WritableMemoryImpl.wrapSegment(seg, ByteOrder.nativeOrder());
   }
 
   /**
@@ -382,7 +400,7 @@ public interface WritableMemory extends Memory {
    */
   static WritableMemory writableWrap(long[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array);
-    return WritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
+    return WritableMemoryImpl.wrapSegment(seg, ByteOrder.nativeOrder());
   }
 
   /**
@@ -392,7 +410,7 @@ public interface WritableMemory extends Memory {
    */
   static WritableMemory writableWrap(float[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array);
-    return WritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
+    return WritableMemoryImpl.wrapSegment(seg, ByteOrder.nativeOrder());
   }
 
   /**
@@ -402,7 +420,7 @@ public interface WritableMemory extends Memory {
    */
   static WritableMemory writableWrap(double[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array);
-    return WritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
+    return WritableMemoryImpl.wrapSegment(seg, ByteOrder.nativeOrder());
   }
   //END OF CONSTRUCTOR-TYPE METHODS
 

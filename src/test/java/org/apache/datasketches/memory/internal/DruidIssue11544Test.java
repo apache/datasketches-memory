@@ -59,26 +59,26 @@ public class DruidIssue11544Test {
 
     //Wrap bb into WritableMemory
     WritableMemory mem1 = WritableMemory.writableWrap(bb);
-    //ByteBuffers are automatically assigned an implicit shared scope (non-closeable)
+    //ByteBuffers are not directly closeable. They are closed by the GC.
     assertTrue(mem1.isDirect()); //confirm mem1 is off-heap
-
+    assertTrue(mem1.getArena() == null); //and Arena is null
     //Request Bigger Memory on heap
     int size2 = size1 * 2;
-    WritableMemory mem2 = myMemReqSvr.request(size2, 8, ByteOrder.LITTLE_ENDIAN, null);
+    WritableMemory mem2 = myMemReqSvr.request(mem1, size2);
 
-    //Confirm that mem2 is on the heap (the default) and 2X size1
+    //Confirm that mem2 is on the heap and 2X size1
     assertFalse(mem2.isDirect());
     assertEquals(mem2.getCapacity(), size2);
 
     //Move data to new memory
     mem1.copyTo(0, mem2, 0, size1);
 
-    assertTrue(mem1.isAlive());
+    assertTrue(mem1.isAlive()); //because mem1 seg is holding a reference to it.
     assertTrue(mem2.isAlive());
 
     //Now we are on the heap and need to grow again:
     int size3 = size2 * 2;
-    WritableMemory mem3 = myMemReqSvr.request(size3, 8, ByteOrder.LITTLE_ENDIAN, null);
+    WritableMemory mem3 = myMemReqSvr.request(mem2, size3);
 
     //Confirm that mem3 is still on the heap and 2X of size2
     assertFalse(mem3.isDirect());

@@ -36,8 +36,9 @@ public interface Resource {
 
   /**
    * The default MemoryRequestServer used primarily by test.
+   * Do not allocate requested memory off-heap.
    */
-  static final MemoryRequestServer defaultMemReqSvr = new DefaultMemoryRequestServer();
+  static final MemoryRequestServer defaultMemReqSvr = new DefaultMemoryRequestServer(8, ByteOrder.nativeOrder(), false, false);
 
   /**
    * Gets the {@link MemoryRequestServer} to request additional memory
@@ -145,7 +146,7 @@ public interface Resource {
   /**
    * Returns the arena used to create this resource and possibly other resources.
    * Be careful when you close the returned Arena, you may be closing other resources as well.
-   * @return the arena used to create this resource and possibly other resources.
+   * @return the arena used to create this resource and possibly other resources. It may be null.
    */
   Arena getArena();
 
@@ -156,11 +157,18 @@ public interface Resource {
   long getCapacity();
 
   /**
-   * Gets the relative base offset of <i>this</i> with respect to <i>that</i>, defined as: <i>this</i> - <i>that</i>.
-   * This method is only valid for <i>native</i> (off-heap) allocated resources.
+   * Gets the MemorySegment that backs this resource as a read-only MemorySegment.
+   * @return the MemorySegment that back this resource as a read-only MemorySegment.
+   */
+  MemorySegment getMemorySegment();
+
+  /**
+   * Gets the relative base offset of <i>this</i> resource with respect to <i>that</i> resource,
+   * defined as: <i>this</i> - <i>that</i>.
    * @param that the given resource.
    * @return <i>this</i> - <i>that</i> offset
-   * @throws IllegalArgumentException if one of the resources is on-heap.
+   * @throws UnsupportedOperationException if the two resources cannot be compared, e.g. because they are of
+     * different kinds, or because they are backed by different Java arrays.
    */
   long getRelativeOffset(Resource that);
 
@@ -253,9 +261,17 @@ public interface Resource {
   boolean isRegion();
 
   /**
-   * Returns true if the underlying resource is the same underlying resource as <i>that</i>.
-   * @param that the other Resource object
-   * @return a long value representing the ordering and size of overlap between <i>this</i> and <i>that</i>
+   * Returns true if the underlying resource is the same resource as <i>that</i>.
+   *
+   * <p>Two resources are considered the same if one were to write a value at offset A in one resource
+   * and that same value appears in the other resource at the same offset A. In other words,
+   * if two regions (or slices) are derived from the same underlying resource they both must have the same
+   * starting offset with respect to the resource and the same size in order to be considered to be the same resource.</p>
+   *
+   * <p>Note: for on-heap resources neither <i>this</i> nor <i>that</i> can be read-only.</p>
+   *
+   * @param that the other Resource.
+   * @return true if the underlying resource is the same underlying resource as <i>that</i>.
    */
   boolean isSameResource(Resource that);
 
@@ -264,17 +280,6 @@ public interface Resource {
    * @see <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/foreign/MemorySegment.html#load()">load()</a>
    */
   void load();
-
-  /**
-   * Returns a positive number if <i>this</i> overlaps <i>that</i> and <i>this</i> base address is &le; <i>that</i>
-   * base address.
-   * Returns a negative number if <i>this</i> overlaps <i>that</i> and <i>this</i> base address is &gt; <i>that</i>
-   * base address.
-   * Returns a zero if there is no overlap or if one or both objects are null, not active or on heap.
-   * @param that the other Resource object
-   * @return a long value representing the ordering and size of overlap between <i>this</i> and <i>that</i>.
-   */
-  long nativeOverlap(Resource that);
 
   /**
    * Finds the first byte mismatch with <i>that</i>.
@@ -303,6 +308,17 @@ mismatch(MemorySegment, long, long, MemorySegment, long, long)</a>
   long mismatch(Resource src, long srcFromOffset, long srcToOffset, Resource dst, long dstFromOffset, long dstToOffset);
 
   /**
+   * Returns a positive number if <i>this</i> overlaps <i>that</i> and <i>this</i> base address is &le; <i>that</i>
+   * base address.
+   * Returns a negative number if <i>this</i> overlaps <i>that</i> and <i>this</i> base address is &gt; <i>that</i>
+   * base address.
+   * Returns a zero if there is no overlap or if one or both objects are null, not active or on heap.
+   * @param that the other Resource object
+   * @return a long value representing the ordering and size of overlap between <i>this</i> and <i>that</i>.
+   */
+  long nativeOverlap(Resource that);
+
+  /**
    * Returns the resource scope associated with this memory segment.
    * @return the resource scope associated with this memory segment.
    */
@@ -322,6 +338,7 @@ mismatch(MemorySegment, long, long, MemorySegment, long, long)</a>
    * @param arena the given arena.
    * If the desired result is to be off-heap, the arena must not be null.
    * Otherwise, the result will be on-heap.
+   * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not recommended.
    * @param alignment requested segment alignment. Typically 1, 2, 4 or 8.
    * @return a copy of the underlying MemorySegment in the given arena.
    */

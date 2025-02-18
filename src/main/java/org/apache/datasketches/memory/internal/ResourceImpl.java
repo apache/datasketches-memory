@@ -106,7 +106,7 @@ abstract class ResourceImpl implements Resource {
 
   /**
    * Root constructor.
-   * @param seg the given, one and only one MemorySegment
+   * @param seg the given, one and only MemorySegment
    * @param typeId the given typeId
    * @param memReqSvr the given MemoryRequestServer, or null.
    * @param arena the given Arena, or null if an on-heap MemorySegment.
@@ -380,6 +380,11 @@ abstract class ResourceImpl implements Resource {
   }
 
   @Override
+  public MemorySegment getMemorySegment() {
+    return seg.asReadOnly();
+  }
+
+  @Override
   public final long getRelativeOffset(final Resource that) {
     final ResourceImpl that2 = (ResourceImpl) that;
     return this.seg.segmentOffset(that2.seg);
@@ -454,9 +459,22 @@ abstract class ResourceImpl implements Resource {
   @Override
   public final boolean isSameResource(final Resource that) {
     Objects.requireNonNull(that);
-    final ResourceImpl that2 = (ResourceImpl) that;
-    return this.seg.address() == that2.seg.address()
-        && this.seg.byteSize() == that2.seg.byteSize();
+    final MemorySegment thisSeg = this.seg;
+    final MemorySegment thatSeg = ((ResourceImpl)that).seg;
+    final boolean thisNative = thisSeg.isNative();
+    final boolean thatNative = thatSeg.isNative();
+    if (thisNative != thatNative) { return false; }
+    if (thisNative && thatNative) { //off-heap
+      return thisSeg.address() == thatSeg.address()
+          && thisSeg.byteSize() == thatSeg.byteSize();
+    } else { //on heap
+      if (thisSeg.isReadOnly() || thatSeg.isReadOnly()) {
+        throw new IllegalArgumentException("Cannot determine 'isSameResource(..)' on heap if either resource is Read-only.");
+      }
+      return (thisSeg.heapBase().get() == thatSeg.heapBase().get())
+          && (thisSeg.address() == thatSeg.address())
+          && thisSeg.byteSize() == thatSeg.byteSize();
+    }
   }
 
   @Override

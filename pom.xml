@@ -25,13 +25,6 @@ under the License.
 
   <modelVersion>4.0.0</modelVersion>
 
-  <!--
-  <parent>
-    <groupId>org.apache</groupId>
-    <artifactId>apache</artifactId>
-    <version>32</version>
-  </parent> -->
-
   <groupId>org.apache.datasketches</groupId>
   <artifactId>datasketches-memory</artifactId>
   <version>6.0.0</version>
@@ -85,7 +78,7 @@ under the License.
 
   <properties>
     <!-- Test -->
-    <testng.version>7.10.2</testng.version>
+    <testng.version>7.11.0</testng.version>
 
     <!-- System-wide properties -->
     <maven.version>3.6.3</maven.version>
@@ -189,7 +182,7 @@ under the License.
               <configuration>
                 <rules>
                   <requireJavaVersion>
-                    <version>${java.version}</version>
+                    <version>${java.version},</version>
                   </requireJavaVersion>
                   <requireMavenVersion>
                     <version>[${maven.version},4.0.0)</version>

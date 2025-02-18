@@ -57,16 +57,35 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
     super(seg, typeId, memReqSvr, arena);
   }
 
-  //WRAP HEAP ARRAY RESOURCE
+  //WRAP SEGMENT RESOURCE
 
   /**
-   * Wrap a <i>MemorySegment</i> as an array
+   * Wrap a <i>MemorySegment</i>.
+   * @param seg the given <i>MemorySegment</i>. It must be non-null.
+   * @param byteOrder the given <i>ByteOrder</i>. It must be non-null.
+   * @return a <i>WritableMemory</i>.
+   */
+  public static WritableMemory wrapSegment(
+      final MemorySegment seg,
+      final ByteOrder byteOrder) {
+    Objects.requireNonNull(byteOrder, "byteOrder must be non-null");
+    int type = MEMORY
+        | (seg.isReadOnly() ? READONLY : 0);
+    if (byteOrder == NON_NATIVE_BYTE_ORDER) {
+      type |= NONNATIVE_BO;
+      return new NonNativeWritableMemoryImpl(seg, type, null, null);
+    }
+    return new NativeWritableMemoryImpl(seg, type, null, null);
+  }
+
+  /**
+   * Wrap a <i>MemorySegment</i>.
    * @param seg the given <i>MemorySegment</i>. It must be non-null.
    * @param byteOrder the given <i>ByteOrder</i>. It must be non-null.
    * @param memReqSvr the given <i>MemoryRequestServer</i>. It may be null.
    * @return a <i>WritableMemory</i>.
    */
-  public static WritableMemory wrapSegmentAsArray(
+  public static WritableMemory wrapSegment(
       final MemorySegment seg,
       final ByteOrder byteOrder,
       final MemoryRequestServer memReqSvr) {

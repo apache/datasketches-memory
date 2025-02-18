@@ -222,7 +222,7 @@ public interface Memory extends Resource {
       int lengthBytes,
       ByteOrder byteOrder) {
     final MemorySegment slice = MemorySegment.ofArray(array).asSlice(offsetBytes, lengthBytes).asReadOnly();
-    return WritableMemoryImpl.wrapSegmentAsArray(slice, byteOrder, null);
+    return WritableMemoryImpl.wrapSegment(slice, byteOrder);
   }
 
   //intentionally removed wrap(boolean[])
@@ -234,7 +234,7 @@ public interface Memory extends Resource {
    */
   static Memory wrap(char[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array).asReadOnly();
-    return WritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
+    return WritableMemoryImpl.wrapSegment(seg, ByteOrder.nativeOrder());
   }
 
   /**
@@ -244,7 +244,7 @@ public interface Memory extends Resource {
    */
   static Memory wrap(short[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array).asReadOnly();
-    return WritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
+    return WritableMemoryImpl.wrapSegment(seg, ByteOrder.nativeOrder());
   }
 
   /**
@@ -254,7 +254,7 @@ public interface Memory extends Resource {
    */
   static Memory wrap(int[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array).asReadOnly();
-    return WritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
+    return WritableMemoryImpl.wrapSegment(seg, ByteOrder.nativeOrder());
   }
 
   /**
@@ -264,7 +264,7 @@ public interface Memory extends Resource {
    */
   static Memory wrap(long[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array).asReadOnly();
-    return WritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
+    return WritableMemoryImpl.wrapSegment(seg, ByteOrder.nativeOrder());
   }
 
   /**
@@ -274,7 +274,7 @@ public interface Memory extends Resource {
    */
   static Memory wrap(float[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array).asReadOnly();
-    return WritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
+    return WritableMemoryImpl.wrapSegment(seg, ByteOrder.nativeOrder());
   }
 
   /**
@@ -284,7 +284,7 @@ public interface Memory extends Resource {
    */
   static Memory wrap(double[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array).asReadOnly();
-    return WritableMemoryImpl.wrapSegmentAsArray(seg, ByteOrder.nativeOrder(), null);
+    return WritableMemoryImpl.wrapSegment(seg, ByteOrder.nativeOrder());
   }
   //END OF CONSTRUCTOR-TYPE METHODS
 

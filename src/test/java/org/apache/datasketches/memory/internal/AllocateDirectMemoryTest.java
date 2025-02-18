@@ -27,6 +27,7 @@ import static org.testng.Assert.assertTrue;
 import java.lang.foreign.Arena;
 import java.nio.ByteOrder;
 
+import org.apache.datasketches.memory.DefaultMemoryRequestServer;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.WritableMemory;
@@ -56,28 +57,76 @@ public class AllocateDirectMemoryTest {
 
   @Test
   public void checkDefaultMemoryRequestServer() {
+    boolean oneArena = false;
+    boolean offHeap = false;
+    checkDefaultMemoryRequestServerVariations(false, false, false);
+    checkDefaultMemoryRequestServerVariations(false, false, true);
+    checkDefaultMemoryRequestServerVariations(false, true, false);
+    checkDefaultMemoryRequestServerVariations(false, true, true);
+    checkDefaultMemoryRequestServerVariations(true, false, false);
+    checkDefaultMemoryRequestServerVariations(true, false, true);
+    checkDefaultMemoryRequestServerVariations(true, true, false);
+    checkDefaultMemoryRequestServerVariations(true, true, true);
+  }
+
+  private void checkDefaultMemoryRequestServerVariations(boolean origArena, boolean oneArena, boolean offHeap) {
     int longs1 = 32;
     int bytes1 = longs1 << 3;
-    try (Arena arena = Arena.ofConfined()) {
-      WritableMemory origWmem = WritableMemory.allocateDirect(bytes1, 8, ByteOrder.LITTLE_ENDIAN, Resource.defaultMemReqSvr, arena);
+    WritableMemory origWmem, newWmem;
+
+    if (origArena) {
+      MemoryRequestServer dmrs = new DefaultMemoryRequestServer(8, ByteOrder.nativeOrder(), oneArena, offHeap);
+      try (Arena arena = Arena.ofConfined()) {
+        origWmem = WritableMemory.allocateDirect(bytes1, 8, ByteOrder.LITTLE_ENDIAN, dmrs, arena);
+        assertTrue(origWmem.isDirect());
+        for (int i = 0; i < longs1; i++) { //puts data in origWmem
+          origWmem.putLong(i << 3, i);
+          assertEquals(origWmem.getLong(i << 3), i);
+        }
+        println(origWmem.toString("Test", 0, longs1 << 3, true));
+
+        int longs2 = 2 * longs1;
+        int bytes2 = longs2 << 3;
+        MemoryRequestServer myMemReqSvr = origWmem.getMemoryRequestServer();
+
+        newWmem = myMemReqSvr.request(origWmem, bytes2);
+        assertTrue( (offHeap && origArena) ? newWmem.isDirect() : newWmem.isHeap() );
+        for (int i = 0; i < longs2; i++) {
+          newWmem.putLong(i << 3, i);
+          assertEquals(newWmem.getLong(i << 3), i);
+        }
+        println(newWmem.toString("Test", 0, longs2 << 3, true));
+        if (oneArena && offHeap)  { assertTrue((newWmem.getArena() == origWmem.getArena()) && origWmem != null); }
+        if (oneArena && !offHeap)  { assertTrue((newWmem.getArena() == null) && origWmem != null); }
+        if (!oneArena && offHeap) { assertTrue((newWmem.getArena() != origWmem.getArena()) && origWmem != null); }
+      } //allow the TWR to close the origWmem resource
+      assertFalse(origWmem.getArena().scope().isAlive());
+      if (!oneArena && offHeap) {
+        newWmem.getArena().close();
+        assertFalse(newWmem.getArena().scope().isAlive());
+      }
+
+    } else {
+      MemoryRequestServer dmrs = new DefaultMemoryRequestServer(8, ByteOrder.nativeOrder(), oneArena, offHeap);
+      origWmem = WritableMemory.allocate(bytes1,ByteOrder.LITTLE_ENDIAN, dmrs);
       for (int i = 0; i < longs1; i++) { //puts data in origWmem
         origWmem.putLong(i << 3, i);
         assertEquals(origWmem.getLong(i << 3), i);
       }
-      println(origWmem.toString("Test", 0, 32 * 8, true));
+      println(origWmem.toString("Test", 0, longs1 << 3, true));
 
-      int longs2 = 64;
+      int longs2 = 2 * longs1;
       int bytes2 = longs2 << 3;
-      origWmem.setMemoryRequestServer(Resource.defaultMemReqSvr);
       MemoryRequestServer myMemReqSvr = origWmem.getMemoryRequestServer();
 
-      WritableMemory newWmem = myMemReqSvr.request(bytes2, 8, ByteOrder.LITTLE_ENDIAN, null); //null -> on-heap
-      assertTrue(newWmem.isHeap());
+      newWmem = myMemReqSvr.request(origWmem, bytes2);
+      assertTrue( (offHeap && origArena) ? newWmem.isDirect() : newWmem.isHeap() );
       for (int i = 0; i < longs2; i++) {
         newWmem.putLong(i << 3, i);
         assertEquals(newWmem.getLong(i << 3), i);
       }
-    } //allow the TWR to close all resources
+      println(newWmem.toString("Test", 0, longs2 << 3, true));
+    }
   }
 
   @Test

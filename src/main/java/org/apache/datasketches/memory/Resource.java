@@ -146,7 +146,7 @@ public interface Resource {
   /**
    * Returns the arena used to create this resource and possibly other resources.
    * Be careful when you close the returned Arena, you may be closing other resources as well.
-   * @return the arena used to create this resource and possibly other resources.
+   * @return the arena used to create this resource and possibly other resources. It may be null.
    */
   Arena getArena();
 

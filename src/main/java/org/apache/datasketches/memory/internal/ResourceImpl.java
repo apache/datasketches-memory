@@ -106,7 +106,7 @@ abstract class ResourceImpl implements Resource {
 
   /**
    * Root constructor.
-   * @param seg the given, one and only one MemorySegment
+   * @param seg the given, one and only MemorySegment
    * @param typeId the given typeId
    * @param memReqSvr the given MemoryRequestServer, or null.
    * @param arena the given Arena, or null if an on-heap MemorySegment.

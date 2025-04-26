@@ -164,11 +164,11 @@ public interface Resource {
 
   /**
    * Gets the relative base offset of <i>this</i> resource with respect to <i>that</i> resource,
-   * defined as: <i>this</i> - <i>that</i>.
+   * defined as: <i>that.address()</i> - <i>this.address()</i>.
    * @param that the given resource.
-   * @return <i>this</i> - <i>that</i> offset
+   * @return <i>that.address()</i> - <i>this.address()</i> offset
    * @throws UnsupportedOperationException if the two resources cannot be compared, e.g. because they are of
-     * different kinds, or because they are backed by different Java arrays.
+   * different kinds, or because they are backed by different Java arrays.
    */
   long getRelativeOffset(Resource that);
 

@@ -387,7 +387,7 @@ abstract class ResourceImpl implements Resource {
   @Override
   public final long getRelativeOffset(final Resource that) {
     final ResourceImpl that2 = (ResourceImpl) that;
-    return this.seg.segmentOffset(that2.seg);
+    return that2.seg.address() - this.seg.address();
   }
 
   @Override

@@ -82,7 +82,7 @@ under the License.
 
     <!-- System-wide properties -->
     <maven.version>3.6.3</maven.version>
-    <java.version>25</java.version>
+    <java.version>22</java.version>
     <jvm-arguments></jvm-arguments>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -182,7 +182,7 @@ under the License.
               <configuration>
                 <rules>
                   <requireJavaVersion>
-                    <version>[${java.version},)</version> <!-- ${java.version} -->
+                    <version>[22,)</version> <!-- ${java.version} -->
                   </requireJavaVersion>
                   <requireMavenVersion>
                     <version>[${maven.version},4.0.0)</version>

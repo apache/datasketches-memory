@@ -19,17 +19,15 @@
 
 package org.apache.datasketches.memory.internal;
 
-import java.lang.foreign.Arena;
-import java.lang.foreign.MemorySegment;
-
 import static org.testng.Assert.assertEquals;
 
+import java.lang.foreign.Arena;
 import java.nio.ByteOrder;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.Assert;
 import org.testng.annotations.Test;

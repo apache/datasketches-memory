@@ -70,7 +70,7 @@ import java.nio.ByteOrder;
  *
  * @author Lee Rhodes
  */
-@SuppressWarnings("resource") //can't use TWRs here
+//@SuppressWarnings("resource") //can't use TWRs here
 public final class DefaultMemoryRequestServer implements MemoryRequestServer {
   private final long alignmentBytes;
   private final ByteOrder byteOrder;

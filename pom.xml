@@ -82,7 +82,7 @@ under the License.
 
     <!-- System-wide properties -->
     <maven.version>3.6.3</maven.version>
-    <java.version>22</java.version>
+    <java.version>24</java.version>
     <jvm-arguments></jvm-arguments>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>

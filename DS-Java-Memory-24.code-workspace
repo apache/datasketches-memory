@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../datasketches-java21"
+		}
+	],
+	"settings": {
+		"maven.view": "flat"
+	}
+}

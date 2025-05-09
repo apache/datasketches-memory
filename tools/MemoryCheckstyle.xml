@@ -38,16 +38,16 @@ under the License.
   <property name="fileExtensions" value="java"/>
   <property name="basedir" value="${basedir}"/>
 
-  <!-- Exclude all module-info.java files 
+  <!-- Exclude all module-info.java files and all test files 
        https://checkstyle.org/filefilters/beforeexecutionexclusionfilefilter.html#BeforeExecutionExclusionFileFilter -->
   <module name="BeforeExecutionExclusionFileFilter">
-    <property name="fileNamePattern" value="module\-info\.java$"/>
+    <property name="fileNamePattern" value="(.*[\\/]test[\\/].*$)|(module\-info\.java$)"/>
   </module>
 
-  <!-- Exclude all src/test/... files -->
+  <!-- Exclude all src/test/... files and all module-info files
   <module name="BeforeExecutionExclusionFileFilter">
     <property name="fileNamePattern" value=".*[\\/]src[\\/]test[\\/].*$"/>
-  </module>
+  </module> -->
 
   <module name="FileTabCharacter">
     <property name="eachLine" value="true"/>

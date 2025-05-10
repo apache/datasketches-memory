@@ -321,6 +321,7 @@ under the License.
               <exclude>**/git.properties</exclude>
               <exclude>LICENSE</exclude>
               <exclude>NOTICE</exclude>
+              <exclude>**/*.code-workspace</exclude>
             </excludes>
           </configuration>
         </plugin>

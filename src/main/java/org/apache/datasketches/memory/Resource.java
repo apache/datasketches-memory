@@ -143,6 +143,7 @@ public interface Resource {
    */
   void force();
 
+  //Temporary during transition
   /**
    * Returns the arena used to create this resource and possibly other resources.
    * Be careful when you close the returned Arena, you may be closing other resources as well.
@@ -156,9 +157,10 @@ public interface Resource {
    */
   long getCapacity();
 
+  //Temporary during transition
   /**
-   * Gets the MemorySegment that backs this resource as a read-only MemorySegment.
-   * @return the MemorySegment that back this resource as a read-only MemorySegment.
+   * Gets the MemorySegment that backs this resource.
+   * @return the MemorySegment that back this resource.
    */
   MemorySegment getMemorySegment();
 

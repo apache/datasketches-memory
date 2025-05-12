@@ -311,7 +311,7 @@ public class BufferTest {
   public void checkCheckNotAliveAfterTWR() {
     Buffer buf;
     try (Arena arena = Arena.ofConfined()) {
-      WritableMemory wmem = WritableMemory.allocateDirect(100, Arena.ofConfined());
+      WritableMemory wmem = WritableMemory.allocateDirect(100, arena);
       buf = wmem.asBuffer();
     }
     try {

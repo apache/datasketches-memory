@@ -19,12 +19,10 @@
 
 package org.apache.datasketches.memory.internal;
 
-import java.lang.foreign.Arena;
 import static org.testng.Assert.fail;
 
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 

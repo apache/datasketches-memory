@@ -82,11 +82,11 @@ under the License.
 
     <!-- System-wide properties -->
     <maven.version>3.6.3</maven.version>
-    <java.version>21</java.version>
-    <enable.preview>--enable-preview</enable.preview>
+    <java.version>24</java.version>
+    <jvm-arguments></jvm-arguments>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
-    <argLine>-Xmx4g -Duser.language=en -Duser.country=US -Dfile.encoding=UTF-8 ${enable.preview}</argLine>
+    <argLine>-Xmx4g -Duser.language=en -Duser.country=US -Dfile.encoding=UTF-8 ${jvm-arguments}</argLine>
     <charset.encoding>UTF-8</charset.encoding>
     <project.build.sourceEncoding>${charset.encoding}</project.build.sourceEncoding>
     <project.build.resourceEncoding>${charset.encoding}</project.build.resourceEncoding>
@@ -99,13 +99,12 @@ under the License.
     <maven-deploy-plugin.version>3.1.3</maven-deploy-plugin.version>
     <maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
     <maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
-    <maven-install-plugin.version>3.1.2</maven-install-plugin.version>
     <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
     <maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
     <maven-release-plugin.version>3.1.1</maven-release-plugin.version>
-    <maven-remote-resources-plugin.version>3.2.0</maven-remote-resources-plugin.version>
     <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
-    <maven-surefire-failsafe-plugins.version>3.5.2</maven-surefire-failsafe-plugins.version> <!-- for surefire, failsafe and surefire-report -->
+    <!-- for surefire, failsafe and surefire-report: -->
+    <maven-surefire-failsafe-plugins.version>3.5.2</maven-surefire-failsafe-plugins.version>
     <maven-toolchains-plugin.version>3.2.0</maven-toolchains-plugin.version>
     <!-- com.github plugins -->
     <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
@@ -115,12 +114,11 @@ under the License.
     <coveralls-repo-token></coveralls-repo-token>
     <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
     <!-- org.jacoco.maven plugins -->
-    <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
+    <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
     <!-- org.mojohaus plugins -->
     <versions-maven-plugin.version>2.18.0</versions-maven-plugin.version>
     <!-- other -->
     <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
-    <zero-allocation-hashing.version>0.16</zero-allocation-hashing.version>
   </properties>
 
   <dependencies>
@@ -129,14 +127,6 @@ under the License.
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
       <version>${testng.version}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <!-- Used for xxHash testing -->
-      <groupId>net.openhft</groupId>
-      <artifactId>zero-allocation-hashing</artifactId>
-      <version>${zero-allocation-hashing.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -156,7 +146,7 @@ under the License.
           <version>${maven-compiler-plugin.version}</version>
           <configuration>
             <compilerArgs>
-              <arg>${enable.preview}</arg>
+              <arg>${jvm-arguments}</arg>
             </compilerArgs>
           </configuration>
         </plugin>
@@ -182,7 +172,7 @@ under the License.
               <configuration>
                 <rules>
                   <requireJavaVersion>
-                    <version>${java.version},</version>
+                    <version>[22,)</version> <!-- java.version -->
                   </requireJavaVersion>
                   <requireMavenVersion>
                     <version>[${maven.version},4.0.0)</version>
@@ -228,10 +218,12 @@ under the License.
           <version>${maven-javadoc-plugin.version}</version>
           <configuration>
             <excludePackageNames>org.apache.datasketches.memory/internal</excludePackageNames>
+            <docfilessubdirs>true</docfilessubdirs>
             <show>public</show>
-            <additionalOptions>
-              <additionalOption>${enable.preview}</additionalOption>
-            </additionalOptions>
+            <doclint>all,-missing</doclint>
+            <additionalJOptions>
+              <additionalJOption>${jvm-arguments}</additionalJOption>
+            </additionalJOptions>
           </configuration>
           <executions>
             <execution>
@@ -276,7 +268,7 @@ under the License.
           <artifactId>maven-surefire-plugin</artifactId>
           <version>${maven-surefire-failsafe-plugins.version}</version>
           <configuration>
-            <argLine>${enable.preview}</argLine>
+            <argLine>${jvm-arguments}</argLine>
             <trimStackTrace>false</trimStackTrace>
             <useManifestOnlyJar>false</useManifestOnlyJar>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
@@ -329,6 +321,7 @@ under the License.
               <exclude>**/git.properties</exclude>
               <exclude>LICENSE</exclude>
               <exclude>NOTICE</exclude>
+              <exclude>**/*.code-workspace</exclude>
             </excludes>
           </configuration>
         </plugin>
@@ -602,5 +595,4 @@ under the License.
     </profile>
 
   </profiles>
-
 </project>

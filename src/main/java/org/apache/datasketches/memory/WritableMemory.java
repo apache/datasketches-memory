@@ -43,7 +43,7 @@ public interface WritableMemory extends Memory {
    * @param byteBuffer the given <i>ByteBuffer</i>. It must be non-null and writable.
    * @return a new <i>WritableMemory</i> for write operations on the given <i>ByteBuffer</i>.
    */
-  static WritableMemory writableWrap(ByteBuffer byteBuffer) {
+  static WritableMemory writableWrap(final ByteBuffer byteBuffer) {
     return writableWrap(byteBuffer, byteBuffer.order(), null);
   }
 
@@ -61,9 +61,9 @@ public interface WritableMemory extends Memory {
    * @throws IllegalArgumentException if ByteBuffer is not writable.
    */
   static WritableMemory writableWrap(
-      ByteBuffer byteBuffer,
-      ByteOrder byteOrder,
-      MemoryRequestServer memReqSvr) {
+      final ByteBuffer byteBuffer,
+      final ByteOrder byteOrder,
+      final MemoryRequestServer memReqSvr) {
     return WritableMemoryImpl.wrapByteBuffer(byteBuffer, false, byteOrder, memReqSvr);
   }
 
@@ -83,7 +83,7 @@ public interface WritableMemory extends Memory {
    * @throws SecurityException If a security manager is installed and it denies an unspecified permission
    * required by the implementation.
    */
-  static WritableMemory writableMap(File file, Arena arena) throws IOException {
+  static WritableMemory writableMap(final File file, final Arena arena) throws IOException {
     return WritableMemoryImpl.wrapMap(file, 0, file.length(), ByteOrder.nativeOrder(), false, arena);
   }
 
@@ -103,11 +103,11 @@ public interface WritableMemory extends Memory {
    * required by the implementation.
    */
   static WritableMemory writableMap(
-      File file,
-      long fileOffsetBytes,
-      long capacityBytes,
-      ByteOrder byteOrder,
-      Arena arena) throws IOException {
+      final File file,
+      final long fileOffsetBytes,
+      final long capacityBytes,
+      final ByteOrder byteOrder,
+      final Arena arena) throws IOException {
     return WritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, byteOrder, false, arena);
   }
 
@@ -127,7 +127,7 @@ public interface WritableMemory extends Memory {
    *
    * @return a WritableMemory for this off-heap resource.
    */
-  static WritableMemory allocateDirect(long capacityBytes, Arena arena) {
+  static WritableMemory allocateDirect(final long capacityBytes, final Arena arena) {
     return allocateDirect(capacityBytes, 8, ByteOrder.nativeOrder(), new DefaultMemoryRequestServer(), arena);
   }
 
@@ -146,7 +146,7 @@ public interface WritableMemory extends Memory {
    *
    * @return a WritableMemory for this off-heap resource.
    */
-  static WritableMemory allocateDirect(long capacityBytes, MemoryRequestServer memReqSvr, Arena arena) {
+  static WritableMemory allocateDirect(final long capacityBytes, final MemoryRequestServer memReqSvr, final Arena arena) {
     return allocateDirect(capacityBytes, 8, ByteOrder.nativeOrder(), memReqSvr, arena);
   }
 
@@ -168,11 +168,11 @@ public interface WritableMemory extends Memory {
    * @return a WritableMemory for this off-heap resource.
    */
   static WritableMemory allocateDirect(
-      long capacityBytes,
-      long alignmentBytes,
-      ByteOrder byteOrder,
-      MemoryRequestServer memReqSvr,
-      Arena arena) {
+      final long capacityBytes,
+      final long alignmentBytes,
+      final ByteOrder byteOrder,
+      final MemoryRequestServer memReqSvr,
+      final Arena arena) {
     return WritableMemoryImpl.wrapDirect(capacityBytes, alignmentBytes, byteOrder, memReqSvr, arena);
   }
 
@@ -191,8 +191,8 @@ public interface WritableMemory extends Memory {
    * @return a new <i>WritableMemory</i> representing the defined writable region.
    */
   default WritableMemory writableRegion(
-      long offsetBytes,
-      long capacityBytes) {
+      final long offsetBytes,
+      final long capacityBytes) {
     return writableRegion(offsetBytes, capacityBytes, getTypeByteOrder());
   }
 
@@ -256,7 +256,7 @@ public interface WritableMemory extends Memory {
    * @param capacityBytes the given capacity in bytes.
    * @return a new WritableMemory for write operations on a new byte array.
    */
-  static WritableMemory allocate(int capacityBytes) {
+  static WritableMemory allocate(final int capacityBytes) {
     return allocate(capacityBytes, ByteOrder.nativeOrder(), null);
   }
 
@@ -267,8 +267,8 @@ public interface WritableMemory extends Memory {
    * @return a new WritableMemory for write operations on a new byte array.
    */
   static WritableMemory allocate(
-      int capacityBytes,
-      ByteOrder byteOrder) {
+      final int capacityBytes,
+      final ByteOrder byteOrder) {
     return allocate(capacityBytes, byteOrder, null);
   }
 
@@ -281,9 +281,9 @@ public interface WritableMemory extends Memory {
    * @return a new WritableMemory for write operations on a new byte array.
    */
   static WritableMemory allocate(
-      int capacityBytes,
-      ByteOrder byteOrder,
-      MemoryRequestServer memReqSvr) {
+      final int capacityBytes,
+      final ByteOrder byteOrder,
+      final MemoryRequestServer memReqSvr) {
     final byte[] arr = new byte[capacityBytes];
     return writableWrap(arr, 0, capacityBytes, byteOrder, memReqSvr);
   }
@@ -298,7 +298,7 @@ public interface WritableMemory extends Memory {
    * @param array the given primitive array. It must be non-null.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
-  static WritableMemory writableWrap(byte[] array) {
+  static WritableMemory writableWrap(final byte[] array) {
     return writableWrap(array, 0, array.length, ByteOrder.nativeOrder(), null);
   }
 
@@ -312,8 +312,8 @@ public interface WritableMemory extends Memory {
    * @return a new WritableMemory for write operations on the given primitive array.
    */
   static WritableMemory writableWrap(
-      byte[] array,
-      ByteOrder byteOrder) {
+      final byte[] array,
+      final ByteOrder byteOrder) {
     return writableWrap(array, 0, array.length, byteOrder, null);
   }
 
@@ -329,10 +329,10 @@ public interface WritableMemory extends Memory {
    * @return a new WritableMemory for write operations on the given primitive array.
    */
   static WritableMemory writableWrap(
-      byte[] array,
-      int offsetBytes,
-      int lengthBytes,
-      ByteOrder byteOrder) {
+      final byte[] array,
+      final int offsetBytes,
+      final int lengthBytes,
+      final ByteOrder byteOrder) {
     return writableWrap(array, offsetBytes, lengthBytes, byteOrder, null);
   }
 
@@ -352,11 +352,11 @@ public interface WritableMemory extends Memory {
    * @return a new WritableMemory for write operations on the given primitive array.
    */
   static WritableMemory writableWrap(
-      byte[] array,
-      int offsetBytes,
-      int lengthBytes,
-      ByteOrder byteOrder,
-      MemoryRequestServer memReqSvr) {
+      final byte[] array,
+      final int offsetBytes,
+      final int lengthBytes,
+      final ByteOrder byteOrder,
+      final MemoryRequestServer memReqSvr) {
     final MemorySegment slice = MemorySegment.ofArray(array).asSlice(offsetBytes, lengthBytes);
     return WritableMemoryImpl.wrapSegment(slice, byteOrder, memReqSvr);
   }
@@ -368,7 +368,7 @@ public interface WritableMemory extends Memory {
    * @param array the given primitive array. It must be non-null.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
-  static WritableMemory writableWrap(char[] array) {
+  static WritableMemory writableWrap(final char[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array);
     return WritableMemoryImpl.wrapSegment(seg, ByteOrder.nativeOrder());
   }
@@ -378,7 +378,7 @@ public interface WritableMemory extends Memory {
    * @param array the given primitive array. It must be non-null.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
-  static WritableMemory writableWrap(short[] array) {
+  static WritableMemory writableWrap(final short[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array);
     return WritableMemoryImpl.wrapSegment(seg, ByteOrder.nativeOrder());
   }
@@ -388,7 +388,7 @@ public interface WritableMemory extends Memory {
    * @param array the given primitive array. It must be non-null.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
-  static WritableMemory writableWrap(int[] array) {
+  static WritableMemory writableWrap(final int[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array);
     return WritableMemoryImpl.wrapSegment(seg, ByteOrder.nativeOrder());
   }
@@ -398,7 +398,7 @@ public interface WritableMemory extends Memory {
    * @param array the given primitive array. It must be non-null.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
-  static WritableMemory writableWrap(long[] array) {
+  static WritableMemory writableWrap(final long[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array);
     return WritableMemoryImpl.wrapSegment(seg, ByteOrder.nativeOrder());
   }
@@ -408,7 +408,7 @@ public interface WritableMemory extends Memory {
    * @param array the given primitive array. It must be non-null.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
-  static WritableMemory writableWrap(float[] array) {
+  static WritableMemory writableWrap(final float[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array);
     return WritableMemoryImpl.wrapSegment(seg, ByteOrder.nativeOrder());
   }
@@ -418,7 +418,7 @@ public interface WritableMemory extends Memory {
    * @param array the given primitive array. It must be non-null.
    * @return a new WritableMemory for write operations on the given primitive array.
    */
-  static WritableMemory writableWrap(double[] array) {
+  static WritableMemory writableWrap(final double[] array) {
     final MemorySegment seg = MemorySegment.ofArray(array);
     return WritableMemoryImpl.wrapSegment(seg, ByteOrder.nativeOrder());
   }

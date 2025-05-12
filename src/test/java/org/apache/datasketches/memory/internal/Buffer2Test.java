@@ -352,7 +352,7 @@ public class Buffer2Test {
     }
   }
 
-  @Test(expectedExceptions = UnsupportedOperationException.class)
+  @Test(expectedExceptions = { IllegalArgumentException.class, UnsupportedOperationException.class })
   public void testROByteBuffer() {
     byte[] arr = new byte[64];
     ByteBuffer roBB = ByteBuffer.wrap(arr).asReadOnlyBuffer();
@@ -361,7 +361,7 @@ public class Buffer2Test {
     wbuf.putByte(0, (byte) 1);
   }
 
-  @Test(expectedExceptions = UnsupportedOperationException.class)
+  @Test(expectedExceptions = { IllegalArgumentException.class, UnsupportedOperationException.class })
   public void testROByteBuffer2() {
     byte[] arr = new byte[64];
     ByteBuffer roBB = ByteBuffer.wrap(arr).asReadOnlyBuffer();
@@ -370,7 +370,7 @@ public class Buffer2Test {
     wbuf.putByteArray(arr, 0, 64);
   }
 
-  @Test(expectedExceptions = UnsupportedOperationException.class)
+  @Test(expectedExceptions = { IllegalArgumentException.class, UnsupportedOperationException.class })
   public void testIllegalFill() {
     byte[] arr = new byte[64];
     ByteBuffer roBB = ByteBuffer.wrap(arr).asReadOnlyBuffer();

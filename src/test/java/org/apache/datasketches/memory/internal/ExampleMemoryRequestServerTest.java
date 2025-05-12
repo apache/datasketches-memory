@@ -24,7 +24,6 @@ import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.DefaultMemoryRequestServer;
 import org.apache.datasketches.memory.MemoryRequestServer;
-import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
@@ -92,7 +91,6 @@ public class ExampleMemoryRequestServerTest {
         //Not big enough, expand
         oldWorkingCap = newWorkingCap;
         newWorkingCap = 2 * oldWorkingCap;
-        Arena arena = Arena.ofConfined(); // new confined scope for each iteration
         newMem = memReqSvr.request(workingMem, newWorkingCap);
 
         //done with old memory, close it

@@ -32,7 +32,6 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
-import java.io.IOException;
 import java.lang.foreign.Arena;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -51,7 +50,7 @@ public class MemoryTest {
   final MemoryRequestServer myMemReqSvr = Resource.defaultMemReqSvr;
 
   @BeforeClass
-  public void setReadOnly() throws IOException {
+  public void setReadOnly() throws IllegalStateException {
     UtilTest.setGettysburgAddressFileToReadOnly();
   }
 

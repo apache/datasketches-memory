@@ -57,8 +57,7 @@ public class AllocateDirectMemoryTest {
 
   @Test
   public void checkDefaultMemoryRequestServer() {
-    boolean oneArena = false;
-    boolean offHeap = false;
+	//params: origArena, oneArena, offHeap
     checkDefaultMemoryRequestServerVariations(false, false, false);
     checkDefaultMemoryRequestServerVariations(false, false, true);
     checkDefaultMemoryRequestServerVariations(false, true, false);
@@ -69,7 +68,7 @@ public class AllocateDirectMemoryTest {
     checkDefaultMemoryRequestServerVariations(true, true, true);
   }
 
-  private void checkDefaultMemoryRequestServerVariations(boolean origArena, boolean oneArena, boolean offHeap) {
+  private static void checkDefaultMemoryRequestServerVariations(boolean origArena, boolean oneArena, boolean offHeap) {
     int longs1 = 32;
     int bytes1 = longs1 << 3;
     WritableMemory origWmem, newWmem;
@@ -140,6 +139,7 @@ public class AllocateDirectMemoryTest {
   }
 
   @Test
+  @SuppressWarnings("resource")
   public void checkExplicitCloseNoTWR() {
     final long cap = 128;
     Arena arena = Arena.ofConfined();

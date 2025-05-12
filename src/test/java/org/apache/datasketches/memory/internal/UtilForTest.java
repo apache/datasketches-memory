@@ -19,11 +19,6 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.ResourceImpl.NATIVE_BYTE_ORDER;
-import static org.apache.datasketches.memory.internal.ResourceImpl.NON_NATIVE_BYTE_ORDER;
-
-import java.nio.ByteOrder;
-
 public class UtilForTest {
 
   //Java does not provide reverse bytes on doubles or floats

@@ -166,7 +166,7 @@ public class WritableMemoryTest {
     Memory client2 = owner.region(0, owner.getCapacity()); //create a readOnly region (MemorySegment) from owner
     try {
       ((WritableMemory) client2).putInt(0, 3); //now you cannot make client2 writable
-    } catch (UnsupportedOperationException e) { }
+    } catch (IllegalArgumentException | UnsupportedOperationException e) { }
   }
 
   @Test

@@ -114,7 +114,7 @@ under the License.
     <coveralls-repo-token></coveralls-repo-token>
     <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
     <!-- org.jacoco.maven plugins -->
-    <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
+    <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
     <!-- org.mojohaus plugins -->
     <versions-maven-plugin.version>2.18.0</versions-maven-plugin.version>
     <!-- other -->

@@ -19,21 +19,14 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import org.apache.datasketches.memory.*;
+import org.testng.annotations.Test;
 
 import java.lang.foreign.Arena;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.Resource;
-import org.apache.datasketches.memory.Buffer;
-import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.WritableBuffer;
-import org.apache.datasketches.memory.WritableMemory;
-import org.testng.annotations.Test;
+import static org.testng.Assert.*;
 
 public class Buffer2Test {
 
@@ -352,7 +345,7 @@ public class Buffer2Test {
     }
   }
 
-  @Test(expectedExceptions = UnsupportedOperationException.class)
+  @Test(expectedExceptions = { IllegalArgumentException.class, UnsupportedOperationException.class })
   public void testROByteBuffer() {
     byte[] arr = new byte[64];
     ByteBuffer roBB = ByteBuffer.wrap(arr).asReadOnlyBuffer();
@@ -361,7 +354,7 @@ public class Buffer2Test {
     wbuf.putByte(0, (byte) 1);
   }
 
-  @Test(expectedExceptions = UnsupportedOperationException.class)
+  @Test(expectedExceptions = { IllegalArgumentException.class, UnsupportedOperationException.class })
   public void testROByteBuffer2() {
     byte[] arr = new byte[64];
     ByteBuffer roBB = ByteBuffer.wrap(arr).asReadOnlyBuffer();
@@ -370,7 +363,7 @@ public class Buffer2Test {
     wbuf.putByteArray(arr, 0, 64);
   }
 
-  @Test(expectedExceptions = UnsupportedOperationException.class)
+  @Test(expectedExceptions = { IllegalArgumentException.class, UnsupportedOperationException.class })
   public void testIllegalFill() {
     byte[] arr = new byte[64];
     ByteBuffer roBB = ByteBuffer.wrap(arr).asReadOnlyBuffer();

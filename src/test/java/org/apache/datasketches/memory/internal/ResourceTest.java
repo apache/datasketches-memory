@@ -19,24 +19,14 @@
 
 package org.apache.datasketches.memory.internal;
 
-import java.lang.foreign.Arena;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
-import static java.lang.foreign.ValueLayout.JAVA_BYTE;
+import org.apache.datasketches.memory.*;
+import org.testng.annotations.Test;
 
+import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.ValueLayout;
-import java.lang.foreign.ValueLayout.OfByte;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.Buffer;
-import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.MemoryRequestServer;
-import org.apache.datasketches.memory.Resource;
-import org.apache.datasketches.memory.WritableMemory;
-import org.testng.annotations.Test;
+import static org.testng.Assert.*;
 
 public class ResourceTest {
   private static final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
@@ -208,8 +198,7 @@ public class ResourceTest {
       ResourceImpl.parseJavaVersion("20");
       fail();
     } catch (IllegalArgumentException e) { }
-    ResourceImpl.parseJavaVersion("21");
-    ResourceImpl.parseJavaVersion("22");
+    ResourceImpl.parseJavaVersion("25");
   }
 
   @Test

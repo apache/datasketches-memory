@@ -72,8 +72,8 @@ Starting with release *datasketches-memory-5.0.0*, this Memory component support
 ### Runtime Notes:
 * There are no run-time dependencies. 
 * The DataSketches Java Memory Component is not thread-safe.
-* This Release, based on Java 21, leverages the new Java Foreign Function & Memory (FFM) API [JEP 442](https://openjdk.org/jeps/442), which is in its third Preview and will require the JVM flag *--enable-preview* at run-time.
-* We recommend Eclipse Adoptium/Temurin 21.0.5+11 or later as earlier releases of 21 have bugs that affect this product.
+* This Release, based on Java 25, leverages the new Java Foreign Function & Memory (FFM) API [JEP 454](https://openjdk.org/jeps/454).
+* We recommend Eclipse Adoptium/Temurin 25.0.0+36-LTS or later as earlier releases of 25 have bugs that affect this product.
 * This component is not designed as a Java Module, so the Jar file should be part of the application classpath.
 
 ## Build Instructions
@@ -83,7 +83,6 @@ __NOTES:__
 As a result, the directory elements of the full absolute path of the target installation directory must qualify as Java identifiers.
 In other words, the directory elements must not have any space characters (or non-Java identifier characters) in any of the path elements. This is required by the Oracle Java Specification in order to ensure location-independent access to resources:
 [See Oracle Location-Independent Access to Resources](https://docs.oracle.com/javase/8/docs/technotes/guides/lang/resources.html)
-* The compile command line must contain the JVM flag *--enable-preview* (see [JEP 442](https://openjdk.org/jeps/442)).
 
 
 #### Build & Test Dependencies

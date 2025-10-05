@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        jdk: [ 21 ] # LTS versions only
+        jdk: [ 25 ] # LTS versions only
         os: [ ubuntu-latest ]
         include:
 #         - os: windows-latest

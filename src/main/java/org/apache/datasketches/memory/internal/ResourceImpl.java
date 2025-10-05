@@ -19,7 +19,10 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.Util.characterPad;
+import org.apache.datasketches.memory.MemoryRequestServer;
+import org.apache.datasketches.memory.Resource;
+import org.apache.datasketches.memory.WritableBuffer;
+import org.apache.datasketches.memory.WritableMemory;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
@@ -29,10 +32,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Objects;
 
-import org.apache.datasketches.memory.MemoryRequestServer;
-import org.apache.datasketches.memory.Resource;
-import org.apache.datasketches.memory.WritableBuffer;
-import org.apache.datasketches.memory.WritableMemory;
+import static org.apache.datasketches.memory.internal.Util.characterPad;
 
 /**
  * Implements the root Resource methods plus some common static variables and check methods.
@@ -387,7 +387,7 @@ abstract class ResourceImpl implements Resource {
   @Override
   public final long getRelativeOffset(final Resource that) {
     final ResourceImpl that2 = (ResourceImpl) that;
-    return this.seg.segmentOffset(that2.seg);
+    return that2.seg.address() - this.seg.address();
   }
 
   @Override

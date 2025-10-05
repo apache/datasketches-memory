@@ -23,20 +23,17 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.ResourceImpl.LS;
-import static org.apache.datasketches.memory.internal.Util.getResourceFile;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
+import org.apache.datasketches.memory.Memory;
+import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.foreign.Arena;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.Memory;
-import org.testng.annotations.Test;
+import static org.apache.datasketches.memory.internal.ResourceImpl.LS;
+import static org.apache.datasketches.memory.internal.Util.getResourceFile;
+import static org.testng.Assert.*;
 
 public class AllocateDirectMapMemoryTest {
 
@@ -50,6 +47,7 @@ public class AllocateDirectMapMemoryTest {
     } //The Try-With-Resources will throw since it is already closed
     catch (IllegalStateException e) { /* OK */ }
     if (mem != null) { assertFalse(mem.isAlive()); }
+    UtilTest.setGettysburgAddressFileToReadWrite();
   }
 
   @Test

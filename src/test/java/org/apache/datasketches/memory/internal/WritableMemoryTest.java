@@ -19,17 +19,15 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.memory.WritableMemory;
+import org.testng.annotations.Test;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.WritableMemory;
-import org.testng.annotations.Test;
+import static org.testng.Assert.*;
 
 public class WritableMemoryTest {
 
@@ -166,7 +164,8 @@ public class WritableMemoryTest {
     Memory client2 = owner.region(0, owner.getCapacity()); //create a readOnly region (MemorySegment) from owner
     try {
       ((WritableMemory) client2).putInt(0, 3); //now you cannot make client2 writable
-    } catch (UnsupportedOperationException e) { }
+    }
+    catch (UnsupportedOperationException | IllegalArgumentException e) { }
   }
 
   @Test

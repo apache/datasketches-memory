@@ -19,8 +19,7 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static java.nio.channels.FileChannel.MapMode.READ_ONLY;
-import static java.nio.channels.FileChannel.MapMode.READ_WRITE;
+import org.apache.datasketches.memory.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -36,11 +35,8 @@ import java.nio.file.StandardOpenOption;
 import java.util.Objects;
 import java.util.Set;
 
-import org.apache.datasketches.memory.Buffer;
-import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.memory.MemoryRequestServer;
-import org.apache.datasketches.memory.WritableBuffer;
-import org.apache.datasketches.memory.WritableMemory;
+import static java.nio.channels.FileChannel.MapMode.READ_ONLY;
+import static java.nio.channels.FileChannel.MapMode.READ_WRITE;
 
 /**
  * Common base of native-ordered and non-native-ordered {@link WritableMemory} implementations.
@@ -165,7 +161,7 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
    * @throws IllegalArgumentException if file is not readable.
    * @throws IOException if mapping is not successful.
    */
-  @SuppressWarnings({"resource","preview"})
+  @SuppressWarnings("resource")
   public static WritableMemory wrapMap(
       final File file,
       final long fileOffsetBytes,

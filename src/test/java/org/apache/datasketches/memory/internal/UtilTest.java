@@ -23,9 +23,7 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static java.nio.file.Files.readString;
-import static org.apache.datasketches.memory.internal.Util.getResourceFile;
-import static org.testng.Assert.assertTrue;
+import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +33,9 @@ import java.nio.file.attribute.PosixFileAttributeView;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermissions;
 
-import org.testng.annotations.Test;
+import static java.nio.file.Files.readString;
+import static org.apache.datasketches.memory.internal.Util.getResourceFile;
+import static org.testng.Assert.assertTrue;
 
 public class UtilTest {
 
@@ -55,6 +55,12 @@ public class UtilTest {
     if (!file.setWritable(false)) { throw new IllegalStateException("File could not set Read-Only"); }
     return file;
   }
+
+    static final File setGettysburgAddressFileToReadWrite() {
+        File file = getResourceFile("GettysburgAddress.txt");
+        if (!file.setWritable(true)) { throw new IllegalStateException("File could not set Read-Only"); }
+        return file;
+    }
 
   //Resources
 

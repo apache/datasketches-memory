@@ -23,36 +23,36 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.apache.datasketches.memory.internal.ResourceImpl.LS;
-import static org.apache.datasketches.memory.internal.ResourceImpl.NON_NATIVE_BYTE_ORDER;
-import static org.apache.datasketches.memory.internal.Util.getResourceFile;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.lang.foreign.Arena;
-import java.nio.ByteOrder;
-import java.nio.file.InvalidPathException;
-
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.WritableMemory;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import java.io.*;
+import java.lang.foreign.Arena;
+import java.nio.ByteOrder;
+import java.nio.file.InvalidPathException;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.apache.datasketches.memory.internal.ResourceImpl.LS;
+import static org.apache.datasketches.memory.internal.ResourceImpl.NON_NATIVE_BYTE_ORDER;
+import static org.apache.datasketches.memory.internal.Util.getResourceFile;
+import static org.testng.Assert.*;
 
 public class AllocateDirectWritableMapMemoryTest {
   private final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
 
   @BeforeClass
-  public void setReadOnly() throws IOException {
+  public void setReadOnly() {
     UtilTest.setGettysburgAddressFileToReadOnly();
+  }
+
+  @AfterClass
+  public void clearReadOnly() {
+      UtilTest.setGettysburgAddressFileToReadWrite();
   }
 
   @Test

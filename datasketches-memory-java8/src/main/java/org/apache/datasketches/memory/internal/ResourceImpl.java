@@ -157,7 +157,7 @@ public abstract class ResourceImpl implements Resource {
     }
     if (p0 > 11) {
       System.err.println(
-          "Warning: Java versions > Java 11 can only operate in restriced mode where no off-heap operations are allowed!");
+          "Warning: Java versions > Java 11 can only operate in restricted mode where no off-heap operations are allowed!");
     }
   }
 

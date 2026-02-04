@@ -23,8 +23,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
 
 /**
- * <p>The MurmurHash3 is a fast, non-cryptographic, 128-bit hash function that has
- * excellent avalanche and 2-way bit independence properties.</p>
+ * The MurmurHash3 is a fast, non-cryptographic, 128-bit hash function that has
+ * excellent avalanche and 2-way bit independence properties.
  *
  * <p>Austin Appleby's C++
  * <a href="https://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp">

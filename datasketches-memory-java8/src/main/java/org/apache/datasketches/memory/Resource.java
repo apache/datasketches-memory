@@ -113,7 +113,7 @@ public interface Resource extends AutoCloseable {
    * @return true if the given object has equal contents to this object.
    * @see #equalTo(long, Resource, long, long)
    */
-  default boolean equalTo(Resource that) {
+  default boolean equalTo(final Resource that) {
     if (that == null || this.getCapacity() != that.getCapacity()) { return false; }
     return equalTo(0, that, 0, that.getCapacity());
   }

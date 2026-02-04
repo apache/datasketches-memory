@@ -151,9 +151,13 @@ public abstract class ResourceImpl implements Resource {
    * @param p1 The second number group
    */
   static void checkJavaVersion(final String jdkVer, final int p0, final int p1 ) {
-    final boolean ok = ((p0 == 1) && (p1 == 8)) || (p0 == 8) || (p0 == 11) || (p0 == 17 || (p0 == 21));
+    final boolean ok = ((p0 == 1) && (p1 == 8)) || (p0 == 8) || (p0 == 11) || (p0 == 17 || (p0 == 21) || (p0 == 25));
     if (!ok) { throw new IllegalArgumentException(
-        "Unsupported JDK Major Version. It must be one of 1.8, 8, 11, 17, 21: " + jdkVer);
+        "Unsupported JDK Major Version. It must be one of 1.8, 8, 11, 17, 21, 25: " + jdkVer);
+    }
+    if (p0 > 11) {
+      System.err.println(
+          "Warning: Java versions > Java 11 can only operate in restriced mode where no off-heap operations are allowed!");
     }
   }
 

@@ -82,6 +82,8 @@ public abstract class ResourceImpl implements Resource {
   static final String NOT_MAPPED_FILE_RESOURCE = "This is not a memory-mapped file resource";
   static final String THREAD_EXCEPTION_TEXT = "Attempted access outside owning thread";
 
+  private static boolean JAVA_VERSION_WARNING_PRINTED = false;
+  
   static {
     final String jdkVer = System.getProperty("java.version");
     final int[] p = parseJavaVersion(jdkVer);
@@ -155,9 +157,10 @@ public abstract class ResourceImpl implements Resource {
     if (!ok) { throw new IllegalArgumentException(
         "Unsupported JDK Major Version. It must be one of 1.8, 8, 11, 17, 21, 25: " + jdkVer);
     }
-    if (p0 > 11) {
+    if (p0 > 11 && !JAVA_VERSION_WARNING_PRINTED) {
       System.err.println(
           "Warning: Java versions > Java 11 can only operate in restricted mode where no off-heap operations are allowed!");
+      JAVA_VERSION_WARNING_PRINTED = true;
     }
   }
 

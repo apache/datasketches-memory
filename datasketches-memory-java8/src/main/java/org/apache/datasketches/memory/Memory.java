@@ -45,7 +45,7 @@ public interface Memory extends Resource {
    * @param byteBuffer the given <i>ByteBuffer</i>. It must be non-null.
    * @return a new <i>Memory</i> for read-only operations on the given <i>ByteBuffer</i>.
    */
-  static Memory wrap(ByteBuffer byteBuffer) {
+  static Memory wrap(final ByteBuffer byteBuffer) {
     return wrap(byteBuffer, byteBuffer.order());
   }
 
@@ -60,8 +60,8 @@ public interface Memory extends Resource {
    * @return a new <i>Memory</i> for read-only operations on the given <i>ByteBuffer</i>.
    */
   static Memory wrap(
-      ByteBuffer byteBuffer, 
-      ByteOrder byteOrder) {
+      final ByteBuffer byteBuffer, 
+      final ByteOrder byteOrder) {
     return BaseWritableMemoryImpl.wrapByteBuffer(byteBuffer, true, byteOrder, null);
   }
 
@@ -80,7 +80,7 @@ public interface Memory extends Resource {
    * @throws SecurityException If a security manager is installed and it denies an unspecified permission
    * required by the implementation.
    */
-  static Memory map(File file) throws IOException {
+  static Memory map(final File file) throws IOException {
     return map(file, 0, file.length(), ByteOrder.nativeOrder());
   }
 
@@ -97,10 +97,10 @@ public interface Memory extends Resource {
    * required by the implementation.
    */
   static Memory map(
-      File file, 
-      long fileOffsetBytes, 
-      long capacityBytes, 
-      ByteOrder byteOrder) throws IOException {
+      final File file, 
+      final long fileOffsetBytes, 
+      final long capacityBytes, 
+      final ByteOrder byteOrder) throws IOException {
     return BaseWritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, true, byteOrder);
   }
 
@@ -119,8 +119,8 @@ public interface Memory extends Resource {
    * offsetBytes and capacityBytes.
    */
   default Memory region(
-      long offsetBytes, 
-      long capacityBytes) {
+      final long offsetBytes, 
+      final long capacityBytes) {
     return region(offsetBytes, capacityBytes, getTypeByteOrder());
   }
 
@@ -183,7 +183,7 @@ public interface Memory extends Resource {
    * @param array the given primitive array. It must be non-null.
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(byte[] array) {
+  static Memory wrap(final byte[] array) {
     Objects.requireNonNull(array, "array must be non-null");
     return wrap(array, 0, array.length, ByteOrder.nativeOrder());
   }
@@ -195,8 +195,8 @@ public interface Memory extends Resource {
    * @return a new <i>Memory</i> for read operations
    */
   static Memory wrap(
-      byte[] array, 
-      ByteOrder byteOrder) {
+      final byte[] array, 
+      final ByteOrder byteOrder) {
     return wrap(array, 0, array.length, byteOrder);
   }
 
@@ -209,10 +209,10 @@ public interface Memory extends Resource {
    * @return a new <i>Memory</i> for read operations
    */
   static Memory wrap(
-      byte[] array, 
-      int offsetBytes, 
-      int lengthBytes, 
-      ByteOrder byteOrder) {
+      final byte[] array, 
+      final int offsetBytes, 
+      final int lengthBytes, 
+      final ByteOrder byteOrder) {
     return BaseWritableMemoryImpl.wrapHeapArray(array, offsetBytes, lengthBytes, true, byteOrder, null);
   }
 
@@ -221,7 +221,7 @@ public interface Memory extends Resource {
    * @param array the given primitive array. It must be non-null.
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(char[] array) {
+  static Memory wrap(final char[] array) {
     Objects.requireNonNull(array, "array must be non-null");
     final long lengthBytes = array.length << Prim.CHAR.shift();
     return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, true, ByteOrder.nativeOrder(), null);
@@ -232,7 +232,7 @@ public interface Memory extends Resource {
    * @param array the given primitive array. It must be non-null.
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(short[] array) {
+  static Memory wrap(final short[] array) {
     Objects.requireNonNull(array, "array must be non-null");
     final long lengthBytes = array.length << Prim.SHORT.shift();
     return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, true, ByteOrder.nativeOrder(), null);
@@ -243,7 +243,7 @@ public interface Memory extends Resource {
    * @param array the given primitive array. It must be non-null.
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(int[] array) {
+  static Memory wrap(final int[] array) {
     Objects.requireNonNull(array, "array must be non-null");
     final long lengthBytes = array.length << Prim.INT.shift();
     return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, true, ByteOrder.nativeOrder(), null);
@@ -254,7 +254,7 @@ public interface Memory extends Resource {
    * @param array the given primitive array. It must be non-null.
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(long[] array) {
+  static Memory wrap(final long[] array) {
     Objects.requireNonNull(array, "array must be non-null");
     final long lengthBytes = array.length << Prim.LONG.shift();
     return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, true, ByteOrder.nativeOrder(), null);
@@ -265,7 +265,7 @@ public interface Memory extends Resource {
    * @param array the given primitive array. It must be non-null.
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(float[] array) {
+  static Memory wrap(final float[] array) {
     Objects.requireNonNull(array, "array must be non-null");
     final long lengthBytes = array.length << Prim.FLOAT.shift();
     return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, true, ByteOrder.nativeOrder(), null);
@@ -276,7 +276,7 @@ public interface Memory extends Resource {
    * @param array the given primitive array. It must be non-null.
    * @return a new <i>Memory</i> for read operations
    */
-  static Memory wrap(double[] array) {
+  static Memory wrap(final double[] array) {
     Objects.requireNonNull(array, "array must be non-null");
     final long lengthBytes = array.length << Prim.DOUBLE.shift();
     return BaseWritableMemoryImpl.wrapHeapArray(array, 0L, lengthBytes, true, ByteOrder.nativeOrder(), null);

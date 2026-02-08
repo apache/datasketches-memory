@@ -642,7 +642,6 @@ public interface WritableMemory extends Memory {
       long offsetBytes,
       byte bitMask);
 
-
   //OTHER WRITABLE API METHODS
   /**
    * Returns a copy of the primitive backing array as a byte array.

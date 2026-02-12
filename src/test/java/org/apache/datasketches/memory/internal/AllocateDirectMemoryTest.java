@@ -57,7 +57,7 @@ public class AllocateDirectMemoryTest {
 
   @Test
   public void checkDefaultMemoryRequestServer() {
-	//params: origArena, oneArena, offHeap
+    //params: origArena, oneArena, offHeap
     checkDefaultMemoryRequestServerVariations(false, false, false);
     checkDefaultMemoryRequestServerVariations(false, false, true);
     checkDefaultMemoryRequestServerVariations(false, true, false);

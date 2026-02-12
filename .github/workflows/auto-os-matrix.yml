@@ -2,12 +2,12 @@ name: Auto OS Matrix Test & Install
 
 on:
 #  push:
-#    paths-ignore: [ '**/*.html', '**/*.md', '**/*.txt', '**/*.yaml', '**/*.yml', '**/LICENSE', '**/NOTICE' ]
-#    branches: [ 'main', '[0-9]+.[0-9]+.[Xx]' ]
+#    paths-ignore: [ '**/*.html', '**/*.md', '**/*.txt', '**/LICENSE', '**/NOTICE' ]
+#    branches: [ 'main', '[0-9]+.[0-9]+.[Xx]',  'v[0-9]+.[0-9]+.[Xx]']
 #  pull_request:
-#    paths-ignore: [ '**/*.html', '**/*.md', '**/*.txt', '**/*.yaml', '**/*.yml', '**/LICENSE', '**/NOTICE' ]
+#    paths-ignore: [ '**/*.html', '**/*.md', '**/*.txt', '**/LICENSE', '**/NOTICE' ]
 #    # The branches below must be a subset of the branches above
-#    branches: [ 'main', '[0-9]+.[0-9]+.[Xx]' ]
+#    branches: [ 'main', '[0-9]+.[0-9]+.[Xx]' 'v[0-9]+.[0-9]+.[Xx]']
   workflow_dispatch:
 
 env:

@@ -1,13 +1,13 @@
 name: Auto JDK Matrix Test & Install
 
 on:
-#  push:
-#    paths-ignore: [ '**/*.html', '**/*.md', '**/*.txt', '**/LICENSE', '**/NOTICE' ]
-#    branches: [ 'main', '[0-9]+.[0-9]+.[Xx]',  'v[0-9]+.[0-9]+.[Xx]' ]
-#  pull_request:
-#    paths-ignore: [ '**/*.html', '**/*.md', '**/*.txt', '**/LICENSE', '**/NOTICE' ]
-#    # The branches below must be a subset of the branches above
-#    branches: [ 'main', '[0-9]+.[0-9]+.[Xx]',  'v[0-9]+.[0-9]+.[Xx]' ]
+  push:
+    paths-ignore: [ '**/*.html', '**/*.md', '**/*.txt', '**/LICENSE', '**/NOTICE' ]
+    branches: [ 'main', '[0-9]+.[0-9]+.[Xx]',  'v[0-9]+.[0-9]+.[Xx]' ]
+  pull_request:
+    paths-ignore: [ '**/*.html', '**/*.md', '**/*.txt', '**/LICENSE', '**/NOTICE' ]
+    # The branches below must be a subset of the branches above
+    branches: [ 'main', '[0-9]+.[0-9]+.[Xx]',  'v[0-9]+.[0-9]+.[Xx]' ]
   workflow_dispatch:
 
 env:
@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        jdk: [ 21 ] # LTS versions only
+        jdk: [ 25 ] # LTS versions only
         os: [ ubuntu-latest ]
         include:
 #         - os: windows-latest

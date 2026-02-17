@@ -38,8 +38,8 @@ jobs:
           distribution: 'temurin'
           java-package: jdk
           architecture: x64
-          cache: 'maven'
-          overwrite-settings: true
+          cache: 'maven'  # performance optimization
+          overwrite-settings: true  # ensures the runner's .m2/settings.xml is current
 
       - name: Verify Toolchain Configuration
         shell: bash

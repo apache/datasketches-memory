@@ -51,9 +51,7 @@ jobs:
           fi
 
       - name: Echo Java & Maven Version
-        run: |
-          java -version
-          mvn -version
+        run: mvn -version #also prints java-version
 
       - name: Print Current workflow
         run: cat .github/workflows/auto-os-matrix.yml
@@ -62,7 +60,7 @@ jobs:
         run: mvn clean test
 
       - name: Install
-        run: mvn clean install -DskipTests=true
+        run: mvn install -DskipTests=true -Dmaven.clean.failOnError=false  #windows os hack
 
 
 # Architecture options: x86, x64, armv7, aarch64, ppc64le

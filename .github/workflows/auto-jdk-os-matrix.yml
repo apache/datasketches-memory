@@ -1,4 +1,4 @@
-name: Auto OS Matrix Test & Install
+name: Auto JDK & OS Matrix Test & Install
 
 on:
   push:
@@ -54,7 +54,7 @@ jobs:
         run: mvn -version #also prints java-version
 
       - name: Print Current workflow
-        run: cat .github/workflows/auto-os-matrix.yml
+        run: cat .github/workflows/auto-jdk-os-matrix.yml
 
       - name: Test
         run: mvn clean test
@@ -65,6 +65,7 @@ jobs:
 
 # Architecture options: x86, x64, armv7, aarch64, ppc64le
 # Lifecycle: validate, compile, test, package, verify, install, deploy
-# -B batch mode
+# -B batch mode, never stops for user input
 # -V show Version without stopping
+# -X debug mode
 # -q quiet, only show errors

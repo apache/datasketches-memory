@@ -24,7 +24,6 @@ import static org.apache.datasketches.memory.internal.Util.isAllBitsClear;
 import static org.apache.datasketches.memory.internal.Util.isAllBitsSet;
 import static org.apache.datasketches.memory.internal.Util.isAnyBitsClear;
 import static org.apache.datasketches.memory.internal.Util.isAnyBitsSet;
-import static org.apache.datasketches.memory.internal.Util.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -32,7 +31,6 @@ import static org.testng.Assert.assertTrue;
 import java.lang.foreign.Arena;
 import java.nio.ByteOrder;
 
-import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.WritableMemory;

@@ -19,16 +19,13 @@
 
 package org.apache.datasketches.memory.internal;
 
-import java.lang.foreign.Arena;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
-import static java.lang.foreign.ValueLayout.JAVA_BYTE;
 
+import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.ValueLayout;
-import java.lang.foreign.ValueLayout.OfByte;
 import java.nio.ByteOrder;
 
 import org.apache.datasketches.memory.Buffer;

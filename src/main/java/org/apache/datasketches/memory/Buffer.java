@@ -43,7 +43,7 @@ public interface Buffer extends Positional, Resource {
    * @param byteBuffer the given ByteBuffer, must not be null.
    * @return a new <i>Buffer</i> for read-only operations on the given ByteBuffer.
    */
-  static Buffer wrap(ByteBuffer byteBuffer) {
+  static Buffer wrap(final ByteBuffer byteBuffer) {
     return wrap(byteBuffer, ByteOrder.nativeOrder());
   }
 
@@ -60,8 +60,8 @@ public interface Buffer extends Positional, Resource {
    * @return a new <i>Buffer</i> for read-only operations on the given ByteBuffer.
    */
   static Buffer wrap(
-      ByteBuffer byteBuffer,
-      ByteOrder byteOrder) {
+      final ByteBuffer byteBuffer,
+      final ByteOrder byteOrder) {
     return WritableBufferImpl.wrapByteBuffer(byteBuffer, true, byteOrder, null);
   }
 

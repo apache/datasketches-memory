@@ -115,7 +115,7 @@ public interface Resource {
    * @param that the given Resource object
    * @return true if the given object has equal contents to this object.
    */
-  default boolean equalTo(Resource that) {
+  default boolean equalTo(final Resource that) {
     if (that == null || this.getCapacity() != that.getCapacity()) { return false; }
     return equalTo(0, that, 0, that.getCapacity());
   }
@@ -143,6 +143,7 @@ public interface Resource {
    */
   void force();
 
+  //Temporary during transition
   /**
    * Returns the arena used to create this resource and possibly other resources.
    * Be careful when you close the returned Arena, you may be closing other resources as well.
@@ -156,19 +157,20 @@ public interface Resource {
    */
   long getCapacity();
 
+  //Temporary during transition
   /**
-   * Gets the MemorySegment that backs this resource as a read-only MemorySegment.
-   * @return the MemorySegment that back this resource as a read-only MemorySegment.
+   * Gets the MemorySegment that backs this resource.
+   * @return the MemorySegment that back this resource.
    */
   MemorySegment getMemorySegment();
 
   /**
    * Gets the relative base offset of <i>this</i> resource with respect to <i>that</i> resource,
-   * defined as: <i>this</i> - <i>that</i>.
+   * defined as: <i>that.address()</i> - <i>this.address()</i>.
    * @param that the given resource.
-   * @return <i>this</i> - <i>that</i> offset
+   * @return <i>that.address()</i> - <i>this.address()</i> offset
    * @throws UnsupportedOperationException if the two resources cannot be compared, e.g. because they are of
-     * different kinds, or because they are backed by different Java arrays.
+   * different kinds, or because they are backed by different Java arrays.
    */
   long getRelativeOffset(Resource that);
 

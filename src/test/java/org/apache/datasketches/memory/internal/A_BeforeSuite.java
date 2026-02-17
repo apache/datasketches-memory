@@ -19,20 +19,15 @@
 
 package org.apache.datasketches.memory.internal;
 
-public class UtilForTest {
+import org.testng.annotations.BeforeSuite;
 
-  //Java does not provide reverse bytes on doubles or floats
+public class A_BeforeSuite {
 
-  static double doubleReverseBytes(double value) {
-    long longIn = Double.doubleToRawLongBits(value);
-    long longOut = Long.reverseBytes(longIn);
-    return Double.longBitsToDouble(longOut);
+  @BeforeSuite
+  public void printTestEnvironment() {
+    System.out.println("====================================================");
+    System.out.println("TEST JDK: " + System.getProperty("java.version"));
+    System.out.println("TEST JDK HOME: " + System.getProperty("java.home"));
+    System.out.println("=====================================================");
   }
-
-  static float floatReverseBytes(float value) {
-    int intIn = Float.floatToRawIntBits(value);
-    int intOut = Integer.reverseBytes(intIn);
-    return Float.intBitsToFloat(intOut);
-  }
-
 }

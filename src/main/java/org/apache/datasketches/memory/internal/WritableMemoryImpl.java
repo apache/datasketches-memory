@@ -165,7 +165,7 @@ public abstract class WritableMemoryImpl extends ResourceImpl implements Writabl
    * @throws IllegalArgumentException if file is not readable.
    * @throws IOException if mapping is not successful.
    */
-  @SuppressWarnings({"resource","preview"})
+  @SuppressWarnings({"resource"})
   public static WritableMemory wrapMap(
       final File file,
       final long fileOffsetBytes,

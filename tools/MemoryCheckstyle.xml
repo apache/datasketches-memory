@@ -38,7 +38,7 @@ under the License.
   <property name="fileExtensions" value="java"/>
   <property name="basedir" value="${basedir}"/>
 
-  <!-- Exclude all module-info.java files 
+  <!-- Exclude all module-info.java files
        https://checkstyle.org/filefilters/beforeexecutionexclusionfilefilter.html#BeforeExecutionExclusionFileFilter -->
   <module name="BeforeExecutionExclusionFileFilter">
     <property name="fileNamePattern" value="module\-info\.java$"/>

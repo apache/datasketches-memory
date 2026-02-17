@@ -43,7 +43,7 @@ public interface WritableBuffer extends Buffer {
    * @param byteBuffer the given ByteBuffer. It must be non-null and writable.
    * @return a new <i>WritableBuffer</i> for write operations on the given <i>ByteBuffer</i>.
    */
-  static WritableBuffer writableWrap(ByteBuffer byteBuffer) {
+  static WritableBuffer writableWrap(final ByteBuffer byteBuffer) {
     return writableWrap(byteBuffer, byteBuffer.order(), null);
   }
 
@@ -63,9 +63,9 @@ public interface WritableBuffer extends Buffer {
    * @throws IllegalArgumentException if ByteBuffer is not writable
    */
   static WritableBuffer writableWrap(
-      ByteBuffer byteBuffer,
-      ByteOrder byteOrder,
-      MemoryRequestServer memReqSvr) {
+      final ByteBuffer byteBuffer,
+      final ByteOrder byteOrder,
+      final MemoryRequestServer memReqSvr) {
     return WritableBufferImpl.wrapByteBuffer(byteBuffer, false, byteOrder, memReqSvr);
   }
 

@@ -113,6 +113,7 @@ abstract class ResourceImpl implements Resource {
    * Warning: This class is not thread-safe. Specifying an Arena that allows multiple threads is not recommended.
    */
   ResourceImpl(final MemorySegment seg, final int typeId, final MemoryRequestServer memReqSvr, final Arena arena) {
+    Objects.requireNonNull(seg, "MemorySegment must not be null");
     this.seg = seg;
     this.typeId = typeId;
     this.memReqSvr = memReqSvr;
@@ -305,8 +306,8 @@ abstract class ResourceImpl implements Resource {
     final StringBuilder sb = new StringBuilder();
     final int group1 = typeId & 0x7;
     switch (group1) { // 0000 0XXX
-      case 0 : sb.append(pad("Writable + ",32)); break;
-      case 1 : sb.append(pad("ReadOnly + ",32)); break;
+      case 0 : sb.append(pad("Writable + ",32)); break; //from seg
+      case 1 : sb.append(pad("ReadOnly + ",32)); break; //from seg
       case 2 : sb.append(pad("Writable + Region + ",32)); break;
       case 3 : sb.append(pad("ReadOnly + Region + ",32)); break;
       case 4 : sb.append(pad("Writable + Duplicate + ",32)); break;
@@ -317,10 +318,10 @@ abstract class ResourceImpl implements Resource {
     }
     final int group2 = (typeId >>> 3) & 0x3;
     switch (group2) { // 000X X000                            43
-      case 0 : sb.append(pad("Heap + ",15)); break;   //      00
-      case 1 : sb.append(pad("Direct + ",15)); break; //      01
-      case 2 : sb.append(pad("Map + Direct + ",15)); break; //10
-      case 3 : sb.append(pad("Map + Direct + ",15)); break; //11
+      case 0 : sb.append(pad("Heap + ",15)); break;   //      00 //from seg
+      case 1 : sb.append(pad("Direct + ",15)); break; //      01 //from seg
+      case 2 : sb.append(pad("Map + Direct + ",15)); break; //10 //from seg
+      case 3 : sb.append(pad("Map + Direct + ",15)); break; //11 //from seg
       default: break;
     }
     final int group3 = (typeId >>> 5) & 0x1;
@@ -371,6 +372,7 @@ abstract class ResourceImpl implements Resource {
   @Override
   public void force() { seg.force(); }
 
+  //Temporary during transition
   @Override
   public Arena getArena() { return arena; }
 
@@ -379,15 +381,14 @@ abstract class ResourceImpl implements Resource {
     return seg.byteSize();
   }
 
+  //Temporary during transition
   @Override
-  public MemorySegment getMemorySegment() {
-    return seg.asReadOnly();
-  }
+  public MemorySegment getMemorySegment() { return seg; }
 
   @Override
   public final long getRelativeOffset(final Resource that) {
     final ResourceImpl that2 = (ResourceImpl) that;
-    return this.seg.segmentOffset(that2.seg);
+    return that2.seg.address() - this.seg.address();
   }
 
   @Override

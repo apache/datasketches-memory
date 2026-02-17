@@ -121,7 +121,7 @@ final class Util {
     return (value & bitMask) != 0;
   }
 
-  //Resources mention: these 2 methods are duplicated in Java/ datasketches/Util
+  //Resources mention: these 2 methods are similar to DS-Java: datasketches/common/TestUtil
 
   /**
    * Gets the absolute path of the given resource file's shortName.

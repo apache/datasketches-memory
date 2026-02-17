@@ -51,7 +51,7 @@ public class AllocateDirectWritableMapMemoryTest {
   private final MemoryRequestServer memReqSvr = Resource.defaultMemReqSvr;
 
   @BeforeClass
-  public void setReadOnly() throws IOException {
+  public void setReadOnly() throws IllegalStateException {
     UtilTest.setGettysburgAddressFileToReadOnly();
   }
 
@@ -104,6 +104,7 @@ public class AllocateDirectWritableMapMemoryTest {
   }
 
   @Test
+  @SuppressWarnings("resource")
   public void checkNonNativeFile()
       throws IllegalArgumentException, InvalidPathException, IllegalStateException, UnsupportedOperationException,
       IOException, SecurityException {
@@ -149,6 +150,7 @@ public class AllocateDirectWritableMapMemoryTest {
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)
+  @SuppressWarnings("resource")
   public void checkReadException()
       throws IllegalArgumentException, InvalidPathException, IllegalStateException, UnsupportedOperationException,
       IOException, SecurityException {

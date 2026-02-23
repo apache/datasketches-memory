@@ -105,7 +105,8 @@ under the License.
     <maven-release-plugin.version>3.3.1</maven-release-plugin.version>
     <maven-source-plugin.version>3.4.0</maven-source-plugin.version>
     <maven-surefire-failsafe-plugins.version>3.5.4</maven-surefire-failsafe-plugins.version> <!-- for surefire, failsafe and surefire-report -->
-    <!--   org.apache.creadur plugins -->
+
+    <!--    org.apache.rat plugins -->
     <apache-rat-plugin.version>0.17</apache-rat-plugin.version> <!-- parent 37: 0.16.1 -->
 
     <!-- Not covered by Apache Parent POM-->
@@ -114,7 +115,6 @@ under the License.
     <!-- com.github maven plugins -->
     <coveralls-repo-token></coveralls-repo-token>
     <coveralls-maven-plugin.version>5.0.0</coveralls-maven-plugin.version>
-
 
     <!-- io.github plugins -->
     <git-commit-id-maven-plugin.version>9.0.2</git-commit-id-maven-plugin.version>
@@ -175,7 +175,7 @@ under the License.
               <configuration>
                 <rules>
                   <!-- The normal Java enforcer rule out of the box is toolchain unaware
-                  and is really only usefull for checking what java version is available
+                  and is really only useful for checking what java version is available
                   via the users shell environment. It does not check that the java compiler
                   version is sane or matches the java command version.
                   In the context of toolchains this rule is useless.
@@ -230,10 +230,10 @@ under the License.
             <show>public</show>
             <doclint>all,-missing</doclint>
            <additionalJOptions>
-              <additionalJOption>${jvm.mem}</additionalJOption>
-              <additionalJOption>${jvm.locale.language}</additionalJOption>
-              <additionalJOption>${jvm.locale.country}</additionalJOption>
-              <additionalJOption>${jvm.locale.encoding}</additionalJOption>
+              <additionalJOption>-J${jvm.mem}</additionalJOption>
+              <additionalJOption>-J${jvm.locale.language}</additionalJOption>
+              <additionalJOption>-J${jvm.locale.country}</additionalJOption>
+              <additionalJOption>-J${jvm.locale.encoding}</additionalJOption>
             </additionalJOptions>
           </configuration>
           <executions>
@@ -329,8 +329,7 @@ under the License.
           <configuration>
             <outputDirectory>${project.basedir}/rat</outputDirectory>
             <consoleOutput>true</consoleOutput>
-            <useDefaultExcludes>true</useDefaultExcludes>
-            <excludes>
+            <inputExcludes>
               <!-- rat uses .gitignore for excludes by default -->
               <inputExcludeStd>StandardCollection</inputExcludeStd>
               <inputExclude>**/*.yaml</inputExclude>
@@ -343,7 +342,7 @@ under the License.
               <inputExclude>LICENSE</inputExclude>
               <inputExclude>NOTICE</inputExclude>
               <inputExclude>**/*.code-workspace</inputExclude>
-            </excludes>
+            </inputExcludes>
           </configuration>
         </plugin>
 
@@ -387,63 +386,79 @@ under the License.
 
       </plugins>
     </pluginManagement>
+
     <plugins>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-toolchains-plugin</artifactId>
       </plugin>
+
       <plugin>
         <groupId>org.apache.rat</groupId>
         <artifactId>apache-rat-plugin</artifactId>
       </plugin>
+
       <plugin>
         <groupId>com.github.hazendaz.maven</groupId>
         <artifactId>coveralls-maven-plugin</artifactId>
       </plugin>
+
       <plugin>
         <groupId>io.github.git-commit-id</groupId>
         <artifactId>git-commit-id-maven-plugin</artifactId>
       </plugin>
+
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
       </plugin>
+
     </plugins>
   </build>
 
@@ -534,6 +549,7 @@ under the License.
                     <addBuildEnvironmentEntries>true</addBuildEnvironmentEntries>
                   </manifest>
                   <manifestEntries>
+                    <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
                     <GroupId-ArtifactId>${project.groupId}:${project.artifactId}</GroupId-ArtifactId>
                     <!-- these properties are generated by the git-commit-id-maven-plugin during initialize -->
                     <!--suppress UnresolvedMavenProperty -->

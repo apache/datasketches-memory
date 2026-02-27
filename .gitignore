@@ -1,0 +1,13 @@
+/bin/
+
+# IntelliJ project files
+*.idea
+**/*.iml
+*.ipr
+*.iws
+
+# VSCode project files
+**/.vscode/
+
+# OSX files
+**/.DS_Store

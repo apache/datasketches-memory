@@ -1,0 +1,56 @@
+name: Reusable JDK OS Matrix Logic
+
+on:
+  workflow_call:
+    inputs:
+      jdk_version:
+        required: true
+        type: string
+      os_type:
+        required: true
+        type: string
+      java_arch:
+        required: true
+        type: string
+
+env:
+  MAVEN_OPTS: -Xmx4g -Xms1g
+  MAVEN_ARGS: "-B -Dmaven.javadoc.skip=true -Dgpg.skip=true"
+
+jobs:
+  build:
+    name: Build (${{ inputs.os_type }}, JDK ${{ inputs.jdk_version }}, ${{ inputs.java_arch }})
+    runs-on: ${{ inputs.os_type }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install Matrix JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ inputs.jdk_version }}
+          distribution: 'temurin'
+          java-package: jdk
+          architecture: ${{ inputs.java_arch }}
+          cache: 'maven'
+          overwrite-settings: true
+
+      - name: Verify Toolchain Configuration
+        shell: bash
+        run: |
+          if [ -f ~/.m2/toolchains.xml ]; then
+            cat ~/.m2/toolchains.xml
+          else
+            echo "toolchains.xml not found in ~/.m2/"
+          fi
+
+      - name: Echo Java & Maven Version
+        run: mvn -version
+
+      - name: Test
+        run: mvn clean test
+
+      - name: Install
+        run: mvn clean install "-DskipTests=true" "-Dmaven.clean.failOnError=false"

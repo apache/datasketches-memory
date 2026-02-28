@@ -19,6 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         jdk: [ 25 ]
+        os: [ windows-latest, ubuntu-latest, macos-latest ]
         include:
           - os: windows-latest
             arch: x64

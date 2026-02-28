@@ -9,7 +9,11 @@ on:
     branches: [ 'main', '[0-9]+.[0-9]+.[Xx]', 'v[0-9]+.[0-9]+.[Xx]']
   workflow_dispatch: 
 
-jobs:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+    jobs:
   run-matrix:
     strategy:
       fail-fast: false

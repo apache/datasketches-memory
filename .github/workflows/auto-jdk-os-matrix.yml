@@ -13,7 +13,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-    jobs:
+jobs:
   run-matrix:
     strategy:
       fail-fast: false
@@ -33,3 +33,13 @@ concurrency:
       jdk_version: ${{ matrix.jdk }}
       os_type: ${{ matrix.os }}
       java_arch: ${{ matrix.arch }}
+
+  post-build-cleanup:
+    needs: run-matrix
+    runs-on: ubuntu-latest
+    if: always() # Runs even if the matrix failed (useful for reporting)
+    steps:
+      - name: Final Status Report
+        run: |
+          echo "Matrix execution finished with status: ${{ needs.run-matrix.result }}"
+          # Add actual cleanup commands here, like deleting temporary cloud resources

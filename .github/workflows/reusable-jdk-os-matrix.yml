@@ -56,7 +56,9 @@ jobs:
         run: mvn -version
 
       - name: Print Current Workflows
+        continue-on-error: true
         run: |
+          echo "Checking for workflow files..."
           echo "--- Reusable Workflow: ---"
           cat .github/workflow-logic/.github/workflows/reusable-jdk-os-matrix.yml || echo "::warning::Could not find Reusable Workflow file."
           echo "--- Caller Workflow: ---"

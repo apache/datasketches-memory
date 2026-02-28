@@ -69,3 +69,12 @@ jobs:
 
       - name: Install
         run: mvn clean install "-DskipTests=true" "-Dmaven.clean.failOnError=false"
+
+      - name: Generate Scalable Summary
+        if: always() # Ensures the report is written even if tests fail
+        run: |
+          echo "### 🖥️ Job Result: ${{ inputs.os_type }} | ${{ inputs.java_arch }}" >> $GITHUB_STEP_SUMMARY
+          echo "* **JDK Version:** ${{ inputs.jdk_version }}" >> $GITHUB_STEP_SUMMARY
+          echo "* **Build Status:** ${{ job.status == 'success' && '✅ Passed' || '❌ Failed' }}" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+

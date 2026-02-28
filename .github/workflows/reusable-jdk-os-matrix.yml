@@ -22,11 +22,17 @@ jobs:
     name: Build (${{ inputs.os_type }}, JDK ${{ inputs.jdk_version }}, ${{ inputs.java_arch }})
     runs-on: ${{ inputs.os_type }}
     steps:
-      - name: Checkout code
+      - name: Checkout Source code
         uses: actions/checkout@v4
         with:
           persist-credentials: false
 
+      - name: Checkout Workflow Logic (workflows branch)
+        uses: actions/checkout@v4
+        with:
+          ref: workflows
+          path: .github/workflow-logic
+          
       - name: Install Matrix JDK
         uses: actions/setup-java@v4
         with:
@@ -49,6 +55,13 @@ jobs:
       - name: Echo Java & Maven Version
         run: mvn -version
 
+        - name: Print Current Workflows
+          run: |
+            echo "Reusable Workflow:"
+            cat .github/workflow-logic/.github/workflows/reusable-jdk-os-matrix.yml
+            echo "Caller Workflow:"
+            cat .github/workflows/auto-jdk-os-matrix.yml
+          
       - name: Test
         run: mvn clean test
 

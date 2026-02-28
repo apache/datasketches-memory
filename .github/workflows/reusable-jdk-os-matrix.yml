@@ -32,7 +32,7 @@ jobs:
         with:
           ref: workflows
           path: .github/workflow-logic
-          
+
       - name: Install Matrix JDK
         uses: actions/setup-java@v4
         with:
@@ -55,13 +55,13 @@ jobs:
       - name: Echo Java & Maven Version
         run: mvn -version
 
-        - name: Print Current Workflows
-          run: |
-            echo "Reusable Workflow:"
-            cat .github/workflow-logic/.github/workflows/reusable-jdk-os-matrix.yml
-            echo "Caller Workflow:"
-            cat .github/workflows/auto-jdk-os-matrix.yml
-          
+      - name: Print Current Workflows
+        run: |
+          echo "Reusable Workflow:"
+          cat .github/workflow-logic/.github/workflows/reusable-jdk-os-matrix.yml
+          echo "Caller Workflow:"
+          cat .github/workflows/auto-jdk-os-matrix.yml
+
       - name: Test
         run: mvn clean test
 

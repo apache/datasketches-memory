@@ -18,8 +18,8 @@
 -->
 
 [![Build Status](https://travis-ci.org/apache/datasketches-memory.svg?branch=master)](https://travis-ci.org/apache/datasketches-memory)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.datasketches/datasketches-memory/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.apache.datasketches/datasketches-memory)
-[![Coverage Status](https://coveralls.io/repos/github/apache/datasketches-memory/badge.svg?branch=master)](https://coveralls.io/github/apache/datasketches-memory?branch=master)
+[![Maven Central](https://img.shields.io/maven-central/v/org.apache.datasketches/datasketches-memory)](https://central.sonatype.com/artifact/org.apache.datasketches/datasketches-memory)
+[![Coverage Status](https://coveralls.io/repos/github/apache/datasketches-memory/badge.svg?branch=main)](https://coveralls.io/github/apache/datasketches-memory?branch=main)
 
 =================
 

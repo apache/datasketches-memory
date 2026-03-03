@@ -19,9 +19,10 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<suppressions>
-  <!-- Tone down the checking for test code -->
-  <suppress checks="FinalLocalVariable" files=".*[\\/]src[\\/](test|it)[\\/]"/>
-  <suppress checks="AvoidEscapedUnicodeCharacters" files=".*[\\/]src[\\/](test|it)[\\/]"/>
-  <suppress checks="JavadocPackage" files=".*[\\/]src[\\/](test|it)[\\/]"/>
-</suppressions>
+<suite name="MemorySuite">
+    <test name="AllMemoryTests">
+        <packages>
+            <package name="org.apache.datasketches.memory.*" />
+        </packages>
+    </test>
+</suite>

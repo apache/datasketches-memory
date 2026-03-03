@@ -227,6 +227,7 @@ under the License.
           <version>${maven-javadoc-plugin.version}</version>
           <configuration>
             <excludePackageNames>org.apache.datasketches.memory/internal</excludePackageNames>
+            <outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
             <docfilessubdirs>true</docfilessubdirs>
             <show>public</show>
             <doclint>all,-missing</doclint>

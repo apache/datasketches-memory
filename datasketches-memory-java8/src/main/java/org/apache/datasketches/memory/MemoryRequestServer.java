@@ -44,7 +44,7 @@ public interface MemoryRequestServer {
    *
    * @param memToClose the relevant WritableMemory to be considered for closing. It must be non-null.
    */
-  default void requestClose(WritableMemory memToClose) {
+  default void requestClose(final WritableMemory memToClose) {
     requestClose(memToClose, null);
   }
   

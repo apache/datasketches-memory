@@ -1,0 +1,36 @@
+name: Auto JDK & OS Matrix Test & Install
+
+on:
+  push:
+    paths-ignore: [ '**/*.html', '**/*.md', '**/*.txt', '**/LICENSE', '**/NOTICE' ]
+    branches: [ 'main', '[0-9]+.[0-9]+.[Xx]', 'v[0-9]+.[0-9]+.[Xx]']
+  pull_request:
+    paths-ignore: [ '**/*.html', '**/*.md', '**/*.txt', '**/LICENSE', '**/NOTICE' ]
+    branches: [ 'main', '[0-9]+.[0-9]+.[Xx]', 'v[0-9]+.[0-9]+.[Xx]']
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  run-matrix:
+    strategy:
+      fail-fast: false
+      matrix:
+        jdk: [ 8 ]
+        os: [ windows-latest, ubuntu-latest, macos-latest ]
+        include:
+          - os: windows-latest
+            arch: x64
+          - os: ubuntu-latest
+            arch: x64
+          - os: macos-latest
+            arch: aarch64
+
+    # Reference the reusable workflow on the "workflows" branch
+    uses: apache/datasketches-memory/.github/workflows/reusable-jdk-os-matrix.yml@workflows
+    with:
+      jdk_version: ${{ matrix.jdk }}
+      os_type: ${{ matrix.os }}
+      java_arch: ${{ matrix.arch }}

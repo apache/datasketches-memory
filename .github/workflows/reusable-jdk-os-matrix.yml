@@ -23,18 +23,18 @@ jobs:
     runs-on: ${{ inputs.os_type }}
     steps:
       - name: Checkout Source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
 
       - name: Checkout Workflow Logic (workflows branch)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: workflows
           path: .github/workflow-logic
 
       - name: Install Matrix JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: ${{ inputs.jdk_version }}
           distribution: 'temurin'

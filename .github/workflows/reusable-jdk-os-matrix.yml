@@ -9,7 +9,10 @@ on:
       os_type:
         required: true
         type: string
-      java_arch:
+      cpu_arch:
+        required: true
+        type: string
+      jdk_distribution:
         required: true
         type: string
 
@@ -19,7 +22,7 @@ env:
 
 jobs:
   build:
-    name: Build (${{ inputs.os_type }}, JDK ${{ inputs.jdk_version }}, ${{ inputs.java_arch }})
+    name: Build (OS ${{ inputs.os_type }}, JDK ${{ inputs.jdk_version }}, CPU ${{ inputs.cpu_arch }}, DIST ${{ inputs.jdk_distribution }})
     runs-on: ${{ inputs.os_type }}
     steps:
       - name: Checkout Source code
@@ -37,9 +40,9 @@ jobs:
         uses: actions/setup-java@v5
         with:
           java-version: ${{ inputs.jdk_version }}
-          distribution: 'temurin'
+          architecture: ${{ inputs.cpu_arch }}
+          distribution: ${{ inputs.jdk_distribution }}
           java-package: jdk
-          architecture: ${{ inputs.java_arch }}
           cache: 'maven'
           overwrite-settings: true
 
@@ -75,8 +78,8 @@ jobs:
         shell: bash
         run: |
           # Define the header
-          HEADER="| OS | Arch | JDK | Status |"
-          SEP="|----|------|-----|--------|"
+          HEADER="| OS | Arch | JDK | DIST | Status |"
+          SEP="|----|------|-----|--------|-----|"
 
           # Check if the header already exists in the summary file
           if ! grep -q "$HEADER" "$GITHUB_STEP_SUMMARY"; then
@@ -85,5 +88,5 @@ jobs:
           fi
 
           # Append the specific job row
-          echo "| ${{ inputs.os_type }} | ${{ inputs.java_arch }} | ${{ inputs.jdk_version }} | ${{ job.status == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| ${{ inputs.os_type }} | ${{ inputs.cpu_arch }} | ${{ inputs.jdk_version }} | ${{ inputs.jdk_distribution }} | ${{ job.status == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
 

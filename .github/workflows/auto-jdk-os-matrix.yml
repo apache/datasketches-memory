@@ -35,3 +35,4 @@ jobs:
       os_type: ${{ matrix.os }}
       cpu_arch: ${{ matrix.arch }}
       jdk_distribution: 'temurin'
+      jvm_args: ""

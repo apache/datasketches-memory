@@ -34,5 +34,5 @@ jobs:
       jdk_version: ${{ matrix.jdk }}
       os_type: ${{ matrix.os }}
       cpu_arch: ${{ matrix.arch }}
-      jdk_distribution: 'temurin'
+      jdk_distribution: 'zulu'
       jvm_args: ""

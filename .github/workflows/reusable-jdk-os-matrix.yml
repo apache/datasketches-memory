@@ -15,14 +15,25 @@ on:
       jdk_distribution:
         required: true
         type: string
+      jvm_args:
+        required: false
+        type: string
+        default: ""
 
 env:
+  JVM_ARGS: ${{ inputs.jvm_args }}
   MAVEN_OPTS: -Xmx4g -Xms1g
-  MAVEN_ARGS: "-B -Dmaven.javadoc.skip=true -Dgpg.skip=true"
+  MAVEN_ARGS: "-B -Dmaven.javadoc.skip=true -Dgpg.skip=true -ntp"
+  # -ntp (no-transfer-progress) hides the "Downloaded..." lines
 
 jobs:
   build:
-    name: Build (OS ${{ inputs.os_type }}, JDK ${{ inputs.jdk_version }}, CPU ${{ inputs.cpu_arch }}, DIST ${{ inputs.jdk_distribution }})
+    name: >
+      Build (OS ${{ inputs.os_type }}, 
+      JDK ${{ inputs.jdk_version }}, 
+      CPU ${{ inputs.cpu_arch }}, 
+      DIST ${{ inputs.jdk_distribution }}),
+      JVM_ARGS ${{ inputs.jvm_args }}
     runs-on: ${{ inputs.os_type }}
     steps:
       - name: Checkout Source code
@@ -66,12 +77,14 @@ jobs:
           cat .github/workflow-logic/.github/workflows/reusable-jdk-os-matrix.yml || echo "::warning::Could not find Reusable Workflow file."
           echo "--- Caller Workflow: ---"
           cat .github/workflows/auto-jdk-os-matrix.yml || echo "::warning::Could not find Caller Workflow file."
+          echo "--- JVM ARGS ---"
+          echo "${{ env.JVM_ARGS }}"
 
       - name: Test
-        run: mvn clean test
+        run: mvn clean test -DargLine="${{ env.JVM_ARGS }}"
 
       - name: Install
-        run: mvn clean install "-DskipTests=true" "-Dmaven.clean.failOnError=false"
+        run: mvn clean install "-DskipTests=true" "-Dmaven.clean.failOnError=false" "-DargLine=${{ env.JVM_ARGS }}"
 
       - name: Add Result to Summary
         if: always()

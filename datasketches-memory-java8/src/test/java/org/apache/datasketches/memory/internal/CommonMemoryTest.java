@@ -93,7 +93,6 @@ public class CommonMemoryTest {
   }
 
   public static void setGetArraysTests(WritableMemory mem) {
-    int accessCapacity = (int)mem.getCapacity();
 
     int words = 4;
 

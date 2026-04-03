@@ -17,8 +17,11 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -31,6 +34,14 @@ under the License.
   <description>High-performance native memory access.</description>
   <url>https://datasketches.apache.org/</url>
   <inceptionYear>2015</inceptionYear>
+  
+  <licenses>
+    <license>
+      <name>Apache-2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
   <mailingLists>
     <mailingList>
@@ -56,6 +67,19 @@ under the License.
     <tag>HEAD</tag>
   </scm>
 
+  <distributionManagement>
+    <repository>
+      <id>apache.releases.https</id>
+      <name>Apache Release Distribution Repository</name>
+      <url>https://repository.apache.org/service/local/staging/deploy/maven2</url>
+    </repository>
+    <snapshotRepository>
+      <id>apache.snapshots.https</id>
+      <name>Apache Development Snapshot Repository</name>
+      <url>https://repository.apache.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
+
   <issueManagement>
     <system>GitHub</system>
     <url>https://github.com/apache/${project.artifactId}/issues</url>
@@ -71,26 +95,13 @@ under the License.
     </developer>
   </developers>
 
-  <!--
-       NOTICE:
-       The datasketches-memory submodule uses the Maven project-aggregation feature and does not inherit
-       from this root module as a parent; so that there is no runtime dependency on the parent project (root module).
-       As a result, some properties from this POM (including the version) are duplicated in the datasketches-memory
-       module for inclusion in the assembled artifacts.  For more information, see:
-       https://maven.apache.org/guides/introduction/introduction-to-the-pom.html#Project_Aggregation -->
-
-
   <properties>
-    <!-- Used for xxHash testing -->
-    <zero-allocation-hashing.version>0.16</zero-allocation-hashing.version>
-
     <!-- Test -->
     <testng.version>7.5.1</testng.version>
 
     <!-- System-wide properties -->
-    <maven.version>3.6.3</maven.version>
+    <maven.version>3.9.12</maven.version>
     <java.version>8</java.version>
-    <jdk-toolchain.version>8</jdk-toolchain.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <jvm.mem>-Xmx4g</jvm.mem>
@@ -99,13 +110,15 @@ under the License.
     <jvm.locale.encoding>-Dfile.encoding=UTF-8</jvm.locale.encoding>
     <jvm.args>${jvm.mem} ${jvm.locale.language} ${jvm.locale.country} ${jvm.locale.encoding}</jvm.args>
     <charset.encoding>UTF-8</charset.encoding>
+    <project.build.outputTimestamp>2026-01-09T19:00:20Z</project.build.outputTimestamp>
     <project.build.sourceEncoding>${charset.encoding}</project.build.sourceEncoding>
     <project.build.resourceEncoding>${charset.encoding}</project.build.resourceEncoding>
+    <project.reporting.inputEncoding>${charset.encoding}</project.reporting.inputEncoding>
     <project.reporting.outputEncoding>${charset.encoding}</project.reporting.outputEncoding>
     <project.reporting.outputDirectory>${project.build.directory}/site</project.reporting.outputDirectory>
     <maven.build.timestamp.format>yyyy-MM-dd'T'HH-mm-ss'Z'</maven.build.timestamp.format>
 
-    <!--    org.apache.maven plugins -->
+    <!--  org.apache.maven plugins -->
     <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
     <maven-deploy-plugin.version>3.1.4</maven-deploy-plugin.version>
     <maven-enforcer-plugin.version>3.6.2</maven-enforcer-plugin.version>
@@ -114,14 +127,13 @@ under the License.
     <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
     <maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
     <maven-release-plugin.version>3.3.1</maven-release-plugin.version>
-    <maven-remote-resources-plugin.version>3.2.0</maven-remote-resources-plugin.version>
     <maven-source-plugin.version>3.4.0</maven-source-plugin.version>
-    <maven-surefire-failsafe-plugin.version>3.5.4</maven-surefire-failsafe-plugin.version> <!-- for surefire, failsafe and surefire-report -->
+    <maven-surefire-failsafe-plugins.version>3.5.4</maven-surefire-failsafe-plugins.version> <!-- surefire, failsafe, surefire-report -->
     <maven-toolchains-plugin.version>3.2.0</maven-toolchains-plugin.version>
-    
-    <!--    org.apache.rat plugins -->
-    <apache-rat-plugin.version>0.16.1</apache-rat-plugin.version>
-    
+
+    <!--  org.apache.rat plugins -->
+    <apache-rat-plugin.version>0.17</apache-rat-plugin.version>
+
     <!-- com.github maven plugins -->
     <coveralls-repo-token></coveralls-repo-token>
     <coveralls-maven-plugin.version>5.0.0</coveralls-maven-plugin.version>
@@ -132,22 +144,24 @@ under the License.
     <!-- org.jacoco.maven plugins -->
     <jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
 
-    <!-- org.mojohaus plugins -->
-    <exec-maven-plugin.version>3.3.0</exec-maven-plugin.version>
-    
     <!-- other -->
     <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
-    
+
+    <!-- org.mojohaus plugins -->
+    <exec-maven-plugin.version>3.3.0</exec-maven-plugin.version>
+
+    <!-- Used for xxHash testing -->
+    <zero-allocation-hashing.version>0.16</zero-allocation-hashing.version>
+
     <maven.deploy.skip>true</maven.deploy.skip>
-    <maven.install.skip>true</maven.install.skip>
     <maven.javadoc.skip>true</maven.javadoc.skip>
   </properties>
-
+  
   <repositories>
     <repository>
       <id>apache.snapshots</id>
       <name>Apache Snapshot Repository</name>
-      <url>https://repository.apache.org/content/groups/snapshots/org/apache/datasketches/</url>
+      <url>https://repository.apache.org/content/groups/snapshots</url>
       <releases>
         <enabled>false</enabled>
       </releases>
@@ -158,7 +172,7 @@ under the License.
     <repository>
       <id>apache</id>
       <name>Apache Releases Repository</name>
-      <url>https://repository.apache.org/content/repositories/releases/org/apache/datasketches/</url>
+      <url>https://repository.apache.org/content/groups/public</url>
       <releases>
         <enabled>true</enabled>
       </releases>
@@ -192,11 +206,32 @@ under the License.
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>3.6.0</version>
+          <dependencies>
+            <dependency>
+              <groupId>com.puppycrawl.tools</groupId>
+              <artifactId>checkstyle</artifactId>
+              <version>13.4.0</version>
+            </dependency>
+          </dependencies>
+          <configuration>
+            <jdkToolchain>
+              <version>25</version> <!-- only for the checkstyle core runtime -->
+            </jdkToolchain>
+            <configLocation>tools/SketchesCheckstyle.xml</configLocation>
+            <consoleOutput>true</consoleOutput>
+            <failsOnError>true</failsOnError>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>${maven-compiler-plugin.version}</version>
           <configuration>
             <jdkToolchain>
-              <version>${jdk-toolchain.version}</version>
+              <version>${java.version}</version>
             </jdkToolchain>
           </configuration>
         </plugin>
@@ -211,8 +246,42 @@ under the License.
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-release-plugin</artifactId>
-          <version>${maven-release-plugin.version}</version>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>${maven-enforcer-plugin.version}</version>
+          <executions>
+            <execution>
+              <id>enforce-banned-dependencies</id>
+              <goals>
+                <goal>enforce</goal>
+              </goals>
+              <configuration>
+                <rules>
+                  <!-- The Java enforcer rule is toolchain unaware
+                  and is only checks the compiler used by the Maven runtime.
+                  In the context of toolchains this rule is useless.
+                  See: https://github.com/paulmoloney/maven-enforcer-toolchain-rules
+                  <requireJavaVersion> ... </requireJavaVersion>
+                  -->
+                  <requireMavenVersion>
+                    <version>[${maven.version},4.0.0)</version>
+                  </requireMavenVersion>
+                  <bannedDependencies>
+                    <excludes>
+                      <!--LGPL licensed library-->
+                      <exclude>com.google.code.findbugs:annotations</exclude>
+                    </excludes>
+                  </bannedDependencies>
+                </rules>
+                <fail>true</fail>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>${maven-install-plugin.version}</version>
         </plugin>
 
         <plugin>
@@ -245,7 +314,7 @@ under the License.
             <docfilessubdirs>true</docfilessubdirs>
             <doclint>none</doclint>
             <jdkToolchain>
-              <version>${jdk-toolchain.version}</version>
+              <version>${java.version}</version>
             </jdkToolchain>
             <excludePackageNames>org.apache.datasketches.memory.internal</excludePackageNames>
           </configuration>
@@ -262,38 +331,65 @@ under the License.
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-enforcer-plugin</artifactId>
-          <version>${maven-enforcer-plugin.version}</version>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>${maven-release-plugin.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>${maven-source-plugin.version}</version>
           <executions>
             <execution>
-              <id>enforce-banned-dependencies</id>
+              <id>attach-sources</id>
+              <phase>package</phase>
               <goals>
-                <goal>enforce</goal>
+                <goal>jar-no-fork</goal>
               </goals>
-              <configuration>
-                <rules>
-                  <!-- The normal Java enforcer rule out of the box is toolchain unaware
-                  and is really only useful for checking what java version is available
-                  via the users shell environment. It does not check that the java compiler
-                  version is sane or matches the java command version.
-                  In the context of toolchains this rule is useless.
-                  See: https://github.com/paulmoloney/maven-enforcer-toolchain-rules
-                  <requireJavaVersion> ... </requireJavaVersion>
-                  -->
-                  <requireMavenVersion>
-                    <version>[${maven.version},4.0.0)</version>
-                  </requireMavenVersion>
-                  <bannedDependencies>
-                    <excludes>
-                      <!--LGPL licensed library-->
-                      <exclude>com.google.code.findbugs:annotations</exclude>
-                    </excludes>
-                  </bannedDependencies>
-                </rules>
-                <fail>true</fail>
-              </configuration>
+            </execution>
+            <execution>
+              <id>attach-test-sources</id>
+              <phase>package</phase>
+              <goals>
+                <goal>test-jar-no-fork</goal>
+              </goals>
             </execution>
           </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${maven-surefire-failsafe-plugins.version}</version>
+          <configuration>
+            <trimStackTrace>false</trimStackTrace>
+            <useManifestOnlyJar>false</useManifestOnlyJar>
+            <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            <jdkToolchain>
+              <version>${jdk-toolchain.version}</version>
+            </jdkToolchain>
+            <reportsDirectory>${project.build.directory}/test-output/${maven.build.timestamp}</reportsDirectory>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-toolchains-plugin</artifactId>
+          <version>${maven-toolchains-plugin.version}</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>toolchain</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <toolchains>
+              <jdk>
+                <version>${java.version}</version>
+              </jdk>
+            </toolchains>
+          </configuration>
         </plugin>
 
         <plugin>
@@ -330,63 +426,6 @@ under the License.
         </plugin>
 
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-source-plugin</artifactId>
-          <version>${maven-source-plugin.version}</version>
-          <executions>
-            <execution>
-              <id>attach-sources</id>
-              <phase>package</phase>
-              <goals>
-                <goal>jar-no-fork</goal>
-              </goals>
-            </execution>
-            <execution>
-              <id>attach-test-sources</id>
-              <phase>package</phase>
-              <goals>
-                <goal>test-jar-no-fork</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>${maven-surefire-failsafe-plugin.version}</version>
-          <configuration>
-            <trimStackTrace>false</trimStackTrace>
-            <useManifestOnlyJar>false</useManifestOnlyJar>
-            <redirectTestOutputToFile>true</redirectTestOutputToFile>
-            <jdkToolchain>
-              <version>${jdk-toolchain.version}</version>
-            </jdkToolchain>
-            <reportsDirectory>${project.build.directory}/test-output/${maven.build.timestamp}</reportsDirectory>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-toolchains-plugin</artifactId>
-          <version>${maven-toolchains-plugin.version}</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>toolchain</goal>
-              </goals>
-            </execution>
-          </executions>
-          <configuration>
-            <toolchains>
-              <jdk>
-                <version>${java.version}</version> <!-- [8,9),[11,12) -->
-              </jdk>
-            </toolchains>
-          </configuration>
-        </plugin>
-
-        <plugin>
           <!-- Generates code coverage report from website. -->
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
@@ -413,8 +452,6 @@ under the License.
             <jacocoReports>${maven.multiModuleProjectDirectory}/datasketches-memory-java8/target/site/jacoco/jacoco.xml</jacocoReports>
           </configuration>
         </plugin>
-
-
 
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -468,41 +505,10 @@ under the License.
     </plugins>
   </build>
 
-  <profiles>
-
-    <profile>
-      <id>only-eclipse</id>
-      <activation>
-        <property>
-          <name>m2e.version</name>
-        </property>
-      </activation>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-remote-resources-plugin</artifactId>
-              <version>${maven-remote-resources-plugin.version}</version>
-              <executions>
-                <execution>
-                  <id>process-resource-bundles</id>
-                  <phase>none</phase>
-                </execution>
-              </executions>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-
-  </profiles>
-
-  <!-- This Maven project is divided into an aggregator project (the root), that manages a group of submodules that
-       inherit configuration from this root module.
-       A multi-module project is used to target different version-specific features of the Java language APIs.
-       Furthermore, it is a structure that is supported in most IDEs allowing minimal disruption to developers that
-       contribute to this project -->
+  <!-- This project utilizes both Project Inheritance and Project Aggregation. It is divided into an 
+       aggregator project (the root), that manages a group of submodules that inherit configuration from this root.
+       The submodules target different version-specific features of the Java language APIs.
+  -->
   <modules>
     <module>datasketches-memory-java8</module>
     <module>datasketches-memory-java11</module>

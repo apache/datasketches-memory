@@ -67,7 +67,7 @@ under the License.
     <tag>HEAD</tag>
   </scm>
 
-  <distributionManagement>
+  <distributionManagement> <!-- May not need this -->
     <repository>
       <id>apache.releases.https</id>
       <name>Apache Release Distribution Repository</name>
@@ -138,6 +138,9 @@ under the License.
     <coveralls-repo-token></coveralls-repo-token>
     <coveralls-maven-plugin.version>5.0.0</coveralls-maven-plugin.version>
 
+    <!-- org.mojohaus plugins, used by java11 sub-module -->
+    <exec-maven-plugin.version>3.6.3</exec-maven-plugin.version>
+
     <!-- io.github plugins -->
     <git-commit-id-maven-plugin.version>9.0.2</git-commit-id-maven-plugin.version>
 
@@ -147,11 +150,8 @@ under the License.
     <!-- other -->
     <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
 
-    <!-- org.mojohaus plugins -->
-    <exec-maven-plugin.version>3.3.0</exec-maven-plugin.version>
-
     <!-- Used for xxHash testing -->
-    <zero-allocation-hashing.version>0.16</zero-allocation-hashing.version>
+    <zero-allocation-hashing.version>2026.0</zero-allocation-hashing.version>
 
     <maven.deploy.skip>true</maven.deploy.skip>
     <maven.javadoc.skip>true</maven.javadoc.skip>
@@ -206,39 +206,15 @@ under the License.
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>3.6.0</version>
-          <dependencies>
-            <dependency>
-              <groupId>com.puppycrawl.tools</groupId>
-              <artifactId>checkstyle</artifactId>
-              <version>13.4.0</version>
-            </dependency>
-          </dependencies>
-          <configuration>
-            <jdkToolchain>
-              <version>25</version> <!-- only for the checkstyle core runtime -->
-            </jdkToolchain>
-            <configLocation>tools/SketchesCheckstyle.xml</configLocation>
-            <consoleOutput>true</consoleOutput>
-            <failsOnError>true</failsOnError>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>${maven-compiler-plugin.version}</version>
           <configuration>
-            <jdkToolchain>
-              <version>${java.version}</version>
-            </jdkToolchain>
+            <fork>true</fork> <!-- required if Maven is using a different JVM -->
           </configuration>
         </plugin>
 
         <plugin>
-          <!-- We want to deploy the artifacts to a staging location for perusal -->
-          <!-- Apache Parent pom: apache-release profile -->
+          <!-- We want to deploy the artifacts to a staging location for perusal, not sure we need this. -->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
           <version>${maven-deploy-plugin.version}</version>
@@ -311,11 +287,16 @@ under the License.
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>${maven-javadoc-plugin.version}</version>
           <configuration>
+            <outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
             <docfilessubdirs>true</docfilessubdirs>
-            <doclint>none</doclint>
-            <jdkToolchain>
-              <version>${java.version}</version>
-            </jdkToolchain>
+            <show>public</show>
+            <doclint>none</doclint> <!-- use Checkstyle -->
+            <additionalJOptions>
+              <additionalJOption>-J${jvm.mem}</additionalJOption>
+              <additionalJOption>-J${jvm.locale.language}</additionalJOption>
+              <additionalJOption>-J${jvm.locale.country}</additionalJOption>
+              <additionalJOption>-J${jvm.locale.encoding}</additionalJOption>
+            </additionalJOptions>
             <excludePackageNames>org.apache.datasketches.memory.internal</excludePackageNames>
           </configuration>
           <executions>
@@ -329,7 +310,7 @@ under the License.
           </executions>
         </plugin>
 
-        <plugin>
+        <plugin> <!-- not sure we need this -->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
           <version>${maven-release-plugin.version}</version>
@@ -362,13 +343,12 @@ under the License.
           <artifactId>maven-surefire-plugin</artifactId>
           <version>${maven-surefire-failsafe-plugins.version}</version>
           <configuration>
+            <argLine>@{argLine} @{jvm.args}</argLine>
             <trimStackTrace>false</trimStackTrace>
             <useManifestOnlyJar>false</useManifestOnlyJar>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
-            <jdkToolchain>
-              <version>${jdk-toolchain.version}</version>
-            </jdkToolchain>
             <reportsDirectory>${project.build.directory}/test-output/${maven.build.timestamp}</reportsDirectory>
+            <perCoreThreadCount>false</perCoreThreadCount>
           </configuration>
         </plugin>
 
@@ -411,18 +391,35 @@ under the License.
             <excludes>
               <exclude>**/*.yaml</exclude>
               <exclude>**/*.yml</exclude>
-              <exclude>**/toolchains.xml</exclude>
               <exclude>**/.*</exclude>
               <exclude>**/.clover/**/*</exclude>
               <exclude>**/test/resources/**/*.txt</exclude>
               <exclude>**/test-output/**/*</exclude>
-              <exclude>**/img/**/*.png</exclude>
               <exclude>**/git.properties</exclude>
               <exclude>**/scripts/assets/LoremIpsum.txt</exclude>
               <exclude>LICENSE</exclude>
               <exclude>NOTICE</exclude>
             </excludes>
           </configuration>
+        </plugin>
+
+        <plugin>
+          <!-- Submit code coverage report to Coveralls.io. -->
+          <groupId>com.github.hazendaz.maven</groupId>
+          <artifactId>coveralls-maven-plugin</artifactId>
+          <version>${coveralls-maven-plugin.version}</version>
+          <configuration>
+            <!--suppress UnresolvedMavenProperty -->
+            <repoToken>${coveralls-repo-token}</repoToken>
+            <!--suppress UnresolvedMavenProperty -->
+            <jacocoReports>${session.rootDirectory}/datasketches-memory-java8/target/site/jacoco/jacoco.xml</jacocoReports>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>io.github.git-commit-id</groupId>
+          <artifactId>git-commit-id-maven-plugin</artifactId>
+          <version>${git-commit-id-maven-plugin.version}</version>
         </plugin>
 
         <plugin>
@@ -437,20 +434,14 @@ under the License.
                 <goal>prepare-agent</goal>
               </goals>
             </execution>
+            <execution>
+              <id>default-report</id>
+              <phase>test</phase>
+              <goals>
+                <goal>report</goal>
+              </goals>
+            </execution>
           </executions>
-        </plugin>
-
-        <plugin>
-          <!-- Submit code coverage report to Coveralls.io. -->
-          <groupId>com.github.hazendaz.maven</groupId>
-          <artifactId>coveralls-maven-plugin</artifactId>
-          <version>${coveralls-maven-plugin.version}</version>
-          <configuration>
-            <!--suppress UnresolvedMavenProperty -->
-            <repoToken>${coveralls-repo-token}</repoToken>
-            <!--suppress UnresolvedMavenProperty -->
-            <jacocoReports>${maven.multiModuleProjectDirectory}/datasketches-memory-java8/target/site/jacoco/jacoco.xml</jacocoReports>
-          </configuration>
         </plugin>
 
         <plugin>
@@ -461,47 +452,74 @@ under the License.
 
       </plugins>
     </pluginManagement>
+
     <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-release-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
       </plugin>
+
       <plugin>
-        <groupId>org.apache.rat</groupId>
-        <artifactId>apache-rat-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
       </plugin>
+
       <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-toolchains-plugin</artifactId>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+      </plugin>
+
       <plugin>
         <groupId>com.github.hazendaz.maven</groupId>
         <artifactId>coveralls-maven-plugin</artifactId>
       </plugin>
+
+      <plugin>
+        <groupId>io.github.git-commit-id</groupId>
+        <artifactId>git-commit-id-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+      </plugin>
+
     </plugins>
   </build>
 

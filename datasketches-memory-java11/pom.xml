@@ -48,6 +48,7 @@ under the License.
           <artifactId>maven-compiler-plugin</artifactId>
           <version>${maven-compiler-plugin.version}</version>
           <configuration>
+            <fork>true</fork> <!-- required if Maven is using a different JVM -->
             <compilerArgs>
               <arg>--add-exports</arg>
               <arg>java.base/jdk.internal.ref=org.apache.datasketches.memory</arg>
@@ -56,6 +57,26 @@ under the License.
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-toolchains-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>toolchain</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <toolchains>
+            <jdk>
+              <version>${java.version}</version>
+            </jdk>
+          </toolchains>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
 
   <profiles>
@@ -67,10 +88,10 @@ under the License.
         </property>
       </activation>
       <properties>
-        <assembly.script.path>${maven.multiModuleProjectDirectory}/tools/scripts/package-multi-release-jar.sh</assembly.script.path>
+        <assembly.script.path>${session.rootDirectory}/tools/scripts/package-multi-release-jar.sh</assembly.script.path>
         <assembly.java.home>${env.JAVA_HOME}</assembly.java.home>
         <assembly.git.tag>${project.version}</assembly.git.tag>
-        <assembly.base.dir>${maven.multiModuleProjectDirectory}</assembly.base.dir>
+        <assembly.base.dir>${session.rootDirectory}</assembly.base.dir>
       </properties>
       <build>
         <defaultGoal>exec:exec</defaultGoal>
@@ -79,7 +100,7 @@ under the License.
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
             <!-- The trailing comment on the line below ignores an eclipse warning. The version is required for dependency updates. -->
-            <version>${exec-maven-plugin.version}</version><!--$NO-MVN-MAN-VER$-->
+            <version>${exec-maven-plugin.version}</version><!--$NO-MVN-MAN-VER$--> <!-- ?? -->
             <executions>
               <execution>
                 <id>package-mr-jar</id>

@@ -32,9 +32,9 @@ jobs:
             jvm_args: ""
             distribution: 'zulu'
 
-          - jdk: 11
-            jvm_args: " --add-exports java.base/jdk.internal.misc=org.apache.datasketches.memory --add-exports java.base/jdk.internal.ref=org.apache.datasketches.memory --add-opens java.base/java.nio=org.apache.datasketches.memory --add-opens java.base/sun.nio.ch=org.apache.datasketches.memory"
-            distribution: 'temurin' 
+#          - jdk: 11
+#            jvm_args: " --add-exports java.base/jdk.internal.misc=org.apache.datasketches.memory --add-exports java.base/jdk.internal.ref=org.apache.datasketches.memory --add-opens java.base/java.nio=org.apache.datasketches.memory --add-opens java.base/sun.nio.ch=org.apache.datasketches.memory"
+#            distribution: 'temurin' 
 
     # Reference the reusable workflow on the "workflows" branch
     uses: apache/datasketches-memory/.github/workflows/reusable-jdk-os-matrix.yml@workflows

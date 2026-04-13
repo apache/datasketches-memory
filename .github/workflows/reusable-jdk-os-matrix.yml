@@ -50,7 +50,13 @@ jobs:
       - name: Install Matrix JDK
         uses: actions/setup-java@v5
         with:
-          java-version: ${{ inputs.jdk_version }}
+          java-version: |
+            8
+            11
+            17
+            21
+            25
+            ${{ inputs.jdk_version }}
           architecture: ${{ inputs.cpu_arch }}
           distribution: ${{ inputs.jdk_distribution }}
           java-package: jdk

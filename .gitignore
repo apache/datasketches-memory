@@ -5,6 +5,7 @@ datasketches-memory*/.gitignore
 .classpath
 .project
 .settings/
+.factorypath
 .checkstyle
 
 # IntelliJ project files

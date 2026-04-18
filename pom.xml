@@ -392,6 +392,7 @@ under the License.
               <exclude>**/*.yaml</exclude>
               <exclude>**/*.yml</exclude>
               <exclude>**/.*</exclude>
+              <exclude>**/_*</exclude>
               <exclude>**/.clover/**/*</exclude>
               <exclude>**/test/resources/**/*.txt</exclude>
               <exclude>**/test-output/**/*</exclude>

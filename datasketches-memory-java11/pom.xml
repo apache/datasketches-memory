@@ -17,8 +17,10 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -37,28 +39,57 @@ under the License.
     <jdk-toolchain.version>11</jdk-toolchain.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
-    <maven.javadoc.skip>true</maven.javadoc.skip>
+    <maven.javadoc.skip>>true</maven.javadoc.skip>
+    <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
+    <!-- jdk.internal.misc is used to call public Unsafe & public VM -->
+    <arg.jdk.internal.misc>--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED</arg.jdk.internal.misc>
+    <!-- jdk.internal.ref is used to call public Cleaner -->
+    <arg.jdk.internal.ref>--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED</arg.jdk.internal.ref>
+    <!-- java.nio is used to open MappedByteBuffer load0, isloaded0, & force0 for reflection -->
+    <arg.java.nio>--add-opens=java.base/java.nio=ALL-UNNAMED</arg.java.nio>
+    <!-- sun.nio.ch is used to open FileChannelImpl for map0 & unmap0-->
+    <arg.sun.nio.ch>--add-opens=java.base/sun.nio.ch=ALL-UNNAMED</arg.sun.nio.ch>
   </properties>
 
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>${maven-compiler-plugin.version}</version>
-          <configuration>
-            <compilerArgs>
-              <arg>--add-exports</arg>
-              <arg>java.base/jdk.internal.ref=org.apache.datasketches.memory</arg>
-            </compilerArgs>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <fork>true</fork> <!-- required if Maven is using a different JVM -->
+          <compilerArgs>
+            <arg>${arg.jdk.internal.ref}</arg>
+            <arg>${arg.jdk.internal.misc}</arg>
+            <arg>${arg.java.nio}</arg>
+            <arg>${arg.sun.nio.ch}</arg>
+          </compilerArgs>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-toolchains-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>toolchain</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <toolchains>
+            <jdk>
+              <version>${java.version}</version>
+            </jdk>
+          </toolchains>
+        </configuration>
+      </plugin>
+     </plugins>
   </build>
 
   <profiles>
+
     <profile>
       <id>assemble-mr-jar</id>
       <activation>
@@ -67,10 +98,10 @@ under the License.
         </property>
       </activation>
       <properties>
-        <assembly.script.path>${maven.multiModuleProjectDirectory}/tools/scripts/package-multi-release-jar.sh</assembly.script.path>
+        <assembly.script.path>${session.rootDirectory}/tools/scripts/package-multi-release-jar.sh</assembly.script.path>
         <assembly.java.home>${env.JAVA_HOME}</assembly.java.home>
         <assembly.git.tag>${project.version}</assembly.git.tag>
-        <assembly.base.dir>${maven.multiModuleProjectDirectory}</assembly.base.dir>
+        <assembly.base.dir>${session.rootDirectory}</assembly.base.dir>
       </properties>
       <build>
         <defaultGoal>exec:exec</defaultGoal>
@@ -79,7 +110,7 @@ under the License.
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
             <!-- The trailing comment on the line below ignores an eclipse warning. The version is required for dependency updates. -->
-            <version>${exec-maven-plugin.version}</version><!--$NO-MVN-MAN-VER$-->
+            <version>${exec-maven-plugin.version}</version><!--$NO-MVN-MAN-VER$--> <!-- ?? -->
             <executions>
               <execution>
                 <id>package-mr-jar</id>
@@ -99,4 +130,11 @@ under the License.
     </profile>
   </profiles>
 
+  <dependencies>
+  	<dependency>
+  		<groupId>org.apache.datasketches</groupId>
+  		<artifactId>datasketches-memory-java8</artifactId>
+  		<version>3.0.2</version>
+  	</dependency>
+  </dependencies>
 </project>

@@ -17,8 +17,11 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -31,6 +34,14 @@ under the License.
   <description>High-performance native memory access.</description>
   <url>https://datasketches.apache.org/</url>
   <inceptionYear>2015</inceptionYear>
+  
+  <licenses>
+    <license>
+      <name>Apache-2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
   <mailingLists>
     <mailingList>
@@ -41,11 +52,11 @@ under the License.
       <archive>https://mail-archives.apache.org/mod_mbox/datasketches-dev</archive>
     </mailingList>
     <mailingList>
-      <name>sketches-user</name>
-      <archive>https://groups.google.com/forum/#!forum/sketches-user</archive>
-      <subscribe>mailto:sketches-user%2Bsubscribe@googlegroups.com</subscribe>
-      <unsubscribe>mailto:sketches-user%2Bunsubscribe@googlegroups.com</unsubscribe>
-      <post>mailto:sketches-user@googlegroups.com</post>
+      <name>DataSketches Users</name>
+      <subscribe>user-subscribe@datasketches.apache.org</subscribe>
+      <unsubscribe>user-unsubscribe@datasketches.apache.org</unsubscribe>
+      <post>user@datasketches.apache.org</post>
+      <archive>https://mail-archives.apache.org/mod_mbox/datasketches-user</archive>
     </mailingList>
   </mailingLists>
 
@@ -56,9 +67,20 @@ under the License.
     <tag>HEAD</tag>
   </scm>
 
+  <distributionManagement> <!-- May not need this -->
+    <repository>
+      <id>apache.releases.https</id>
+      <name>Apache Release Distribution Repository</name>
+      <url>https://repository.apache.org/service/local/staging/deploy/maven2</url>
+    </repository>
+    <snapshotRepository>
+      <id>apache.snapshots.https</id>
+      <name>Apache Development Snapshot Repository</name>
+      <url>https://repository.apache.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
+
   <issueManagement>
-    <!-- <system>jira</system> --> 
-    <!-- <url>https://issues.apache.org/jira/browse/DATASKETCHES</url> -->
     <system>GitHub</system>
     <url>https://github.com/apache/${project.artifactId}/issues</url>
   </issueManagement>
@@ -73,73 +95,73 @@ under the License.
     </developer>
   </developers>
 
-  <!--
-       NOTICE:
-       The datasketches-memory submodule uses the Maven project-aggregation feature and does not inherit
-       from this root module as a parent; so that there is no runtime dependency on the parent project (root module).
-       As a result, some properties from this POM (including the version) are duplicated in the datasketches-memory
-       module for inclusion in the assembled artifacts.  For more information, see:
-       https://maven.apache.org/guides/introduction/introduction-to-the-pom.html#Project_Aggregation -->
-
-
   <properties>
-    <!-- Used for xxHash testing -->
-    <zero-allocation-hashing.version>0.16</zero-allocation-hashing.version>
-
     <!-- Test -->
     <testng.version>7.5.1</testng.version>
 
     <!-- System-wide properties -->
-    <maven.version>3.6.3</maven.version>
+    <maven.version>3.9.12</maven.version>
     <java.version>8</java.version>
-    <jdk-toolchain.version>8</jdk-toolchain.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
-    <argLine>-Xmx4g -Duser.language=en -Duser.country=US -Dfile.encoding=UTF-8</argLine>
+    <jvm.mem>-Xmx4g</jvm.mem>
+    <jvm.locale.language>-Duser.language=en</jvm.locale.language>
+    <jvm.locale.country>-Duser.country=US</jvm.locale.country>
+    <jvm.locale.encoding>-Dfile.encoding=UTF-8</jvm.locale.encoding>
+    <jvm.args>${jvm.mem} ${jvm.locale.language} ${jvm.locale.country} ${jvm.locale.encoding}</jvm.args>
     <charset.encoding>UTF-8</charset.encoding>
+    <project.build.outputTimestamp>2026-01-09T19:00:20Z</project.build.outputTimestamp>
     <project.build.sourceEncoding>${charset.encoding}</project.build.sourceEncoding>
     <project.build.resourceEncoding>${charset.encoding}</project.build.resourceEncoding>
+    <project.reporting.inputEncoding>${charset.encoding}</project.reporting.inputEncoding>
     <project.reporting.outputEncoding>${charset.encoding}</project.reporting.outputEncoding>
+    <project.reporting.outputDirectory>${project.build.directory}/site</project.reporting.outputDirectory>
+    <maven.build.timestamp.format>yyyy-MM-dd'T'HH-mm-ss'Z'</maven.build.timestamp.format>
 
     <!--  org.apache.maven plugins -->
-    <maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>
-    <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
-    <maven-deploy-plugin.version>3.1.2</maven-deploy-plugin.version>
-    <maven-enforcer-plugin.version>3.4.1</maven-enforcer-plugin.version>
-    <maven-gpg-plugin.version>3.2.3</maven-gpg-plugin.version>
-    <maven-install-plugin.version>3.0.0-M1</maven-install-plugin.version>
-    <maven-jar-plugin.version>3.4.1</maven-jar-plugin.version>
-    <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
-    <maven-release-plugin.version>3.0.1</maven-release-plugin.version>
-    <maven-remote-resources-plugin.version>3.2.0</maven-remote-resources-plugin.version>
-    <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
-    <maven-surefire-failsafe-plugin.version>3.2.5</maven-surefire-failsafe-plugin.version> <!-- for surefire, failsafe and surefire-report -->
+    <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
+    <maven-deploy-plugin.version>3.1.4</maven-deploy-plugin.version>
+    <maven-enforcer-plugin.version>3.6.2</maven-enforcer-plugin.version>
+    <maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
+    <maven-install-plugin.version>3.1.4</maven-install-plugin.version>
+    <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
+    <maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
+    <maven-release-plugin.version>3.3.1</maven-release-plugin.version>
+    <maven-source-plugin.version>3.4.0</maven-source-plugin.version>
+    <maven-surefire-failsafe-plugins.version>3.5.4</maven-surefire-failsafe-plugins.version> <!-- surefire, failsafe, surefire-report -->
     <maven-toolchains-plugin.version>3.2.0</maven-toolchains-plugin.version>
-    <!-- com.github plugins -->
-    <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
-    <!-- org.apache.creadur plugins -->
-    <apache-rat-plugin.version>0.16.1</apache-rat-plugin.version>
-    <!-- org.eluder maven plugins -->
+
+    <!--  org.apache.rat plugins -->
+    <apache-rat-plugin.version>0.17</apache-rat-plugin.version>
+
+    <!-- com.github maven plugins -->
     <coveralls-repo-token></coveralls-repo-token>
-    <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
-    <!-- org.jacoco maven plugins -->
-    <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
-    <!-- org.mojohaus plugins -->
-    <versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
-    <exec-maven-plugin.version>3.3.0</exec-maven-plugin.version>
+    <coveralls-maven-plugin.version>5.0.0</coveralls-maven-plugin.version>
+
+    <!-- org.mojohaus plugins, used by java11 sub-module -->
+    <exec-maven-plugin.version>3.6.3</exec-maven-plugin.version>
+
+    <!-- io.github plugins -->
+    <git-commit-id-maven-plugin.version>9.0.2</git-commit-id-maven-plugin.version>
+
+    <!-- org.jacoco.maven plugins -->
+    <jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
+
     <!-- other -->
     <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
-    
+
+    <!-- Used for xxHash testing -->
+    <zero-allocation-hashing.version>2026.0</zero-allocation-hashing.version>
+
     <maven.deploy.skip>true</maven.deploy.skip>
-    <maven.install.skip>true</maven.install.skip>
     <maven.javadoc.skip>true</maven.javadoc.skip>
   </properties>
-
+  
   <repositories>
     <repository>
       <id>apache.snapshots</id>
       <name>Apache Snapshot Repository</name>
-      <url>https://repository.apache.org/content/groups/snapshots/org/apache/datasketches/</url>
+      <url>https://repository.apache.org/content/groups/snapshots</url>
       <releases>
         <enabled>false</enabled>
       </releases>
@@ -150,7 +172,7 @@ under the License.
     <repository>
       <id>apache</id>
       <name>Apache Releases Repository</name>
-      <url>https://repository.apache.org/content/repositories/releases/org/apache/datasketches/</url>
+      <url>https://repository.apache.org/content/groups/public</url>
       <releases>
         <enabled>true</enabled>
       </releases>
@@ -183,14 +205,16 @@ under the License.
       <plugins>
 
         <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>versions-maven-plugin</artifactId>
-          <version>${versions-maven-plugin.version}</version>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven-compiler-plugin.version}</version>
+          <configuration>
+            <fork>true</fork> <!-- required if Maven is using a different JVM -->
+          </configuration>
         </plugin>
 
         <plugin>
-          <!-- We want to deploy the artifacts to a staging location for perusal -->
-          <!-- Apache Parent pom: apache-release profile -->
+          <!-- We want to deploy the artifacts to a staging location for perusal, not sure we need this. -->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
           <version>${maven-deploy-plugin.version}</version>
@@ -198,8 +222,42 @@ under the License.
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-release-plugin</artifactId>
-          <version>${maven-release-plugin.version}</version>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>${maven-enforcer-plugin.version}</version>
+          <executions>
+            <execution>
+              <id>enforce-banned-dependencies</id>
+              <goals>
+                <goal>enforce</goal>
+              </goals>
+              <configuration>
+                <rules>
+                  <!-- The Java enforcer rule is toolchain unaware
+                  and is only checks the compiler used by the Maven runtime.
+                  In the context of toolchains this rule is useless.
+                  See: https://github.com/paulmoloney/maven-enforcer-toolchain-rules
+                  <requireJavaVersion> ... </requireJavaVersion>
+                  -->
+                  <requireMavenVersion>
+                    <version>[${maven.version},4.0.0)</version>
+                  </requireMavenVersion>
+                  <bannedDependencies>
+                    <excludes>
+                      <!--LGPL licensed library-->
+                      <exclude>com.google.code.findbugs:annotations</exclude>
+                    </excludes>
+                  </bannedDependencies>
+                </rules>
+                <fail>true</fail>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>${maven-install-plugin.version}</version>
         </plugin>
 
         <plugin>
@@ -229,11 +287,16 @@ under the License.
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>${maven-javadoc-plugin.version}</version>
           <configuration>
+            <outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
             <docfilessubdirs>true</docfilessubdirs>
-            <doclint>none</doclint>
-            <jdkToolchain>
-              <version>${jdk-toolchain.version}</version>
-            </jdkToolchain>
+            <show>public</show>
+            <doclint>none</doclint> <!-- use Checkstyle -->
+            <additionalJOptions>
+              <additionalJOption>-J${jvm.mem}</additionalJOption>
+              <additionalJOption>-J${jvm.locale.language}</additionalJOption>
+              <additionalJOption>-J${jvm.locale.country}</additionalJOption>
+              <additionalJOption>-J${jvm.locale.encoding}</additionalJOption>
+            </additionalJOptions>
             <excludePackageNames>org.apache.datasketches.memory.internal</excludePackageNames>
           </configuration>
           <executions>
@@ -247,68 +310,10 @@ under the License.
           </executions>
         </plugin>
 
-        <plugin>
+        <plugin> <!-- not sure we need this -->
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-enforcer-plugin</artifactId>
-          <version>${maven-enforcer-plugin.version}</version>
-          <executions>
-            <execution>
-              <id>enforce-banned-dependencies</id>
-              <goals>
-                <goal>enforce</goal>
-              </goals>
-              <configuration>
-                <rules>
-                  <requireJavaVersion>
-                    <version>[8,9),[11,12)</version>
-                  </requireJavaVersion>
-                  <requireMavenVersion>
-                    <version>[${maven.version},)</version>
-                  </requireMavenVersion>
-                  <bannedDependencies>
-                    <excludes>
-                      <!--LGPL licensed library-->
-                      <exclude>com.google.code.findbugs:annotations</exclude>
-                    </excludes>
-                  </bannedDependencies>
-                </rules>
-                <fail>true</fail>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.rat</groupId>
-          <artifactId>apache-rat-plugin</artifactId>
-          <version>${apache-rat-plugin.version}</version>
-          <executions>
-            <execution>
-              <phase>verify</phase>
-              <goals>
-                <goal>check</goal>
-              </goals>
-            </execution>
-          </executions>
-          <configuration>
-            <outputDirectory>${project.basedir}/rat</outputDirectory>
-            <consoleOutput>true</consoleOutput>
-            <useDefaultExcludes>true</useDefaultExcludes>
-            <excludes>
-              <exclude>**/*.yaml</exclude>
-              <exclude>**/*.yml</exclude>
-              <exclude>**/toolchains.xml</exclude>
-              <exclude>**/.*</exclude>
-              <exclude>**/.clover/**/*</exclude>
-              <exclude>**/test/resources/**/*.txt</exclude>
-              <exclude>**/test-output/**/*</exclude>
-              <exclude>**/img/**/*.png</exclude>
-              <exclude>**/git.properties</exclude>
-              <exclude>**/scripts/assets/LoremIpsum.txt</exclude>
-              <exclude>LICENSE</exclude>
-              <exclude>NOTICE</exclude>
-            </excludes>
-          </configuration>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>${maven-release-plugin.version}</version>
         </plugin>
 
         <plugin>
@@ -336,15 +341,14 @@ under the License.
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>${maven-surefire-failsafe-plugin.version}</version>
+          <version>${maven-surefire-failsafe-plugins.version}</version>
           <configuration>
+            <argLine>@{argLine} @{jvm.args}</argLine>
             <trimStackTrace>false</trimStackTrace>
             <useManifestOnlyJar>false</useManifestOnlyJar>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
-            <jdkToolchain>
-              <version>${jdk-toolchain.version}</version>
-            </jdkToolchain>
             <reportsDirectory>${project.build.directory}/test-output/${maven.build.timestamp}</reportsDirectory>
+            <perCoreThreadCount>false</perCoreThreadCount>
           </configuration>
         </plugin>
 
@@ -352,13 +356,6 @@ under the License.
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-toolchains-plugin</artifactId>
           <version>${maven-toolchains-plugin.version}</version>
-          <configuration>
-            <toolchains>
-              <jdk>
-                <version>[8,9),[11,12)</version>
-              </jdk>
-            </toolchains>
-          </configuration>
           <executions>
             <execution>
               <goals>
@@ -366,6 +363,64 @@ under the License.
               </goals>
             </execution>
           </executions>
+          <configuration>
+            <toolchains>
+              <jdk>
+                <version>${java.version}</version>
+              </jdk>
+            </toolchains>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.rat</groupId>
+          <artifactId>apache-rat-plugin</artifactId>
+          <version>${apache-rat-plugin.version}</version>
+          <executions>
+            <execution>
+              <phase>verify</phase>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <outputDirectory>${project.basedir}/rat</outputDirectory>
+            <consoleOutput>true</consoleOutput>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <excludes>
+              <exclude>**/*.yaml</exclude>
+              <exclude>**/*.yml</exclude>
+              <exclude>**/.*</exclude>
+              <exclude>**/_*</exclude>
+              <exclude>**/.clover/**/*</exclude>
+              <exclude>**/test/resources/**/*.txt</exclude>
+              <exclude>**/test-output/**/*</exclude>
+              <exclude>**/git.properties</exclude>
+              <exclude>**/scripts/assets/LoremIpsum.txt</exclude>
+              <exclude>LICENSE</exclude>
+              <exclude>NOTICE</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <!-- Submit code coverage report to Coveralls.io. -->
+          <groupId>com.github.hazendaz.maven</groupId>
+          <artifactId>coveralls-maven-plugin</artifactId>
+          <version>${coveralls-maven-plugin.version}</version>
+          <configuration>
+            <!--suppress UnresolvedMavenProperty -->
+            <repoToken>${coveralls-repo-token}</repoToken>
+            <!--suppress UnresolvedMavenProperty -->
+            <jacocoReports>${session.rootDirectory}/datasketches-memory-java8/target/site/jacoco/jacoco.xml</jacocoReports>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>io.github.git-commit-id</groupId>
+          <artifactId>git-commit-id-maven-plugin</artifactId>
+          <version>${git-commit-id-maven-plugin.version}</version>
         </plugin>
 
         <plugin>
@@ -380,31 +435,14 @@ under the License.
                 <goal>prepare-agent</goal>
               </goals>
             </execution>
+            <execution>
+              <id>default-report</id>
+              <phase>test</phase>
+              <goals>
+                <goal>report</goal>
+              </goals>
+            </execution>
           </executions>
-        </plugin>
-
-        <plugin>
-          <!-- Submit code coverage report to Coveralls.io. -->
-          <groupId>org.eluder.coveralls</groupId>
-          <artifactId>coveralls-maven-plugin</artifactId>
-          <version>${coveralls-maven-plugin.version}</version>
-          <configuration>
-            <!--suppress UnresolvedMavenProperty -->
-            <repoToken>${coveralls-repo-token}</repoToken>
-            <!--suppress UnresolvedMavenProperty -->
-            <jacocoReports>${maven.multiModuleProjectDirectory}/datasketches-memory-java8/target/site/jacoco/jacoco.xml</jacocoReports>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>${maven-compiler-plugin.version}</version>
-          <configuration>
-            <jdkToolchain>
-              <version>${jdk-toolchain.version}</version>
-            </jdkToolchain>
-          </configuration>
         </plugin>
 
         <plugin>
@@ -415,105 +453,81 @@ under the License.
 
       </plugins>
     </pluginManagement>
+
     <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-release-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
       </plugin>
+
       <plugin>
-        <groupId>org.apache.rat</groupId>
-        <artifactId>apache-rat-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-toolchains-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>com.github.hazendaz.maven</groupId>
+        <artifactId>coveralls-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>io.github.git-commit-id</groupId>
+        <artifactId>git-commit-id-maven-plugin</artifactId>
+      </plugin>
+
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
       </plugin>
-      <plugin>
-        <groupId>org.eluder.coveralls</groupId>
-        <artifactId>coveralls-maven-plugin</artifactId>
-      </plugin>
+
     </plugins>
   </build>
 
-  <profiles>
-    <!-- Disable source release assembly for 'apache-release' profile.
-             This is performed from a script outside Maven
-    -->
-    <profile>
-      <id>apache-release</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <version>${maven-assembly-plugin.version}</version>
-            <executions>
-              <execution>
-                <id>source-release-assembly</id>
-                <phase>none</phase>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>only-eclipse</id>
-      <activation>
-        <property>
-          <name>m2e.version</name>
-        </property>
-      </activation>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-remote-resources-plugin</artifactId>
-              <version>${maven-remote-resources-plugin.version}</version>
-              <executions>
-                <execution>
-                  <id>process-resource-bundles</id>
-                  <phase>none</phase>
-                </execution>
-              </executions>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-
-  </profiles>
-
-  <!-- This Maven project is divided into an aggregator project (the root), that manages a group of submodules that
-       inherit configuration from this root module.
-       A multi-module project is used to target different version-specific features of the Java language APIs.
-       Furthermore, it is a structure that is supported in most IDEs allowing minimal disruption to developers that
-       contribute to this project -->
+  <!-- This project utilizes both Project Inheritance and Project Aggregation. It is divided into an 
+       aggregator project (the root), that manages a group of submodules that inherit configuration from this root.
+       The submodules target different version-specific features of the Java language APIs.
+  -->
   <modules>
     <module>datasketches-memory-java8</module>
     <module>datasketches-memory-java11</module>

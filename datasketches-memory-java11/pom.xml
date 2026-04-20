@@ -80,7 +80,7 @@ under the License.
         <configuration>
           <toolchains>
             <jdk>
-              <version>${java.version}</version>
+              <version>${java.version}</version> <!-- override -->
             </jdk>
           </toolchains>
         </configuration>

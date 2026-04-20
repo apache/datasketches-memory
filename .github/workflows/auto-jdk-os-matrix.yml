@@ -28,7 +28,7 @@ jobs:
           - os: macos-latest
             arch: aarch64
 
-          - jdk: 8
+          - jdk: 1.8
             jvm_args: ""
             distribution: 'zulu'
 

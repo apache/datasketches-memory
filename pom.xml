@@ -213,13 +213,13 @@ under the License.
           </configuration>
         </plugin>
 
+<!-- We want to deploy the artifacts to a staging location for perusal, not sure we need this.
         <plugin>
-          <!-- We want to deploy the artifacts to a staging location for perusal, not sure we need this. -->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
           <version>${maven-deploy-plugin.version}</version>
         </plugin>
-
+-->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-enforcer-plugin</artifactId>
@@ -260,6 +260,7 @@ under the License.
           <version>${maven-install-plugin.version}</version>
         </plugin>
 
+<!--
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
@@ -281,7 +282,7 @@ under the License.
             </execution>
           </executions>
         </plugin>
-
+-->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
@@ -310,7 +311,8 @@ under the License.
           </executions>
         </plugin>
 
-        <plugin> <!-- not sure we need this -->
+<!-- not sure we need these 
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
           <version>${maven-release-plugin.version}</version>
@@ -337,7 +339,7 @@ under the License.
             </execution>
           </executions>
         </plugin>
-
+-->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
@@ -387,20 +389,23 @@ under the License.
           <configuration>
             <outputDirectory>${project.basedir}/rat</outputDirectory>
             <consoleOutput>true</consoleOutput>
-            <useDefaultExcludes>true</useDefaultExcludes>
-            <excludes>
-              <exclude>**/*.yaml</exclude>
-              <exclude>**/*.yml</exclude>
-              <exclude>**/.*</exclude>
-              <exclude>**/_*</exclude>
-              <exclude>**/.clover/**/*</exclude>
-              <exclude>**/test/resources/**/*.txt</exclude>
-              <exclude>**/test-output/**/*</exclude>
-              <exclude>**/git.properties</exclude>
-              <exclude>**/scripts/assets/LoremIpsum.txt</exclude>
-              <exclude>LICENSE</exclude>
-              <exclude>NOTICE</exclude>
-            </excludes>
+            <inputExcludes>
+              <!-- rat uses .gitignore for excludes by default -->
+              <inputExcludeStd>StandardCollection</inputExcludeStd>
+              <inputExclude>**/*.yaml</inputExclude>
+              <inputExclude>**/*.yml</inputExclude>
+              <inputExclude>**/.*</inputExclude>
+              <inputExclude>**/_*</inputExclude>
+              <inputExclude>**/test/resources/**/*.txt</inputExclude>
+              <inputExclude>**/test-output/**/*</inputExclude>
+              <inputExclude>**/git.properties</inputExclude>
+              <inputExclude>**/doc/**</inputExclude>
+              <inputExclude>**/*.sk</inputExclude>
+              <inputExclude>LICENSE</inputExclude>
+              <inputExclude>NOTICE</inputExclude>
+              <inputExclude>**/*.code-workspace</inputExclude>
+              <inputExclude>**/scripts/assets/LoremIpsum.txt</inputExclude>
+            </inputExcludes>
           </configuration>
         </plugin>
 
@@ -475,17 +480,17 @@ under the License.
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-install-plugin</artifactId>
       </plugin>
-
+<!--
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
       </plugin>
-
+-->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
       </plugin>
-
+<!--
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
@@ -495,7 +500,7 @@ under the License.
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
       </plugin>
-
+-->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>

@@ -46,9 +46,9 @@ under the License.
     <!-- jdk.internal.ref is used to call public Cleaner -->
     <arg.jdk.internal.ref>--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED</arg.jdk.internal.ref>
     <!-- java.nio is used to open MappedByteBuffer load0, isloaded0, & force0 for reflection -->
-    <arg.java.nio>--add-opens=java.base/java.nio=ALL-UNNAMED</arg.java.nio>
-    <!-- sun.nio.ch is used to open FileChannelImpl for map0 & unmap0-->
-    <arg.sun.nio.ch>--add-opens=java.base/sun.nio.ch=ALL-UNNAMED</arg.sun.nio.ch>
+    <!-- <arg.java.nio>- -add-opens=java.base/java.nio=ALL-UNNAMED</arg.java.nio> -->
+    <!-- sun.nio.ch is used to open FileChannelImpl for map0 & unmap0 for reflection-->
+    <!-- <arg.sun.nio.ch>- -add-opens=java.base/sun.nio.ch=ALL-UNNAMED</arg.sun.nio.ch> -->
   </properties>
 
   <build>
@@ -98,10 +98,10 @@ under the License.
         </property>
       </activation>
       <properties>
-        <assembly.script.path>${session.rootDirectory}/tools/scripts/package-multi-release-jar.sh</assembly.script.path>
+        <assembly.script.path>${project.root}/tools/scripts/package-multi-release-jar.sh</assembly.script.path>
         <assembly.java.home>${env.JAVA_HOME}</assembly.java.home>
         <assembly.git.tag>${project.version}</assembly.git.tag>
-        <assembly.base.dir>${session.rootDirectory}</assembly.base.dir>
+        <assembly.base.dir>${project.root}</assembly.base.dir>
       </properties>
       <build>
         <defaultGoal>exec:exec</defaultGoal>

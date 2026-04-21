@@ -35,11 +35,13 @@ under the License.
   <packaging>jar</packaging>
 
   <properties>
+    <!-- Test -->
+    <testng.version>7.12.0</testng.version>
     <java.version>11</java.version>
-    <jdk-toolchain.version>11</jdk-toolchain.version>
+    <jdk-toolchain.version>${java.version}</jdk-toolchain.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
-    <maven.javadoc.skip>>true</maven.javadoc.skip>
+    <maven.javadoc.skip>true</maven.javadoc.skip>
     <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
     <!-- jdk.internal.misc is used to call public Unsafe & public VM -->
     <arg.jdk.internal.misc>--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED</arg.jdk.internal.misc>
@@ -51,7 +53,37 @@ under the License.
     <!-- <arg.sun.nio.ch>- -add-opens=java.base/sun.nio.ch=ALL-UNNAMED</arg.sun.nio.ch> -->
   </properties>
 
+  <dependencies>
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <version>${testng.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- Used for xxHash testing -->
+      <groupId>net.openhft</groupId>
+      <artifactId>zero-allocation-hashing</artifactId>
+      <version>${zero-allocation-hashing.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.datasketches</groupId>
+        <artifactId>datasketches-memory-java8</artifactId>
+        <version>3.0.2</version>
+    </dependency>
+  </dependencies>
+
   <build>
+   <pluginManagement>
+     <plugins>   
+       <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-deploy-plugin</artifactId>
+       </plugin>
+     </plugins>
+   </pluginManagement>
+  
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -61,9 +93,23 @@ under the License.
           <compilerArgs>
             <arg>${arg.jdk.internal.ref}</arg>
             <arg>${arg.jdk.internal.misc}</arg>
-            <arg>${arg.java.nio}</arg>
-            <arg>${arg.sun.nio.ch}</arg>
+<!--        <arg>${arg.java.nio}</arg>
+            <arg>${arg.sun.nio.ch}</arg> -->
           </compilerArgs>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+
+        <configuration>
+          <argLine>@{argLine} @{jvm.args}</argLine>
+          <trimStackTrace>false</trimStackTrace>
+          <useManifestOnlyJar>false</useManifestOnlyJar>
+          <redirectTestOutputToFile>true</redirectTestOutputToFile>
+          <reportsDirectory>${project.build.directory}/test-output/${maven.build.timestamp}</reportsDirectory>
+          <perCoreThreadCount>false</perCoreThreadCount>
         </configuration>
       </plugin>
 
@@ -93,11 +139,9 @@ under the License.
     <profile>
       <id>assemble-mr-jar</id>
       <activation>
-        <property>
-          <name>!unsetDefaultProfile</name>
-        </property>
+        <activeByDefault>false</activeByDefault>
       </activation>
-      <properties>
+      <properties> <!-- project.root defined in /.mvn/maven.config -->
         <assembly.script.path>${project.root}/tools/scripts/package-multi-release-jar.sh</assembly.script.path>
         <assembly.java.home>${env.JAVA_HOME}</assembly.java.home>
         <assembly.git.tag>${project.version}</assembly.git.tag>
@@ -130,11 +174,4 @@ under the License.
     </profile>
   </profiles>
 
-  <dependencies>
-  	<dependency>
-  		<groupId>org.apache.datasketches</groupId>
-  		<artifactId>datasketches-memory-java8</artifactId>
-  		<version>3.0.2</version>
-  	</dependency>
-  </dependencies>
 </project>

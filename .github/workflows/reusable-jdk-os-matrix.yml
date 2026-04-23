@@ -52,8 +52,10 @@ jobs:
         with:
           java-version: |
            8
-           11 
-           ${{ inputs.jdk_version }}
+           11
+           17
+           21
+           25
           architecture: ${{ inputs.cpu_arch }}
           distribution: 'zulu' #${{ inputs.jdk_distribution }}
           java-package: jdk

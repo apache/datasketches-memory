@@ -28,6 +28,7 @@ under the License.
     <groupId>org.apache.datasketches</groupId>
     <artifactId>datasketches-memory</artifactId>
     <version>3.0.2</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>datasketches-memory-java11</artifactId>
@@ -48,9 +49,9 @@ under the License.
     <!-- jdk.internal.ref is used to call public Cleaner -->
     <arg.jdk.internal.ref>--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED</arg.jdk.internal.ref>
     <!-- java.nio is used to open MappedByteBuffer load0, isloaded0, & force0 for reflection -->
-    <!-- <arg.java.nio>- -add-opens=java.base/java.nio=ALL-UNNAMED</arg.java.nio> -->
+    <arg.java.nio>--add-opens=java.base/java.nio=ALL-UNNAMED</arg.java.nio>
     <!-- sun.nio.ch is used to open FileChannelImpl for map0 & unmap0 for reflection-->
-    <!-- <arg.sun.nio.ch>- -add-opens=java.base/sun.nio.ch=ALL-UNNAMED</arg.sun.nio.ch> -->
+    <arg.sun.nio.ch>--add-opens=java.base/sun.nio.ch=ALL-UNNAMED</arg.sun.nio.ch>
   </properties>
 
   <dependencies>
@@ -93,18 +94,22 @@ under the License.
           <compilerArgs>
             <arg>${arg.jdk.internal.ref}</arg>
             <arg>${arg.jdk.internal.misc}</arg>
-<!--        <arg>${arg.java.nio}</arg>
-            <arg>${arg.sun.nio.ch}</arg> -->
           </compilerArgs>
         </configuration>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
+        <artifactId>maven-jar-plugin</artifactId>
+      </plugin>
 
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <argLine>@{argLine} @{jvm.args}</argLine>
+          <argLine>
+            @{argLine} @{jvm.args} ${arg.java.nio} ${arg.sun.nio.ch} ${arg.jdk.internal.misc} ${arg.jdk.internal.ref}
+          </argLine>
           <trimStackTrace>false</trimStackTrace>
           <useManifestOnlyJar>false</useManifestOnlyJar>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>

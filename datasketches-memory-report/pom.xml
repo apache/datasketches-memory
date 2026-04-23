@@ -31,34 +31,24 @@ under the License.
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>datasketches-memory-java8</artifactId>
+  <artifactId>datasketches-memory-report</artifactId>
   <name>${project.artifactId}</name>
-  <packaging>jar</packaging>
-
+  <packaging>pom</packaging>
+  
   <properties>
-    <!-- Test -->
-    <testng.version>7.5.1</testng.version>
-    <java.version>8</java.version>
-    
-    <jdk-toolchain.version>${java.version}</jdk-toolchain.version>
-    <maven.compiler.source>${java.version}</maven.compiler.source>
-    <maven.compiler.target>${java.version}</maven.compiler.target>
-    <maven.javadoc.skip>false</maven.javadoc.skip>
+    <java.version>11</java.version>
   </properties>
 
   <dependencies>
     <dependency>
-      <groupId>org.testng</groupId>
-      <artifactId>testng</artifactId>
-      <version>${testng.version}</version>
-      <scope>test</scope>
+      <groupId>org.apache.datasketches</groupId>
+      <artifactId>datasketches-memory-java8</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
-      <!-- Used for xxHash testing -->
-      <groupId>net.openhft</groupId>
-      <artifactId>zero-allocation-hashing</artifactId>
-      <version>${zero-allocation-hashing.version}</version>
-      <scope>test</scope>
+      <groupId>org.apache.datasketches</groupId>
+      <artifactId>datasketches-memory-java11</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 
@@ -66,9 +56,40 @@ under the License.
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
+        <artifactId>maven-toolchains-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>toolchain</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <toolchains>
+            <jdk>
+              <version>${java.version}</version> <!-- override -->
+            </jdk>
+          </toolchains>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>report-aggregate</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>report-aggregate</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <excludes>
+            <exclude>org/apache/datasketches/memory/internal/VirtualMachineMemory.class</exclude>
+          </excludes>
+        </configuration>
       </plugin>
     </plugins>
   </build>
-
 </project>

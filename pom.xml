@@ -130,7 +130,7 @@ under the License.
     <maven-toolchains-plugin.version>3.2.0</maven-toolchains-plugin.version>
 
     <!--  org.apache.rat plugins -->
-    <apache-rat-plugin.version>0.17</apache-rat-plugin.version>
+    <apache-rat-plugin.version>0.18</apache-rat-plugin.version>
 
     <!-- com.github maven plugins -->
     <coveralls-repo-token></coveralls-repo-token>
@@ -179,24 +179,7 @@ under the License.
       </snapshots>
     </repository>
   </repositories>
-<!--
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.testng</groupId>
-        <artifactId>testng</artifactId>
-        <version>${testng.version}</version>
-        <scope>test</scope>
-      </dependency> 
-      <dependency> 
-        <groupId>net.openhft</groupId>
-        <artifactId>zero-allocation-hashing</artifactId>
-        <version>${zero-allocation-hashing.version}</version>
-        <scope>test</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
--->
+
   <build>
     <pluginManagement>
       <plugins>
@@ -210,12 +193,12 @@ under the License.
           </configuration>
         </plugin>
 
-        <!-- We want to deploy the artifacts to a staging location for perusal. -->
+        <!-- We want to deploy the artifacts to a staging location for perusal.
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
           <version>${maven-deploy-plugin.version}</version>
-        </plugin>
+        </plugin> -->
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -288,6 +271,7 @@ under the License.
             <docfilessubdirs>true</docfilessubdirs>
             <show>public</show>
             <doclint>none</doclint> <!-- use Checkstyle -->
+            <quiet>true</quiet>
             <additionalJOptions>
               <additionalJOption>-J${jvm.mem}</additionalJOption>
               <additionalJOption>-J${jvm.locale.language}</additionalJOption>
@@ -374,6 +358,7 @@ under the License.
           <groupId>org.apache.rat</groupId>
           <artifactId>apache-rat-plugin</artifactId>
           <version>${apache-rat-plugin.version}</version>
+          <inherited>false</inherited>
           <executions>
             <execution>
               <phase>verify</phase>
@@ -383,6 +368,7 @@ under the License.
             </execution>
           </executions>
           <configuration>
+            <excludeSubProjects>false</excludeSubProjects>
             <outputDirectory>${project.basedir}/rat</outputDirectory>
             <consoleOutput>true</consoleOutput>
             <inputExcludes>
@@ -414,7 +400,7 @@ under the License.
             <!--suppress UnresolvedMavenProperty -->
             <repoToken>${coveralls-repo-token}</repoToken>
             <!--suppress UnresolvedMavenProperty -->
-            <jacocoReports>${session.rootDirectory}/datasketches-memory-java8/target/site/jacoco/jacoco.xml</jacocoReports>
+            <jacocoReports>${project.basedir}/datasketches-memory-report/target/site/jacoco-aggregate/jacoco.xml</jacocoReports>
           </configuration>
         </plugin>
 
@@ -425,7 +411,7 @@ under the License.
         </plugin>
 
         <plugin>
-          <!-- Generates code coverage report from website. -->
+          <!-- Generates code coverage report -->
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
           <version>${jacoco-maven-plugin.version}</version>
@@ -475,11 +461,6 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-install-plugin</artifactId>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
       </plugin>
 
       <plugin>
@@ -542,6 +523,7 @@ under the License.
   <modules>
     <module>datasketches-memory-java8</module>
     <module>datasketches-memory-java11</module>
+    <module>datasketches-memory-report</module>
   </modules>
 
 </project>

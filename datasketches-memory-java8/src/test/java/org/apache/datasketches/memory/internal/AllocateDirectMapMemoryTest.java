@@ -38,10 +38,14 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class AllocateDirectMapMemoryTest {
+  
   private static final String LS = System.getProperty("line.separator");
 
   @BeforeClass
   public void setReadOnly() {
+    if (System.getProperty("os.name").startsWith("Windows")) {
+      return; // Or force unmap or skip the toggle-in-place test for Windows
+    }
     UtilTest.setGettysburgAddressFileToReadOnly();
   }
 

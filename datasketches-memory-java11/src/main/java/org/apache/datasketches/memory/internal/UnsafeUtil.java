@@ -29,7 +29,7 @@ import sun.misc.Unsafe;
  *
  * @author Lee Rhodes
  */
-@SuppressWarnings({"restriction","javadoc"})
+//@SuppressWarnings({"restriction","javadoc"})
 public final class UnsafeUtil {
   public static final Unsafe unsafe;
 

@@ -23,12 +23,15 @@ import static java.util.Arrays.fill;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 import java.util.Random;
 
@@ -318,7 +321,7 @@ public final class Util {
   //Resources NOTE: these 3 methods are duplicated in Java/ datasketches/Util
 
   /**
-   * Gets the absolute path of the given resource file's shortName.
+   * Gets the Path of the given resource file's shortName.
    *
    * <p>Note that the ClassLoader.getResource(shortName) returns a URL,
    * which can have special characters, e.g., "%20" for spaces. This method
@@ -336,21 +339,21 @@ public final class Util {
       Objects.requireNonNull(url, "resource " + shortFileName + " could not be acquired.");
       final URI uri = url.toURI();
       //decodes any special characters
-      final String path = uri.isAbsolute() ? Paths.get(uri).toAbsolutePath().toString() : uri.getPath();
-      return path;
+      final String pathStr = uri.isAbsolute() ? Paths.get(uri).toAbsolutePath().toString() : uri.getPath();
+      return pathStr;
     } catch (final URISyntaxException e) {
       throw new IllegalArgumentException("Cannot find resource: " + shortFileName + LS + e);
     }
   }
 
-  /**
-   * Gets the file defined by the given resource file's shortFileName.
-   * @param shortFileName the last name in the pathname's name sequence.
-   * @return the file defined by the given resource file's shortFileName.
-   */
-  public static File getResourceFile(final String shortFileName) {
-    return new File(getResourcePath(shortFileName));
-  }
+//  /**
+//   * Gets the file defined by the given resource file's shortFileName.
+//   * @param shortFileName the last name in the pathname's name sequence.
+//   * @return the file defined by the given resource file's shortFileName.
+//   */
+//  public static File getResourceFile(final String shortFileName) {
+//    return new File(getResourcePath(shortFileName));
+//  }
 
   /**
    * Returns a byte array of the contents of the file defined by the given resource file's
@@ -367,4 +370,58 @@ public final class Util {
     }
   }
 
+  public static void ensureReadOnly(Path path) {
+    if (!Files.exists(path)) {
+      throw new IllegalArgumentException("File not found.");
+    }
+
+    // Works on Windows and POSIX)
+    path.toFile().setReadOnly();
+  }
+  
+  /**
+   *   Windows and JAR friendly get Resource File
+   *   @param resourceName the simple file name. No special characters or slashes.
+   *   @return a File System File
+   */
+  public static File getResourceFile(String resourceName) {
+    Objects.requireNonNull(resourceName, "Given resourceName must not be null");
+    if (resourceName.isEmpty()) { throw new IllegalArgumentException("Given resourceName must not be empty"); }
+    // Normalize name: ClassLoaders MUST use forward slashes even on Windows
+    String normalizedName = resourceName.replace('\\', '/');
+    if (normalizedName.startsWith("/")) { normalizedName = normalizedName.substring(1); }
+
+    ClassLoader loader = Util.class.getClassLoader();
+    URL url = loader.getResource(normalizedName);
+    if (url == null) { throw new IllegalArgumentException("Resource not found: " + normalizedName); }
+
+    // If it's a real file, return it directly
+    if ("file".equals(url.getProtocol())) {
+        try { 
+          URI uri = url.toURI();
+          return new File(uri); } 
+        catch (URISyntaxException e) { return new File(url.getPath()); }
+    }
+
+    // If it's in a JAR, we must extract it for Memory.map() to work
+    // We use a prefix that won't collide with Windows reserved names
+    File tempFile;
+    try { tempFile = File.createTempFile("datasketches-", ".bin"); }
+    catch (IOException e1) { throw new IllegalArgumentException(e1); }
+    tempFile.deleteOnExit();
+
+    try (InputStream in = loader.getResourceAsStream(normalizedName)) {
+        if (in == null) throw new IllegalArgumentException("Could not open stream for " + normalizedName);
+        
+        // Use REPLACE_EXISTING to avoid "File Already Exists" errors on Windows retries
+        Files.copy(in, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    } catch (IOException e) { throw new IllegalArgumentException(e); }
+
+    // Final Windows Fix: Ensure the file is actually writable if you need to setReadOnly later
+    //tempFile.setWritable(true); 
+    
+    return tempFile;
+  }
+  
+  
 }

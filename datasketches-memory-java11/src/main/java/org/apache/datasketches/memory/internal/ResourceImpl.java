@@ -35,7 +35,7 @@ import org.apache.datasketches.memory.Resource;
  *
  * @author Lee Rhodes
  */
-@SuppressWarnings("restriction")
+//@SuppressWarnings("restriction")
 public abstract class ResourceImpl implements Resource {
   static final String JDK; 
   static final int JDK_MAJOR; //8, 11, 17, etc

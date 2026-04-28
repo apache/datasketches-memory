@@ -19,38 +19,32 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_CHAR_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_DOUBLE_BASE_OFFSET;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_DOUBLE_INDEX_SCALE;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_FLOAT_BASE_OFFSET;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_FLOAT_INDEX_SCALE;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_INT_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_LONG_BASE_OFFSET;
-import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_SHORT_BASE_OFFSET;
 import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
 
 import org.apache.datasketches.memory.WritableBuffer;
 
 /**
- * Implementation of {@link WritableBuffer} for native endian byte order.
+ * Implementation of {@link WritableBuffer} for non-native endian byte order.
  * @author Roman Leventov
  * @author Lee Rhodes
  */
-@SuppressWarnings("restriction")
-abstract class NativeWritableBufferImpl extends BaseWritableBufferImpl {
+//@SuppressWarnings("restriction")
+abstract class NonNativeWritableBufferImpl extends BaseWritableBufferImpl {
 
   //Pass-through constructor
-  NativeWritableBufferImpl(final long capacityBytes) { super(capacityBytes); }
+  NonNativeWritableBufferImpl(final long capacityBytes) { super(capacityBytes); }
 
   //PRIMITIVE getX() and getXArray()
   @Override
   public char getChar() {
-    return getNativeOrderedChar();
+    return Character.reverseBytes(getNativeOrderedChar());
   }
 
   @Override
   public char getChar(final long offsetBytes) {
-    return getNativeOrderedChar(offsetBytes);
+    return Character.reverseBytes(getNativeOrderedChar(offsetBytes));
   }
 
   @Override
@@ -58,26 +52,23 @@ abstract class NativeWritableBufferImpl extends BaseWritableBufferImpl {
     final long pos = getPosition();
     final long copyBytes = ((long) lengthChars) << CHAR_SHIFT;
     incrementAndCheckPositionForRead(pos, copyBytes);
-    ResourceImpl.checkBounds(dstOffsetChars, lengthChars, dstArray.length);
-    CompareAndCopy.copyMemoryCheckingDifferentObject(
-            getUnsafeObject(),
-            getCumulativeOffset(pos),
-            dstArray,
-            ARRAY_CHAR_BASE_OFFSET + (((long) dstOffsetChars) << CHAR_SHIFT),
-            copyBytes);
+    CompareAndCopy.getNonNativeChars(getUnsafeObject(), getCumulativeOffset(pos), copyBytes,
+        dstArray, dstOffsetChars, lengthChars);
   }
 
   @Override
   public double getDouble() {
     final long pos = getPosition();
     incrementAndCheckPositionForRead(pos, ARRAY_DOUBLE_INDEX_SCALE);
-    return unsafe.getDouble(getUnsafeObject(), getCumulativeOffset(pos));
+    return Double.longBitsToDouble(
+        Long.reverseBytes(unsafe.getLong(getUnsafeObject(), getCumulativeOffset(pos))));
   }
 
   @Override
   public double getDouble(final long offsetBytes) {
     checkValidAndBounds(offsetBytes, ARRAY_DOUBLE_INDEX_SCALE);
-    return unsafe.getDouble(getUnsafeObject(), getCumulativeOffset(offsetBytes));
+    return Double.longBitsToDouble(
+        Long.reverseBytes(unsafe.getLong(getUnsafeObject(), getCumulativeOffset(offsetBytes))));
   }
 
   @Override
@@ -86,26 +77,23 @@ abstract class NativeWritableBufferImpl extends BaseWritableBufferImpl {
     final long pos = getPosition();
     final long copyBytes = ((long) lengthDoubles) << DOUBLE_SHIFT;
     incrementAndCheckPositionForRead(pos, copyBytes);
-    ResourceImpl.checkBounds(dstOffsetDoubles, lengthDoubles, dstArray.length);
-    CompareAndCopy.copyMemoryCheckingDifferentObject(
-            getUnsafeObject(),
-            getCumulativeOffset(pos),
-            dstArray,
-            ARRAY_DOUBLE_BASE_OFFSET + (((long) dstOffsetDoubles) << DOUBLE_SHIFT),
-            copyBytes);
+    CompareAndCopy.getNonNativeDoubles(getUnsafeObject(), getCumulativeOffset(pos), copyBytes,
+        dstArray, dstOffsetDoubles, lengthDoubles);
   }
 
   @Override
   public float getFloat() {
     final long pos = getPosition();
     incrementAndCheckPositionForRead(pos, ARRAY_FLOAT_INDEX_SCALE);
-    return unsafe.getFloat(getUnsafeObject(), getCumulativeOffset(pos));
+    return Float.intBitsToFloat(
+        Integer.reverseBytes(unsafe.getInt(getUnsafeObject(), getCumulativeOffset(pos))));
   }
 
   @Override
   public float getFloat(final long offsetBytes) {
     checkValidAndBounds(offsetBytes, ARRAY_FLOAT_INDEX_SCALE);
-    return unsafe.getFloat(getUnsafeObject(), getCumulativeOffset(offsetBytes));
+    return Float.intBitsToFloat(
+        Integer.reverseBytes(unsafe.getInt(getUnsafeObject(), getCumulativeOffset(offsetBytes))));
   }
 
   @Override
@@ -114,23 +102,18 @@ abstract class NativeWritableBufferImpl extends BaseWritableBufferImpl {
     final long pos = getPosition();
     final long copyBytes = ((long) lengthFloats) << FLOAT_SHIFT;
     incrementAndCheckPositionForRead(pos, copyBytes);
-    ResourceImpl.checkBounds(dstOffsetFloats, lengthFloats, dstArray.length);
-    CompareAndCopy.copyMemoryCheckingDifferentObject(
-            getUnsafeObject(),
-            getCumulativeOffset(pos),
-            dstArray,
-            ARRAY_FLOAT_BASE_OFFSET + (((long) dstOffsetFloats) << FLOAT_SHIFT),
-            copyBytes);
+    CompareAndCopy.getNonNativeFloats(getUnsafeObject(), getCumulativeOffset(pos), copyBytes,
+        dstArray, dstOffsetFloats, lengthFloats);
   }
 
   @Override
   public int getInt() {
-    return getNativeOrderedInt();
+    return Integer.reverseBytes(getNativeOrderedInt());
   }
 
   @Override
   public int getInt(final long offsetBytes) {
-    return getNativeOrderedInt(offsetBytes);
+    return Integer.reverseBytes(getNativeOrderedInt(offsetBytes));
   }
 
   @Override
@@ -138,23 +121,18 @@ abstract class NativeWritableBufferImpl extends BaseWritableBufferImpl {
     final long pos = getPosition();
     final long copyBytes = ((long) lengthInts) << INT_SHIFT;
     incrementAndCheckPositionForRead(pos, copyBytes);
-    ResourceImpl.checkBounds(dstOffsetInts, lengthInts, dstArray.length);
-    CompareAndCopy.copyMemoryCheckingDifferentObject(
-            getUnsafeObject(),
-            getCumulativeOffset(pos),
-            dstArray,
-            ARRAY_INT_BASE_OFFSET + (((long) dstOffsetInts) << INT_SHIFT),
-            copyBytes);
+    CompareAndCopy.getNonNativeInts(getUnsafeObject(), getCumulativeOffset(pos), copyBytes,
+        dstArray, dstOffsetInts, lengthInts);
   }
 
   @Override
   public long getLong() {
-    return getNativeOrderedLong();
+    return Long.reverseBytes(getNativeOrderedLong());
   }
 
   @Override
   public long getLong(final long offsetBytes) {
-    return getNativeOrderedLong(offsetBytes);
+    return Long.reverseBytes(getNativeOrderedLong(offsetBytes));
   }
 
   @Override
@@ -162,23 +140,18 @@ abstract class NativeWritableBufferImpl extends BaseWritableBufferImpl {
     final long pos = getPosition();
     final long copyBytes = ((long) lengthLongs) << LONG_SHIFT;
     incrementAndCheckPositionForRead(pos, copyBytes);
-    ResourceImpl.checkBounds(dstOffsetLongs, lengthLongs, dstArray.length);
-    CompareAndCopy.copyMemoryCheckingDifferentObject(
-            getUnsafeObject(),
-            getCumulativeOffset(pos),
-            dstArray,
-            ARRAY_LONG_BASE_OFFSET + (((long) dstOffsetLongs) << LONG_SHIFT),
-            copyBytes);
+    CompareAndCopy.getNonNativeLongs(getUnsafeObject(), getCumulativeOffset(pos), copyBytes,
+        dstArray, dstOffsetLongs, lengthLongs);
   }
 
   @Override
   public short getShort() {
-    return getNativeOrderedShort();
+    return Short.reverseBytes(getNativeOrderedShort());
   }
 
   @Override
   public short getShort(final long offsetBytes) {
-    return getNativeOrderedShort(offsetBytes);
+    return Short.reverseBytes(getNativeOrderedShort(offsetBytes));
   }
 
   @Override
@@ -187,24 +160,19 @@ abstract class NativeWritableBufferImpl extends BaseWritableBufferImpl {
     final long pos = getPosition();
     final long copyBytes = ((long) lengthShorts) << SHORT_SHIFT;
     incrementAndCheckPositionForRead(pos, copyBytes);
-    ResourceImpl.checkBounds(dstOffsetShorts, lengthShorts, dstArray.length);
-    CompareAndCopy.copyMemoryCheckingDifferentObject(
-            getUnsafeObject(),
-            getCumulativeOffset(pos),
-            dstArray,
-            ARRAY_SHORT_BASE_OFFSET + (((long) dstOffsetShorts) << SHORT_SHIFT),
-            copyBytes);
+    CompareAndCopy.getNonNativeShorts(getUnsafeObject(), getCumulativeOffset(pos), copyBytes,
+        dstArray, dstOffsetShorts, lengthShorts);
   }
 
   //PRIMITIVE putX() and putXArray()
   @Override
   public void putChar(final char value) {
-    putNativeOrderedChar(value);
+    putNativeOrderedChar(Character.reverseBytes(value));
   }
 
   @Override
   public void putChar(final long offsetBytes, final char value) {
-    putNativeOrderedChar(offsetBytes, value);
+    putNativeOrderedChar(offsetBytes, Character.reverseBytes(value));
   }
 
   @Override
@@ -212,26 +180,23 @@ abstract class NativeWritableBufferImpl extends BaseWritableBufferImpl {
     final long pos = getPosition();
     final long copyBytes = ((long) lengthChars) << CHAR_SHIFT;
     incrementAndCheckPositionForWrite(pos, copyBytes);
-    ResourceImpl.checkBounds(srcOffsetChars, lengthChars, srcArray.length);
-    CompareAndCopy.copyMemoryCheckingDifferentObject(
-            srcArray,
-            ARRAY_CHAR_BASE_OFFSET + (((long) srcOffsetChars) << CHAR_SHIFT),
-            getUnsafeObject(),
-            getCumulativeOffset(pos),
-            copyBytes);
+    CompareAndCopy.putNonNativeChars(srcArray, srcOffsetChars, lengthChars, copyBytes,
+        getUnsafeObject(), getCumulativeOffset(pos));
   }
 
   @Override
   public void putDouble(final double value) {
     final long pos = getPosition();
     incrementAndCheckPositionForWrite(pos, ARRAY_DOUBLE_INDEX_SCALE);
-    unsafe.putDouble(getUnsafeObject(), getCumulativeOffset(pos), value);
+    unsafe.putLong(getUnsafeObject(), getCumulativeOffset(pos),
+        Long.reverseBytes(Double.doubleToRawLongBits(value)));
   }
 
   @Override
   public void putDouble(final long offsetBytes, final double value) {
     checkValidAndBoundsForWrite(offsetBytes, ARRAY_DOUBLE_INDEX_SCALE);
-    unsafe.putDouble(getUnsafeObject(), getCumulativeOffset(offsetBytes), value);
+    unsafe.putLong(getUnsafeObject(), getCumulativeOffset(offsetBytes),
+        Long.reverseBytes(Double.doubleToRawLongBits(value)));
   }
 
   @Override
@@ -240,26 +205,23 @@ abstract class NativeWritableBufferImpl extends BaseWritableBufferImpl {
     final long pos = getPosition();
     final long copyBytes = ((long) lengthDoubles) << DOUBLE_SHIFT;
     incrementAndCheckPositionForWrite(pos, copyBytes);
-    ResourceImpl.checkBounds(srcOffsetDoubles, lengthDoubles, srcArray.length);
-    CompareAndCopy.copyMemoryCheckingDifferentObject(
-            srcArray,
-            ARRAY_DOUBLE_BASE_OFFSET + (((long) srcOffsetDoubles) << DOUBLE_SHIFT),
-            getUnsafeObject(),
-            getCumulativeOffset(pos),
-            copyBytes);
+    CompareAndCopy.putNonNativeDoubles(srcArray, srcOffsetDoubles, lengthDoubles, copyBytes,
+        getUnsafeObject(), getCumulativeOffset(pos));
   }
 
   @Override
   public void putFloat(final float value) {
     final long pos = getPosition();
     incrementAndCheckPositionForWrite(pos, ARRAY_FLOAT_INDEX_SCALE);
-    unsafe.putFloat(getUnsafeObject(), getCumulativeOffset(pos), value);
+    unsafe.putInt(getUnsafeObject(), getCumulativeOffset(pos),
+        Integer.reverseBytes(Float.floatToRawIntBits(value)));
   }
 
   @Override
   public void putFloat(final long offsetBytes, final float value) {
     checkValidAndBoundsForWrite(offsetBytes, ARRAY_FLOAT_INDEX_SCALE);
-    unsafe.putFloat(getUnsafeObject(), getCumulativeOffset(offsetBytes), value);
+    unsafe.putInt(getUnsafeObject(), getCumulativeOffset(offsetBytes),
+        Integer.reverseBytes(Float.floatToRawIntBits(value)));
   }
 
   @Override
@@ -268,23 +230,18 @@ abstract class NativeWritableBufferImpl extends BaseWritableBufferImpl {
     final long pos = getPosition();
     final long copyBytes = ((long) lengthFloats) << FLOAT_SHIFT;
     incrementAndCheckPositionForWrite(pos, copyBytes);
-    ResourceImpl.checkBounds(srcOffsetFloats, lengthFloats, srcArray.length);
-    CompareAndCopy.copyMemoryCheckingDifferentObject(
-            srcArray,
-            ARRAY_FLOAT_BASE_OFFSET + (((long) srcOffsetFloats) << FLOAT_SHIFT),
-            getUnsafeObject(),
-            getCumulativeOffset(pos),
-            copyBytes);
+    CompareAndCopy.putNonNativeFloats(srcArray, srcOffsetFloats, lengthFloats, copyBytes,
+        getUnsafeObject(), getCumulativeOffset(pos));
   }
 
   @Override
   public void putInt(final int value) {
-    putNativeOrderedInt(value);
+    putNativeOrderedInt(Integer.reverseBytes(value));
   }
 
   @Override
   public void putInt(final long offsetBytes, final int value) {
-    putNativeOrderedInt(offsetBytes, value);
+    putNativeOrderedInt(offsetBytes, Integer.reverseBytes(value));
   }
 
   @Override
@@ -292,23 +249,18 @@ abstract class NativeWritableBufferImpl extends BaseWritableBufferImpl {
     final long pos = getPosition();
     final long copyBytes = ((long) lengthInts) << INT_SHIFT;
     incrementAndCheckPositionForWrite(pos, copyBytes);
-    ResourceImpl.checkBounds(srcOffsetInts, lengthInts, srcArray.length);
-    CompareAndCopy.copyMemoryCheckingDifferentObject(
-            srcArray,
-            ARRAY_INT_BASE_OFFSET + (((long) srcOffsetInts) << INT_SHIFT),
-            getUnsafeObject(),
-            getCumulativeOffset(pos),
-            copyBytes);
+    CompareAndCopy.putNonNativeInts(srcArray, srcOffsetInts, lengthInts, copyBytes,
+        getUnsafeObject(), getCumulativeOffset(pos));
   }
 
   @Override
   public void putLong(final long value) {
-    putNativeOrderedLong(value);
+    putNativeOrderedLong(Long.reverseBytes(value));
   }
 
   @Override
   public void putLong(final long offsetBytes, final long value) {
-    putNativeOrderedLong(offsetBytes, value);
+    putNativeOrderedLong(offsetBytes, Long.reverseBytes(value));
   }
 
   @Override
@@ -316,23 +268,18 @@ abstract class NativeWritableBufferImpl extends BaseWritableBufferImpl {
     final long pos = getPosition();
     final long copyBytes = ((long) lengthLongs) << LONG_SHIFT;
     incrementAndCheckPositionForWrite(pos, copyBytes);
-    ResourceImpl.checkBounds(srcOffsetLongs, lengthLongs, srcArray.length);
-    CompareAndCopy.copyMemoryCheckingDifferentObject(
-            srcArray,
-            ARRAY_LONG_BASE_OFFSET + (((long) srcOffsetLongs) << LONG_SHIFT),
-            getUnsafeObject(),
-            getCumulativeOffset(pos),
-            copyBytes);
+    CompareAndCopy.putNonNativeLongs(srcArray, srcOffsetLongs, lengthLongs, copyBytes,
+        getUnsafeObject(), getCumulativeOffset(pos));
   }
 
   @Override
   public void putShort(final short value) {
-    putNativeOrderedShort(value);
+    putNativeOrderedShort(Short.reverseBytes(value));
   }
 
   @Override
   public void putShort(final long offsetBytes, final short value) {
-    putNativeOrderedShort(offsetBytes, value);
+    putNativeOrderedShort(offsetBytes, Short.reverseBytes(value));
   }
 
   @Override
@@ -341,12 +288,8 @@ abstract class NativeWritableBufferImpl extends BaseWritableBufferImpl {
     final long pos = getPosition();
     final long copyBytes = ((long) lengthShorts) << SHORT_SHIFT;
     incrementAndCheckPositionForWrite(pos, copyBytes);
-    ResourceImpl.checkBounds(srcOffsetShorts, lengthShorts, srcArray.length);
-    CompareAndCopy.copyMemoryCheckingDifferentObject(
-            srcArray,
-            ARRAY_SHORT_BASE_OFFSET + (((long) srcOffsetShorts) << SHORT_SHIFT),
-            getUnsafeObject(),
-            getCumulativeOffset(pos),
-            copyBytes);
+    CompareAndCopy.putNonNativeShorts(srcArray, srcOffsetShorts, lengthShorts, copyBytes,
+        getUnsafeObject(), getCumulativeOffset(pos));
   }
+
 }

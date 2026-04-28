@@ -42,11 +42,6 @@ under the License.
   <dependencies>
     <dependency>
       <groupId>org.apache.datasketches</groupId>
-      <artifactId>datasketches-memory-java8</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.datasketches</groupId>
       <artifactId>datasketches-memory-java11</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -86,7 +81,7 @@ under the License.
         </executions>
         <configuration>
           <excludes>
-            <exclude>org/apache/datasketches/memory/internal/VirtualMachineMemory.class</exclude>
+            <!-- <exclude>org/apache/datasketches/memory/internal/VirtualMachineMemory.class</exclude> -->
           </excludes>
         </configuration>
       </plugin>

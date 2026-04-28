@@ -43,7 +43,7 @@ import org.apache.datasketches.memory.WritableMemory;
  * Common base of native-ordered and non-native-ordered {@link WritableBuffer} implementations.
  * Contains methods which are agnostic to the byte order.
  */
-@SuppressWarnings("restriction")
+//@SuppressWarnings("restriction")
 public abstract class BaseWritableBufferImpl extends PositionalImpl implements WritableBuffer {
 
   //Pass-through constructor

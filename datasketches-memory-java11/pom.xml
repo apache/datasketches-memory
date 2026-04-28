@@ -39,19 +39,23 @@ under the License.
     <!-- Test -->
     <testng.version>7.12.0</testng.version>
     <java.version>11</java.version>
+
     <jdk-toolchain.version>${java.version}</jdk-toolchain.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
-    <maven.javadoc.skip>true</maven.javadoc.skip>
+    <maven.javadoc.skip>false</maven.javadoc.skip>
     <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
     <!-- jdk.internal.misc is used to call public Unsafe & public VM -->
     <arg.jdk.internal.misc>--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED</arg.jdk.internal.misc>
     <!-- jdk.internal.ref is used to call public Cleaner -->
     <arg.jdk.internal.ref>--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED</arg.jdk.internal.ref>
+    <!-- sun.nio.ch.exports is used to open FileChannelImpl for DirectBuffer-->
+    <arg.sun.nio.ch.exports>--add-exports=java.base/sun.nio.ch=ALL-UNNAMED</arg.sun.nio.ch.exports>
+    <!-- sun.nio.ch.opens is used to open FileChannelImpl for map0 & unmap0 for reflection-->
+    <arg.sun.nio.ch.opens>--add-opens=java.base/sun.nio.ch=ALL-UNNAMED</arg.sun.nio.ch.opens>
     <!-- java.nio is used to open MappedByteBuffer load0, isloaded0, & force0 for reflection -->
     <arg.java.nio>--add-opens=java.base/java.nio=ALL-UNNAMED</arg.java.nio>
-    <!-- sun.nio.ch is used to open FileChannelImpl for map0 & unmap0 for reflection-->
-    <arg.sun.nio.ch>--add-opens=java.base/sun.nio.ch=ALL-UNNAMED</arg.sun.nio.ch>
+
   </properties>
 
   <dependencies>
@@ -69,21 +73,22 @@ under the License.
       <scope>test</scope>
     </dependency>
     <dependency>
-        <groupId>org.apache.datasketches</groupId>
-        <artifactId>datasketches-memory-java8</artifactId>
-        <version>3.0.2</version>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>${org-slf4j.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
   <build>
-   <pluginManagement>
-     <plugins>   
-       <plugin>
-         <groupId>org.apache.maven.plugins</groupId>
-         <artifactId>maven-deploy-plugin</artifactId>
-       </plugin>
-     </plugins>
-   </pluginManagement>
+    <pluginManagement>
+      <plugins>   
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   
     <plugins>
       <plugin>
@@ -94,6 +99,8 @@ under the License.
           <compilerArgs>
             <arg>${arg.jdk.internal.ref}</arg>
             <arg>${arg.jdk.internal.misc}</arg>
+            <arg>${arg.sun.nio.ch.exports}</arg>
+            <arg>${arg.sun.nio.ch.opens}</arg>
           </compilerArgs>
         </configuration>
       </plugin>
@@ -108,11 +115,12 @@ under the License.
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <argLine>
-            @{argLine} @{jvm.args} ${arg.java.nio} ${arg.sun.nio.ch} ${arg.jdk.internal.misc} ${arg.jdk.internal.ref}
+            @{argLine} @{jvm.args} ${arg.java.nio} ${arg.sun.nio.ch.exports} ${arg.sun.nio.ch.opens} ${arg.jdk.internal.misc} ${arg.jdk.internal.ref}
           </argLine>
           <trimStackTrace>false</trimStackTrace>
+          <useFile>false</useFile>
           <useManifestOnlyJar>false</useManifestOnlyJar>
-          <redirectTestOutputToFile>true</redirectTestOutputToFile>
+          <redirectTestOutputToFile>false</redirectTestOutputToFile>
           <reportsDirectory>${project.build.directory}/test-output/${maven.build.timestamp}</reportsDirectory>
           <perCoreThreadCount>false</perCoreThreadCount>
         </configuration>

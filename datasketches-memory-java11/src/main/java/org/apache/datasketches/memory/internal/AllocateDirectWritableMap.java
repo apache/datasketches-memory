@@ -49,7 +49,7 @@ import sun.nio.ch.FileChannelImpl;
  * @author Lee Rhodes
  * @author Praveenkumar Venkatesan
  */
-@SuppressWarnings("restriction")
+//@SuppressWarnings("restriction")
 final class AllocateDirectWritableMap {
   static final Logger LOG = Logger.getLogger(AllocateDirectWritableMap.class.getCanonicalName());
 

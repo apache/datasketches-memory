@@ -55,7 +55,7 @@ public class AllocateDirectMapMemoryTest {
   }
 
   @Test
-  public void printGettysbergAddress() throws IOException {
+  public void printGettysburgAddress() throws IOException {
     File file = getResourceFile("GettysburgAddress.txt");
     try (Memory mem = Memory.map(file))
     {

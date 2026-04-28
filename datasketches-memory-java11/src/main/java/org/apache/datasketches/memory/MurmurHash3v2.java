@@ -184,7 +184,7 @@ public final class MurmurHash3v2 {
    * @param hashOut the size 2 long array for the resulting 128-bit hash
    * @return the hash.
    */
-  @SuppressWarnings("restriction")
+  //@SuppressWarnings("restriction")
   public static long[] hash(
       final Memory mem, 
       final long offsetBytes, 

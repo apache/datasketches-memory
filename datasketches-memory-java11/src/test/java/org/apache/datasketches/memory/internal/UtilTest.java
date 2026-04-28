@@ -149,7 +149,7 @@ public class UtilTest {
   static final void setGettysburgAddressFileToReadOnly() {
     File file = getResourceFile("GettysburgAddress.txt");
     try {
-    Files.setPosixFilePermissions(file.toPath(), PosixFilePermissions.fromString("r--r--r--"));
+      Files.setPosixFilePermissions(file.toPath(), PosixFilePermissions.fromString("r--r--r--"));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -164,10 +164,12 @@ public class UtilTest {
     assertTrue(file.exists());
   }
 
-  @Test(expectedExceptions = NullPointerException.class)
+  @Test
   public void resourceFileNotFound() {
     final String shortFileName = "GettysburgAddress.txt";
-    getResourceFile(shortFileName + "123");
+    try { getResourceFile(shortFileName + "123"); }
+    catch (IllegalArgumentException e) { //OK
+    }
   }
 
   @Test

@@ -147,6 +147,7 @@ under the License.
 
     <!-- other -->
     <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
+    <org-slf4j.version>2.0.12</org-slf4j.version>
 
     <!-- Used for xxHash testing -->
     <zero-allocation-hashing.version>2026.0</zero-allocation-hashing.version>
@@ -327,8 +328,9 @@ under the License.
           <configuration>
             <argLine>@{argLine} @{jvm.args}</argLine>
             <trimStackTrace>false</trimStackTrace>
+            <useFile>false</useFile>
             <useManifestOnlyJar>false</useManifestOnlyJar>
-            <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            <redirectTestOutputToFile>false</redirectTestOutputToFile>
             <reportsDirectory>${project.build.directory}/test-output/${maven.build.timestamp}</reportsDirectory>
             <perCoreThreadCount>false</perCoreThreadCount>
           </configuration>
@@ -521,7 +523,6 @@ under the License.
        The submodules target different version-specific features of the Java language APIs.
   -->
   <modules>
-    <module>datasketches-memory-java8</module>
     <module>datasketches-memory-java11</module>
     <module>datasketches-memory-report</module>
   </modules>

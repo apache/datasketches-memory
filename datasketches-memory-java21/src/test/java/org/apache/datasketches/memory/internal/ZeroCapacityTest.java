@@ -28,7 +28,7 @@ import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
 /**
- * Although one might think that allocating zero bytes is a bug, it is tolerated in Java.
+ * Although allocating zero bytes may be a bug, it is tolerated in Java.
  *
  * @author Lee Rhodes
  */

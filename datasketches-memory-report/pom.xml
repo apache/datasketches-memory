@@ -45,6 +45,11 @@ under the License.
       <artifactId>datasketches-memory-java11</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.datasketches</groupId>
+      <artifactId>datasketches-memory-java21</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
   <build>

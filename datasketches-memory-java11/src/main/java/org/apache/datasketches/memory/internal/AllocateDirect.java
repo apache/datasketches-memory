@@ -21,82 +21,68 @@ package org.apache.datasketches.memory.internal;
 
 import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
 
-import java.util.logging.Logger;
+import java.lang.ref.Cleaner;
 
 /**
- * Provides access to direct (native) memory.
+ * Provides access to off-heap memory.
  *
- * @author Roman Leventov
  * @author Lee Rhodes
  */
-//@SuppressWarnings("restriction")
-final class AllocateDirect {
-  static final Logger LOG = Logger.getLogger(AllocateDirect.class.getCanonicalName());
-
+public class AllocateDirect {
+  private static final Cleaner CLEANER = Cleaner.create();
+  private final long rawAddress;     //used for freeMemory
+  private final long alignedAddress; //data start address
   private final Deallocator deallocator;
-  private final long nativeBaseOffset;
-  private final MemoryCleaner cleaner;
-
+  private final Cleaner.Cleanable cleanable;
+ 
   /**
-   * Base Constructor for allocate native memory.
-   *
-   * <p>Allocates and provides access to capacityBytes directly in native (off-heap) memory
-   * leveraging the MemoryImpl interface.
-   * The allocated memory will be 8-byte aligned, but may not be page aligned.
-   * @param capacityBytes the the requested capacity of off-heap memory. Cannot be zero.
+   * Allocates off-heap memory with a default alignment of 8 bytes.
+   * @param capacityBytes must be greater than zero.
    */
   AllocateDirect(final long capacityBytes) {
-    final boolean pageAligned = VirtualMachineMemory.getIsPageAligned();
-    final long pageSize = getPageSize();
-    final long allocationSize = capacityBytes + (pageAligned ? pageSize : 0);
-    final long nativeAddress;
+    this(capacityBytes, Long.BYTES);
+  }
+  
+  /**
+   * Allocates off-heap memory with a specified alignment.
+   * @param capacityBytes must be greater than or equal 0.
+   * @param alignment the desired alignment. It must be a power of 2; e.g., 2, 4 or 8; and greater than 1.
+   */
+  AllocateDirect(final long capacityBytes, int alignment) {
+    if (capacityBytes < 0) { throw new IllegalArgumentException("capacityBytes must be >= 0: " + capacityBytes); }
+    long mask = alignment - 1L;
+    if (checkAlignment(alignment)) {
+      throw new IllegalArgumentException("alignment must be a positive power of 2 and greater than one: " + alignment); }
     try {
-      nativeAddress = unsafe.allocateMemory(allocationSize);
+      this.rawAddress = unsafe.allocateMemory(capacityBytes + mask);
     } catch (final OutOfMemoryError err) {
       throw new RuntimeException(err);
-    }
-    if (pageAligned && ((nativeAddress % pageSize) != 0)) {
-      //Round up to page boundary
-      nativeBaseOffset = (nativeAddress & ~(pageSize - 1L)) + pageSize;
-    } else {
-      nativeBaseOffset = nativeAddress;
-    }
-    deallocator = new Deallocator(nativeAddress);
-    cleaner = new MemoryCleaner(this, deallocator);
+    }    
+    this.alignedAddress = rawAddress & ~mask;
+    this.deallocator = new Deallocator(rawAddress);
+    this.cleanable = CLEANER.register(this, deallocator);
+  }
+  
+  public long getAddress() {
+    return alignedAddress;
   }
 
   public void close() {
-    try {
-      if (deallocator.deallocate(false)) {
-        // This Cleaner.clean() call effectively just removes the Cleaner from the internal linked
-        // list of all cleaners. It will delegate to Deallocator.deallocate() which will be a no-op
-        // because the valid state is already changed.
-        cleaner.clean();
-      }
-    } finally {
-      ResourceImpl.reachabilityFence(this);
-    }
-  }
-
-  long getNativeBaseOffset() {
-    return nativeBaseOffset;
-  }
-
-  public static int getPageSize() {
-    return unsafe.pageSize();
+    cleanable.clean();
   }
 
   public StepBoolean getValid() {
     return deallocator.getValid();
   }
 
+  //Must be static and NOT hold a reference to the outer AllocateDirect class
   private static final class Deallocator implements Runnable {
     //This is the only place the actual native address is kept for use by unsafe.freeMemory();
-    private final long nativeAddress;
+    private final long addressToFree;
     private final StepBoolean valid = new StepBoolean(true); //only place for this
 
-    Deallocator(final long nativeAddress) {
-      this.nativeAddress = nativeAddress;
+    Deallocator(final long addressToFree) {
+      this.addressToFree = addressToFree;
     }
 
     StepBoolean getValid() {
@@ -104,21 +90,20 @@ final class AllocateDirect {
     }
 
     @Override
-    public void run() throws IllegalStateException {
-      deallocate(true);
-    }
-
-    boolean deallocate(final boolean calledFromCleaner) throws IllegalStateException {
-      if (valid.change()) {
-        if (calledFromCleaner) {
-          // Warn about non-deterministic resource cleanup.
-          LOG.warning("A direct resource was not closed explicitly.");
-        }
-        unsafe.freeMemory(nativeAddress);
-        return true;
+    public void run() {
+      if (valid.change() && addressToFree != 0) {
+        unsafe.freeMemory(addressToFree);
       }
-      return false;
     }
   }
-
+  
+  /**
+   * Returns true if given <i>n</i> is greater than one and a positive power of 2.
+   *
+   * @param n The input argument.
+   * @return true if argument is greater than one and a positive power of 2.
+   */
+  private static final boolean checkAlignment(final int n) {
+    return (n >= 1) && ((n & -n) == n);
+  }
 }

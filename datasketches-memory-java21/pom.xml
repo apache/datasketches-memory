@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.apache.datasketches</groupId>
+    <artifactId>datasketches-memory</artifactId>
+    <version>3.0.2</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>datasketches-memory-java21</artifactId>
+  <name>${project.artifactId}</name>
+  <packaging>jar</packaging>
+
+  <properties>
+    <!-- Test -->
+    <testng.version>7.12.0</testng.version>
+    <java.version>21</java.version>
+
+    <jdk-toolchain.version>${java.version}</jdk-toolchain.version>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
+    <maven.javadoc.skip>false</maven.javadoc.skip>
+    <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
+    <!-- jdk.internal.misc is used to call public Unsafe & public VM -->
+    <arg.jdk.internal.misc>--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED</arg.jdk.internal.misc>
+    <!-- jdk.internal.ref is used to call public Cleaner -->
+    <arg.jdk.internal.ref>--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED</arg.jdk.internal.ref>
+    <!-- sun.nio.ch.exports is used to open FileChannelImpl for DirectBuffer-->
+    <arg.sun.nio.ch.exports>--add-exports=java.base/sun.nio.ch=ALL-UNNAMED</arg.sun.nio.ch.exports>
+    <!-- jdk.internal.access is used to access SharedSecrets and JavaNioAccess -->
+    <arg.jdk.internal.access>--add-exports=java.base/jdk.internal.access=ALL-UNNAMED</arg.jdk.internal.access>
+    <!-- java.nio is used to open MappedByteBuffer load0, isloaded0, & force0 for reflection -->
+    <arg.java.nio>--add-opens=java.base/java.nio=ALL-UNNAMED</arg.java.nio>    
+    <!-- sun.nio.ch.opens is used to open FileChannelImpl for map0 & unmap0 for reflection-->
+    <arg.sun.nio.ch.opens>--add-opens=java.base/sun.nio.ch=ALL-UNNAMED</arg.sun.nio.ch.opens>
+
+
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <version>${testng.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- Used for xxHash testing -->
+      <groupId>net.openhft</groupId>
+      <artifactId>zero-allocation-hashing</artifactId>
+      <version>${zero-allocation-hashing.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>${org-slf4j.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>   
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <fork>true</fork> <!-- required if Maven is using a different JVM -->
+          <compilerArgs>
+            <arg>${arg.jdk.internal.misc}</arg>
+            <arg>${arg.jdk.internal.ref}</arg>
+            <arg>${arg.sun.nio.ch.exports}</arg>
+            <arg>${arg.jdk.internal.access}</arg>
+            <arg>${arg.java.nio}</arg>
+            <arg>${arg.sun.nio.ch.opens}</arg>
+          </compilerArgs>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <argLine>
+            @{argLine}
+            @{jvm.args}
+            ${arg.java.nio}
+            ${arg.sun.nio.ch.exports}
+            ${arg.sun.nio.ch.opens}
+            ${arg.jdk.internal.misc}
+            ${arg.jdk.internal.ref}
+            ${arg.jdk.internal.access}
+            -Dorg.slf4j.simpleLogger.log.org.testng=warn
+          </argLine>
+          <trimStackTrace>false</trimStackTrace>
+          <useFile>true</useFile>
+          <useManifestOnlyJar>false</useManifestOnlyJar>
+          <redirectTestOutputToFile>true</redirectTestOutputToFile>
+          <reportsDirectory>${project.build.directory}/test-output/${maven.build.timestamp}</reportsDirectory>
+          <perCoreThreadCount>false</perCoreThreadCount>
+          <properties>
+            <property>
+              <name>verbose</name>
+              <value>0</value> 
+            </property>
+          </properties>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-toolchains-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>toolchain</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <toolchains>
+            <jdk>
+              <version>${java.version}</version> <!-- override -->
+            </jdk>
+          </toolchains>
+        </configuration>
+      </plugin>
+     </plugins>
+  </build>
+
+  <profiles>
+
+    <profile>
+      <id>assemble-mr-jar</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <properties> <!-- project.root defined in /.mvn/maven.config -->
+        <assembly.script.path>${project.root}/tools/scripts/package-multi-release-jar.sh</assembly.script.path>
+        <assembly.java.home>${env.JAVA_HOME}</assembly.java.home>
+        <assembly.git.tag>${project.version}</assembly.git.tag>
+        <assembly.base.dir>${project.root}</assembly.base.dir>
+      </properties>
+      <build>
+        <defaultGoal>exec:exec</defaultGoal>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <!-- The trailing comment on the line below ignores an eclipse warning. The version is required for dependency updates. -->
+            <version>${exec-maven-plugin.version}</version><!--$NO-MVN-MAN-VER$--> <!-- ?? -->
+            <executions>
+              <execution>
+                <id>package-mr-jar</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>package</phase>
+                <configuration>
+                  <executable>bash</executable>
+                  <commandlineArgs>${assembly.script.path} ${assembly.java.home} ${assembly.git.tag} ${assembly.base.dir}</commandlineArgs>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+</project>

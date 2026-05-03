@@ -18,16 +18,3 @@
  */
 
 package org.apache.datasketches.memory.internal;
-
-import org.testng.annotations.Test;
-
-@SuppressWarnings({"unused"})
-public class VirtualMachineMemoryTest {
-
-    @Test
-    public void inertPageAlignment() {
-      boolean result = VirtualMachineMemory.getIsPageAligned();
-      //System.out.println("VM page alignment:" + result);
-      assert (true); //no exception was thrown
-    }
-}

@@ -19,29 +19,33 @@
 
 package org.apache.datasketches.memory.internal;
 
-import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 
 /**
- * This is a step boolean function that can change its state only once.
+ * This is a step boolean or latch function that can change its state only once.
  *
  * @author Lee Rhodes
  */
 public final class StepBoolean {
-  private static final int FALSE = 0;
-  private static final int TRUE = 1;
-  private static final AtomicIntegerFieldUpdater<StepBoolean> STATE_FIELD_UPDATER =
-      AtomicIntegerFieldUpdater.newUpdater(StepBoolean.class, "state");
+  private static final VarHandle STATE_HANDLE;
+
+  static {
+      try {
+          STATE_HANDLE = MethodHandles.lookup().findVarHandle(StepBoolean.class, "state", int.class);
+      } catch (final ReflectiveOperationException e) { throw new Error(e); }
+  }
 
   private final int initialState;
-  private volatile int state;
+  private volatile int state; // Still needs to be volatile
 
   /**
    * Defines the initial state
    * @param initialState the given initial state
    */
   public StepBoolean(final boolean initialState) {
-    this.initialState = initialState ? TRUE : FALSE;
-    state = this.initialState;
+      this.initialState = initialState ? 1 : 0;
+      this.state = this.initialState;
   }
 
   /**
@@ -49,19 +53,20 @@ public final class StepBoolean {
    * @return the current state.
    */
   public boolean get() {
-    return state == TRUE;
+    return state == 1;
   }
-
+  
   /**
    * This changes the state of this step boolean function if it has not yet changed.
    * @return true if this call led to the change of the state; false if the state has already been
    * changed
    */
   public boolean change() {
-    final int notInitialState = initialState == TRUE ? FALSE : TRUE;
-    return STATE_FIELD_UPDATER.compareAndSet(this, initialState, notInitialState);
+      final int targetState = 1 - initialState;
+      // Transition 'state' from 'initialState' to 'targetState'
+      return STATE_HANDLE.compareAndSet(this, initialState, targetState);
   }
-
+  
   /**
    * Return true if the state has changed from the initial state
    * @return true if the state has changed from the initial state

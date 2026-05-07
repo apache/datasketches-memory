@@ -370,7 +370,7 @@ public final class Util {
     }
   }
 
-  public static void ensureReadOnly(Path path) {
+  public static void ensureReadOnly(final Path path) {
     if (!Files.exists(path)) {
       throw new IllegalArgumentException("File not found.");
     }
@@ -384,44 +384,42 @@ public final class Util {
    *   @param resourceName the simple file name. No special characters or slashes.
    *   @return a File System File
    */
-  public static File getResourceFile(String resourceName) {
+  public static File getResourceFile(final String resourceName) {
     Objects.requireNonNull(resourceName, "Given resourceName must not be null");
     if (resourceName.isEmpty()) { throw new IllegalArgumentException("Given resourceName must not be empty"); }
     // Normalize name: ClassLoaders MUST use forward slashes even on Windows
     String normalizedName = resourceName.replace('\\', '/');
     if (normalizedName.startsWith("/")) { normalizedName = normalizedName.substring(1); }
 
-    ClassLoader loader = Util.class.getClassLoader();
-    URL url = loader.getResource(normalizedName);
+    final ClassLoader loader = Util.class.getClassLoader();
+    final URL url = loader.getResource(normalizedName);
     if (url == null) { throw new IllegalArgumentException("Resource not found: " + normalizedName); }
 
     // If it's a real file, return it directly
     if ("file".equals(url.getProtocol())) {
         try { 
-          URI uri = url.toURI();
+          final URI uri = url.toURI();
           return new File(uri); } 
-        catch (URISyntaxException e) { return new File(url.getPath()); }
+        catch (final URISyntaxException e) { return new File(url.getPath()); }
     }
 
     // If it's in a JAR, we must extract it for Memory.map() to work
     // We use a prefix that won't collide with Windows reserved names
-    File tempFile;
+    final File tempFile;
     try { tempFile = File.createTempFile("datasketches-", ".bin"); }
-    catch (IOException e1) { throw new IllegalArgumentException(e1); }
+    catch (final IOException e1) { throw new IllegalArgumentException(e1); }
     tempFile.deleteOnExit();
 
     try (InputStream in = loader.getResourceAsStream(normalizedName)) {
-        if (in == null) throw new IllegalArgumentException("Could not open stream for " + normalizedName);
+        if (in == null) { throw new IllegalArgumentException("Could not open stream for " + normalizedName); }
         
         // Use REPLACE_EXISTING to avoid "File Already Exists" errors on Windows retries
         Files.copy(in, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-    } catch (IOException e) { throw new IllegalArgumentException(e); }
+    } catch (final IOException e) { throw new IllegalArgumentException(e); }
 
     // Final Windows Fix: Ensure the file is actually writable if you need to setReadOnly later
     //tempFile.setWritable(true); 
     
     return tempFile;
   }
-  
-  
 }

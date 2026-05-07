@@ -81,8 +81,6 @@ public abstract class ResourceImpl implements Resource {
 
   static final String NOT_MAPPED_FILE_RESOURCE = "This is not a memory-mapped file resource";
   static final String THREAD_EXCEPTION_TEXT = "Attempted access outside owning thread";
-
-  //private static boolean JAVA_VERSION_WARNING_PRINTED = false;
   
   static {
     final String jdkVer = System.getProperty("java.version");
@@ -157,11 +155,6 @@ public abstract class ResourceImpl implements Resource {
     if (!ok) { throw new IllegalArgumentException(
         "Unsupported JDK Major Version. It must be one of 1.8, 8, 11, 17, 21, 25: " + jdkVer);
     }
-//    if (p0 > 11 && !JAVA_VERSION_WARNING_PRINTED) {
-//      System.err.println(
-//          "Warning: Java versions > Java 11 can only operate in restricted mode where no off-heap operations are allowed!");
-//      JAVA_VERSION_WARNING_PRINTED = true;
-//    }
   }
 
   void checkNotReadOnly() {
@@ -239,10 +232,10 @@ public abstract class ResourceImpl implements Resource {
     return CompareAndCopy.equals(this, thisOffsetBytes, (ResourceImpl) that, thatOffsetBytes, lengthBytes);
   }
 
-  @Override
-  public void force() { //overridden by Map Leaves
-    throw new UnsupportedOperationException(NOT_MAPPED_FILE_RESOURCE);
-  }
+//  @Override
+//  public void force() { //overridden by Map Leaves
+//    throw new UnsupportedOperationException(NOT_MAPPED_FILE_RESOURCE);
+//  }
 
   //Overridden by ByteBuffer Leaves. Used internally and for tests.
   ByteBuffer getByteBuffer() {
@@ -317,13 +310,8 @@ public abstract class ResourceImpl implements Resource {
   }
 
   @Override
-  public boolean isLoaded() { //overridden by Map Leaves
-    throw new IllegalStateException(NOT_MAPPED_FILE_RESOURCE);
-  }
-
-  @Override
   public boolean isMapped() {
-    return (getTypeId() & MAP) > 0;
+    return false;
   }
 
   @Override
@@ -368,11 +356,6 @@ public abstract class ResourceImpl implements Resource {
   @Override
   public boolean isAlive() {
     return true;
-  }
-
-  @Override
-  public void load() { //overridden by Map leaves
-    throw new IllegalStateException(NOT_MAPPED_FILE_RESOURCE);
   }
 
   private static String pad(final String s, final int fieldLen) {

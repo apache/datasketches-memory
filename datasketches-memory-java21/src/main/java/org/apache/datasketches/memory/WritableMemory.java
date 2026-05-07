@@ -70,7 +70,7 @@ public interface WritableMemory extends Memory {
 
   //Duplicates make no sense here
 
-  //No Mapping in Java 21
+  //No Mapping in Java 17 or 21
 
   //ALLOCATE OFF-HEAP
 

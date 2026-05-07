@@ -24,23 +24,12 @@
 package org.apache.datasketches.memory.internal;
 
 import static org.apache.datasketches.memory.internal.Util.characterPad;
-import static org.apache.datasketches.memory.internal.Util.getResourceBytes;
-import static org.apache.datasketches.memory.internal.Util.getResourceFile;
 import static org.apache.datasketches.memory.internal.Util.negativeCheck;
-import static org.apache.datasketches.memory.internal.Util.nullCheck;
 import static org.apache.datasketches.memory.internal.Util.zeroCheck;
 import static org.apache.datasketches.memory.internal.Util.zeroPad;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.attribute.PosixFileAttributeView;
-import java.nio.file.attribute.PosixFileAttributes;
-import java.nio.file.attribute.PosixFilePermissions;
 
 import org.apache.datasketches.memory.MemoryBoundsException;
 import org.apache.datasketches.memory.WritableMemory;
@@ -83,14 +72,7 @@ public class UtilTest {
   }
 
   @Test
-  public void checkNullZeroNegativeChecks() {
-    Object obj = null;
-    try {
-      nullCheck(obj, "Test Object");
-      fail();
-    } catch (IllegalArgumentException e) {
-      //OK
-    }
+  public void checkZeroNegativeChecks() {
     try {
       zeroCheck(0, "Test Long");
       fail();
@@ -129,60 +111,6 @@ public class UtilTest {
         fail();
       }
     }
-  }
-
-  static final String getFileAttributes(File file) {
-    try {
-    PosixFileAttributes attrs = Files.getFileAttributeView(
-        file.toPath(), PosixFileAttributeView.class, new LinkOption[0]).readAttributes();
-    String s = String.format("%s: %s %s %s%n",
-        file.getPath(),
-        attrs.owner().getName(),
-        attrs.group().getName(),
-        PosixFilePermissions.toString(attrs.permissions()));
-    return s;
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  static final void setGettysburgAddressFileToReadOnly() {
-    File file = getResourceFile("GettysburgAddress.txt");
-    try {
-      Files.setPosixFilePermissions(file.toPath(), PosixFilePermissions.fromString("r--r--r--"));
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  //Resources
-
-  @Test
-  public void resourceFileExits() {
-    final String shortFileName = "GettysburgAddress.txt";
-    final File file = getResourceFile(shortFileName);
-    assertTrue(file.exists());
-  }
-
-  @Test
-  public void resourceFileNotFound() {
-    final String shortFileName = "GettysburgAddress.txt";
-    try { getResourceFile(shortFileName + "123"); }
-    catch (IllegalArgumentException e) { //OK
-    }
-  }
-
-  @Test
-  public void resourceBytesCorrect() {
-    final String shortFileName = "GettysburgAddress.txt";
-    final byte[] bytes = getResourceBytes(shortFileName);
-    assertTrue(bytes.length == 1541);
-  }
-
-  @Test(expectedExceptions = NullPointerException.class)
-  public void resourceBytesFileNotFound() {
-    final String shortFileName = "GettysburgAddress.txt";
-    getResourceBytes(shortFileName + "123");
   }
 
   @Test

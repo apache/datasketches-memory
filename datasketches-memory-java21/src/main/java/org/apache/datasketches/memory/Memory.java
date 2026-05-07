@@ -66,7 +66,7 @@ public interface Memory extends Resource {
 
   //Duplicates make no sense here
 
-  //No Mapping in Java 21
+  //No Mapping in Java 17 or 21
   
   //NO ALLOCATE OFF-HEAP, makes no sense
 

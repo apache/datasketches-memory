@@ -299,8 +299,8 @@ public abstract class BaseWritableMemoryImpl extends ResourceImpl implements Wri
   }
 
   @Override
-  public final void writeTo(final long offsetBytes, final long lengthBytes,
-      final WritableByteChannel out) throws IOException {
+  public final void writeTo(final long offsetBytes, final long lengthBytes, final WritableByteChannel out) 
+      throws IOException {
     checkValidAndBounds(offsetBytes, lengthBytes);
     if (getUnsafeObject() instanceof byte[]) {
       writeByteArrayTo((byte[]) getUnsafeObject(), offsetBytes, lengthBytes, out);

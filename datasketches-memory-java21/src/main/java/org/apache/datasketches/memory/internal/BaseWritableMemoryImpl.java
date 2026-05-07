@@ -121,9 +121,9 @@ public abstract class BaseWritableMemoryImpl extends ResourceImpl implements Wri
       final ByteOrder byteOrder, final MemoryRequestServer memReqSvr) {
     Util.negativeCheck(capacityBytes, "capacityBytes");
     Objects.requireNonNull(byteOrder, "byteOrder must be non-null.");
-    final AllocateDirect direct = new AllocateDirect(capacityBytes);
+    final AllocateDirect direct = new AllocateDirect(capacityBytes, 3);
     final int typeId = 0; //direct is never read-only on construction
-    final long nativeBaseOffset = direct.getNativeBaseOffset();
+    final long nativeBaseOffset = direct.getAddress();
     final long cumOffsetBytes = nativeBaseOffset;
     final BaseWritableMemoryImpl wmem = Util.isNativeByteOrder(byteOrder)
         ? new DirectWritableMemoryImpl(

@@ -47,8 +47,6 @@ under the License.
     <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
     <!-- jdk.internal.misc is used to call public Unsafe & public VM -->
     <arg.jdk.internal.misc>--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED</arg.jdk.internal.misc>
-    <!-- jdk.internal.ref is used to call public Cleaner -->
-    <arg.jdk.internal.ref>--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED</arg.jdk.internal.ref>
     <!-- sun.nio.ch.exports is used to open FileChannelImpl for DirectBuffer-->
     <arg.sun.nio.ch.exports>--add-exports=java.base/sun.nio.ch=ALL-UNNAMED</arg.sun.nio.ch.exports>
     <!-- sun.nio.ch.opens is used to open FileChannelImpl for map0 & unmap0 for reflection-->
@@ -97,7 +95,7 @@ under the License.
         <configuration>
           <fork>true</fork> <!-- required if Maven is using a different JVM -->
           <compilerArgs>
-            <arg>${arg.jdk.internal.ref}</arg>
+            <!-- <arg>${arg.jdk.internal.ref}</arg> -->
             <arg>${arg.jdk.internal.misc}</arg>
             <arg>${arg.sun.nio.ch.exports}</arg>
             <arg>${arg.sun.nio.ch.opens}</arg>
@@ -115,7 +113,7 @@ under the License.
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <argLine>
-            @{argLine} @{jvm.args} ${arg.java.nio} ${arg.sun.nio.ch.exports} ${arg.sun.nio.ch.opens} ${arg.jdk.internal.misc} ${arg.jdk.internal.ref}
+            @{argLine} @{jvm.args} ${arg.java.nio} ${arg.sun.nio.ch.exports} ${arg.sun.nio.ch.opens} ${arg.jdk.internal.misc}
           </argLine>
           <trimStackTrace>false</trimStackTrace>
           <useFile>false</useFile>

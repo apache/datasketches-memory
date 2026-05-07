@@ -28,12 +28,13 @@ import org.apache.datasketches.memory.WritableMemory;
 
 public class CheckMemoryJar {
 
-    public void printJDK() {
+    public int printJDK() {
         String JdkVersionString = System.getProperty("java.version");
         int JdkMajorVersion = getJavaMajorVersion(JdkVersionString);
         println("JDK Full Version : " + JdkVersionString);
         println("JDK Major Version: " + JdkMajorVersion);
         println("");
+        return JdkMajroVersion;
     }
 
     public void checkHeapWritableMemory() {
@@ -69,6 +70,7 @@ public class CheckMemoryJar {
         }
     }
 
+    //MAP
     public void checkMap(String mappedFilePath) throws Exception {
         try {
             String str = "4 - Memory Map Successful";
@@ -82,18 +84,21 @@ public class CheckMemoryJar {
     }
 
     public static void main(final String[] args) throws Exception {
-        if (args.length < 1) {
+        CheckMemoryJar check = new CheckMemoryJar();
+        int majVer = check.printJDK();
+        
+        if (majVer <= 11) {
+          if (args.length < 1) {
             System.out.println("Please provide the full path to the memory mapped file!");
             System.exit(1);
+          }
+          String mappedFilePath = args[0];
+          check.checkMap(mappedFilePath);
         }
-
-        String mappedFilePath = args[0];
-        CheckMemoryJar check = new CheckMemoryJar();
-        check.printJDK();
+        //all versions
         check.checkHeapWritableMemory();
         check.checkAllocateDirect();
         check.checkByteBuffer();
-        check.checkMap(mappedFilePath);
         println("");
         println("All checks passed.");
     }

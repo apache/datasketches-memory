@@ -48,9 +48,9 @@ public class AllocateDirect {
    * @param capacityBytes must be greater than or equal 0.
    * @param alignment the desired alignment. It must be a power of 2; e.g., 2, 4 or 8; and greater than 1.
    */
-  AllocateDirect(final long capacityBytes, int alignment) {
+  AllocateDirect(final long capacityBytes, final int alignment) {
     if (capacityBytes < 0) { throw new IllegalArgumentException("capacityBytes must be >= 0: " + capacityBytes); }
-    long mask = alignment - 1L;
+    final long mask = alignment - 1L;
     if (checkAlignment(alignment)) {
       throw new IllegalArgumentException("alignment must be a positive power of 2 and greater than one: " + alignment); }
     try {
@@ -104,6 +104,6 @@ public class AllocateDirect {
    * @return true if argument is greater than one and a positive power of 2.
    */
   private static final boolean checkAlignment(final int n) {
-    return (n >= 1) && ((n & -n) == n);
+    return (n > 1) && ((n & -n) == n);
   }
 }

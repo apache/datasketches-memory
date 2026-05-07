@@ -45,15 +45,14 @@ under the License.
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <maven.javadoc.skip>false</maven.javadoc.skip>
     <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
-    <!-- jdk.internal.misc is used to call public Unsafe & public VM -->
-    <arg.jdk.internal.misc>--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED</arg.jdk.internal.misc>
-    <!-- sun.nio.ch.exports is used to open FileChannelImpl for DirectBuffer-->
-    <arg.sun.nio.ch.exports>--add-exports=java.base/sun.nio.ch=ALL-UNNAMED</arg.sun.nio.ch.exports>
-    <!-- sun.nio.ch.opens is used to open FileChannelImpl for map0 & unmap0 for reflection-->
-    <arg.sun.nio.ch.opens>--add-opens=java.base/sun.nio.ch=ALL-UNNAMED</arg.sun.nio.ch.opens>
-    <!-- java.nio is used to open MappedByteBuffer load0, isloaded0, & force0 for reflection -->
-    <arg.java.nio>--add-opens=java.base/java.nio=ALL-UNNAMED</arg.java.nio>
-
+    <!-- export.jdk.internal.misc is used to call public Unsafe & public VM -->
+    <export.jdk.internal.misc>--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED</export.jdk.internal.misc>
+    <!-- export.sun.nio.ch is used to open FileChannelImpl for DirectBuffer-->
+    <export.sun.nio.ch>--add-exports=java.base/sun.nio.ch=ALL-UNNAMED</export.sun.nio.ch>
+    <!-- open.java.nio is used to open MappedByteBuffer load0, isloaded0, & force0 for reflection -->
+    <open.java.nio>--add-opens=java.base/java.nio=ALL-UNNAMED</open.java.nio>
+    <!-- open.sun.nio.ch is used to open FileChannelImpl for map0 & unmap0 for reflection-->
+    <open.sun.nio.ch>--add-opens=java.base/sun.nio.ch=ALL-UNNAMED</open.sun.nio.ch>
   </properties>
 
   <dependencies>
@@ -95,10 +94,8 @@ under the License.
         <configuration>
           <fork>true</fork> <!-- required if Maven is using a different JVM -->
           <compilerArgs>
-            <!-- <arg>${arg.jdk.internal.ref}</arg> -->
-            <arg>${arg.jdk.internal.misc}</arg>
-            <arg>${arg.sun.nio.ch.exports}</arg>
-            <arg>${arg.sun.nio.ch.opens}</arg>
+            <arg>${export.jdk.internal.misc}</arg>
+            <arg>${export.sun.nio.ch}</arg>
           </compilerArgs>
         </configuration>
       </plugin>
@@ -113,14 +110,26 @@ under the License.
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <argLine>
-            @{argLine} @{jvm.args} ${arg.java.nio} ${arg.sun.nio.ch.exports} ${arg.sun.nio.ch.opens} ${arg.jdk.internal.misc}
+            @{argLine}
+            @{jvm.args}
+            ${export.jdk.internal.misc}
+            ${export.sun.nio.ch}
+            ${open.java.nio}
+            ${open.sun.nio.ch}
+            -Dorg.slf4j.simpleLogger.log.org.testng=warn
           </argLine>
           <trimStackTrace>false</trimStackTrace>
-          <useFile>false</useFile>
+          <useFile>true</useFile>
           <useManifestOnlyJar>false</useManifestOnlyJar>
-          <redirectTestOutputToFile>false</redirectTestOutputToFile>
+          <redirectTestOutputToFile>true</redirectTestOutputToFile>
           <reportsDirectory>${project.build.directory}/test-output/${maven.build.timestamp}</reportsDirectory>
           <perCoreThreadCount>false</perCoreThreadCount>
+          <properties>
+            <property>
+              <name>verbose</name>
+              <value>0</value> 
+            </property>
+          </properties>
         </configuration>
       </plugin>
 

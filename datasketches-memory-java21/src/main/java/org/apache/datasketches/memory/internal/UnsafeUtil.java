@@ -118,7 +118,7 @@ public final class UnsafeUtil {
    * @param fieldName the declared field name
    * @return the field offset in bytes.
    */
-  @SuppressWarnings("deprecation")
+  @SuppressWarnings("deprecation") //for Java 21
   public static long getFieldOffset(final Class<?> c, final String fieldName) {
     try {
       return unsafe.objectFieldOffset(c.getDeclaredField(fieldName));

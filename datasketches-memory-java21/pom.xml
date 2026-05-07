@@ -47,16 +47,8 @@ under the License.
     <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
     <!-- export.jdk.internal.misc is used to call public Unsafe & public VM -->
     <export.jdk.internal.misc>--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED</export.jdk.internal.misc>
-    <!-- export.jdk.internal.ref is used to call public Cleaner -->
-    <export.jdk.internal.ref>--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED</export.jdk.internal.ref>
     <!-- export.sun.nio.ch is used to open FileChannelImpl for DirectBuffer-->
     <export.sun.nio.ch>--add-exports=java.base/sun.nio.ch=ALL-UNNAMED</export.sun.nio.ch>
-    <!-- export.jdk.internal.access is used to access SharedSecrets and JavaNioAccess -->
-    <export.jdk.internal.access>--add-exports=java.base/jdk.internal.access=ALL-UNNAMED</export.jdk.internal.access>
-    <!-- open.java.nio is used to open MappedByteBuffer load0, isloaded0, & force0 for reflection -->
-    <open.java.nio>--add-opens=java.base/java.nio=ALL-UNNAMED</open.java.nio>
-    <!-- open.sun.nio.ch is used to open FileChannelImpl for map0 & unmap0 for reflection-->
-    <open.sun.nio.ch>--add-opens=java.base/sun.nio.ch=ALL-UNNAMED</open.sun.nio.ch>
   </properties>
 
   <dependencies>

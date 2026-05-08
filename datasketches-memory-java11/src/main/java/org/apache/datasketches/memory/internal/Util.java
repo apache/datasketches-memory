@@ -283,18 +283,6 @@ public final class Util {
   } //End class RandomCodePoints
 
   /**
-   * Checks if given value is &le; zero.
-   * @param value the given value
-   * @param arg a meaningful name of the actual argument.
-   * @throws IllegalArgumentException if value is &le; 0.
-   */
-  public static final void zeroCheck(final long value, final String arg) {
-    if (value <= 0) {
-      throw new IllegalArgumentException("The argument '" + arg + "' may not be negative or zero.");
-    }
-  }
-
-  /**
    * Checks if given value is &lt; zero.
    * @param value the given value
    * @param arg a meaningful name of the actual argument.
@@ -305,20 +293,6 @@ public final class Util {
       throw new IllegalArgumentException("The argument '" + arg + "' may not be negative.");
     }
   }
-
-  /**
-   * Checks if given value is null.
-   * @param obj the given object
-   * @param arg a meaningful name of the actual argument.
-   * @throws IllegalArgumentException if value is null.
-   */
-  public static final void nullCheck(final Object obj, final String arg) {
-    if (obj == null) {
-      throw new IllegalArgumentException("The argument '" + arg + "' may not be null.");
-    }
-  }
-
-  //Resources NOTE: these 3 methods are duplicated in Java/ datasketches/Util
 
   /**
    * Gets the Path of the given resource file's shortName.
@@ -345,15 +319,6 @@ public final class Util {
       throw new IllegalArgumentException("Cannot find resource: " + shortFileName + LS + e);
     }
   }
-
-//  /**
-//   * Gets the file defined by the given resource file's shortFileName.
-//   * @param shortFileName the last name in the pathname's name sequence.
-//   * @return the file defined by the given resource file's shortFileName.
-//   */
-//  public static File getResourceFile(final String shortFileName) {
-//    return new File(getResourcePath(shortFileName));
-//  }
 
   /**
    * Returns a byte array of the contents of the file defined by the given resource file's

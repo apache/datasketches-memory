@@ -17,18 +17,12 @@
  * under the License.
  */
 
-/*
- * Note: Lincoln's Gettysburg Address is in the public domain. See LICENSE.
- */
-
 package org.apache.datasketches.memory.internal;
 
 import static org.apache.datasketches.memory.internal.Util.characterPad;
 import static org.apache.datasketches.memory.internal.Util.getResourceBytes;
 import static org.apache.datasketches.memory.internal.Util.getResourceFile;
 import static org.apache.datasketches.memory.internal.Util.negativeCheck;
-import static org.apache.datasketches.memory.internal.Util.nullCheck;
-import static org.apache.datasketches.memory.internal.Util.zeroCheck;
 import static org.apache.datasketches.memory.internal.Util.zeroPad;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -83,20 +77,7 @@ public class UtilTest {
   }
 
   @Test
-  public void checkNullZeroNegativeChecks() {
-    Object obj = null;
-    try {
-      nullCheck(obj, "Test Object");
-      fail();
-    } catch (IllegalArgumentException e) {
-      //OK
-    }
-    try {
-      zeroCheck(0, "Test Long");
-      fail();
-    } catch (IllegalArgumentException e) {
-      //OK
-    }
+  public void checkNegativeChecks() {
     try {
       negativeCheck(-1L, "Test Long");
       fail();

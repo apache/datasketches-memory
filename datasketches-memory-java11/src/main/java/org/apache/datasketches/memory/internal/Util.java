@@ -30,7 +30,6 @@ import java.net.URL;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 import java.util.Random;
@@ -295,32 +294,6 @@ public final class Util {
   }
 
   /**
-   * Gets the Path of the given resource file's shortName.
-   *
-   * <p>Note that the ClassLoader.getResource(shortName) returns a URL,
-   * which can have special characters, e.g., "%20" for spaces. This method
-   * obtains the URL, converts it to a URI, then does a uri.getPath(), which
-   * decodes any special characters in the URI path. This is required to make
-   * obtaining resources operating-system independent.</p>
-   *
-   * @param shortFileName the last name in the pathname's name sequence.
-   * @return the absolute path of the given resource file's shortName.
-   */
-  public static String getResourcePath(final String shortFileName) {
-    Objects.requireNonNull(shortFileName, "input parameter " + shortFileName + " cannot be null.");
-    try {
-      final URL url = Util.class.getClassLoader().getResource(shortFileName);
-      Objects.requireNonNull(url, "resource " + shortFileName + " could not be acquired.");
-      final URI uri = url.toURI();
-      //decodes any special characters
-      final String pathStr = uri.isAbsolute() ? Paths.get(uri).toAbsolutePath().toString() : uri.getPath();
-      return pathStr;
-    } catch (final URISyntaxException e) {
-      throw new IllegalArgumentException("Cannot find resource: " + shortFileName + LS + e);
-    }
-  }
-
-  /**
    * Returns a byte array of the contents of the file defined by the given resource file's
    * shortFileName.
    * @param shortFileName the last name in the pathname's name sequence.
@@ -329,7 +302,7 @@ public final class Util {
    */
   public static byte[] getResourceBytes(final String shortFileName) {
     try {
-      return Files.readAllBytes(Paths.get(getResourcePath(shortFileName)));
+      return Files.readAllBytes(getResourceFile(shortFileName).toPath());
     } catch (final IOException e) {
       throw new IllegalArgumentException("Cannot read resource: " + shortFileName + LS + e);
     }

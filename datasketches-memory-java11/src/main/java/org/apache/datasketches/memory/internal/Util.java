@@ -294,32 +294,39 @@ public final class Util {
   }
 
   /**
-   * Returns a byte array of the contents of the file defined by the given resource file's
-   * shortFileName.
-   * @param shortFileName the last name in the pathname's name sequence.
-   * @return a byte array of the contents of the file defined by the given resource file's
-   * shortFileName.
+   * Returns a byte array of the contents of the file defined by the given resourceName.
+   * @param resourceName the short name or the full path name.
+   * @return a byte array of the contents of the file defined by the given resourceName.
    */
-  public static byte[] getResourceBytes(final String shortFileName) {
+  public static byte[] getResourceBytes(final String resourceName) {
     try {
-      return Files.readAllBytes(getResourceFile(shortFileName).toPath());
+      return Files.readAllBytes(getResourceFile(resourceName).toPath());
     } catch (final IOException e) {
-      throw new IllegalArgumentException("Cannot read resource: " + shortFileName + LS + e);
+      throw new IllegalArgumentException("Cannot read resource: " + resourceName + LS + e);
     }
   }
 
-  public static void ensureReadOnly(final Path path) {
-    if (!Files.exists(path)) {
-      throw new IllegalArgumentException("File not found.");
-    }
-
-    // Works on Windows and POSIX)
-    path.toFile().setReadOnly();
+  /**
+   * Checks if the given resourceName exists and sets it to Read-Only.  
+   * If the resource is in a JAR it will be copied into the File System as a temporary file first.
+   * This will not work if the file is currently memory-mapped.  If it is memory-mapped, close the mapping first.
+   * @param resourceName the given resource 
+   */
+  public static void ensureReadOnly(final String resourceName) {
+      final File file = getResourceFile(resourceName);
+      if (!file.exists()) {
+        throw new IllegalArgumentException("File not found.");
+      }
+      // Works on Windows and POSIX)
+      file.setReadOnly();
   }
   
   /**
-   *   Windows and JAR friendly get Resource File
-   *   @param resourceName the simple file name. No special characters or slashes.
+   *   Windows and JAR friendly get Resource File.
+   *   If the resource is in a JAR it will be copied into the File System as a temporary file first.
+   *   @param resourceName the simple file name or full path name. 
+   *   Any back-slashes will be converted to forward slashes and a leading forward slash will be removed.
+   *   No other special characters allowed.
    *   @return a File System File
    */
   public static File getResourceFile(final String resourceName) {

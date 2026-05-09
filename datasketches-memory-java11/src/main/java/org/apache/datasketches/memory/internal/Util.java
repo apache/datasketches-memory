@@ -293,26 +293,8 @@ public final class Util {
   }
 
   /**
-   * Checks if the given resourceName exists and sets it to Read-Only.  This is only used in test.
-   * If the resource is in a JAR it will be copied into the File System as a temporary file first.
-   * This will not work if the file is currently memory-mapped.  
-   * If it is memory-mapped, close the mapping first.
-   * @param resourceName the given resource.
-   * @return File the read only file.
-   */
-  public static File ensureReadOnly(final String resourceName) {
-      final File file = getResourceFile(resourceName);
-      if (!file.exists()) {
-        throw new IllegalArgumentException("File not found.");
-      }
-      // Works on Windows and POSIX)
-      file.setReadOnly();
-      return file;
-  }
-  
-  /**
-   * Returns a byte array of the contents of the file defined by the given resourceName.
-   * This is only used in test.
+   * Windows, POSIX, and JAR friendly, returns a byte array of the contents of the file defined by the given 
+   * resourceName. This is only used in test.
    * If the resource is in a JAR it will be copied into the File System as a temporary file first.
    * 
    * @param resourceName the short name or the full path name.
@@ -382,5 +364,20 @@ public final class Util {
     //tempFile.setWritable(true); 
     
     return tempFile;
+  }
+  
+  /**
+   * Windows, POSIX, and JAR friendly, checks if the given resourceName exists and sets it to Read-Only.  
+   * This is only used in test.
+   * If the resource is in a JAR it will be copied into the File System as a temporary file first.
+   * This will not work if the file is currently memory-mapped.  
+   * If it is memory-mapped, close the mapping first.
+   * @param resourceName the given resource.
+   * @return the read only file.
+   */
+  public static File setResourceReadOnly(final String resourceName) {
+      final File file = getResourceFile(resourceName);
+      file.setReadOnly();
+      return file;
   }
 }

@@ -17,14 +17,10 @@
  * under the License.
  */
 
-/*
- * Note: Lincoln's Gettysburg Address is in the public domain. See LICENSE.
- */
-
 package org.apache.datasketches.memory.internal;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.apache.datasketches.memory.internal.Util.getResourceFile;
+import static org.apache.datasketches.memory.internal.Util.setResourceReadOnly;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -44,16 +40,16 @@ import org.testng.annotations.Test;
 
 public class AllocateDirectWritableMapMemoryTest {
   private static final String LS = System.getProperty("line.separator");
-
+  private File gettyFile;
+  
   @BeforeClass
   public void setReadOnly() {
-    UtilTest.setGettysburgAddressFileToReadOnly();
+    gettyFile = setResourceReadOnly("GettysburgAddress.txt");
   }
 
   @Test
   public void simpleMap() throws Exception {
-    File file = getResourceFile("GettysburgAddress.txt");
-    try (Memory mem = Memory.map(file)) {
+    try (Memory mem = Memory.map(gettyFile)) {
       byte[] bytes = new byte[(int)mem.getCapacity()];
       mem.getByteArray(0, bytes, 0, bytes.length);
       String text = new String(bytes, UTF_8);
@@ -133,17 +129,14 @@ public class AllocateDirectWritableMapMemoryTest {
 
   @Test(expectedExceptions = ReadOnlyException.class)
   public void simpleMap2() throws IOException {
-    File file = getResourceFile("GettysburgAddress.txt");
-    assertTrue(file.canRead() && !file.canWrite());
-    try (WritableMemory wmem = WritableMemory.writableMap(file)) { //throws
-      //
+    try (WritableMemory wmem = WritableMemory.writableMap(gettyFile)) {
+      //throws
     }
   }
 
   @Test(expectedExceptions = ReadOnlyException.class)
-  public void checkOverLength() throws Exception  {
-    File file = getResourceFile("GettysburgAddress.txt");
-    WritableMemory.writableMap(file, 0, 1 << 20, ByteOrder.nativeOrder());
+  public void checkOverLength() throws Exception  {    
+    WritableMemory.writableMap(gettyFile, 0, 1 << 20, ByteOrder.nativeOrder());
   }
 
   @Test

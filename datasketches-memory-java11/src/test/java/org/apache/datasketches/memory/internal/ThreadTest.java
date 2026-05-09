@@ -19,7 +19,6 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.Util.getResourceFile;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
@@ -33,20 +32,18 @@ import org.testng.annotations.Test;
 
 public class ThreadTest {
 
-  File file;
+  File gettyFile;
   Memory mem;
   WritableMemory wmem;
   Thread altThread;
 
   @BeforeClass
   public void prepareFileAndMemory() throws IOException {
-    UtilTest.setGettysburgAddressFileToReadOnly();
-    file = getResourceFile("GettysburgAddress.txt");
-    assertTrue(AllocateDirectWritableMap.isFileReadOnly(file));
+    gettyFile = Util.setResourceReadOnly("GettysburgAddress.txt");
   }
 
   void initMap() throws IOException {
-    mem = Memory.map(file); assertTrue(mem.isAlive());
+    mem = Memory.map(gettyFile); assertTrue(mem.isAlive());
   }
 
   void initDirectMem() {

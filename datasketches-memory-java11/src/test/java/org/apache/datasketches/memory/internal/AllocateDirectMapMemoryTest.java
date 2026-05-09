@@ -17,14 +17,9 @@
  * under the License.
  */
 
-/*
- * Note: Lincoln's Gettysburg Address is in the public domain. See LICENSE.
- */
-
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.Util.ensureReadOnly;
-import static org.apache.datasketches.memory.internal.Util.getResourceFile;
+import static org.apache.datasketches.memory.internal.Util.setResourceReadOnly;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -40,24 +35,26 @@ import org.testng.annotations.Test;
 
 public class AllocateDirectMapMemoryTest {
   private static final String LS = System.getProperty("line.separator");
-
+  private File gettyFile;
+  private long gettySize;
+  
   @BeforeClass
   public void setReadOnly() {
-    UtilTest.setGettysburgAddressFileToReadOnly();
+    gettyFile = setResourceReadOnly("GettysburgAddress.txt");
+    gettySize = gettyFile.length();
   }
 
   @Test(expectedExceptions = IllegalStateException.class)
   public void simpleMap() throws IOException {
-    File file = ensureReadOnly("GettysburgAddress.txt");
-    try (Memory mem = Memory.map(file)) {
+    
+    try (Memory mem = Memory.map(gettyFile)) {
       mem.close(); //explicit close
     } //The Try-With-Resources will throw
   }
 
   @Test
   public void printGettysburgAddress() throws IOException {
-    File file = getResourceFile("GettysburgAddress.txt");
-    try (Memory mem = Memory.map(file))
+    try (Memory mem = Memory.map(gettyFile))
     {
       int len1 = (int)mem.getCapacity();
       println("Mem Cap:       " + len1);
@@ -86,14 +83,13 @@ public class AllocateDirectMapMemoryTest {
 
   @Test
   public void testIllegalArguments() throws IOException {
-    File file = getResourceFile("GettysburgAddress.txt");
-    try (Memory mem = Memory.map(file, -1, Integer.MAX_VALUE, ByteOrder.nativeOrder())) {
+    try (Memory mem = Memory.map(gettyFile, -1, Integer.MAX_VALUE, ByteOrder.nativeOrder())) {
       fail("Failed: Position was negative.");
     } catch (IllegalArgumentException e) {
       //ok
     }
 
-    try (Memory mem = Memory.map(file, 0, -1, ByteOrder.nativeOrder())) {
+    try (Memory mem = Memory.map(gettyFile, 0, -1, ByteOrder.nativeOrder())) {
       fail("Failed: Size was negative.");
     } catch (IllegalArgumentException e) {
       //ok
@@ -102,30 +98,27 @@ public class AllocateDirectMapMemoryTest {
 
   @Test(expectedExceptions = IllegalStateException.class)
   public void testAccessAfterClose() throws IOException {
-    File file = getResourceFile("GettysburgAddress.txt");
-    long memCapacity = file.length();
-    try (Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
+    long memCapacity = gettySize;
+    try (Memory mem = Memory.map(gettyFile, 0, memCapacity, ByteOrder.nativeOrder())) {
       assertEquals(memCapacity, mem.getCapacity());
     } //normal close via TWR
-    Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder());
+    Memory mem = Memory.map(gettyFile, 0, memCapacity, ByteOrder.nativeOrder());
     mem.close(); //normal manual close
     mem.getCapacity(); //isLoaded(); //already closed, invalid
   }
 
   @Test(expectedExceptions = IllegalStateException.class)
   public void testReadFailAfterClose() throws IOException  {
-    File file = getResourceFile("GettysburgAddress.txt");
-    long memCapacity = file.length();
-    Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder());
+    long memCapacity = gettySize;
+    Memory mem = Memory.map(gettyFile, 0, memCapacity, ByteOrder.nativeOrder());
     mem.close();
     mem.isLoaded();
   }
 
   @Test
   public void testLoad() throws IOException  {
-    File file = getResourceFile("GettysburgAddress.txt");
-    long memCapacity = file.length();
-    try (Memory mem = Memory.map(file, 0, memCapacity, ByteOrder.nativeOrder())) {
+    long memCapacity = gettySize;
+    try (Memory mem = Memory.map(gettyFile, 0, memCapacity, ByteOrder.nativeOrder())) {
       mem.load();
       assertTrue(mem.isLoaded());
     } //normal TWR close

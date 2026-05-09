@@ -20,7 +20,7 @@
 package org.apache.datasketches.memory.internal;
 
 import static org.apache.datasketches.memory.internal.Util.characterPad;
-import static org.apache.datasketches.memory.internal.Util.ensureReadOnly;
+import static org.apache.datasketches.memory.internal.Util.setResourceReadOnly;
 import static org.apache.datasketches.memory.internal.Util.getResourceBytes;
 import static org.apache.datasketches.memory.internal.Util.getResourceFile;
 import static org.apache.datasketches.memory.internal.Util.negativeCheck;
@@ -39,11 +39,20 @@ import java.nio.file.attribute.PosixFilePermissions;
 
 import org.apache.datasketches.memory.MemoryBoundsException;
 import org.apache.datasketches.memory.WritableMemory;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class UtilTest {
   private static final String LS = System.getProperty("line.separator");
-
+  private File gettyFile;
+  private long gettySize;
+  
+  @BeforeClass
+  public void setReadOnly() {
+    gettyFile = setResourceReadOnly("GettysburgAddress.txt");
+    gettySize = gettyFile.length();
+  }
+  
   //Binary Search
   @Test
   public void checkBinarySearch() {
@@ -128,17 +137,11 @@ public class UtilTest {
     }
   }
 
-  static final void setGettysburgAddressFileToReadOnly() {
-    ensureReadOnly("GettysburgAddress.txt");
-  }
-
   //Resources
 
   @Test
   public void resourceFileExits() {
-    final String shortFileName = "GettysburgAddress.txt";
-    final File file = getResourceFile(shortFileName);
-    assertTrue(file.exists());
+    assertTrue(gettyFile.exists());
   }
 
   @Test
@@ -151,9 +154,7 @@ public class UtilTest {
 
   @Test
   public void resourceBytesCorrect() {
-    final String shortFileName = "GettysburgAddress.txt";
-    final byte[] bytes = getResourceBytes(shortFileName);
-    assertTrue(bytes.length == 1541);
+    assertTrue(gettySize == 1541);
   }
 
   @Test

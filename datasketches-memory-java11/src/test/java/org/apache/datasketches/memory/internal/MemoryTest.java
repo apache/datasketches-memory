@@ -17,10 +17,6 @@
  * under the License.
  */
 
-/*
- * Note: Lincoln's Gettysburg Address is in the public domain. See LICENSE.
- */
-
 package org.apache.datasketches.memory.internal;
 
 import static org.testng.Assert.assertEquals;
@@ -40,17 +36,11 @@ import org.apache.datasketches.memory.MemoryRequestServer;
 import org.apache.datasketches.memory.Resource;
 import org.apache.datasketches.memory.WritableBuffer;
 import org.apache.datasketches.memory.WritableMemory;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.testng.collections.Lists;
 
 public class MemoryTest {
   private static final String LS = Util.LS;
-
-  @BeforeClass
-  public void setReadOnly() {
-    UtilTest.setGettysburgAddressFileToReadOnly();
-  }
 
   @Test
   public void checkDirectRoundTrip() throws Exception {

@@ -146,10 +146,6 @@ final class AllocateDirectWritableMap {
     return deallocator.getValid();
   }
 
-  public static boolean isFileReadOnly(final File file) {
-    return (!file.canWrite());
-  }
-
   public boolean isLoaded() {
     try {
       return (boolean) MAPPED_BYTE_BUFFER_ISLOADED0_METHOD
@@ -176,6 +172,11 @@ final class AllocateDirectWritableMap {
   }
 
   // Private methods
+
+  private static boolean isFileReadOnly(final File file) {
+    return (file.canRead() && !file.canWrite());
+  }
+  
   /**
    * called by load(). Calls the native method load0 in MappedByteBuffer.java, implemented
    * in MappedByteBuffer.c. See reference at top of class. load0 allows setting a mapping length

@@ -293,22 +293,6 @@ public final class Util {
   }
 
   /**
-   * Returns a byte array of the contents of the file defined by the given resourceName.
-   * This is only used in test.
-   * If the resource is in a JAR it will be copied into the File System as a temporary file first.
-   * 
-   * @param resourceName the short name or the full path name.
-   * @return a byte array of the contents of the file defined by the given resourceName.
-   */
-  public static byte[] getResourceBytes(final String resourceName) {
-    try {
-      return Files.readAllBytes(getResourceFile(resourceName).toPath());
-    } catch (final IOException e) {
-      throw new IllegalArgumentException("Cannot read resource: " + resourceName + LS + e);
-    }
-  }
-
-  /**
    * Checks if the given resourceName exists and sets it to Read-Only.  This is only used in test.
    * If the resource is in a JAR it will be copied into the File System as a temporary file first.
    * This will not work if the file is currently memory-mapped.  
@@ -327,7 +311,34 @@ public final class Util {
   }
   
   /**
-   *   Windows and JAR friendly get Resource File. This is only used in test.
+   * Returns a byte array of the contents of the file defined by the given resourceName.
+   * This is only used in test.
+   * If the resource is in a JAR it will be copied into the File System as a temporary file first.
+   * 
+   * @param resourceName the short name or the full path name.
+   * @return a byte array of the contents of the file defined by the given resourceName.
+   */
+  public static byte[] getResourceBytes(final String resourceName) {
+    Objects.requireNonNull(resourceName, "Given resourceName must not be null");
+    
+    String normalizedName = resourceName.replace('\\', '/');
+    if (normalizedName.startsWith("/")) {
+      normalizedName = normalizedName.substring(1);
+    }
+
+    final ClassLoader loader = Util.class.getClassLoader();
+    try (InputStream in = loader.getResourceAsStream(normalizedName)) {
+      if (in == null) {
+        throw new IllegalArgumentException("Resource not found: " + normalizedName);
+      }
+      return in.readAllBytes();
+    } catch (final IOException e) {
+      throw new IllegalArgumentException("Cannot read resource: " + normalizedName + LS + e);
+    }
+  }
+
+  /**
+   *   Windows, POSIX, and JAR friendly get Resource File. This is only used in test.
    *   If the resource is in a JAR it will be copied into the File System as a temporary file first.
    *   @param resourceName the simple file name or full path name. 
    *   Any back-slashes will be converted to forward slashes and a leading forward slash will be removed.

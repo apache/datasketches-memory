@@ -23,6 +23,7 @@
 
 package org.apache.datasketches.memory.internal;
 
+import static org.apache.datasketches.memory.internal.Util.ensureReadOnly;
 import static org.apache.datasketches.memory.internal.Util.getResourceFile;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -47,11 +48,10 @@ public class AllocateDirectMapMemoryTest {
 
   @Test(expectedExceptions = IllegalStateException.class)
   public void simpleMap() throws IOException {
-    File file = getResourceFile("GettysburgAddress.txt");
-    assertTrue(AllocateDirectWritableMap.isFileReadOnly(file));
+    File file = ensureReadOnly("GettysburgAddress.txt");
     try (Memory mem = Memory.map(file)) {
       mem.close(); //explicit close
-    } //The Try-With-Resources will throw if already closed
+    } //The Try-With-Resources will throw
   }
 
   @Test

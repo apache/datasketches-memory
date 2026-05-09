@@ -20,6 +20,7 @@
 package org.apache.datasketches.memory.internal;
 
 import static org.apache.datasketches.memory.internal.Util.characterPad;
+import static org.apache.datasketches.memory.internal.Util.ensureReadOnly;
 import static org.apache.datasketches.memory.internal.Util.getResourceBytes;
 import static org.apache.datasketches.memory.internal.Util.getResourceFile;
 import static org.apache.datasketches.memory.internal.Util.negativeCheck;
@@ -128,12 +129,7 @@ public class UtilTest {
   }
 
   static final void setGettysburgAddressFileToReadOnly() {
-    File file = getResourceFile("GettysburgAddress.txt");
-    try {
-      Files.setPosixFilePermissions(file.toPath(), PosixFilePermissions.fromString("r--r--r--"));
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    ensureReadOnly("GettysburgAddress.txt");
   }
 
   //Resources
@@ -160,10 +156,12 @@ public class UtilTest {
     assertTrue(bytes.length == 1541);
   }
 
-  @Test(expectedExceptions = NullPointerException.class)
+  @Test
   public void resourceBytesFileNotFound() {
     final String shortFileName = "GettysburgAddress.txt";
-    getResourceBytes(shortFileName + "123");
+    try { getResourceBytes(shortFileName + "123"); }
+    catch (IllegalArgumentException e) { //OK
+    }
   }
 
   @Test

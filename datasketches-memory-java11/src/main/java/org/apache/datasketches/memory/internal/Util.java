@@ -29,7 +29,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 import java.util.Random;
@@ -295,6 +294,9 @@ public final class Util {
 
   /**
    * Returns a byte array of the contents of the file defined by the given resourceName.
+   * This is only used in test.
+   * If the resource is in a JAR it will be copied into the File System as a temporary file first.
+   * 
    * @param resourceName the short name or the full path name.
    * @return a byte array of the contents of the file defined by the given resourceName.
    */
@@ -307,22 +309,25 @@ public final class Util {
   }
 
   /**
-   * Checks if the given resourceName exists and sets it to Read-Only.  
+   * Checks if the given resourceName exists and sets it to Read-Only.  This is only used in test.
    * If the resource is in a JAR it will be copied into the File System as a temporary file first.
-   * This will not work if the file is currently memory-mapped.  If it is memory-mapped, close the mapping first.
-   * @param resourceName the given resource 
+   * This will not work if the file is currently memory-mapped.  
+   * If it is memory-mapped, close the mapping first.
+   * @param resourceName the given resource.
+   * @return File the read only file.
    */
-  public static void ensureReadOnly(final String resourceName) {
+  public static File ensureReadOnly(final String resourceName) {
       final File file = getResourceFile(resourceName);
       if (!file.exists()) {
         throw new IllegalArgumentException("File not found.");
       }
       // Works on Windows and POSIX)
       file.setReadOnly();
+      return file;
   }
   
   /**
-   *   Windows and JAR friendly get Resource File.
+   *   Windows and JAR friendly get Resource File. This is only used in test.
    *   If the resource is in a JAR it will be copied into the File System as a temporary file first.
    *   @param resourceName the simple file name or full path name. 
    *   Any back-slashes will be converted to forward slashes and a leading forward slash will be removed.

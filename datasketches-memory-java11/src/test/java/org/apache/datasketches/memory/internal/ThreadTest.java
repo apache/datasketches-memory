@@ -39,7 +39,7 @@ public class ThreadTest {
 
   @BeforeClass
   public void prepareFileAndMemory() throws IOException {
-    gettyFile = Util.setResourceReadOnly("GettysburgAddress.txt");
+    gettyFile = TestUtil.setResourceReadOnly("GettysburgAddress.txt");
   }
 
   void initMap() throws IOException {

@@ -19,13 +19,7 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.Util.isAllBitsClear;
-import static org.apache.datasketches.memory.internal.Util.isAllBitsSet;
-import static org.apache.datasketches.memory.internal.Util.isAnyBitsClear;
-import static org.apache.datasketches.memory.internal.Util.isAnyBitsSet;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
@@ -219,46 +213,6 @@ public class CommonMemoryTest {
     mem.getShortArray(0, dstArray8, 2, items / 2 );
     for (int i = 2; i < items; i++) {
       assertEquals(dstArray8[i], srcArray8[i]);
-    }
-  }
-
-  @Test
-  public void checkSetClearIsBits() throws Exception {
-    int memCapacity = 8;
-    try (WritableMemory mem = WritableMemory.allocateDirect(memCapacity)) {
-      assertEquals(memCapacity, mem.getCapacity());
-      mem.clear();
-      setClearIsBitsTests(mem);
-    }
-  }
-
-  public static void setClearIsBitsTests(WritableMemory mem) {
-  //single bits
-    for (int i = 0; i < 8; i++) {
-      long bitMask = (1 << i);
-      long v = mem.getByte(0) & 0XFFL;
-      assertTrue(isAnyBitsClear(v, bitMask));
-      mem.setBits(0, (byte) bitMask);
-      v = mem.getByte(0) & 0XFFL;
-      assertTrue(isAnyBitsSet(v, bitMask));
-      mem.clearBits(0, (byte) bitMask);
-      v = mem.getByte(0) & 0XFFL;
-      assertTrue(isAnyBitsClear(v, bitMask));
-    }
-
-    //multiple bits
-    for (int i = 0; i < 7; i++) {
-      long bitMask1 = (1 << i);
-      long bitMask2 = (3 << i);
-      long v = mem.getByte(0) & 0XFFL;
-      assertTrue(isAnyBitsClear(v, bitMask1));
-      assertTrue(isAnyBitsClear(v, bitMask2));
-      mem.setBits(0, (byte) bitMask1); //set one bit
-      v = mem.getByte(0) & 0XFFL;
-      assertTrue(isAnyBitsSet(v, bitMask2));
-      assertTrue(isAnyBitsClear(v, bitMask2));
-      assertFalse(isAllBitsSet(v, bitMask2));
-      assertFalse(isAllBitsClear(v, bitMask2));
     }
   }
 

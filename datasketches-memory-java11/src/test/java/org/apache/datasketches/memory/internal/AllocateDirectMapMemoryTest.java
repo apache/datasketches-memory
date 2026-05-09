@@ -19,7 +19,6 @@
 
 package org.apache.datasketches.memory.internal;
 
-import static org.apache.datasketches.memory.internal.Util.setResourceReadOnly;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -40,7 +39,7 @@ public class AllocateDirectMapMemoryTest {
   
   @BeforeClass
   public void setReadOnly() {
-    gettyFile = setResourceReadOnly("GettysburgAddress.txt");
+    gettyFile = TestUtil.setResourceReadOnly("GettysburgAddress.txt");
     gettySize = gettyFile.length();
   }
 

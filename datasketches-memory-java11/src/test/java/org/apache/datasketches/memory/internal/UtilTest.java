@@ -20,9 +20,6 @@
 package org.apache.datasketches.memory.internal;
 
 import static org.apache.datasketches.memory.internal.Util.characterPad;
-import static org.apache.datasketches.memory.internal.Util.setResourceReadOnly;
-import static org.apache.datasketches.memory.internal.Util.getResourceBytes;
-import static org.apache.datasketches.memory.internal.Util.getResourceFile;
 import static org.apache.datasketches.memory.internal.Util.negativeCheck;
 import static org.apache.datasketches.memory.internal.Util.zeroPad;
 import static org.testng.Assert.assertEquals;
@@ -49,7 +46,7 @@ public class UtilTest {
   
   @BeforeClass
   public void setReadOnly() {
-    gettyFile = setResourceReadOnly("GettysburgAddress.txt");
+    gettyFile = TestUtil.setResourceReadOnly("GettysburgAddress.txt");
     gettySize = gettyFile.length();
   }
   
@@ -59,12 +56,12 @@ public class UtilTest {
     int k = 1024; //longs
     WritableMemory wMem = WritableMemory.allocate(k << 3); //1024 longs
     for (int i = 0; i < k; i++) { wMem.putLong(i << 3, i); }
-    long idx = Util.binarySearchLongs(wMem, 0, k - 1, k / 2);
+    long idx = TestUtil.binarySearchLongs(wMem, 0, k - 1, k / 2);
     long val = wMem.getLong(idx << 3);
     assertEquals(idx, k / 2);
     assertEquals(val, k / 2);
 
-    idx = Util.binarySearchLongs(wMem, 0, k - 1, k);
+    idx = TestUtil.binarySearchLongs(wMem, 0, k - 1, k);
     assertEquals(idx, -1024);
   }
 
@@ -98,7 +95,7 @@ public class UtilTest {
 
   @Test
   public void checkCodePointArr() {
-    final Util.RandomCodePoints rvcp = new Util.RandomCodePoints(true);
+    final TestUtil.RandomCodePoints rvcp = new TestUtil.RandomCodePoints(true);
     final int n = 1000;
     final int[] cpArr = new int[n];
     rvcp.fillCodePointArray(cpArr);
@@ -112,7 +109,7 @@ public class UtilTest {
 
   @Test
   public void checkCodePoint() {
-    final Util.RandomCodePoints rvcp = new Util.RandomCodePoints(true);
+    final TestUtil.RandomCodePoints rvcp = new TestUtil.RandomCodePoints(true);
     final int n = 1000;
     for (int i = 0; i < n; i++) {
       int cp = rvcp.getCodePoint();
@@ -147,7 +144,7 @@ public class UtilTest {
   @Test
   public void resourceFileNotFound() {
     final String shortFileName = "GettysburgAddress.txt";
-    try { getResourceFile(shortFileName + "123"); }
+    try { TestUtil.getResourceFile(shortFileName + "123"); }
     catch (IllegalArgumentException e) { //OK
     }
   }
@@ -160,7 +157,7 @@ public class UtilTest {
   @Test
   public void resourceBytesFileNotFound() {
     final String shortFileName = "GettysburgAddress.txt";
-    try { getResourceBytes(shortFileName + "123"); }
+    try { TestUtil.getResourceBytes(shortFileName + "123"); }
     catch (IllegalArgumentException e) { //OK
     }
   }

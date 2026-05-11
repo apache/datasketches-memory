@@ -81,8 +81,6 @@ public interface Resource extends AutoCloseable {
    */
   void setMemoryRequestServer(MemoryRequestServer memReqSvr);
   
-  //***
-  
   /**
    * Closes this resource if this can be closed via <em>AutoCloseable</em>.
    * If this operation completes without exceptions, this resource will be marked as <em>not alive</em>,
@@ -262,7 +260,7 @@ public interface Resource extends AutoCloseable {
   boolean isLoaded();
 
   /**
-   * If true, this is a <i>Memory</i> or <i>WritableMemory</i> instance, which provides the Memory API.
+   * If {@code true}, this is a <i>Memory</i> or <i>WritableMemory</i> instance, which provides the Memory API.
    * The Memory API is the principal API for this Memory Component.
    * It provides a rich variety of direct manipulations of four types of resources:
    * On-heap memory, off-heap memory, memory-mapped files, and ByteBuffers.
@@ -272,14 +270,14 @@ public interface Resource extends AutoCloseable {
    * similar to that in <i>ByteBuffer</i>.  The positional API is a convenience when iterating over structured
    * arrays, or buffering input or output streams (thus the name).</p>
    *
-   * @return true if this is a <i>Memory</i> or <i>WritableMemory</i> instance, which provides the Memory API,
+   * @return {@code true} if this is a <i>Memory</i> or <i>WritableMemory</i> instance, which provides the Memory API,
    * otherwise this is a <i>Buffer</i> or <i>WritableBuffer</i> instance, which provides the Buffer API.
    */
   boolean isMemory();
 
   /**
-   * Returns true if the backing resource is a memory-mapped file.
-   * @return true if the backing resource is a memory-mapped file.
+   * Returns {@code true} if the backing resource is a memory-mapped file.
+   * @return {@code true} if the backing resource is a memory-mapped file.
    */
   boolean isMapped();
 

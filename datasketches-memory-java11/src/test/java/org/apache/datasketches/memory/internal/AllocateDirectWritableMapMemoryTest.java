@@ -43,7 +43,7 @@ public class AllocateDirectWritableMapMemoryTest {
   
   @BeforeClass
   public void setReadOnly() {
-    gettyFile = TestUtil.setResourceReadOnly("GettysburgAddress.txt");
+    gettyFile = UtilitiesForTest.setResourceReadOnly("GettysburgAddress.txt");
   }
 
   @Test

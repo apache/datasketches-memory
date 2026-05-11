@@ -86,11 +86,6 @@ public final class UnsafeUtil {
       unsafeConstructor.setAccessible(true);
       unsafe = unsafeConstructor.newInstance();
 
-      // Alternative, but may not work across different JVMs.
-      //      Field field = Unsafe.class.getDeclaredField("theUnsafe");
-      //      field.setAccessible(true);
-      //      unsafe = (Unsafe) field.get(null);
-
     } catch (final InstantiationException | IllegalAccessException | IllegalArgumentException
         | InvocationTargetException | NoSuchMethodException e) {
       e.printStackTrace();

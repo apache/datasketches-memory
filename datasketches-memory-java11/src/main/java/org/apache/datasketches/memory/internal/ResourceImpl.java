@@ -37,8 +37,8 @@ import org.apache.datasketches.memory.Resource;
  */
 //@SuppressWarnings("restriction")
 public abstract class ResourceImpl implements Resource {
-  static final String JDK; 
-  static final int JDK_MAJOR; //8, 11, 17, etc
+  public static final int JDK_MAJOR; //11, 17, 21
+  public static final String unsupportedJDK;
 
   //Used to convert "type" to bytes:  bytes = longs << LONG_SHIFT
   static final int BOOLEAN_SHIFT    = 0;
@@ -84,9 +84,9 @@ public abstract class ResourceImpl implements Resource {
   
   static {
     final String jdkVer = System.getProperty("java.version");
-    final int[] p = parseJavaVersion(jdkVer);
-    JDK = p[0] + "." + p[1];
-    JDK_MAJOR = (p[0] == 1) ? p[1] : p[0];
+    JDK_MAJOR = parseJavaVersion(jdkVer);
+    checkJavaVersion(JDK_MAJOR);
+    unsupportedJDK = "Not supported for this JDK " + JDK_MAJOR + ". Please use JDK 11.";
   }
 
   //set by the leaf nodes
@@ -142,18 +142,13 @@ public abstract class ResourceImpl implements Resource {
   }
 
   /**
-   * Checks the runtime Java Version string. Note that Java 17 and 21 is allowed only because some clients do not use the
-   * WritableMemory.allocateDirect(..) and related functions, which will not work with Java versions >= 14.  
-   * The on-heap functions may work with 17 and 21, nonetheless, versions > Java 11 are not officially supported. 
-   * Caveat emptor.
-   * @param jdkVer the <i>System.getProperty("java.version")</i> string of the form "p0.p1.X"
-   * @param p0 The first number group 
-   * @param p1 The second number group
+   * Checks the runtime Java Version string. 
+   * @param jdkMajor the first number from the <i>System.getProperty("java.version")</i> string."
    */
-  static void checkJavaVersion(final String jdkVer, final int p0, final int p1 ) {
-    final boolean ok = ((p0 == 1) && (p1 == 8)) || (p0 == 8) || (p0 == 11) || (p0 == 17 || (p0 == 21) || (p0 == 25));
+  static void checkJavaVersion(final int jdkMajor) {
+    final boolean ok = jdkMajor == 11; 
     if (!ok) { throw new IllegalArgumentException(
-        "Unsupported JDK Major Version. It must be one of 1.8, 8, 11, 17, 21, 25: " + jdkVer);
+        "Unsupported JDK Major Version. It must be 11: " + jdkMajor);
     }
   }
 
@@ -373,23 +368,22 @@ public abstract class ResourceImpl implements Resource {
   }
 
   /**
-   * Returns first two number groups of the java version string.
-   * @param jdkVer the java version string from System.getProperty("java.version").
-   * @return first two number groups of the java version string.
+   * Returns the JDK major version.
+   * @return the JDK major version.
    * @throws IllegalArgumentException for an improper Java version string.
    */
-  static int[] parseJavaVersion(final String jdkVer) {
-    final int p0, p1;
+  static final int parseJavaVersion(final String jdkVer) {
+    final int jdkMajor;
     try {
       String[] parts = jdkVer.trim().split("^0-9\\.");//grab only number groups and "."
       parts = parts[0].split("\\."); //split out the number groups
-      p0 = Integer.parseInt(parts[0]); //the first number group
-      p1 = (parts.length > 1) ? Integer.parseInt(parts[1]) : 0; //2nd number group, or 0
+      final int p0 = Integer.parseInt(parts[0]); //the first number group
+      final int p1 = (parts.length > 1) ? Integer.parseInt(parts[1]) : 0; //2nd number group, or 0
+      jdkMajor = (p0 == 1) ? p1 : p0;
     } catch (final NumberFormatException | ArrayIndexOutOfBoundsException  e) {
-      throw new IllegalArgumentException("Improper Java -version string: " + jdkVer + LS + e);
+      throw new IllegalArgumentException("Improper Java version string: " + jdkVer + LS + e);
     }
-    checkJavaVersion(jdkVer, p0, p1);
-    return new int[] {p0, p1};
+    return jdkMajor;
   }
 
   //REACHABILITY FENCE
@@ -450,7 +444,7 @@ public abstract class ResourceImpl implements Resource {
     sb.append("Read Only           : ").append(state.isReadOnly()).append(LS);
     sb.append("Type Byte Order     : ").append(state.getTypeByteOrder().toString()).append(LS);
     sb.append("Native Byte Order   : ").append(ByteOrder.nativeOrder().toString()).append(LS);
-    sb.append("JDK Runtime Version : ").append(JDK).append(LS);
+    sb.append("JDK Runtime Version : ").append(JDK_MAJOR).append(LS);
     //Data detail
     if (withData) {
       sb.append("Data, bytes         :  0  1  2  3  4  5  6  7");

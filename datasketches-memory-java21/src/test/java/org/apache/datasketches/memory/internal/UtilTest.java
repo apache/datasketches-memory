@@ -17,41 +17,20 @@
  * under the License.
  */
 
-/*
- * Note: Lincoln's Gettysburg Address is in the public domain. See LICENSE.
- */
-
 package org.apache.datasketches.memory.internal;
 
 import static org.apache.datasketches.memory.internal.Util.characterPad;
 import static org.apache.datasketches.memory.internal.Util.negativeCheck;
-import static org.apache.datasketches.memory.internal.Util.zeroCheck;
 import static org.apache.datasketches.memory.internal.Util.zeroPad;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 import org.apache.datasketches.memory.MemoryBoundsException;
-import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.Test;
 
 public class UtilTest {
   private static final String LS = System.getProperty("line.separator");
-
-  //Binary Search
-  @Test
-  public void checkBinarySearch() {
-    int k = 1024; //longs
-    WritableMemory wMem = WritableMemory.allocate(k << 3); //1024 longs
-    for (int i = 0; i < k; i++) { wMem.putLong(i << 3, i); }
-    long idx = Util.binarySearchLongs(wMem, 0, k - 1, k / 2);
-    long val = wMem.getLong(idx << 3);
-    assertEquals(idx, k / 2);
-    assertEquals(val, k / 2);
-
-    idx = Util.binarySearchLongs(wMem, 0, k - 1, k);
-    assertEquals(idx, -1024);
-  }
 
   @Test(expectedExceptions = MemoryBoundsException.class)
   public void checkBoundsTest() {
@@ -72,44 +51,12 @@ public class UtilTest {
   }
 
   @Test
-  public void checkZeroNegativeChecks() {
-    try {
-      zeroCheck(0, "Test Long");
-      fail();
-    } catch (IllegalArgumentException e) {
-      //OK
-    }
+  public void checkNegativeChecks() {
     try {
       negativeCheck(-1L, "Test Long");
       fail();
     } catch (IllegalArgumentException e) {
       //OK
-    }
-  }
-
-  @Test
-  public void checkCodePointArr() {
-    final Util.RandomCodePoints rvcp = new Util.RandomCodePoints(true);
-    final int n = 1000;
-    final int[] cpArr = new int[n];
-    rvcp.fillCodePointArray(cpArr);
-    for (int i = 0; i < n; i++) {
-      int cp = cpArr[i];
-      if ((cp >= Character.MIN_SURROGATE) && (cp <= Character.MAX_SURROGATE)) {
-        fail();
-      }
-    }
-  }
-
-  @Test
-  public void checkCodePoint() {
-    final Util.RandomCodePoints rvcp = new Util.RandomCodePoints(true);
-    final int n = 1000;
-    for (int i = 0; i < n; i++) {
-      int cp = rvcp.getCodePoint();
-      if ((cp >= Character.MIN_SURROGATE) && (cp <= Character.MAX_SURROGATE)) {
-        fail();
-      }
     }
   }
 

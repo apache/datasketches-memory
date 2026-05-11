@@ -17,10 +17,6 @@
  * under the License.
  */
 
-/*
- * Note: Lincoln's Gettysburg Address is in the public domain. See LICENSE.
- */
-
 package org.apache.datasketches.memory.internal;
 
 import static org.testng.Assert.assertEquals;

@@ -35,7 +35,6 @@ import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermissions;
 
 import org.apache.datasketches.memory.MemoryBoundsException;
-import org.apache.datasketches.memory.WritableMemory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -46,23 +45,8 @@ public class UtilTest {
   
   @BeforeClass
   public void setReadOnly() {
-    gettyFile = TestUtil.setResourceReadOnly("GettysburgAddress.txt");
+    gettyFile = UtilitiesForTest.setResourceReadOnly("GettysburgAddress.txt");
     gettySize = gettyFile.length();
-  }
-  
-  //Binary Search
-  @Test
-  public void checkBinarySearch() {
-    int k = 1024; //longs
-    WritableMemory wMem = WritableMemory.allocate(k << 3); //1024 longs
-    for (int i = 0; i < k; i++) { wMem.putLong(i << 3, i); }
-    long idx = TestUtil.binarySearchLongs(wMem, 0, k - 1, k / 2);
-    long val = wMem.getLong(idx << 3);
-    assertEquals(idx, k / 2);
-    assertEquals(val, k / 2);
-
-    idx = TestUtil.binarySearchLongs(wMem, 0, k - 1, k);
-    assertEquals(idx, -1024);
   }
 
   @Test(expectedExceptions = MemoryBoundsException.class)
@@ -93,32 +77,6 @@ public class UtilTest {
     }
   }
 
-  @Test
-  public void checkCodePointArr() {
-    final TestUtil.RandomCodePoints rvcp = new TestUtil.RandomCodePoints(true);
-    final int n = 1000;
-    final int[] cpArr = new int[n];
-    rvcp.fillCodePointArray(cpArr);
-    for (int i = 0; i < n; i++) {
-      int cp = cpArr[i];
-      if ((cp >= Character.MIN_SURROGATE) && (cp <= Character.MAX_SURROGATE)) {
-        fail();
-      }
-    }
-  }
-
-  @Test
-  public void checkCodePoint() {
-    final TestUtil.RandomCodePoints rvcp = new TestUtil.RandomCodePoints(true);
-    final int n = 1000;
-    for (int i = 0; i < n; i++) {
-      int cp = rvcp.getCodePoint();
-      if ((cp >= Character.MIN_SURROGATE) && (cp <= Character.MAX_SURROGATE)) {
-        fail();
-      }
-    }
-  }
-
   static final String getFileAttributes(File file) {
     try {
     PosixFileAttributes attrs = Files.getFileAttributeView(
@@ -144,7 +102,7 @@ public class UtilTest {
   @Test
   public void resourceFileNotFound() {
     final String shortFileName = "GettysburgAddress.txt";
-    try { TestUtil.getResourceFile(shortFileName + "123"); }
+    try { UtilitiesForTest.getResourceFile(shortFileName + "123"); }
     catch (IllegalArgumentException e) { //OK
     }
   }
@@ -157,7 +115,7 @@ public class UtilTest {
   @Test
   public void resourceBytesFileNotFound() {
     final String shortFileName = "GettysburgAddress.txt";
-    try { TestUtil.getResourceBytes(shortFileName + "123"); }
+    try { UtilitiesForTest.getResourceBytes(shortFileName + "123"); }
     catch (IllegalArgumentException e) { //OK
     }
   }

@@ -19,6 +19,9 @@
 
 package org.apache.datasketches.memory;
 
+import static org.apache.datasketches.memory.internal.ResourceImpl.unsupportedJDK;
+
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -66,8 +69,41 @@ public interface Memory extends Resource {
 
   //Duplicates make no sense here
 
-  //No Mapping in Java 17 or 21
-  
+  //MAP
+  /**
+   * NOTE: This operation is unsupported for JDKs 17 and 21.
+   * Please use datasketches-java 9.0+, which supports JDK 25.
+   *
+   * <p>Maps the given file into <i>Memory</i> for read operations.</p>
+   * Calling this method is equivalent to calling
+   * {@link #map(File, long, long, ByteOrder)
+   * map(file, 0, file.length(), ByteOrder.nativeOrder())}.
+   * @param file the given file to map. It must be non-null with a non-negative length and readable.
+   * @return <i>Memory</i> for managing the mapped memory.
+   */
+  static Memory map(final File file) {
+    return map(file, 0, file.length(), ByteOrder.nativeOrder());
+  }
+
+  /**
+   * NOTE: This operation is unsupported for JDKs 17 and 21.
+   * Please use datasketches-java 9.0+, which supports JDK 25.
+   *
+   * <p>Maps the specified portion of the given file into <i>Memory</i> for read operations.</p>
+   * @param file the given file to map. It must be non-null, readable and length &ge; 0.
+   * @param fileOffsetBytes the position in the given file in bytes. It must be &ge; 0.
+   * @param capacityBytes the size of the mapped memory. It must be &ge; 0.
+   * @param byteOrder the byte order to be used.  It must be non-null.
+   * @return <i>Memory</i> for managing the mapped memory.
+   */
+  static Memory map(
+      final File file, 
+      final long fileOffsetBytes, 
+      final long capacityBytes, 
+      final ByteOrder byteOrder) {
+    throw new UnsupportedOperationException(unsupportedJDK);
+  }
+
   //NO ALLOCATE OFF-HEAP, makes no sense
 
   //REGIONS

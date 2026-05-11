@@ -39,7 +39,7 @@ public class AllocateDirectMapMemoryTest {
   
   @BeforeClass
   public void setReadOnly() {
-    gettyFile = TestUtil.setResourceReadOnly("GettysburgAddress.txt");
+    gettyFile = UtilitiesForTest.setResourceReadOnly("GettysburgAddress.txt");
     gettySize = gettyFile.length();
   }
 

@@ -31,7 +31,7 @@ under the License.
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>datasketches-memory-java21</artifactId>
+  <artifactId>datasketches-memory-java17_21</artifactId>
   <name>${project.artifactId}</name>
   <packaging>jar</packaging>
 

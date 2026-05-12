@@ -524,7 +524,7 @@ under the License.
   -->
   <modules>
     <module>datasketches-memory-java11</module>
-    <module>datasketches-memory-java21</module>
+    <module>datasketches-memory-java17_21</module>
     <module>datasketches-memory-report</module>
   </modules>
 

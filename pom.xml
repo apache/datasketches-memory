@@ -107,6 +107,7 @@ under the License.
     <jvm.locale.country>-Duser.country=US</jvm.locale.country>
     <jvm.locale.encoding>-Dfile.encoding=UTF-8</jvm.locale.encoding>
     <jvm.args>${jvm.mem} ${jvm.locale.language} ${jvm.locale.country} ${jvm.locale.encoding}</jvm.args>
+    <argLine></argLine>
     <charset.encoding>UTF-8</charset.encoding>
     <project.build.outputTimestamp>2026-01-09T19:00:20Z</project.build.outputTimestamp>
     <project.build.sourceEncoding>${charset.encoding}</project.build.sourceEncoding>

@@ -27,7 +27,7 @@ under the License.
   <parent>
     <groupId>org.apache.datasketches</groupId>
     <artifactId>datasketches-memory</artifactId>
-    <version>3.0.2</version>
+    <version>7.0.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -36,10 +36,7 @@ under the License.
   <packaging>jar</packaging>
 
   <properties>
-    <!-- Test -->
-    <testng.version>7.12.0</testng.version>
     <java.version>11</java.version>
-
     <jdk-toolchain.version>${java.version}</jdk-toolchain.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -59,21 +56,14 @@ under the License.
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
-      <version>${testng.version}</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
-      <!-- Used for xxHash testing -->
       <groupId>net.openhft</groupId>
       <artifactId>zero-allocation-hashing</artifactId>
-      <version>${zero-allocation-hashing.version}</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-      <version>${org-slf4j.version}</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -141,6 +131,35 @@ under the License.
             </jdk>
           </toolchains>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.5.0</version>
+        <executions>
+          <execution>
+            <id>add-source</id>
+            <phase>generate-sources</phase>
+            <goals><goal>add-source</goal></goals>
+            <configuration>
+              <sources>
+                <source>${project.basedir}/datasketches-memory-common/src/main/java</source>
+                <source>${project.basedir}/datasketches-memory-common/src/main/javadoc</source>
+              </sources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>add-test-source</id>
+            <phase>generate-test-sources</phase>
+            <goals><goal>add-test-source</goal></goals>
+            <configuration>
+              <sources>
+                <source>${project.basedir}/datasketches-memory-common/src/test/java</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 
       <plugin>

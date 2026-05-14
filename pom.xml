@@ -27,7 +27,7 @@ under the License.
 
   <groupId>org.apache.datasketches</groupId>
   <artifactId>datasketches-memory</artifactId>
-  <version>3.0.2</version>
+  <version>7.0.0</version>
   <packaging>pom</packaging>
 
   <name>${project.artifactId}</name>
@@ -67,7 +67,7 @@ under the License.
     <tag>HEAD</tag>
   </scm>
 
-  <distributionManagement> <!-- May not need this -->
+  <distributionManagement>
     <repository>
       <id>apache.releases.https</id>
       <name>Apache Release Distribution Repository</name>
@@ -95,11 +95,36 @@ under the License.
     </developer>
   </developers>
 
-  <properties>
+  <repositories>
+    <repository>
+      <id>apache.snapshots</id>
+      <name>Apache Snapshot Repository</name>
+      <url>https://repository.apache.org/content/groups/snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>apache</id>
+      <name>Apache Releases Repository</name>
+      <url>https://repository.apache.org/content/groups/public</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
 
+  <properties>
     <!-- System-wide properties -->
     <maven.version>3.9.12</maven.version>
     <java.version>11</java.version>
+    <testng.version>7.12.0</testng.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <jvm.mem>-Xmx4g</jvm.mem>
@@ -156,31 +181,30 @@ under the License.
     <maven.deploy.skip>true</maven.deploy.skip>
     <maven.javadoc.skip>true</maven.javadoc.skip>
   </properties>
-  
-  <repositories>
-    <repository>
-      <id>apache.snapshots</id>
-      <name>Apache Snapshot Repository</name>
-      <url>https://repository.apache.org/content/groups/snapshots</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>apache</id>
-      <name>Apache Releases Repository</name>
-      <url>https://repository.apache.org/content/groups/public</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.testng</groupId>
+        <artifactId>testng</artifactId>
+        <version>${testng.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <!-- Used for xxHash testing -->
+        <groupId>net.openhft</groupId>
+        <artifactId>zero-allocation-hashing</artifactId>
+        <version>${zero-allocation-hashing.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <version>${org-slf4j.version}</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <build>
     <pluginManagement>

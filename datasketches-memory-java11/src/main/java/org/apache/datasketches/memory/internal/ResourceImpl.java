@@ -85,7 +85,7 @@ public abstract class ResourceImpl implements Resource {
   static {
     final String jdkVer = System.getProperty("java.version");
     JDK_MAJOR = parseJavaVersion(jdkVer);
-    unsupportedJDK = "Not supported for this JDK " + JDK_MAJOR + ". Please use JDK 11.";
+    unsupportedJDK = "JDK Not supported.  Please use JDK 11. Given JDK: ";
     checkJavaVersion(JDK_MAJOR);
   }
 
@@ -147,7 +147,7 @@ public abstract class ResourceImpl implements Resource {
    */
   static void checkJavaVersion(final int jdkMajor) {
     final boolean ok = jdkMajor == 11; 
-    if (!ok) { throw new IllegalArgumentException(unsupportedJDK);
+    if (!ok) { throw new IllegalArgumentException(unsupportedJDK + jdkMajor);
     }
   }
 

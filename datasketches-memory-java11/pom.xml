@@ -111,9 +111,6 @@ under the License.
               <value>0</value> 
             </property>
           </properties>
-          <dependenciesToScan>
-            <dependency>${project.basedir}/../org.apache.datasketches:datasketches-memory-common</dependency>
-          </dependenciesToScan>
         </configuration>
       </plugin>
 
@@ -158,7 +155,7 @@ under the License.
             <goals><goal>add-test-source</goal></goals>
             <configuration>
               <sources>
-                <source>${project.basedir}/datasketches-memory-common/src/test/java</source>
+                <source>${project.basedir}/../datasketches-memory-common/src/test/java</source>
               </sources>
             </configuration>
           </execution>

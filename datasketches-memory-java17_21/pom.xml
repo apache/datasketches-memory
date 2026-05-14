@@ -107,6 +107,9 @@ under the License.
               <value>0</value> 
             </property>
           </properties>
+          <dependenciesToScan>
+            <dependency>${project.basedir}/../org.apache.datasketches:datasketches-memory-common</dependency>
+          </dependenciesToScan>
         </configuration>
       </plugin>
 

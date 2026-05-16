@@ -45,7 +45,7 @@ jobs:
               --add-exports java.base/jdk.internal.misc=ALL-UNNAMED
               --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
 
-          - jdk: '21''
+          - jdk: '21'
             distribution: 'temurin' 
             jvm_args: >-
               --add-exports java.base/jdk.internal.misc=ALL-UNNAMED

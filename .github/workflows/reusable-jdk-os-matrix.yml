@@ -41,40 +41,45 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Checkout Workflow Logic (workflows branch)
-        uses: actions/checkout@v6
-        with:
-          ref: workflows
-          path: .github/workflow-logic
-
-      - name: Install Matrix JDK
+      # 1. ALWAYS install Host JDK 25 to execute Maven itself natively
+      - name: Install Host Driver JDK 25
         uses: actions/setup-java@v5
         with:
-          java-version: |
-           8
-           11
-           17
-           21
-           25
-          architecture: ${{ inputs.cpu_arch }}
-          distribution: 'zulu' #${{ inputs.jdk_distribution }}
-          java-package: jdk
+          java-version: '25'
+          distribution: 'temurin'
           cache: 'maven'
-          check-latest: false
-          generate-job-summary: true
-          # overwrite-settings: true
 
-      - name: Verify Toolchain Configuration
-        shell: bash
-        run: |
-          if [ -f ~/.m2/toolchains.xml ]; then
-            cat ~/.m2/toolchains.xml
-          else
-            echo "toolchains.xml not found in ~/.m2/"
-          fi
+      # 2. Dynamically provision the Target isolated execution JDK
+      - name: Provision Target Execution JDK
+        id: target-jdk
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ inputs.jdk_version }}
+          distribution: ${{ inputs.jdk_distribution }}
+          architecture: ${{ inputs.cpu_arch }}
 
       - name: Echo Java & Maven Version
         run: mvn -version
+
+      # 3. Clean and build all artifacts, inserting them into the local reactor build path
+      - name: Build and Local Install via Host JVM
+        run: mvn clean install -DskipTests=true
+
+      # 4. Execute module verification tests directly from packaged jars using target JVM fork
+      - name: Run Package Tests via Target JVM Fork
+        shell: bash
+        run: |
+          if [ "${{ inputs.jdk_version }}" = "11" ]; then
+            mvn surefire:test -pl datasketches-memory-java11 \
+              -Dmaven.test.classpath.useTestJar=true \
+              -Djvm=${{ steps.target-jdk.outputs.path }}/bin/java \
+              -DargLine="${{ env.JVM_ARGS }}"
+          else
+            mvn surefire:test -pl datasketches-memory-java17_21 \
+              -Dmaven.test.classpath.useTestJar=true \
+              -Djvm=${{ steps.target-jdk.outputs.path }}/bin/java \
+              -DargLine="${{ env.JVM_ARGS }}"
+          fi
 
       - name: Print Current Workflows
         continue-on-error: true
@@ -87,12 +92,7 @@ jobs:
           echo "--- JVM ARGS ---"
           echo "${{ env.JVM_ARGS }}"
 
-      - name: Test
-        run: mvn clean test -DargLine="${{ env.JVM_ARGS }}"
-
-      - name: Install
-        run: mvn clean install "-DskipTests=true" "-Dmaven.clean.failOnError=false" "-DargLine=${{ env.JVM_ARGS }}"
-
+      # 5. Build Summary Generation
       - name: Add Result to Summary
         if: always()
         shell: bash

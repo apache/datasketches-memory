@@ -86,9 +86,11 @@ jobs:
         run: |
           echo "Checking for workflow files..."
           echo "--- Reusable Workflow: ---"
-          cat .github/workflow-logic/.github/workflows/reusable-jdk-os-matrix.yml || echo "::warning::Could not find Reusable Workflow file."
+          cat .github/workflow-logic/.github/workflows/reusable-jdk-os-matrix.yml \
+            || echo "::warning::Could not find Reusable Workflow file."
           echo "--- Caller Workflow: ---"
-          cat .github/workflows/auto-jdk-os-matrix.yml || echo "::warning::Could not find Caller Workflow file."
+          cat .github/workflows/auto-jdk-os-matrix.yml \
+            || echo "::warning::Could not find Caller Workflow file."
           echo "--- JVM ARGS ---"
           echo "${{ env.JVM_ARGS }}"
 
@@ -108,5 +110,9 @@ jobs:
           fi
 
           # Append the specific job row
-          echo "| ${{ inputs.os_type }} | ${{ inputs.cpu_arch }} | ${{ inputs.jdk_version }} | ${{ inputs.jdk_distribution }} | ${{ job.status == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| ${{ inputs.os_type }}" \
+               "| ${{ inputs.cpu_arch }}" \
+               "| ${{ inputs.jdk_version }}" \
+               "| ${{ inputs.jdk_distribution }}" \
+               "| ${{ job.status == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
 

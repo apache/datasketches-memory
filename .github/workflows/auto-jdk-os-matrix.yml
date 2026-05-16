@@ -31,15 +31,15 @@ jobs:
           - os: macos-latest
             arch: aarch64
 
-          - jdk: 11
+          - jdk: '11'
             distribution: 'temurin' 
             jvm_args: "--add-exports java.base/jdk.internal.misc=ALL-UNNAMED --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED"
 
-          - jdk: 17
+          - jdk: '17'
             distribution: 'temurin' 
             jvm_args: "--add-exports java.base/jdk.internal.misc=ALL-UNNAMED --add-exports java.base/jdk.internal.ref=ALL-UNNAMED"
 
-          - jdk: 21
+          - jdk: '21''
             distribution: 'temurin' 
             jvm_args: "--add-exports java.base/jdk.internal.misc=ALL-UNNAMED --add-exports java.base/jdk.internal.ref=ALL-UNNAMED"
 

@@ -85,12 +85,12 @@ jobs:
         continue-on-error: true
         run: |
           echo "Checking for workflow files..."
-          echo "--- Reusable Workflow: ---"
-          cat .github/workflow-logic/.github/workflows/reusable-jdk-os-matrix.yml \
-            || echo "::warning::Could not find Reusable Workflow file."
-          echo "--- Caller Workflow: ---"
+          echo "--- Reusable Workflow (from worflows branch): ---"
+          git show origin/workflows:.github/workflows/reusable-jdk-os-matrix.yml \
+            || echo "::warning::Could not find Reusable Workflow on workflows branch."
+          echo "--- Caller Workflow (from current branch): ---"
           cat .github/workflows/auto-jdk-os-matrix.yml \
-            || echo "::warning::Could not find Caller Workflow file."
+            || echo "::warning::Could not find Caller Workflow file on local branch."
           echo "--- JVM ARGS ---"
           echo "${{ env.JVM_ARGS }}"
 

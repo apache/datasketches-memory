@@ -115,4 +115,3 @@ jobs:
                "| ${{ inputs.jdk_version }}" \
                "| ${{ inputs.jdk_distribution }}" \
                "| ${{ job.status == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
-

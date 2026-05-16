@@ -110,8 +110,8 @@ jobs:
           fi
 
           # Append the specific job row
-          echo "| ${{ inputs.os_type }}" \
-               "| ${{ inputs.cpu_arch }}" \
-               "| ${{ inputs.jdk_version }}" \
-               "| ${{ inputs.jdk_distribution }}" \
-               "| ${{ job.status == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| ${{ inputs.os_type }} \
+                | ${{ inputs.cpu_arch }} \
+                | ${{ inputs.jdk_version }} \
+                | ${{ inputs.jdk_distribution }} \
+                | ${{ job.status == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY

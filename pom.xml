@@ -151,6 +151,7 @@ under the License.
     <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
     <maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version> <!-- don't use 3.12.0 -->
     <maven-release-plugin.version>3.3.1</maven-release-plugin.version>
+    <maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
     <maven-source-plugin.version>3.4.0</maven-source-plugin.version>
     <maven-surefire-failsafe-plugins.version>3.5.4</maven-surefire-failsafe-plugins.version> <!-- surefire, failsafe, surefire-report -->
     <maven-toolchains-plugin.version>3.2.0</maven-toolchains-plugin.version>
@@ -179,7 +180,7 @@ under the License.
     <zero-allocation-hashing.version>2026.0</zero-allocation-hashing.version>
 
     <maven.deploy.skip>true</maven.deploy.skip>
-    <maven.javadoc.skip>true</maven.javadoc.skip>
+    <maven.javadoc.skip>false</maven.javadoc.skip> <!-- set to true for deployment -->
   </properties>
 
   <dependencyManagement>
@@ -241,7 +242,7 @@ under the License.
                   and is only checks the compiler used by the Maven runtime.
                   In the context of toolchains this rule is useless.
                   See: https://github.com/paulmoloney/maven-enforcer-toolchain-rules
-                  <requireJavaVersion> ... </requireJavaVersion>
+                  <requireJavaVersion> </requireJavaVersion>
                   -->
                   <requireMavenVersion>
                     <version>[${maven.version},4.0.0)</version>
@@ -273,18 +274,28 @@ under the License.
             <execution>
               <id>default-jar</id>
               <phase>package</phase>
-              <goals>
-                <goal>jar</goal>
-              </goals>
+              <goals><goal>jar</goal></goals>
             </execution>
             <execution>
               <id>default-test-jar</id>
               <phase>package</phase>
-              <goals>
-                <goal>test-jar</goal>
-              </goals>
+              <goals><goal>test-jar</goal></goals>
             </execution>
           </executions>
+          <configuration>
+            <archive>
+              <manifestEntries>
+                <Build-Jdk-Spec>${java.specification.version}</Build-Jdk-Spec>
+                <Build-OS>${os.name} ${os.arch} ${os.version}</Build-OS>
+                <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
+                <Group-ArtifactId  >${project.groupId}:${project.artifactId}</Group-ArtifactId  >
+                <git-branch>${git.branch}</git-branch>
+                <git-commit-id>${git.commit.id}</git-commit-id>
+                <git-commit-time>${git.commit.time}</git-commit-time>
+                <git-commit-user-email>${git.commit.user.email}</git-commit-user-email>
+              </manifestEntries>
+            </archive>
+          </configuration>
         </plugin>
 
         <plugin>
@@ -304,14 +315,24 @@ under the License.
               <additionalJOption>-J${jvm.locale.encoding}</additionalJOption>
             </additionalJOptions>
             <excludePackageNames>org.apache.datasketches.memory.internal</excludePackageNames>
+            <archive>
+              <manifestEntries>
+                <Build-Jdk-Spec>${java.specification.version}</Build-Jdk-Spec>
+                <Build-OS>${os.name} ${os.arch} ${os.version}</Build-OS>
+                <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
+                <Group-ArtifactId  >${project.groupId}:${project.artifactId}</Group-ArtifactId  >
+                <git-branch>${git.branch}</git-branch>
+                <git-commit-id>${git.commit.id}</git-commit-id>
+                <git-commit-time>${git.commit.time}</git-commit-time>
+                <git-commit-user-email>${git.commit.user.email}</git-commit-user-email>
+              </manifestEntries>
+            </archive>
           </configuration>
           <executions>
             <execution>
               <id>attach-javadocs</id>
               <phase>package</phase>
-              <goals>
-                <goal>jar</goal>
-              </goals>
+              <goals><goal>jar</goal></goals>
             </execution>
           </executions>
         </plugin>
@@ -324,24 +345,70 @@ under the License.
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>${maven-resources-plugin.version}</version>
+          <executions>
+            <execution>
+              <id>default-resources</id>
+              <phase>process-resources</phase>
+              <goals><goal>resources</goal></goals>
+            </execution>
+            <execution>
+              <id>copy-legal-docs</id>
+              <phase>prepare-package</phase>
+              <goals><goal>copy-resources</goal></goals>
+              <configuration>
+                <outputDirectory>${project.build.outputDirectory}/META-INF</outputDirectory>
+                <resources>
+                  <resource>
+                    <directory>${project.basedir}</directory>
+                    <includes>
+                      <include>LICENSE</include>
+                      <include>NOTICE</include>
+                      <include>DEPENDENCIES</include>
+                    </includes>
+                  </resource>
+                </resources>
+              </configuration>
+            </execution>
+          </executions>
+          <configuration>
+            <nonFilteredFileExtensions>
+              <nonFilteredFileExtension>DS_Store</nonFilteredFileExtension>
+            </nonFilteredFileExtensions>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
           <version>${maven-source-plugin.version}</version>
           <executions>
             <execution>
               <id>attach-sources</id>
               <phase>package</phase>
-              <goals>
-                <goal>jar-no-fork</goal>
-              </goals>
+              <goals><goal>jar-no-fork</goal></goals>
             </execution>
             <execution>
               <id>attach-test-sources</id>
               <phase>package</phase>
-              <goals>
-                <goal>test-jar-no-fork</goal>
-              </goals>
+              <goals><goal>test-jar-no-fork</goal></goals>
             </execution>
           </executions>
+          <configuration>
+            <archive>
+              <manifestEntries>
+                <Build-Jdk-Spec>${java.specification.version}</Build-Jdk-Spec>
+                <Build-OS>${os.name} ${os.arch} ${os.version}</Build-OS>
+                <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
+                <Group-ArtifactId  >${project.groupId}:${project.artifactId}</Group-ArtifactId  >
+                <git-branch>${git.branch}</git-branch>
+                <git-commit-id>${git.commit.id}</git-commit-id>
+                <git-commit-time>${git.commit.time}</git-commit-time>
+                <git-commit-user-email>${git.commit.user.email}</git-commit-user-email>
+              </manifestEntries>
+            </archive>
+          </configuration>
         </plugin>
 
         <plugin>
@@ -417,22 +484,21 @@ under the License.
         </plugin>
 
         <plugin>
-          <!-- Submit code coverage report to Coveralls.io. -->
-          <groupId>com.github.hazendaz.maven</groupId>
-          <artifactId>coveralls-maven-plugin</artifactId>
-          <version>${coveralls-maven-plugin.version}</version>
-          <configuration>
-            <!--suppress UnresolvedMavenProperty -->
-            <repoToken>${coveralls-repo-token}</repoToken>
-            <!--suppress UnresolvedMavenProperty -->
-            <jacocoReports>${project.basedir}/datasketches-memory-report/target/site/jacoco-aggregate/jacoco.xml</jacocoReports>
-          </configuration>
-        </plugin>
-
-        <plugin>
           <groupId>io.github.git-commit-id</groupId>
           <artifactId>git-commit-id-maven-plugin</artifactId>
           <version>${git-commit-id-maven-plugin.version}</version>
+          <executions>
+            <execution>
+              <id>get-the-git-infos</id>
+              <goals><goal>revision</goal></goals>
+              <phase>initialize</phase>
+            </execution>
+          </executions>
+          <configuration>
+            <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+            <generateGitPropertiesFile>false</generateGitPropertiesFile>
+            <skipPoms>false</skipPoms>
+          </configuration>
         </plugin>
 
         <plugin>
@@ -475,13 +541,22 @@ under the License.
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>3.3.1</version>
-        <configuration>
-          <nonFilteredFileExtensions>
-          <nonFilteredFileExtension>DS_Store</nonFilteredFileExtension>
-          </nonFilteredFileExtensions>
-        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
       </plugin>
 
       <plugin>
@@ -494,6 +569,11 @@ under the License.
         <artifactId>apache-rat-plugin</artifactId>
       </plugin>
 
+      <plugin>
+        <groupId>io.github.git-commit-id</groupId>
+        <artifactId>git-commit-id-maven-plugin</artifactId>
+      </plugin>
+
     </plugins>
   </build>
 
@@ -504,7 +584,6 @@ under the License.
   <modules>
     <module>datasketches-memory-java11</module>
     <module>datasketches-memory-java17_21</module>
-    <module>datasketches-memory-report</module>
   </modules>
 
 </project>

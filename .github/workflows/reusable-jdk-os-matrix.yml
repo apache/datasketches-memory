@@ -42,51 +42,22 @@ jobs:
           persist-credentials: false
 
       - name: 2. Install Host Driver JDK 25 For Maven
-        id: host-driver-jdk # Explicit ID
+        id: host-driver-jdk
         uses: actions/setup-java@v5
         with:
           java-version: '25'
           distribution: 'temurin'
           cache: 'maven'
-          # generate-job-summary: true # gen toolchains file
 
       - name: 3. Dynamically Provision Target Isolated Execution JDK
-        id: target-jdk #Explicit ID
+        id: target-jdk
         uses: actions/setup-java@v5
         with:
           java-version: ${{ inputs.jdk_version }}
           distribution: ${{ inputs.jdk_distribution }}
           architecture: ${{ inputs.cpu_arch }}
-          check-latest: false #append this JDK version into runner's toolchain
-
-      - name: 4. Explicitly Configure local toolchains.xml
-        shell: bash
-        run: |
-          mkdir -p ~/.m2
-          cat <<EOF > ~/.m2/toolchains.xml
-          <?xml version="1.0" encoding="UTF-8"?>
-          <toolchains>
-            <toolchain>
-              <type>jdk</type>
-              <provides>
-                <version>${{ inputs.jdk_version }}</version>
-              </provides>
-              <configuration>
-                <jdkHome>${{ env. Gavin || steps.target-jdk.outputs.path || env.RUNNER_TOOL_CACHE }}/Java_Temurin-Hotspot_jdk/${{ inputs.jdk_version }}*</jdkHome>
-              </configuration>
-            </toolchain>
-
-            <toolchain>
-              <type>jdk</type>
-              <provides>
-                <version>25</version>
-              </provides>
-              <configuration>
-                <jdkHome>${{ steps.host-driver-jdk.outputs.path || env.JAVA_HOME_25_X64 || env.JAVA_HOME }}</jdkHome>
-              </configuration>
-            </toolchain>
-          </toolchains>
-          EOF
+          check-latest: false
+          generate-job-summary: true # register this target JDK into the runner's toolchains
 
       - name: 5. Echo Java & Maven Version
         run: mvn -version

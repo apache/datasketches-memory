@@ -58,7 +58,7 @@ jobs:
           architecture: ${{ inputs.cpu_arch }}
           check-latest: false #append this JDK version into runner's toolchain
 
-      - name: 4. Manually Configure local toolchains.xml
+      - name: 4. Explicitly Configure local toolchains.xml
         shell: bash
         run: |
           mkdir -p ~/.m2
@@ -69,6 +69,16 @@ jobs:
               <type>jdk</type>
               <provides>
                 <version>${{ inputs.jdk_version }}</version>
+              </provides>
+              <configuration>
+                <jdkHome>${{ steps.target-jdk.outputs.path }}</jdkHome>
+              </configuration>
+            </toolchain>
+
+            <toolchain>
+              <type>jdk</type>
+              <provides>
+                <version>11</version>
               </provides>
               <configuration>
                 <jdkHome>${{ steps.target-jdk.outputs.path }}</jdkHome>

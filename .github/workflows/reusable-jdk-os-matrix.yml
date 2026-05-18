@@ -42,15 +42,16 @@ jobs:
           persist-credentials: false
 
       - name: 2. Install Host Driver JDK 25 For Maven
+        id: host-driver-jdk # Explicit ID
         uses: actions/setup-java@v5
         with:
           java-version: '25'
           distribution: 'temurin'
           cache: 'maven'
-          generate-job-summary: true # gen toolchains file
+          # generate-job-summary: true # gen toolchains file
 
       - name: 3. Dynamically Provision Target Isolated Execution JDK
-        id: target-jdk
+        id: target-jdk #Explicit ID
         uses: actions/setup-java@v5
         with:
           java-version: ${{ inputs.jdk_version }}
@@ -71,7 +72,7 @@ jobs:
                 <version>${{ inputs.jdk_version }}</version>
               </provides>
               <configuration>
-                <jdkHome>${{ steps.target-jdk.outputs.path }}</jdkHome>
+                <jdkHome>${{ env. Gavin || steps.target-jdk.outputs.path || env.RUNNER_TOOL_CACHE }}/Java_Temurin-Hotspot_jdk/${{ inputs.jdk_version }}*</jdkHome>
               </configuration>
             </toolchain>
 
@@ -81,7 +82,7 @@ jobs:
                 <version>25</version>
               </provides>
               <configuration>
-                <jdkHome>${{ steps.setup-java.outputs.path || '/usr/lib/jvm/temurin-25' }}</jdkHome>
+                <jdkHome>${{ steps.host-driver-jdk.outputs.path || env.JAVA_HOME_25_X64 || env.JAVA_HOME }}</jdkHome>
               </configuration>
             </toolchain>
           </toolchains>

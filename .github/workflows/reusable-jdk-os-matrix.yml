@@ -36,13 +36,12 @@ jobs:
       JVM_ARGS ${{ inputs.jvm_args }}
     runs-on: ${{ inputs.os_type }}
     steps:
-      - name: Checkout Source code
+      - name: 1. Checkout Source code
         uses: actions/checkout@v6
         with:
           persist-credentials: false
 
-      # 1. ALWAYS install Host JDK 25 to execute Maven itself natively
-      - name: Install Host Driver JDK 25
+      - name: 2. Install Host Driver JDK 25 For Maven
         uses: actions/setup-java@v5
         with:
           java-version: '25'
@@ -50,8 +49,7 @@ jobs:
           cache: 'maven'
           generate-job-summary: true # gen toolchains file
 
-      # 2. Dynamically provision the Target isolated execution JDK
-      - name: Provision Target Execution JDK
+      - name: 3. Dynamically Provision Target Isolated Execution JDK
         id: target-jdk
         uses: actions/setup-java@v5
         with:
@@ -60,7 +58,7 @@ jobs:
           architecture: ${{ inputs.cpu_arch }}
           check-latest: false #append this JDK version into runner's toolchain
 
-      - name: Configure local toolchains.xml
+      - name: 4. Manually Configure local toolchains.xml
         shell: bash
         run: |
           mkdir -p ~/.m2
@@ -78,16 +76,14 @@ jobs:
             </toolchain>
           </toolchains>
           EOF
-          
-      - name: Echo Java & Maven Version
+
+      - name: 5. Echo Java & Maven Version
         run: mvn -version
 
-      # 3. Clean and build all artifacts, inserting them into the local reactor build path
-      - name: Build and Local Install via Host JVM
+      - name: 6. Clean & Local Install via Host JVM, all artifacts into reactor build path
         run: mvn clean install -DskipTests=true
 
-      # 4. Execute module verification tests directly from packaged jars using target JVM fork
-      - name: Run Package Tests via Target JVM Fork
+      - name: 7. Run Package Tests from jars via Target JVM Fork
         shell: bash
         run: |
           if [ "${{ inputs.jdk_version }}" = "11" ]; then
@@ -102,7 +98,7 @@ jobs:
               -DargLine="${{ env.JVM_ARGS }}"
           fi
 
-      - name: Print Current Workflows
+      - name: 8. Print Current Workflows
         continue-on-error: true
         run: |
           echo "Checking for workflow files..."
@@ -115,8 +111,7 @@ jobs:
           echo "--- JVM ARGS ---"
           echo "${{ env.JVM_ARGS }}"
 
-      # 5. Build Summary Generation
-      - name: Add Result to Summary
+      - name: 9. Add Result to Summary
         if: always()
         shell: bash
         run: |

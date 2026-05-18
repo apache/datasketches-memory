@@ -78,10 +78,10 @@ jobs:
             <toolchain>
               <type>jdk</type>
               <provides>
-                <version>11</version>
+                <version>25</version>
               </provides>
               <configuration>
-                <jdkHome>${{ steps.target-jdk.outputs.path }}</jdkHome>
+                <jdkHome>${{ steps.setup-java.outputs.path || '/usr/lib/jvm/temurin-25' }}</jdkHome>
               </configuration>
             </toolchain>
           </toolchains>

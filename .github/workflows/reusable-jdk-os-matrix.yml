@@ -60,6 +60,25 @@ jobs:
           architecture: ${{ inputs.cpu_arch }}
           check-latest: false #append this JDK version into runner's toolchain
 
+      - name: Configure local toolchains.xml
+        shell: bash
+        run: |
+          mkdir -p ~/.m2
+          cat <<EOF > ~/.m2/toolchains.xml
+          <?xml version="1.0" encoding="UTF-8"?>
+          <toolchains>
+            <toolchain>
+              <type>jdk</type>
+              <provides>
+                <version>${{ inputs.jdk_version }}</version>
+              </provides>
+              <configuration>
+                <jdkHome>${{ steps.target-jdk.outputs.path }}</jdkHome>
+              </configuration>
+            </toolchain>
+          </toolchains>
+          EOF
+          
       - name: Echo Java & Maven Version
         run: mvn -version
 

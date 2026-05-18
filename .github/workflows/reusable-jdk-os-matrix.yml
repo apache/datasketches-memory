@@ -41,7 +41,20 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: 2. Install Host Driver JDK 25 For Maven
+      - name: 2. Print Current Workflows
+        continue-on-error: true
+        run: |
+          echo "Checking for workflow files..."
+          echo "--- Reusable Workflow (from worflows branch): ---"
+          git show origin/workflows:.github/workflows/reusable-jdk-os-matrix.yml \
+            || echo "::warning::Could not find Reusable Workflow on workflows branch."
+          echo "--- Caller Workflow (from current branch): ---"
+          cat .github/workflows/auto-jdk-os-matrix.yml \
+            || echo "::warning::Could not find Caller Workflow file on local branch."
+          echo "--- JVM ARGS ---"
+          echo "${{ env.JVM_ARGS }}"
+
+      - name: 3. Install Host Driver JDK 25 For Maven
         id: host-driver-jdk
         uses: actions/setup-java@v5
         with:
@@ -49,7 +62,7 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: 3. Dynamically Provision Target Isolated Execution JDK
+      - name: 4. Dynamically Provision Target Isolated Execution JDK
         id: target-jdk
         uses: actions/setup-java@v5
         with:
@@ -60,7 +73,9 @@ jobs:
           generate-job-summary: true # register this target JDK into the runner's toolchains
 
       - name: 5. Echo Java & Maven Version
-        run: mvn -version
+        run: |
+          mvn -version
+          echo "Target Version: ${{ inputs.jdk_version }}"
 
       - name: 6. Clean & Local Install via Host JVM, all artifacts into reactor build path
         run: mvn clean install -DskipTests=true -Dtoolchains.skip=true
@@ -80,20 +95,7 @@ jobs:
               -DargLine="${{ env.JVM_ARGS }}"
           fi
 
-      - name: 8. Print Current Workflows
-        continue-on-error: true
-        run: |
-          echo "Checking for workflow files..."
-          echo "--- Reusable Workflow (from worflows branch): ---"
-          git show origin/workflows:.github/workflows/reusable-jdk-os-matrix.yml \
-            || echo "::warning::Could not find Reusable Workflow on workflows branch."
-          echo "--- Caller Workflow (from current branch): ---"
-          cat .github/workflows/auto-jdk-os-matrix.yml \
-            || echo "::warning::Could not find Caller Workflow file on local branch."
-          echo "--- JVM ARGS ---"
-          echo "${{ env.JVM_ARGS }}"
-
-      - name: 9. Add Result to Summary
+      - name: 8. Add Result to Summary
         if: always()
         shell: bash
         run: |

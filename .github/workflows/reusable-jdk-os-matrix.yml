@@ -39,7 +39,7 @@ jobs:
     steps:
       # 1. Pull down the compiled workspace binaries from Phase 1
       - name: 1. Download Compiled Workspace Jars
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: compiled-jars
 
@@ -77,17 +77,24 @@ jobs:
       - name: 5. Run Package Tests from jars via Target JVM Fork
         shell: bash
         run: |
+          # Dynamically detect if the host runner is Windows
+          if [[ "${{ inputs.os_type }}" == *"windows"* ]]; then
+            JAVA_EXE="$JAVA_HOME/bin/java.exe"
+          else
+            JAVA_EXE="$JAVA_HOME/bin/java"
+          fi
+
           if [ "${{ inputs.jdk_version }}" = "11" ]; then
             echo "Testing datasketches-memory-java11 jars for JDK version ${{ inputs.jdk_version }}..."
             mvn surefire:test -pl datasketches-memory-java11 \
               -Dmaven.test.classpath.useTestJar=true \
-              -Djvm=${{ steps.target-jdk.outputs.path }}/bin/java \
+              -Djvm="$JAVA_EXE" \
               -DargLine="${{ env.JVM_ARGS }}"
           else
             echo "Testing datasketches-memory-java17_21 jars for JDK version ${{ inputs.jdk_version }}..."
             mvn surefire:test -pl datasketches-memory-java17_21 \
               -Dmaven.test.classpath.useTestJar=true \
-              -Djvm=${{ steps.target-jdk.outputs.path }}/bin/java \
+              -Djvm="$JAVA_EXE" \
               -DargLine="${{ env.JVM_ARGS }}"
           fi
 

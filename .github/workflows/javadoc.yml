@@ -30,7 +30,23 @@ jobs:
           ref: ${{ github.ref }}
           fetch-depth: 0
 
-      - name: 2. Set up JDK 25 for Host use
+      - name: 2a. Provision JDK 11 Toolchain
+        uses: actions/setup-java@v5
+        with:
+         java-version: '11'
+         distribution: 'temurin'
+         java-package: jdk
+         architecture: x64
+
+      - name: 2b. Provision JDK 17 Toolchain
+        uses: actions/setup-java@v5
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          java-package: jdk
+          architecture: x64
+
+      - name: 2c. Provision JDK 25 (Host Runtime)
         uses: actions/setup-java@v5
         with:
           java-version: '25'
@@ -42,19 +58,16 @@ jobs:
       - name: 3. Extract POM Project Version
         id: get-version
         run: |
-          # Query the clean version string from the Maven reactor model
           POM_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           echo "Discovered Project Version: $POM_VERSION"
-          
-          # Expose it globally to the rest of the workflow execution environment
           echo "POM_VERSION=$POM_VERSION" >> $GITHUB_ENV
 
-      - name: 4.Compile and Generate Java 11 Module Javadoc
+      - name: 4. Compile and Generate Java 11 Module Javadoc
         run: |
           echo "Generating Javadoc for Java 11 Module..."
           mvn clean compile javadoc:javadoc -pl datasketches-memory-java11
 
-      - name: 5.Compile and Generate Java 17/21 Module Javadoc
+      - name: 5. Compile and Generate Java 17/21 Module Javadoc
         run: |
           echo "Generating Javadoc for Java 17/21 Module..."
           mvn compile javadoc:javadoc -pl datasketches-memory-java17_21
@@ -65,7 +78,7 @@ jobs:
           echo "Creating structured staging directories for version ${{ env.POM_VERSION }}..."
           mkdir -p "${STAGE_DIR}/datasketches-memory-java11-${{ env.POM_VERSION }}"
           mkdir -p "${STAGE_DIR}/datasketches-memory-java17_21-${{ env.POM_VERSION }}"
-          
+                
           echo "Copying generated HTML assets into staging..."
           cp -r datasketches-memory-java11/target/site/apidocs/* \
             "${STAGE_DIR}/datasketches-memory-java11-${{ env.POM_VERSION }}/"
@@ -75,6 +88,6 @@ jobs:
       - name: 7. Upload Generated Javadocs as Workflow Zip Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: versioned-javadocs-${{ env.POM_VERSION }}
-          path: javadoc-staging/
-          retention-days: 30
+        name: versioned-javadocs-${{ env.POM_VERSION }}
+        path: javadoc-staging/
+        retention-days: 30

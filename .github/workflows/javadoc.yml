@@ -88,6 +88,6 @@ jobs:
       - name: 7. Upload Generated Javadocs as Workflow Zip Artifact
         uses: actions/upload-artifact@v4
         with:
-        name: versioned-javadocs-${{ env.POM_VERSION }}
-        path: javadoc-staging/
-        retention-days: 30
+          name: versioned-javadocs-${{ env.POM_VERSION }}
+          path: javadoc-staging/
+          retention-days: 30

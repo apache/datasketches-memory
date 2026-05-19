@@ -15,9 +15,42 @@ concurrency:
 
 permissions:
   contents: read
-  
+
 jobs:
-  matrix-build:
+  # PHASE 1: Replicate command-line compilation exactly
+  build-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v6
+
+      - name: Install Build JDKs for Subproject Toolchains
+        uses: actions/setup-java@v5
+        with:
+          java-version: |
+            11
+            17
+          distribution: 'temurin'
+          cache: 'maven'
+
+      # Builds the isolated modules using their respective toolchains
+      - name: Package All Versioned JARs
+        run: mvn clean package -DskipTests=true
+
+      # Archive the compiled artifacts and skeletal structure for Phase 2 testing
+      - name: Archive Compiled Workspace
+        uses: actions/upload-artifact@v4
+        with:
+          name: compiled-jars
+          path: |
+            pom.xml
+            **/pom.xml
+            **/target/*.jar
+            **/src/test/resources/
+
+# PHASE 2: Run isolated target matrix tests against the JARs
+  matrix-test:
+    needs: build-artifacts # <--- THIS makes Phase 2 flow sequentially after Phase 1
     strategy:
       fail-fast: false
       matrix:
@@ -30,28 +63,28 @@ jobs:
             arch: x64
           - os: macos-latest
             arch: aarch64
-
+            
           - jdk: '11'
-            distribution: 'temurin' 
+            distribution: 'temurin'
             jvm_args: >-
               --add-exports java.base/jdk.internal.misc=ALL-UNNAMED
               --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
               --add-opens java.base/java.nio=ALL-UNNAMED
               --add-opens java.base/sun.nio.ch=ALL-UNNAMED
-
+              
           - jdk: '17'
-            distribution: 'temurin' 
+            distribution: 'temurin'
             jvm_args: >-
               --add-exports java.base/jdk.internal.misc=ALL-UNNAMED
               --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
-
+              
           - jdk: '21'
-            distribution: 'temurin' 
+            distribution: 'temurin'
             jvm_args: >-
               --add-exports java.base/jdk.internal.misc=ALL-UNNAMED
               --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
 
-    # Reference the reusable workflow on the "workflows" branch
+    # Reference your reusable workflow branch
     uses: apache/datasketches-memory/.github/workflows/reusable-jdk-os-matrix.yml@workflows
     with:
       jdk_version: ${{ matrix.jdk }}

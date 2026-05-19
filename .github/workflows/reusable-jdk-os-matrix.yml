@@ -35,34 +35,28 @@ jobs:
       DIST ${{ inputs.jdk_distribution }}),
       JVM_ARGS ${{ inputs.jvm_args }}
     runs-on: ${{ inputs.os_type }}
-    steps:
-      - name: 1. Checkout Source code
-        uses: actions/checkout@v6
-        with:
-          persist-credentials: false
 
+    steps:
+      # 1. Pull down the compiled workspace binaries from Phase 1
+      - name: 1. Download Compiled Workspace Jars
+        uses: actions/download-artifact@v4
+        with:
+          name: compiled-jars
+
+      # 2. Print Workflows (Workspace metadata diagnostics)
       - name: 2. Print Current Workflows
         continue-on-error: true
         run: |
           echo "Checking for workflow files..."
-          echo "--- Reusable Workflow (from worflows branch): ---"
-          git show origin/workflows:.github/workflows/reusable-jdk-os-matrix.yml \
-            || echo "::warning::Could not find Reusable Workflow on workflows branch."
+          echo "--- Reusable Workflow (Local Workspace File): ---"
+          cat .github/workflows/reusable-jdk-os-matrix.yml \
+            || echo "::warning::Could not find Reusable Workflow file."
           echo "--- Caller Workflow (from current branch): ---"
           cat .github/workflows/auto-jdk-os-matrix.yml \
             || echo "::warning::Could not find Caller Workflow file on local branch."
-          echo "--- JVM ARGS ---"
-          echo "${{ env.JVM_ARGS }}"
 
-      - name: 3. Install Host Driver JDK 25 For Maven
-        id: host-driver-jdk
-        uses: actions/setup-java@v5
-        with:
-          java-version: '25'
-          distribution: 'temurin'
-          cache: 'maven'
-
-      - name: 4. Dynamically Provision Target Isolated Execution JDK
+      # 3. Provision ONLY the specific isolated JDK required for this test run
+      - name: 3. Provision Target Isolated Execution JDK
         id: target-jdk
         uses: actions/setup-java@v5
         with:
@@ -70,32 +64,35 @@ jobs:
           distribution: ${{ inputs.jdk_distribution }}
           architecture: ${{ inputs.cpu_arch }}
           check-latest: false
-          generate-job-summary: true # register this target JDK into the runner's toolchains
 
-      - name: 5. Echo Java & Maven Version
+      # 4. Environment Verification
+      - name: 4. Verify Environment Context
         run: |
+          echo "--- Target JVM Path Exposes: ---"
+          echo "Path: ${{ steps.target-jdk.outputs.path }}"
+          echo "--- Native Maven Boot Info: ---"
           mvn -version
-          echo "Target Version: ${{ inputs.jdk_version }}"
 
-      - name: 6. Clean & Local Install via Host JVM, all artifacts into reactor build path
-        run: mvn clean install -DskipTests=true -Dtoolchains.skip=true
-
-      - name: 7. Run Package Tests from jars via Target JVM Fork
+      # 5. Run the mutually exclusive tests targeted strictly to this version
+      - name: 5. Run Package Tests from jars via Target JVM Fork
         shell: bash
         run: |
           if [ "${{ inputs.jdk_version }}" = "11" ]; then
+            echo "Testing datasketches-memory-java11 jars for JDK version ${{ inputs.jdk_version }}..."
             mvn surefire:test -pl datasketches-memory-java11 \
               -Dmaven.test.classpath.useTestJar=true \
               -Djvm=${{ steps.target-jdk.outputs.path }}/bin/java \
               -DargLine="${{ env.JVM_ARGS }}"
           else
+            echo "Testing datasketches-memory-java17_21 jars for JDK version ${{ inputs.jdk_version }}..."
             mvn surefire:test -pl datasketches-memory-java17_21 \
               -Dmaven.test.classpath.useTestJar=true \
               -Djvm=${{ steps.target-jdk.outputs.path }}/bin/java \
               -DargLine="${{ env.JVM_ARGS }}"
           fi
 
-      - name: 8. Add Result to Summary
+      # 6. Build unified Markdown Job Summary report table
+      - name: 6. Add Result to Summary
         if: always()
         shell: bash
         run: |
@@ -110,8 +107,5 @@ jobs:
           fi
 
           # Append the specific job row
-          echo "| ${{ inputs.os_type }} \
-                | ${{ inputs.cpu_arch }} \
-                | ${{ inputs.jdk_version }} \
-                | ${{ inputs.jdk_distribution }} \
-                | ${{ job.status == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| ${{ inputs.os_type }} | ${{ inputs.cpu_arch }} | ${{ inputs.jdk_version }}| ${{ inputs.jdk_distribution }} | ${{ job.status == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+

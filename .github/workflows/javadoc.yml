@@ -86,7 +86,7 @@ jobs:
             "${STAGE_DIR}/datasketches-memory-java17_21-${{ env.POM_VERSION }}/"
 
       - name: 7. Upload Generated Javadocs as Workflow Zip Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: versioned-javadocs-${{ env.POM_VERSION }}
           path: javadoc-staging/

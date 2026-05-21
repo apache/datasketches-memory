@@ -1,9 +1,10 @@
-name: Stage Release Candidate Source Assets (Manual Trigger)
+name: Placeholder for Manual Trigger
 
 # Prototype skeleton to register the workflow name and manual dispatch 
 # switch with GitHub's UI on the default branch. 
 # This placeholder allows full testing inside development branches 
 #  for this .github/workflows/<filename>.
+# Once the developed WF is ready to push rename the developed WF to its real name.
 
 on:
   workflow_dispatch:

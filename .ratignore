@@ -16,5 +16,4 @@ NOTICE
 **/api-links.bin
 
 # Target specific test resources
-**/GettysburgAddress.txt
-**/LoremIpsum.txt
+GettysburgAddress.txt

@@ -11,10 +11,10 @@ StandardCollection
 LICENSE
 NOTICE
 **/*.code-workspace
-**/scripts/assets/LoremIpsum.txt
 **/*.txt
 **/*.html
 **/api-links.bin
 
 # Target specific test resources
-**/src/test/resources/GettysburgAddress.txt
+**/GettysburgAddress.txt
+**/LoremIpsum.txt

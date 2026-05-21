@@ -476,23 +476,7 @@ under the License.
             <excludeSubProjects>false</excludeSubProjects>
             <outputDirectory>${project.basedir}/rat</outputDirectory>
             <consoleOutput>true</consoleOutput>
-            <!-- rat uses .gitignore for excludes by default
-            <inputExcludes>
-              <inputExcludeStd>StandardCollection</inputExcludeStd>
-              <inputExclude>**/*.yaml</inputExclude>
-              <inputExclude>**/*.yml</inputExclude>
-              <inputExclude>**/.*</inputExclude>
-              <inputExclude>**/_*</inputExclude>
-              <inputExclude>**/test-output/**/*</inputExclude>
-              <inputExclude>**/git.properties</inputExclude>
-              <inputExclude>**/doc/**</inputExclude>
-              <inputExclude>**/docs/**</inputExclude>
-              <inputExclude>**/*.sk</inputExclude>
-              <inputExclude>LICENSE</inputExclude>
-              <inputExclude>NOTICE</inputExclude>
-              <inputExclude>**/*.code-workspace</inputExclude>
-              <inputExclude>**/scripts/assets/LoremIpsum.txt</inputExclude>
-            </inputExcludes> -->
+            <inputExcludeFile>${project.basedir}/.ratignore</inputExcludeFile>
           </configuration>
         </plugin>
 

@@ -143,6 +143,7 @@ under the License.
     <maven.build.timestamp.format>yyyy-MM-dd'T'HH-mm-ss'Z'</maven.build.timestamp.format>
 
     <!--  org.apache.maven plugins -->
+    <maven-assembly-plugin.version>3.8.0</maven-assembly-plugin.version>
     <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
     <maven-deploy-plugin.version>3.1.4</maven-deploy-plugin.version>
     <maven-enforcer-plugin.version>3.6.2</maven-enforcer-plugin.version>
@@ -210,6 +211,18 @@ under the License.
   <build>
     <pluginManagement>
       <plugins>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>${maven-assembly-plugin.version}</version>
+          <configuration>
+            <descriptorRefs>
+              <descriptorRef>source-release</descriptorRef>
+            </descriptorRefs>
+            <tarLongFileMode>posix</tarLongFileMode>
+          </configuration>
+        </plugin>
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -474,6 +487,7 @@ under the License.
               <inputExclude>**/test-output/**/*</inputExclude>
               <inputExclude>**/git.properties</inputExclude>
               <inputExclude>**/doc/**</inputExclude>
+              <inputExclude>**/docs/**</inputExclude>
               <inputExclude>**/*.sk</inputExclude>
               <inputExclude>LICENSE</inputExclude>
               <inputExclude>NOTICE</inputExclude>
@@ -533,6 +547,11 @@ under the License.
     </pluginManagement>
 
     <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+      </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

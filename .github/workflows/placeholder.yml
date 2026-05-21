@@ -44,7 +44,7 @@ jobs:
       - name: 4. Execute Apache RAT License Audit
         run: |
           echo "Running corporate license header checks..."
-          mvn rat:check
+          mvn apache-rat:check
 
       # 5. Clean workspace and assemble the official source release container
       - name: 5. Build Apache Source Release Archive

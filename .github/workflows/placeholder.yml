@@ -44,7 +44,7 @@ jobs:
       - name: 4. Execute Apache RAT License Audit
         run: |
           echo "Running corporate license header checks..."
-          mvn apache-rat:check -Drat.excludesFile=.ratignore
+          mvn apache-rat:check -N
 
       # Diagnostic Step: Print the target report if the audit drops dead
       - name: 4b. Diagnostic - Display RAT Failure Report

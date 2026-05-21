@@ -463,7 +463,7 @@ under the License.
           <groupId>org.apache.rat</groupId>
           <artifactId>apache-rat-plugin</artifactId>
           <version>${apache-rat-plugin.version}</version>
-          <inherited>false</inherited>
+          <inherited>true</inherited> <!-- Inherits the configuration to sub modules -->
           <executions>
             <execution>
               <phase>verify</phase>
@@ -473,11 +473,11 @@ under the License.
             </execution>
           </executions>
           <configuration>
-            <excludeSubProjects>false</excludeSubProjects>
+            <excludeSubProjects>false</excludeSubProjects> <!-- examine the whole project from the root -->
             <outputDirectory>${project.basedir}/rat</outputDirectory>
             <consoleOutput>true</consoleOutput>
             <inputExcludes>
-              <inputExclude>StandardCollection</inputExclude>>
+              <inputExclude>StandardCollection</inputExclude>
               <inputExclude>**/*.yaml</inputExclude>
               <inputExclude>**/*.yml</inputExclude>
               <inputExclude>**/.*</inputExclude>
@@ -492,7 +492,6 @@ under the License.
               <inputExclude>**/*.txt</inputExclude>
               <inputExclude>**/*.html</inputExclude>
               <inputExclude>**/api-links.bin</inputExclude>
-              <inputExclude>datasketches-memory-java11/src/test/resources/GettysburgAddress.txt</inputExclude>
             </inputExcludes>
           </configuration>
         </plugin>

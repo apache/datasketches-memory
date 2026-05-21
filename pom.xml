@@ -476,23 +476,24 @@ under the License.
             <excludeSubProjects>false</excludeSubProjects>
             <outputDirectory>${project.basedir}/rat</outputDirectory>
             <consoleOutput>true</consoleOutput>
-            <excludes>
-              <exclude>StandardCollection</exclude>
-              <exclude>**/*.yaml</exclude>
-              <exclude>**/*.yml</exclude>
-              <exclude>**/.*</exclude>
-              <exclude>**/test-output/**/*</exclude>
-              <exclude>**/git.properties</exclude>
-              <exclude>**/doc/**</exclude>
-              <exclude>**/docs/**</exclude>
-              <exclude>**/*.sk</exclude>
-              <exclude>LICENSE</exclude>
-              <exclude>NOTICE</exclude>
-              <exclude>**/*.code-workspace</exclude>
-              <exclude>**/*.txt</exclude>
-              <exclude>**/*.html</exclude>
-              <exclude>**/api-links.bin</exclude>
-            </excludes>
+            <inputExcludes>
+              <inputExclude>StandardCollection</inputExclude>>
+              <inputExclude>**/*.yaml</inputExclude>
+              <inputExclude>**/*.yml</inputExclude>
+              <inputExclude>**/.*</inputExclude>
+              <inputExclude>**/test-output/**/*</inputExclude>
+              <inputExclude>**/git.properties</inputExclude>
+              <inputExclude>**/doc/**</inputExclude>
+              <inputExclude>**/docs/**</inputExclude>
+              <inputExclude>**/*.sk</inputExclude>
+              <inputExclude>LICENSE</inputExclude>
+              <inputExclude>NOTICE</inputExclude>
+              <inputExclude>**/*.code-workspace</inputExclude>
+              <inputExclude>**/*.txt</inputExclude>
+              <inputExclude>**/*.html</inputExclude>
+              <inputExclude>**/api-links.bin</inputExclude>
+              <inputExclude>datasketches-memory-java11/src/test/resources/GettysburgAddress.txt</inputExclude>
+            </inputExcludes>
           </configuration>
         </plugin>
 

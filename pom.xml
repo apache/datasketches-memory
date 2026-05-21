@@ -157,8 +157,9 @@ under the License.
     <maven-surefire-failsafe-plugins.version>3.5.4</maven-surefire-failsafe-plugins.version> <!-- surefire, failsafe, surefire-report -->
     <maven-toolchains-plugin.version>3.2.0</maven-toolchains-plugin.version>
 
-    <!--  org.apache.rat plugins -->
+    <!--  org.apache plugins -->
     <apache-rat-plugin.version>0.18</apache-rat-plugin.version>
+    <apache-source-release-assembly-descriptor.version>1.8</apache-source-release-assembly-descriptor.version>
 
     <!-- com.github maven plugins -->
     <coveralls-repo-token></coveralls-repo-token>
@@ -216,6 +217,13 @@ under the License.
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
           <version>${maven-assembly-plugin.version}</version>
+          <dependencies>
+            <dependency>
+            <groupId>org.apache.apache.resources</groupId>
+            <artifactId>apache-source-release-assembly-descriptor</artifactId>
+            <version>${apache-source-release-assembly-descriptor.version}</version>
+            </dependency>
+          </dependencies>
           <configuration>
             <descriptorRefs>
               <descriptorRef>source-release</descriptorRef>

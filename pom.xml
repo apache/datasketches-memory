@@ -484,6 +484,7 @@ under the License.
               <inputExclude>**/.*</inputExclude>
               <inputExclude>**/_*</inputExclude>
               <inputExclude>/src/test/resources/GettysburgAddress.txt</inputExclude>
+              <inputExclude>datasketches-memory-java11/src/test/resources/GettysburgAddress.txt</inputExclude>
               <inputExclude>**/test-output/**/*</inputExclude>
               <inputExclude>**/git.properties</inputExclude>
               <inputExclude>**/doc/**</inputExclude>

@@ -46,6 +46,18 @@ jobs:
           echo "Running corporate license header checks..."
           mvn apache-rat:check
 
+      # Diagnostic Step: Print the target report if the audit drops dead
+      - name: 4b. Diagnostic - Display RAT Failure Report
+        if: always()
+        run: |
+          echo "Checking for java11 submodule RAT report..."
+          if [ -f datasketches-memory-java11/target/rat.txt ]; then
+            echo "=== DATASKETCHES-MEMORY-JAVA11 RAT.TXT ==="
+            cat datasketches-memory-java11/target/rat.txt
+          else
+            echo "No submodule rat.txt report found."
+          fi
+
       # 5. Clean workspace and assemble the official source release container
       - name: 5. Build Apache Source Release Archive
         run: |

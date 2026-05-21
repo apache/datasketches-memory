@@ -23,3 +23,12 @@ github:
 
   dependabot_alerts:  true
   dependabot_updates: false
+  
+  # Configure ASF Inframail routing parameters
+  notifications:
+    commits:      commits@datasketches.apache.org
+    issues:       dev@datasketches.apache.org
+    pullrequests: dev@datasketches.apache.org
+    # Setting jobs to an empty string completely silences 
+    # GitHub Actions success/failure emails to the dev list.
+    jobs:         ""

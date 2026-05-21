@@ -1,0 +1,17 @@
+name: Placeholder for Manual Trigger
+
+# Prototype skeleton to register the workflow name and manual dispatch 
+# switch with GitHub's UI on the default branch. 
+# This placeholder allows full testing inside development branches 
+#  for this .github/workflows/<filename>.
+# Once the developed WF is ready to push rename the developed WF to its real name.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  placeholder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prototype Placeholder
+        run: echo "This is a placeholder. Run this workflow from your feature branch to execute the real deployment logic."

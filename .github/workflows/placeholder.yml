@@ -1,0 +1,80 @@
+name: Stage Release Candidate Source Assets (Manual Trigger)
+
+# file: placeholder.yml (temporary)
+# This workflow acts as Phase 1 of your official Release Candidate process.
+# It handles the clean compilation, license verification, and source packaging
+# on a cloud runner, delivering a pristine ZIP for local signing.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  assemble-source-candidate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      # 1. Checkout the clean working workspace context
+      - name: 1. Checkout Branch Context
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+
+      # 2. Set up the foundational Java runtime environment
+      - name: 2. Provision JDK 25 for Build Execution
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          java-package: jdk
+          architecture: x64
+          cache: 'maven'
+
+      # 3. Dynamically extract the project version from the root pom.xml
+      - name: 3. Extract POM Project Version
+        id: parse-version
+        run: |
+          POM_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "Target Release Version: $POM_VERSION"
+          echo "POM_VERSION=$POM_VERSION" >> $GITHUB_ENV
+
+      # 4. Audit license headers across all source files and submodules
+      - name: 4. Execute Apache RAT License Audit
+        run: |
+          echo "Running corporate license header checks..."
+          mvn rat:check
+
+      # 5. Clean workspace and assemble the official source release container
+      - name: 5. Build Apache Source Release Archive
+        run: |
+          echo "Assembling project distribution ZIP..."
+          mvn clean assembly:single
+
+      # 6. Relocate and calculate the SHA-512 cryptographic checksum string
+      - name: 6. Stage Deliverables and Compute Checksums
+        run: |
+          # Create a temporary staging area for the artifact collection
+          mkdir -p staging_dir
+          
+          # Define standard names based on the extracted POM version
+          SRC_ZIP="datasketches-memory-${{ env.POM_VERSION }}-src.zip"
+          
+          echo "Locating generated assembly asset..."
+          cp target/datasketches-memory-${{ env.POM_VERSION }}-source-release.zip staging_dir/$SRC_ZIP
+          
+          cd staging_dir
+          echo "Generating SHA-512 checksum signature file..."
+          sha512sum $SRC_ZIP > $SRC_ZIP.sha512
+          
+          echo "Verification Checksum Content:"
+          cat $SRC_ZIP.sha512
+
+      # 7. Package and upload the staged bundle as a secure workflow archive
+      - name: 7. Upload Release Candidate Assets for Local Signing
+        uses: actions/upload-artifact@v4
+        with:
+          name: datasketches-memory-RC-source-bundle
+          path: staging_dir/
+          retention-days: 15

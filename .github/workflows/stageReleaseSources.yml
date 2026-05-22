@@ -1,6 +1,5 @@
 name: Stage Release Candidate Source Assets (Manual Trigger)
 
-# file: placeholder.yml (temporary)
 # This workflow acts as Phase 1 of your official Release Candidate process.
 # It handles the clean compilation, license verification, and source packaging
 # on a cloud runner, delivering a pristine ZIP for local signing.

@@ -4,7 +4,7 @@ name: Placeholder for Manual Trigger
 # switch with GitHub's UI on the default branch. 
 # This placeholder allows full testing inside development branches 
 #  for this .github/workflows/<filename>.
-#
+# 
 # 1. Create a temporary branch off of /main/.
 # 2. In that branch create a new file with the eventual target workflow filename.
 # 3. Push a copy the contents of the placeholder.yml to the new file.

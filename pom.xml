@@ -284,6 +284,25 @@ under the License.
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>${maven-gpg-plugin.version}</version>
+          <executions>
+            <execution>
+              <id>sign-artifacts</id>
+              <phase>verify</phase>
+              <goals><goal>sign</goal></goals>
+            </execution>
+          </executions>
+          <configuration>
+            <gpgArguments>
+              <arg>--verbose</arg>
+              <arg>--personal-digest-preferences=SHA512</arg>
+            </gpgArguments>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-install-plugin</artifactId>
           <version>${maven-install-plugin.version}</version>
         </plugin>
@@ -625,10 +644,23 @@ under the License.
   </build>
 
   <profiles>
+    <!--  This profile is used to release signed jars to the Apache Nexus repository.
+          This must be executed from a git repository set at the proper Release branch (e.g., 1.1.X)
+          and at a Release Candidate tag (e.g., 1.1.0-RC1).
+          The pom version in the release branch must be properly set to something like: "1.1.0".
+          The pom version in the master would be set to something like: "1.2.0-SNAPSHOT".
+          Test Command: mvn clean verify -Pnexus-jars -DskipTests=true
+          Command: mvn clean deploy -Dnexus-jars
+          Verify Command (from terminal): gpg -v &#45;&#45;verify $ASC $FILE # dashdashverify
+    -->
     <profile>
       <id>nexus-jars</id>
       <build>
         <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+          </plugin>
           <plugin>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>nexus-staging-maven-plugin</artifactId>

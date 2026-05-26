@@ -176,6 +176,7 @@ under the License.
 
     <!-- other -->
     <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
+    <nexus-staging-maven-plugin.version>1.7.0</nexus-staging-maven-plugin.version>
     <org-slf4j.version>2.0.12</org-slf4j.version>
 
     <!-- Used for xxHash testing -->
@@ -259,8 +260,8 @@ under the License.
               </goals>
               <configuration>
                 <rules>
-                  <!-- The Java enforcer rule is toolchain unaware
-                  and is only checks the compiler used by the Maven runtime.
+                  <!-- The Java enforcer rule is not toolchain aware
+                  and it only checks the compiler used by the Maven runtime.
                   In the context of toolchains this rule is useless.
                   See: https://github.com/paulmoloney/maven-enforcer-toolchain-rules
                   <requireJavaVersion> </requireJavaVersion>
@@ -305,6 +306,9 @@ under the License.
           </executions>
           <configuration>
             <archive>
+              <!-- WARNING: MANIFEST SYNC REQUIRED. If you modify these manifest entries here you must
+                   make sure that all of these entries are identical across the maven-jar-plugin,
+                   maven-javadoc-plugin and maven-source-plugin. -->
               <manifestEntries>
                 <Build-Jdk-Spec>${java.specification.version}</Build-Jdk-Spec>
                 <Build-OS>${os.name} ${os.arch} ${os.version}</Build-OS>
@@ -337,6 +341,9 @@ under the License.
             </additionalJOptions>
             <excludePackageNames>org.apache.datasketches.memory.internal</excludePackageNames>
             <archive>
+              <!-- WARNING: MANIFEST SYNC REQUIRED. If you modify these manifest entries here you must
+                   make sure that all of these entries are identical across the maven-jar-plugin,
+                   maven-javadoc-plugin and maven-source-plugin. -->
               <manifestEntries>
                 <Build-Jdk-Spec>${java.specification.version}</Build-Jdk-Spec>
                 <Build-OS>${os.name} ${os.arch} ${os.version}</Build-OS>
@@ -418,6 +425,9 @@ under the License.
           </executions>
           <configuration>
             <archive>
+              <!-- WARNING: MANIFEST SYNC REQUIRED. If you modify these manifest entries here you must
+                   make sure that all of these entries are identical across the maven-jar-plugin,
+                   maven-javadoc-plugin and maven-source-plugin. -->
               <manifestEntries>
                 <Build-Jdk-Spec>${java.specification.version}</Build-Jdk-Spec>
                 <Build-OS>${os.name} ${os.arch} ${os.version}</Build-OS>
@@ -550,6 +560,17 @@ under the License.
           <version>${exec-maven-plugin.version}</version>
         </plugin>
 
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>nexus-staging-maven-plugin</artifactId>
+          <version>${nexus-staging-maven-plugin.version}</version>
+          <configuration>
+            <serverId>apache.releases.https</serverId>
+            <nexusUrl>https://repository.apache.org/</nexusUrl>
+            <autoReleaseAfterClose>false</autoReleaseAfterClose> 
+          </configuration>
+        </plugin>
+
       </plugins>
     </pluginManagement>
 
@@ -602,6 +623,21 @@ under the License.
 
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>nexus-jars</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <extensions>true</extensions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
   <!-- This project utilizes both Project Inheritance and Project Aggregation. It is divided into an 
        aggregator project (the root), that manages a group of submodules that inherit configuration from this root.

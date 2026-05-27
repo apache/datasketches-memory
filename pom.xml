@@ -316,15 +316,20 @@ under the License.
               <id>default-jar</id>
               <phase>package</phase>
               <goals><goal>jar</goal></goals>
+              <configuration>
+                <skipIfEmpty>true</skipIfEmpty>
+              </configuration>
             </execution>
             <execution>
               <id>default-test-jar</id>
               <phase>package</phase>
               <goals><goal>test-jar</goal></goals>
+              <configuration>
+                <skipIfEmpty>true</skipIfEmpty>
+              </configuration>
             </execution>
           </executions>
           <configuration>
-            <skipIfEmpty>true</skipIfEmpty>
             <archive>
               <!-- WARNING: MANIFEST SYNC REQUIRED. If you modify these manifest entries here you must
                    make sure that all of these entries are identical across the maven-jar-plugin,

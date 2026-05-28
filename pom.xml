@@ -121,26 +121,37 @@ under the License.
   </repositories>
 
   <properties>
-    <!-- System-wide properties -->
+    <!-- Maven properties -->
     <maven.version>3.9.12</maven.version>
+    <project.build.outputTimestamp>2026-01-09T19:00:20Z</project.build.outputTimestamp>
+    <maven.build.timestamp.format>yyyy-MM-dd'T'HH-mm-ss'Z'</maven.build.timestamp.format>
+
+    <!-- Base Build Compiler properties -->
     <java.version>11</java.version>
-    <testng.version>7.12.0</testng.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
+    <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
+    
+    <!-- Test Code Dependencies -->
+    <testng.version>7.12.0</testng.version>
+    <zero-allocation-hashing.version>2026.0</zero-allocation-hashing.version> <!-- xxHash testing -->
+    <org-slf4j.version>2.0.12</org-slf4j.version> <!-- used by TestNG -->
+
+    <!-- JVM arguments -->
     <jvm.mem>-Xmx4g</jvm.mem>
     <jvm.locale.language>-Duser.language=en</jvm.locale.language>
     <jvm.locale.country>-Duser.country=US</jvm.locale.country>
     <jvm.locale.encoding>-Dfile.encoding=UTF-8</jvm.locale.encoding>
     <jvm.args>${jvm.mem} ${jvm.locale.language} ${jvm.locale.country} ${jvm.locale.encoding}</jvm.args>
     <argLine></argLine>
+
+    <!-- Encoding properties -->
     <charset.encoding>UTF-8</charset.encoding>
-    <project.build.outputTimestamp>2026-01-09T19:00:20Z</project.build.outputTimestamp>
     <project.build.sourceEncoding>${charset.encoding}</project.build.sourceEncoding>
     <project.build.resourceEncoding>${charset.encoding}</project.build.resourceEncoding>
     <project.reporting.inputEncoding>${charset.encoding}</project.reporting.inputEncoding>
     <project.reporting.outputEncoding>${charset.encoding}</project.reporting.outputEncoding>
     <project.reporting.outputDirectory>${project.build.directory}/site</project.reporting.outputDirectory>
-    <maven.build.timestamp.format>yyyy-MM-dd'T'HH-mm-ss'Z'</maven.build.timestamp.format>
 
     <!--  org.apache.maven plugins -->
     <maven-assembly-plugin.version>3.8.0</maven-assembly-plugin.version>
@@ -175,14 +186,8 @@ under the License.
     <jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
 
     <!-- other -->
-    <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
     <nexus-staging-maven-plugin.version>1.7.0</nexus-staging-maven-plugin.version>
-    <org-slf4j.version>2.0.12</org-slf4j.version>
 
-    <!-- Used for xxHash testing -->
-    <zero-allocation-hashing.version>2026.0</zero-allocation-hashing.version>
-
-    <maven.deploy.skip>true</maven.deploy.skip> <!-- override in the command line -->
   </properties>
 
   <dependencyManagement>

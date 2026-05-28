@@ -182,8 +182,7 @@ under the License.
     <!-- Used for xxHash testing -->
     <zero-allocation-hashing.version>2026.0</zero-allocation-hashing.version>
 
-    <maven.deploy.skip>true</maven.deploy.skip>
-    <maven.javadoc.skip>false</maven.javadoc.skip> <!-- set to true for deployment -->
+    <maven.deploy.skip>true</maven.deploy.skip> <!-- override in the command line -->
   </properties>
 
   <dependencyManagement>
@@ -647,7 +646,7 @@ under the License.
           The pom version in the release branch must be properly set to something like: "1.1.0".
           The pom version in the master would be set to something like: "1.2.0-SNAPSHOT".
           Test Command: mvn clean verify -Pnexus-jars -DskipTests=true
-          Command: mvn clean deploy -Dnexus-jars
+          Command: mvn clean deploy -Dnexus-jars -DskipTests=true
           Verify Command (from terminal): gpg -v &#45;&#45;verify $ASC $FILE # dashdashverify
     -->
     <profile>

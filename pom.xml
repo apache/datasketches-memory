@@ -419,7 +419,7 @@ under the License.
                 <outputDirectory>${project.build.outputDirectory}/META-INF</outputDirectory>
                 <resources>
                   <resource>
-                    <directory>${project.root}</directory>
+                    <directory>${maven.multiModuleProjectDirectory}</directory>
                     <includes>
                       <include>LICENSE</include>
                       <include>NOTICE</include>
@@ -522,7 +522,7 @@ under the License.
           </executions>
           <configuration>
             <excludeSubProjects>false</excludeSubProjects> <!-- examine the whole project from the root -->
-            <outputDirectory>${project.root}/target/rat</outputDirectory>
+            <outputDirectory>${maven.multiModuleProjectDirectory}/target/rat</outputDirectory>
             <consoleOutput>true</consoleOutput>
             <inputExcludes>
               <inputExclude>StandardCollection</inputExclude>
@@ -556,7 +556,7 @@ under the License.
             </execution>
           </executions>
           <configuration>
-            <dotGitDirectory>${project.root}/.git</dotGitDirectory>
+            <dotGitDirectory>${maven.multiModuleProjectDirectory}/.git</dotGitDirectory>
             <generateGitPropertiesFile>false</generateGitPropertiesFile>
             <skipPoms>false</skipPoms>
           </configuration>

@@ -215,6 +215,22 @@ under the License.
   </dependencyManagement>
 
   <build>
+
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
+        <directory>${maven.multiModuleProjectDirectory}</directory>
+        <targetPath>META-INF</targetPath>
+        <includes>
+          <include>LICENSE</include>
+          <include>NOTICE</include>
+          <include>DEPENDENCIES</include>
+        </includes>
+      </resource>
+    </resources>
+
     <pluginManagement>
       <plugins>
 
@@ -405,31 +421,6 @@ under the License.
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
           <version>${maven-resources-plugin.version}</version>
-          <executions>
-            <execution>
-              <id>default-resources</id>
-              <phase>process-resources</phase>
-              <goals><goal>resources</goal></goals>
-            </execution>
-            <execution>
-              <id>copy-legal-docs</id>
-              <phase>prepare-package</phase>
-              <goals><goal>copy-resources</goal></goals>
-              <configuration>
-                <outputDirectory>${project.build.outputDirectory}/META-INF</outputDirectory>
-                <resources>
-                  <resource>
-                    <directory>${maven.multiModuleProjectDirectory}</directory>
-                    <includes>
-                      <include>LICENSE</include>
-                      <include>NOTICE</include>
-                      <include>DEPENDENCIES</include>
-                    </includes>
-                  </resource>
-                </resources>
-              </configuration>
-            </execution>
-          </executions>
           <configuration>
             <nonFilteredFileExtensions>
               <nonFilteredFileExtension>DS_Store</nonFilteredFileExtension>

@@ -18,7 +18,8 @@
  */
 
 /**
- * <b>This package defines the interfaces for the DataSketches-Memory project for Java 11.</b>
+ * <b>This package defines the interfaces for the DataSketches-Memory project 
+ * for Java 17 and Java 21.</b>
  *
  * @author Lee Rhodes
  */

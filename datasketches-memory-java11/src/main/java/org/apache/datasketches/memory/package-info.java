@@ -17,4 +17,10 @@
  * under the License.
  */
 
+/**
+ * This package defines the interfaces for the DataSketches-Memory project for Java 11.
+ *
+ * @author Lee Rhodes
+ */
 package org.apache.datasketches.memory;
+

@@ -72,7 +72,7 @@ public interface Memory extends Resource {
   //MAP
   /**
    * NOTE: This operation is unsupported for JDKs 17 and 21.
-   * Please use datasketches-java 9.0+, which supports JDK 25.
+   * Calling this method will resort in an {@link UnsupportedOperationException}
    *
    * <p>Maps the given file into <i>Memory</i> for read operations.</p>
    * Calling this method is equivalent to calling

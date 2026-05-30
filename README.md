@@ -17,9 +17,9 @@
     under the License.
 -->
 
-[![Build Status](https://travis-ci.org/apache/datasketches-memory.svg?branch=master)](https://travis-ci.org/apache/datasketches-memory)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.datasketches/datasketches-memory/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.apache.datasketches/datasketches-memory)
-[![Coverage Status](https://coveralls.io/repos/github/apache/datasketches-memory/badge.svg?branch=master)](https://coveralls.io/github/apache/datasketches-memory?branch=master)
+[![JDK & OS Matrix CI](https://github.com/apache/datasketches-memory/actions/workflows/auto-jdk-os-matrix.yml/badge.svg)](https://github.com/apache/datasketches-memory/actions/workflows/auto-jdk-os-matrix.yml)
+[![Maven Central Latest Version](https://img.shields.io/maven-central/v/org.apache.datasketches/datasketches-memory.svg)](https://search.maven.org/artifact/org.apache.datasketches/datasketches-memory "Maven Central Latest Version")
+[![Coveralls Main Branch Test Coverage](https://coveralls.io/repos/github/apache/datasketches-memory/badge.svg?branch=master)](https://coveralls.io/github/apache/datasketches-memory?branch=master)
 
 =================
 

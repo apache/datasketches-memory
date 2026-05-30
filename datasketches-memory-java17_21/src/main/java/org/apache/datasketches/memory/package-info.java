@@ -20,6 +20,8 @@
 /**
  * <b>This package defines the interfaces for the DataSketches-Memory project 
  * for Java 17 and Java 21.</b>
+ * 
+ * Note: Memory Mapping is disabled for this product.
  *
  * @author Lee Rhodes
  */

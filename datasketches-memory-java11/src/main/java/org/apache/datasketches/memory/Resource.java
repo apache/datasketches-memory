@@ -260,6 +260,12 @@ public interface Resource extends AutoCloseable {
   boolean isLoaded();
 
   /**
+   * Returns {@code true} if the backing resource is a memory-mapped file.
+   * @return {@code true} if the backing resource is a memory-mapped file.
+   */
+  boolean isMapped();
+
+  /**
    * If {@code true}, this is a <i>Memory</i> or <i>WritableMemory</i> instance, which provides the Memory API.
    * The Memory API is the principal API for this Memory Component.
    * It provides a rich variety of direct manipulations of four types of resources:
@@ -274,12 +280,6 @@ public interface Resource extends AutoCloseable {
    * otherwise this is a <i>Buffer</i> or <i>WritableBuffer</i> instance, which provides the Buffer API.
    */
   boolean isMemory();
-
-  /**
-   * Returns {@code true} if the backing resource is a memory-mapped file.
-   * @return {@code true} if the backing resource is a memory-mapped file.
-   */
-  boolean isMapped();
 
   /**
    * If true, all put and get operations will assume the non-native ByteOrder.

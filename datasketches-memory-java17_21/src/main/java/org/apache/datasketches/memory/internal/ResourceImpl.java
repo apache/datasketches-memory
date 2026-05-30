@@ -37,8 +37,7 @@ import org.apache.datasketches.memory.Resource;
  */
 //@SuppressWarnings("restriction")
 public abstract class ResourceImpl implements Resource {
-  public static final int JDK_MAJOR; //11, 17, 21
-  public static final String unsupportedJDK;
+  public static final int JAVA_MAJOR; //11, 17, 21
 
   //Used to convert "type" to bytes:  bytes = longs << LONG_SHIFT
   static final int BOOLEAN_SHIFT    = 0;
@@ -83,10 +82,9 @@ public abstract class ResourceImpl implements Resource {
   static final String THREAD_EXCEPTION_TEXT = "Attempted access outside owning thread";
   
   static {
-    final String jdkVer = System.getProperty("java.version");
-    JDK_MAJOR = parseJavaVersion(jdkVer);
-    unsupportedJDK = "JDK Not supported.  Please use JDK 17 or 21. Given JDK: ";
-    checkJavaVersion(JDK_MAJOR);
+    final String javaVer = System.getProperty("java.version");
+    JAVA_MAJOR = parseJavaVersion(javaVer);
+    checkJavaVersion(JAVA_MAJOR);
   }
 
   //set by the leaf nodes
@@ -143,11 +141,11 @@ public abstract class ResourceImpl implements Resource {
 
   /**
    * Checks the runtime Java Version string. 
-   * @param jdkMajor the first number from the <i>System.getProperty("java.version")</i> string."
+   * @param javaMajor the first number from the <i>System.getProperty("java.version")</i> string."
    */
-  static void checkJavaVersion(final int jdkMajor) {
-    final boolean ok = ( (jdkMajor == 17) || (jdkMajor == 21) ); 
-    if (!ok) { throw new IllegalArgumentException(unsupportedJDK + jdkMajor);
+  static void checkJavaVersion(final int javaMajor) {
+    final boolean ok = ( (javaMajor == 17) || (javaMajor == 21) ); 
+    if (!ok) { throw new IllegalArgumentException("This Java version is not supported: " + javaMajor);
     }
   }
 
@@ -226,6 +224,11 @@ public abstract class ResourceImpl implements Resource {
     return CompareAndCopy.equals(this, thisOffsetBytes, (ResourceImpl) that, thatOffsetBytes, lengthBytes);
   }
 
+//  @Override
+//  public void force() { //overridden by Map Leaves
+//    throw new UnsupportedOperationException(NOT_MAPPED_FILE_RESOURCE);
+//  }
+
   //Overridden by ByteBuffer Leaves. Used internally and for tests.
   ByteBuffer getByteBuffer() {
     return null;
@@ -298,6 +301,16 @@ public abstract class ResourceImpl implements Resource {
     return getUnsafeObject() != null;
   }
 
+//  @Override
+//  public boolean isLoaded() { //overridden by Map Leaves
+//    throw new IllegalStateException(NOT_MAPPED_FILE_RESOURCE);
+//  }
+//
+//  @Override
+//  public boolean isMapped() {
+//    return (getTypeId() & MAP) > 0;
+//  }
+
   @Override
   public boolean isMemory() {
     return (getTypeId() & BUFFER) == 0;
@@ -342,27 +355,32 @@ public abstract class ResourceImpl implements Resource {
     return true;
   }
 
+//  @Override
+//  public void load() { //overridden by Map leaves
+//    throw new IllegalStateException(NOT_MAPPED_FILE_RESOURCE);
+//  }
+
   private static String pad(final String s, final int fieldLen) {
     return characterPad(s, fieldLen, ' ' , true);
   }
 
   /**
-   * Returns the JDK major version.
-   * @return the JDK major version.
+   * Returns the Java major version.
+   * @return the Java major version.
    * @throws IllegalArgumentException for an improper Java version string.
    */
-  static final int parseJavaVersion(final String jdkVer) {
-    final int jdkMajor;
+  static final int parseJavaVersion(final String javaVer) {
+    final int javaMajor;
     try {
-      String[] parts = jdkVer.trim().split("^0-9\\.");//grab only number groups and "."
+      String[] parts = javaVer.trim().split("^0-9\\.");//grab only number groups and "."
       parts = parts[0].split("\\."); //split out the number groups
       final int p0 = Integer.parseInt(parts[0]); //the first number group
       final int p1 = (parts.length > 1) ? Integer.parseInt(parts[1]) : 0; //2nd number group, or 0
-      jdkMajor = (p0 == 1) ? p1 : p0;
+      javaMajor = (p0 == 1) ? p1 : p0; //1.X becomes X
     } catch (final NumberFormatException | ArrayIndexOutOfBoundsException  e) {
-      throw new IllegalArgumentException("Improper Java version string: " + jdkVer + LS + e);
+      throw new IllegalArgumentException("Improper Java version string: " + javaVer + LS + e);
     }
-    return jdkMajor;
+    return javaMajor;
   }
 
   //REACHABILITY FENCE
@@ -423,7 +441,7 @@ public abstract class ResourceImpl implements Resource {
     sb.append("Read Only           : ").append(state.isReadOnly()).append(LS);
     sb.append("Type Byte Order     : ").append(state.getTypeByteOrder().toString()).append(LS);
     sb.append("Native Byte Order   : ").append(ByteOrder.nativeOrder().toString()).append(LS);
-    sb.append("JDK Runtime Version : ").append(JDK_MAJOR).append(LS);
+    sb.append("JDK Runtime Version : ").append(JAVA_MAJOR).append(LS);
     //Data detail
     if (withData) {
       sb.append("Data, bytes         :  0  1  2  3  4  5  6  7");

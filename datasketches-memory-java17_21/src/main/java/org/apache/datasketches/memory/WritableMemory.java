@@ -19,10 +19,10 @@
 
 package org.apache.datasketches.memory;
 
-import static org.apache.datasketches.memory.internal.ResourceImpl.unsupportedJDK;
 import static org.apache.datasketches.memory.internal.Util.negativeCheck;
 
-import java.io.File;
+//import java.io.File;
+//import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Objects;
@@ -73,38 +73,41 @@ public interface WritableMemory extends Memory {
   //Duplicates make no sense here
 
   //MAP
-  /**
-   * NOTE: This operation is unsupported for JDKs 17 and 21.
-   * Please use datasketches-java 9.0+, which supports JDK 25.
-   *
-   * <p>Maps the entire given file into native-ordered WritableMemory for write operations.</p>
-   * Calling this method is equivalent to calling
-   * {@link #writableMap(File, long, long, ByteOrder) writableMap(file, 0, file.length(), ByteOrder.nativeOrder())}.
-   * @param file the given file to map. It must be non-null and writable.
-   * @return a file-mapped WritableMemory
-   */
-  static WritableMemory writableMap(final File file) {
-    return writableMap(file, 0, file.length(), ByteOrder.nativeOrder());
-  }
+//  /**
+//   * Maps the entire given file into native-ordered WritableMemory for write operations
+//   * Calling this method is equivalent to calling
+//   * {@link #writableMap(File, long, long, ByteOrder) writableMap(file, 0, file.length(), ByteOrder.nativeOrder())}.
+//   * @param file the given file to map. It must be non-null and writable.
+//   * @return a file-mapped WritableMemory
+//   * @throws IllegalArgumentException if file is not readable or not writable.
+//   * @throws IOException if the specified path does not point to an existing file, or if some other I/O error occurs.
+//   * @throws SecurityException If a security manager is installed and it denies an unspecified permission
+//   * required by the implementation.
+//   */
+//  static WritableMemory writableMap(final File file) throws IOException {
+//    return writableMap(file, 0, file.length(), ByteOrder.nativeOrder());
+//  }
 
-  /**
-   * NOTE: This operation is unsupported for JDKs 17 and 21.
-   * Please use datasketches-java 9.0+, which supports JDK 25.
-   *
-   * <p>Maps the specified portion of the given file into Memory for write operations.</p>
-   * @param file the given file to map. It must be non-null and writable.
-   * @param fileOffsetBytes the position in the given file in bytes. It must be &ge; 0.
-   * @param capacityBytes the size of the mapped Memory. It must be &ge; 0.
-   * @param byteOrder the given <i>ByteOrder</i>. It must be non-null.
-   * @return a file-mapped WritableMemory.
-   */
-  static WritableMemory writableMap(
-      final File file, 
-      final long fileOffsetBytes, 
-      final long capacityBytes,
-      final ByteOrder byteOrder) {
-    throw new UnsupportedOperationException(unsupportedJDK);
-  }
+//  /**
+//   * Maps the specified portion of the given file into Memory for write operations.
+//   * @param file the given file to map. It must be non-null and writable.
+//   * @param fileOffsetBytes the position in the given file in bytes. It must be &ge; 0.
+//   * @param capacityBytes the size of the mapped Memory. It must be &ge; 0.
+//   * @param byteOrder the given <i>ByteOrder</i>. It must be non-null.
+//   * @return a file-mapped WritableMemory.
+//   * @throws IllegalArgumentException if file is not readable or not writable.
+//   * @throws IOException if the specified path does not point to an existing file, or if some other I/O error occurs.
+//   * @throws SecurityException If a security manager is installed and it denies an unspecified permission
+//   * required by the implementation.
+//   */
+//  static WritableMemory writableMap(
+//      final File file, 
+//      final long fileOffsetBytes, 
+//      final long capacityBytes,
+//      final ByteOrder byteOrder) throws IOException {
+//    if (!file.canWrite()) { throw new ReadOnlyException("file must be writable."); }
+//    return BaseWritableMemoryImpl.wrapMap(file, fileOffsetBytes, capacityBytes, false, byteOrder);
+//  }
 
   //ALLOCATE OFF-HEAP
 

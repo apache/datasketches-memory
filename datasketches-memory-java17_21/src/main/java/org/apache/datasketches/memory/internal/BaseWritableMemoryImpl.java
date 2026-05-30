@@ -29,6 +29,7 @@ import static org.apache.datasketches.memory.internal.UnsafeUtil.ARRAY_SHORT_IND
 import static org.apache.datasketches.memory.internal.UnsafeUtil.unsafe;
 import static org.apache.datasketches.memory.internal.Util.negativeCheck;
 
+//import java.io.File
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -109,6 +110,41 @@ public abstract class BaseWritableMemoryImpl extends ResourceImpl implements Wri
         : new BBNonNativeWritableMemoryImpl(abb.unsafeObj, abb.nativeBaseOffset,
             abb.offsetBytes, abb.capacityBytes,  typeId, cumOffsetBytes, memReqSvr, byteBuffer);
   }
+
+//  /**
+//   * The static constructor that chooses the correct Map leaf node based on the byte order.
+//   * @param file the file being wrapped.  It must be non-null.
+//   * @param fileOffsetBytes the file offset bytes. It must be &ge; 0.
+//   * @param capacityBytes the requested capacity of the memory mapped region. It must be &ge; 0.
+//   * @param localReadOnly the requested read-only state
+//   * @param byteOrder the requested byte-order. It must be non-null.
+//   * @return this class constructed via the leaf node.
+//   */
+//  public static WritableMemory wrapMap(final File file, final long fileOffsetBytes,
+//      final long capacityBytes, final boolean localReadOnly, final ByteOrder byteOrder) {
+//    Objects.requireNonNull(file, "File must be non-null.");
+//    Util.negativeCheck(fileOffsetBytes, "fileOffsetBytes");
+//    Util.negativeCheck(capacityBytes, "capacityBytes");
+//    Objects.requireNonNull(byteOrder, "ByteOrder must be non-null.");
+//    final AllocateDirectWritableMap dirWMap =
+//        new AllocateDirectWritableMap(file, fileOffsetBytes, capacityBytes, localReadOnly);
+//    final int typeId = (dirWMap.resourceReadOnly || localReadOnly) ? READONLY : 0;
+//    final long cumOffsetBytes = dirWMap.nativeBaseOffset;
+//    final BaseWritableMemoryImpl wmem = Util.isNativeByteOrder(byteOrder)
+//        ? new MapWritableMemoryImpl(
+//            dirWMap,
+//            0L,
+//            capacityBytes,
+//            typeId,
+//            cumOffsetBytes)
+//        : new MapNonNativeWritableMemoryImpl(
+//            dirWMap,
+//            0L,
+//            capacityBytes,
+//            typeId,
+//            cumOffsetBytes);
+//    return wmem;
+//  }
 
   /**
    * The static constructor that chooses the correct Direct leaf node based on the byte order.

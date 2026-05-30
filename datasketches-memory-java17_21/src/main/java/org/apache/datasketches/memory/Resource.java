@@ -19,8 +19,6 @@
 
 package org.apache.datasketches.memory;
 
-import static org.apache.datasketches.memory.internal.ResourceImpl.unsupportedJDK;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -135,29 +133,30 @@ public interface Resource extends AutoCloseable {
       long thatOffsetBytes, 
       long lengthBytes);
 
-  /**
-   * NOTE: This operation is unsupported for JDKs 17 and 21.
-   * Please use datasketches-java 9.0+, which supports JDK 25.
-   *
-   * <p>Forces any changes made to the contents of this memory-mapped Resource to be written to the storage
-   * device described by the configured file descriptor.</p>
-   *
-   * <p>If the file descriptor associated with this memory-mapped Resource resides on a local storage device then when
-   * this method returns, it is guaranteed that all changes made to this mapped Resource since it was created, or since
-   * this method was last invoked, will have been written to that device.</p>
-   *
-   * <p>If the file descriptor associated with this memory-mapped Resource does not reside on a local device then no
-   * such guarantee is made.</p>
-   *
-   * <p>If this memory-mapped Resource was not mapped in read/write mode
-   * ({@link java.nio.channels.FileChannel.MapMode#READ_WRITE}) then invoking this method may have no effect.
-   * In particular, this method has no effect for files mapped in read-only or private
-   * mapping modes. This method may or may not have an effect for implementation-specific mapping modes.</p>
-   *
-   */
-  default void force() {
-    throw new UnsupportedOperationException(unsupportedJDK);
-  }
+//  /**
+//   * Forces any changes made to the contents of this memory-mapped Resource to be written to the storage
+//   * device described by the configured file descriptor.
+//   *
+//   * <p>If the file descriptor associated with this memory-mapped Resource resides on a local storage device then when
+//   * this method returns, it is guaranteed that all changes made to this mapped Resource since it was created, or since
+//   * this method was last invoked, will have been written to that device.</p>
+//   *
+//   * <p>If the file descriptor associated with this memory-mapped Resource does not reside on a local device then no
+//   * such guarantee is made.</p>
+//   *
+//   * <p>If this memory-mapped Resource was not mapped in read/write mode
+//   * ({@link java.nio.channels.FileChannel.MapMode#READ_WRITE}) then invoking this method may have no effect.
+//   * In particular, this method has no effect for files mapped in read-only or private
+//   * mapping modes. This method may or may not have an effect for implementation-specific mapping modes.</p>
+//   *
+//   * @throws IllegalStateException if this Resource is not <em>alive</em>.
+//   * @throws IllegalStateException if this method is not accessed from the owning thread.
+//   * @throws UnsupportedOperationException if this Resource is not memory-mapped, e.g. if {@code isMapped() == false}.
+//   * @throws ReadOnlyException if this Resource is read-only.
+//   * @throws RuntimeException if there is some other error writing the contents of this
+//   * memory-mapped Resource to the associated storage device.
+//   */
+//  void force();
 
   /**
    * Gets the capacity of this object in bytes
@@ -239,27 +238,32 @@ public interface Resource extends AutoCloseable {
    */
   boolean isHeap();
 
-  /**
-   * NOTE: This operation returns {@code false} for JDKs 17 and 21..
-   * Please use datasketches-java 9.0+, which supports JDK 25.
-   *
-   * <p>Tells whether or not the contents of this memory-mapped Resource is resident in physical memory.</p>
-   *
-   * <p>A return value of {@code true} implies that it is highly likely that all of the data in this memory-mapped
-   * Resource is resident in physical memory and may therefore be accessed without incurring any virtual-memory page
-   * faults or I/O operations.</p>
-   *
-   * <p>A return value of {@code false} does not necessarily imply that all of the data in this memory-mapped Resource
-   * is not resident in physical memory.</p>
-   *
-   * <p>The returned value is a hint, rather than a guarantee, because the underlying operating system may have paged
-   * out some of this Resource's data by the time that an invocation of this method returns.</p>
-   *
-   * @return true if it is likely that all of the data in this memory-mapped Resource is resident in physical memory
-   */
-  default boolean isLoaded() {
-    return false;
-  }
+//  /**
+//   * Tells whether or not the contents of this memory-mapped Resource is resident in physical memory.
+//   *
+//   * <p>A return value of {@code true} implies that it is highly likely that all of the data in this memory-mapped
+//   * Resource is resident in physical memory and may therefore be accessed without incurring any virtual-memory page
+//   * faults or I/O operations.</p>
+//   *
+//   * <p>A return value of {@code false} does not necessarily imply that all of the data in this memory-mapped Resource
+//   * is not resident in physical memory.</p>
+//   *
+//   * <p>The returned value is a hint, rather than a guarantee, because the underlying operating system may have paged
+//   * out some of this Resource's data by the time that an invocation of this method returns.</p>
+//   *
+//   * @return true if it is likely that all of the data in this memory-mapped Resource is resident in physical memory
+//   *
+//   * @throws IllegalStateException if this Resource is not <em>alive</em>.
+//   * @throws IllegalStateException if this method is not accessed from the owning thread.
+//   * @throws UnsupportedOperationException if this Resource is not memory-mapped, e.g. if {@code isMapped() == false}.
+//   */
+//  boolean isLoaded();
+
+//  /**
+//   * Returns {@code true} if the backing resource is a memory-mapped file.
+//   * @return {@code true} if the backing resource is a memory-mapped file.
+//   */
+//  boolean isMapped();
 
   /**
    * If {@code true}, this is a <i>Memory</i> or <i>WritableMemory</i> instance, which provides the Memory API.
@@ -276,17 +280,6 @@ public interface Resource extends AutoCloseable {
    * otherwise this is a <i>Buffer</i> or <i>WritableBuffer</i> instance, which provides the Buffer API.
    */
   boolean isMemory();
-
-  /**
-   * NOTE: This operation returns {@code false} for JDKs 17 and 21..
-   * Please use datasketches-java 9.0+, which supports JDK 25.
-   *
-   * <p>Returns {@code true} if the backing resource is a memory-mapped file.</p>
-   * @return {@code true} if the backing resource is a memory-mapped file.
-   */
-  default boolean isMapped() {
-    return false;
-  }
 
   /**
    * If true, all put and get operations will assume the non-native ByteOrder.
@@ -324,19 +317,18 @@ public interface Resource extends AutoCloseable {
    */
   boolean isAlive();
 
-  /**
-   * NOTE: This operation is unsupported for JDKs 17 and 21.
-   * Please use datasketches-java 9.0+, which supports JDK 25.
-   *
-   * <p>Loads the contents of this memory-mapped Resource into physical memory.</p>
-   *
-   * <p>This method makes a best effort to ensure that, when it returns, this contents of the memory-mapped Resource is
-   * resident in physical memory. Invoking this method may cause some number of page faults and
-   * I/O operations to occur.</p>
-   */
-  default void load() {
-    throw new UnsupportedOperationException(unsupportedJDK);
-  }
+//  /**
+//   * Loads the contents of this memory-mapped Resource into physical memory.
+//   *
+//   * <p>This method makes a best effort to ensure that, when it returns, this contents of the memory-mapped Resource is
+//   * resident in physical memory. Invoking this method may cause some number of page faults and
+//   * I/O operations to occur.</p>
+//   *
+//   * @throws IllegalStateException if this Resource is not <em>alive</em>.
+//   * @throws IllegalStateException if this method is not accessed from the owning thread.
+//   * @throws UnsupportedOperationException if this Resource is not memory-mapped, e.g. if {@code isMapped() == false}.
+//   */
+//  void load();
 
   /**
    * Returns a description of this object with an optional formatted hex string of the data

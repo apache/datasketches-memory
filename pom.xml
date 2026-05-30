@@ -421,11 +421,6 @@ under the License.
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
           <version>${maven-resources-plugin.version}</version>
-          <configuration>
-            <nonFilteredFileExtensions>
-              <nonFilteredFileExtension>DS_Store</nonFilteredFileExtension>
-            </nonFilteredFileExtensions>
-          </configuration>
         </plugin>
 
         <plugin>

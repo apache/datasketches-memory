@@ -183,4 +183,4 @@ Please visit the main [DataSketches website](https://datasketches.apache.org) fo
 If you are interested in making contributions to this Memory Project or to any of the other DataSketches Projects please visit our
 [Community](https://datasketches.apache.org/docs/Community/) page.
 
-/- LR
+\- LR

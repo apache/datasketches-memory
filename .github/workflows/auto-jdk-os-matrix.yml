@@ -1,4 +1,4 @@
-name: Auto JDK & OS Matrix Test & Install
+name: JDK & OS Matrix Test
 
 on:
 #  push:

@@ -354,7 +354,8 @@ under the License.
             <archive>
               <!-- WARNING: MANIFEST SYNC REQUIRED. If you modify these manifest entries here you must
                    make sure that all of these entries are identical across the maven-jar-plugin,
-                   maven-javadoc-plugin and maven-source-plugin. -->
+                   maven-javadoc-plugin and maven-source-plugin with the sole exception of the
+                   Automatic-Module-Name, which only belongs here. -->
               <manifestEntries>
                 <Build-Jdk-Spec>${java.specification.version}</Build-Jdk-Spec>
                 <Build-OS>${os.name} ${os.arch} ${os.version}</Build-OS>
@@ -364,6 +365,7 @@ under the License.
                 <git-commit-id>${git.commit.id}</git-commit-id>
                 <git-commit-time>${git.commit.time}</git-commit-time>
                 <git-commit-user-email>${git.commit.user.email}</git-commit-user-email>
+                <Automatic-Module-Name>${project.artifactId}</Automatic-Module-Name>
               </manifestEntries>
             </archive>
           </configuration>
@@ -389,8 +391,7 @@ under the License.
             <archive>
               <!-- WARNING: MANIFEST SYNC REQUIRED. If you modify these manifest entries here you must
                    make sure that all of these entries are identical across the maven-jar-plugin,
-                   maven-javadoc-plugin and maven-source-plugin with the sole exception of the
-                   Automatic-Module-Name, which only belongs here. -->
+                   maven-javadoc-plugin and maven-source-plugin. -->
               <manifestEntries>
                 <Build-Jdk-Spec>${java.specification.version}</Build-Jdk-Spec>
                 <Build-OS>${os.name} ${os.arch} ${os.version}</Build-OS>
@@ -400,7 +401,6 @@ under the License.
                 <git-commit-id>${git.commit.id}</git-commit-id>
                 <git-commit-time>${git.commit.time}</git-commit-time>
                 <git-commit-user-email>${git.commit.user.email}</git-commit-user-email>
-                <Automatic-Module-Name>${project.artifactId}</Automatic-Module-Name>
               </manifestEntries>
             </archive>
           </configuration>

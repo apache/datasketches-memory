@@ -365,7 +365,6 @@ under the License.
                 <git-commit-id>${git.commit.id}</git-commit-id>
                 <git-commit-time>${git.commit.time}</git-commit-time>
                 <git-commit-user-email>${git.commit.user.email}</git-commit-user-email>
-                <Automatic-Module-Name>${project.artifactId}</Automatic-Module-Name>
               </manifestEntries>
             </archive>
           </configuration>

@@ -86,6 +86,6 @@ jobs:
       - name: 7. Upload Release Candidate Assets for Local Signing
         uses: actions/upload-artifact@v4
         with:
-          name: datasketches-memory-RC-source-bundle
+          name: datasketches-memory-release-source-bundle
           path: staging_dir/
           retention-days: 15

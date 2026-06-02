@@ -97,10 +97,10 @@ Deprecated with the 7.X releases.
 * In addition to the source code obtained from Apache, this release provides two sets of jars in Maven Central based on two artifacts:
 
 #### Artifact: datasketches-memory-java11 (Capability Set A)
-This artifact only supports Java 11
+This artifact is compiled with Java 11 and can only be used with Java 11
 
 #### Artifact: datasketches-memory-java17_21 (Capability Set B)
-This artifact only supports Java 17 and Java 21
+This artifact is compiled with Java 17 and can only be used with Java 17 and Java 21
 
 ----
 
@@ -125,11 +125,12 @@ You will need to add these java modular arguments to your JVM:
 ## DEVELOPER USAGE
 In this environment the developer needs to build the Memory component from source and run the Memory Component tests.  
 
-* Fork this project at https://github.com/apache/datasketches-memory into your own GitHub development site. The 7.0.X releases will be located in the branch 7.0.X.
-* Provide a [toolchains.xml](https://maven.apache.org/guides/mini/guide-using-toolchains.html) in your local system at `~/.m2/toolchains.xml` and configured with at least JDK versions 11, 17 and 21.
+* Fork this project at https://github.com/apache/datasketches-memory into your own GitHub development site. The 7.0.X releases will be located in the branch 7.0.X.  
+    * Note: although it is possible to build this project from just the source downloaded from Apache, the forked GitHub project includes the GitHub/workflows that the Apache source download does not. These workflows provide comprehensive CI testing as well as helpful tools for releasing the project to Apache and Maven Central.
+* You must provide a [toolchains.xml](https://maven.apache.org/guides/mini/guide-using-toolchains.html) in your local system at `~/.m2/toolchains.xml` and configured with at least JDK versions 11, 17 and 21.
     * This project uses the maven-toolchains-plugin to ensure that each module is strictly compiled against its target Java release version, regardless of your default JAVA_HOME. 
 * You must have `gpg-agent` running in your terminal.
-    * Note: The Maven release plugins run GPG in batch mode. Ensure your `gpg-agent.conf` is configured with a long cache TTL, or signing will fail with a no pinentry error during longer builds. 
+    * Note: The Maven release plugins run GPG in batch mode. Ensure your `gpg-agent.conf` is configured with a long cache Time-To-Live (TTL), or signing might fail with a no pinentry error during longer builds. 
 * Your local machine JAVA_HOME should be set to at least Java 8, but Java 17 or higher is recommended. This is just to run Maven, the `pom.xml` files along with the `toolchains.xml` determine the JDK version used to compile the projects.
 
 ### Maven Build Instructions
@@ -139,20 +140,20 @@ __NOTES:__
 
 __TESTS:__
 
-* There are two types of tests: unit tests and continuous integration (CI) tests run from GitHub Actions workflows.
-The CI tests target the released jars and run all the unit tests against Java versions 11, 17 and 21 and three different OSs, Windows, MacOS and Ubuntu.
+* There are two types of tests: unit tests and Continuous Integration (CI) tests run from GitHub Actions workflows.
+The CI tests target the released jars and run all the unit tests against Java versions: 11, 17 and 21 and three different OSs: Windows, MacOS and Ubuntu.
 
-To run normal unit tests on the forked site:
+#### To run normal unit tests on the forked site:
 
 * `mvn clean test`
    * The test results can be found in `/target/test-output`
 
-To run javadoc on this multi-module project, use:
+#### To run javadoc on this multi-module project, use:
 
 *  `mvn clean javadoc:javadoc -DskipTests=true`
    *  The javadocs will be located in `/target/site/apidocs/`
 
-To install the jars in ~/.m2
+#### To install the jars in ~/.m2
 
 * `mvn clean install -DskipTests=true -Pnexus-jars`
     * The `-Pnexus-jars` is required to generage the GPG signatures.
@@ -175,6 +176,18 @@ This will create the following sets of Jars and POMs, with associated GPG .asc s
    * datasketches-memory-java17_21-X.Y.Z-test-sources.jar
    * datasketches-memory-java17_21-X.Y.Z-javadoc.jar
    * datasketches-memory-java17_21-X.Y.Z-pom
+
+#### To deploy the jars to Maven Central
+
+* `mvn clean deploy -DskipTests=true -Pnexus-jars`
+
+This will upload the two sets of jars above as two distinct artifact IDs but in one upload batch.
+You must log into Nexus / Staging Repositories and `close` the upload until you are ready to actually release.
+
+#### Helpful Github Workflows
+* **auto-jdk-os-matrix.yml** This workflow runs the full unit-test suite against three Java versions and three OSs as mentioned above. 
+* **javadoc.yml** This workflow produces the two sets of javadocs in preparation for uploading to a website.
+* **stageReleaseSources.yml** This workflow stages all the sources in preparation for uploading to the Apache SVN "dist" repository.
 
 ---
 

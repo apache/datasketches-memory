@@ -1,4 +1,4 @@
-name: Stage Release Candidate Source Assets (Manual Trigger)
+name: Stage Release Sources (Manual Trigger)
 
 # This workflow acts as Phase 1 of your official Release Candidate process.
 # It handles the clean compilation, license verification, and source packaging
@@ -61,7 +61,7 @@ jobs:
       - name: 5. Build Apache Source Release Archive
         run: |
           echo "Assembling project distribution ZIP..."
-          mvn clean assembly:single
+          mvn clean assembly:single -N
 
       # 6. Relocate and calculate the SHA-512 cryptographic checksum string
       - name: 6. Stage Deliverables and Compute Checksums

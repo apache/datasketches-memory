@@ -1,14 +1,15 @@
-# ignore .gitignore in sub module projects
+# ignore .gitignore only in sub module projects
 datasketches-memory*/.gitignore
 
 # Eclipse project files 
 .classpath
 .project
 .settings/
+.factorypath
 .checkstyle
 
 # IntelliJ project files
-*.idea
+*.idea/
 *.iml
 *.ipr
 *.iws

@@ -17,112 +17,183 @@
     under the License.
 -->
 
-[![Build Status](https://travis-ci.org/apache/datasketches-memory.svg?branch=master)](https://travis-ci.org/apache/datasketches-memory)
-[![Maven Central](https://img.shields.io/maven-central/v/org.apache.datasketches/datasketches-memory)](https://central.sonatype.com/artifact/org.apache.datasketches/datasketches-memory)
-[![Coverage Status](https://coveralls.io/repos/github/apache/datasketches-memory/badge.svg?branch=main)](https://coveralls.io/github/apache/datasketches-memory?branch=main)
+[![JDK & OS Matrix CI](https://github.com/apache/datasketches-memory/actions/workflows/auto-jdk-os-matrix.yml/badge.svg)](https://github.com/apache/datasketches-memory/actions/workflows/auto-jdk-os-matrix.yml)
+[![Maven Central Latest Version](https://img.shields.io/maven-central/v/org.apache.datasketches/datasketches-memory.svg)](https://search.maven.org/artifact/org.apache.datasketches/datasketches-memory "Maven Central Latest Version")
+[![Coveralls Main Branch Test Coverage](https://coveralls.io/repos/github/apache/datasketches-memory/badge.svg?branch=master)](https://coveralls.io/github/apache/datasketches-memory?branch=master)
 
 =================
 
-# DataSketches Java Memory Component
-This Memory component is general purpose, has no external runtime dependencies and can be used in any
-application that needs to manage data structures inside or outside the Java heap.
+# DataSketches Memory Project
+This Memory Project was initially developed to enable the DataSketches Java Project to manage off-heap data structures efficiently. The first version was developed as an internal project at Yahoo in 2014 using Java 8 and released to open source in 2015. This Memory Project is general purpose, has no external runtime dependencies and can be used in any application that needs to manage data structures on or off the Java heap.
 
-Please visit the main [DataSketches website](https://datasketches.apache.org) for more information.
+## Basic Capabilities
+* **Speed**: Fast Read & Write using Unsafe
+* **Types**: All Java primitives plus Java Strings
+* **Target**: A contiguous *region* of on-heap or off-heap memory. (Note: Java FFM later named this *region* a *MemorySegment*)
+* **Addressing**: Arbitrary Byte Offset (long) as well as relative positional offset.
+* **Size**: A region of off-heap memory may exceed the standard Java limit of 2^31-1 bytes.
 
-If you are interested in making contributions to this Memory component please see our
-[Community](https://datasketches.apache.org/docs/Community/) page.
+To make this useful, this project also provided:
 
-The goal of this component of the DataSketches library is to provide a high performance access API for accessing four different types of memory resources:
+## Capability Set A:
+* Wrapping of Java primitive arrays as a region.
+* Wrapping of ByteBuffers (both on and off-heap) as a region.
+* Creation and immediate closing of off-heap regions of memory.
+* Creation and immediate closing of off-heap memory-mapped regions of a file.
 
-* On-heap Memory via primitive arrays
-* On-heap Memory via ByteBuffers
-* Off-heap (Direct or Native) Memory via direct allocation
-* Off-Heap Memory-Mapped files
+Providing these capabilities without sacrificing performance required leveraging internal JVM classes such as *Unsafe*, *FileChannelImpl*, *DirectBuffer*, *MappedByteBuffer internals* and *sun.nio.ch*. 
 
-Each of the four resource types is accessed using different API methods in the Memory component.
+However, starting with Java 11, Oracle started restricting access to a many JVM internal classes. With Java 17 the internals of *FileChannelImpl* and *MappedByteBuffer* were hidden or relocated. This blocked the ability to provide direct access to file-mapped memory. 
 
-Note: *primitive* := *{byte, short, int, long, float, double}*
+Meanwhile, the Java Panama project, which had the potential to provide all the above capabilities as part of the Java language, became available as the Foreign Function and Memory (FFM) API in the form of "Incubation" code in Java 17 and as "Preview" code in Java 21.  
 
-### Contiguous bytes on the Java Heap constructed by these examples:
+Unfortunately, the DataSketches Memory Project releases 4.X, 5.X and 6.X for Java 17 and 21 were developed using the Incubation and Preview versions of FFM not realizing that Incubation and Preview codes are only available until the next java version is released, after which they are no longer available.
 
-* **Heap via primitive arrays:**
-    * *Memory.wrap(primitive[])* (read only)
-    * *WritableMemory.allocate(int)*
-    * *WritableMemory.writableWrap(primitive[])*
+The actual LTS release of FFM did not occur until Java 25 was released on September 16, 2025. Since Java 17 was released on September 14, 2021, there is a gap of 4 years where Oracle had blocked access to internals of the JVM without providing a LTS release API with comparable capabilities.  This means that for the LTS Java versions 17 and 21, the DataSketches Memory Project can not provide access to file-mapped memory.  Nonetheless, it is still possible to provide these capabilities:
 
-* **Heap via ByteBuffer**
-    * *Memory.wrap(ByteBuffer.wrap(byte[]))* (read only)
-    * *WritableMemory.writableWrap(ByteBuffer.allocate(int))*
+## Capability Set B:
+* Wrapping of Java primitive arrays as a region.
+* Wrapping of ByteBuffers (both on and off-heap) as a region.
+* Creation and immediate closing of off-heap regions of memory.
 
-### Contiguous bytes off the Java Heap constructed by these examples:
+The objective of this 7.X release of the Memory Project is to provide **Capability Set A** with Java 11 and **Capability Set B** for Java versions 17 and 21 for users that are still dependent on the these older LTS releases.
 
-* **Off-Heap, Direct via direct allocation:**
-    * *WritableMemory.allocateDirect(long)* 
+In addition, with this release the build code has been completely refactored:
 
-* **Off-Heap, Direct via (Direct) ByteBuffer** 
-    *  *WritableMemory.writableWrap(ByteBuffer.allocateDirect(int))*
+* A clean all-Maven build, install and deploy process ( no shell scripts required ).
+* New GitHub Actions Workflows that test this project in matrix of 3 OSs (Windows, MacOS, Ubuntu) and 3 Java versions (11, 17, 21).
+* All code jar files, including the test jars, can be successfully run as jars.
+* The Apache release source is a multi-module Maven project
+* The release to Maven Central is two jar sets as two new artifacts:
+    * datasketches-memory-java11
+    * datasketches-memory-java17_21
+* All documentation has been brought up-to-date.
 
-* **Off-Heap, Memory-Mapped Files**
-    * *Memory.map(File, Arena)*  (read only)
-    * *WritableMemory.writableMap(File)*
+Because the FFM capabilities built into Java 25 (released September, 2025) are a major superset of this Memory Project's capabilities (open sourced in 2015), all of these capabilities are now available directly from the Java Language. There is little reason to continue to provide new releases of this project. Alas, this project must come to an end. Any further releases will only be for bug fixes. Nonetheless, we were able to provide these fast, low-level, off-heap memory capabilities for 10 years before the Java language finally provided it. 
 
-## Release 5.0.0 (inclusive) to 7.0.0 (exclusive)
-Starting with release *datasketches-memory-5.0.0*, this Memory component supports only Java 21 when compiling from source and may work with later Java versions at runtime.
+## Comments about ByteBuffer
+Although the ByteBuffer provides similar capabilities, it has some severe limitations.
 
-### Runtime Notes:
-* There are no run-time dependencies. 
-* The DataSketches Java Memory Component is not thread-safe.
-* This Release, based on Java 21, leverages the new Java Foreign Function & Memory (FFM) API [JEP 442](https://openjdk.org/jeps/442), which is in its third Preview and will require the JVM flag *--enable-preview* at run-time.
-* We recommend Eclipse Adoptium/Temurin 21.0.5+11 or later as earlier releases of 21 have bugs that affect this product.
-* This component is not designed as a Java Module, so the Jar file should be part of the application classpath.
+* The deallocation of a ByteBuffer is governed by the Garbage Collector. In large systems this delay can lead to out-of-memory failures. 
+* The addressing is limited to 2^31 -1 elements.
+* Reading and writing multi-byte primitive arrays require recasting the ByteBuffer to a <*type*>Buffer where the alignment becomes modulo the *type*.  This severely complicates the creation of packed structs.
+* The API has some serious footguns, which can catch even experienced programmers and can be challenging to debug:
+    * Every duplicate() or slice() resets the endianness to Big Endian.
+    * Numerous common operations silently discard the *mark*.
 
-## Build Instructions
+----
+
+## Release Comments 
+
+### For Use With Java 8
+Please download datasketches-memory 3.X from the website [downloads](https://datasketches.apache.org/docs/Community/Downloads.html) page and refer to the README.md there.
+The 3.X set of releases will be the last that support Java 8.
+
+### Releases 4.X, 5.X and 6.X
+Deprecated with the 7.X releases.
+
+### Releases 7.X (THIS RELEASE)
+* This release no longer uses JPMS but the default jar manifests do provide an Automatic Module Name.
+* In addition to the source code obtained from Apache, this release provides two sets of jars in Maven Central based on two artifacts:
+
+#### Artifact: datasketches-memory-java11 (Capability Set A)
+This artifact is compiled with Java 11 and can only be used with Java 11
+
+#### Artifact: datasketches-memory-java17_21 (Capability Set B)
+This artifact is compiled with Java 17 and can only be used with Java 17 and Java 21
+
+----
+
+## LIBRARY USAGE (using jars from Maven Central)
+In this environment, the user is using the Jars from Maven Central as a library dependency and not attempting to build this Memory Project from the source code.
+
+
+### If you are running Java 11 you must use artifact *`datasketches-memory-java11`*
+You will need to add these java modular arguments to your JVM:
+
+* --add-exports=java.base/jdk.internal.misc=ALL-UNNAMED
+* --add-exports=java.base/sun.nio.ch=ALL-UNNAMED
+* --add-opens=java.base/java.nio=ALL-UNNAMED
+* --add-opens=java.base/sun.nio.ch=ALL-UNNAMED
+
+### If you are running Java 17 or Java 21 you must use artifact *`datasketches-memory-java17_21`*
+You will need to add these java modular arguments to your JVM:
+
+* --add-exports=java.base/jdk.internal.misc=ALL-UNNAMED
+* --add-exports=java.base/sun.nio.ch=ALL-UNNAMED
+
+## DEVELOPER USAGE
+In this environment the developer needs to build the Memory component from source and run the Memory Component tests.  
+
+* Fork this project at https://github.com/apache/datasketches-memory into your own GitHub development site. The 7.0.X releases will be located in the branch 7.0.X.  
+    * Note: although it is possible to build this project from just the source downloaded from Apache, the forked GitHub project includes the GitHub/workflows that the Apache source download does not. These workflows provide comprehensive CI testing as well as helpful tools for releasing the project to Apache and Maven Central.
+* You must provide a [toolchains.xml](https://maven.apache.org/guides/mini/guide-using-toolchains.html) in your local system at `~/.m2/toolchains.xml` and configured with at least JDK versions 11, 17 and 21.
+    * This project uses the maven-toolchains-plugin to ensure that each module is strictly compiled against its target Java release version, regardless of your default JAVA_HOME. 
+* You must have `gpg-agent` running in your terminal.
+    * Note: The Maven release plugins run GPG in batch mode. Ensure your `gpg-agent.conf` is configured with a long cache Time-To-Live (TTL), or signing might fail with a no pinentry error during longer builds. 
+* Your local machine JAVA_HOME should be set to at least Java 8, but Java 17 or higher is recommended. This is just to run Maven, the `pom.xml` files along with the `toolchains.xml` determine the JDK version used to compile the projects.
+
+### Maven Build Instructions
 __NOTES:__
 
-* This component accesses resource files for testing. 
-As a result, the directory elements of the full absolute path of the target installation directory must qualify as Java identifiers.
-In other words, the directory elements must not have any space characters (or non-Java identifier characters) in any of the path elements. This is required by the Oracle Java Specification in order to ensure location-independent access to resources:
-[See Oracle Location-Independent Access to Resources](https://docs.oracle.com/javase/8/docs/technotes/guides/lang/resources.html)
-* The compile command line must contain the JVM flag *--enable-preview* (see [JEP 442](https://openjdk.org/jeps/442)).
+* This component accesses resource files for testing. As a result, the directory elements of the full absolute path of the target installation directory must qualify as Java identifiers. In other words, the directory elements must not have any space characters (or non-Java identifier characters) in any of the path elements. This is required by the Oracle Java Specification in order to ensure location-independent access to resources: [See Oracle Location-Independent Access to Resources](https://docs.oracle.com/javase/8/docs/technotes/guides/lang/resources.html).
 
+__TESTS:__
 
-#### Build & Test Dependencies
-* There are two direct build dependencies, both of which are only used in *test scope*:
-    * org.testng/testng
-    * net.openhft/zero-allocation-hashing  
-* See the pom.xml file for maven plug-in dependencies.
+* There are two types of tests: unit tests and Continuous Integration (CI) tests run from GitHub Actions workflows.
+The CI tests target the released jars and run all the unit tests against Java versions: 11, 17 and 21 and three different OSs: Windows, MacOS and Ubuntu.
 
+#### To run normal unit tests on the forked site:
 
-#### Maven build instructions
-The Maven build requires JDK-21 to compile:
+* `mvn clean test`
+   * The test results can be found in `/target/test-output`
 
-* We recommend Eclipse Adoptium/Temurin 21.0.5+11 or later as earlier releases of 21 have bugs that affect this product.
+#### To run javadoc on this multi-module project, use:
 
-To run normal unit tests:
+*  `mvn clean javadoc:javadoc -DskipTests=true`
+   *  The javadocs will be located in `/target/site/apidocs/`
 
-    mvn clean test
+#### To install the jars in ~/.m2
 
-To run javadoc:
+* `mvn clean install -DskipTests=true -Pnexus-jars`
+    * The `-Pnexus-jars` is required to generage the GPG signatures.
 
-    mvn clean javadoc:javadoc -DskipTests=true
+This will create the following sets of Jars and POMs, with associated GPG .asc signatures (not listed here) in the folder `~/.m2/repository/org/apache/datasketches/` and under
 
-To run the eclipse plugin on this project, use:
+* `datasketches-memory-java11/X.Y.Z/`:
 
-    mvn clean eclipse:eclipse -DskipTests=true
+   * datasketches-memory-java11-X.Y.Z.jar
+   * datasketches-memory-java11-X.Y.Z-tests.jar
+   * datasketches-memory-java11-X.Y.Z-sources.jar
+   * datasketches-memory-java11-X.Y.Z-test-sources.jar
+   * datasketches-memory-java11-X.Y.Z-javadoc.jar
+   * datasketches-memory-java11-X.Y.Z-pom
 
-To install jars built from the downloaded source:
+* `datasketches-memory-java17_21/X.Y.Z/`:
+   * datasketches-memory-java17_21-X.Y.Z.jar
+   * datasketches-memory-java17_21-X.Y.Z-tests.jar
+   * datasketches-memory-java17_21-X.Y.Z-sources.jar
+   * datasketches-memory-java17_21-X.Y.Z-test-sources.jar
+   * datasketches-memory-java17_21-X.Y.Z-javadoc.jar
+   * datasketches-memory-java17_21-X.Y.Z-pom
 
-    mvn clean install -DskipTests=true
+#### To deploy the jars to Maven Central
 
-This will create the following Jars:
+* `mvn clean deploy -DskipTests=true -Pnexus-jars`
 
-* datasketches-memory-X.Y.Z.jar The compiled main class files.
-* datasketches-memory-X.Y.Z-tests.jar The compiled test class files.
-* datasketches-memory-X.Y.Z-sources.jar The main source files.
-* datasketches-memory-X.Y.Z-test-sources.jar The test source files
-* datasketches-memory-X.Y.Z-javadoc.jar The compressed Javadocs.
+This will upload the two sets of jars above as two distinct artifact IDs but in one upload batch.
+You must log into Nexus / Staging Repositories and `close` the upload until you are ready to actually release.
 
-### Deployment to Nexus 
+#### Helpful Github Workflows
+* **auto-jdk-os-matrix.yml** This workflow runs the full unit-test suite against three Java versions and three OSs as mentioned above. 
+* **javadoc.yml** This workflow produces the two sets of javadocs in preparation for uploading to a website.
+* **stageReleaseSources.yml** This workflow stages all the sources in preparation for uploading to the Apache SVN "dist" repository.
 
-For releasing to Nexus, please use the `sign-deploy-jar.sh` script in the scripts directory.
-See the documentation within the script for usage instructions.
+---
+
+Please visit the main [DataSketches website](https://datasketches.apache.org) for more information about the DataSketches Library and all the different languages it is available in.
+
+If you are interested in making contributions to this Memory Project or to any of the other DataSketches Projects please visit our
+[Community](https://datasketches.apache.org/docs/Community/) page.
+
+\- LR

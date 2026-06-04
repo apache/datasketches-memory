@@ -1,0 +1,145 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+package org.apache.datasketches.memory.internal;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
+
+import org.apache.datasketches.memory.Memory;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+public class AllocateDirectMapMemoryTest {
+  private static final String LS = System.getProperty("line.separator");
+  private File gettyFile;
+  private long gettySize;
+  
+  @BeforeClass
+  public void setReadOnly() {
+    gettyFile = UtilitiesForTest.setResourceReadOnly("GettysburgAddress.txt");
+    gettySize = gettyFile.length();
+  }
+
+  @Test(expectedExceptions = IllegalStateException.class)
+  public void simpleMap() throws IOException {
+    
+    try (Memory mem = Memory.map(gettyFile)) {
+      mem.close(); //explicit close
+    } //The Try-With-Resources will throw
+  }
+
+  @Test
+  public void printGettysburgAddress() throws IOException {
+    try (Memory mem = Memory.map(gettyFile))
+    {
+      int len1 = (int)mem.getCapacity();
+      println("Mem Cap:       " + len1);
+      println("Total Offset:  " + mem.getRelativeOffset());
+      println("Cum Offset:    " + ((ResourceImpl)mem).getCumulativeOffset(0));
+      println("Total Offset: " + mem.getRelativeOffset());
+      byte[] bArr = new byte[len1];
+      mem.getByteArray(0, bArr, 0, len1);
+      String s = new String(bArr, StandardCharsets.UTF_8);
+      println(s);
+
+      println("");
+      Memory mem2 = mem.region(43 + 76, 34);
+      int len2 = (int)mem2.getCapacity();
+      println("Mem Cap:       " + len2);
+      println("Offset:        " + mem.getRelativeOffset());
+      println("Cum Offset:    " + ((ResourceImpl)mem2).getCumulativeOffset(0));
+      println("Total Offset: " + mem2.getRelativeOffset());
+      byte[] bArr2 = new byte[len2];
+      mem2.getByteArray(0, bArr2, 0, len2);
+      String s2 = new String(bArr2,StandardCharsets.UTF_8);
+      println(s2);
+      assertEquals(s2,"a new nation, conceived in Liberty");
+    }
+  }
+
+  @Test
+  public void testIllegalArguments() throws IOException {
+    try (Memory mem = Memory.map(gettyFile, -1, Integer.MAX_VALUE, ByteOrder.nativeOrder())) {
+      fail("Failed: Position was negative.");
+    } catch (IllegalArgumentException e) {
+      //ok
+    }
+
+    try (Memory mem = Memory.map(gettyFile, 0, -1, ByteOrder.nativeOrder())) {
+      fail("Failed: Size was negative.");
+    } catch (IllegalArgumentException e) {
+      //ok
+    }
+  }
+
+  @Test(expectedExceptions = IllegalStateException.class)
+  public void testAccessAfterClose() throws IOException {
+    long memCapacity = gettySize;
+    try (Memory mem = Memory.map(gettyFile, 0, memCapacity, ByteOrder.nativeOrder())) {
+      assertEquals(memCapacity, mem.getCapacity());
+    } //normal close via TWR
+    Memory mem = Memory.map(gettyFile, 0, memCapacity, ByteOrder.nativeOrder());
+    mem.close(); //normal manual close
+    mem.getCapacity(); //isLoaded(); //already closed, invalid
+  }
+
+  @Test(expectedExceptions = IllegalStateException.class)
+  public void testReadFailAfterClose() throws IOException  {
+    long memCapacity = gettySize;
+    Memory mem = Memory.map(gettyFile, 0, memCapacity, ByteOrder.nativeOrder());
+    mem.close();
+    mem.isLoaded();
+  }
+
+  @Test
+  public void testLoad() throws IOException  {
+    long memCapacity = gettySize;
+    try (Memory mem = Memory.map(gettyFile, 0, memCapacity, ByteOrder.nativeOrder())) {
+      mem.load();
+      assertTrue(mem.isLoaded());
+    } //normal TWR close
+  }
+
+  @Test
+  public void printlnTest() {
+    println("PRINTING: " + this.getClass().getName());
+  }
+
+  static void println(final Object o) {
+    if (o == null) { print(LS); }
+    else { print(o.toString() + LS); }
+  }
+
+  /**
+   * @param o value to print
+   */
+  static void print(final Object o) {
+    if (o != null) {
+      //System.out.print(o.toString()); //disable here
+    }
+  }
+
+}

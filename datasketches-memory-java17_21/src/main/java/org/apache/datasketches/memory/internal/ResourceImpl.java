@@ -145,7 +145,9 @@ public abstract class ResourceImpl implements Resource {
    */
   static void checkJavaVersion(final int javaMajor) {
     final boolean ok = ( (javaMajor == 17) || (javaMajor == 21) ); 
-    if (!ok) { throw new IllegalArgumentException("This Java version is not supported: " + javaMajor);
+    if (!ok) {
+      System.err.println("WARNING: Java " + javaMajor + " is not officially supported " +
+          "by Apache DataSketches Memory, use at your own risk.");
     }
   }
 

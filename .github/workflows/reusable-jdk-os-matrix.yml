@@ -71,7 +71,7 @@ jobs:
           echo "--- Target JVM Path Exposes: ---"
           echo "Path: ${{ steps.target-jdk.outputs.path }}"
           echo "--- Native Maven Boot Info: ---"
-          mvn -version
+          mvn -version -B
 
       # 5. Run the mutually exclusive tests targeted strictly to this version
       - name: 5. Run Package Tests from jars via Target JVM Fork
@@ -86,13 +86,13 @@ jobs:
 
           if [ "${{ inputs.jdk_version }}" = "11" ]; then
             echo "Testing datasketches-memory-java11 jars for JDK version ${{ inputs.jdk_version }}..."
-            mvn surefire:test -pl datasketches-memory-java11 \
+            mvn surefire:test -B -pl datasketches-memory-java11 \
               -Dmaven.test.classpath.useTestJar=true \
               -Djvm="$JAVA_EXE" \
               -DargLine="${{ env.JVM_ARGS }}"
           else
             echo "Testing datasketches-memory-java17_21 jars for JDK version ${{ inputs.jdk_version }}..."
-            mvn surefire:test -pl datasketches-memory-java17_21 \
+            mvn surefire:test -B -pl datasketches-memory-java17_21 \
               -Dmaven.test.classpath.useTestJar=true \
               -Djvm="$JAVA_EXE" \
               -DargLine="${{ env.JVM_ARGS }}"

@@ -35,7 +35,7 @@ jobs:
       - name: 3. Extract POM Project Version
         id: parse-version
         run: |
-          POM_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          POM_VERSION=$(mvn help:evaluate -B -Dexpression=project.version -q -DforceStdout)
           echo "Target Release Version: $POM_VERSION"
           echo "POM_VERSION=$POM_VERSION" >> $GITHUB_ENV
 
@@ -43,7 +43,7 @@ jobs:
       - name: 4. Execute Apache RAT License Audit
         run: |
           echo "Running corporate license header checks..."
-          mvn apache-rat:check -N
+          mvn apache-rat:check -N -B
 
       # Diagnostic Step: Print the target report if the audit drops dead
       - name: 4b. Diagnostic - Display RAT Failure Report
@@ -61,7 +61,7 @@ jobs:
       - name: 5. Build Apache Source Release Archive
         run: |
           echo "Assembling project distribution ZIP..."
-          mvn clean assembly:single -N
+          mvn clean assembly:single -N -B
 
       # 6. Relocate and calculate the SHA-512 cryptographic checksum string
       - name: 6. Stage Deliverables and Compute Checksums

@@ -1,4 +1,4 @@
-name: Stage for Review the Versioned Javadocs (Manual Trigger)
+name: Stage Versioned Javadocs (Manual Trigger)
 
 # This workflow is triggered manually via Workflow Dispatch on GitHub.
 # It automatically extracts the project version from the root pom.xml 

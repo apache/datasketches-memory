@@ -9,7 +9,7 @@ on:
 
 jobs:
   assemble-source-candidate:
-    runs-on: ubuntu
+    runs-on: windows-latest
     permissions:
       contents: read
 

@@ -1,4 +1,4 @@
-name: Stage for Review the Versioned Javadocs (Manual Trigger)
+name: Stage Versioned Javadocs (Manual Trigger)
 
 # This workflow is triggered manually via Workflow Dispatch on GitHub.
 # It automatically extracts the project version from the root pom.xml 
@@ -19,7 +19,7 @@ on:
 
 jobs:
   build-and-package-javadoc:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     permissions:
       contents: read
 
@@ -57,22 +57,26 @@ jobs:
 
       - name: 3. Extract POM Project Version
         id: get-version
+        shell: bash
         run: |
-          POM_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          POM_VERSION=$(mvn help:evaluate -B -Dexpression=project.version -q -DforceStdout)
           echo "Discovered Project Version: $POM_VERSION"
           echo "POM_VERSION=$POM_VERSION" >> $GITHUB_ENV
 
       - name: 4. Compile and Generate Java 11 Module Javadoc
+        shell: bash
         run: |
           echo "Generating Javadoc for Java 11 Module..."
-          mvn clean compile javadoc:javadoc -pl datasketches-memory-java11
+          mvn clean compile javadoc:javadoc -B -pl datasketches-memory-java11
 
       - name: 5. Compile and Generate Java 17/21 Module Javadoc
+        shell: bash
         run: |
           echo "Generating Javadoc for Java 17/21 Module..."
-          mvn compile javadoc:javadoc -pl datasketches-memory-java17_21
+          mvn compile javadoc:javadoc -B -pl datasketches-memory-java17_21
 
       - name: 6. Stage Artifacts for Review
+        shell: bash
         run: |
           STAGE_DIR="javadoc-staging/docs/${{ env.POM_VERSION }}"
           echo "Creating structured staging directories for version ${{ env.POM_VERSION }}..."

@@ -35,7 +35,7 @@ jobs:
 
       # Builds the isolated modules using their respective toolchains
       - name: Package All Versioned JARs
-        run: mvn clean package -DskipTests=true
+        run: mvn clean package -DskipTests=true -B
 
       # Archive the compiled artifacts and skeletal structure for Phase 2 testing
       - name: Archive Compiled Workspace

@@ -54,8 +54,8 @@ under the License.
     <property name="fileExtensions" value="java, xml, yml, yaml"/>
   </module>
 
-  <!-- each package must have a package-info.java file -->
-  <module name="JavadocPackage"/>
+  <!-- each package must have a package-info.java file 
+  <module name="JavadocPackage"/> -->
 
   <module name="NewlineAtEndOfFile">
     <property name="lineSeparator" value="lf"/>

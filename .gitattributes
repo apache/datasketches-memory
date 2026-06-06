@@ -20,6 +20,7 @@ NOTICE text
 *.xml text
 *.yml text
 *.yaml text
+*.txt text eol=lf
 
 # Declare files that will always have CRLF line endings on checkout.
 

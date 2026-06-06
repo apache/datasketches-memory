@@ -187,7 +187,12 @@ under the License.
 
     <!-- other -->
     <nexus-staging-maven-plugin.version>1.7.0</nexus-staging-maven-plugin.version>
-
+    
+    <!-- fallback properties in case of a build from the distributed source: -->
+    <git.branch>source-release-no-git</git.branch>
+    <git.commit.id>unknown</git.commit.id>
+    <git.commit.time>unknown</git.commit.time>
+    <git.commit.user.email>unknown</git.commit.user.email>
   </properties>
 
   <dependencyManagement>
@@ -546,6 +551,7 @@ under the License.
             <dotGitDirectory>${maven.multiModuleProjectDirectory}/.git</dotGitDirectory>
             <generateGitPropertiesFile>false</generateGitPropertiesFile>
             <skipPoms>false</skipPoms>
+            <failOnNoGitDirectory>false</failOnNoGitDirectory>
           </configuration>
         </plugin>
 

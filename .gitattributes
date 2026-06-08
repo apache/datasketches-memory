@@ -1,27 +1,33 @@
 # The default behavior, which overrides 'core.autocrlf', is to use Git's
 # built-in heuristics to determine whether a particular file is text or binary.
 # Text files are automatically normalized to the user's platforms.
-* text=auto
+# 15 years ago this was probably OK, but today it is a bad idea.
+* text=auto eol=lf
 
-# Explicitly declare text files that should always be normalized and converted
-# to native line endings.
-.asf.yaml text
-.gitattributes text
-.gitignore text
-git.properties text
-.travis.yml text
-LICENSE text
-NOTICE text
-*.html text
-*.java text
-*.md text
-*.properties text
-*.sh text
-*.xml text
-*.yml text
-*.yaml text
+# Explicitly declare text files that should always be LF
+.asf.yaml text eol=lf
+.gitattributes text eol=lf
+.gitignore text eol=lf
+git.properties text eol=lf
+.travis.yml text eol=lf
+LICENSE text eol=lf
+NOTICE text eol=lf
+*.html text eol=lf
+*.java text eol=lf
+*.md text eol=lf
+*.properties text eol=lf
+*.sh text eol=lf
+*.xml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.txt text eol=lf
+GettysburgAddress.txt text eol=lf
+
 
 # Declare files that will always have CRLF line endings on checkout.
+# Windows batch scripts strictly require CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
 
 # Explicitly denote all files that are truly binary and should not be modified.
 *.jpg binary

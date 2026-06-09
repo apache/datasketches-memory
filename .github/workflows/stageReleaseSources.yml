@@ -94,3 +94,50 @@ jobs:
           name: datasketches-memory-release-source-bundle
           path: staging_dir/
           retention-days: 15
+
+  test-source-candidate:
+    name: Test Source Candidate on ${{ matrix.os }}
+    needs: assemble-source-candidate
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      # 1. Download the zipped artifact uploaded by the previous job
+      - name: Download Source ZIP Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: datasketches-memory-release-source-bundle
+          path: downloaded-bundle
+
+      # 2. Extract the source distribution
+      - name: Extract Source Distribution
+        shell: bash
+        run: |
+          # The downloaded artifact folder contains the zip file
+          ZIP_FILE=$(ls downloaded-bundle/*.zip)
+          echo "Unzipping $ZIP_FILE..."
+          unzip -q $ZIP_FILE -d test-workspace
+          
+      # 3. Setup Java Toolchain (11, 17, and 21)
+      - name: Setup Java Toolchains
+        uses: actions/setup-java@v5
+        with:
+          java-version: |
+            11
+            17
+            21
+          distribution: 'temurin'
+          
+      # 4. Run the tests on the unzipped sources
+      - name: Execute Tests
+        shell: bash
+        run: |
+          # Enter the unzipped directory (which will be named datasketches-memory-X.Y.Z-src)
+          cd test-workspace/*
+          echo "Running tests in $(pwd)"
+          
+          # Run the standard test phase (this validates line-endings, missing files, and fallbacks!)
+          mvn clean test

@@ -1,8 +1,13 @@
 name: Stage Release Sources (Manual Trigger)
 
 # This workflow acts as Phase 1 of your official Release Candidate process.
-# It handles the clean compilation, license verification, and source packaging
-# on a cloud runner, delivering a pristine ZIP for local signing.
+# 1. It handles the clean compilation, license verification, and source packaging
+#    on a cloud runner, delivering a pristine ZIP for local signing.
+# 2. It computes the SHA512 checksum and attaches it as a file.
+# 3. It builds the project from just the source ZIP (no .git file) and runs all the unit tests
+#    on Windows, Ubuntu, and MacOS.
+# 4. Because we don't want to share private keys and credentials with this process, you will need
+#    to add the GPG .asc signature file before submitting the artifact to ASF.
 
 on:
   workflow_dispatch:
@@ -16,7 +21,7 @@ jobs:
     steps:
       # 1. Checkout the clean working workspace context
       - name: 1. Checkout Branch Context
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.ref }}
           fetch-depth: 0

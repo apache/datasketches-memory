@@ -112,7 +112,7 @@ jobs:
     steps:
       # 1. Download the zipped artifact uploaded by the previous job
       - name: Download Source ZIP Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: datasketches-memory-release-source-bundle
           path: downloaded-bundle

@@ -29,11 +29,13 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.datasketches.memory.Memory;
+import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class AllocateDirectMapMemoryTest {
   private static final String LS = System.getProperty("line.separator");
+  private static final boolean IS_WINDOWS = System.getProperty("os.name").toLowerCase().contains("windows");
   private File gettyFile;
   private long gettySize;
   
@@ -116,6 +118,10 @@ public class AllocateDirectMapMemoryTest {
 
   @Test
   public void testLoad() throws IOException  {
+    if (IS_WINDOWS) {
+      throw new SkipException("isLoaded() is unreliable on Windows VMM; skipping test.");
+    }
+    
     long memCapacity = gettySize;
     try (Memory mem = Memory.map(gettyFile, 0, memCapacity, ByteOrder.nativeOrder())) {
       mem.load();

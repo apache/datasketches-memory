@@ -34,11 +34,13 @@ import java.nio.ByteOrder;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.memory.ReadOnlyException;
 import org.apache.datasketches.memory.WritableMemory;
+import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class AllocateDirectWritableMapMemoryTest {
   private static final String LS = System.getProperty("line.separator");
+  private static final boolean IS_WINDOWS = System.getProperty("os.name").toLowerCase().contains("windows");
   private File gettyFile;
   
   @BeforeClass
@@ -140,6 +142,10 @@ public class AllocateDirectWritableMapMemoryTest {
 
   @Test
   public void testForce() throws Exception {
+    if (IS_WINDOWS) {
+      throw new SkipException("isLoaded() is unreliable on Windows VMM; skipping test.");
+    }
+    
     String origStr = "Corectng spellng mistks";
     File origFile = createFile("force_original.txt", origStr); //23
     assertTrue(origFile.setWritable(true, false));

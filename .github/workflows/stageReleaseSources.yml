@@ -89,7 +89,7 @@ jobs:
 
       # 7. Package and upload the staged bundle as a secure workflow archive
       - name: 7. Upload Release Candidate Assets for Local Signing
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: datasketches-memory-release-source-bundle
           path: staging_dir/
@@ -107,7 +107,7 @@ jobs:
     steps:
       # 1. Download the zipped artifact uploaded by the previous job
       - name: Download Source ZIP Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: datasketches-memory-release-source-bundle
           path: downloaded-bundle

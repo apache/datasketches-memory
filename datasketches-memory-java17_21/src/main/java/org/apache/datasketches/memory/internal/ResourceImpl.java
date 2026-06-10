@@ -144,7 +144,7 @@ public abstract class ResourceImpl implements Resource {
    * @param javaMajor the first number from the <i>System.getProperty("java.version")</i> string."
    */
   static void checkJavaVersion(final int javaMajor) {
-    final boolean ok = ( (javaMajor == 17) || (javaMajor == 21) ); 
+    final boolean ok = ( (javaMajor == 17) || (javaMajor >= 21) ); 
     if (!ok) { throw new IllegalArgumentException("This Java version is not supported: " + javaMajor);
     }
   }

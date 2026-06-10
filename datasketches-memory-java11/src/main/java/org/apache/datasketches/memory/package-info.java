@@ -18,7 +18,7 @@
  */
 
 /**
- * <b>This package defines the interfaces for the DataSketches-Memory project for Java 17 and Java 21.</b>
+ * <b>This package defines the interfaces for the DataSketches-Memory project for Java 11.</b>
  * 
  * <p>This project provides high performance primitive and primitive array access to 
  * direct (native) off-heap memory and memory-mapped file resources, and consistent views into

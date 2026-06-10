@@ -37,7 +37,7 @@ import org.apache.datasketches.memory.Resource;
  */
 //@SuppressWarnings("restriction")
 public abstract class ResourceImpl implements Resource {
-  public static final int JAVA_MAJOR; //11, 17, 21
+  public static final int JAVA_MAJOR; //11, 17, 21, 25
 
   //Used to convert "type" to bytes:  bytes = longs << LONG_SHIFT
   static final int BOOLEAN_SHIFT    = 0;
@@ -144,7 +144,7 @@ public abstract class ResourceImpl implements Resource {
    * @param javaMajor the first number from the <i>System.getProperty("java.version")</i> string."
    */
   static void checkJavaVersion(final int javaMajor) {
-    final boolean ok = ( (javaMajor == 17) || (javaMajor >= 21) ); 
+    final boolean ok = ( (javaMajor == 17) || (javaMajor == 21) || (javaMajor >= 25)); 
     if (!ok) { throw new IllegalArgumentException("This Java version is not supported: " + javaMajor);
     }
   }

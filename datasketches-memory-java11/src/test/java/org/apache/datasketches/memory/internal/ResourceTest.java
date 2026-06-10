@@ -131,45 +131,33 @@ public class ResourceTest {
     for (int i = 0; i < len; i++) {
       jdkVer = good1_Strings[i];
       jdkMaj = ResourceImpl.parseJavaVersion(jdkVer);
-      ResourceImpl.checkJavaVersion(jdkMaj);
-    }
-    try {
-      jdkVer = "14.0.4"; //invalid string
-      jdkMaj = ResourceImpl.parseJavaVersion(jdkVer);
-      ResourceImpl.checkJavaVersion(jdkMaj); //throws
-      fail();
-    } catch (IllegalArgumentException e) {
-      println("" + e);
+      assertTrue(ResourceImpl.checkJavaVersion(jdkMaj));
     }
 
-    try {
-      jdkVer = "1.7.0_80"; //invalid string
-      jdkMaj = ResourceImpl.parseJavaVersion(jdkVer);
-      ResourceImpl.checkJavaVersion(jdkMaj); //throws
-      fail();
-    } catch (IllegalArgumentException e) {
-      println("" + e);
-    }
-    try {
-      jdkVer = "1.6.0_65"; //invalid string
-      jdkMaj = ResourceImpl.parseJavaVersion(jdkVer);
-      ResourceImpl.checkJavaVersion(jdkMaj); //throws
-      fail();
-    } catch (IllegalArgumentException e) {
-      println("" + e);
-    }
+    jdkVer = "14.0.4"; //invalid string
+    jdkMaj = ResourceImpl.parseJavaVersion(jdkVer);
+    assertFalse(ResourceImpl.checkJavaVersion(jdkMaj));
+
+    jdkVer = "1.7.0_80"; //invalid string
+    jdkMaj = ResourceImpl.parseJavaVersion(jdkVer);
+    assertFalse(ResourceImpl.checkJavaVersion(jdkMaj));
+
+    jdkVer = "1.6.0_65"; //invalid string
+    jdkMaj = ResourceImpl.parseJavaVersion(jdkVer);
+    assertFalse(ResourceImpl.checkJavaVersion(jdkMaj));
+
     try {
       jdkVer = "b"; //invalid string
-      jdkMaj = ResourceImpl.parseJavaVersion(jdkVer);
-      ResourceImpl.checkJavaVersion(jdkMaj); //throws
+      jdkMaj = ResourceImpl.parseJavaVersion(jdkVer); //throws
+      assertFalse(ResourceImpl.checkJavaVersion(jdkMaj));
       fail();
     } catch (IllegalArgumentException e) {
       println("" + e);
     }
     try {
       jdkVer = ""; //invalid string
-      jdkMaj = ResourceImpl.parseJavaVersion(jdkVer);
-      ResourceImpl.checkJavaVersion(jdkMaj); //throws
+      jdkMaj = ResourceImpl.parseJavaVersion(jdkVer);  //throws
+      assertFalse(ResourceImpl.checkJavaVersion(jdkMaj));
       fail();
     } catch (IllegalArgumentException e) {
       println("" + e);

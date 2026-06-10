@@ -143,10 +143,13 @@ public abstract class ResourceImpl implements Resource {
    * Checks the runtime Java Version string. 
    * @param javaMajor the first number from the <i>System.getProperty("java.version")</i> string."
    */
-  static void checkJavaVersion(final int javaMajor) {
+  static boolean checkJavaVersion(final int javaMajor) {
     final boolean ok = javaMajor == 11;
-    if (!ok) { throw new IllegalArgumentException("This Java version is not supported: " + javaMajor);
+    if (!ok) {
+      System.err.println("WARNING: Java " + javaMajor + " is not officially supported " +
+          "by Apache DataSketches Memory, use at your own risk.");
     }
+    return ok;
   }
 
   void checkNotReadOnly() {

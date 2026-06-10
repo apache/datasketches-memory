@@ -126,7 +126,7 @@ jobs:
           echo "Unzipping $ZIP_FILE..."
           unzip -q $ZIP_FILE -d test-workspace
 
-      # 3. Setup Java Toolchain (11, 17, and 21)
+      # 3. Setup Java Toolchain (11, 17, 21, 25)
       - name: Setup Java Toolchains
         uses: actions/setup-java@v5
         with:

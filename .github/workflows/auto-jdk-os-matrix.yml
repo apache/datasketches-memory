@@ -91,7 +91,7 @@ jobs:
               --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
 
     # Reference your reusable workflow branch
-    uses: apache/datasketches-memory/.github/workflows/reusable-jdk-os-matrix.yml@workflows
+    uses: ./.github/workflows/reusable-jdk-os-matrix.yml@workflows
     with:
       jdk_version: ${{ matrix.jdk }}
       os_type: ${{ matrix.os }}

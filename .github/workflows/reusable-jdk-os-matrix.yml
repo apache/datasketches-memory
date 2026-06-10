@@ -46,6 +46,7 @@ jobs:
       # 2. Print Workflows (Workspace metadata diagnostics)
       - name: 2. Print Current Workflows
         continue-on-error: true
+        shell: bash
         run: |
           echo "Checking for workflow files..."
           echo "--- Reusable Workflow (Local Workspace File): ---"
@@ -67,6 +68,7 @@ jobs:
 
       # 4. Environment Verification
       - name: 4. Verify Environment Context
+        shell: bash
         run: |
           echo "--- Target JVM Path Exposes: ---"
           echo "Path: ${{ steps.target-jdk.outputs.path }}"

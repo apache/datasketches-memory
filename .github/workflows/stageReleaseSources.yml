@@ -81,14 +81,14 @@ jobs:
           
           # Define standard names based on the extracted POM version
           SRC_ZIP="datasketches-memory-${{ env.POM_VERSION }}-src.zip"
-          
+
           echo "Locating generated assembly asset..."
           cp target/datasketches-memory-${{ env.POM_VERSION }}-source-release.zip staging_dir/$SRC_ZIP
-          
+
           cd staging_dir
           echo "Generating SHA-512 checksum signature file..."
           sha512sum $SRC_ZIP > $SRC_ZIP.sha512
-          
+
           echo "Verification Checksum Content:"
           cat $SRC_ZIP.sha512
 
@@ -103,11 +103,11 @@ jobs:
   test-source-candidate:
     name: Test Source Candidate on ${{ matrix.os }}
     needs: assemble-source-candidate
-    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
 
     steps:
       # 1. Download the zipped artifact uploaded by the previous job
@@ -125,8 +125,8 @@ jobs:
           ZIP_FILE=$(ls downloaded-bundle/*.zip)
           echo "Unzipping $ZIP_FILE..."
           unzip -q $ZIP_FILE -d test-workspace
-          
-      # 3. Setup Java Toolchain (11, 17, and 21)
+
+      # 3. Setup Java Toolchain (11, 17, 21, 25)
       - name: Setup Java Toolchains
         uses: actions/setup-java@v5
         with:
@@ -134,8 +134,9 @@ jobs:
             11
             17
             21
+            25
           distribution: 'temurin'
-          
+
       # 4. Run the tests on the unzipped sources
       - name: Execute Tests
         shell: bash

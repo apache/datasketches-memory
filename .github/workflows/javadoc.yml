@@ -69,11 +69,11 @@ jobs:
           echo "Generating Javadoc for Java 11 Module..."
           mvn clean compile javadoc:javadoc -B -pl datasketches-memory-java11
 
-      - name: 5. Compile and Generate Java 17/21 Module Javadoc
+      - name: 5. Compile and Generate Java 17_25 Module Javadoc
         shell: bash
         run: |
-          echo "Generating Javadoc for Java 17/21 Module..."
-          mvn compile javadoc:javadoc -B -pl datasketches-memory-java17_21
+          echo "Generating Javadoc for Java 17_25 Module..."
+          mvn compile javadoc:javadoc -B -pl datasketches-memory-java17_25
 
       - name: 6. Stage Artifacts for Review
         shell: bash
@@ -81,13 +81,13 @@ jobs:
           STAGE_DIR="javadoc-staging/docs/${{ env.POM_VERSION }}"
           echo "Creating structured staging directories for version ${{ env.POM_VERSION }}..."
           mkdir -p "${STAGE_DIR}/datasketches-memory-java11-${{ env.POM_VERSION }}"
-          mkdir -p "${STAGE_DIR}/datasketches-memory-java17_21-${{ env.POM_VERSION }}"
+          mkdir -p "${STAGE_DIR}/datasketches-memory-java17_25-${{ env.POM_VERSION }}"
                 
           echo "Copying generated HTML assets into staging..."
           cp -r datasketches-memory-java11/target/site/apidocs/* \
             "${STAGE_DIR}/datasketches-memory-java11-${{ env.POM_VERSION }}/"
-          cp -r datasketches-memory-java17_21/target/site/apidocs/* \
-            "${STAGE_DIR}/datasketches-memory-java17_21-${{ env.POM_VERSION }}/"
+          cp -r datasketches-memory-java17_25/target/site/apidocs/* \
+            "${STAGE_DIR}/datasketches-memory-java17_25-${{ env.POM_VERSION }}/"
 
       - name: 7. Upload Generated Javadocs as Workflow Zip Artifact
         uses: actions/upload-artifact@v7

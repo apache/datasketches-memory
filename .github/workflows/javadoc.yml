@@ -69,10 +69,10 @@ jobs:
           echo "Generating Javadoc for Java 11 Module..."
           mvn clean compile javadoc:javadoc -B -pl datasketches-memory-java11
 
-      - name: 5. Compile and Generate Java 17/21 Module Javadoc
+      - name: 5. Compile and Generate Java 17_25 Module Javadoc
         shell: bash
         run: |
-          echo "Generating Javadoc for Java 17/21 Module..."
+          echo "Generating Javadoc for Java 17_25 Module..."
           mvn compile javadoc:javadoc -B -pl datasketches-memory-java17_25
 
       - name: 6. Stage Artifacts for Review

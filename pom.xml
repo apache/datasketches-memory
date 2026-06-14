@@ -362,7 +362,7 @@ under the License.
                    maven-javadoc-plugin and maven-source-plugin with the sole exception of the
                    Automatic-Module-Name, which only belongs here. -->
               <manifestEntries>
-                <Build-Jdk-Spec>${java.specification.version}</Build-Jdk-Spec>
+                <Build-Jdk-Spec>${java.runtime.version}</Build-Jdk-Spec>
                 <Build-OS>${os.name} ${os.arch} ${os.version}</Build-OS>
                 <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
                 <Group-ArtifactId  >${project.groupId}:${project.artifactId}</Group-ArtifactId  >
@@ -397,7 +397,7 @@ under the License.
                    make sure that all of these entries are identical across the maven-jar-plugin,
                    maven-javadoc-plugin and maven-source-plugin. -->
               <manifestEntries>
-                <Build-Jdk-Spec>${java.specification.version}</Build-Jdk-Spec>
+                <Build-Jdk-Spec>${java.runtime.version}</Build-Jdk-Spec>
                 <Build-OS>${os.name} ${os.arch} ${os.version}</Build-OS>
                 <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
                 <Group-ArtifactId  >${project.groupId}:${project.artifactId}</Group-ArtifactId  >
@@ -451,7 +451,7 @@ under the License.
                    make sure that all of these entries are identical across the maven-jar-plugin,
                    maven-javadoc-plugin and maven-source-plugin. -->
               <manifestEntries>
-                <Build-Jdk-Spec>${java.specification.version}</Build-Jdk-Spec>
+                <Build-Jdk-Spec>${java.runtime.version}</Build-Jdk-Spec>
                 <Build-OS>${os.name} ${os.arch} ${os.version}</Build-OS>
                 <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
                 <Group-ArtifactId  >${project.groupId}:${project.artifactId}</Group-ArtifactId  >

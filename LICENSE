@@ -225,7 +225,7 @@ APPENDIX B: Additional licenses relevant to this product:
     Code locations:
     -------------------------------------------------------------
     This product contains a method to create a dummy read-only ByteBuffer using unsafe:
-      * datasketches-memory-java8/src/main/java/org/apache/datasketches/memory/internal/AccessByteBuffer.java,
+      * datasketches-memory-common/src/main/java/org/apache/datasketches/memory/internal/AccessByteBuffer.java,
         Method: getDummyReadOnlyDirectByteBuffer(...)
     and adapted from Java source code located at:
       * src/one/nio/mem/DirectMemory.java,
@@ -242,10 +242,10 @@ APPENDIX B: Additional licenses relevant to this product:
     Code locations:
     -------------------------------------------------------------
     This product contains code to implement and test the xxHash function:
-      * datasketches-memory-java8/src/main/java/org/apache/datasketches/memory/internal/XxHash64.java
-      * datasketches-memory-java8-tests/src/test/java/org/apache/datasketches/memory/test/XxHash64Test.java
+      * datasketches-memory-common/src/main/java/org/apache/datasketches/memory/internal/XxHash64.java
+      * datasketches-memory-common/src/test/java/org/apache/datasketches/memory/internal/XxHash64Test.java
         Method: collisionTest(),
-      * datasketches-memory-java8-tests/src/test/java/org/apache/datasketches/memory/test/XxHash64LoopingTest.java
+      * datasketches-memory-common/src/test/java/org/apache/datasketches/memory/internal/XxHash64LoopingTest.java
         Method: testWithSeed() and HASHES_OF_LOOPING_BYTES_WITH_SEED_42 test data,
     and adapted from Java source code located at:
       * https://github.com/OpenHFT/Zero-Allocation-Hashing
@@ -283,8 +283,8 @@ APPENDIX B: Additional licenses relevant to this product:
     Code locations:
     -------------------------------------------------------------    
     This product contains code for encoding, decoding and testing xxHash:
-      * datasketches-memory-java8/src/main/java/org/apache/datasketches/memory/internal/XxHash64.java
-    and adapted from C++ code located at:
+      * datasketches-memory-common/src/main/java/org/apache/datasketches/memory/internal/XxHash64.java,
+    which has been adapted from C++ code located at:
       * https://github.com/Cyan4973/xxHash/blob/dev/xxhash.c,
       * https://github.com/Cyan4973/xxHash/blob/dev/xxhash.h
 
@@ -295,8 +295,8 @@ APPENDIX B: Additional licenses relevant to this product:
     =============================================================
       This product contains the text of Lincoln's Gettysburg Address, which is in the public domain,
       and is used in various file tests. This file is read-only and tested for its exact character 
-      sequence and cannot be appended with any additional text.
-      * datasketches-memory-java8-tests/src/test/java/org/apache/datasketches/memory/test/AllocateDirectMapMemoryTest.java
-      * datasketches-memory-java8-tests/src/test/java/org/apache/datasketches/memory/test/AllocateDirectWritableMapMemoryTest.java
-      * datasketches-memory-java8-tests/src/test/java/org/apache/datasketches/memory/test/MemoryTest.java
-      * datasketches-memory-java8-tests/src/test/java/org/apache/datasketches/memory/test/UtilTest.java
+      sequence and cannot be appended with any additional text. Approximate locations:
+      * datasketches-memory-java11/src/test/java/org/apache/datasketches/memory/internal/AllocateDirectMapMemoryTest.java
+      * datasketches-memory-java11/src/test/java/org/apache/datasketches/memory/internal/AllocateDirectWritableMapMemoryTest.java
+      * datasketches-memory-java11/src/test/java/org/apache/datasketches/memory/internal/UtilTest.java
+      * datasketches-memory-java11/src/test/java/org/apache/datasketches/memory/internal/ThreadTest.java

@@ -19,7 +19,7 @@ on:
 
 jobs:
   build-and-package-javadoc:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     permissions:
       contents: read
 

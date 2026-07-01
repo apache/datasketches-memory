@@ -14,7 +14,7 @@ on:
 
 jobs:
   assemble-source-candidate:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     permissions:
       contents: read
 

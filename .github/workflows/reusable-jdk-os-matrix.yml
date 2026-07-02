@@ -37,15 +37,13 @@ jobs:
         with:
           name: compiled-jars
 
-      - name: 2. Print Matrix Run Coordinates
+      - name: 2. Print Calling Repo & Branch
         continue-on-error: true
         shell: bash
         run: |
-          echo "=== Matrix Run Coordinates ==="
+          echo "=== Calling Repo & Branch ==="
           echo "Triggered by Repository: ${{ github.repository }}"
           echo "Triggered by Ref/Branch: ${{ github.ref_name }}"
-          echo "Targeting OS: ${{ inputs.os_type }}"
-          echo "Targeting JDK: ${{ inputs.jdk_version }} (${{ inputs.jdk_distribution }}, ${{ inputs.cpu_arch }})"
 
       # Provision ONLY the specific isolated JDK required for this test run
       - name: 3. Provision Target Isolated Execution JDK

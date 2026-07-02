@@ -98,7 +98,7 @@ jobs:
           echo "$HEADER" >> $GITHUB_STEP_SUMMARY
           echo "$SEP" >> $GITHUB_STEP_SUMMARY
 
-         # 2. Determine the status icon dynamically via Bash
+         # Determine the status icon dynamically via Bash
           STATUS_ICON="❌"
           if [ "${{ job.status }}" = "success" ]; then
             STATUS_ICON="✅"
@@ -106,7 +106,7 @@ jobs:
 
           # Append the specific job row
           echo "| ${{ inputs.jdk_version }} \
-                | ${{ inputs.os_type }} \
-                | ${{ inputs.cpu_arch }} \
-                | ${{ inputs.jdk_distribution }} \
-                | $STATUS_ICON |" >> $GITHUB_STEP_SUMMARY
+          | ${{ inputs.os_type }} \
+          | ${{ inputs.cpu_arch }} \
+          | ${{ inputs.jdk_distribution }} \
+          | $STATUS_ICON |" >> $GITHUB_STEP_SUMMARY

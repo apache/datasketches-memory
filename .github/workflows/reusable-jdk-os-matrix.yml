@@ -98,7 +98,7 @@ jobs:
           echo "$HEADER" >> $GITHUB_STEP_SUMMARY
           echo "$SEP" >> $GITHUB_STEP_SUMMARY
 
-         # Determine the status icon dynamically via Bash
+          # Determine the status icon dynamically via Bash
           STATUS_ICON="❌"
           if [ "${{ job.status }}" = "success" ]; then
             STATUS_ICON="✅"

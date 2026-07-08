@@ -80,7 +80,7 @@ jobs:
               -Djvm="$JAVA_EXE" \
               -DargLine="${{ env.JVM_ARGS }}"
           else
-            echo "Testing datasketches-memory-java17_21 jars for JDK version ${{ inputs.jdk_version }}..."
+            echo "Testing datasketches-memory-java17_25 jars for JDK version ${{ inputs.jdk_version }}..."
             mvn surefire:test -B -pl datasketches-memory-java17_25 \
               -Dmaven.test.classpath.useTestJar=true \
               -Djvm="$JAVA_EXE" \

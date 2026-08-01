@@ -28,7 +28,7 @@ jobs:
 
       # 2. Set up the foundational Java runtime environment
       - name: 2. Provision JDK 25 for Build Execution
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v5.6.0
         with:
           java-version: '25'
           distribution: 'temurin'
@@ -128,7 +128,7 @@ jobs:
 
       # 3. Setup Java Toolchain (11, 17, 21, 25)
       - name: Setup Java Toolchains
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v5.6.0
         with:
           java-version: |
             11

@@ -31,7 +31,7 @@ jobs:
           fetch-depth: 0
 
       - name: 2a. Provision JDK 11 Toolchain
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v5.6.0
         with:
          java-version: '11'
          distribution: 'temurin'
@@ -39,7 +39,7 @@ jobs:
          architecture: x64
 
       - name: 2b. Provision JDK 17 Toolchain
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v5.6.0
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -47,7 +47,7 @@ jobs:
           architecture: x64
 
       - name: 2c. Provision JDK 25 (Host Runtime)
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v5.6.0
         with:
           java-version: '25'
           distribution: 'temurin'

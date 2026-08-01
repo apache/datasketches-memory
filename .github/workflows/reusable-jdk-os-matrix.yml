@@ -48,7 +48,7 @@ jobs:
       # Provision ONLY the specific isolated JDK required for this test run
       - name: 3. Provision Target Isolated Execution JDK
         id: target-jdk
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v5.6.0
         with:
           java-version: ${{ inputs.jdk_version }}
           distribution: ${{ inputs.jdk_distribution }}

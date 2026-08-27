@@ -98,10 +98,7 @@ public class UtilitiesForTest {
         // Use REPLACE_EXISTING to avoid "File Already Exists" errors on Windows retries
         Files.copy(in, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
     } catch (final IOException e) { throw new IllegalArgumentException(e); }
-  
-    // Final Windows Fix: Ensure the file is actually writable if you need to setReadOnly later
-    //tempFile.setWritable(true); 
-    
+
     return tempFile;
   }
 
